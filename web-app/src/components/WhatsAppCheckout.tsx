@@ -29,19 +29,16 @@ export default function WhatsAppCheckout() {
   };
 
   return (
-    <div className={isMobile ? "" : "liquid-glass-card checkout-container"} style={{
-      padding: isMobile ? '0' : 'clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 3rem)',
+    <div className="checkout-container" style={{
+      padding: isMobile ? '0' : 'clamp(1.5rem, 5vw, 3rem) 0',
       maxWidth: '1100px',
       margin: '0 auto',
       display: 'flex',
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: isMobile ? '0' : 'clamp(1.5rem, 4vw, 3rem)',
-      alignItems: 'stretch',
-      borderRadius: isMobile ? '0' : '32px',
-      boxShadow: isMobile ? 'none' : '0 20px 60px rgba(0,0,0,0.15)',
-      background: isMobile ? 'transparent' : 'rgba(253, 250, 243, 0.98)',
-      overflow: 'hidden'
+      gap: isMobile ? '2rem' : 'clamp(2rem, 4vw, 4rem)',
+      alignItems: 'center',
+      background: 'transparent',
     }}>
       {/* Product Image — left side */}
       <div style={{ flex: '1 1 380px', minWidth: '250px', position: 'relative' }}>
@@ -80,9 +77,8 @@ export default function WhatsAppCheckout() {
         flexDirection: 'column', 
         gap: '1.5rem', 
         justifyContent: 'center',
-        background: isMobile ? 'rgba(255,255,255,0.95)' : 'transparent',
-        padding: isMobile ? '1.5rem' : '0',
-        borderRadius: isMobile ? '24px' : '0',
+        background: 'transparent',
+        padding: '0',
         position: 'relative',
         zIndex: 2,
       }}>

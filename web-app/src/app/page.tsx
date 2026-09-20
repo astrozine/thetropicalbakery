@@ -70,7 +70,7 @@ export default function Home() {
       />
 
       {/* Checkout Section */}
-      <section id="order" style={{ padding: '6rem 2rem', background: 'repeating-linear-gradient(-45deg, #fdfaf3, #fdfaf3 10px, #ebd9b4 10px, #ebd9b4 14px, #c9a67a 14px, #c9a67a 16px)' }}>
+      <section id="order" style={{ padding: '6rem 2rem', background: '#fdfaf3' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '1100px' }}>
           <ScrollReveal className="text-center">
             <WhatsAppCheckout />
