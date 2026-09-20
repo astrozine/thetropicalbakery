@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CartDrawer() {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
+  const router = useRouter();
   const [customerName, setCustomerName] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [affiliateCode, setAffiliateCode] = useState('');
@@ -164,7 +166,7 @@ export default function CartDrawer() {
                   
                   {/* Add More Items Button */}
                   <button 
-                    onClick={() => setIsCartOpen(false)}
+                    onClick={() => { setIsCartOpen(false); router.push('/menu'); }}
                     style={{ 
                       width: '100%', 
                       padding: '1.2rem', 

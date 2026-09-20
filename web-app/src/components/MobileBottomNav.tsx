@@ -21,9 +21,9 @@ export default function MobileBottomNav() {
 
   const navItems = [
     { name: 'Início', path: '/', icon: '🏠' },
+    { name: 'Cardápio', path: '/menu', icon: '🍰' },
     { name: 'Cursos', path: '/cursos', icon: '🎓' },
     { name: 'Retiros', path: '/retreats', icon: '🌴' },
-    { name: 'Perfil', path: '/login', icon: '👤' },
   ];
 
   return (
