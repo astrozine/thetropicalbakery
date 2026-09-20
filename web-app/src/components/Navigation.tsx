@@ -47,7 +47,7 @@ export default function Navigation() {
   const retreatLangs = [
     { name: '🇧🇷 Português', path: '/retreats' },
     { name: '🇦🇷 Español', path: '/es/retiros' },
-    { name: '🌐 English', path: '/en/retreats' },
+    { name: '✈️ English', path: '/en/retreats' },
   ];
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
