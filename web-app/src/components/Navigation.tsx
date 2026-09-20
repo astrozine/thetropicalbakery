@@ -240,7 +240,7 @@ export default function Navigation() {
         </div>
 
         {/* Mobile Menu Toggle & Cart */}
-        <div className="glass-pill actions-pill mobile-menu-toggle flex md:hidden items-center gap-4">
+        <div className="glass-pill actions-pill mobile-menu-toggle mobile-icons flex items-center gap-4">
           <button 
             onClick={() => setIsCartOpen(true)}
             style={{ 
