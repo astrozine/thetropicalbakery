@@ -13,6 +13,7 @@ const DELIVERY_ZONES = [
 export default function WhatsAppCheckout() {
   const [boxCount, setBoxCount] = useState(1);
   const [fullName, setFullName] = useState('');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
   const [address, setAddress] = useState('');
   const [zoneId, setZoneId] = useState('zone1');
   
@@ -60,8 +61,8 @@ export default function WhatsAppCheckout() {
   };
 
   const handleOrder = async () => {
-    if (!fullName.trim() || !address.trim()) {
-      alert("Por favor, preencha seu nome e o endereço exato.");
+    if (!fullName.trim() || !address.trim() || !whatsappNumber.trim()) {
+      alert("Por favor, preencha todos os campos obrigatórios, incluindo seu WhatsApp.");
       return;
     }
 
@@ -69,15 +70,13 @@ export default function WhatsAppCheckout() {
 
     try {
       // 1. Save to CRM (users table)
-      // Since we don't have auth for checkout, we generate a random password for the NOT NULL constraint
       const randomPassword = Math.random().toString(36).slice(-8);
-      const whatsappNumberFallback = '00' + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
       
-      const { data: user, error: userError } = await supabase
+      const { error: insertError } = await supabase
         .from('users')
         .insert([{
           full_name: fullName,
-          whatsapp_number: whatsappNumberFallback, // We should probably add a field for this, but let's just use a placeholder for now to not overwhelm the form
+          whatsapp_number: whatsappNumber,
           password_hash: randomPassword,
           location: `${address} - ${selectedZone?.label}`,
           is_vegan: isVegan,
@@ -85,13 +84,22 @@ export default function WhatsAppCheckout() {
           is_sugar_free: isSugarFree,
           is_salt_free: isSaltFree,
           is_oil_free: isOilFree,
-        }])
-        .select()
-        .single();
+        }]);
 
-      if (userError) {
-        console.error("CRM Error:", userError);
-        // Continue anyway to WhatsApp so we don't lose the sale
+      if (insertError && insertError.code === '23505') {
+        // If user already exists (unique whatsapp_number), update their details
+        await supabase
+          .from('users')
+          .update({
+            full_name: fullName,
+            location: `${address} - ${selectedZone?.label}`,
+            is_vegan: isVegan,
+            is_gluten_free: isGlutenFree,
+            is_sugar_free: isSugarFree,
+            is_salt_free: isSaltFree,
+            is_oil_free: isOilFree,
+          })
+          .eq('whatsapp_number', whatsappNumber);
       }
 
       // 2. Redirect to WhatsApp
@@ -199,6 +207,15 @@ export default function WhatsAppCheckout() {
             value={fullName}
             onChange={e => setFullName(e.target.value)}
             placeholder="Ex: Maria Silva"
+            style={{ width: '100%', padding: '0.8rem 1rem', fontSize: '1rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)', fontFamily: 'inherit', marginBottom: '0.5rem' }}
+          />
+
+          <label style={{ fontSize: '0.9rem', fontWeight: 600, color: '#594a42' }}>WhatsApp (com DDD):</label>
+          <input 
+            type="text" 
+            value={whatsappNumber}
+            onChange={e => setWhatsappNumber(e.target.value)}
+            placeholder="Ex: 11999999999"
             style={{ width: '100%', padding: '0.8rem 1rem', fontSize: '1rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)', fontFamily: 'inherit' }}
           />
         </div>

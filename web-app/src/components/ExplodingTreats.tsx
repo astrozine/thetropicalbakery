@@ -15,10 +15,10 @@ export default function ExplodingTreats() {
   }, []);
 
   const treats = [
-    { id: '1', src: '/treats/media_1789712796150.jpg', mobile: { x: -80, y: -160, scale: 0.55 }, desktop: { x: -500, y: -150, scale: 1.2 }, rotate: -15 },
-    { id: '2', src: '/treats/media_1789712814475.jpg', mobile: { x: 80, y: -130, scale: 0.6 }, desktop: { x: 550, y: -120, scale: 1.2 }, rotate: 20 },
-    { id: '3', src: '/treats/media_1789712835955.jpg', mobile: { x: -80, y: 100, scale: 0.5 }, desktop: { x: -550, y: 180, scale: 1.2 }, rotate: -25 },
-    { id: '4', src: '/treats/media_1789712972031.jpg', mobile: { x: 80, y: 110, scale: 0.55 }, desktop: { x: 480, y: 200, scale: 1.2 }, rotate: 10 },
+    { id: '1', src: '/treats/media_1789712796150.jpg', mobile: { x: -80, y: -160, scale: 0.55 }, desktop: { x: -350, y: -80, scale: 1.0 }, rotate: -15 },
+    { id: '2', src: '/treats/media_1789712814475.jpg', mobile: { x: 80, y: -130, scale: 0.6 }, desktop: { x: 350, y: -100, scale: 1.0 }, rotate: 20 },
+    { id: '3', src: '/treats/media_1789712835955.jpg', mobile: { x: -80, y: 100, scale: 0.5 }, desktop: { x: -380, y: 120, scale: 1.0 }, rotate: -25 },
+    { id: '4', src: '/treats/media_1789712972031.jpg', mobile: { x: 80, y: 110, scale: 0.55 }, desktop: { x: 330, y: 140, scale: 1.0 }, rotate: 10 },
   ];
 
   if (isMobile) {
@@ -31,7 +31,7 @@ export default function ExplodingTreats() {
           <motion.img
             src="/hero-logo-transparent.png"
             alt="The Tropical Bakery Logo"
-            style={{ width: '95vw', filter: 'drop-shadow(0 0 25px rgba(253,250,243,1))' }}
+            style={{ width: '60vw', maxWidth: '250px', filter: 'drop-shadow(0 0 25px rgba(253,250,243,1))' }}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1 }}
@@ -150,7 +150,7 @@ export default function ExplodingTreats() {
         <motion.img
           src="/hero-logo-transparent.png"
           alt="The Tropical Bakery Logo"
-          style={{ maxWidth: '750px', width: '90%', filter: 'drop-shadow(0 0 30px rgba(253,250,243,0.9))', marginBottom: '2rem' }}
+          style={{ maxWidth: '250px', width: '90%', filter: 'drop-shadow(0 0 30px rgba(253,250,243,0.9))', marginBottom: '1.5rem' }}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1 }}

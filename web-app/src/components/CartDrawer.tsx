@@ -10,6 +10,7 @@ export default function CartDrawer() {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
   const router = useRouter();
   const [customerName, setCustomerName] = useState('');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [affiliateCode, setAffiliateCode] = useState('');
   const [showError, setShowError] = useState(false);
@@ -25,20 +26,20 @@ export default function CartDrawer() {
   };
 
   const handleWhatsAppCheckout = async () => {
-    if (!customerName.trim() || !deliveryAddress.trim()) {
+    if (!customerName.trim() || !deliveryAddress.trim() || !whatsappNumber.trim()) {
       setShowError(true);
       return;
     }
 
     try {
       const randomPassword = Math.random().toString(36).slice(-8);
-      const whatsappNumberFallback = '00' + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
       
-      await supabase
+      // First try to insert
+      const { error: insertError } = await supabase
         .from('users')
         .insert([{
           full_name: customerName,
-          whatsapp_number: whatsappNumberFallback,
+          whatsapp_number: whatsappNumber,
           password_hash: randomPassword,
           location: deliveryAddress,
           is_vegan: isVegan,
@@ -47,6 +48,22 @@ export default function CartDrawer() {
           is_salt_free: isSaltFree,
           is_oil_free: isOilFree,
         }]);
+        
+      if (insertError && insertError.code === '23505') {
+        // If unique constraint violation (user exists), try updating their info
+        await supabase
+          .from('users')
+          .update({
+            full_name: customerName,
+            location: deliveryAddress,
+            is_vegan: isVegan,
+            is_gluten_free: isGlutenFree,
+            is_sugar_free: isSugarFree,
+            is_salt_free: isSaltFree,
+            is_oil_free: isOilFree,
+          })
+          .eq('whatsapp_number', whatsappNumber);
+      }
     } catch (e) {
       console.error("CRM Error:", e);
     }
@@ -236,6 +253,17 @@ export default function CartDrawer() {
                         value={customerName}
                         onChange={e => setCustomerName(e.target.value)}
                         placeholder="Ex: João da Silva"
+                        style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
+                      />
+                    </label>
+
+                    <label style={{ display: 'block', marginBottom: '1rem' }}>
+                      <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.25rem' }}>WhatsApp (com DDD)</span>
+                      <input 
+                        type="text" 
+                        value={whatsappNumber}
+                        onChange={e => setWhatsappNumber(e.target.value)}
+                        placeholder="Ex: 11999999999"
                         style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
                       />
                     </label>
