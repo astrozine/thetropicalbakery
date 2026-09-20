@@ -437,7 +437,7 @@ export default function Navigation() {
               letterSpacing: '2px',
               opacity: 0.6,
             }}>
-              IDIOMA (RETIROS)
+              RETIROS (IDIOMA)
             </div>
             {retreatLangs.map((link) => (
               <Link 
