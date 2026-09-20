@@ -81,7 +81,7 @@ export default function Navigation() {
         </Link>
         
         {/* Desktop Menu & Cart */}
-        <div className="desktop-menu" style={{ display: 'none', alignItems: 'center' }}>
+        <div className="hidden md:flex items-center" style={{ alignItems: 'center' }}>
           {links.map((link) => (
             <Link key={link.path} href={link.path} style={{
               marginLeft: '1.5rem',
@@ -240,7 +240,7 @@ export default function Navigation() {
         </div>
 
         {/* Mobile Menu Toggle & Cart */}
-        <div className="glass-pill actions-pill mobile-menu-toggle mobile-icons flex items-center gap-4">
+        <div className="md:hidden glass-pill actions-pill flex items-center gap-4">
           <button 
             onClick={() => setIsCartOpen(true)}
             style={{ 
@@ -275,24 +275,6 @@ export default function Navigation() {
           </button>
         </div>
       </div>
-
-      {/* Basic inline style to handle media query for desktop menu */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @media (min-width: 768px) {
-          .mobile-icons { display: none !important; }
-          .desktop-menu { display: flex !important; }
-        }
-        @media (max-width: 767px) {
-          .nav-inner {
-            flex-direction: row;
-            justify-content: space-between !important;
-          }
-          .mobile-icons {
-            display: flex;
-            justify-content: flex-end;
-          }
-        }
-      `}} />
     </nav>
       {/* ============ MOBILE FULL-SCREEN MENU ============ */}
       {isOpen && (
