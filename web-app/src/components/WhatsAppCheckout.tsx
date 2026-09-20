@@ -103,7 +103,7 @@ export default function WhatsAppCheckout() {
       }
 
       // 2. Redirect to WhatsApp
-      const whatsappNumber = '5511932119196'; 
+      const storeWhatsappNumber = '5511932119196'; 
       let message = `Olá Tropical Bakery! Gostaria de encomendar ${boxCount} Surprise Treat Box(es).\n\n`;
       message += `*Nome:* ${fullName}\n`;
       message += `*Entrega:* ${selectedZone?.label}\n`;
@@ -125,7 +125,7 @@ export default function WhatsAppCheckout() {
       message += `*Total a pagar:* R$${total},00\n`;
 
       const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      const whatsappUrl = `https://wa.me/${storeWhatsappNumber}?text=${encodedMessage}`;
       window.open(whatsappUrl, '_blank');
       
       // Reset form
