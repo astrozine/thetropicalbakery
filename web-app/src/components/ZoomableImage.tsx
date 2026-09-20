@@ -37,7 +37,7 @@ export default function ZoomableImage({ src, alt, style, className, ...props }: 
             backgroundColor: 'rgba(0, 0, 0, 0.6)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
-            zIndex: 99999,
+            zIndex: 100000,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -68,7 +68,7 @@ export default function ZoomableImage({ src, alt, style, className, ...props }: 
                 alignItems: 'center',
                 justifyContent: 'center',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                zIndex: 100000
+                zIndex: 100001
               }}
             >
               ✕

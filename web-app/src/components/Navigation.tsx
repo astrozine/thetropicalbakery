@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -10,11 +10,28 @@ export default function Navigation() {
   const pathname = usePathname();
   const { totalItems, setIsCartOpen } = useCart();
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  // Close menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  const closeMenu = () => setIsOpen(false);
 
   const links = [
     { name: 'Início', path: '/' },
     { name: 'Cursos', path: '/cursos' },
+    { name: 'Retiros', path: '/retreats' },
+    { name: 'Menu de Eventos', path: '/menu' },
   ];
 
   const b2bLinks = [
@@ -25,6 +42,12 @@ export default function Navigation() {
     { name: 'Padarias', path: '/b2b/bakeries' },
     { name: 'Travel Managers', path: '/b2b/travel-managers' },
     { name: 'Afiliados', path: '/b2b/affiliates' },
+  ];
+
+  const retreatLangs = [
+    { name: '🇧🇷 Português', path: '/retreats' },
+    { name: '🇦🇷 Español', path: '/es/retiros' },
+    { name: '🌐 English', path: '/en/retreats' },
   ];
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -64,22 +87,9 @@ export default function Navigation() {
             }}>
               {link.name}
             </Link>
-
-
           ))}
 
-          <Link href="/menu" className="btn btn-secondary" style={{
-            marginLeft: '1.5rem',
-            padding: '0.4rem 1.2rem',
-            fontSize: '0.85rem',
-            borderRadius: '999px',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}>
-            Menu de Eventos
-          </Link>
-
-          {/* Retreats Dropdown */}
+          {/* Retreats Language Dropdown */}
           <div 
             style={{ position: 'relative', marginLeft: '1.5rem', cursor: 'pointer' }}
             onMouseEnter={() => setIsRetreatsDropdownOpen(true)}
@@ -94,7 +104,7 @@ export default function Navigation() {
               alignItems: 'center',
               gap: '0.5rem'
             }}>
-              Retiros ▾
+              Idioma (Retiros) ▾
             </span>
             {isRetreatsDropdownOpen && (
               <div style={{
@@ -111,15 +121,11 @@ export default function Navigation() {
                 flexDirection: 'column',
                 gap: '0.5rem'
               }}>
-                <Link href="/retreats" style={{ padding: '0.5rem 1.5rem', color: pathname === '/retreats' ? '#d4af37' : '#594a42', textDecoration: 'none', fontWeight: pathname === '/retreats' ? 'bold' : 'normal', fontSize: '0.9rem', textTransform: 'uppercase' }}>
-                  🇧🇷 Português
-                </Link>
-                <Link href="/es/retiros" style={{ padding: '0.5rem 1.5rem', color: pathname === '/es/retiros' ? '#d4af37' : '#594a42', textDecoration: 'none', fontWeight: pathname === '/es/retiros' ? 'bold' : 'normal', fontSize: '0.9rem', textTransform: 'uppercase' }}>
-                  🇦🇷 Español
-                </Link>
-                <Link href="/en/retreats" style={{ padding: '0.5rem 1.5rem', color: pathname === '/en/retreats' ? '#d4af37' : '#594a42', textDecoration: 'none', fontWeight: pathname === '/en/retreats' ? 'bold' : 'normal', fontSize: '0.9rem', textTransform: 'uppercase' }}>
-                  🌐 English
-                </Link>
+                {retreatLangs.map((link) => (
+                  <Link key={link.path} href={link.path} style={{ padding: '0.5rem 1.5rem', color: pathname === link.path ? '#d4af37' : '#594a42', textDecoration: 'none', fontWeight: pathname === link.path ? 'bold' : 'normal', fontSize: '0.9rem', textTransform: 'uppercase' }}>
+                    {link.name}
+                  </Link>
+                ))}
               </div>
             )}
           </div>
@@ -216,81 +222,145 @@ export default function Navigation() {
             )}
           </button>
           
-          <button onClick={toggleMenu} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#3c2a21' }}>
-            ☰
+          <button onClick={() => setIsOpen(!isOpen)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#3c2a21' }}>
+            {isOpen ? '✕' : '☰'}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ============ MOBILE FULL-SCREEN MENU ============ */}
       {isOpen && (
         <div style={{
-          background: 'white',
-          padding: '1rem 2rem',
-          borderTop: '1px solid #eee'
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100vw',
+          height: '100vh',
+          background: '#fdfaf3',
+          zIndex: 99999,
+          display: 'flex',
+          flexDirection: 'column',
         }}>
-          {links.map((link) => (
-            <Link key={link.path} href={link.path} onClick={() => setIsOpen(false)} style={{
-              display: 'block',
-              padding: '0.8rem 0',
-              textDecoration: 'none',
-              color: pathname === link.path ? '#10ac84' : '#636e72',
-              fontWeight: pathname === link.path ? 'bold' : 'normal',
-              borderBottom: '1px solid #f1f2f6'
-            }}>
-              {link.name}
-            </Link>
-          ))}
-          
-          <Link href="/retreats" onClick={() => setIsOpen(false)} style={{
-            display: 'block',
-            padding: '0.8rem 0',
-            textDecoration: 'none',
-            color: pathname === '/retreats' ? '#10ac84' : '#636e72',
-            fontWeight: pathname === '/retreats' ? 'bold' : 'normal',
-            borderBottom: '1px solid #f1f2f6'
+          {/* Menu Header with close button */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '1rem 1.5rem',
+            borderBottom: '1px solid rgba(212,175,55,0.2)',
+            flexShrink: 0,
           }}>
-            Retiros
-          </Link>
+            <Link href="/" onClick={closeMenu} style={{ textDecoration: 'none' }}>
+              <img src="/logo.svg" alt="Logo" style={{ height: '50px' }} />
+            </Link>
+            <button 
+              onClick={closeMenu}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '2rem',
+                cursor: 'pointer',
+                color: '#3c2a21',
+                padding: '0.5rem',
+                lineHeight: 1,
+              }}
+            >
+              ✕
+            </button>
+          </div>
 
-          <Link href="/menu" onClick={() => setIsOpen(false)} style={{
-            display: 'block',
-            padding: '0.8rem 0',
-            textDecoration: 'none',
-            color: '#d4af37',
-            fontWeight: 'bold',
-            borderBottom: '1px solid #f1f2f6'
+          {/* Scrollable menu body */}
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            padding: '1rem 1.5rem 6rem 1.5rem',
           }}>
-            Menu de Eventos
-          </Link>
-          
-          <div style={{ padding: '0.8rem 0', fontWeight: 'bold', color: '#3c2a21', borderBottom: '1px solid #f1f2f6', marginTop: '1rem' }}>
-            PARCEIROS B2B
-          </div>
-          {b2bLinks.map((link) => (
-            <Link key={link.path} href={link.path} onClick={() => setIsOpen(false)} style={{
-              display: 'block',
-              padding: '0.8rem 0 0.8rem 1.5rem',
-              textDecoration: 'none',
-              color: pathname === link.path ? '#10ac84' : '#636e72',
-              borderBottom: '1px solid #f1f2f6'
+            {/* Main Links */}
+            {links.map((link) => (
+              <Link 
+                key={link.path} 
+                href={link.path} 
+                onClick={closeMenu}
+                style={{
+                  display: 'block',
+                  padding: '1rem 0',
+                  textDecoration: 'none',
+                  color: pathname === link.path ? '#d4af37' : '#3c2a21',
+                  fontWeight: pathname === link.path ? 'bold' : '500',
+                  fontSize: '1.2rem',
+                  borderBottom: '1px solid rgba(0,0,0,0.06)',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                {link.name}
+              </Link>
+            ))}
+            
+            {/* B2B Section Header */}
+            <div style={{ 
+              padding: '1.5rem 0 0.5rem 0', 
+              fontWeight: 'bold', 
+              color: '#3c2a21', 
+              fontSize: '0.85rem',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+              opacity: 0.6,
             }}>
-              {link.name}
-            </Link>
-          ))}
-          
-          <div style={{ padding: '0.8rem 0', fontWeight: 'bold', color: '#3c2a21', borderBottom: '1px solid #f1f2f6', marginTop: '1rem' }}>
-            IDIOMA (RETIROS)
+              PARCEIROS B2B
+            </div>
+            {b2bLinks.map((link) => (
+              <Link 
+                key={link.path} 
+                href={link.path} 
+                onClick={closeMenu}
+                style={{
+                  display: 'block',
+                  padding: '0.8rem 0 0.8rem 1rem',
+                  textDecoration: 'none',
+                  color: pathname === link.path ? '#d4af37' : '#594a42',
+                  fontWeight: pathname === link.path ? 'bold' : '400',
+                  fontSize: '1.1rem',
+                  borderBottom: '1px solid rgba(0,0,0,0.04)',
+                }}
+              >
+                {link.name}
+              </Link>
+            ))}
+            
+            {/* Language Section Header */}
+            <div style={{ 
+              padding: '1.5rem 0 0.5rem 0', 
+              fontWeight: 'bold', 
+              color: '#3c2a21', 
+              fontSize: '0.85rem',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+              opacity: 0.6,
+            }}>
+              IDIOMA (RETIROS)
+            </div>
+            {retreatLangs.map((link) => (
+              <Link 
+                key={link.path} 
+                href={link.path} 
+                onClick={closeMenu}
+                style={{
+                  display: 'block',
+                  padding: '0.8rem 0 0.8rem 1rem',
+                  textDecoration: 'none',
+                  color: pathname === link.path ? '#d4af37' : '#594a42',
+                  fontWeight: pathname === link.path ? 'bold' : '400',
+                  fontSize: '1.1rem',
+                  borderBottom: '1px solid rgba(0,0,0,0.04)',
+                }}
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
-          <Link href="/retreats" onClick={() => setIsOpen(false)} style={{ display: 'block', padding: '0.8rem 0', textDecoration: 'none', color: '#636e72', borderBottom: '1px solid #f1f2f6' }}>
-            🇧🇷 Português
-          </Link>
-          <Link href="/es/retiros" onClick={() => setIsOpen(false)} style={{ display: 'block', padding: '0.8rem 0', textDecoration: 'none', color: '#636e72', borderBottom: '1px solid #f1f2f6' }}>
-            🇦🇷 Español
-          </Link>
-          <Link href="/en/retreats" onClick={() => setIsOpen(false)} style={{ display: 'block', padding: '0.8rem 0', textDecoration: 'none', color: '#636e72', borderBottom: '1px solid #f1f2f6' }}>
-            🌐 English
-          </Link>
         </div>
       )}
       
