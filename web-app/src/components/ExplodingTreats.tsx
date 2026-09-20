@@ -31,7 +31,7 @@ export default function ExplodingTreats() {
           <motion.img
             src="/hero-logo-transparent.png"
             alt="The Tropical Bakery Logo"
-            style={{ width: '85vw', maxWidth: '500px', filter: 'drop-shadow(0 0 25px rgba(253,250,243,1))' }}
+            style={{ width: '95vw', filter: 'drop-shadow(0 0 25px rgba(253,250,243,1))' }}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1 }}

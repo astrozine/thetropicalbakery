@@ -13,7 +13,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-background"></div>
-        <div className="container hero-content fade-in" style={{ padding: '4rem 0' }}>
+        <div className="container hero-content fade-in" style={{ padding: '0' }}>
           <ExplodingTreats />
         </div>
       </section>

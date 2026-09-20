@@ -29,9 +29,14 @@ export default function Navigation() {
 
   const links = [
     { name: 'Início', path: '/' },
-    { name: 'Cursos', path: '/cursos' },
-    { name: 'Retiros', path: '/retreats' },
     { name: 'Menu de Eventos', path: '/menu' },
+  ];
+
+  const cursosLinks = [
+    { name: 'Todos os Cursos', path: '/cursos' },
+    { name: 'Turismo Gastronômico', path: '/cursos/turismo-gastronomico' },
+    { name: 'Capacitação Profissional', path: '/cursos/capacitacao-profissional' },
+    { name: 'Saúde e Bem-Estar', path: '/cursos/saude-bem-estar' },
   ];
 
   const b2bLinks = [
@@ -52,6 +57,7 @@ export default function Navigation() {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isRetreatsDropdownOpen, setIsRetreatsDropdownOpen] = useState(false);
+  const [isCursosDropdownOpen, setIsCursosDropdownOpen] = useState(false);
 
   return (
     <>
@@ -89,6 +95,47 @@ export default function Navigation() {
               {link.name}
             </Link>
           ))}
+
+          {/* Cursos Dropdown */}
+          <div 
+            style={{ position: 'relative', marginLeft: '1.5rem', cursor: 'pointer' }}
+            onMouseEnter={() => setIsCursosDropdownOpen(true)}
+            onMouseLeave={() => setIsCursosDropdownOpen(false)}
+          >
+            <span style={{
+              color: '#3c2a21',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              Cursos ▾
+            </span>
+            {isCursosDropdownOpen && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                background: 'rgba(253,250,243,0.95)',
+                backdropFilter: 'blur(10px)',
+                minWidth: '200px',
+                padding: '1rem 0',
+                borderRadius: '8px',
+                boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem'
+              }}>
+                {cursosLinks.map((link) => (
+                  <Link key={link.path} href={link.path} style={{ padding: '0.5rem 1.5rem', color: pathname === link.path ? '#d4af37' : '#594a42', textDecoration: 'none', fontWeight: pathname === link.path ? 'bold' : 'normal', fontSize: '0.9rem', textTransform: 'uppercase' }}>
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Retreats Language Dropdown */}
           <div 
@@ -312,6 +359,37 @@ export default function Navigation() {
                   fontSize: '1.2rem',
                   borderBottom: '1px solid rgba(0,0,0,0.06)',
                   letterSpacing: '0.5px',
+                }}
+              >
+                {link.name}
+              </Link>
+            ))}
+            
+            {/* Cursos Section Header */}
+            <div style={{ 
+              padding: '1.5rem 0 0.5rem 0', 
+              fontWeight: 'bold', 
+              color: '#3c2a21', 
+              fontSize: '0.85rem',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+              opacity: 0.6,
+            }}>
+              CURSOS
+            </div>
+            {cursosLinks.map((link) => (
+              <Link 
+                key={link.path} 
+                href={link.path} 
+                onClick={closeMenu}
+                style={{
+                  display: 'block',
+                  padding: '0.8rem 0 0.8rem 1rem',
+                  textDecoration: 'none',
+                  color: pathname === link.path ? '#d4af37' : '#594a42',
+                  fontWeight: pathname === link.path ? 'bold' : '400',
+                  fontSize: '1.1rem',
+                  borderBottom: '1px solid rgba(0,0,0,0.04)',
                 }}
               >
                 {link.name}
