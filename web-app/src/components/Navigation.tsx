@@ -105,7 +105,7 @@ export default function Navigation() {
               alignItems: 'center',
               gap: '0.5rem'
             }}>
-              Idioma (Retiros) ▾
+              Retiros (Idioma) ▾
             </span>
             {isRetreatsDropdownOpen && (
               <div style={{
