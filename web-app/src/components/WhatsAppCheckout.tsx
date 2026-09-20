@@ -71,7 +71,7 @@ export default function WhatsAppCheckout() {
       // 1. Save to CRM (users table)
       // Since we don't have auth for checkout, we generate a random password for the NOT NULL constraint
       const randomPassword = Math.random().toString(36).slice(-8);
-      const whatsappNumberFallback = '00000000000'; // We'll just put a placeholder or ask for it in the future, wait let's ask for WhatsApp
+      const whatsappNumberFallback = '00' + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
       
       const { data: user, error: userError } = await supabase
         .from('users')

@@ -32,7 +32,7 @@ export default function CartDrawer() {
 
     try {
       const randomPassword = Math.random().toString(36).slice(-8);
-      const whatsappNumberFallback = '00000000000';
+      const whatsappNumberFallback = '00' + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
       
       await supabase
         .from('users')
