@@ -24,14 +24,14 @@ export default function ExplodingTreats() {
   if (isMobile) {
     // Mobile: Native App Home Screen Experience
     return (
-      <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '2vh', paddingBottom: '2rem' }}>
+      <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '0', paddingBottom: '1rem' }}>
         
         {/* Center Content — Logo */}
-        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '90%', marginBottom: '1rem', textAlign: 'center' }}>
+        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginBottom: '1rem', textAlign: 'center' }}>
           <motion.img
             src="/hero-logo-transparent.png"
             alt="The Tropical Bakery Logo"
-            style={{ width: '100%', maxWidth: '600px', filter: 'drop-shadow(0 0 25px rgba(253,250,243,1))' }}
+            style={{ width: '85vw', maxWidth: '500px', filter: 'drop-shadow(0 0 25px rgba(253,250,243,1))' }}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1 }}

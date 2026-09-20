@@ -181,6 +181,14 @@ a {
   padding: 4rem 2rem;
 }
 
+@media (max-width: 767px) {
+  .hero-section {
+    align-items: flex-start;
+    padding-top: 5rem;
+    min-height: auto;
+  }
+}
+
 .hero-background {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
