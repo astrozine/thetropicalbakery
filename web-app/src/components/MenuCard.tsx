@@ -10,6 +10,8 @@ interface MenuCardProps {
     price: string;
     image: string;
     description: string;
+    min_batch_size?: number;
+    batch_multiplier?: number;
   };
 }
 
@@ -41,6 +43,12 @@ export default function MenuCard({ item }: MenuCardProps) {
         <p style={{ color: '#594a42', fontSize: '0.95rem', lineHeight: '1.5', flexGrow: 1 }}>
           {item.description}
         </p>
+        {(item.min_batch_size && item.min_batch_size > 1) ? (
+          <div style={{ fontSize: '0.85rem', color: '#7f8c8d', background: '#f8f9fa', padding: '0.5rem', borderRadius: '4px', marginTop: '0.5rem' }}>
+            <div><strong>Min:</strong> {item.min_batch_size} un.</div>
+            <div><strong>Lote:</strong> múltiplos de {item.batch_multiplier}</div>
+          </div>
+        ) : null}
         <div style={{ marginTop: '1.5rem', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 600, color: '#3c2a21' }}>R$ {item.price}</span>
           <button 

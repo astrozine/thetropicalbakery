@@ -82,8 +82,9 @@ export default function ExplodingTreats() {
         {/* Fixed Pinned CTA Action Area */}
         <div style={{ width: '90%', marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
            <div style={{ background: 'rgba(253,250,243,0.7)', padding: '0.75rem', borderRadius: '12px', backdropFilter: 'blur(10px)', textAlign: 'center' }}>
-            <p style={{ color: '#3c2a21', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', fontSize: '0.7rem', margin: 0 }}>
-              Surprise Treat Boxes · 100% Vegano
+            <p style={{ color: '#3c2a21', fontWeight: 600, fontSize: '0.8rem', margin: 0, lineHeight: '1.4' }}>
+              VEGANOS VINDO PRA ITAMAMBUCA!<br/>
+              <span style={{ fontSize: '0.7rem', fontWeight: 400 }}>Sem Açúcar, Sal, Glúten ou Processados.</span>
             </p>
           </div>
           <a href="#order" className="btn btn-primary" style={{ padding: '1rem', fontSize: '1.1rem', pointerEvents: 'auto', width: '100%', textAlign: 'center', borderRadius: '999px', boxShadow: '0 10px 20px rgba(212,175,55,0.3)' }}>
@@ -154,8 +155,12 @@ export default function ExplodingTreats() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1 }}
         />
-        <p className="hero-subtitle text-center" style={{ color: '#3c2a21', fontWeight: '400', letterSpacing: '2px', textTransform: 'uppercase', fontSize: '0.9rem', maxWidth: '600px', marginBottom: '2rem' }}>
-          Surprise Treat Boxes • Sem Açúcar, Sal ou Óleo • 100% Vegano • Sem Glúten
+        <h2 className="text-center" style={{ color: '#3c2a21', fontWeight: 'bold', fontSize: '1.4rem', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
+          VEGANOS VINDO PRA ITAMAMBUCA, NÃO PERCA A OPORTUNIDADE!
+        </h2>
+        <p className="hero-subtitle text-center" style={{ color: '#3c2a21', fontWeight: '400', fontSize: '1.1rem', maxWidth: '700px', marginBottom: '2rem', lineHeight: '1.6' }}>
+          Hospedado em <strong>Itamambuca</strong>, <strong>Ubatuba</strong> ou arredores? Aproveite nossas deliciosas criações tropicais.<br/>
+          <strong>100% Livres de Açúcar Refinado, Sal, Glúten e Produtos Processados!</strong>
         </p>
         <a href="#order" className="btn btn-primary pointer-events-auto" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', pointerEvents: 'auto' }}>Garanta a Sua Caixa</a>
       </div>

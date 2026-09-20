@@ -5,9 +5,23 @@ import ScrollReveal from '@/components/ScrollReveal';
 import ExplodingTreats from '@/components/ExplodingTreats';
 import ZoomableImage from '@/components/ZoomableImage';
 import ModalCard from '@/components/ModalCard';
+import { supabase } from '@/lib/supabase';
 
+export default async function Home() {
+  
+  // Fetch dynamic content from site_content
+  const { data: contentData } = await supabase.from('site_content').select('*');
+  
+  const getContent = (sectionId: string, fallbackUrl: string) => {
+    const item = contentData?.find(c => c.section_id === sectionId);
+    return item?.image_url || fallbackUrl;
+  };
 
-export default function Home() {
+  const getText = (sectionId: string, fallbackText: string) => {
+    const item = contentData?.find(c => c.section_id === sectionId);
+    return item?.text_content || fallbackText;
+  };
+
   return (
     <main>
       {/* Hero Section */}
@@ -18,7 +32,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Marquee text="100% VEGAN ✦ GLUTEN-FREE ✦ SOS-FREE ✦ THE TROPICAL BAKERY ✦" />
+      <Marquee text="100% VEGAN ✦ GLUTEN-FREE ✦ SOS-FREE ✦ THE TROPICAL BAKERY ✦ ITAMAMBUCA ✦" />
 
       {/* About Section */}
       <section className="container" style={{ padding: '12rem 2rem', position: 'relative' }}>
@@ -26,38 +40,41 @@ export default function Home() {
           <div style={{ flex: '1 1 500px', textAlign: 'left' }}>
             <ScrollReveal className="liquid-glass-card">
               <div style={{ padding: '4rem 3rem' }}>
-              <h2 className="text-primary" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', marginBottom: '2rem', fontFamily: 'var(--font-heading)' }}>Nossa Filosofia</h2>
-              <p style={{ fontSize: '1.2rem', marginBottom: '3rem', color: '#594a42', lineHeight: '1.8' }}>
-                Na The Tropical Bakery, acreditamos que a indulgência não precisa comprometer a saúde. 
-                Nossas <strong>Surprise Treat Boxes</strong> são criadas para serem <strong>SOS-Free</strong> (sem adição de sal, óleo ou açúcar refinado), 
-                <strong> 100% Veganas</strong> e <strong>Sem Glúten</strong>. 
-                Focamos em criações tropicais densas em nutrientes, vibrantes e deliciosas.
+              <h2 className="text-primary" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', marginBottom: '2rem', fontFamily: 'var(--font-heading)' }}>
+                Nossa Filosofia
+              </h2>
+              <p style={{ fontSize: '1.2rem', marginBottom: '3rem', color: '#594a42', lineHeight: '1.8', whiteSpace: 'pre-line' }}>
+                {getText('home-about', `Na The Tropical Bakery, acreditamos que a indulgência não precisa comprometer a saúde.\n\nNossas Surprise Treat Boxes são criadas para serem SOS-Free (sem adição de sal, óleo ou açúcar refinado), 100% Veganas e Sem Glúten. Focamos em criações tropicais densas em nutrientes, vibrantes e deliciosas para quem vive ou visita Itamambuca e Ubatuba.`)}
               </p>
               
               <div className="features-grid" style={{ gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-            <div className="feature-item">
-              <div className="feature-icon" style={{ color: '#d4af37' }}>🌿</div>
-              <h3 className="feature-title">Vegano & Natural</h3>
-              <p style={{ color: '#7a6a61' }}>Ingredientes puros, sem concessões.</p>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon" style={{ color: '#d4af37' }}>🌾</div>
-              <h3 className="feature-title">Sem Glúten</h3>
-              <p style={{ color: '#7a6a61' }}>Seguro e delicioso para todos.</p>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon" style={{ color: '#d4af37' }}>🎁</div>
-              <h3 className="feature-title">Surpresa Semanal</h3>
-              <p style={{ color: '#7a6a61' }}>Uma nova seleção exclusiva a cada semana!</p>
+                <div className="feature-item">
+                  <div className="feature-icon" style={{ color: '#d4af37' }}>🌿</div>
+                  <h3 className="feature-title">Vegano & Natural</h3>
+                  <p style={{ color: '#7a6a61' }}>Ingredientes puros, sem concessões.</p>
+                </div>
+                <div className="feature-item">
+                  <div className="feature-icon" style={{ color: '#d4af37' }}>🌾</div>
+                  <h3 className="feature-title">Sem Glúten</h3>
+                  <p style={{ color: '#7a6a61' }}>Seguro e delicioso para todos.</p>
+                </div>
+                <div className="feature-item">
+                  <div className="feature-icon" style={{ color: '#d4af37' }}>🎁</div>
+                  <h3 className="feature-title">Surpresa Semanal</h3>
+                  <p style={{ color: '#7a6a61' }}>Entregue fresquinho em Itamambuca!</p>
+                </div>
               </div>
-            </div>
             </div>
             </ScrollReveal>
           </div>
 
           <div style={{ flex: '1 1 400px', display: 'flex', justifyContent: 'center' }}>
             <ScrollReveal>
-              <ZoomableImage src="/menu-items/1000240473 - Edited (1).jpg" alt="Mousse Tropical" style={{ width: '100%', maxWidth: '500px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', objectFit: 'cover', aspectRatio: '4/5' }} />
+              <ZoomableImage 
+                src={getContent('home-about', "/menu-items/1000240473 - Edited (1).jpg")} 
+                alt="Filosofia Tropical" 
+                style={{ width: '100%', maxWidth: '500px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', objectFit: 'cover', aspectRatio: '4/5' }} 
+              />
             </ScrollReveal>
           </div>
         </div>
@@ -66,7 +83,7 @@ export default function Home() {
       {/* Parallax Banner 1 */}
       <section 
         className="parallax-banner" 
-        style={{ backgroundImage: 'url(/iphone_nano_banana.jpg)' }} 
+        style={{ backgroundImage: `url(${getContent('home-parallax-1', '/iphone_nano_banana.jpg')})` }} 
       />
 
       {/* Checkout Section */}
@@ -81,7 +98,7 @@ export default function Home() {
       {/* Parallax Banner 2 */}
       <section 
         className="parallax-banner" 
-        style={{ backgroundImage: 'url(/iphone_passion_fruit.jpg)' }} 
+        style={{ backgroundImage: `url(${getContent('home-parallax-2', '/iphone_passion_fruit.jpg')})` }} 
       />
 
       {/* Menu/Inspiration Section */}

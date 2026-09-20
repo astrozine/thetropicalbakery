@@ -8,6 +8,8 @@ export interface CartItem {
   price: string;
   image: string;
   quantity: number;
+  min_batch_size?: number;
+  batch_multiplier?: number;
 }
 
 interface CartContextType {
@@ -49,9 +51,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems(current => {
       const existing = current.find(i => i.id === newItem.id);
       if (existing) {
-        return current.map(i => i.id === newItem.id ? { ...i, quantity: i.quantity + 1 } : i);
+        const batch = existing.batch_multiplier || 1;
+        return current.map(i => i.id === newItem.id ? { ...i, quantity: i.quantity + batch } : i);
       }
-      return [...current, { ...newItem, quantity: 1 }];
+      const minBatch = newItem.min_batch_size || 1;
+      return [...current, { ...newItem, quantity: minBatch }];
     });
     setIsCartOpen(true); // Auto-open cart when adding
   };
@@ -65,7 +69,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeFromCart(id);
       return;
     }
-    setItems(current => current.map(i => i.id === id ? { ...i, quantity } : i));
+    
+    // We enforce the min_batch_size locally in the component or here.
+    // If we do it here, we need the item to check min_batch_size.
+    setItems(current => {
+      const item = current.find(i => i.id === id);
+      if (!item) return current;
+      if (quantity < (item.min_batch_size || 1)) {
+        return current; // Do nothing if trying to go below minimum
+      }
+      return current.map(i => i.id === id ? { ...i, quantity } : i);
+    });
   };
 
   const clearCart = () => {

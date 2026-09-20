@@ -154,9 +154,9 @@ export default function CartDrawer() {
                         <p style={{ color: '#d4af37', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem' }}>{item.price}</p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', background: 'white', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', padding: '0.2rem' }}>
-                            <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ padding: '0.4rem 0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.4rem' }}>-</button>
+                            <button onClick={() => updateQuantity(item.id, item.quantity - (item.batch_multiplier || 1))} style={{ padding: '0.4rem 0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.4rem' }}>-</button>
                             <span style={{ padding: '0 0.8rem', minWidth: '2rem', textAlign: 'center', fontSize: '1.2rem', fontWeight: 'bold' }}>{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ padding: '0.4rem 0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.4rem' }}>+</button>
+                            <button onClick={() => updateQuantity(item.id, item.quantity + (item.batch_multiplier || 1))} style={{ padding: '0.4rem 0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.4rem' }}>+</button>
                           </div>
                           <button onClick={() => removeFromCart(item.id)} style={{ color: '#e74c3c', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', textDecoration: 'underline' }}>Remover</button>
                         </div>

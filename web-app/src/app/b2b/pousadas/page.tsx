@@ -12,10 +12,12 @@ export default function PousadasPage() {
           </div>
           
           <div style={{ flex: '1 1 400px' }}>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)' }}>Seja um Parceiro: Pousadas</h1>
+            <h1 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)' }}>POUSADAS DE UBATUBA E REGIÃO</h1>
             <p style={{ fontSize: '1.2rem', lineHeight: '1.8', color: '#594a42', marginBottom: '2rem' }}>
-              Encante seus hóspedes com uma experiência de café da manhã inesquecível. Oferecemos opções de alta qualidade,
-              100% Veganas e Sem Glúten, perfeitas para pousadas que desejam se destacar.
+              Receba algo especial para seus hóspedes! Encante com uma experiência de café da manhã inesquecível e inclusiva.
+              Oferecemos opções de alta qualidade, 100% Veganas, Sem Glúten e SOS-Free (livre de açúcar refinado, sal e produtos processados).
+              <br/><br/>
+              <strong>Atendemos toda a região:</strong> Itamambuca, Ubatuba, praias vizinhas e eventos em Paraty.
             </p>
             
             <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#d4af37' }}>Por Que Nos Escolher?</h3>

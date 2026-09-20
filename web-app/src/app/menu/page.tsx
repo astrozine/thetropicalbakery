@@ -1,16 +1,40 @@
-import React from 'react';
-import menuItems from '@/data/menu.json';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import ScrollReveal from '@/components/ScrollReveal';
 import MenuCard from '@/components/MenuCard';
 import SquiggleArrows from '@/components/SquiggleArrows';
 
-export const metadata = {
-  title: 'Menu de Eventos e Caixas Surpresa | The Tropical Bakery',
-  description: 'Veja as nossas criações passadas e encomende os seus doces favoritos para o seu próximo evento.',
-};
+interface Treat {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image_url: string;
+  min_batch_size: number;
+  batch_multiplier: number;
+}
 
 export default function MenuPage() {
-  const WHATSAPP_NUMBER = "5511932119196";
+  const [menuItems, setMenuItems] = useState<Treat[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const { data, error } = await supabase
+        .from('treats')
+        .select('*')
+        .eq('is_available', true)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setMenuItems(data);
+      }
+      setLoading(false);
+    };
+    fetchMenu();
+  }, []);
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--color-background)', paddingBottom: '6rem' }}>
@@ -43,7 +67,7 @@ export default function MenuPage() {
           </h1>
           <p style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.8)', maxWidth: '700px', margin: '0 auto 2.5rem', lineHeight: '1.8' }}>
             Toda semana, nossa fundadora cria uma nova <strong>Caixa Surpresa de Degustação</strong> com 4 doces exclusivos por R$ 99,00. 
-            Abaixo, você pode explorar nosso portfólio de criações passadas e encomendá-las em maiores quantidades para o seu próximo evento especial.
+            Abaixo, você pode explorar nosso portfólio de criações passadas e encomendá-las em maiores quantidades para o seu próximo evento especial em Itamambuca ou região.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', position: 'relative' }}>
             <div style={{ position: 'relative' }}>
@@ -68,23 +92,33 @@ export default function MenuPage() {
             Portfólio de Eventos
           </h2>
           <p style={{ fontSize: '1.1rem', color: '#594a42', maxWidth: '600px', margin: '0 auto' }}>
-            Planejando um aniversário, casamento ou encontro corporativo? Encomende qualquer um dos nossos luxuosos doces 100% Veganos, Sem Glúten e SOS-Free.
-            <br/><br/>
-            <strong>Pedido Mínimo Aplicável. Valor Base: R$ 28,00 / unidade.</strong>
+            Planejando um aniversário, casamento ou encontro corporativo na nossa região? Encomende qualquer um dos nossos luxuosos doces 100% Veganos, Sem Glúten e SOS-Free (livres de açúcar refinado e sal).
           </p>
         </div>
 
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-          gap: '2rem' 
-        }}>
-          {menuItems.map((item, idx) => (
-            <ScrollReveal key={idx}>
-              <MenuCard item={item} />
-            </ScrollReveal>
-          ))}
-        </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#7f8c8d' }}>Carregando doces maravilhosos...</div>
+        ) : (
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+            gap: '2rem' 
+          }}>
+            {menuItems.map((item, idx) => (
+              <ScrollReveal key={idx}>
+                <MenuCard item={{
+                  id: item.id,
+                  name: item.name,
+                  description: item.description,
+                  price: item.price.toFixed(2).replace('.', ','),
+                  image: item.image_url,
+                  min_batch_size: item.min_batch_size,
+                  batch_multiplier: item.batch_multiplier
+                }} />
+              </ScrollReveal>
+            ))}
+          </div>
+        )}
       </section>
 
     </main>
