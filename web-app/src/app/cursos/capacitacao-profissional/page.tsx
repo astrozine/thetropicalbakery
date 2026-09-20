@@ -38,8 +38,8 @@ export default function CapacitacaoProfissionalPage() {
       </section>
 
       {/* Content Section */}
-      <section className="container py-16 px-4 max-w-4xl mx-auto">
-        <p style={{ fontSize: '1.25rem', lineHeight: '1.9', color: '#594a42', marginBottom: '2.5rem' }}>
+      <section className="container pt-24 pb-16 px-4 max-w-4xl mx-auto">
+        <p style={{ marginTop: '1.5rem', fontSize: '1.25rem', lineHeight: '1.9', color: '#594a42', marginBottom: '2.5rem' }}>
           Cursos contínuos e semanais focados em treinar cozinheiros particulares locais (patrocinados por seus empregadores) para elevarem o nível da alimentação no dia a dia.
         </p>
         <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 3rem', color: 'var(--color-primary)' }}>
@@ -47,7 +47,7 @@ export default function CapacitacaoProfissionalPage() {
           <BulletItem>Planejamento de cardápios semanais SOS-Free</BulletItem>
           <BulletItem>Substituições inteligentes e saborosas</BulletItem>
         </ul>
-        <div className="text-center mb-12">
+        <div className="text-center mb-24">
           <a href={getWhatsAppLink('Capacitação Profissional para Cozinheiros')} target="_blank" rel="noopener noreferrer" className="btn btn-primary px-8 py-4 text-lg">
             Matricular Funcionário
           </a>

@@ -39,8 +39,8 @@ export default function SaudeBemEstarPage() {
       </section>
 
       {/* Content Section */}
-      <section className="container py-16 px-4 max-w-4xl mx-auto">
-        <p style={{ fontSize: '1.25rem', lineHeight: '1.9', color: '#594a42', marginBottom: '2.5rem' }}>
+      <section className="container pt-24 pb-16 px-4 max-w-4xl mx-auto">
+        <p style={{ marginTop: '1.5rem', fontSize: '1.25rem', lineHeight: '1.9', color: '#594a42', marginBottom: '2.5rem' }}>
           Entenda a lógica por trás de cada ingrediente. Este curso é ideal para donas de casa ou pessoas com questões específicas de saúde que buscam uma transição suave e deliciosa para o veganismo e a alimentação curativa.
         </p>
         <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 3rem', color: 'var(--color-primary)' }}>
@@ -48,7 +48,7 @@ export default function SaudeBemEstarPage() {
           <BulletItem>Receitas curativas e regenerativas</BulletItem>
           <BulletItem>Como criar pratos que a família toda vai amar</BulletItem>
         </ul>
-        <div className="text-center mb-12">
+        <div className="text-center mb-24">
           <a href={getWhatsAppLink('Curso de Saúde e Bem-Estar')} target="_blank" rel="noopener noreferrer" className="btn btn-primary px-8 py-4 text-lg">
             Começar Minha Jornada
           </a>
