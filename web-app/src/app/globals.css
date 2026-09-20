@@ -1,0 +1,451 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Didot Title';
+  src: url('/fonts/Didot-Title.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Didot';
+  src: url('/fonts/Didot.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Didot';
+  src: url('/fonts/Didot-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Didot-Italic';
+  src: url('/fonts/Didot-Italic.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'BodoniXT';
+  src: url('/fonts/BodoniXT.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --color-primary: #3c2a21; /* Deep Cocoa Brown */
+  --color-secondary: #d4af37; /* Gold Foil */
+  --color-accent: #2e4432; /* Rich Tropical Green */
+  --color-background: #fdfaf3; /* Textured Vintage Cream */
+  --color-text: #2f221a; /* Dark Earth */
+  --color-white: #ffffff;
+  
+  --font-heading: 'BodoniXT', 'Didot Title', 'Bodoni MT', 'Times New Roman', serif;
+  --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  
+  --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-subtle: none;
+  --shadow-hover: 0 10px 30px -10px rgba(60, 42, 33, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.8;
+  font-weight: 500;
+  font-size: 1.05rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Utilities */
+.container {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+}
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+@media (min-width: 769px) {
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+}
+
+.text-center { text-align: center; }
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+
+.fade-in {
+  animation: fadeIn 1s var(--transition-smooth) forwards;
+}
+
+/* Glassmorphism Card (Updated to Glam Flat) */
+.glass-card {
+  background: var(--color-background);
+  border: 1px solid var(--color-secondary);
+  border-radius: 0px;
+  padding: clamp(1.5rem, 6vw, 4rem);
+  transition: var(--transition-smooth);
+}
+
+.glass-card:hover {
+  border-color: var(--color-primary);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 3rem;
+  border-radius: 0px;
+  font-weight: 400;
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-primary:hover {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+/* Layout Blocks */
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 4rem 2rem;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    #fdfaf3,
+    #fdfaf3 10px,
+    #ebd9b4 10px,
+    #ebd9b4 14px,
+    #c9a67a 14px,
+    #c9a67a 16px
+  );
+  opacity: 0.3;
+  z-index: -1;
+}
+
+.hero-content {
+  text-align: center;
+  max-width: 800px;
+  z-index: 1;
+}
+
+.hero-title {
+  font-size: clamp(4rem, 10vw, 7rem);
+  color: var(--color-primary);
+  margin-bottom: 1.5rem;
+  line-height: 1;
+}
+
+.hero-subtitle {
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  color: var(--color-text);
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+}
+
+/* Features grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 4rem;
+}
+
+.feature-item {
+  text-align: center;
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  color: var(--color-secondary);
+  margin-bottom: 1rem;
+}
+
+.feature-title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Menu Section */
+.menu-section {
+  padding: 8rem 0;
+  background-color: var(--color-white);
+}
+
+.section-title {
+  text-align: center;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: var(--color-primary);
+  margin-bottom: 4rem;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
+}
+
+.menu-card {
+  position: relative;
+  border-radius: 0px;
+  overflow: hidden;
+  box-shadow: none;
+  transition: var(--transition-smooth);
+  background: var(--color-background);
+  border: 1px solid var(--color-secondary);
+}
+
+.menu-card:hover {
+  border-color: var(--color-primary);
+}
+
+.menu-image {
+  width: 100%;
+  height: 400px;
+  background-color: #eee;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.menu-card:hover .menu-image {
+  transform: scale(1.02);
+}
+
+.menu-content {
+  padding: 2rem;
+}
+
+.menu-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+}
+
+.menu-desc {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  border-radius: 0px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-right: 0.5rem;
+}
+
+/* Footer */
+.footer {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  padding: 4rem 0 2rem;
+  text-align: center;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: var(--color-white);
+  font-size: 1.5rem;
+  margin: 1rem 0;
+  transition: var(--transition-smooth);
+}
+
+.social-link:hover {
+  background: var(--color-secondary);
+  transform: translateY(-5px);
+}
+
+/* Marquee */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  background-color: var(--color-primary);
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--color-secondary);
+  border-bottom: 1px solid var(--color-secondary);
+}
+
+.marquee-content {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 30s linear infinite;
+}
+
+.marquee-text {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  color: var(--color-secondary);
+  padding-right: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+@keyframes marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+/* Parallax Banner */
+.parallax-banner {
+  width: 100%;
+  height: 60vh;
+  min-height: 400px;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-top: 1px solid var(--color-secondary);
+  border-bottom: 1px solid var(--color-secondary);
+}
+
+/* Liquid Glass UI */
+.liquid-glass-card {
+  position: relative;
+  background: rgba(253, 250, 243, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 30px 60px -15px rgba(60, 42, 33, 0.1), 0 10px 20px -5px rgba(60, 42, 33, 0.05);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.liquid-glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.08%22/%3E%3C/svg%3E");
+}
+
+/* --- App-Like Mobile Architecture --- */
+
+@media (max-width: 768px) {
+  /* 1. Header Redesign */
+  .mobile-header-nav {
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    pointer-events: none; /* Let clicks pass through transparent areas */
+  }
+
+  .mobile-header-inner {
+    padding: 1rem 1rem !important;
+  }
+
+  .glass-pill {
+    background: rgba(253,250,243,0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 4px 15px rgba(60, 42, 33, 0.1);
+    pointer-events: auto; /* Re-enable clicks for the pills */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-pill {
+    padding: 0.5rem 1.5rem;
+  }
+
+  .actions-pill {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 767px) { .desktop-only { display: none !important; } }
+@media (min-width: 768px) { .mobile-only { display: none !important; } }
+.course-section { padding: 7rem 0; }
+@media (max-width: 767px) { .course-section { padding: 1rem 0; } }

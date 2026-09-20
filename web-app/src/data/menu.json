@@ -1,0 +1,163 @@
+[
+  {
+    "id": "1",
+    "image": "/menu-items/1000215018.jpg",
+    "name": "Torta Tropical de Maracujá",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "2",
+    "image": "/menu-items/1000231026_3b42196b4ea44c55b3834d9f1bf36302-2_17_2026, 8_48_32 AM.png",
+    "name": "Bolo Rústico de Cacau",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "3",
+    "image": "/menu-items/1000234513 - Edited.jpg",
+    "name": "Docinho de Coco Queimado",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "4",
+    "image": "/menu-items/1000240473 - Edited (1).jpg",
+    "name": "Mini Bundt Cake de Limão",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "5",
+    "image": "/menu-items/20250823_121752.jpg",
+    "name": "Delícia de Abacaxi",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "6",
+    "image": "/menu-items/20250823_122444.jpg",
+    "name": "Trufa de Cacau Amazônico",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "7",
+    "image": "/menu-items/20250907_143728.jpg",
+    "name": "Brownie Fit com Nozes",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "8",
+    "image": "/menu-items/20250914_132214.jpg",
+    "name": "Cookies Rústicos de Aveia",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "9",
+    "image": "/menu-items/20251201_133121.jpg",
+    "name": "Bolo Gelado de Coco",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "10",
+    "image": "/menu-items/20260208_082125_0000.png",
+    "name": "Pudim Vegano de Baunilha",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "11",
+    "image": "/menu-items/20260209_172647.jpg",
+    "name": "Doce de Cupuaçu",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "12",
+    "image": "/menu-items/20260620_163438.jpg",
+    "name": "Torta de Limão Siciliano",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "13",
+    "image": "/menu-items/20260724_154636.jpg",
+    "name": "Cestinha Crocante com Creme",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "14",
+    "image": "/menu-items/Screenshot_20260221_093613_Photos.jpg",
+    "name": "Bolo Mesclado Tropical",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "15",
+    "image": "/menu-items/Screenshot_20260401_193246_Edits.jpg",
+    "name": "Torta de Maçã com Especiarias",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "16",
+    "image": "/menu-items/Screenshot_20260412_123155_Edits.jpg",
+    "name": "Mousse Leve de Manga",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "17",
+    "image": "/menu-items/Screenshot_20260415_110305_Gallery.jpg",
+    "name": "Rocambole Sem Glúten",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "18",
+    "image": "/menu-items/Screenshot_20260513_114809_Edits.jpg",
+    "name": "Sonho Tropical Assado",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "19",
+    "image": "/menu-items/Screenshot_20260518_122444_Gallery.jpg",
+    "name": "Barrinha Energética de Nuts",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "20",
+    "image": "/menu-items/Screenshot_20260623_080155_Gallery.jpg",
+    "name": "Macaron Tropical",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "21",
+    "image": "/menu-items/Screenshot_20260708_144013_Gallery.jpg",
+    "name": "Bolo de Cenoura Fit",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "22",
+    "image": "/menu-items/Screenshot_20260810_135948_Photos.jpg",
+    "name": "Tartelete de Chocolate Branco",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  },
+  {
+    "id": "23",
+    "image": "/menu-items/Screenshot_20260818_075043_Gallery.jpg",
+    "name": "Bolo Red Velvet Natural",
+    "price": "28,00",
+    "description": "Deliciosa criação da Tropical Bakery, perfeita para adoçar seu evento."
+  }
+]
