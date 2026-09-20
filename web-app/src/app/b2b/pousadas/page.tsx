@@ -8,7 +8,7 @@ export default function PousadasPage() {
       <div className="container" style={{ padding: '6rem 2rem' }}>
         <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }}>
-            <ZoomableImage src="/assets/glamorous_pousada_1789884603550.jpg" alt="Pousada" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)' }} />
+            <ZoomableImage src="/menu-items/Screenshot_20260708_144013_Gallery.jpg" alt="Pousada" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)' }} />
           </div>
           
           <div style={{ flex: '1 1 400px' }}>

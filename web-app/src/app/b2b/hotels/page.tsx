@@ -8,7 +8,7 @@ export default function HotelsPage() {
       <div className="container" style={{ padding: '6rem 2rem' }}>
         <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }}>
-            <ZoomableImage src="/assets/fancy_tropical_hotel_1789884614328.jpg" alt="Hotel" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)' }} />
+            <ZoomableImage src="/assets/realistic_hotel.jpg" alt="Hotel" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)' }} />
           </div>
           
           <div style={{ flex: '1 1 400px' }}>
