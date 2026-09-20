@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 export default function WhatsAppCheckout() {
   const [boxCount, setBoxCount] = useState(1);
+  const [address, setAddress] = useState('');
   const [affiliateCode, setAffiliateCode] = useState('');
   const [isMobile, setIsMobile] = useState(false);
   const pricePerBox = 99;
@@ -20,6 +21,9 @@ export default function WhatsAppCheckout() {
 
   const handleOrder = () => {
     let message = `Hello Tropical Bakery! I'd like to order ${boxCount} Surprise Treat Box(es) for a total of R$${total}.`;
+    if (address.trim()) {
+      message += `\nDelivery Address: ${address.trim()}`;
+    }
     if (affiliateCode.trim()) {
       message += `\nAffiliate Code: ${affiliateCode.trim()}`;
     }
@@ -100,6 +104,17 @@ export default function WhatsAppCheckout() {
               style={{ width: '45px', height: '45px', borderRadius: '25px', border: 'none', background: '#d4af37', color: '#fff', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.5rem', boxShadow: '0 4px 10px rgba(212, 175, 55, 0.3)', transition: 'all 0.2s' }}
             >+</button>
           </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: '#fdfaf3', padding: '1rem', borderRadius: '20px', border: '1px solid #e8e1d7' }}>
+          <label style={{ fontSize: '1rem', fontWeight: 600, color: '#594a42' }}>Endereço de Entrega:</label>
+          <input 
+            type="text" 
+            value={address}
+            onChange={e => setAddress(e.target.value)}
+            placeholder="Ex: Rua das Flores, 123 - Centro"
+            style={{ width: '100%', padding: '0.8rem 1rem', fontSize: '1rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)', fontFamily: 'inherit' }}
+          />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: '#fdfaf3', padding: '1rem', borderRadius: '20px', border: '1px solid #e8e1d7' }}>

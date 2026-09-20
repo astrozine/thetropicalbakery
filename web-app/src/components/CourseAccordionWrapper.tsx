@@ -59,7 +59,7 @@ export default function CourseAccordionWrapper({
       </button>
       
       {isOpen && (
-        <div style={{ padding: '0 1.5rem 1.5rem 1.5rem', borderTop: '1px solid rgba(0,0,0,0.05)', marginTop: '0.5rem', paddingTop: '1.5rem' }}>
+        <div className="mobile-accordion-content" style={{ padding: '0 1.5rem 1.5rem 1.5rem', borderTop: '1px solid rgba(0,0,0,0.05)', marginTop: '0.5rem', paddingTop: '1.5rem' }}>
           {children}
         </div>
       )}

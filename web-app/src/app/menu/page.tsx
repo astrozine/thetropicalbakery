@@ -18,7 +18,7 @@ export default function MenuPage() {
       {/* Header Section */}
       <section style={{ 
         position: 'relative',
-        padding: 'clamp(4rem, 8vw, 8rem) 2rem', 
+        padding: 'clamp(6rem, 8vw, 8rem) 1rem clamp(2rem, 5vw, 4rem) 1rem', 
         textAlign: 'center',
         color: '#fdfaf3',
         overflow: 'hidden'
@@ -49,9 +49,7 @@ export default function MenuPage() {
             <div style={{ position: 'relative' }}>
               <SquiggleArrows />
               <a 
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Olá! Gostaria de reservar a Caixa Surpresa de Degustação desta semana.')}`}
-                target="_blank" 
-                rel="noopener noreferrer" 
+                href="/#order"
                 className="btn btn-secondary" 
                 style={{ padding: '1rem 2rem', position: 'relative', zIndex: 11 }}
               >
