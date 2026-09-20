@@ -48,7 +48,7 @@ export default function SaudeBemEstarPage() {
           <BulletItem>Receitas curativas e regenerativas</BulletItem>
           <BulletItem>Como criar pratos que a família toda vai amar</BulletItem>
         </ul>
-        <div className="text-center mb-24">
+        <div className="text-center" style={{ marginBottom: '4rem' }}>
           <a href={getWhatsAppLink('Curso de Saúde e Bem-Estar')} target="_blank" rel="noopener noreferrer" className="btn btn-primary px-8 py-4 text-lg">
             Começar Minha Jornada
           </a>

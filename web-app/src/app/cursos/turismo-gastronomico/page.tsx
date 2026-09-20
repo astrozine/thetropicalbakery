@@ -48,7 +48,7 @@ export default function TurismoGastronomicoPage() {
           <BulletItem>Degustação exclusiva incluída</BulletItem>
           <BulletItem>Leve para casa as receitas criadas</BulletItem>
         </ul>
-        <div className="text-center mb-24">
+        <div className="text-center" style={{ marginBottom: '4rem' }}>
           <a href={getWhatsAppLink('Turismo Gastronômico (1 Dia)')} target="_blank" rel="noopener noreferrer" className="btn btn-primary px-8 py-4 text-lg">
             Agendar Minha Experiência
           </a>

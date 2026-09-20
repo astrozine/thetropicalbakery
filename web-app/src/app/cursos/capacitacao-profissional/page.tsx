@@ -47,7 +47,7 @@ export default function CapacitacaoProfissionalPage() {
           <BulletItem>Planejamento de cardápios semanais SOS-Free</BulletItem>
           <BulletItem>Substituições inteligentes e saborosas</BulletItem>
         </ul>
-        <div className="text-center mb-24">
+        <div className="text-center" style={{ marginBottom: '4rem' }}>
           <a href={getWhatsAppLink('Capacitação Profissional para Cozinheiros')} target="_blank" rel="noopener noreferrer" className="btn btn-primary px-8 py-4 text-lg">
             Matricular Funcionário
           </a>
