@@ -13,22 +13,61 @@ export default function CartDrawer() {
   const [affiliateCode, setAffiliateCode] = useState('');
   const [showError, setShowError] = useState(false);
 
+  const [isVegan, setIsVegan] = useState(false);
+  const [isGlutenFree, setIsGlutenFree] = useState(false);
+  const [isSugarFree, setIsSugarFree] = useState(false);
+  const [isSaltFree, setIsSaltFree] = useState(false);
+  const [isOilFree, setIsOilFree] = useState(false);
+
   const formatPrice = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
 
-  const handleWhatsAppCheckout = () => {
+  const handleWhatsAppCheckout = async () => {
     if (!customerName.trim() || !deliveryAddress.trim()) {
       setShowError(true);
       return;
     }
 
+    try {
+      const randomPassword = Math.random().toString(36).slice(-8);
+      const whatsappNumberFallback = '00000000000';
+      
+      await supabase
+        .from('users')
+        .insert([{
+          full_name: customerName,
+          whatsapp_number: whatsappNumberFallback,
+          password_hash: randomPassword,
+          location: deliveryAddress,
+          is_vegan: isVegan,
+          is_gluten_free: isGlutenFree,
+          is_sugar_free: isSugarFree,
+          is_salt_free: isSaltFree,
+          is_oil_free: isOilFree,
+        }]);
+    } catch (e) {
+      console.error("CRM Error:", e);
+    }
+
     const orderLines = items.map(item => `*${item.quantity}x* ${item.name} (${item.price})`);
     
-    const message = `*NOVO PEDIDO - THE TROPICAL BAKERY* 🌴🥐\n\n` +
+    const restrictions = [];
+    if (isVegan) restrictions.push('Vegano');
+    if (isGlutenFree) restrictions.push('Sem Glúten');
+    if (isSugarFree) restrictions.push('Sem Açúcar');
+    if (isSaltFree) restrictions.push('Sem Sal (SOS-Free)');
+    if (isOilFree) restrictions.push('Sem Óleo (SOS-Free)');
+
+    let message = `*NOVO PEDIDO - THE TROPICAL BAKERY* 🌴🥐\n\n` +
       `*Cliente:* ${customerName}\n` +
-      `*Endereço:* ${deliveryAddress}\n\n` +
-      `*Itens do Pedido:*\n` +
+      `*Endereço:* ${deliveryAddress}\n\n`;
+
+    if (restrictions.length > 0) {
+      message += `*Restrições Alimentares:* ${restrictions.join(', ')}\n\n`;
+    }
+
+    message += `*Itens do Pedido:*\n` +
       orderLines.join('\n') + `\n\n` +
       (affiliateCode.trim() ? `*Código de Afiliado:* ${affiliateCode}\n\n` : '') +
       `*Total:* ${formatPrice(totalPrice)}\n\n` +
@@ -36,10 +75,6 @@ export default function CartDrawer() {
 
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/5511932119196?text=${encodedMessage}`, '_blank');
-    
-    // Optional: Clear cart after sending to WhatsApp
-    // clearCart();
-    // setIsCartOpen(false);
   };
 
   return (
@@ -225,6 +260,28 @@ export default function CartDrawer() {
                         style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit', textTransform: 'uppercase' }}
                       />
                     </label>
+                  </div>
+
+                  {/* Dietary Restrictions */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'white', padding: '1rem', borderRadius: '12px', border: '1px solid #e8e1d7', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+                    <label style={{ fontSize: '1rem', fontFamily: 'var(--font-heading)', color: '#3c2a21' }}>Restrições Alimentares</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginTop: '0.5rem' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={isVegan} onChange={e => setIsVegan(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> Vegano
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={isGlutenFree} onChange={e => setIsGlutenFree(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> Sem Glúten
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={isSugarFree} onChange={e => setIsSugarFree(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> Sem Açúcar
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={isSaltFree} onChange={e => setIsSaltFree(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> SOS-Free (Sem Sal)
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer', gridColumn: '1 / -1' }}>
+                        <input type="checkbox" checked={isOilFree} onChange={e => setIsOilFree(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> SOS-Free (Sem Óleo)
+                      </label>
+                    </div>
                   </div>
 
                   {/* PIX Payment Section */}
