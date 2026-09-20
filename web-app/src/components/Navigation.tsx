@@ -54,10 +54,11 @@ export default function Navigation() {
   const [isRetreatsDropdownOpen, setIsRetreatsDropdownOpen] = useState(false);
 
   return (
-    <nav className="mobile-header-nav" style={{
-      position: 'fixed',
-      top: 0,
-      width: '100%',
+    <>
+      <nav className="mobile-header-nav" style={{
+        position: 'fixed',
+        top: 0,
+        width: '100%',
       zIndex: 1000,
       background: 'rgba(253,250,243,0.9)',
       backdropFilter: 'blur(10px)',
@@ -228,6 +229,24 @@ export default function Navigation() {
         </div>
       </div>
 
+      {/* Basic inline style to handle media query for desktop menu */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @media (min-width: 768px) {
+          .mobile-icons { display: none !important; }
+          .desktop-menu { display: flex !important; }
+        }
+        @media (max-width: 767px) {
+          .nav-inner {
+            flex-direction: row;
+            justify-content: space-between !important;
+          }
+          .mobile-icons {
+            display: flex;
+            justify-content: flex-end;
+          }
+        }
+      `}} />
+    </nav>
       {/* ============ MOBILE FULL-SCREEN MENU ============ */}
       {isOpen && (
         <div style={{
@@ -363,24 +382,6 @@ export default function Navigation() {
           </div>
         </div>
       )}
-      
-      {/* Basic inline style to handle media query for desktop menu */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @media (min-width: 768px) {
-          .mobile-icons { display: none !important; }
-          .desktop-menu { display: flex !important; }
-        }
-        @media (max-width: 767px) {
-          .nav-inner {
-            flex-direction: row;
-            justify-content: space-between !important;
-          }
-          .mobile-icons {
-            display: flex;
-            justify-content: flex-end;
-          }
-        }
-      `}} />
-    </nav>
+    </>
   );
 }
