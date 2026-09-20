@@ -88,7 +88,6 @@ export default function CursosPage() {
                   ))}
                 </div>
               </div>
-            </div>
             </CourseAccordionWrapper>
           </ScrollReveal>
         </div>
@@ -197,7 +196,6 @@ export default function CursosPage() {
                   ))}
                 </div>
               </div>
-            </div>
             </CourseAccordionWrapper>
           </ScrollReveal>
         </div>

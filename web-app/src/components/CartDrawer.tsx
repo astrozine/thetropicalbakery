@@ -8,6 +8,7 @@ export default function CartDrawer() {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
   const [customerName, setCustomerName] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [affiliateCode, setAffiliateCode] = useState('');
   const [showError, setShowError] = useState(false);
 
   const formatPrice = (value: number) => {
@@ -27,6 +28,7 @@ export default function CartDrawer() {
       `*Endereço:* ${deliveryAddress}\n\n` +
       `*Itens do Pedido:*\n` +
       orderLines.join('\n') + `\n\n` +
+      (affiliateCode.trim() ? `*Código de Afiliado:* ${affiliateCode}\n\n` : '') +
       `*Total:* ${formatPrice(totalPrice)}\n\n` +
       `_O pagamento via PIX já foi realizado e o comprovante será enviado em seguida!_`;
 
@@ -208,6 +210,17 @@ export default function CartDrawer() {
                         placeholder="Ex: Rua das Flores, 123 - Centro"
                         rows={3}
                         style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit', resize: 'none' }}
+                      />
+                    </label>
+
+                    <label style={{ display: 'block', marginBottom: '1rem' }}>
+                      <span style={{ display: 'block', fontSize: '1rem', fontWeight: 600, color: '#594a42', marginBottom: '0.5rem' }}>Código de Afiliado (Opcional)</span>
+                      <input 
+                        type="text" 
+                        value={affiliateCode}
+                        onChange={e => setAffiliateCode(e.target.value)}
+                        placeholder="Ex: TROPICAL10"
+                        style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit', textTransform: 'uppercase' }}
                       />
                     </label>
                   </div>
