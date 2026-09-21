@@ -6,13 +6,13 @@ import ExplodingTreats from '@/components/ExplodingTreats';
 import ZoomableImage from '@/components/ZoomableImage';
 import ModalCard from '@/components/ModalCard';
 import { supabase } from '@/lib/supabase';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 
 export const revalidate = 0; // Ensures fresh data is fetched for the homepage
 
-export default async function Home({ params }: { params: { locale: string } }) {
-  const { locale } = params;
-  const t = await getTranslations({ locale, namespace: 'Index' });
+export default async function Home() {
+  const locale = await getLocale();
+  const t = await getTranslations('Index');
   
   // Fetch dynamic content from site_content
   let { data: contentData } = await supabase.from('site_content').select('*').eq('locale', locale);
