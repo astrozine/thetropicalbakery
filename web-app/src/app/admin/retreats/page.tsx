@@ -1,0 +1,161 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import ZoomableImage from '@/components/ZoomableImage';
+
+interface RetreatRoom {
+  id: string;
+  name: string;
+  image_url: string;
+}
+
+export default function AdminRetreatsPage() {
+  const [rooms, setRooms] = useState<RetreatRoom[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<string | null>(null); // track saving state by room id
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  useEffect(() => {
+    fetchRooms();
+  }, []);
+
+  const fetchRooms = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('retreat_rooms')
+      .select('*')
+      .order('id');
+    
+    if (error) {
+      console.error('Error fetching rooms:', error);
+      setMessage({ type: 'error', text: 'Erro ao carregar os dados das suítes.' });
+    } else {
+      setRooms(data || []);
+    }
+    setLoading(false);
+  };
+
+  const handleUpdateImage = async (roomId: string, newImageUrl: string) => {
+    setSaving(roomId);
+    setMessage(null);
+
+    const { error } = await supabase
+      .from('retreat_rooms')
+      .update({ image_url: newImageUrl, updated_at: new Date().toISOString() })
+      .eq('id', roomId);
+
+    if (error) {
+      console.error('Error updating image:', error);
+      setMessage({ type: 'error', text: `Erro ao atualizar a imagem de ${roomId}` });
+    } else {
+      setMessage({ type: 'success', text: 'Imagem atualizada com sucesso!' });
+      // Update local state
+      setRooms(rooms.map(r => r.id === roomId ? { ...r, image_url: newImageUrl } : r));
+    }
+    
+    setSaving(null);
+    
+    // Clear message after 3 seconds
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  if (loading) {
+    return <div className="p-8 text-center text-[#594a42]">Carregando suítes...</div>;
+  }
+
+  return (
+    <div className="fade-in" style={{ maxWidth: '1000px', margin: '0 auto', color: '#3c2a21' }}>
+      <h1 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: '#d4af37' }}>
+        Gerenciar Imagens dos Retiros
+      </h1>
+      <p style={{ fontSize: '1.1rem', color: '#594a42', marginBottom: '2rem' }}>
+        Cole o link (URL) da nova imagem para atualizar as fotos das suítes na página de Retiros.
+      </p>
+
+      {message && (
+        <div style={{
+          padding: '1rem',
+          borderRadius: '8px',
+          marginBottom: '2rem',
+          background: message.type === 'success' ? '#e8f5e9' : '#ffebee',
+          color: message.type === 'success' ? '#2e7d32' : '#c62828',
+          border: `1px solid ${message.type === 'success' ? '#a5d6a7' : '#ef9a9a'}`
+        }}>
+          {message.text}
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gap: '2rem' }}>
+        {rooms.map((room) => (
+          <div key={room.id} className="liquid-glass-card" style={{ padding: '2rem', display: 'flex', gap: '2rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            
+            <div style={{ flex: '1 1 300px' }}>
+              <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: '#3c2a21', marginBottom: '1rem' }}>
+                {room.name}
+              </h3>
+              
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#594a42', marginBottom: '0.5rem' }}>
+                  URL da Imagem:
+                </label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input 
+                    type="url" 
+                    defaultValue={room.image_url}
+                    id={`input-${room.id}`}
+                    style={{
+                      flex: 1,
+                      padding: '0.75rem',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(212,175,55,0.4)',
+                      background: 'white',
+                      fontSize: '1rem',
+                      color: '#594a42'
+                    }}
+                  />
+                  <button 
+                    onClick={() => {
+                      const input = document.getElementById(`input-${room.id}`) as HTMLInputElement;
+                      if (input && input.value !== room.image_url) {
+                        handleUpdateImage(room.id, input.value);
+                      }
+                    }}
+                    disabled={saving === room.id}
+                    className="btn btn-secondary"
+                    style={{ padding: '0.75rem 1.5rem', whiteSpace: 'nowrap' }}
+                  >
+                    {saving === room.id ? 'Salvando...' : 'Salvar'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ width: '300px', flexShrink: 0 }}>
+              <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#594a42', marginBottom: '0.5rem' }}>
+                Pré-visualização Atual:
+              </label>
+              <div style={{ width: '100%', height: '200px', border: '1px solid rgba(212,175,55,0.3)', borderRadius: '8px', overflow: 'hidden' }}>
+                <img 
+                  src={room.image_url} 
+                  alt={room.name} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/retreats/Room with open ripada door.jpg';
+                  }}
+                />
+              </div>
+            </div>
+
+          </div>
+        ))}
+
+        {rooms.length === 0 && !loading && (
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#594a42' }}>
+            Nenhuma suíte encontrada. Por favor, execute o script SQL no Supabase.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

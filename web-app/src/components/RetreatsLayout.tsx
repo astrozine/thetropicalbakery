@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
+import { supabase } from '@/lib/supabase';
 
 export interface RetreatsLayoutProps {
   texts: {
@@ -44,6 +45,25 @@ export interface RetreatsLayoutProps {
 export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInterest, setSelectedInterest] = useState('');
+  const [roomImages, setRoomImages] = useState<{ [key: string]: string }>({
+    penthouse: '/retreats/Room with open ripada door.jpg',
+    big_suite: '/retreats/Room with open ripada door other angle.webp',
+    small_suite: '/retreats/Room shot with view on window and plants.webp'
+  });
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const { data } = await supabase.from('retreat_rooms').select('id, image_url');
+      if (data) {
+        const newImages = { ...roomImages };
+        data.forEach(room => {
+          if (room.image_url) newImages[room.id] = room.image_url;
+        });
+        setRoomImages(newImages);
+      }
+    };
+    fetchImages();
+  }, []);
   
   const WHATSAPP_NUMBER = "5511932119196";
   const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texts.whatsappMessage)}`;
@@ -233,7 +253,7 @@ export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
                 transition: 'transform 0.3s, box-shadow 0.3s',
               }}>
                 <div style={{ position: 'relative' }}>
-                  <ZoomableImage src="/retreats/Room with open ripada door.jpg" alt="Penthouse" style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }} />
+                  <ZoomableImage src={roomImages.penthouse} alt="Penthouse" style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }} />
                   <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: '#d4af37', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>
                     {texts.suites.penthouse.capacity}
                   </div>
@@ -261,7 +281,7 @@ export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
                 transition: 'transform 0.3s, box-shadow 0.3s',
               }}>
                 <div style={{ position: 'relative' }}>
-                  <ZoomableImage src="/retreats/Room with open ripada door other angle.webp" alt="Big Suite" style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }} />
+                  <ZoomableImage src={roomImages.big_suite} alt="Big Suite" style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }} />
                   <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: '#d4af37', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>
                     {texts.suites.bigSuite.capacity}
                   </div>
@@ -289,7 +309,7 @@ export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
                 transition: 'transform 0.3s, box-shadow 0.3s',
               }}>
                 <div style={{ position: 'relative' }}>
-                  <ZoomableImage src="/retreats/Room shot with view on window and plants.webp" alt="Standard Suite" style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }} />
+                  <ZoomableImage src={roomImages.small_suite} alt="Standard Suite" style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }} />
                   <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: '#d4af37', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>
                     {texts.suites.smallSuite.capacity}
                   </div>
