@@ -32,26 +32,41 @@ export default function SaudeBemEstarPage() {
           <span className="text-secondary tracking-[4px] uppercase text-sm md:text-base mb-4 block font-semibold">
             Para Donas de Casa & Foco em Saúde
           </span>
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-8" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
             Saúde, Sabores e Bem-Estar
           </h1>
+          <a href={getWhatsAppLink('Curso de Saúde e Bem-Estar')} target="_blank" rel="noopener noreferrer" className="btn btn-secondary px-8 py-4 text-lg inline-block">
+            Começar Minha Jornada
+          </a>
         </div>
       </section>
 
       {/* Content Section */}
-      <section className="container pt-24 pb-16 px-4 max-w-4xl mx-auto">
-        <p style={{ marginTop: '1.5rem', fontSize: '1.25rem', lineHeight: '1.9', color: '#594a42', marginBottom: '2.5rem' }}>
-          Entenda a lógica por trás de cada ingrediente. Este curso é ideal para donas de casa ou pessoas com questões específicas de saúde que buscam uma transição suave e deliciosa para o veganismo e a alimentação curativa.
-        </p>
-        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 3rem', color: 'var(--color-primary)' }}>
-          <BulletItem>A ciência da nutrição integral</BulletItem>
-          <BulletItem>Receitas curativas e regenerativas</BulletItem>
-          <BulletItem>Como criar pratos que a família toda vai amar</BulletItem>
-        </ul>
-        <div className="text-center" style={{ marginBottom: '4rem' }}>
-          <a href={getWhatsAppLink('Curso de Saúde e Bem-Estar')} target="_blank" rel="noopener noreferrer" className="btn btn-primary px-8 py-4 text-lg">
-            Começar Minha Jornada
-          </a>
+      <section className="container pt-24 pb-16 px-4 max-w-6xl mx-auto">
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4rem', marginBottom: '4rem' }}>
+          <div style={{ flex: '1 1 380px', minWidth: '280px' }}>
+            <div
+              style={{
+                width: '100%',
+                aspectRatio: '4/5',
+                backgroundImage: 'url(/dolly-course3.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                borderRadius: '12px',
+                border: '1px solid var(--color-secondary)'
+              }}
+            />
+          </div>
+          <div style={{ flex: '1 1 380px', minWidth: '280px' }}>
+            <p style={{ fontSize: '1.25rem', lineHeight: '1.9', color: '#594a42', marginBottom: '2.5rem' }}>
+              Entenda a lógica por trás de cada ingrediente. Este curso é ideal para donas de casa ou pessoas com questões específicas de saúde que buscam uma transição suave e deliciosa para o veganismo e a alimentação curativa.
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 3rem', color: 'var(--color-primary)' }}>
+              <BulletItem>A ciência da nutrição integral</BulletItem>
+              <BulletItem>Receitas curativas e regenerativas</BulletItem>
+              <BulletItem>Como criar pratos que a família toda vai amar</BulletItem>
+            </ul>
+          </div>
         </div>
         
         {/* Images Grid */}

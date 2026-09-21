@@ -32,26 +32,41 @@ export default function TurismoGastronomicoPage() {
           <span className="text-secondary tracking-[4px] uppercase text-sm md:text-base mb-4 block font-semibold">
             Para Iniciantes & Entusiastas
           </span>
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-8" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
             Turismo Gastronômico
           </h1>
+          <a href={getWhatsAppLink('Turismo Gastronômico (1 Dia)')} target="_blank" rel="noopener noreferrer" className="btn btn-secondary px-8 py-4 text-lg inline-block">
+            Agendar Minha Experiência
+          </a>
         </div>
       </section>
 
       {/* Content Section */}
-      <section className="container pt-24 pb-16 px-4 max-w-4xl mx-auto">
-        <p style={{ marginTop: '1.5rem', fontSize: '1.25rem', lineHeight: '1.9', color: '#594a42', marginBottom: '2.5rem' }}>
-          Uma experiência imersiva de 1 dia na The Tropical Bakery. Aprenda os segredos da confeitaria vegana tropical em um ambiente prático e descontraído, perfeito para quem está de férias em Ubatuba.
-        </p>
-        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 3rem', color: 'var(--color-primary)' }}>
-          <BulletItem>Imersão rápida e prática</BulletItem>
-          <BulletItem>Degustação exclusiva incluída</BulletItem>
-          <BulletItem>Leve para casa as receitas criadas</BulletItem>
-        </ul>
-        <div className="text-center" style={{ marginBottom: '4rem' }}>
-          <a href={getWhatsAppLink('Turismo Gastronômico (1 Dia)')} target="_blank" rel="noopener noreferrer" className="btn btn-primary px-8 py-4 text-lg">
-            Agendar Minha Experiência
-          </a>
+      <section className="container pt-24 pb-16 px-4 max-w-6xl mx-auto">
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4rem', marginBottom: '4rem' }}>
+          <div style={{ flex: '1 1 380px', minWidth: '280px' }}>
+            <div
+              style={{
+                width: '100%',
+                aspectRatio: '4/5',
+                backgroundImage: 'url(/assets/surfers_retreat_treats_1789884582282.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                borderRadius: '12px',
+                border: '1px solid var(--color-secondary)'
+              }}
+            />
+          </div>
+          <div style={{ flex: '1 1 380px', minWidth: '280px' }}>
+            <p style={{ fontSize: '1.25rem', lineHeight: '1.9', color: '#594a42', marginBottom: '2.5rem' }}>
+              Uma experiência imersiva de 1 dia na The Tropical Bakery. Aprenda os segredos da confeitaria vegana tropical em um ambiente prático e descontraído, perfeito para quem está de férias em Ubatuba.
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 3rem', color: 'var(--color-primary)' }}>
+              <BulletItem>Imersão rápida e prática</BulletItem>
+              <BulletItem>Degustação exclusiva incluída</BulletItem>
+              <BulletItem>Leve para casa as receitas criadas</BulletItem>
+            </ul>
+          </div>
         </div>
         
         {/* Images Grid */}
