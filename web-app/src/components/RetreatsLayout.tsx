@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';

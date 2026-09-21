@@ -49,19 +49,14 @@ Deno.serve(async (req) => {
       const record = payload.record
       customerPhone = record.customer_whatsapp
       
-      messageBody = `Olá ${record.customer_name}! 🌴 Que alegria ter você com a gente.\n\n` +
-                    `Recebemos seu interesse no ${record.interest_type}: *${record.specific_interest}* para a data ${new Date(record.requested_date).toLocaleDateString('pt-BR')}.\n\n` +
-                    `Nossa equipe em Itamambuca está verificando a disponibilidade e te chamará aqui em breve para fechar os detalhes! 🌺`
+      messageBody = `Your appointment is coming up on ${new Date(record.requested_date).toLocaleDateString('pt-BR')} at The Tropical Bakery`
     } 
     // 2. Handle Orders (e.g. Caixa de Degustação)
     else if (payload.table === 'orders') {
       const record = payload.record
       customerPhone = record.customer_whatsapp
-      const totalFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(record.total_price)
       
-      messageBody = `Yay! 🧁 ${record.customer_name}, seu pedido foi recebido com sucesso!\n\n` +
-                    `O valor total é *${totalFormatted}*.\n\n` +
-                    `Por favor, envie o comprovante do PIX por aqui para confirmarmos a produção da sua encomenda. The Tropical Bakery agradece! 🌴`
+      messageBody = `Your order ${record.id || 'Nova Encomenda'} is confirmed.`
     } else {
       return new Response(JSON.stringify({ message: 'Ignored: Table not supported' }), {
         status: 200,
