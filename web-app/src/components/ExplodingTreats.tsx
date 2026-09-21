@@ -15,10 +15,10 @@ export default function ExplodingTreats() {
   }, []);
 
   const treats = [
-    { id: '1', src: '/treats/media_1789712796150.jpg', mobile: { x: -80, y: -160, scale: 0.55 }, desktop: { x: -350, y: -80, scale: 1.0 }, rotate: -15 },
-    { id: '2', src: '/treats/media_1789712814475.jpg', mobile: { x: 80, y: -130, scale: 0.6 }, desktop: { x: 350, y: -100, scale: 1.0 }, rotate: 20 },
-    { id: '3', src: '/treats/media_1789712835955.jpg', mobile: { x: -80, y: 100, scale: 0.5 }, desktop: { x: -380, y: 120, scale: 1.0 }, rotate: -25 },
-    { id: '4', src: '/treats/media_1789712972031.jpg', mobile: { x: 80, y: 110, scale: 0.55 }, desktop: { x: 330, y: 140, scale: 1.0 }, rotate: 10 },
+    { id: '1', src: '/treats/media_1789712796150.jpg', mobile: { x: -80, y: -160, scale: 0.55 }, desktop: { x: -280, y: -150, scale: 1.0 }, rotate: -15 },
+    { id: '2', src: '/treats/media_1789712814475.jpg', mobile: { x: 80, y: -130, scale: 0.6 }, desktop: { x: 280, y: -130, scale: 1.0 }, rotate: 20 },
+    { id: '3', src: '/treats/media_1789712835955.jpg', mobile: { x: -80, y: 100, scale: 0.5 }, desktop: { x: -300, y: 0, scale: 1.0 }, rotate: -25 },
+    { id: '4', src: '/treats/media_1789712972031.jpg', mobile: { x: 80, y: 110, scale: 0.55 }, desktop: { x: 280, y: 20, scale: 1.0 }, rotate: 10 },
   ];
 
   if (isMobile) {
@@ -124,24 +124,28 @@ export default function ExplodingTreats() {
       {treats.map((treat) => {
         const layout = treat.desktop;
         return (
-          <motion.img
+          <motion.div
             key={treat.id}
-            layoutId={`treat-${treat.id}`}
-            onClick={() => setSelectedId(treat.id)}
-            src={treat.src}
-            alt="Treat"
-            className="absolute z-0 rounded-lg"
-            style={{
-              width: '200px',
-              objectFit: 'cover',
-              cursor: 'pointer',
-              boxShadow: '0 15px 35px -5px rgba(60,42,33,0.3), 0 5px 15px -5px rgba(60,42,33,0.2), 0 0 0 1px rgba(255,255,255,0.4)'
-            }}
-            initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+            className="absolute z-0"
+            initial={{ opacity: 0, x: 0, y: 0, scale: 0, rotate: 0 }}
             animate={{ opacity: 1, x: layout.x, y: layout.y, scale: layout.scale, rotate: treat.rotate }}
             transition={{ type: 'spring', stiffness: 50, damping: 15, delay: parseInt(treat.id) * 0.1, duration: 1.5 }}
-            whileHover={{ scale: layout.scale * 1.05 }}
-          />
+          >
+            <motion.img
+              layoutId={`treat-${treat.id}`}
+              onClick={() => setSelectedId(treat.id)}
+              src={treat.src}
+              alt="Treat"
+              className="rounded-lg"
+              style={{
+                width: '200px',
+                objectFit: 'cover',
+                cursor: 'pointer',
+                boxShadow: '0 15px 35px -5px rgba(60,42,33,0.3), 0 5px 15px -5px rgba(60,42,33,0.2), 0 0 0 1px rgba(255,255,255,0.4)'
+              }}
+              whileHover={{ scale: 1.05 }}
+            />
+          </motion.div>
         );
       })}
 
