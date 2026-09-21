@@ -34,7 +34,7 @@ export default function CapacitacaoProfissionalPage() {
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-8" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
             Capacitação Profissional
           </h1>
-          <a href={getWhatsAppLink('Capacitação Profissional para Cozinheiros')} target="_blank" rel="noopener noreferrer" className="btn btn-secondary px-8 py-4 text-lg inline-block">
+          <a href={getWhatsAppLink('Capacitação Profissional para Cozinheiros')} target="_blank" rel="noopener noreferrer" className="btn btn-secondary px-8 py-4 text-lg inline-block" style={{ marginTop: '2.5rem' }}>
             Matricular Funcionário
           </a>
         </div>

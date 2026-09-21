@@ -35,7 +35,7 @@ export default function TurismoGastronomicoPage() {
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-8" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
             Turismo Gastronômico
           </h1>
-          <a href={getWhatsAppLink('Turismo Gastronômico (1 Dia)')} target="_blank" rel="noopener noreferrer" className="btn btn-secondary px-8 py-4 text-lg inline-block">
+          <a href={getWhatsAppLink('Turismo Gastronômico (1 Dia)')} target="_blank" rel="noopener noreferrer" className="btn btn-secondary px-8 py-4 text-lg inline-block" style={{ marginTop: '2.5rem' }}>
             Agendar Minha Experiência
           </a>
         </div>
