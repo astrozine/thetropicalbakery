@@ -62,19 +62,14 @@ export default function Navigation() {
   return (
     <>
       {/* Announcement Banner */}
-      <div style={{ 
+      <div className="text-[0.6rem] md:text-sm py-1 md:py-2" style={{ 
         background: '#3c2a21', 
         color: '#d4af37', 
         textAlign: 'center', 
-        padding: '0.5rem', 
-        fontSize: '0.8rem', 
         fontWeight: 600, 
         letterSpacing: '1px', 
         textTransform: 'uppercase', 
-        position: 'fixed', 
-        top: 0, 
-        left: 0,
-        right: 0,
+        position: 'relative', 
         width: '100%', 
         zIndex: 1001,
         display: 'flex',
@@ -86,8 +81,8 @@ export default function Navigation() {
       </div>
 
       <nav className="mobile-header-nav" style={{
-        position: 'fixed',
-        top: '34px',
+        position: 'sticky',
+        top: 0,
         width: '100%',
       zIndex: 1000,
       background: 'rgba(253,250,243,0.9)',
