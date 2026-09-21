@@ -50,7 +50,9 @@ export default function MenuCard({ item }: MenuCardProps) {
           </div>
         ) : null}
         <div style={{ marginTop: '1.5rem', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontWeight: 600, color: '#3c2a21' }}>R$ {item.price}</span>
+          <span style={{ fontWeight: 600, color: '#3c2a21' }}>
+            R$ {item.price} <span style={{ fontSize: '0.85rem', color: '#7a6a61', fontWeight: 400 }}>/ un.</span>
+          </span>
           <button 
             onClick={() => addToCart(item)}
             style={{ 
