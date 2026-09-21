@@ -29,7 +29,7 @@ export default function AdminRetreatsPage() {
     
     if (error) {
       console.error('Error fetching rooms:', error);
-      setMessage({ type: 'error', text: 'Erro ao carregar os dados das suítes.' });
+      setMessage({ type: 'error', text: `Erro ao carregar: ${error.message}` });
     } else {
       setRooms(data || []);
     }
