@@ -6,10 +6,16 @@ export default function BakeriesPage() {
   return (
     <main style={{ minHeight: '80vh' }}>
       <div className="container" style={{ padding: '6rem 2rem' }}>
+        {/* Dynamic Header inserted by fix script */}
+        <div className="w-full text-center mb-12">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-[#4a3b32] mb-6">
+            Padarias & Lojas
+          </h1>
+          <div className="w-24 h-1 bg-[#d4af37] mx-auto mb-8"></div>
+        </div>
         <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
           
-          <div style={{ textAlign: 'center', borderBottom: '2px solid rgba(212,175,55,0.3)', paddingBottom: '1.5rem', width: '100%', marginBottom: '1rem' }}>
-            </div>
+
 
           <div style={{ display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }}>
