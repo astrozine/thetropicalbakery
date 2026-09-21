@@ -13,6 +13,7 @@ interface CrmRegistrationModalProps {
 
 export default function CrmRegistrationModal({ isOpen, onClose, interestType, specificInterest }: CrmRegistrationModalProps) {
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [dateStr, setDateStr] = useState('');
   const [focusAreas, setFocusAreas] = useState<string[]>([]);
@@ -42,7 +43,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !whatsapp.trim() || !dateStr) {
+    if (!name.trim() || !email.trim() || !whatsapp.trim() || !dateStr) {
       setErrorMsg('Por favor, preencha todos os campos obrigatórios.');
       setStatus('error');
       return;
@@ -152,7 +153,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                    </div>
                 )}
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
                   <label style={{ display: 'block' }}>
                     <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.4rem' }}>Nome Completo *</span>
                     <input 
@@ -161,6 +162,17 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                       value={name}
                       onChange={e => setName(e.target.value)}
                       placeholder="Seu nome"
+                      style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
+                    />
+                  </label>
+                  <label style={{ display: 'block' }}>
+                    <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.4rem' }}>E-mail *</span>
+                    <input 
+                      type="email" 
+                      required
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      placeholder="seu@email.com"
                       style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
                     />
                   </label>
