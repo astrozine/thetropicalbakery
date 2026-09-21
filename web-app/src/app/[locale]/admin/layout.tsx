@@ -58,6 +58,7 @@ export default function AdminLayout({
     { name: 'Visão Geral', path: '/admin' },
     { name: 'Catálogo de Doces', path: '/admin/treats' },
     { name: 'Cursos', path: '/admin/courses' },
+    { name: 'Destaques (Home)', path: '/admin/highlights' },
     { name: 'Conteúdo do Site', path: '/admin/content' },
     { name: 'CRM & Campanhas', path: '/admin/crm' },
   ];
