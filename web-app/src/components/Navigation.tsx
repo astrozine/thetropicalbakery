@@ -27,6 +27,14 @@ export default function Navigation() {
 
   const closeMenu = () => setIsOpen(false);
 
+  const changeLanguage = (langCode: string) => {
+    const selectNode = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (selectNode) {
+      selectNode.value = langCode;
+      selectNode.dispatchEvent(new Event('change'));
+    }
+  };
+
   const links = [
     { name: 'Início', path: '/' },
     { name: 'Menu de Eventos', path: '/menu' },
@@ -159,8 +167,38 @@ export default function Navigation() {
             )}
           </div>
 
-          {/* Google Translate Widget */}
-          <div id="google_translate_element" style={{ marginLeft: '1.5rem', marginTop: '0.5rem' }}></div>
+          {/* Custom Language Switcher */}
+          <div 
+            style={{ position: 'relative', marginLeft: '1.5rem', cursor: 'pointer' }}
+            onMouseEnter={() => setIsRetreatsDropdownOpen(true)}
+            onMouseLeave={() => setIsRetreatsDropdownOpen(false)}
+          >
+            <span style={{ color: '#3c2a21', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              🌐 Idioma ▾
+            </span>
+            {isRetreatsDropdownOpen && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, background: 'rgba(253,250,243,0.95)', backdropFilter: 'blur(10px)', minWidth: '200px', padding: '1rem 0', borderRadius: '8px', boxShadow: '0 10px 30px rgba(60,42,33,0.1)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {[
+                  { code: 'pt', name: 'Português' },
+                  { code: 'en', name: 'English' },
+                  { code: 'es', name: 'Español' },
+                  { code: 'it', name: 'Italiano' },
+                  { code: 'fr', name: 'Français' },
+                  { code: 'de', name: 'Deutsch' },
+                  { code: 'nl', name: 'Nederlands' }
+                ].map((lang) => (
+                  <button 
+                    key={lang.code} 
+                    onClick={() => { changeLanguage(lang.code); setIsRetreatsDropdownOpen(false); }}
+                    style={{ padding: '0.5rem 1.5rem', color: '#594a42', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontSize: '0.9rem', textTransform: 'uppercase' }}>
+                    {lang.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Hidden Google Translate Widget for Desktop */}
+          <div id="google_translate_element" style={{ display: 'none' }}></div>
 
           {/* B2B Dropdown */}
           <div 
@@ -393,10 +431,26 @@ export default function Navigation() {
               </Link>
             ))}
             
-            {/* Google Translate Widget in Mobile Menu */}
-            <div style={{ padding: '1rem 0' }}>
-               <div id="google_translate_element_mobile"></div>
+            {/* Language Section Header */}
+            <div style={{ padding: '1.5rem 0 0.5rem 0', fontWeight: 'bold', color: '#3c2a21', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.6 }}>
+              🌐 IDIOMA
             </div>
+            {[
+              { code: 'pt', name: 'Português' },
+              { code: 'en', name: 'English' },
+              { code: 'es', name: 'Español' },
+              { code: 'it', name: 'Italiano' },
+              { code: 'fr', name: 'Français' },
+              { code: 'de', name: 'Deutsch' },
+              { code: 'nl', name: 'Nederlands' }
+            ].map((lang) => (
+              <button 
+                key={lang.code}
+                onClick={() => { changeLanguage(lang.code); closeMenu(); }}
+                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '0.8rem 0 0.8rem 1rem', color: '#594a42', fontSize: '1.1rem', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                {lang.name}
+              </button>
+            ))}
           </div>
         </div>
       )}

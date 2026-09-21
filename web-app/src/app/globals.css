@@ -464,3 +464,16 @@ a {
     color: var(--color-primary) !important;
   }
 }
+
+/* Hide Google Translate Banner and Widget */
+.goog-te-banner-frame {
+  display: none !important;
+}
+#google_translate_element,
+#google_translate_element_mobile,
+.goog-te-gadget {
+  display: none !important;
+}
+body {
+  top: 0 !important;
+}

@@ -68,8 +68,7 @@ export default function RootLayout({
             function googleTranslateElementInit() {
               new google.translate.TranslateElement({
                 pageLanguage: 'pt',
-                includedLanguages: 'pt,en,es,it,fr,de,nl',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                includedLanguages: 'pt,en,es,it,fr,de,nl'
               }, 'google_translate_element');
             }
           `}
