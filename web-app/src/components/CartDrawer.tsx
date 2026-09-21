@@ -249,104 +249,26 @@ export default function CartDrawer() {
                     <span style={{ fontSize: '1.4rem' }}>+</span> Adicionar Mais Produtos
                   </button>
 
-                  {/* Checkout Form */}
-                  <div style={{ marginTop: '1rem', padding: '1rem', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', color: '#3c2a21', marginBottom: '1rem' }}>Dados de Entrega</h3>
-                    
-                    <label style={{ display: 'block', marginBottom: '1rem' }}>
-                      <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.25rem' }}>Nome Completo</span>
-                      <input 
-                        type="text" 
-                        value={customerName}
-                        onChange={e => setCustomerName(e.target.value)}
-                        placeholder="Ex: João da Silva"
-                        style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
-                      />
-                    </label>
-
-                    <label style={{ display: 'block', marginBottom: '1rem' }}>
-                      <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.25rem' }}>WhatsApp (com DDD)</span>
-                      <input 
-                        type="text" 
-                        value={whatsappNumber}
-                        onChange={e => setWhatsappNumber(e.target.value)}
-                        placeholder="Ex: 11999999999"
-                        style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
-                      />
-                    </label>
-                    
-                    <label style={{ display: 'block', marginBottom: '1rem' }}>
-                      <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.25rem' }}>Endereço Completo (Rua, Número, Bairro)</span>
-                      <textarea 
-                        value={deliveryAddress}
-                        onChange={e => setDeliveryAddress(e.target.value)}
-                        placeholder="Ex: Rua das Flores, 123 - Centro"
-                        rows={2}
-                        style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit', resize: 'none' }}
-                      />
-                    </label>
-
-                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-                      <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.25rem' }}>Código de Afiliado (Opcional)</span>
-                      <input 
-                        type="text" 
-                        value={affiliateCode}
-                        onChange={e => setAffiliateCode(e.target.value)}
-                        placeholder="Ex: TROPICAL10"
-                        style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit', textTransform: 'uppercase' }}
-                      />
-                    </label>
-                  </div>
-
-                  {/* Dietary Restrictions */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'white', padding: '1rem', borderRadius: '12px', border: '1px solid #e8e1d7', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
-                    <label style={{ fontSize: '1rem', fontFamily: 'var(--font-heading)', color: '#3c2a21' }}>Restrições Alimentares</label>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginTop: '0.5rem' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer' }}>
-                        <input type="checkbox" checked={isVegan} onChange={e => setIsVegan(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> Vegano
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer' }}>
-                        <input type="checkbox" checked={isGlutenFree} onChange={e => setIsGlutenFree(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> Sem Glúten
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer' }}>
-                        <input type="checkbox" checked={isSugarFree} onChange={e => setIsSugarFree(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> Sem Açúcar
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer' }}>
-                        <input type="checkbox" checked={isSaltFree} onChange={e => setIsSaltFree(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> SOS-Free (Sem Sal)
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer', gridColumn: '1 / -1' }}>
-                        <input type="checkbox" checked={isOilFree} onChange={e => setIsOilFree(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} /> SOS-Free (Sem Óleo)
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* PIX Payment Section */}
-                  <div style={{ marginTop: '1rem', padding: '1.5rem', background: 'white', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', textAlign: 'center' }}>
-                    <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', color: '#3c2a21', marginBottom: '0.5rem' }}>Pagamento via PIX</h3>
-                    <p style={{ fontSize: '0.95rem', color: '#7a6a61', marginBottom: '1rem' }}>
-                      Escaneie o QR Code abaixo para realizar o pagamento. O valor total é <strong style={{color: '#d4af37'}}>{formatPrice(totalPrice)}</strong>.
-                    </p>
-                    <img src="/pix-qr.jpeg" alt="PIX QR Code" style={{ width: '160px', height: '160px', objectFit: 'contain', margin: '0 auto', display: 'block', borderRadius: '12px', border: '2px solid rgba(0,0,0,0.1)' }} />
-                    <p style={{ fontSize: '0.85rem', color: '#d4af37', marginTop: '1rem', fontWeight: 600 }}>
-                      Após o pagamento, clique no botão abaixo para enviar o comprovante via WhatsApp!
-                    </p>
-                  </div>
+                  {/* Removed Inline Checkout Form - Now handled in /checkout */}
                 </div>
               )}
             </div>
 
             {/* Footer */}
             {items.length > 0 && (
-              <div style={{ padding: '1rem', background: 'white', borderTop: '1px solid rgba(212,175,55,0.2)', boxShadow: '0 -4px 20px rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <span style={{ fontSize: '1rem', color: '#594a42' }}>Total Estimado</span>
-                  <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#3c2a21' }}>{formatPrice(totalPrice)}</span>
+              <div style={{ padding: '1.5rem', background: 'white', borderTop: '1px solid rgba(212,175,55,0.2)', boxShadow: '0 -4px 20px rgba(0,0,0,0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <span style={{ fontSize: '1.1rem', color: '#594a42' }}>Total do Pedido</span>
+                  <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#3c2a21' }}>{formatPrice(totalPrice)}</span>
                 </div>
                 <button 
-                  onClick={handleWhatsAppCheckout}
-                  style={{ width: '100%', padding: '0.75rem', background: '#25D366', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
+                  onClick={() => {
+                    setIsCartOpen(false);
+                    router.push('/checkout');
+                  }}
+                  style={{ width: '100%', padding: '1rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}
                 >
-                  <span>Enviar Pedido pelo WhatsApp</span>
+                  Finalizar Pedido
                 </button>
               </div>
             )}
