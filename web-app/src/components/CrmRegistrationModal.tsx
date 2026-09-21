@@ -68,13 +68,8 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
 
       setStatus('success');
       
-      // Also open whatsapp directly with pre-filled message
-      const text = `Olá! Gostaria de reservar o ${interestType === 'curso' ? 'curso' : 'retiro'}: ${specificInterest}.\n\n` +
-                   `Meu nome é ${name}, gostaria da data ${new Date(dateStr).toLocaleDateString('pt-BR')}.\n\n` +
-                   (focusAreas.length > 0 ? `Tenho interesse especial em: ${focusAreas.join(', ')}.` : '');
-                   
+      // Auto-close modal after 3 seconds
       setTimeout(() => {
-        window.open(`https://wa.me/5511932119196?text=${encodeURIComponent(text)}`, '_blank');
         onClose();
         // Reset form
         setName('');
@@ -82,7 +77,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
         setDateStr('');
         setFocusAreas([]);
         setStatus('idle');
-      }, 2000);
+      }, 3000);
 
     } catch (err: any) {
       console.error(err);
@@ -141,8 +136,8 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
             {status === 'success' ? (
               <div style={{ textAlign: 'center', padding: '2rem 0' }}>
                 <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>✨</div>
-                <h3 style={{ color: '#3c2a21', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>Pedido Recebido!</h3>
-                <p style={{ color: '#594a42' }}>Estamos redirecionando você para o nosso WhatsApp para finalizar os detalhes...</p>
+                <h3 style={{ color: '#3c2a21', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>Reserva Recebida!</h3>
+                <p style={{ color: '#594a42' }}>Você receberá uma mensagem no WhatsApp com os detalhes da sua reserva.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
