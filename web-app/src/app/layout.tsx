@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "../globals.css";
+import Script from 'next/script';
+import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import GlobalMenuTeaser from "@/components/GlobalMenuTeaser";
@@ -40,34 +41,39 @@ export const metadata: Metadata = {
   },
 };
 
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const messages = await getMessages();
-
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider messages={messages}>
-          <Providers>
-            <Navigation />
-            <CartDrawer />
-            <main style={{ paddingBottom: '80px' }}>
-              {children}
-            </main>
-            <GlobalMenuTeaser />
-            <Footer />
-            <MobileBottomNav />
-          </Providers>
-        </NextIntlClientProvider>
+        <Providers>
+          <Navigation />
+          <CartDrawer />
+          <main style={{ paddingBottom: '80px' }}>
+            {children}
+          </main>
+          <GlobalMenuTeaser />
+          <Footer />
+          <MobileBottomNav />
+        </Providers>
+        <Script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" strategy="afterInteractive" />
+        <Script id="google-translate-script" strategy="afterInteractive">
+          {`
+            function googleTranslateElementInit() {
+              new google.translate.TranslateElement({
+                pageLanguage: 'pt',
+                includedLanguages: 'pt,en,es,it,fr,de,nl',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+              }, 'google_translate_element');
+            }
+          `}
+        </Script>
       </body>
     </html>
   );
