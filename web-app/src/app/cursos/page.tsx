@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
 import CourseAccordionWrapper from '@/components/CourseAccordionWrapper';
+import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 
 interface Course {
   id: string;
@@ -20,6 +21,9 @@ interface Course {
 export default function CursosPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState('');
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -122,9 +126,12 @@ export default function CursosPage() {
                           <p style={{ fontSize: '1.15rem', lineHeight: '1.9', color: textColor, marginBottom: '2rem', whiteSpace: 'pre-line' }}>
                             {course.description}
                           </p>
-                          <a href={getWhatsAppLink(course.title)} target="_blank" rel="noopener noreferrer" className={isDark ? "btn btn-secondary" : "btn btn-primary"}>
+                          <button 
+                            onClick={() => { setSelectedCourse(course.title); setIsModalOpen(true); }}
+                            className={isDark ? "btn btn-secondary" : "btn btn-primary"}
+                          >
                             Agendar Minha Experiência
-                          </a>
+                          </button>
                         </div>
 
                         {index % 2 !== 0 && (
@@ -184,9 +191,12 @@ export default function CursosPage() {
                       <BulletItem>Degustação exclusiva incluída</BulletItem>
                       <BulletItem>Leve para casa as receitas criadas</BulletItem>
                     </ul>
-                    <a href={getWhatsAppLink('Turismo Gastronômico (1 Dia)')} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                    <button 
+                      onClick={() => { setSelectedCourse('Turismo Gastronômico (1 Dia)'); setIsModalOpen(true); }}
+                      className="btn btn-primary"
+                    >
                       Agendar Minha Experiência
-                    </a>
+                    </button>
                   </div>
                     <div className="mobile-only mt-8" style={{ display: 'flex', gap: '1rem', overflowX: 'auto', padding: '1rem 0' }}>
                       {['/menu-items/Screenshot_20260412_123155_Edits.jpg', '/menu-items/20260724_154636.jpg', '/menu-items/Screenshot_20260623_080155_Gallery.jpg', '/menu-items/Screenshot_20260810_135948_Photos.jpg'].map((src, i) => (
@@ -239,9 +249,12 @@ export default function CursosPage() {
                       <BulletItem>Planejamento de cardápios semanais SOS-Free</BulletItem>
                       <BulletItem>Substituições inteligentes e saborosas</BulletItem>
                     </ul>
-                    <a href={getWhatsAppLink('Capacitação Profissional para Cozinheiros')} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                    <button 
+                      onClick={() => { setSelectedCourse('Capacitação Profissional para Cozinheiros'); setIsModalOpen(true); }}
+                      className="btn btn-secondary"
+                    >
                       Matricular Funcionário
-                    </a>
+                    </button>
                   </div>
                   <div style={{ flex: '1 1 380px', minWidth: '280px' }}>
                     <div
@@ -292,9 +305,12 @@ export default function CursosPage() {
                       <BulletItem>Receitas curativas e regenerativas</BulletItem>
                       <BulletItem>Como criar pratos que a família toda vai amar</BulletItem>
                     </ul>
-                    <a href={getWhatsAppLink('Curso de Saúde e Bem-Estar')} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                    <button 
+                      onClick={() => { setSelectedCourse('Curso de Saúde e Bem-Estar'); setIsModalOpen(true); }}
+                      className="btn btn-primary"
+                    >
                       Começar Minha Jornada
-                    </a>
+                    </button>
                   </div>
                     <div className="mobile-only mt-8" style={{ display: 'flex', gap: '1rem', overflowX: 'auto', padding: '1rem 0' }}>
                       {['/menu-items/20260620_163438.jpg', '/menu-items/Screenshot_20260518_122444_Gallery.jpg', '/menu-items/20250907_143728.jpg', '/menu-items/Screenshot_20260818_075043_Gallery.jpg'].map((src, i) => (
@@ -334,19 +350,24 @@ export default function CursosPage() {
               <p style={{ fontSize: 'clamp(1rem, 3vw, 1.15rem)', color: 'var(--color-text)', lineHeight: '1.9', marginBottom: '2.5rem' }}>
                 Fale diretamente conosco. Nossa equipe em Itamambuca está pronta para ajudar a montar a experiência perfeita.
               </p>
-              <a
-                href={getWhatsAppLink('Dúvida sobre os cursos')}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => { setSelectedCourse('Consultoria Personalizada'); setIsModalOpen(true); }}
                 className="btn btn-primary"
                 style={{ whiteSpace: 'nowrap', display: 'inline-flex' }}
               >
                 Falar com a Equipe
-              </a>
+              </button>
             </div>
           </ScrollReveal>
         </div>
       </section>
+
+      <CrmRegistrationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        interestType="curso"
+        specificInterest={selectedCourse}
+      />
     </main>
   );
 }

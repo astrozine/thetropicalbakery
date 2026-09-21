@@ -1,6 +1,9 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
+import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 
 export interface RetreatsLayoutProps {
   texts: {
@@ -39,6 +42,9 @@ export interface RetreatsLayoutProps {
 }
 
 export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedInterest, setSelectedInterest] = useState('');
+  
   const WHATSAPP_NUMBER = "5511932119196";
   const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texts.whatsappMessage)}`;
 
@@ -125,9 +131,13 @@ export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
           }}>
             {texts.hero.description}
           </p>
-          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '1rem 3rem', fontSize: '1.1rem', letterSpacing: '2px' }}>
+          <button 
+            onClick={() => { setSelectedInterest(typeof texts.hero.title === 'string' ? texts.hero.title : 'Retiro Tropical'); setIsModalOpen(true); }}
+            className="btn btn-secondary" 
+            style={{ padding: '1rem 3rem', fontSize: '1.1rem', letterSpacing: '2px' }}
+          >
             {texts.hero.cta}
-          </a>
+          </button>
         </div>
       </section>
 
@@ -333,12 +343,22 @@ export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
           <p style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.7)', maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: '1.9' }}>
             {texts.finalCta.description}
           </p>
-          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '1.2rem 3.5rem', fontSize: '1.1rem', letterSpacing: '2px' }}>
+          <button 
+            onClick={() => { setSelectedInterest('Retiro Geral'); setIsModalOpen(true); }}
+            className="btn btn-secondary" 
+            style={{ padding: '1.2rem 3.5rem', fontSize: '1.1rem', letterSpacing: '2px' }}
+          >
             {texts.finalCta.cta}
-          </a>
+          </button>
         </ScrollReveal>
       </section>
 
+      <CrmRegistrationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        interestType="retiro"
+        specificInterest={selectedInterest}
+      />
     </main>
   );
 }
