@@ -204,7 +204,9 @@ export default function CartDrawer() {
                       />
                       <div style={{ flex: 1 }}>
                         <h4 style={{ color: '#3c2a21', fontWeight: 600, fontSize: '1.25rem', marginBottom: '0.25rem' }}>{item.name}</h4>
-                        <p style={{ color: '#d4af37', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem' }}>{item.price}</p>
+                        <p style={{ color: '#d4af37', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                          R$ {item.price} <span style={{ fontSize: '0.85rem', fontWeight: 400, color: '#7a6a61' }}>por unidade</span>
+                        </p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', background: 'white', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', padding: '0.2rem' }}>
                             <button onClick={() => updateQuantity(item.id, item.quantity - (item.batch_multiplier || 1))} style={{ padding: '0.4rem 0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.4rem' }}>-</button>
@@ -213,6 +215,11 @@ export default function CartDrawer() {
                           </div>
                           <button onClick={() => removeFromCart(item.id)} style={{ color: '#e74c3c', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', textDecoration: 'underline' }}>Remover</button>
                         </div>
+                        {item.min_batch_size && item.min_batch_size > 1 && (
+                          <div style={{ fontSize: '0.8rem', color: '#d4af37', fontWeight: 600, marginTop: '0.5rem' }}>
+                            Pedido Mínimo: {item.min_batch_size} unidades
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
