@@ -236,7 +236,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                   className="btn btn-primary"
                   style={{ width: '100%', padding: '1rem', marginTop: '0.5rem', opacity: status === 'submitting' ? 0.7 : 1 }}
                 >
-                  {status === 'submitting' ? 'Processando...' : 'Fazer Reserva e Continuar para o WhatsApp'}
+                  {status === 'submitting' ? 'Processando...' : 'Fazer Reserva'}
                 </button>
                 <p style={{ fontSize: '0.8rem', color: '#7a6a61', textAlign: 'center', marginTop: '0.5rem' }}>
                   Suas informações estão seguras conosco e serão usadas apenas para organizar seu evento.
