@@ -6,10 +6,12 @@ import ExplodingTreats from '@/components/ExplodingTreats';
 import ZoomableImage from '@/components/ZoomableImage';
 import ModalCard from '@/components/ModalCard';
 import { supabase } from '@/lib/supabase';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 0; // Ensures fresh data is fetched for the homepage
 
 export default async function Home() {
+  const t = await getTranslations('Index');
   
   // Fetch dynamic content from site_content
   const { data: contentData } = await supabase.from('site_content').select('*');
@@ -50,27 +52,27 @@ export default async function Home() {
             <ScrollReveal className="liquid-glass-card">
               <div style={{ padding: '4rem 3rem' }}>
               <h2 className="text-primary" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', marginBottom: '2rem', fontFamily: 'var(--font-heading)' }}>
-                Nossa Filosofia
+                {t('philosophyTitle')}
               </h2>
               <p style={{ fontSize: '1.2rem', marginBottom: '3rem', color: '#594a42', lineHeight: '1.8', whiteSpace: 'pre-line' }}>
-                {getText('home-about', `Na The Tropical Bakery, acreditamos que a indulgência não precisa comprometer a saúde.\n\nNossas Surprise Treat Boxes são criadas para serem SOS-Free (sem adição de sal, óleo ou açúcar refinado), 100% Veganas e Sem Glúten. Focamos em criações tropicais densas em nutrientes, vibrantes e deliciosas para quem vive ou visita Itamambuca e Ubatuba.`)}
+                {getText('home-about', t('philosophyText'))}
               </p>
               
               <div className="features-grid" style={{ gridTemplateColumns: '1fr', gap: '1.5rem' }}>
                 <div className="feature-item">
                   <div className="feature-icon" style={{ color: '#d4af37' }}>🌿</div>
-                  <h3 className="feature-title">Vegano & Natural</h3>
-                  <p style={{ color: '#7a6a61' }}>Ingredientes puros, sem concessões.</p>
+                  <h3 className="feature-title">{t('feature1Title')}</h3>
+                  <p style={{ color: '#7a6a61' }}>{t('feature1Desc')}</p>
                 </div>
                 <div className="feature-item">
                   <div className="feature-icon" style={{ color: '#d4af37' }}>🌾</div>
-                  <h3 className="feature-title">Sem Glúten</h3>
-                  <p style={{ color: '#7a6a61' }}>Seguro e delicioso para todos.</p>
+                  <h3 className="feature-title">{t('feature2Title')}</h3>
+                  <p style={{ color: '#7a6a61' }}>{t('feature2Desc')}</p>
                 </div>
                 <div className="feature-item">
                   <div className="feature-icon" style={{ color: '#d4af37' }}>🎁</div>
-                  <h3 className="feature-title">Surpresa Semanal</h3>
-                  <p style={{ color: '#7a6a61' }}>Entregue fresquinho em Itamambuca!</p>
+                  <h3 className="feature-title">{t('feature3Title')}</h3>
+                  <p style={{ color: '#7a6a61' }}>{t('feature3Desc')}</p>
                 </div>
               </div>
             </div>
@@ -114,8 +116,8 @@ export default async function Home() {
       <section id="menu" className="menu-section" style={{ padding: '12rem 2rem', background: '#fdfaf3' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <ScrollReveal>
-            <h2 className="section-title">Destaques Anteriores</h2>
-            <p className="text-center" style={{ marginBottom: '3rem', color: '#594a42', fontSize: '1.1rem' }}>Um gostinho do que você pode encontrar na sua caixa surpresa!</p>
+            <h2 className="section-title">{t('highlightsTitle')}</h2>
+            <p className="text-center" style={{ marginBottom: '3rem', color: '#594a42', fontSize: '1.1rem' }}>{t('highlightsSubtitle')}</p>
           </ScrollReveal>
           
           <div className="menu-grid">
@@ -134,15 +136,15 @@ export default async function Home() {
                 <ScrollReveal delay={0.1}>
                   <ModalCard 
                     imageSrc="/box1.jpg"
-                    title="O Clássico Tropical"
-                    description="Uma seleção primorosa de doces refinados com o toque inconfundível da nossa padaria."
+                    title={t('defaultBox1Title')}
+                    description={t('defaultBox1Desc')}
                   />
                 </ScrollReveal>
                 <ScrollReveal delay={0.2}>
                   <ModalCard 
                     imageSrc="/box2.jpg"
-                    title="Seleção Premium"
-                    description="Texturas marcantes e ingredientes frescos, pensados para surpreender os paladares mais exigentes."
+                    title={t('defaultBox2Title')}
+                    description={t('defaultBox2Desc')}
                   />
                 </ScrollReveal>
               </>

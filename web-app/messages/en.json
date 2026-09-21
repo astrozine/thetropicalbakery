@@ -1,5 +1,18 @@
 {
   "Index": {
-    "title": "The Tropical Bakery"
+    "title": "The Tropical Bakery",
+    "philosophyTitle": "Our Philosophy",
+    "feature1Title": "Vegan & Natural",
+    "feature1Desc": "Pure ingredients, no compromises.",
+    "feature2Title": "Gluten-Free",
+    "feature2Desc": "Safe and delicious for everyone.",
+    "feature3Title": "Weekly Surprise",
+    "feature3Desc": "Delivered fresh in Itamambuca!",
+    "highlightsTitle": "Past Highlights",
+    "highlightsSubtitle": "A taste of what you might find in your surprise box!",
+    "defaultBox1Title": "The Tropical Classic",
+    "defaultBox1Desc": "An exquisite selection of refined sweets with the unmistakable touch of our bakery.",
+    "defaultBox2Title": "Premium Selection",
+    "defaultBox2Desc": "Striking textures and fresh ingredients, designed to surprise the most demanding palates."
   }
 }

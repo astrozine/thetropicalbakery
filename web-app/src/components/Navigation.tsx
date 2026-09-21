@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from '@/i18n/routing';
 import { useCart } from '@/context/CartContext';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { totalItems, setIsCartOpen } = useCart();
 
   // Lock body scroll when menu is open
@@ -30,6 +31,7 @@ export default function Navigation() {
   const links = [
     { name: 'Início', path: '/' },
     { name: 'Menu de Eventos', path: '/menu' },
+    { name: 'Retiros', path: '/retreats' },
   ];
 
   const cursosLinks = [
@@ -199,7 +201,13 @@ export default function Navigation() {
                   { code: 'de', name: 'Deutsch' },
                   { code: 'nl', name: 'Nederlands' }
                 ].map((lang) => (
-                  <button key={lang.code} style={{ 
+                  <button 
+                    key={lang.code} 
+                    onClick={() => {
+                      router.replace(pathname, { locale: lang.code });
+                      setIsRetreatsDropdownOpen(false);
+                    }}
+                    style={{ 
                     padding: '0.5rem 1.5rem', 
                     color: '#594a42', 
                     background: 'none', 
@@ -470,7 +478,10 @@ export default function Navigation() {
             ].map((lang) => (
               <button 
                 key={lang.code}
-                onClick={closeMenu}
+                onClick={() => {
+                  router.replace(pathname, { locale: lang.code });
+                  closeMenu();
+                }}
                 style={{
                   display: 'block',
                   width: '100%',
