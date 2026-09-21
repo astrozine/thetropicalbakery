@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { generatePixData } from '@/utils/pix';
 
+import { supabase } from '@/lib/supabase';
+
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
   const [step, setStep] = useState(1);
@@ -34,7 +36,21 @@ export default function CheckoutPage() {
     setPixQR(base64);
     setStep(2);
 
-    // TODO: Send to Supabase 'orders' table
+    // Save to Supabase 'orders' table
+    try {
+      await supabase.from('orders').insert([{
+        customer_name: formData.name,
+        customer_email: formData.email,
+        customer_whatsapp: formData.whatsapp.replace(/\D/g, ''),
+        delivery_address: formData.address,
+        requested_date: formData.date || null,
+        total_price: totalPrice(),
+        pix_transaction_id: transactionId,
+        status: 'PENDING'
+      }]);
+    } catch (err) {
+      console.error("Error saving order:", err);
+    }
   };
 
   const copyPix = () => {
