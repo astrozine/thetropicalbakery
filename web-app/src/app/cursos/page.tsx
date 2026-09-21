@@ -73,7 +73,7 @@ export default function CursosPage() {
           <p style={{ fontFamily: 'var(--font-body)', maxWidth: '800px', margin: '0 auto 2.5rem', fontSize: '1.25rem', color: '#fdfaf3', lineHeight: '1.9', fontWeight: 300 }}>
             Descubra a lógica por trás dos sabores. Aprenda a criar experiências gastronômicas incríveis que são 100% veganas, sem glúten e focadas na saúde integral.
           </p>
-          <a href="#turismo" className="btn btn-secondary shadow-lg">
+          <a href="#cursos-list" className="btn btn-secondary shadow-lg">
             Ver Cursos
           </a>
         </div>
