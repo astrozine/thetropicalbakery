@@ -9,6 +9,7 @@ export default function PousadasPage() {
         <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
           
           <div style={{ textAlign: 'center', borderBottom: '2px solid rgba(212,175,55,0.3)', paddingBottom: '1.5rem', width: '100%', marginBottom: '1rem' }}>
+            <h1 style={{ fontSize: '3rem', color: '#3c2a21', letterSpacing: '1px' }}>Parcerias para Pousadas</h1>
             </div>
 
           <div style={{ display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
