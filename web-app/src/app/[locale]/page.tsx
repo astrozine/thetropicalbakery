@@ -10,18 +10,34 @@ import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 0; // Ensures fresh data is fetched for the homepage
 
-export default async function Home() {
-  const t = await getTranslations('Index');
+export default async function Home({ params }: { params: { locale: string } }) {
+  const { locale } = params;
+  const t = await getTranslations({ locale, namespace: 'Index' });
   
   // Fetch dynamic content from site_content
-  const { data: contentData } = await supabase.from('site_content').select('*');
+  let { data: contentData } = await supabase.from('site_content').select('*').eq('locale', locale);
+  if (!contentData || contentData.length === 0) {
+    const { data: fallbackContent } = await supabase.from('site_content').select('*').eq('locale', 'pt');
+    contentData = fallbackContent;
+  }
   
   // Fetch highlights
-  const { data: highlights } = await supabase
+  let { data: highlights } = await supabase
     .from('highlights')
     .select('*')
     .eq('is_active', true)
+    .eq('locale', locale)
     .order('created_at', { ascending: false });
+    
+  if (!highlights || highlights.length === 0) {
+    const { data: fallbackHighlights } = await supabase
+      .from('highlights')
+      .select('*')
+      .eq('is_active', true)
+      .eq('locale', 'pt')
+      .order('created_at', { ascending: false });
+    highlights = fallbackHighlights;
+  }
   
   const getContent = (sectionId: string, fallbackUrl: string) => {
     const item = contentData?.find(c => c.section_id === sectionId);
