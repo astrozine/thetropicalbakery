@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ModalCardProps {
   imageSrc: string;
@@ -162,12 +163,6 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                 </div>
               </div>
 
-              {errorMsg && (
-                <div style={{ color: '#e74c3c', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: 600, background: 'rgba(231, 76, 60, 0.1)', padding: '0.8rem', borderRadius: '8px' }}>
-                  {errorMsg}
-                </div>
-              )}
-
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                 <button 
                   onClick={() => handleOrder('CAIXA_DEGUSTACAO')}
@@ -208,6 +203,48 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
 
             </div>
           </div>
+
+          <AnimatePresence>
+            {errorMsg && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                style={{
+                  position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                  backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 10000,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  backdropFilter: 'blur(5px)'
+                }}
+                onClick={() => setErrorMsg('')}
+              >
+                <motion.div 
+                  initial={{ scale: 0.9, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.9, y: 20 }}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    background: 'white', padding: '2rem', borderRadius: '16px',
+                    maxWidth: '400px', width: '90%', textAlign: 'center',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                  }}
+                >
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', color: '#e74c3c', marginBottom: '1rem' }}>Atenção</h3>
+                  <p style={{ color: '#594a42', marginBottom: '2rem', fontSize: '1.1rem' }}>
+                    {errorMsg}
+                  </p>
+                  <button 
+                    onClick={() => setErrorMsg('')}
+                    className="btn btn-primary"
+                    style={{ width: '100%', padding: '1rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                  >
+                    Entendido
+                  </button>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
     </>
