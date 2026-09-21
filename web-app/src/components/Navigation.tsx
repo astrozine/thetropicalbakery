@@ -62,7 +62,7 @@ export default function Navigation() {
   return (
     <>
       {/* Announcement Banner */}
-      <div className="text-[0.6rem] md:text-sm py-1 md:py-2" style={{ 
+      <div style={{ 
         background: '#3c2a21', 
         color: '#d4af37', 
         textAlign: 'center', 
@@ -75,7 +75,9 @@ export default function Navigation() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '0.5rem'
+        gap: '0.5rem',
+        fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
+        padding: 'clamp(0.5rem, 1.5vw, 0.8rem)'
       }}>
         <span>🌴 Entregas exclusivas: Itamambuca, Ubatuba e Região. Eventos em Paraty! 🌴</span>
       </div>

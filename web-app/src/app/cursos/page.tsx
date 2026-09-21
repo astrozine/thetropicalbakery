@@ -92,7 +92,7 @@ export default function CursosPage() {
             const headingColor = isDark ? 'white' : 'var(--color-primary)';
 
             return (
-              <section key={course.id} className="course-section" style={{ background: bgColor, color: textColor, position: 'relative', overflow: 'hidden' }}>
+              <section key={course.id} className="course-section" style={{ background: bgColor, color: textColor, position: 'relative', overflow: 'hidden', padding: 'clamp(3rem, 5vw, 6rem) 0' }}>
                 <div className="container" style={{ position: 'relative', zIndex: 1 }}>
                   <ScrollReveal>
                     <CourseAccordionWrapper title={course.title} tag={`R$ ${course.price.toFixed(2).replace('.', ',')}`}>
