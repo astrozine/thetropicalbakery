@@ -53,16 +53,17 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
     setErrorMsg('');
 
     try {
-      const { error } = await supabase
-        .from('course_registrations')
-        .insert([{
+      const { data, error } = await supabase.from('course_registrations').insert([
+        {
           customer_name: name.trim(),
+          email: email.trim(),
           customer_whatsapp: formatWhatsApp(whatsapp),
           interest_type: interestType,
           specific_interest: specificInterest,
           requested_date: dateStr,
           focus_areas: focusAreas
-        }]);
+        }
+      ]);
 
       if (error) throw error;
 
