@@ -16,13 +16,15 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
   const [name, setName] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const router = useRouter();
 
   const WHATSAPP_NUMBER = "5511932119196";
   
   const handleOrder = async (orderType: 'CAIXA_DEGUSTACAO' | 'EVENTO') => {
+    setErrorMsg(''); // clear previous errors
     if (!name || !whatsapp) {
-      alert('Por favor, preencha seu nome e WhatsApp.');
+      setErrorMsg('Por favor, preencha seu nome e WhatsApp para continuar.');
       return;
     }
 
@@ -159,6 +161,12 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                   />
                 </div>
               </div>
+
+              {errorMsg && (
+                <div style={{ color: '#e74c3c', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: 600, background: 'rgba(231, 76, 60, 0.1)', padding: '0.8rem', borderRadius: '8px' }}>
+                  {errorMsg}
+                </div>
+              )}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                 <button 
