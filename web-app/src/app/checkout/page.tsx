@@ -73,151 +73,143 @@ export default function CheckoutPage() {
   const getNumericPrice = (priceStr: string) => parseFloat(priceStr.replace(/[^\d,]/g, '').replace(',', '.'));
 
   return (
-    <main className="min-h-screen pt-32 pb-16 px-4 bg-[#fdfaf3]">
-      <div className="container max-w-5xl mx-auto">
+    <main style={{ minHeight: '100vh', paddingTop: '8rem', paddingBottom: '4rem', paddingLeft: '1rem', paddingRight: '1rem', backgroundColor: 'var(--color-background)' }}>
+      <div className="container" style={{ maxWidth: '1200px' }}>
         
         {/* Progress Steps */}
-        <div className="mb-10 flex justify-center items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === 1 ? 'bg-[#d4af37] text-white' : 'bg-[#3c2a21] text-white'}`}>1</div>
-            <span className={`font-semibold ${step === 1 ? 'text-[#d4af37]' : 'text-[#3c2a21]'}`}>Dados</span>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginBottom: '3rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.9rem', backgroundColor: step === 1 ? 'var(--color-secondary)' : 'var(--color-primary)', color: '#fff' }}>1</div>
+            <span style={{ fontWeight: 'bold', color: step === 1 ? 'var(--color-secondary)' : 'var(--color-primary)' }}>Dados</span>
           </div>
-          <div className="h-1 w-16 bg-gray-200 rounded-full overflow-hidden">
-            <div className={`h-full bg-[#d4af37] transition-all duration-500 ${step === 2 ? 'w-full' : 'w-0'}`}></div>
+          <div style={{ height: '2px', width: '4rem', backgroundColor: '#e5e7eb', overflow: 'hidden' }}>
+            <div style={{ height: '100%', backgroundColor: 'var(--color-secondary)', transition: 'width 0.5s', width: step === 2 ? '100%' : '0%' }}></div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === 2 ? 'bg-[#d4af37] text-white' : 'bg-gray-200 text-gray-500'}`}>2</div>
-            <span className={`font-semibold ${step === 2 ? 'text-[#d4af37]' : 'text-gray-400'}`}>Pagamento</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.9rem', backgroundColor: step === 2 ? 'var(--color-secondary)' : '#e5e7eb', color: step === 2 ? '#fff' : '#9ca3af' }}>2</div>
+            <span style={{ fontWeight: 'bold', color: step === 2 ? 'var(--color-secondary)' : '#9ca3af' }}>Pagamento</span>
           </div>
         </div>
 
-        <div className="flex flex-col-reverse lg:flex-row gap-8">
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', flexDirection: 'row-reverse' }}>
           
-          {/* LEFT: FORM OR PIX (Takes up more space) */}
-          <div className="flex-grow lg:w-2/3">
+          {/* RIGHT: CART SUMMARY */}
+          <div style={{ flex: '1 1 350px' }}>
+            <div className="liquid-glass-card" style={{ padding: '2rem', position: 'sticky', top: '8rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(212,175,55,0.3)', fontFamily: 'var(--font-heading)' }}>Resumo do Pedido</h2>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '40vh', overflowY: 'auto' }}>
+                {items.map(item => (
+                  <div key={item.id} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ width: '4rem', height: '4rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.3)', position: 'relative' }}>
+                        <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <span style={{ position: 'absolute', top: '-4px', right: '-4px', backgroundColor: 'var(--color-primary)', color: 'white', fontSize: '0.6rem', width: '1.2rem', height: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontWeight: 'bold' }}>{item.quantity}</span>
+                    </div>
+                    <div style={{ flexGrow: 1 }}>
+                      <p style={{ fontWeight: '600', color: 'var(--color-text)', fontSize: '0.9rem', lineHeight: '1.2', marginBottom: '0.2rem' }}>{item.name}</p>
+                      <p style={{ fontWeight: 'bold', color: 'var(--color-primary)', fontSize: '0.9rem' }}>R$ {(getNumericPrice(item.price) * item.quantity).toFixed(2)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(212,175,55,0.3)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#555' }}>
+                  <span>Subtotal</span>
+                  <span>R$ {totalPrice.toFixed(2)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#555' }}>
+                  <span>Frete</span>
+                  <span style={{ color: 'var(--color-secondary)', fontWeight: 'bold' }}>A Combinar</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(212,175,55,0.3)' }}>
+                  <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>Total</span>
+                  <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--color-secondary)' }}>R$ {totalPrice.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* LEFT: FORM OR PIX */}
+          <div style={{ flex: '2 1 500px' }}>
             {step === 1 ? (
-              <form onSubmit={handleCheckout} className="bg-white p-8 rounded-2xl shadow-xl shadow-black/5 border border-gray-100">
-                <h2 className="text-2xl font-bold text-[#3c2a21] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>Informações de Entrega</h2>
+              <form onSubmit={handleCheckout} className="liquid-glass-card" style={{ padding: '3rem 2rem' }}>
+                <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '2rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>Informações de Entrega</h2>
                 
-                <div className="space-y-5">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   <div>
-                    <label className="block text-sm font-semibold text-[#594a42] mb-1">Nome Completo</label>
-                    <input required type="text" placeholder="Ex: João da Silva" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition-all outline-none" />
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Nome Completo</label>
+                    <input required type="text" placeholder="Ex: João da Silva" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={{ width: '100%', padding: '1rem', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-body)', outline: 'none' }} />
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-semibold text-[#594a42] mb-1">E-mail</label>
-                      <input required type="email" placeholder="seu@email.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition-all outline-none" />
+                  <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
+                    <div style={{ flex: '1 1 200px' }}>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>E-mail</label>
+                      <input required type="email" placeholder="seu@email.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} style={{ width: '100%', padding: '1rem', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-body)', outline: 'none' }} />
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-[#594a42] mb-1">WhatsApp (com DDD)</label>
-                      <input required type="tel" placeholder="Ex: 11999999999" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition-all outline-none" />
+                    <div style={{ flex: '1 1 200px' }}>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>WhatsApp (com DDD)</label>
+                      <input required type="tel" placeholder="Ex: 11999999999" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} style={{ width: '100%', padding: '1rem', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-body)', outline: 'none' }} />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-[#594a42] mb-1">Endereço Completo</label>
-                    <input required type="text" placeholder="Rua, Número, Bairro, CEP" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition-all outline-none" />
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Endereço Completo</label>
+                    <input required type="text" placeholder="Rua, Número, Bairro, CEP" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} style={{ width: '100%', padding: '1rem', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-body)', outline: 'none' }} />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-[#594a42] mb-1">Data de Entrega Desejada</label>
-                    <input required type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition-all outline-none" />
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Data de Entrega Desejada</label>
+                    <input required type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} style={{ width: '100%', padding: '1rem', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-body)', outline: 'none' }} />
                   </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-gray-100">
-                  <button type="submit" className="w-full bg-[#3c2a21] hover:bg-[#2a1d17] text-white py-4 rounded-xl text-lg font-bold tracking-wide transition-all transform hover:scale-[1.02] shadow-lg flex justify-center items-center gap-2">
-                    Continuar para Pagamento <span className="text-xl">→</span>
+                <div style={{ marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(212,175,55,0.3)', textAlign: 'center' }}>
+                  <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem', borderRadius: '8px' }}>
+                    Continuar para Pagamento ➔
                   </button>
-                  <p className="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
+                  <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '1rem' }}>
                     🔒 Pagamento 100% seguro via Pix
                   </p>
                 </div>
               </form>
             ) : (
-              <div className="bg-white p-8 rounded-2xl shadow-xl shadow-black/5 border border-[#d4af37] text-center relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#d4af37] to-[#e8c65f]"></div>
-                
-                <h2 className="text-3xl font-bold text-[#3c2a21] mb-2 mt-4" style={{ fontFamily: 'var(--font-heading)' }}>Pagamento Pix</h2>
-                <p className="text-[#594a42] mb-8 text-lg">Seu pedido foi registrado. Realize o pagamento para confirmar a produção.</p>
+              <div className="liquid-glass-card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>Pagamento Pix</h2>
+                <p style={{ color: 'var(--color-text)', marginBottom: '2rem', fontSize: '1.1rem' }}>Seu pedido foi registrado. Realize o pagamento para confirmar a produção.</p>
                 
                 {/* Desktop QR Code */}
-                <div className="hidden md:flex flex-col items-center mb-8">
-                  <div className="p-4 bg-white border-2 border-gray-100 rounded-2xl shadow-sm mb-4">
-                    <img src={pixQR} alt="QR Code Pix" className="w-56 h-56 object-contain" />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
+                  <div style={{ padding: '1rem', backgroundColor: '#fff', border: '2px solid rgba(212,175,55,0.3)', borderRadius: '12px', marginBottom: '1rem' }}>
+                    <img src={pixQR} alt="QR Code Pix" style={{ width: '220px', height: '220px', objectFit: 'contain' }} />
                   </div>
-                  <p className="text-sm font-medium text-gray-500">Abra o app do seu banco e escaneie o QR Code acima</p>
-                </div>
-
-                <div className="md:hidden flex items-center justify-center mb-8">
-                    <div className="w-full max-w-[250px] aspect-square rounded-2xl border border-gray-200 bg-gray-50 flex flex-col items-center justify-center p-6 text-gray-400">
-                        <span className="text-4xl mb-2">📱</span>
-                        <p className="text-sm font-medium text-center">QR Code disponível no Computador</p>
-                    </div>
+                  <p style={{ fontSize: '0.85rem', fontWeight: '500', color: '#666' }}>Abra o app do seu banco e escaneie o QR Code acima</p>
                 </div>
 
                 {/* Mobile Copia e Cola */}
-                <div className="max-w-md mx-auto mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-bold text-gray-700">Pix Copia e Cola</span>
+                <div style={{ maxWidth: '400px', margin: '0 auto', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>Pix Copia e Cola</span>
                   </div>
-                  <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl p-2 relative">
-                    <div className="truncate text-gray-500 text-sm pl-2 pr-4 w-full select-all">{pixPayload}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.8)', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px', padding: '0.5rem', position: 'relative' }}>
+                    <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#666', fontSize: '0.85rem', paddingLeft: '0.5rem', paddingRight: '1rem', width: '100%' }}>{pixPayload}</div>
                     <button 
                       onClick={copyPix}
-                      className={`min-w-[120px] py-2.5 px-4 rounded-lg font-bold text-sm transition-all ${copied ? 'bg-green-500 text-white' : 'bg-[#3c2a21] text-white hover:bg-[#2a1d17]'}`}
+                      className="btn"
+                      style={{ padding: '0.75rem 1rem', minWidth: '130px', fontSize: '0.8rem', borderRadius: '6px', backgroundColor: copied ? '#2e4432' : 'var(--color-primary)', color: 'white' }}
                     >
                       {copied ? '✅ Copiado!' : 'Copiar Código'}
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-gray-100">
-                  <p className="text-sm text-[#7a6a61] bg-[#fdfaf3] p-4 rounded-lg border border-[#e8e1d7]">
+                <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(212,175,55,0.3)' }}>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--color-text)', backgroundColor: 'rgba(212,175,55,0.1)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.2)' }}>
                     💡 <strong>Atenção:</strong> Seu pedido só começará a ser produzido após a confirmação do pagamento pelo banco.
                   </p>
                 </div>
               </div>
             )}
-          </div>
-
-          {/* RIGHT: CART SUMMARY (Sticky sidebar) */}
-          <div className="lg:w-1/3">
-            <div className="bg-white p-6 rounded-2xl shadow-lg shadow-black/5 border border-gray-100 sticky top-32">
-              <h2 className="text-xl font-bold text-[#3c2a21] mb-6 pb-4 border-b border-gray-100" style={{ fontFamily: 'var(--font-heading)' }}>Resumo do Pedido</h2>
-              
-              <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                {items.map(item => (
-                  <div key={item.id} className="flex gap-4 items-start">
-                    <div className="w-16 h-16 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200 relative">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                        <span className="absolute -top-1 -right-1 bg-gray-800 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{item.quantity}</span>
-                    </div>
-                    <div className="flex-grow">
-                      <p className="font-bold text-[#594a42] text-sm leading-tight mb-1">{item.name}</p>
-                      <p className="font-bold text-[#3c2a21] text-sm">R$ {(getNumericPrice(item.price) * item.quantity).toFixed(2)}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-6 pt-6 border-t border-gray-100 space-y-3">
-                <div className="flex justify-between items-center text-sm text-gray-500">
-                  <span>Subtotal</span>
-                  <span>R$ {totalPrice.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm text-gray-500">
-                  <span>Frete</span>
-                  <span className="text-[#d4af37] font-semibold">A Combinar</span>
-                </div>
-                <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                  <span className="text-lg font-bold text-[#3c2a21]">Total</span>
-                  <span className="text-2xl font-bold text-[#d4af37]">R$ {totalPrice.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
           </div>
           
         </div>
