@@ -6,13 +6,17 @@ export default function PousadasPage() {
   return (
     <main style={{ minHeight: '80vh' }}>
       <div className="container" style={{ padding: '6rem 2rem' }}>
-        <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          
+          <div style={{ textAlign: 'center', borderBottom: '2px solid rgba(212,175,55,0.3)', paddingBottom: '1.5rem', width: '100%', marginBottom: '1rem' }}>
+            </div>
+
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }}>
             <ZoomableImage src="/menu-items/Screenshot_20260708_144013_Gallery.jpg" alt="Pousada" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)' }} />
           </div>
           
           <div style={{ flex: '1 1 400px' }}>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)' }}>POUSADAS DE UBATUBA E REGIÃO</h1>
             <p style={{ fontSize: '1.2rem', lineHeight: '1.8', color: '#594a42', marginBottom: '2rem' }}>
               Receba algo especial para seus hóspedes! Encante com uma experiência de café da manhã inesquecível e inclusiva.
               Oferecemos opções de alta qualidade, 100% Veganas, Sem Glúten e SOS-Free (livre de açúcar refinado, sal e produtos processados).
@@ -33,6 +37,7 @@ export default function PousadasPage() {
               </a>
             </div>
           </div>
+        </div>
         </div>
       </div>
 

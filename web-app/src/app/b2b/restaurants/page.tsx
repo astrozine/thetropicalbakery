@@ -6,13 +6,17 @@ export default function RestaurantsPage() {
   return (
     <main style={{ minHeight: '80vh' }}>
       <div className="container" style={{ padding: '6rem 2rem' }}>
-        <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          
+          <div style={{ textAlign: 'center', borderBottom: '2px solid rgba(212,175,55,0.3)', paddingBottom: '1.5rem', width: '100%', marginBottom: '1rem' }}>
+            </div>
+
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }}>
             <ZoomableImage src="/assets/tropical_restaurant_vegan_1789884909542.jpg" alt="Restaurant" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)' }} />
           </div>
           
           <div style={{ flex: '1 1 400px' }}>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)' }}>Seja um Parceiro: Restaurantes</h1>
             <p style={{ fontSize: '1.2rem', lineHeight: '1.8', color: '#594a42', marginBottom: '2rem' }}>
               Buscando expandir seu cardápio de sobremesas com opções de alta qualidade focadas na saúde? A The Tropical Bakery 
               oferece doces no atacado com a garantia de impressionar seus clientes sem o incômodo da preparação na própria cozinha.
@@ -31,6 +35,7 @@ export default function RestaurantsPage() {
               </a>
             </div>
           </div>
+        </div>
         </div>
       </div>
 

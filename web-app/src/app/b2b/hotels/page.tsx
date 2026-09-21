@@ -6,13 +6,17 @@ export default function HotelsPage() {
   return (
     <main style={{ minHeight: '80vh' }}>
       <div className="container" style={{ padding: '6rem 2rem' }}>
-        <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          
+          <div style={{ textAlign: 'center', borderBottom: '2px solid rgba(212,175,55,0.3)', paddingBottom: '1.5rem', width: '100%', marginBottom: '1rem' }}>
+            </div>
+
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }}>
             <ZoomableImage src="/assets/realistic_hotel.jpg" alt="Hotel" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)' }} />
           </div>
           
           <div style={{ flex: '1 1 400px' }}>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)' }}>Seja um Parceiro: Hotéis</h1>
             <p style={{ fontSize: '1.2rem', lineHeight: '1.8', color: '#594a42', marginBottom: '2rem' }}>
               Eleve a experiência dos seus hóspedes com uma oferta de café da manhã de luxo. A The Tropical Bakery
               oferece pedidos em grande escala das nossas criações Veganas e Sem Glúten para os mais finos hotéis de Ubatuba.
@@ -31,6 +35,7 @@ export default function HotelsPage() {
               </a>
             </div>
           </div>
+        </div>
         </div>
       </div>
 
