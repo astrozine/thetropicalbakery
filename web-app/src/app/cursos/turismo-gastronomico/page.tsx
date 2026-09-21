@@ -1,12 +1,13 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import ZoomableImage from '@/components/ZoomableImage';
 import OtherCourses from '@/components/OtherCourses';
+import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 
 export default function TurismoGastronomicoPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const WHATSAPP_NUMBER = "5511932119196";
-  const getWhatsAppLink = (courseName: string) => {
-    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Olá! Gostaria de saber mais sobre o curso: ${courseName}`)}`;
-  };
 
   const BulletItem = ({ children }: { children: React.ReactNode }) => (
     <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '1.2rem', lineHeight: '1.7', fontSize: '1.1rem' }}>
@@ -35,9 +36,9 @@ export default function TurismoGastronomicoPage() {
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-8" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
             Turismo Gastronômico
           </h1>
-          <a href={getWhatsAppLink('Turismo Gastronômico (1 Dia)')} target="_blank" rel="noopener noreferrer" className="btn btn-secondary px-8 py-4 text-lg inline-block" style={{ marginTop: '2.5rem' }}>
+          <button onClick={() => setIsModalOpen(true)} className="btn btn-secondary px-8 py-4 text-lg inline-block" style={{ marginTop: '2.5rem' }}>
             Agendar Minha Experiência
-          </a>
+          </button>
         </div>
       </section>
 
@@ -79,6 +80,13 @@ export default function TurismoGastronomicoPage() {
 
       {/* Cross Navigation */}
       <OtherCourses currentSlug="turismo-gastronomico" />
+
+      <CrmRegistrationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        interestType="curso"
+        specificInterest="Turismo Gastronômico (1 Dia)"
+      />
     </main>
   );
 }

@@ -1,11 +1,12 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import OtherCourses from '@/components/OtherCourses';
+import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 
 export default function CapacitacaoProfissionalPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const WHATSAPP_NUMBER = "5511932119196";
-  const getWhatsAppLink = (courseName: string) => {
-    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Olá! Gostaria de saber mais sobre o curso: ${courseName}`)}`;
-  };
 
   const BulletItem = ({ children }: { children: React.ReactNode }) => (
     <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '1.2rem', lineHeight: '1.7', fontSize: '1.1rem' }}>
@@ -34,9 +35,9 @@ export default function CapacitacaoProfissionalPage() {
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-8" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
             Capacitação Profissional
           </h1>
-          <a href={getWhatsAppLink('Capacitação Profissional para Cozinheiros')} target="_blank" rel="noopener noreferrer" className="btn btn-secondary px-8 py-4 text-lg inline-block" style={{ marginTop: '2.5rem' }}>
+          <button onClick={() => setIsModalOpen(true)} className="btn btn-secondary px-8 py-4 text-lg inline-block" style={{ marginTop: '2.5rem' }}>
             Matricular Funcionário
-          </a>
+          </button>
         </div>
       </section>
 
@@ -71,6 +72,13 @@ export default function CapacitacaoProfissionalPage() {
 
       {/* Cross Navigation */}
       <OtherCourses currentSlug="capacitacao-profissional" />
+
+      <CrmRegistrationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        interestType="curso"
+        specificInterest="Capacitação Profissional para Cozinheiros"
+      />
     </main>
   );
 }
