@@ -158,7 +158,7 @@ export default function Navigation() {
             )}
           </div>
 
-          {/* Retreats Language Dropdown */}
+          {/* Language Dropdown (Placeholder) */}
           <div 
             style={{ position: 'relative', marginLeft: '1.5rem', cursor: 'pointer' }}
             onMouseEnter={() => setIsRetreatsDropdownOpen(true)}
@@ -173,7 +173,7 @@ export default function Navigation() {
               alignItems: 'center',
               gap: '0.5rem'
             }}>
-              Retiros (Idioma) ▾
+              🌐 Idioma ▾
             </span>
             {isRetreatsDropdownOpen && (
               <div style={{
@@ -190,10 +190,27 @@ export default function Navigation() {
                 flexDirection: 'column',
                 gap: '0.5rem'
               }}>
-                {retreatLangs.map((link) => (
-                  <Link key={link.path} href={link.path} style={{ padding: '0.5rem 1.5rem', color: pathname === link.path ? '#d4af37' : '#594a42', textDecoration: 'none', fontWeight: pathname === link.path ? 'bold' : 'normal', fontSize: '0.9rem', textTransform: 'uppercase' }}>
-                    {link.name}
-                  </Link>
+                {[
+                  { code: 'pt', name: 'Português' },
+                  { code: 'en', name: 'English' },
+                  { code: 'es', name: 'Español' },
+                  { code: 'it', name: 'Italiano' },
+                  { code: 'fr', name: 'Français' },
+                  { code: 'de', name: 'Deutsch' },
+                  { code: 'nl', name: 'Nederlands' }
+                ].map((lang) => (
+                  <button key={lang.code} style={{ 
+                    padding: '0.5rem 1.5rem', 
+                    color: '#594a42', 
+                    background: 'none', 
+                    border: 'none', 
+                    textAlign: 'left', 
+                    cursor: 'pointer', 
+                    fontSize: '0.9rem', 
+                    textTransform: 'uppercase' 
+                  }}>
+                    {lang.name}
+                  </button>
                 ))}
               </div>
             )}
@@ -440,25 +457,35 @@ export default function Navigation() {
               letterSpacing: '2px',
               opacity: 0.6,
             }}>
-              RETIROS (IDIOMA)
+              🌐 IDIOMA
             </div>
-            {retreatLangs.map((link) => (
-              <Link 
-                key={link.path} 
-                href={link.path} 
+            {[
+              { code: 'pt', name: 'Português' },
+              { code: 'en', name: 'English' },
+              { code: 'es', name: 'Español' },
+              { code: 'it', name: 'Italiano' },
+              { code: 'fr', name: 'Français' },
+              { code: 'de', name: 'Deutsch' },
+              { code: 'nl', name: 'Nederlands' }
+            ].map((lang) => (
+              <button 
+                key={lang.code}
                 onClick={closeMenu}
                 style={{
                   display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
                   padding: '0.8rem 0 0.8rem 1rem',
-                  textDecoration: 'none',
-                  color: pathname === link.path ? '#d4af37' : '#594a42',
-                  fontWeight: pathname === link.path ? 'bold' : '400',
+                  color: '#594a42',
                   fontSize: '1.1rem',
                   borderBottom: '1px solid rgba(0,0,0,0.04)',
                 }}
               >
-                {link.name}
-              </Link>
+                {lang.name}
+              </button>
             ))}
           </div>
         </div>

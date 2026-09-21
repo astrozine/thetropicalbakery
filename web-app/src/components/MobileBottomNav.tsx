@@ -79,46 +79,6 @@ export default function MobileBottomNav() {
         );
       })}
 
-      <button onClick={() => setIsCartOpen(true)} style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        background: 'none',
-        border: 'none',
-        color: '#887d77',
-        gap: '4px',
-        position: 'relative',
-        width: '20%',
-        cursor: 'pointer'
-      }}>
-        <span style={{ fontSize: '1.5rem', position: 'relative' }}>
-          🛒
-          {totalItems > 0 && (
-            <span style={{
-              position: 'absolute',
-              top: '-6px',
-              right: '-10px',
-              background: '#d4af37',
-              color: '#fff',
-              borderRadius: '50%',
-              padding: '2px 6px',
-              fontSize: '0.7rem',
-              fontWeight: 'bold',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-            }}>
-              {totalItems}
-            </span>
-          )}
-        </span>
-        <span style={{
-          fontSize: '0.65rem',
-          fontWeight: 400,
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px'
-        }}>
-          Carrinho
-        </span>
-      </button>
     </div>
   );
 }
