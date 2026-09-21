@@ -14,6 +14,20 @@ export default function ExplodingTreats() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    if (!selectedId) return;
+    const initialScrollY = window.scrollY;
+    
+    const handleScroll = () => {
+      if (Math.abs(window.scrollY - initialScrollY) > 150) {
+        setSelectedId(null);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [selectedId]);
+
   const treats = [
     { id: '1', src: '/treats/media_1789712796150.jpg', mobile: { x: -80, y: -160, scale: 0.55 }, desktop: { x: -280, y: -150, scale: 1.0 }, rotate: -15 },
     { id: '2', src: '/treats/media_1789712814475.jpg', mobile: { x: 80, y: -130, scale: 0.6 }, desktop: { x: 280, y: -130, scale: 1.0 }, rotate: 20 },
@@ -99,11 +113,11 @@ export default function ExplodingTreats() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center"
-              style={{ backdropFilter: 'blur(20px)', background: 'rgba(60, 42, 33, 0.4)' }}
+              className="fixed inset-0 flex items-center justify-center"
+              style={{ backdropFilter: 'blur(20px)', background: 'rgba(60, 42, 33, 0.4)', zIndex: 99999 }}
             >
               <div className="absolute inset-0 z-[-1]" onClick={() => setSelectedId(null)} />
-              <button onClick={() => setSelectedId(null)} className="absolute top-8 right-8 text-white z-50 text-4xl" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+              <button onClick={() => setSelectedId(null)} className="absolute top-8 right-8 text-white text-4xl" style={{ background: 'none', border: 'none', cursor: 'pointer', zIndex: 100000 }}>✕</button>
               <motion.img
                 src={treats.find(t => t.id === selectedId)?.src}
                 alt="Treat Detail"
@@ -176,11 +190,11 @@ export default function ExplodingTreats() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ backdropFilter: 'blur(20px)', background: 'rgba(60, 42, 33, 0.4)' }}
+            className="fixed inset-0 flex items-center justify-center"
+            style={{ backdropFilter: 'blur(20px)', background: 'rgba(60, 42, 33, 0.4)', zIndex: 99999 }}
           >
             <div className="absolute inset-0 z-[-1]" onClick={() => setSelectedId(null)} style={{ backdropFilter: 'blur(25px)' }} />
-            <button onClick={() => setSelectedId(null)} className="absolute top-8 right-8 text-white z-50 text-4xl" style={{ background: 'none', border: 'none', cursor: 'pointer', mixBlendMode: 'difference' }}>✕</button>
+            <button onClick={() => setSelectedId(null)} className="absolute top-8 right-8 text-white text-4xl" style={{ background: 'none', border: 'none', cursor: 'pointer', mixBlendMode: 'difference', zIndex: 100000 }}>✕</button>
             <motion.img
               layoutId={`treat-${selectedId}`}
               src={treats.find(t => t.id === selectedId)?.src}
