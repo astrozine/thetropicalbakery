@@ -40,27 +40,34 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const messages = await getMessages();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Providers>
-          <Navigation />
-          <CartDrawer />
-          <main style={{ paddingBottom: '80px' }}>
-            {children}
-          </main>
-          <GlobalMenuTeaser />
-          <Footer />
-          <MobileBottomNav />
-        </Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>
+            <Navigation />
+            <CartDrawer />
+            <main style={{ paddingBottom: '80px' }}>
+              {children}
+            </main>
+            <GlobalMenuTeaser />
+            <Footer />
+            <MobileBottomNav />
+          </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
