@@ -28,7 +28,7 @@ export default function CheckoutPage() {
     // Generate Pix Code
     const transactionId = `ORD${Date.now()}`.substring(0, 25);
     const { payload, base64 } = await generatePixData({
-      value: totalPrice(),
+      value: totalPrice,
       transactionId
     });
     
@@ -44,7 +44,7 @@ export default function CheckoutPage() {
         customer_whatsapp: formData.whatsapp.replace(/\D/g, ''),
         delivery_address: formData.address,
         requested_date: formData.date || null,
-        total_price: totalPrice(),
+        total_price: totalPrice,
         pix_transaction_id: transactionId,
         status: 'PENDING'
       }]);
@@ -69,6 +69,8 @@ export default function CheckoutPage() {
       </main>
     );
   }
+
+  const getNumericPrice = (priceStr: string) => parseFloat(priceStr.replace(/[^\d,]/g, '').replace(',', '.'));
 
   return (
     <main className="min-h-screen pt-32 pb-16 px-4 bg-[#fdfaf3]">
@@ -137,13 +139,13 @@ export default function CheckoutPage() {
                     <p className="font-bold text-[#594a42]">{item.name}</p>
                     <p className="text-sm text-gray-500">Qtd: {item.quantity}</p>
                   </div>
-                  <p className="font-bold text-[#3c2a21]">R$ {(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-bold text-[#3c2a21]">R$ {(getNumericPrice(item.price) * item.quantity).toFixed(2)}</p>
                 </div>
               ))}
             </div>
             <div className="flex justify-between items-center text-xl font-bold text-[#d4af37] pt-4">
               <span>Total:</span>
-              <span>R$ {totalPrice().toFixed(2)}</span>
+              <span>R$ {totalPrice.toFixed(2)}</span>
             </div>
           </div>
           
