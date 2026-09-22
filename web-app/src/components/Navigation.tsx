@@ -37,6 +37,7 @@ export default function Navigation() {
 
   const links = [
     { name: 'Início', path: '/' },
+    { name: 'Caixas da Semana', path: '/caixas' },
     { name: 'Menu de Eventos', path: '/menu' },
     { name: 'Retiros', path: '/retreats' },
   ];

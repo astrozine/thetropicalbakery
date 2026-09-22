@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 const DELIVERY_ZONES = [
   { id: 'zone1', label: 'Itamambuca', fee: 0, minBoxes: 1 },
@@ -10,7 +11,12 @@ const DELIVERY_ZONES = [
   { id: 'zone4', label: 'Paraty, Picinguaba (Somente Atacado/Eventos)', fee: 100, minBoxes: 10 },
 ];
 
-export default function WhatsAppCheckout() {
+interface WhatsAppCheckoutProps {
+  activeTastingBoxId?: string;
+  priceOverride?: number;
+}
+
+export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride }: WhatsAppCheckoutProps = {}) {
   const [boxCount, setBoxCount] = useState(1);
   const [fullName, setFullName] = useState('');
   const [whatsappNumber, setWhatsappNumber] = useState('');
@@ -26,8 +32,9 @@ export default function WhatsAppCheckout() {
   
   const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { user, profile, signInWithGoogle, signInWithFacebook, updateProfile } = useAuth();
 
-  const pricePerBox = 99;
+  const pricePerBox = priceOverride || 99;
   const selectedZone = DELIVERY_ZONES.find(z => z.id === zoneId);
   const deliveryFee = selectedZone ? selectedZone.fee : 0;
   const total = (boxCount * pricePerBox) + deliveryFee;
@@ -38,6 +45,13 @@ export default function WhatsAppCheckout() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (profile) {
+      if (profile.full_name) setFullName(profile.full_name);
+      if (profile.phone) setWhatsappNumber(profile.phone);
+    }
+  }, [profile]);
 
   const handleZoneChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newZoneId = e.target.value;
@@ -69,7 +83,26 @@ export default function WhatsAppCheckout() {
     setLoading(true);
 
     try {
-      // 1. Save to CRM (users table)
+      if (user) {
+        // Save missing info to profile if they are logged in
+        await updateProfile({
+          full_name: fullName,
+          phone: whatsappNumber,
+        });
+      }
+
+      // 1. If this is a tasting box, we decrement the inventory
+      if (activeTastingBoxId) {
+        // Fetch current sold_quantity
+        const { data: boxData } = await supabase.from('tasting_boxes').select('sold_quantity').eq('id', activeTastingBoxId).single();
+        if (boxData) {
+          await supabase.from('tasting_boxes').update({
+            sold_quantity: boxData.sold_quantity + boxCount
+          }).eq('id', activeTastingBoxId);
+        }
+      }
+
+      // 2. Save to CRM (users table)
       const randomPassword = Math.random().toString(36).slice(-8);
       
       const { error: insertError } = await supabase
@@ -195,10 +228,24 @@ export default function WhatsAppCheckout() {
         zIndex: 2,
       }}>
         <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '0.75rem' }}>Peça Sua Caixa Surpresa</h2>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '0.75rem' }}>Peça Sua Caixa</h2>
           <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: '1.6' }}>Entregas exclusivas para Itamambuca, praias vizinhas e eventos em Paraty. Preencha seus dados para montarmos uma caixa perfeita para suas restrições!</p>
         </div>
         
+        {!user && (
+          <div style={{ background: '#fdfaf3', padding: '1.2rem', borderRadius: '16px', border: '1px solid #e8e1d7', textAlign: 'center' }}>
+            <p style={{ fontSize: '0.9rem', color: '#594a42', marginBottom: '1rem', fontWeight: 600 }}>Já tem cadastro? Entre para um checkout mais rápido:</p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={signInWithGoogle} style={{ padding: '0.6rem 1.2rem', background: '#fff', border: '1px solid #ccc', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '18px' }}/> Google
+              </button>
+              <button onClick={signInWithFacebook} style={{ padding: '0.6rem 1.2rem', background: '#1877F2', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <img src="https://www.svgrepo.com/show/448224/facebook.svg" alt="Facebook" style={{ width: '18px', filter: 'brightness(0) invert(1)' }}/> Facebook
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Basic Info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: '#fdfaf3', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7' }}>
           <label style={{ fontSize: '0.9rem', fontWeight: 600, color: '#594a42' }}>Nome Completo:</label>
