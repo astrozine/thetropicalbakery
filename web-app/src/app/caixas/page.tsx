@@ -93,7 +93,7 @@ export default function CaixasPage() {
                 <span>{percentageSold.toFixed(0)}% Vendido</span>
               </div>
               <div style={{ width: '100%', height: '12px', background: 'rgba(255,255,255,0.2)', borderRadius: '6px', overflow: 'hidden' }}>
-                <div style={{ width: \`\${percentageSold}%\`, height: '100%', background: remainingQuantity <= 5 ? '#e74c3c' : '#d4af37', transition: 'width 1s ease-in-out' }} />
+                <div style={{ width: `${percentageSold}%`, height: '100%', background: remainingQuantity <= 5 ? '#e74c3c' : '#d4af37', transition: 'width 1s ease-in-out' }} />
               </div>
               {remainingQuantity <= 5 && remainingQuantity > 0 && (
                 <p style={{ color: '#ff7675', marginTop: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold', animation: 'pulse 2s infinite' }}>Corra! O lote está quase no fim.</p>
