@@ -60,24 +60,27 @@ export default function MenuPage() {
         <div style={{ position: 'relative', zIndex: 1 }}>
           <ScrollReveal>
           <span style={{ color: '#d4af37', letterSpacing: '4px', textTransform: 'uppercase', fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '1.5rem' }}>
-            Nossas Criações
+            Atacado &amp; Casamentos
           </span>
           <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem' }}>
-            Caixas Surpresa &amp; Menu para Eventos
+            Menu para Eventos
           </h1>
           <p style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.8)', maxWidth: '700px', margin: '0 auto 2.5rem', lineHeight: '1.8' }}>
-            Toda semana, nossa fundadora cria uma nova <strong>Caixa Surpresa de Degustação</strong> com 4 doces exclusivos por R$ 99,00. 
-            Abaixo, você pode explorar nosso portfólio de criações passadas e encomendá-las em maiores quantidades para o seu próximo evento especial em Itamambuca ou região.
+            Planejando um aniversário, casamento, retiro ou encontro corporativo na nossa região? 
+            Abaixo você encontra nosso portfólio de doces de luxo 100% Veganos, Sem Glúten e SOS-Free (livres de açúcar refinado e óleo). 
+            Todos os itens abaixo são para <strong>encomendas em grandes quantidades</strong>. Entre em contato conosco via WhatsApp para organizarmos os detalhes, quantidades e a data de entrega do seu evento!
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', position: 'relative' }}>
             <div style={{ position: 'relative' }}>
               <SquiggleArrows />
               <a 
-                href="/#order"
+                href="https://wa.me/5511932119196"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn btn-secondary" 
                 style={{ padding: '1rem 2rem', position: 'relative', zIndex: 11 }}
               >
-                Pedir a Caixa Desta Semana
+                Conversar no WhatsApp
               </a>
             </div>
           </div>
@@ -89,10 +92,10 @@ export default function MenuPage() {
       <section style={{ padding: 'clamp(3rem, 6vw, 5rem) 2rem', maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
-            Portfólio de Eventos
+            Nosso Portfólio
           </h2>
           <p style={{ fontSize: '1.1rem', color: '#594a42', maxWidth: '600px', margin: '0 auto' }}>
-            Planejando um aniversário, casamento ou encontro corporativo na nossa região? Encomende qualquer um dos nossos luxuosos doces 100% Veganos, Sem Glúten e SOS-Free (livres de açúcar refinado e sal).
+            Navegue pelas nossas criações para montar a mesa perfeita para seus convidados.
           </p>
         </div>
 

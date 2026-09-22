@@ -20,6 +20,13 @@ export default async function Home() {
     .select('*')
     .eq('is_active', true)
     .order('created_at', { ascending: false });
+
+  // Fetch active tasting box
+  const { data: activeBox } = await supabase
+    .from('tasting_boxes')
+    .select('*')
+    .eq('is_active', true)
+    .single();
   
   const getContent = (sectionId: string, fallbackUrl: string) => {
     const item = contentData?.find(c => c.section_id === sectionId);
@@ -95,11 +102,37 @@ export default async function Home() {
         style={{ backgroundImage: `url(${getContent('home-parallax-1', '/iphone_nano_banana.jpg')})` }} 
       />
 
-      {/* Checkout Section */}
+      {/* Active Box Banner */}
       <section id="order" style={{ padding: '6rem 2rem', background: '#fdfaf3' }}>
-        <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '1100px' }}>
+        <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '1000px' }}>
           <ScrollReveal className="text-center">
-            <WhatsAppCheckout />
+            {activeBox ? (
+              <div style={{ background: 'white', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(60, 42, 33, 0.1)', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ height: '300px', width: '100%', background: `url(${activeBox.image_url}) center/cover no-repeat` }} />
+                <div style={{ padding: '3rem', textAlign: 'left', flex: 1 }}>
+                  <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>
+                    Apenas esta semana! • {activeBox.batch_date_label}
+                  </span>
+                  <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1rem' }}>
+                    {activeBox.title}
+                  </h2>
+                  <p style={{ fontSize: '1.1rem', color: '#594a42', marginBottom: '2rem', lineHeight: '1.6' }}>
+                    {activeBox.description}
+                  </p>
+                  <a href="/caixas" className="btn btn-primary" style={{ padding: '1rem 2rem', display: 'inline-block', width: '100%', textAlign: 'center', background: 'linear-gradient(135deg, #d4af37, #c19b2e)', border: 'none', borderRadius: '40px' }}>
+                    Reservar Minha Caixa
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div style={{ padding: '4rem 2rem', background: 'white', borderRadius: '24px', boxShadow: '0 10px 30px rgba(60, 42, 33, 0.05)' }}>
+                <h2 style={{ fontSize: '2.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>Fique de Olho!</h2>
+                <p style={{ fontSize: '1.1rem', color: '#594a42', marginBottom: '2rem' }}>O lote de Caixas de Degustação desta semana já esgotou ou ainda não foi lançado.</p>
+                <a href="https://instagram.com/thetropicalbakery" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ borderRadius: '40px' }}>
+                  Acompanhar no Instagram
+                </a>
+              </div>
+            )}
           </ScrollReveal>
         </div>
       </section>

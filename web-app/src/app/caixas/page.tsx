@@ -43,11 +43,47 @@ export default function CaixasPage() {
 
   if (!activeBox) {
     return (
-      <main style={{ minHeight: '100vh', background: 'var(--color-background)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <h1 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '1rem' }}>Esgotado!</h1>
-          <p style={{ fontSize: '1.2rem', color: '#594a42' }}>Nenhuma caixa de degustação está disponível no momento. Fique de olho no nosso Instagram para o próximo lançamento!</p>
-        </div>
+      <main style={{ minHeight: '100vh', background: 'var(--color-background)', display: 'flex', flexDirection: 'column' }}>
+        <section style={{ 
+          flex: 1,
+          position: 'relative',
+          padding: 'clamp(6rem, 8vw, 8rem) 1rem', 
+          textAlign: 'center',
+          color: '#fdfaf3',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden'
+        }}>
+          <div
+            style={{
+              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
+              backgroundSize: 'cover', backgroundPosition: 'center',
+              backgroundImage: 'url(/iphone_cacao_pod.jpg), linear-gradient(rgba(60, 42, 33, 0.8), rgba(60, 42, 33, 0.95))',
+              backgroundBlendMode: 'overlay',
+            }}
+          />
+          
+          <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
+            <ScrollReveal>
+              <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem', color: '#d4af37' }}>
+                Preparando o Próximo Lote...
+              </h1>
+              <p style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.9)', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+                Nossas Caixas de Degustação são edições limitadas lançadas semanalmente. O lote atual já esgotou ou estamos preparando o próximo menu surpresa com nossos melhores doces veganos, sem glúten e sem açúcar.
+              </p>
+              
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <a href="https://instagram.com/thetropicalbakery" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '1rem 2rem', background: 'linear-gradient(135deg, #d4af37, #c19b2e)', border: 'none', borderRadius: '40px' }}>
+                  Acompanhar no Instagram
+                </a>
+                <a href="/menu" className="btn btn-secondary" style={{ padding: '1rem 2rem', borderRadius: '40px' }}>
+                  Ver Menu para Eventos
+                </a>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
       </main>
     );
   }

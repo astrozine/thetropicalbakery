@@ -159,7 +159,7 @@ export default function AdminCaixas() {
 
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Data do Lote</label>
-            <input type="text" required value={batchDateLabel} onChange={e => setBatchDateLabel(e.target.value)} placeholder="Ex: Sexta-feira, 3 Outubro" style={{ width: '100%', padding: '0.8rem', border: '1px solid #ccc', borderRadius: '6px' }} />
+            <input type="date" required value={batchDateLabel} onChange={e => setBatchDateLabel(e.target.value)} style={{ width: '100%', padding: '0.8rem', border: '1px solid #ccc', borderRadius: '6px' }} />
           </div>
 
           <div>
@@ -173,8 +173,9 @@ export default function AdminCaixas() {
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Quantidade Vendida (Ajuste Manual)</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Quantidade Vendida</label>
             <input type="number" required value={soldQuantity} onChange={e => setSoldQuantity(Number(e.target.value))} style={{ width: '100%', padding: '0.8rem', border: '1px solid #ccc', borderRadius: '6px' }} />
+            <p style={{ fontSize: '0.8rem', color: '#7f8c8d', marginTop: '0.2rem' }}>(Calculado automaticamente pelas compras no WhatsApp. Edite manualmente apenas se houver cancelamentos ou vendas externas)</p>
           </div>
 
           <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '2rem', alignItems: 'center' }}>
