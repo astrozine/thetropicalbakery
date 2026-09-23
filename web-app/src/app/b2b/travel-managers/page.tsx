@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ZoomableImage from '@/components/ZoomableImage';
 import StripedBackground from '@/components/StripedBackground';
-import BurleMarxBand from '@/components/BurleMarxBand';
 
 const OFFERINGS = [
   {
@@ -74,10 +73,8 @@ export default function TravelManagersPage() {
         </div>
       </section>
 
-      <BurleMarxBand height={110} />
-
       {/* Everything we offer */}
-      <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: '1rem' }}>
+      <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(3.5rem, 7vw, 5.5rem)', paddingBottom: '1rem' }}>
         <h2 style={{ position: 'relative', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#3c2a21', marginBottom: '1rem' }}>
           Tudo o Que Você Pode Incluir no Pacote
         </h2>
@@ -99,7 +96,7 @@ export default function TravelManagersPage() {
       </section>
 
       {/* How the partnership works + gallery */}
-      <section className="container pt-8 pb-20 px-4 max-w-6xl mx-auto">
+      <section className="container px-4 max-w-6xl mx-auto" style={{ paddingTop: '2rem', paddingBottom: 'clamp(5rem, 10vw, 7.5rem)' }}>
         <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '4rem', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }} className="fade-in">
             <div className="liquid-glass-card" style={{ padding: '3rem' }}>

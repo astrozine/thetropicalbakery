@@ -2,7 +2,6 @@ import React from 'react';
 import Image from 'next/image';
 import ZoomableImage from '@/components/ZoomableImage';
 import StripedBackground from '@/components/StripedBackground';
-import BurleMarxBand from '@/components/BurleMarxBand';
 
 export interface PartnershipOption {
   icon: string;
@@ -82,10 +81,8 @@ export default function B2BPageLayout({
         </div>
       </section>
 
-      <BurleMarxBand height={110} />
-
       {/* Partnership options */}
-      <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: '1rem' }}>
+      <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(3.5rem, 7vw, 5.5rem)', paddingBottom: '1rem' }}>
         <h2 style={{ position: 'relative', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#3c2a21', marginBottom: '3rem' }}>
           {optionsHeading}
         </h2>
@@ -103,7 +100,7 @@ export default function B2BPageLayout({
       {children}
 
       {/* Why choose us + CTA */}
-      <section className="container pb-20 px-4 max-w-4xl mx-auto text-center">
+      <section className="container px-4 max-w-4xl mx-auto text-center" style={{ paddingTop: '1rem', paddingBottom: 'clamp(5rem, 10vw, 7.5rem)' }}>
         <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#d4af37', fontFamily: 'var(--font-heading)' }}>Por Que Nos Escolher?</h3>
         <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2.5rem', color: '#594a42', lineHeight: 2, fontSize: '1.05rem' }}>
           {whyChooseUs.map((line, i) => (
