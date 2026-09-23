@@ -13,9 +13,13 @@ interface TastingBox {
   sold_quantity: number;
   price: number;
   is_active: boolean;
+  items?: BoxItem[] | null;
 }
 
 import Link from 'next/link';
+import ToggleSwitch from '@/components/ToggleSwitch';
+import BoxItemsEditor from '@/components/BoxItemsEditor';
+import { BoxItem } from '@/lib/allergens';
 
 export default function AdminCaixas() {
   const [boxes, setBoxes] = useState<TastingBox[]>([]);
@@ -32,6 +36,7 @@ export default function AdminCaixas() {
   const [price, setPrice] = useState(99);
   const [isActive, setIsActive] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [items, setItems] = useState<BoxItem[]>([]);
 
   useEffect(() => {
     fetchBoxes();
@@ -85,6 +90,7 @@ export default function AdminCaixas() {
     setSoldQuantity(0);
     setPrice(99);
     setIsActive(false);
+    setItems([]);
   };
 
   const handleEdit = (box: TastingBox) => {
@@ -97,6 +103,7 @@ export default function AdminCaixas() {
     setSoldQuantity(box.sold_quantity);
     setPrice(box.price);
     setIsActive(box.is_active);
+    setItems(box.items || []);
     
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -110,9 +117,12 @@ export default function AdminCaixas() {
       await supabase.from('tasting_boxes').update({ is_active: false }).neq('id', editingId || '00000000-0000-0000-0000-000000000000');
     }
 
+    // The treats build the box's description; the paragraph is just an optional intro.
+    const cleanItems = items.filter(i => i.name.trim());
     const payload = {
       title,
-      description,
+      description: description.trim() || cleanItems.map(i => `${i.emoji} ${i.name}`).join(' · '),
+      items: cleanItems,
       image_url: imageUrl,
       batch_date_label: batchDateLabel,
       total_quantity: totalQuantity,
@@ -123,10 +133,10 @@ export default function AdminCaixas() {
 
     if (editingId) {
       const { error } = await supabase.from('tasting_boxes').update(payload).eq('id', editingId);
-      if (error) alert('Erro ao atualizar: ' + error.message);
+      if (error) alert('Erro ao atualizar: ' + error.message + (/items/.test(error.message) ? ' — Rode a migration_13_box_items.sql no Supabase primeiro.' : ''));
     } else {
       const { error } = await supabase.from('tasting_boxes').insert([payload]);
-      if (error) alert('Erro ao criar: ' + error.message);
+      if (error) alert('Erro ao criar: ' + error.message + (/items/.test(error.message) ? ' — Rode a migration_13_box_items.sql no Supabase primeiro.' : ''));
     }
 
     resetForm();
@@ -165,8 +175,17 @@ export default function AdminCaixas() {
           </div>
 
           <div style={{ gridColumn: '1 / -1' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Descrição / Doces Inclusos</label>
-            <textarea required value={description} onChange={e => setDescription(e.target.value)} rows={3} style={{ width: '100%', padding: '0.8rem', border: '1px solid #ccc', borderRadius: '6px' }} />
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Texto de abertura (opcional)</label>
+            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder="Uma frase sobre o tema desta edição. Se ficar vazio, usamos a lista dos doces." style={{ width: '100%', padding: '0.8rem', border: '1px solid #ccc', borderRadius: '6px' }} />
+          </div>
+
+          <div style={{ gridColumn: '1 / -1' }}>
+            <h3 style={{ fontSize: '1.2rem', color: '#2c3e50', marginBottom: '0.25rem' }}>🍫 Doces desta caixa</h3>
+            <p style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: '1rem', lineHeight: 1.6 }}>
+              Adicione um doce de cada vez: nome, descrição, foto, ingredientes e alérgenos. O site monta tudo isso numa lista que abre e fecha,
+              com o resumo de alérgenos da caixa inteira.
+            </p>
+            <BoxItemsEditor items={items} onChange={setItems} />
           </div>
 
           <div>
@@ -200,11 +219,14 @@ export default function AdminCaixas() {
           </div>
 
           <div style={{ gridColumn: '1 / -1' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.1rem', color: isActive ? '#27ae60' : '#7f8c8d' }}>
-              <input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} style={{ width: '20px', height: '20px' }} />
-              {isActive ? 'Ativo (Aparecendo no Site)' : 'Inativo (Oculto)'}
-            </label>
-            <p style={{ fontSize: '0.85rem', color: '#7f8c8d', marginTop: '0.5rem' }}>Ao marcar como Ativo, os outros lotes serão desativados automaticamente.</p>
+            <ToggleSwitch
+              checked={isActive}
+              onChange={setIsActive}
+              label="Mostrar esta caixa no site"
+              onText="Ativado — aparecendo no site"
+              offText="Desativado — escondida do site"
+              helper="Ao ativar, as outras caixas são desativadas automaticamente."
+            />
           </div>
 
           <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem', marginTop: '1rem' }}>

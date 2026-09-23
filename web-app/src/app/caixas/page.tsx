@@ -8,6 +8,8 @@ import BoxOrder from '@/components/BoxOrder';
 import ScrollReveal from '@/components/ScrollReveal';
 import WaitlistCapture from '@/components/WaitlistCapture';
 import Marquee from '@/components/Marquee';
+import BoxContents from '@/components/BoxContents';
+import { BoxItem } from '@/lib/allergens';
 
 interface TastingBox {
   id: string;
@@ -18,6 +20,7 @@ interface TastingBox {
   total_quantity: number;
   sold_quantity: number;
   price: number;
+  items?: BoxItem[] | null;
 }
 
 export default function CaixasPage() {
@@ -191,6 +194,8 @@ export default function CaixasPage() {
           </ScrollReveal>
         </div>
       </section>
+
+      {activeBox.items && activeBox.items.length > 0 && <BoxContents items={activeBox.items} />}
 
       {/* Checkout Section */}
       <section id="order" style={{ padding: '4rem 2rem' }}>

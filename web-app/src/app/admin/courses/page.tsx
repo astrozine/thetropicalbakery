@@ -1,5 +1,6 @@
 'use client';
 
+import ToggleSwitch from '@/components/ToggleSwitch';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
@@ -190,15 +191,14 @@ export default function CoursesAdmin() {
             />
           </div>
 
-          <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <input 
-              type="checkbox" 
-              id="is_active"
+          <div style={{ gridColumn: '1 / -1' }}>
+            <ToggleSwitch
               checked={formData.is_active ?? true}
-              onChange={e => setFormData({...formData, is_active: e.target.checked})}
-              style={{ width: '1.2rem', height: '1.2rem' }}
+              onChange={v => setFormData({ ...formData, is_active: v })}
+              label="Mostrar este curso no site"
+              onText="Ativado — aparecendo no site"
+              offText="Desativado — escondido do site"
             />
-            <label htmlFor="is_active" style={{ fontWeight: 'bold' }}>Curso Ativo</label>
           </div>
 
           <div style={{ gridColumn: '1 / -1' }}>

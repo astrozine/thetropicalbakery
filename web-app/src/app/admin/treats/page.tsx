@@ -1,5 +1,6 @@
 'use client';
 
+import ToggleSwitch from '@/components/ToggleSwitch';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
@@ -205,15 +206,14 @@ export default function TreatsAdmin() {
             <small style={{ color: '#7f8c8d' }}>Ex: 10 (se só puder pedir 10, 20, 30...)</small>
           </div>
 
-          <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <input 
-              type="checkbox" 
-              id="is_available"
+          <div style={{ gridColumn: '1 / -1' }}>
+            <ToggleSwitch
               checked={formData.is_available ?? true}
-              onChange={e => setFormData({...formData, is_available: e.target.checked})}
-              style={{ width: '1.2rem', height: '1.2rem' }}
+              onChange={v => setFormData({ ...formData, is_available: v })}
+              label="Mostrar este doce no Menu"
+              onText="Ativado — aparecendo no menu"
+              offText="Desativado — escondido do menu"
             />
-            <label htmlFor="is_available" style={{ fontWeight: 'bold' }}>Disponível no Menu</label>
           </div>
 
           <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
