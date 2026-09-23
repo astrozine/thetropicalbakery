@@ -28,6 +28,15 @@ export default function AdminDashboard() {
           </Link>
         </div>
 
+        {/* Inscrições em Cursos Card */}
+        <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+          <h3 style={{ fontSize: '1.2rem', color: '#3c2a21', marginBottom: '1rem' }}>Inscrições em Cursos</h3>
+          <p style={{ color: '#7f8c8d', marginBottom: '2rem' }}>Veja quem pediu informações sobre cursos, retiros e experiências — seus contatos mais quentes.</p>
+          <Link href="/admin/inscricoes" style={{ display: 'inline-block', background: '#8e44ad', color: 'white', padding: '0.8rem 1.5rem', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' }}>
+            Ver Inscrições
+          </Link>
+        </div>
+
       </div>
     </div>
   );

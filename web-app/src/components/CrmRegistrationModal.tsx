@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
-import SocialLoginPrompt from '@/components/SocialLoginPrompt';
+import LoginPanel from '@/components/LoginPanel';
 
 interface CrmRegistrationModalProps {
   isOpen: boolean;
@@ -161,7 +161,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                 )}
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
-                  <SocialLoginPrompt message="Entre para preencher seus dados automaticamente:" />
+                  <LoginPanel />
                   
                   <label style={{ display: 'block' }}>
                     <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.4rem' }}>Nome Completo *</span>

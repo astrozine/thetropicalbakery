@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 export default function CartDrawer() {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
   const router = useRouter();
+  const { profile, saveProfile } = useAuth();
   const [customerName, setCustomerName] = useState('');
   const [whatsappNumber, setWhatsappNumber] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
@@ -21,6 +23,30 @@ export default function CartDrawer() {
   const [isSaltFree, setIsSaltFree] = useState(false);
   const [isOilFree, setIsOilFree] = useState(false);
 
+  // Anything we already know — from their account, or from a form they filled
+  // earlier on this device — is filled in for them. Nobody should have to type
+  // their address again to order a second time.
+  useEffect(() => {
+    const savedName = localStorage.getItem('checkout_fullName');
+    const savedPhone = localStorage.getItem('checkout_phone');
+    const savedAddress = localStorage.getItem('checkout_address');
+    if (savedName) setCustomerName(prev => prev || savedName);
+    if (savedPhone) setWhatsappNumber(prev => prev || savedPhone);
+    if (savedAddress) setDeliveryAddress(prev => prev || savedAddress);
+  }, []);
+
+  useEffect(() => {
+    if (!profile) return;
+    if (profile.full_name) setCustomerName(profile.full_name);
+    if (profile.phone) setWhatsappNumber(profile.phone);
+    if (profile.address) setDeliveryAddress(profile.address);
+    setIsVegan(profile.is_vegan);
+    setIsGlutenFree(profile.is_gluten_free);
+    setIsSugarFree(profile.is_sugar_free);
+    setIsSaltFree(profile.is_salt_free);
+    setIsOilFree(profile.is_oil_free);
+  }, [profile]);
+
   const formatPrice = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
@@ -31,39 +57,36 @@ export default function CartDrawer() {
       return;
     }
 
+    // Remember it for next time, on this device and on their account.
+    localStorage.setItem('checkout_fullName', customerName);
+    localStorage.setItem('checkout_phone', whatsappNumber);
+    localStorage.setItem('checkout_address', deliveryAddress);
+
     try {
-      const randomPassword = Math.random().toString(36).slice(-8);
-      
-      // First try to insert
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert([{
-          full_name: customerName,
-          whatsapp_number: whatsappNumber,
-          password_hash: randomPassword,
-          location: deliveryAddress,
-          is_vegan: isVegan,
-          is_gluten_free: isGlutenFree,
-          is_sugar_free: isSugarFree,
-          is_salt_free: isSaltFree,
-          is_oil_free: isOilFree,
-        }]);
-        
-      if (insertError && insertError.code === '23505') {
-        // If unique constraint violation (user exists), try updating their info
-        await supabase
-          .from('users')
-          .update({
-            full_name: customerName,
-            location: deliveryAddress,
-            is_vegan: isVegan,
-            is_gluten_free: isGlutenFree,
-            is_sugar_free: isSugarFree,
-            is_salt_free: isSaltFree,
-            is_oil_free: isOilFree,
-          })
-          .eq('whatsapp_number', whatsappNumber);
-      }
+      await saveProfile({
+        full_name: customerName,
+        phone: whatsappNumber,
+        address: deliveryAddress,
+        is_vegan: isVegan,
+        is_gluten_free: isGlutenFree,
+        is_sugar_free: isSugarFree,
+        is_salt_free: isSaltFree,
+        is_oil_free: isOilFree,
+      });
+
+      // Saved through a controlled database function so the customer list
+      // itself stays unreadable to the public.
+      const { error: crmError } = await supabase.rpc('upsert_crm_customer', {
+        p_full_name: customerName,
+        p_whatsapp_number: whatsappNumber,
+        p_location: deliveryAddress,
+        p_is_vegan: isVegan,
+        p_is_gluten_free: isGlutenFree,
+        p_is_sugar_free: isSugarFree,
+        p_is_salt_free: isSaltFree,
+        p_is_oil_free: isOilFree,
+      });
+      if (crmError) console.error('CRM save error:', crmError);
     } catch (e) {
       console.error("CRM Error:", e);
     }

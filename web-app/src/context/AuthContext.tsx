@@ -18,25 +18,61 @@ export interface UserProfile {
   is_oil_free: boolean;
 }
 
-export type AuthProvider = 'google' | 'facebook';
+export type OAuthProvider = 'google' | 'facebook';
+export type LoginMethod = OAuthProvider | 'email' | 'phone';
+
+/** Everything here reports problems as a returned message rather than throwing.
+ *  These run in the middle of someone placing an order — a login hiccup must
+ *  show a friendly line of Portuguese, never blow up the checkout. */
+type Result = { error?: string };
 
 interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
-  availableProviders: AuthProvider[];
-  signIn: (provider: AuthProvider) => Promise<void>;
+  availableMethods: LoginMethod[];
+  signInWithProvider: (provider: OAuthProvider) => Promise<Result>;
+  sendEmailLink: (email: string) => Promise<Result>;
+  sendPhoneCode: (phone: string) => Promise<Result>;
+  verifyPhoneCode: (phone: string, code: string) => Promise<Result>;
   signOut: () => Promise<void>;
   saveProfile: (data: Partial<UserProfile>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Turns whatever a Brazilian customer types into the +55DDXXXXXXXXX format
+ * that SMS requires. Accepts "(12) 99123-4567", "12991234567", "+55 12 99123 4567".
+ * Returns null when it isn't a plausible Brazilian mobile.
+ */
+export function toBrazilianE164(input: string): string | null {
+  const digits = input.replace(/\D/g, '');
+
+  const withoutCountry = digits.startsWith('55') && digits.length > 11
+    ? digits.slice(2)
+    : digits;
+
+  // DDD (2) + mobile number (9, always starting with 9 in Brazil)
+  if (withoutCountry.length !== 11) return null;
+  if (withoutCountry[2] !== '9') return null;
+
+  return `+55${withoutCountry}`;
+}
+
+/** Pretty-prints a stored number back as (12) 99123-4567 for display. */
+export function formatBrazilianPhone(input: string | null | undefined): string {
+  if (!input) return '';
+  const d = input.replace(/\D/g, '').replace(/^55/, '');
+  if (d.length !== 11) return input;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [availableProviders, setAvailableProviders] = useState<AuthProvider[]>([]);
+  const [availableMethods, setAvailableMethods] = useState<LoginMethod[]>([]);
 
   const fetchProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
@@ -71,40 +107,102 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
 
-  // Ask Supabase which social providers are actually configured, so we never
-  // render a button that would fail. Enabling Facebook in the Supabase
-  // dashboard makes its button appear with no code change.
+  // Ask Supabase which sign-in methods are actually switched on, so we never
+  // show a button that would fail. Turning Facebook or phone login on in the
+  // Supabase dashboard makes it appear here with no code change.
   useEffect(() => {
-    const loadProviders = async () => {
+    const loadMethods = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/settings`, {
           headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! },
         });
         const settings = await res.json();
-        const enabled = (['google', 'facebook'] as AuthProvider[])
-          .filter(provider => settings?.external?.[provider]);
-        setAvailableProviders(enabled);
+        const enabled = (['google', 'facebook', 'phone', 'email'] as LoginMethod[])
+          .filter(method => settings?.external?.[method]);
+        setAvailableMethods(enabled);
       } catch {
-        setAvailableProviders(['google']);
+        // Fall back to the two we know are configured rather than showing nothing.
+        setAvailableMethods(['google', 'email']);
       }
     };
 
-    loadProviders();
+    loadMethods();
   }, []);
 
-  const signIn = async (provider: AuthProvider) => {
+  const signInWithProvider = async (provider: OAuthProvider): Promise<Result> => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       // Come back to the page they were on — someone signing in mid-checkout
       // should land back in that checkout, not on the homepage.
       options: { redirectTo: window.location.href },
     });
-    if (error) throw error;
+    if (error) return { error: 'Não foi possível abrir o login. Tente novamente.' };
+    return {};
+  };
+
+  const sendEmailLink = async (email: string): Promise<Result> => {
+    const trimmed = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      return { error: 'Digite um e-mail válido.' };
+    }
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email: trimmed,
+      options: { emailRedirectTo: window.location.href },
+    });
+
+    if (error) {
+      console.error('Email login error:', error);
+      return {
+        error: error.status === 429
+          ? 'Muitas tentativas. Aguarde alguns minutos e tente de novo.'
+          : 'Não foi possível enviar o e-mail. Tente novamente.',
+      };
+    }
+    return {};
+  };
+
+  const sendPhoneCode = async (phone: string): Promise<Result> => {
+    const e164 = toBrazilianE164(phone);
+    if (!e164) {
+      return { error: 'Digite o número com DDD, por exemplo (12) 99123-4567.' };
+    }
+
+    const { error } = await supabase.auth.signInWithOtp({ phone: e164 });
+
+    if (error) {
+      console.error('Phone login error:', error);
+      return {
+        error: error.status === 429
+          ? 'Muitas tentativas. Aguarde alguns minutos e tente de novo.'
+          : 'Não foi possível enviar o código. Tente novamente.',
+      };
+    }
+    return {};
+  };
+
+  const verifyPhoneCode = async (phone: string, code: string): Promise<Result> => {
+    const e164 = toBrazilianE164(phone);
+    if (!e164) return { error: 'Número inválido.' };
+
+    const digits = code.replace(/\D/g, '');
+    if (digits.length !== 6) return { error: 'O código tem 6 dígitos.' };
+
+    const { error } = await supabase.auth.verifyOtp({
+      phone: e164,
+      token: digits,
+      type: 'sms',
+    });
+
+    if (error) {
+      console.error('Phone verify error:', error);
+      return { error: 'Código incorreto ou expirado. Peça um novo código.' };
+    }
+    return {};
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    await supabase.auth.signOut();
   };
 
   // Deliberately never throws. This runs while an order is being placed, and a
@@ -112,9 +210,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const saveProfile = async (data: Partial<UserProfile>) => {
     if (!user) return;
 
-    const { error } = await supabase
-      .from('user_profiles')
-      .upsert({ id: user.id, email: user.email, ...data });
+    // Only ever send columns we have a real value for. Sending `null` would
+    // erase a detail the customer already gave us on an earlier order.
+    const payload: Record<string, unknown> = { id: user.id, ...data };
+    if (data.email === undefined && user.email) payload.email = user.email;
+    if (data.phone === undefined && user.phone) {
+      payload.phone = `+${user.phone.replace(/\D/g, '')}`;
+    }
+
+    const { error } = await supabase.from('user_profiles').upsert(payload);
 
     if (error) {
       console.error('Could not save profile:', error);
@@ -129,8 +233,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user,
       profile,
       loading,
-      availableProviders,
-      signIn,
+      availableMethods,
+      signInWithProvider,
+      sendEmailLink,
+      sendPhoneCode,
+      verifyPhoneCode,
       signOut,
       saveProfile,
     }}>

@@ -42,8 +42,17 @@ export default function PrivacyPolicyPage() {
             <li style={liStyle}>Data desejada para entrega, curso ou retiro</li>
           </ul>
           <p style={pStyle}>
-            Se você optar por entrar com Google ou Facebook para não precisar preencher esses dados a cada
-            pedido, recebemos do provedor apenas seu nome, e-mail e foto de perfil — nunca sua senha.
+            Você pode criar uma conta para não precisar preencher esses dados a cada pedido. Há quatro
+            formas de entrar, e você escolhe a que preferir:
+          </p>
+          <ul style={{ paddingLeft: '1.5rem', marginBottom: '1rem' }}>
+            <li style={liStyle}><strong>Google ou Facebook</strong> — recebemos do provedor apenas seu nome, e-mail e foto de perfil, nunca sua senha</li>
+            <li style={liStyle}><strong>Número de celular</strong> — enviamos um código por SMS para confirmar que o número é seu</li>
+            <li style={liStyle}><strong>E-mail</strong> — enviamos um link de acesso, sem necessidade de criar senha</li>
+          </ul>
+          <p style={pStyle}>
+            Em todos os casos, guardamos apenas o necessário para reconhecer você no próximo pedido e
+            preencher seus dados automaticamente. Nunca guardamos senhas.
           </p>
         </section>
 

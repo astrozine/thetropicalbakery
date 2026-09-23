@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import SocialLoginPrompt from '@/components/SocialLoginPrompt';
+import LoginPanel from '@/components/LoginPanel';
 import { generatePixData } from '@/utils/pix';
 
 import { supabase } from '@/lib/supabase';
@@ -28,10 +28,12 @@ export default function CheckoutPage() {
   useEffect(() => {
     const savedName = localStorage.getItem('checkout_fullName');
     const savedPhone = localStorage.getItem('checkout_phone');
+    const savedAddress = localStorage.getItem('checkout_address');
     setFormData(prev => ({
       ...prev,
       name: prev.name || savedName || '',
       whatsapp: prev.whatsapp || savedPhone || '',
+      address: prev.address || savedAddress || '',
     }));
   }, []);
 
@@ -50,7 +52,8 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (formData.name) localStorage.setItem('checkout_fullName', formData.name);
     if (formData.whatsapp) localStorage.setItem('checkout_phone', formData.whatsapp);
-  }, [formData.name, formData.whatsapp]);
+    if (formData.address) localStorage.setItem('checkout_address', formData.address);
+  }, [formData.name, formData.whatsapp, formData.address]);
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,7 +178,7 @@ export default function CheckoutPage() {
                 <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '2rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>Informações de Entrega</h2>
 
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <SocialLoginPrompt />
+                  <LoginPanel />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>

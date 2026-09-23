@@ -6,6 +6,29 @@ import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 
+/**
+ * Asks the database whether the signed-in person is on the admin list.
+ *
+ * Being signed in is NOT enough — customers sign in too, and without this
+ * check any of them could open /admin and read the whole customer database.
+ *
+ * If the security migration hasn't been run yet the function doesn't exist, so
+ * we report 'unprotected' and let the owner in with a warning rather than
+ * locking them out of their own panel.
+ */
+async function checkAdminAccess(): Promise<'allowed' | 'denied' | 'unprotected'> {
+  const { data, error } = await supabase.rpc('is_admin');
+
+  if (error) {
+    const missing = error.code === 'PGRST202' || /does not exist|not found/i.test(error.message);
+    if (missing) return 'unprotected';
+    console.error('Admin check failed:', error);
+    return 'denied';
+  }
+
+  return data === true ? 'allowed' : 'denied';
+}
+
 export default function AdminLayout({
   children,
 }: {
@@ -17,6 +40,10 @@ export default function AdminLayout({
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // 'allowed'        — on the admin list
+  // 'denied'         — signed in, but not an admin
+  // 'unprotected'    — the security migration hasn't been run yet
+  const [access, setAccess] = useState<'checking' | 'allowed' | 'denied' | 'unprotected'>('checking');
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -33,16 +60,19 @@ export default function AdminLayout({
         router.push('/admin/login');
       } else {
         setUser(session?.user || null);
+        if (session) setAccess(await checkAdminAccess());
       }
       setLoading(false);
     };
 
     checkUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user || null);
       if (!session && pathname !== '/admin/login') {
         router.push('/admin/login');
+      } else if (session) {
+        setAccess(await checkAdminAccess());
       }
     });
 
@@ -63,10 +93,37 @@ export default function AdminLayout({
     router.push('/admin/login');
   };
 
+  if (access === 'checking') {
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Verificando acesso...</div>;
+  }
+
+  // Signed in, but not on the admin list — a customer account, most likely.
+  if (access === 'denied') {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f6fa', padding: '2rem' }}>
+        <div style={{ background: 'white', padding: '2.5rem', borderRadius: '12px', maxWidth: '440px', textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <h1 style={{ fontSize: '1.5rem', color: '#2c3e50', marginBottom: '1rem' }}>Acesso Restrito</h1>
+          <p style={{ color: '#7f8c8d', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+            Esta área é só para a equipe da Tropical Bakery. A conta{' '}
+            <strong style={{ color: '#2c3e50', wordBreak: 'break-all' }}>{user?.email || user?.phone}</strong>{' '}
+            não tem permissão de administrador.
+          </p>
+          <button onClick={handleLogout} style={{ background: '#2c3e50', color: 'white', border: 'none', padding: '0.8rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+            Entrar com outra conta
+          </button>
+          <p style={{ marginTop: '1.5rem' }}>
+            <Link href="/" style={{ color: '#7f8c8d', fontSize: '0.9rem' }}>← Voltar para o site</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const navItems = [
     { name: 'Visão Geral', path: '/admin' },
     { name: 'Caixas da Semana', path: '/admin/caixas' },
     { name: 'Fila de Espera', path: '/admin/waitlist' },
+    { name: 'Inscrições em Cursos', path: '/admin/inscricoes' },
     { name: 'Catálogo de Doces', path: '/admin/treats' },
     { name: 'Cursos', path: '/admin/courses' },
     { name: 'Retiros (Imagens)', path: '/admin/retreats' },
@@ -163,6 +220,17 @@ export default function AdminLayout({
 
       {/* Main Content Area */}
       <main style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+        {access === 'unprotected' && (
+          <div style={{
+            background: '#fff4e5', border: '1px solid #ffb74d', borderLeft: '5px solid #f57c00',
+            borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '2rem', color: '#7a4a00', lineHeight: 1.6,
+          }}>
+            <strong>Atenção: esta área ainda não está protegida.</strong><br />
+            Qualquer cliente que entre no site pode abrir este painel e ver a lista de clientes.
+            Rode o arquivo <code>migration_02_accounts_and_security.sql</code> no SQL Editor do
+            Supabase para corrigir isso.
+          </div>
+        )}
         {children}
       </main>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 /**
@@ -35,6 +36,12 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
           {avatar}
           <span className="notranslate" translate="no" style={{ color: '#3c2a21', fontWeight: 600 }}>{displayName}</span>
         </div>
+        <Link
+          href="/minha-conta"
+          style={{ display: 'block', color: '#594a42', fontSize: '1rem', textDecoration: 'none', marginBottom: '0.75rem' }}
+        >
+          Minha Conta
+        </Link>
         <button
           onClick={signOut}
           style={{
@@ -68,6 +75,15 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
           backdropFilter: 'blur(10px)', minWidth: '160px', padding: '0.5rem 0', borderRadius: '8px',
           boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
         }}>
+          <Link
+            href="/minha-conta"
+            style={{
+              display: 'block', padding: '0.5rem 1.5rem', color: '#594a42',
+              fontSize: '0.9rem', textTransform: 'uppercase', textDecoration: 'none',
+            }}
+          >
+            Minha Conta
+          </Link>
           <button
             onClick={signOut}
             style={{

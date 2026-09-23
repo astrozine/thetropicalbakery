@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
-import SocialLoginPrompt from '@/components/SocialLoginPrompt';
+import LoginPanel from '@/components/LoginPanel';
 
 const DELIVERY_ZONES = [
   { id: 'zone1', label: 'Itamambuca', fee: 0, minBoxes: 1 },
@@ -138,39 +138,21 @@ export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride, ma
         }
       }
 
-      // 2. Save to CRM (users table)
-      const randomPassword = Math.random().toString(36).slice(-8);
-      
-      const crmRecord = {
-        full_name: fullName,
-        location: `${address} - ${selectedZone?.label}`,
-        is_vegan: isVegan,
-        is_gluten_free: isGlutenFree,
-        is_sugar_free: isSugarFree,
-        is_salt_free: isSaltFree,
-        is_oil_free: isOilFree,
-        // Ties this CRM record to their account when they're signed in.
-        auth_user_id: user?.id ?? null,
-        email: user?.email ?? null,
-      };
-
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert([{
-          ...crmRecord,
-          whatsapp_number: whatsappNumber,
-          password_hash: randomPassword,
-        }]);
-
-      if (insertError && insertError.code === '23505') {
-        // Returning customer (whatsapp_number is unique) — refresh their details.
-        await supabase
-          .from('users')
-          .update(crmRecord)
-          .eq('whatsapp_number', whatsappNumber);
-      } else if (insertError) {
-        console.error("Insert error:", insertError);
-      }
+      // 2. Save to CRM — through a controlled database function, so the customer
+      //    list itself stays unreadable to the public. It links the record to
+      //    their account server-side when they're signed in.
+      const { error: crmError } = await supabase.rpc('upsert_crm_customer', {
+        p_full_name: fullName,
+        p_whatsapp_number: whatsappNumber,
+        p_location: `${address} - ${selectedZone?.label}`,
+        p_email: user?.email ?? null,
+        p_is_vegan: isVegan,
+        p_is_gluten_free: isGlutenFree,
+        p_is_sugar_free: isSugarFree,
+        p_is_salt_free: isSaltFree,
+        p_is_oil_free: isOilFree,
+      });
+      if (crmError) console.error('CRM save error:', crmError);
 
       // 3. Redirect to WhatsApp
       const storeWhatsappNumber = '5511932119196'; 
@@ -269,7 +251,7 @@ export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride, ma
           <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: '1.6' }}>Entregas exclusivas para Itamambuca, praias vizinhas e eventos em Paraty. Preencha seus dados para montarmos uma caixa perfeita para suas restrições!</p>
         </div>
         
-        <SocialLoginPrompt message="Já tem cadastro? Entre para um checkout mais rápido:" />
+        <LoginPanel />
 
         {/* Basic Info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: '#fdfaf3', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7' }}>

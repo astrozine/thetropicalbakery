@@ -114,7 +114,7 @@ export default function Navigation() {
         padding: '1rem'
       }}>
         <Link href="/" className="glass-pill logo-pill" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', maxWidth: '70vw' }}>
-          <img src="/logo.svg" alt="The Tropical Bakery Logo" style={{ height: '60px', maxWidth: '100%', objectFit: 'contain' }} />
+          <img src="/logo-gold.webp" alt="The Tropical Bakery Logo" style={{ height: '62px', maxWidth: '100%', objectFit: 'contain' }} />
         </Link>
         
         {/* Desktop Menu & Cart */}
@@ -337,7 +337,7 @@ export default function Navigation() {
             flexShrink: 0,
           }}>
             <Link href="/" onClick={closeMenu} style={{ textDecoration: 'none' }}>
-              <img src="/logo.svg" alt="Logo" style={{ height: '50px' }} />
+              <img src="/logo-gold.webp" alt="Logo" style={{ height: '52px' }} />
             </Link>
             <button 
               onClick={closeMenu}
