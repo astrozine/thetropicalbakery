@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import WhatsAppCheckout from '@/components/WhatsAppCheckout';
 import Marquee from '@/components/Marquee';
 import ScrollReveal from '@/components/ScrollReveal';
 import ExplodingTreats from '@/components/ExplodingTreats';

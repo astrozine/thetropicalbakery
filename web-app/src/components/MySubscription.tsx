@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import { Subscription, SubscriptionPlan, STATUS_LABELS, DIETARY_FIELDS } from '@/lib/subscriptions';
 import { formatBRL } from '@/lib/deliveryZones';
+import DeliveryCalendar from '@/components/DeliveryCalendar';
 
 interface Delivery {
   id: string;
@@ -160,6 +161,14 @@ export default function MySubscription() {
             )}
           </div>
         )}
+
+        {/* The shared, cheerful box calendar — your own deliveries are the teal stars */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <DeliveryCalendar
+            title="Dias de caixa"
+            highlight={upcoming.filter(d => d.status !== 'skipped').map(d => d.delivery_date)}
+          />
+        </div>
 
         {/* Plan facts */}
         <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '1.5rem', fontSize: '0.9rem', color: '#594a42' }}>

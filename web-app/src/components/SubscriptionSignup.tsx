@@ -191,7 +191,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
           mesmo dia.
         </p>
         <p style={{ color: '#7a6a61', fontSize: '0.9rem', marginBottom: '2rem' }}>
-          Sua primeira caixa sai no próximo sábado depois da confirmação.
+          Sua primeira caixa sai no próximo dia de entrega depois da confirmação.
         </p>
         <a
           href={waUrl}

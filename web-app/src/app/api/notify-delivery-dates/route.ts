@@ -91,10 +91,10 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Rule-generated dates have no delivery_dates row, so notifications get their own table.
   await supabase
-    .from('delivery_dates')
-    .update({ notified_at: new Date().toISOString() })
-    .in('delivery_date', dates);
+    .from('delivery_notifications')
+    .upsert(dates.map(d => ({ delivery_date: d, notified_at: new Date().toISOString() })), { onConflict: 'delivery_date' });
 
   return NextResponse.json({ sent, total: uniqueEmails.length });
 }

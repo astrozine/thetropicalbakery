@@ -4,6 +4,8 @@ import { InspirationTeaser } from '@/components/InspirationSection';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import StripedBackground from '@/components/StripedBackground';
+import HighlightsHero from '@/components/HighlightsHero';
+import DeliveryCalendar from '@/components/DeliveryCalendar';
 import SubscriptionSignup from '@/components/SubscriptionSignup';
 import ScrollReveal from '@/components/ScrollReveal';
 import { SubscriptionPlan, monthlySavings } from '@/lib/subscriptions';
@@ -25,8 +27,8 @@ const HOW_IT_WORKS = [
   },
   {
     step: '03',
-    title: 'Sua caixa chega no sábado',
-    body: 'Feita no dia, entregue fresca em Itamambuca e região. Você só abre e se serve.',
+    title: 'Sua caixa chega no dia de entrega',
+    body: 'Feita no dia, entregue fresca em Itamambuca e região. Os dias de entrega estão no calendário aí embaixo — você só abre e se serve.',
   },
 ];
 
@@ -118,12 +120,7 @@ export default function SubscriptionPage() {
 
       {/* ---------------------------------------------------------------- HERO */}
       <StripedBackground tone="dark" bandHeight={96} style={{ paddingTop: 'clamp(7rem, 12vw, 10rem)', paddingBottom: 'clamp(4rem, 8vw, 7rem)' }}>
-        <div className="hero-side-image hero-side-image-left">
-          <img src="/box2.jpg" alt="Caixa de Degustação The Tropical Bakery" />
-        </div>
-        <div className="hero-side-image hero-side-image-right">
-          <img src="/box4.jpg" alt="Caixa de Degustação The Tropical Bakery" />
-        </div>
+        <HighlightsHero>
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center' }}>
           <img src="/logo-gold.webp" alt="" style={{ height: 'clamp(72px, 12vw, 104px)', margin: '0 auto 2rem', display: 'block' }} />
 
@@ -147,7 +144,7 @@ export default function SubscriptionPage() {
             fontSize: 'clamp(1rem, 2.4vw, 1.2rem)', color: 'rgba(253,250,243,0.86)',
             lineHeight: 1.85, maxWidth: '620px', margin: '0 auto 2.5rem',
           }}>
-            Uma criação nova a cada sábado, feita à mão pela Dolly em Itamambuca.
+            Uma criação nova a cada semana, feita à mão pela Dolly em Itamambuca.
             Vegana, sem glúten, sem açúcar refinado — e sem nunca repetir a semana anterior.
           </p>
 
@@ -163,6 +160,7 @@ export default function SubscriptionPage() {
             Vagas limitadas — tudo é feito em uma cozinha, por uma pessoa.
           </p>
         </div>
+        </HighlightsHero>
       </StripedBackground>
 
       {/* -------------------------------------------------------- HOW IT WORKS */}
@@ -195,6 +193,24 @@ export default function SubscriptionPage() {
               </ScrollReveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------- DELIVERY CALENDAR */}
+      <section style={{ padding: '0 1.5rem clamp(4rem, 9vw, 7rem)' }}>
+        <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+          <ScrollReveal>
+            <h2 style={{
+              fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.7rem, 4.5vw, 2.4rem)',
+              color: 'var(--color-primary)', textAlign: 'center', marginBottom: '0.6rem',
+            }}>
+              O melhor dia da semana 🎉
+            </h2>
+            <p style={{ textAlign: 'center', color: '#594a42', lineHeight: 1.8, marginBottom: '2rem' }}>
+              Cada dia laranja é um dia de caixa. É quando a sua chega, fresquinha, na sua porta.
+            </p>
+            <DeliveryCalendar title="Calendário de entregas" />
+          </ScrollReveal>
         </div>
       </section>
 

@@ -10,11 +10,16 @@ export interface CartItem {
   quantity: number;
   min_batch_size?: number;
   batch_multiplier?: number;
+  /** 'box' = a Degustation Box (uses the box delivery calendar); anything else is a Menu de Eventos item. */
+  kind?: 'box' | 'events';
+  /** For boxes: which tasting_boxes row to decrement, and how many are left. */
+  tasting_box_id?: string;
+  max_quantity?: number;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
+  addToCart: (item: Omit<CartItem, 'quantity'>, options?: { open?: boolean; quantity?: number }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -47,17 +52,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('tropical_cart', JSON.stringify(items));
   }, [items]);
 
-  const addToCart = (newItem: Omit<CartItem, 'quantity'>) => {
+  const addToCart = (newItem: Omit<CartItem, 'quantity'>, options?: { open?: boolean; quantity?: number }) => {
     setItems(current => {
       const existing = current.find(i => i.id === newItem.id);
       if (existing) {
         const batch = existing.batch_multiplier || 1;
-        return current.map(i => i.id === newItem.id ? { ...i, quantity: i.quantity + batch } : i);
+        const next = existing.quantity + batch;
+        if (existing.max_quantity && next > existing.max_quantity) return current;
+        return current.map(i => i.id === newItem.id ? { ...i, quantity: next } : i);
       }
       const minBatch = newItem.min_batch_size || 1;
-      return [...current, { ...newItem, quantity: minBatch }];
+      return [...current, { ...newItem, quantity: options?.quantity ?? minBatch }];
     });
-    setIsCartOpen(true); // Auto-open cart when adding
+    if (options?.open !== false) setIsCartOpen(true); // Auto-open cart when adding
   };
 
   const removeFromCart = (id: string) => {
@@ -77,6 +84,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (!item) return current;
       if (quantity < (item.min_batch_size || 1)) {
         return current; // Do nothing if trying to go below minimum
+      }
+      if (item.max_quantity && quantity > item.max_quantity) {
+        return current; // Sold out beyond this
       }
       return current.map(i => i.id === id ? { ...i, quantity } : i);
     });

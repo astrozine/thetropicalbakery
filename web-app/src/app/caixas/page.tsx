@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import StripedBackground from '@/components/StripedBackground';
-import WhatsAppCheckout from '@/components/WhatsAppCheckout';
+import BoxOrder from '@/components/BoxOrder';
 import ScrollReveal from '@/components/ScrollReveal';
 import WaitlistCapture from '@/components/WaitlistCapture';
 import Marquee from '@/components/Marquee';
+import HighlightsHero from '@/components/HighlightsHero';
 
 interface TastingBox {
   id: string;
@@ -163,7 +164,9 @@ export default function CaixasPage() {
           }}
         />
         
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+        <HighlightsHero>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <ScrollReveal>
             <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.5rem' }}>
               Edição Limitada • {activeBox.batch_date_label}
@@ -190,13 +193,15 @@ export default function CaixasPage() {
             </div>
           </ScrollReveal>
         </div>
+        </HighlightsHero>
+        </div>
       </section>
 
       {/* Checkout Section */}
       <section id="order" style={{ padding: '4rem 2rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <ScrollReveal>
-            <WhatsAppCheckout activeTastingBoxId={activeBox.id} priceOverride={activeBox.price} maxQuantity={remainingQuantity} />
+            <BoxOrder box={activeBox} maxQuantity={remainingQuantity} />
           </ScrollReveal>
         </div>
       </section>
