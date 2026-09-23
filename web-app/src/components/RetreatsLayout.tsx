@@ -6,6 +6,8 @@ import ZoomableImage from '@/components/ZoomableImage';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 import RetreatPricingCalculator from '@/components/RetreatPricingCalculator';
 import RoomsAccordion from '@/components/RoomsAccordion';
+import RetreatTracks from '@/components/RetreatTracks';
+import { InspirationSection } from '@/components/InspirationSection';
 import { supabase } from '@/lib/supabase';
 
 export interface RetreatsLayoutProps {
@@ -262,6 +264,10 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           <RoomsAccordion onInquire={(name) => { setSelectedInterest(name); setIsModalOpen(true); }} />
         </div>
       </section>
+
+      <RetreatTracks onInquire={(interest) => { setSelectedInterest(interest); setIsModalOpen(true); }} />
+
+      <InspirationSection />
 
       {/* Pricing Calculator */}
       <section style={{ padding: 'clamp(4rem, 8vw, 6rem) 1.5rem', background: 'linear-gradient(180deg, #2e4432 0%, #3c2a21 100%)' }}>

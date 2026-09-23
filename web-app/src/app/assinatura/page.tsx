@@ -1,5 +1,6 @@
 'use client';
 
+import { InspirationTeaser } from '@/components/InspirationSection';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import StripedBackground from '@/components/StripedBackground';
@@ -383,6 +384,10 @@ export default function SubscriptionPage() {
             onSelectPlan={setSelectedPlanId}
           />
         )}
+      </section>
+
+      <section style={{ padding: '0 1.5rem clamp(3rem, 6vw, 4.5rem)' }}>
+        <InspirationTeaser />
       </section>
 
       {/* --------------------------------------------------------------- FAQ */}

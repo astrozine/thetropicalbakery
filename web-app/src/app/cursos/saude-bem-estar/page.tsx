@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import ZoomableImage from '@/components/ZoomableImage';
 import OtherCourses from '@/components/OtherCourses';
+import { InspirationTeaser } from '@/components/InspirationSection';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 
 export default function SaudeBemEstarPage() {
@@ -81,6 +82,10 @@ export default function SaudeBemEstarPage() {
             <ZoomableImage key={i} src={src} alt="Criação Tropical" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: '12px', border: '2px solid rgba(212,175,55,0.3)' }} />
           ))}
         </div>
+      </section>
+
+      <section className="px-4 pb-16">
+        <InspirationTeaser />
       </section>
 
       {/* Cross Navigation */}
