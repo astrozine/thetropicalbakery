@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth, formatBrazilianPhone } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
+import MySubscription from '@/components/MySubscription';
 import { SUBSCRIPTION_ZONES, formatBRL, isItamambuca } from '@/lib/deliveryZones';
 import { DIETARY_FIELDS, DietaryKey } from '@/lib/subscriptions';
 
@@ -163,6 +164,8 @@ export default function MyAccountPage() {
               Tudo aqui é preenchido automaticamente nos seus pedidos e na sua assinatura.
               Quanto mais completo, mais a Dolly acerta na sua caixa.
             </p>
+
+            <MySubscription />
 
             {inItamambuca && (
               <div className="liquid-glass-card fade-in" style={{

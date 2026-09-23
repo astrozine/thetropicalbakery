@@ -30,8 +30,8 @@ export interface PayBreakdown {
   fgtsPerMonth: number;
 }
 
-export function estimatePay(daysPerWeek: number, hoursPerDay: number): PayBreakdown {
-  const hourlyRate = MINIMUM_WAGE / MONTHLY_HOURS_DIVISOR;
+export function estimatePay(daysPerWeek: number, hoursPerDay: number, minimumWage: number = MINIMUM_WAGE): PayBreakdown {
+  const hourlyRate = minimumWage / MONTHLY_HOURS_DIVISOR;
   const weeklyHours = daysPerWeek * hoursPerDay;
   const weeklyPay = hourlyRate * weeklyHours;
   const monthlyPay = weeklyPay * WEEKS_PER_MONTH;

@@ -10,6 +10,7 @@ export interface SubscriptionPlan {
   perks: string[];
   sort_order: number;
   is_active: boolean;
+  image_url: string | null;
 }
 
 export type SubscriptionStatus = 'pending' | 'active' | 'paused' | 'cancelled';

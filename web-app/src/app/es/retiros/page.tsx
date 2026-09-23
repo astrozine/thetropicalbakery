@@ -56,5 +56,5 @@ export default function RetirosSpanishPage() {
     },
   };
 
-  return <RetreatsLayout texts={spanishTexts} />;
+  return <RetreatsLayout texts={spanishTexts} locale="es" />;
 }

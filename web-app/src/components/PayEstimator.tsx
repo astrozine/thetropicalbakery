@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { estimatePay } from '@/lib/payEstimate';
+import React, { useState, useEffect } from 'react';
+import { estimatePay, MINIMUM_WAGE } from '@/lib/payEstimate';
 import { formatBRL } from '@/lib/deliveryZones';
+import { getSiteSetting } from '@/lib/siteSettings';
 
 const chipStyle = (on: boolean): React.CSSProperties => ({
   padding: '0.55rem 1.1rem',
@@ -19,8 +20,13 @@ const chipStyle = (on: boolean): React.CSSProperties => ({
 export default function PayEstimator() {
   const [days, setDays] = useState(2);
   const [hours, setHours] = useState(5);
+  const [minimumWage, setMinimumWage] = useState(MINIMUM_WAGE);
 
-  const est = estimatePay(days, hours);
+  useEffect(() => {
+    getSiteSetting('minimum_wage', MINIMUM_WAGE).then(setMinimumWage);
+  }, []);
+
+  const est = estimatePay(days, hours, minimumWage);
 
   return (
     <div style={{ background: '#fff', border: '1px solid #e8e1d7', borderRadius: '20px', padding: 'clamp(1.5rem, 4vw, 2.5rem)' }}>

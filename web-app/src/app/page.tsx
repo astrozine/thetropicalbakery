@@ -6,6 +6,7 @@ import ExplodingTreats from '@/components/ExplodingTreats';
 import ZoomableImage from '@/components/ZoomableImage';
 import ModalCard from '@/components/ModalCard';
 import WaitlistCapture from '@/components/WaitlistCapture';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
 export const revalidate = 0; // Ensures fresh data is fetched for the homepage
@@ -39,11 +40,30 @@ export default async function Home() {
     return item?.text_content || fallbackText;
   };
 
+  const announcement = getText('announcement', '');
+  const announcementLink = getContent('announcement', '');
+
   return (
     <main>
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-background"></div>
+        {announcement && (
+          <div style={{ position: 'absolute', top: 'clamp(1rem, 3vw, 1.75rem)', right: 'clamp(1rem, 3vw, 1.75rem)', zIndex: 5, maxWidth: 'min(80vw, 320px)' }}>
+            {announcementLink ? (
+              <Link
+                href={announcementLink}
+                style={{ display: 'block', background: '#3c2a21', color: '#fdfaf3', padding: '0.65rem 1.1rem', borderRadius: '30px', fontSize: '0.82rem', fontWeight: 600, border: '1px solid rgba(212,175,55,0.6)', boxShadow: '0 8px 20px rgba(60,42,33,0.25)', lineHeight: 1.5 }}
+              >
+                {announcement}
+              </Link>
+            ) : (
+              <div style={{ background: '#3c2a21', color: '#fdfaf3', padding: '0.65rem 1.1rem', borderRadius: '30px', fontSize: '0.82rem', fontWeight: 600, border: '1px solid rgba(212,175,55,0.6)', boxShadow: '0 8px 20px rgba(60,42,33,0.25)', lineHeight: 1.5 }}>
+                {announcement}
+              </div>
+            )}
+          </div>
+        )}
         <div className="container hero-content fade-in" style={{ padding: '0' }}>
           <ExplodingTreats />
         </div>

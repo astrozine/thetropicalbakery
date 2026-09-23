@@ -29,9 +29,14 @@ export interface RetreatPackageQuote {
   perNightPerGuest: number;
 }
 
-export function quoteRetreatPackage(room: RetreatRoom, nights: number, guests: number): RetreatPackageQuote {
+export function quoteRetreatPackage(
+  room: RetreatRoom,
+  nights: number,
+  guests: number,
+  immersionFeePerGuestPerNight: number = IMMERSION_FEE_PER_GUEST_PER_NIGHT,
+): RetreatPackageQuote {
   const roomSubtotal = room.airbnb_nightly_rate * nights;
-  const immersionSubtotal = IMMERSION_FEE_PER_GUEST_PER_NIGHT * guests * nights;
+  const immersionSubtotal = immersionFeePerGuestPerNight * guests * nights;
   const total = roomSubtotal + immersionSubtotal;
 
   return {

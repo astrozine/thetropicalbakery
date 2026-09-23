@@ -8,6 +8,8 @@ import RetreatPricingCalculator from '@/components/RetreatPricingCalculator';
 import { supabase } from '@/lib/supabase';
 
 export interface RetreatsLayoutProps {
+  /** English/Spanish visitors get an approximate USD/EUR line under the retreat calculator's total. */
+  locale?: 'pt' | 'en' | 'es';
   texts: {
     whatsappMessage: string;
     hero: {
@@ -43,7 +45,7 @@ export interface RetreatsLayoutProps {
   }
 }
 
-export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
+export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInterest, setSelectedInterest] = useState('');
   const [roomImages, setRoomImages] = useState<{ [key: string]: string }>({
@@ -354,7 +356,7 @@ export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
             O Pacote Completo, Não Só a Estadia
           </h2>
         </div>
-        <RetreatPricingCalculator whatsappNumber={WHATSAPP_NUMBER} />
+        <RetreatPricingCalculator whatsappNumber={WHATSAPP_NUMBER} locale={locale} />
       </section>
 
       {/* Photo Gallery — cinematic grid */}

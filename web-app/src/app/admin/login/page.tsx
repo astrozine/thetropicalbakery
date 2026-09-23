@@ -46,8 +46,8 @@ export default function AdminLogin() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fdfaf3' }}>
-      <div className="glass-card" style={{ maxWidth: '400px', width: '100%', padding: '2rem' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fdfaf3', padding: '1.5rem' }}>
+      <div className="glass-card" style={{ maxWidth: '400px', width: '100%', padding: 'clamp(1.5rem, 5vw, 2rem)' }}>
         <h2 style={{ fontFamily: 'var(--font-heading)', color: '#3c2a21', fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>
           Acesso Restrito
         </h2>

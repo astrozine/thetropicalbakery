@@ -56,5 +56,5 @@ export default function RetreatsPage() {
     },
   };
 
-  return <RetreatsLayout texts={englishTexts} />;
+  return <RetreatsLayout texts={englishTexts} locale="en" />;
 }

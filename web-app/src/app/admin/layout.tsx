@@ -129,7 +129,7 @@ export default function AdminLayout({
     { name: 'Cursos', path: '/admin/courses' },
     { name: 'Retiros (Imagens)', path: '/admin/retreats' },
     { name: 'Manutenção & Reparos', path: '/admin/manutencao' },
-    { name: 'Conteúdo do Site', path: '/admin/content' },
+    { name: 'Anúncio Especial', path: '/admin/anuncio' },
     { name: 'CRM & Campanhas', path: '/admin/crm' },
     { name: 'Candidaturas', path: '/admin/vagas' },
   ];

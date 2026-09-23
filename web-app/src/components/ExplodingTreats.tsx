@@ -29,11 +29,13 @@ export default function ExplodingTreats() {
   }, [selectedId]);
 
   const treats = [
-    { id: '1', src: '/treats/media_1789712796150.jpg', mobile: { x: -80, y: -160, scale: 0.55 }, desktop: { x: -280, y: -150, scale: 1.0 }, rotate: -15 },
-    { id: '2', src: '/treats/media_1789712814475.jpg', mobile: { x: 80, y: -130, scale: 0.6 }, desktop: { x: 280, y: -130, scale: 1.0 }, rotate: 20 },
-    { id: '3', src: '/treats/media_1789712835955.jpg', mobile: { x: -80, y: 100, scale: 0.5 }, desktop: { x: -300, y: 0, scale: 1.0 }, rotate: -25 },
-    { id: '4', src: '/treats/media_1789712972031.jpg', mobile: { x: 80, y: 110, scale: 0.55 }, desktop: { x: 280, y: 20, scale: 1.0 }, rotate: 10 },
+    { id: '1', src: '/treats/media_1789712796150.jpg', mobile: { x: -80, y: -160, scale: 0.55 }, desktop: { x: -340, y: -160, scale: 1.0 }, rotate: -15 },
+    { id: '2', src: '/treats/media_1789712814475.jpg', mobile: { x: 80, y: -130, scale: 0.6 }, desktop: { x: 340, y: -140, scale: 1.0 }, rotate: 20 },
+    { id: '3', src: '/treats/media_1789712835955.jpg', mobile: { x: -80, y: 100, scale: 0.5 }, desktop: { x: -360, y: 130, scale: 1.0 }, rotate: -25 },
+    { id: '4', src: '/treats/media_1789712972031.jpg', mobile: { x: 80, y: 110, scale: 0.55 }, desktop: { x: 360, y: 150, scale: 1.0 }, rotate: 10 },
   ];
+
+  const tags = ['Sem Açúcar Refinado', 'Sem Sal', 'Sem Glúten', 'Sem Processados'];
 
   if (isMobile) {
     // Mobile: Native App Home Screen Experience
@@ -95,11 +97,20 @@ export default function ExplodingTreats() {
 
         {/* Fixed Pinned CTA Action Area */}
         <div style={{ width: '90%', marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-           <div style={{ background: 'rgba(253,250,243,0.7)', padding: '0.75rem', borderRadius: '12px', backdropFilter: 'blur(10px)', textAlign: 'center' }}>
-            <p style={{ color: '#3c2a21', fontWeight: 600, fontSize: '0.8rem', margin: 0, lineHeight: '1.4' }}>
-              VEGANOS VINDO PRA ITAMAMBUCA!<br/>
-              <span style={{ fontSize: '0.7rem', fontWeight: 400 }}>Sem Açúcar, Sal, Glúten ou Processados.</span>
+           <div style={{ background: 'rgba(253,250,243,0.72)', backdropFilter: 'blur(14px)', border: '1px solid rgba(212,175,55,0.4)', padding: '1.1rem 1.25rem', borderRadius: '18px', textAlign: 'center' }}>
+            <span style={{ display: 'block', color: '#a6832b', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+              🌴 Itamambuca · Ubatuba
+            </span>
+            <p style={{ color: '#3c2a21', fontWeight: 800, fontSize: '0.95rem', margin: '0 0 0.65rem', fontFamily: 'var(--font-heading)' }}>
+              Veganos Chegando em Itamambuca
             </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', justifyContent: 'center' }}>
+              {tags.map(tag => (
+                <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#3c2a21', fontSize: '0.65rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
           <a href="#order" className="btn btn-primary" style={{ padding: '1rem', fontSize: '1.1rem', pointerEvents: 'auto', width: '100%', textAlign: 'center', borderRadius: '999px', boxShadow: '0 10px 20px rgba(212,175,55,0.3)' }}>
             Garanta a Sua Caixa
@@ -173,14 +184,37 @@ export default function ExplodingTreats() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1 }}
         />
-        <h2 className="text-center" style={{ color: '#3c2a21', fontWeight: 'bold', fontSize: '1.4rem', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
-          VEGANOS VINDO PRA ITAMAMBUCA, NÃO PERCA A OPORTUNIDADE!
-        </h2>
-        <p className="hero-subtitle text-center" style={{ color: '#3c2a21', fontWeight: '400', fontSize: '1.1rem', maxWidth: '700px', marginBottom: '2rem', lineHeight: '1.6' }}>
-          Hospedado em <strong>Itamambuca</strong>, <strong>Ubatuba</strong> ou arredores? Aproveite nossas deliciosas criações tropicais.<br/>
-          <strong>100% Livres de Açúcar Refinado, Sal, Glúten e Produtos Processados!</strong>
-        </p>
-        <a href="#order" className="btn btn-primary pointer-events-auto" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', pointerEvents: 'auto' }}>Garanta a Sua Caixa</a>
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          style={{
+            background: 'rgba(253,250,243,0.72)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(212,175,55,0.4)',
+            borderRadius: '22px',
+            padding: '1.75rem 2.25rem',
+            maxWidth: '420px',
+            textAlign: 'center',
+            boxShadow: '0 25px 50px -12px rgba(60,42,33,0.3)',
+            pointerEvents: 'auto',
+          }}
+        >
+          <span style={{ display: 'inline-block', color: '#a6832b', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+            🌴 Itamambuca · Ubatuba
+          </span>
+          <h2 style={{ color: '#3c2a21', fontWeight: 800, fontSize: '1.5rem', marginBottom: '1rem', lineHeight: 1.2, fontFamily: 'var(--font-heading)' }}>
+            Veganos Chegando em Itamambuca
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            {tags.map(tag => (
+              <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#3c2a21', fontSize: '0.72rem', fontWeight: 700, padding: '0.35rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.35)' }}>
+                {tag}
+              </span>
+            ))}
+          </div>
+          <a href="#order" className="btn btn-primary" style={{ padding: '0.9rem 2.25rem', fontSize: '1rem', display: 'inline-block' }}>Garanta a Sua Caixa</a>
+        </motion.div>
       </div>
 
       {/* Lightbox Modal */}

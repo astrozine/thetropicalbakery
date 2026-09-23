@@ -46,7 +46,7 @@ export default function TravelManagersPage() {
   return (
     <main className="min-h-screen" style={{ background: 'var(--color-background)' }}>
       {/* Hero */}
-      <section style={{ position: 'relative', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <section style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', paddingTop: 'clamp(7rem, 14vw, 9rem)', paddingBottom: 'clamp(4.5rem, 9vw, 6.5rem)' }}>
         <div
           style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
@@ -59,7 +59,7 @@ export default function TravelManagersPage() {
         <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 2, width: '90px', opacity: 0.95 }}>
           <Image src="/itamambuca-lockup.png" alt="The Tropical Bakery — Itamambuca" width={172} height={220} style={{ width: '100%', height: 'auto' }} />
         </div>
-        <div className="container relative z-10 text-center fade-in px-4 py-16">
+        <div className="container relative z-10 text-center fade-in px-4">
           <span className="text-secondary tracking-[4px] uppercase text-sm md:text-base mb-4 block font-semibold">
             Organizadores &amp; Travel Managers
           </span>

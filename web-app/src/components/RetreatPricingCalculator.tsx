@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatBRL } from '@/lib/deliveryZones';
 import { RetreatRoom, quoteRetreatPackage, IMMERSION_FEE_PER_GUEST_PER_NIGHT } from '@/lib/retreatPricing';
+import { getSiteSetting } from '@/lib/siteSettings';
+import { useExchangeRates, formatForeign } from '@/lib/currency';
 
 const DEFAULT_ROOMS: RetreatRoom[] = [
   { id: 'penthouse', name: 'Cobertura (Penthouse)', airbnb_nightly_rate: 0, max_guests: 6 },
@@ -25,13 +27,17 @@ const chipStyle = (on: boolean): React.CSSProperties => ({
 
 interface Props {
   whatsappNumber: string;
+  /** English/Spanish visitors get an approximate USD/EUR line under the total. */
+  locale?: 'pt' | 'en' | 'es';
 }
 
-export default function RetreatPricingCalculator({ whatsappNumber }: Props) {
+export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt' }: Props) {
   const [rooms, setRooms] = useState<RetreatRoom[]>(DEFAULT_ROOMS);
   const [roomId, setRoomId] = useState('penthouse');
   const [nights, setNights] = useState(3);
   const [guests, setGuests] = useState(2);
+  const [immersionFee, setImmersionFee] = useState(IMMERSION_FEE_PER_GUEST_PER_NIGHT);
+  const { rates } = useExchangeRates();
 
   useEffect(() => {
     supabase
@@ -47,11 +53,15 @@ export default function RetreatPricingCalculator({ whatsappNumber }: Props) {
           })));
         }
       });
+    getSiteSetting('retreat_immersion_fee_per_guest_per_night', IMMERSION_FEE_PER_GUEST_PER_NIGHT).then(setImmersionFee);
   }, []);
 
   const room = rooms.find(r => r.id === roomId) || rooms[0];
   const cappedGuests = Math.min(guests, room.max_guests);
-  const quote = quoteRetreatPackage(room, nights, cappedGuests);
+  const quote = quoteRetreatPackage(room, nights, cappedGuests, immersionFee);
+  const foreignCurrency = locale === 'en' ? 'USD' : locale === 'es' ? 'EUR' : null;
+  const foreignRate = foreignCurrency === 'USD' ? rates.usd : foreignCurrency === 'EUR' ? rates.eur : null;
+  const foreignLine = foreignCurrency ? formatForeign(quote.total, foreignRate, foreignCurrency) : '';
 
   const message = encodeURIComponent(
     `Olá! Tenho interesse no Pacote de Retiro:\n` +
@@ -116,13 +126,18 @@ export default function RetreatPricingCalculator({ whatsappNumber }: Props) {
           <span>{formatBRL(quote.roomSubtotal)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', color: 'rgba(253,250,243,0.85)', fontSize: '0.92rem', marginBottom: '0.9rem' }}>
-          <span>Imersão Tropical Bakery ({cappedGuests}p × {nights}n × {formatBRL(IMMERSION_FEE_PER_GUEST_PER_NIGHT)})</span>
+          <span>Imersão Tropical Bakery ({cappedGuests}p × {nights}n × {formatBRL(immersionFee)})</span>
           <span>{formatBRL(quote.immersionSubtotal)}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '0.9rem', color: '#fdfaf3', fontWeight: 800, fontSize: '1.3rem' }}>
           <span>Total</span>
           <span>{formatBRL(quote.total)}</span>
         </div>
+        {foreignLine && (
+          <div style={{ textAlign: 'right', color: 'rgba(253,250,243,0.6)', fontSize: '0.82rem', marginTop: '0.3rem' }}>
+            {foreignLine} <span style={{ opacity: 0.7 }}>(aproximado)</span>
+          </div>
+        )}
       </div>
 
       <a
