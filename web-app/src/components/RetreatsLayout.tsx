@@ -125,6 +125,11 @@ export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
 
         {/* Center Content */}
         <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '0 2rem', maxWidth: '800px' }}>
+          <img
+            src="/itamambuca-ribbon.png"
+            alt="Itamambuca"
+            style={{ width: 'clamp(140px, 20vw, 220px)', marginBottom: '1rem', filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.4))' }}
+          />
           <span style={{
             display: 'inline-block',
             color: '#d4af37',

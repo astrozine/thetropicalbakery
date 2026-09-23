@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth, formatBrazilianPhone } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
-import { SUBSCRIPTION_ZONES, formatBRL } from '@/lib/deliveryZones';
+import { SUBSCRIPTION_ZONES, formatBRL, isItamambuca } from '@/lib/deliveryZones';
 import { DIETARY_FIELDS, DietaryKey } from '@/lib/subscriptions';
 
 const labelStyle: React.CSSProperties = {
@@ -128,6 +129,12 @@ export default function MyAccountPage() {
     setTimeout(() => setSaved(false), 3000);
   };
 
+  const inItamambuca = isItamambuca({
+    delivery_zone: basics.delivery_zone,
+    address_neighborhood: address.address_neighborhood,
+    address_city: address.address_city,
+  });
+
   return (
     <main style={{ minHeight: '100vh', paddingTop: '8rem', paddingBottom: '6rem', background: 'var(--color-background)' }}>
       <div className="container" style={{ maxWidth: '720px', margin: '0 auto', padding: '0 1.5rem' }}>
@@ -156,6 +163,55 @@ export default function MyAccountPage() {
               Tudo aqui é preenchido automaticamente nos seus pedidos e na sua assinatura.
               Quanto mais completo, mais a Dolly acerta na sua caixa.
             </p>
+
+            {inItamambuca && (
+              <div className="liquid-glass-card fade-in" style={{
+                padding: 'clamp(1.5rem, 4vw, 2.5rem)',
+                marginBottom: '2rem',
+                display: 'flex',
+                gap: '1.75rem',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                background: 'linear-gradient(135deg, rgba(212,175,55,0.08), rgba(60,42,33,0.03))',
+              }}>
+                <Image
+                  src="/itamambuca-lockup.png"
+                  alt="The Tropical Bakery — Itamambuca"
+                  width={172}
+                  height={220}
+                  style={{ width: '86px', height: 'auto', flexShrink: 0 }}
+                />
+                <div style={{ flex: '1 1 280px' }}>
+                  <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', color: '#3c2a21', marginBottom: '0.5rem' }}>
+                    Você está bem no coração de Itamambuca 🌴
+                  </h2>
+                  <p style={{ color: '#594a42', lineHeight: 1.7, marginBottom: '1.25rem', fontSize: '0.95rem' }}>
+                    Sendo daqui, você está pertinho de tudo que a Tropical Bakery faz — não só a caixa semanal.
+                    Dá uma olhada no que dá pra viver de perto:
+                  </p>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <Link href="/cursos" className="btn btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}>
+                      Cursos de Confeitaria
+                    </Link>
+                    <Link href="/retreats" className="btn btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}>
+                      Retiros e Estadias
+                    </Link>
+                    <Link href="/assinatura" className="btn btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}>
+                      Caixa de Degustação
+                    </Link>
+                    <a
+                      href="https://wa.me/5511932119196?text=Ol%C3%A1%21%20Sou%20de%20Itamambuca%20e%20queria%20saber%20mais%20sobre%20os%20retiros%2Fcursos%20da%20Tropical%20Bakery."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-primary"
+                      style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}
+                    >
+                      Fazer uma Pergunta
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleSave} className="liquid-glass-card" style={{ padding: 'clamp(1.5rem, 4vw, 2rem)' }}>
 

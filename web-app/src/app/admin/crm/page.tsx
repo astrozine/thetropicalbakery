@@ -45,7 +45,10 @@ interface Customer {
   ordered: boolean;
   createdAt: string;
   dietary: string[];
+  itamambuca: boolean;
 }
+
+const isItamambucaAddress = (address: string | null) => /itamambuca/i.test(address || '');
 
 const PROVIDER_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   google: { label: 'Google', color: '#1a73e8', bg: '#e8f0fe' },
@@ -87,6 +90,7 @@ export default function CRMAdmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [onlyItamambuca, setOnlyItamambuca] = useState(false);
 
   useEffect(() => {
     load();
@@ -129,18 +133,20 @@ export default function CRMAdmin() {
 
       if (profile) usedProfileIds.add(profile.id);
 
+      const address = c.location || profile?.address || null;
       return {
         key: `crm-${c.id}`,
         name: c.full_name || profile?.full_name || 'Sem nome',
         whatsapp: c.whatsapp_number || profile?.phone || null,
         email: c.email || profile?.email || null,
-        address: c.location || profile?.address || null,
+        address,
         provider: profile?.auth_provider || null,
         hasAccount: Boolean(profile),
         ordered: true,
         createdAt: c.created_at,
         // The CRM row is written at order time, so it's the fresher record.
         dietary: dietaryTags(c),
+        itamambuca: isItamambucaAddress(address),
       };
     });
 
@@ -158,6 +164,7 @@ export default function CRMAdmin() {
         ordered: false,
         createdAt: p.created_at,
         dietary: dietaryTags(p),
+        itamambuca: isItamambucaAddress(p.address),
       });
     }
 
@@ -168,19 +175,22 @@ export default function CRMAdmin() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return customers;
-    return customers.filter(c =>
+    let list = customers;
+    if (onlyItamambuca) list = list.filter(c => c.itamambuca);
+    if (!q) return list;
+    return list.filter(c =>
       [c.name, c.email, c.address, c.whatsapp, ...c.dietary]
         .filter(Boolean)
         .some(v => String(v).toLowerCase().includes(q)),
     );
-  }, [customers, search]);
+  }, [customers, search, onlyItamambuca]);
 
   const stats = useMemo(() => ({
     total: customers.length,
     withAccount: customers.filter(c => c.hasAccount).length,
     ordered: customers.filter(c => c.ordered).length,
     leads: customers.filter(c => c.hasAccount && !c.ordered).length,
+    itamambuca: customers.filter(c => c.itamambuca).length,
   }), [customers]);
 
   if (loading) return <div style={{ padding: '2rem' }}>Carregando CRM...</div>;
@@ -207,6 +217,7 @@ export default function CRMAdmin() {
           { label: 'Já pediram', value: stats.ordered },
           { label: 'Com conta', value: stats.withAccount },
           { label: 'Conta sem pedido', value: stats.leads },
+          { label: '📍 Em Itamambuca', value: stats.itamambuca },
         ].map(s => (
           <div key={s.label} style={{ background: 'white', padding: '1.25rem', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
             <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: '#2c3e50' }}>{s.value}</div>
@@ -215,13 +226,32 @@ export default function CRMAdmin() {
         ))}
       </div>
 
-      <input
-        type="search"
-        placeholder="Buscar por nome, e-mail, endereço, telefone ou restrição..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        style={{ width: '100%', padding: '0.9rem 1rem', border: '1px solid #dfe4ea', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '1rem', outline: 'none' }}
-      />
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <input
+          type="search"
+          placeholder="Buscar por nome, e-mail, endereço, telefone ou restrição..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ flex: '1 1 320px', padding: '0.9rem 1rem', border: '1px solid #dfe4ea', borderRadius: '8px', fontSize: '1rem', outline: 'none' }}
+        />
+        <button
+          type="button"
+          onClick={() => setOnlyItamambuca(v => !v)}
+          style={{
+            padding: '0.9rem 1.4rem',
+            borderRadius: '8px',
+            border: onlyItamambuca ? '1px solid #d4af37' : '1px solid #dfe4ea',
+            background: onlyItamambuca ? '#fdf7ee' : 'white',
+            color: onlyItamambuca ? '#8a6d1f' : '#7f8c8d',
+            fontWeight: 700,
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          📍 Só Itamambuca{onlyItamambuca ? ' ✓' : ''}
+        </button>
+      </div>
 
       {filtered.length === 0 ? (
         <div style={{ background: 'white', padding: '3rem', borderRadius: '12px', textAlign: 'center', color: '#7f8c8d', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
@@ -250,6 +280,11 @@ export default function CRMAdmin() {
                     {!c.ordered && (
                       <span style={{ background: '#fff4e5', color: '#7a4a00', padding: '0.15rem 0.6rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         Sem pedido
+                      </span>
+                    )}
+                    {c.itamambuca && (
+                      <span style={{ background: '#fdf7ee', color: '#8a6d1f', padding: '0.15rem 0.6rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        📍 Itamambuca
                       </span>
                     )}
                   </div>

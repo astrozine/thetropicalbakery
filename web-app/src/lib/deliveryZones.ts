@@ -31,3 +31,19 @@ export const getZone = (id: string | null | undefined) =>
 
 export const formatBRL = (value: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+
+/**
+ * Itamambuca is our own backyard — people there are a short walk from the
+ * courses, the retreat house and the weekly box, not just a delivery zone.
+ * Checked against the zone selector first (the reliable signal), then
+ * against free-text neighbourhood/city for accounts filled in before that
+ * selector existed.
+ */
+export const isItamambuca = (p: {
+  delivery_zone?: string | null;
+  address_neighborhood?: string | null;
+  address_city?: string | null;
+}) =>
+  p.delivery_zone === 'zone1' ||
+  /itamambuca/i.test(p.address_neighborhood || '') ||
+  /itamambuca/i.test(p.address_city || '');

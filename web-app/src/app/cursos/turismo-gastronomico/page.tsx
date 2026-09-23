@@ -67,6 +67,11 @@ export default function TurismoGastronomicoPage() {
               <BulletItem>Degustação exclusiva incluída</BulletItem>
               <BulletItem>Leve para casa as receitas criadas</BulletItem>
             </ul>
+            {/* Repeated here on purpose: by this point someone has read what's
+                included and shouldn't have to scroll back to the hero to act. */}
+            <button onClick={() => setIsModalOpen(true)} className="btn btn-primary px-8 py-4 text-lg inline-block">
+              Agendar Minha Experiência
+            </button>
           </div>
         </div>
         

@@ -1,66 +1,37 @@
 import React from 'react';
-import Link from 'next/link';
-import ZoomableImage from '@/components/ZoomableImage';
+import B2BPageLayout from '@/components/B2BPageLayout';
 
 export default function RestaurantsPage() {
   return (
-    <main style={{ minHeight: '80vh' }}>
-      <div className="container" style={{ padding: '6rem 2rem' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative' }}>
-          <div style={{ position: 'absolute', top: '-10px', left: '10px', zIndex: 10 }}>
-            <img
-              src="/hero-logo-transparent.png"
-              alt="The Tropical Bakery Logo"
-              style={{ width: '140px', animation: 'tilt-playful 6s ease-in-out infinite' }}
-            />
-          </div>
-
-          <div className="liquid-glass-card fade-in" style={{ padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem', flexWrap: 'wrap', alignItems: 'center', position: 'relative' }}>
-
-          <div style={{ textAlign: 'center', borderBottom: '2px solid rgba(212,175,55,0.3)', paddingBottom: '1.5rem', width: '100%', marginBottom: '1rem', paddingLeft: '7rem' }}>
-            <h1 style={{ fontSize: '3rem', color: '#3c2a21', letterSpacing: '1px', fontFamily: 'var(--font-heading)', fontWeight: 800 }}>Parcerias para Restaurantes</h1>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ flex: '1 1 400px' }}>
-            <ZoomableImage src="/assets/tropical_restaurant_vegan_1789884909542.jpg" alt="Restaurant" style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)' }} />
-          </div>
-          
-          <div style={{ flex: '1 1 400px' }}>
-            <p style={{ fontSize: '1.2rem', lineHeight: '1.8', color: '#594a42', marginBottom: '2rem' }}>
-              Buscando expandir seu cardápio de sobremesas com opções de alta qualidade focadas na saúde? A The Tropical Bakery 
-              oferece doces no atacado com a garantia de impressionar seus clientes sem o incômodo da preparação na própria cozinha.
-            </p>
-            
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#d4af37' }}>Por Que Nos Escolher?</h3>
-            <ul style={{ fontSize: '1.1rem', lineHeight: '1.8', color: '#594a42', marginBottom: '2rem', paddingLeft: '1.5rem' }}>
-              <li>Forneça sobremesas Veganas e Sem Glúten premium instantaneamente.</li>
-              <li>Fornecimento no atacado confiável e adaptado ao seu volume.</li>
-              <li>Potencial de empratamento deslumbrante para experiências gastronômicas sofisticadas.</li>
-            </ul>
-
-            <div style={{ marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <a href="https://wa.me/5511932119196?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20uma%20parceria%20para%20Restaurante!" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.2rem', borderRadius: '4px', letterSpacing: '1px', display: 'inline-block' }}>
-                Fale Conosco no WhatsApp
-              </a>
-              <Link href="/trabalhe-conosco" className="btn btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.2rem', borderRadius: '4px', letterSpacing: '1px', display: 'inline-block' }}>
-                Trabalhe Conosco
-              </Link>
-            </div>
-          </div>
-        </div>
-        </div>
-        </div>
-      </div>
-
-      {/* Treat Gallery Strip */}
-      <section style={{ padding: '3rem 0', background: '#3c2a21' }}>
-        <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap', padding: '0 2rem' }}>
-          {['/menu-items/1000234513 - Edited.jpg', '/menu-items/Screenshot_20260415_110305_Gallery.jpg', '/menu-items/20260208_082125_0000.png', '/menu-items/Screenshot_20260221_093613_Photos.jpg'].map((src, i) => (
-            <ZoomableImage key={i} src={src} alt="Criação Tropical" style={{ width: '200px', height: '200px', objectFit: 'cover', borderRadius: '12px', border: '2px solid rgba(212,175,55,0.3)' }} />
-          ))}
-        </div>
-      </section>
-    </main>
+    <B2BPageLayout
+      eyebrow="Parcerias para Restaurantes"
+      title="Sobremesas com a Cara do Seu Restaurante"
+      intro="Atenda o público que busca opções sem glúten, veganas, sem óleo, sem açúcar refinado ou sal — sem sobrecarregar sua cozinha. A Dolly cria a sobremesa, você recebe pronta, sua equipe só finaliza o prato."
+      heroImage="/assets/tropical_restaurant_vegan_1789884909542.jpg"
+      options={[
+        {
+          icon: '🎨',
+          title: 'Sobremesa com o Tema do Restaurante',
+          description: 'A Dolly desenvolve uma criação personalizada relacionada à identidade do seu restaurante — por exemplo, uma versão tailandesa para um restaurante tailandês.',
+        },
+        {
+          icon: '📋',
+          title: 'Cardápio de Opções',
+          description: 'Prefere praticidade? Escolha entre as mesmas opções usadas no nosso menu de eventos, prontas para entrar no seu cardápio.',
+        },
+        {
+          icon: '🧊',
+          title: 'Entrega Sob Demanda',
+          description: 'Entregamos conforme sua necessidade, mantido no freezer até a hora de servir — zero desperdício, estoque sempre pronto.',
+        },
+      ]}
+      whyChooseUs={[
+        'Forneça sobremesas veganas e sem glúten premium instantaneamente.',
+        'Fornecimento no atacado confiável e adaptado ao seu volume.',
+        'Potencial de empratamento deslumbrante para experiências gastronômicas sofisticadas.',
+      ]}
+      whatsappHref="https://wa.me/5511932119196?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20uma%20parceria%20para%20Restaurante!"
+      galleryImages={['/menu-items/1000234513 - Edited.jpg', '/menu-items/Screenshot_20260415_110305_Gallery.jpg', '/menu-items/20260208_082125_0000.png', '/menu-items/Screenshot_20260221_093613_Photos.jpg']}
+    />
   );
 }
