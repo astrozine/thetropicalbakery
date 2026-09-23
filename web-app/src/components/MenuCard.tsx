@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
+import TreatInfo, { hasTreatInfo } from '@/components/TreatInfo';
+import { allergenById } from '@/lib/allergens';
 
 interface MenuCardProps {
   item: {
@@ -12,6 +14,10 @@ interface MenuCardProps {
     description: string;
     min_batch_size?: number;
     batch_multiplier?: number;
+    emoji?: string | null;
+    ingredients?: string[] | null;
+    contains?: string[] | null;
+    may_contain?: string[] | null;
   };
 }
 
@@ -19,6 +25,8 @@ export default function MenuCard({ item }: MenuCardProps) {
   const { addToCart } = useCart();
   const [isMobile, setIsMobile] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const hasInfo = hasTreatInfo(item);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -35,7 +43,10 @@ export default function MenuCard({ item }: MenuCardProps) {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    addToCart(item);
+    addToCart({
+      id: item.id, name: item.name, price: item.price, image: item.image,
+      min_batch_size: item.min_batch_size, batch_multiplier: item.batch_multiplier, kind: 'events',
+    });
     if (isMobile) setIsDrawerOpen(false);
   };
 
@@ -73,13 +84,40 @@ export default function MenuCard({ item }: MenuCardProps) {
         
         <div style={{ padding: isMobile ? '1rem' : '1.5rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
           <h3 style={{ fontSize: isMobile ? '1.1rem' : '1.3rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
-            {item.name}
+            {item.emoji ? `${item.emoji} ` : ''}{item.name}
           </h3>
           
           {!isMobile && (
             <p style={{ color: '#594a42', fontSize: '0.95rem', lineHeight: '1.5', flexGrow: 1 }}>
               {item.description}
             </p>
+          )}
+
+          {!isMobile && (item.contains?.length || 0) > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.6rem' }} aria-label="Alérgenos">
+              {item.contains!.map(id => {
+                const a = allergenById(id);
+                return a ? <span key={id} title={`Contém ${a.label}`} style={{ background: '#fdecea', color: '#b03a2e', border: '1px solid #f5b7b1', borderRadius: '20px', padding: '0.1rem 0.5rem', fontSize: '0.75rem', fontWeight: 600 }}>{a.emoji} {a.label}</span> : null;
+              })}
+            </div>
+          )}
+
+          {!isMobile && hasInfo && (
+            <div style={{ marginTop: '0.75rem' }}>
+              <button
+                type="button"
+                onClick={() => setShowInfo(v => !v)}
+                aria-expanded={showInfo}
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#8a6d1f', fontWeight: 700, fontSize: '0.85rem' }}
+              >
+                🌿 Ingredientes e alérgenos {showInfo ? '−' : '+'}
+              </button>
+              {showInfo && (
+                <div style={{ marginTop: '0.75rem' }}>
+                  <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} showEmptyNote={false} />
+                </div>
+              )}
+            </div>
           )}
 
           {(!isMobile && item.min_batch_size && item.min_batch_size > 1) ? (
@@ -138,12 +176,18 @@ export default function MenuCard({ item }: MenuCardProps) {
             <img src={item.image} alt={item.name} style={{ width: '100%', height: '35vh', minHeight: '250px', objectFit: 'cover', borderRadius: '12px', marginBottom: '1.5rem' }} />
             
             <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
-              {item.name}
+              {item.emoji ? `${item.emoji} ` : ''}{item.name}
             </h3>
             
             <p style={{ color: '#594a42', fontSize: '1rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
               {item.description}
             </p>
+
+            {hasInfo && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} showEmptyNote={false} />
+              </div>
+            )}
 
             {(item.min_batch_size && item.min_batch_size > 1) ? (
               <div style={{ fontSize: '0.9rem', color: '#7f8c8d', background: '#f8f9fa', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem' }}>

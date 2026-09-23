@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BoxItem, allergenById, summarizeAllergens } from '@/lib/allergens';
+import { BoxItem, summarizeAllergens } from '@/lib/allergens';
+import TreatInfo, { AllergenChips } from '@/components/TreatInfo';
 
 const chip = (tone: 'contains' | 'may'): React.CSSProperties => ({
   display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.28rem 0.7rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600,
@@ -9,17 +10,6 @@ const chip = (tone: 'contains' | 'may'): React.CSSProperties => ({
     ? { background: '#fdecea', color: '#b03a2e', border: '1px solid #f5b7b1' }
     : { background: '#fff4e0', color: '#8a5a00', border: '1px solid #f0d09a' }),
 });
-
-function AllergenChips({ ids, tone }: { ids: string[]; tone: 'contains' | 'may' }) {
-  return (
-    <>
-      {ids.map(id => {
-        const a = allergenById(id);
-        return a ? <span key={id} style={chip(tone)}>{a.emoji} {a.label}</span> : null;
-      })}
-    </>
-  );
-}
 
 /**
  * "O que vem na caixa": one big title per treat that opens into a photo, a
@@ -84,37 +74,7 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
                         <p style={{ color: '#594a42', lineHeight: 1.85, marginBottom: '1.25rem' }}>{item.description}</p>
                       )}
 
-                      {item.ingredients?.length > 0 && (
-                        <div style={{ marginBottom: '1.25rem' }}>
-                          <p style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700, marginBottom: '0.6rem' }}>🌿 Ingredientes</p>
-                          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexWrap: 'wrap', gap: '0.4rem 0.5rem' }}>
-                            {item.ingredients.map(ing => (
-                              <li key={ing} style={{ background: '#f5efe2', color: '#594a42', fontSize: '0.85rem', padding: '0.3rem 0.8rem', borderRadius: '20px' }}>
-                                <span style={{ color: '#d4af37', marginRight: '0.3rem' }}>✦</span>{ing}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {(item.contains?.length > 0 || item.may_contain?.length > 0) ? (
-                        <div style={{ display: 'grid', gap: '0.75rem' }}>
-                          {item.contains?.length > 0 && (
-                            <div>
-                              <p style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#b03a2e', fontWeight: 700, marginBottom: '0.5rem' }}>⚠️ Contém</p>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}><AllergenChips ids={item.contains} tone="contains" /></div>
-                            </div>
-                          )}
-                          {item.may_contain?.length > 0 && (
-                            <div>
-                              <p style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#8a5a00', fontWeight: 700, marginBottom: '0.5rem' }}>🔸 Pode conter (contaminação cruzada)</p>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}><AllergenChips ids={item.may_contain} tone="may" /></div>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <p style={{ color: '#7a6a61', fontSize: '0.85rem' }}>🌱 Nenhum dos principais alérgenos declarados neste doce.</p>
-                      )}
+                      <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} />
                     </div>
                   </div>
                 )}

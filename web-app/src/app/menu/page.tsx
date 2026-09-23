@@ -15,6 +15,10 @@ interface Treat {
   image_url: string;
   min_batch_size: number;
   batch_multiplier: number;
+  emoji?: string | null;
+  ingredients?: string[] | null;
+  contains?: string[] | null;
+  may_contain?: string[] | null;
 }
 
 export default function MenuPage() {
@@ -112,12 +116,21 @@ export default function MenuPage() {
                   price: item.price.toFixed(2).replace('.', ','),
                   image: item.image_url,
                   min_batch_size: item.min_batch_size,
-                  batch_multiplier: item.batch_multiplier
+                  batch_multiplier: item.batch_multiplier,
+                  emoji: item.emoji,
+                  ingredients: item.ingredients,
+                  contains: item.contains,
+                  may_contain: item.may_contain,
                 }} />
               </ScrollReveal>
             ))}
           </div>
         )}
+
+        <p style={{ maxWidth: '760px', margin: '3rem auto 0', textAlign: 'center', color: '#7a6a61', fontSize: '0.85rem', lineHeight: 1.75 }}>
+          Alérgenos e ingredientes são informados por doce. Tudo é feito na mesma cozinha, então traços de outros ingredientes podem existir
+          mesmo quando não estão na receita. Se algum convidado tem alergia grave, fale com a gente no WhatsApp antes de fechar o pedido.
+        </p>
       </section>
 
     </main>

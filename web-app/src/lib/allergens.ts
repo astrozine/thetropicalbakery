@@ -76,7 +76,54 @@ export interface BoxItem {
   ingredients: string[];
   contains: string[];
   may_contain: string[];
+  /** Link to the same treat in the Menu de Eventos (public.treats). */
+  treat_id?: string | null;
+  /** Editor-only: create this treat in the Menu de Eventos when the box is saved. Never stored. */
+  add_to_menu?: boolean;
+  menu_price?: number;
+  menu_min_batch?: number;
+  menu_batch_multiplier?: number;
 }
+
+/** The detail fields a treat has in both places (box item and Menu de Eventos row). */
+export interface TreatDetails {
+  name: string;
+  description: string;
+  image_url: string;
+  emoji: string;
+  ingredients: string[];
+  contains: string[];
+  may_contain: string[];
+}
+
+/** A row of public.treats as the admin reads it. */
+export interface TreatRow {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+  is_available: boolean;
+  min_batch_size: number;
+  batch_multiplier: number;
+  emoji?: string | null;
+  ingredients?: string[] | null;
+  contains?: string[] | null;
+  may_contain?: string[] | null;
+}
+
+/** Copies a Menu de Eventos treat into a box, keeping the link so both stay in step. */
+export const treatToBoxItem = (t: TreatRow): BoxItem => ({
+  ...newBoxItem(),
+  name: t.name,
+  emoji: t.emoji || '🍫',
+  description: t.description || '',
+  image_url: t.image_url || '',
+  ingredients: t.ingredients || [],
+  contains: t.contains || [],
+  may_contain: t.may_contain || [],
+  treat_id: t.id,
+});
 
 export const TREAT_EMOJIS = ['🍫', '🥥', '🍓', '🍌', '🍍', '🥭', '🌰', '🍪', '🧁', '🍰', '🍯', '🌺', '🍋', '🥜', '✨'];
 
