@@ -103,12 +103,14 @@ a {
 .container {
   max-width: 1500px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
   width: 100%;
 }
 @media (max-width: 768px) {
   .container {
-    padding: 0 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 @media (min-width: 769px) {

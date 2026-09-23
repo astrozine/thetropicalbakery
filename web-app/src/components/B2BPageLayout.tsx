@@ -2,8 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import ZoomableImage from '@/components/ZoomableImage';
 import StripedBackground from '@/components/StripedBackground';
-import OrganicDivider from '@/components/OrganicDivider';
-import BlobAccent from '@/components/BlobAccent';
+import BurleMarxBand from '@/components/BurleMarxBand';
 
 export interface PartnershipOption {
   icon: string;
@@ -83,12 +82,10 @@ export default function B2BPageLayout({
         </div>
       </section>
 
-      <OrganicDivider color="var(--color-background)" direction="down" height={70} style={{ marginTop: '-1px' }} />
+      <BurleMarxBand height={110} />
 
       {/* Partnership options */}
-      <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(1rem, 3vw, 2rem)', paddingBottom: '1rem' }}>
-        <BlobAccent color="#2e4432" size={220} opacity={0.06} rotate={20} style={{ top: '-40px', left: '-60px' }} />
-        <BlobAccent color="#d4af37" size={180} opacity={0.09} rotate={-15} style={{ top: '10px', right: '-40px' }} />
+      <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(1.5rem, 4vw, 2.5rem)', paddingBottom: '1rem' }}>
         <h2 style={{ position: 'relative', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#3c2a21', marginBottom: '3rem' }}>
           {optionsHeading}
         </h2>
