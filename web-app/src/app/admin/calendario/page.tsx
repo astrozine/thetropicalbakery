@@ -25,6 +25,8 @@ export default function DeliveryCalendarAdmin() {
   const [leadDays, setLeadDays] = useState(2);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [problems, setProblems] = useState<string[]>([]);
+  const [dayMessage, setDayMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
   const [notifying, setNotifying] = useState(false);
   const [notifyResult, setNotifyResult] = useState('');
@@ -52,12 +54,13 @@ export default function DeliveryCalendarAdmin() {
       supabase.from('delivery_notifications').select('delivery_date'),
       supabase.from('site_settings').select('value').eq('key', 'delivery_lead_days').maybeSingle(),
     ]);
-    if (rulesRes.error) {
-      setError('Não foi possível carregar as regras de entrega. Confirme que a migration_12_delivery_schedule.sql foi executada.');
-    } else {
-      setError('');
-      setRules((rulesRes.data as ScheduleRule[]) || []);
-    }
+    // Which database steps are missing? Say so plainly instead of failing silently.
+    const missing: string[] = [];
+    if (rulesRes.error) missing.push('Regras de entrega — rode a migration_12_delivery_schedule.sql');
+    if (datesRes.error) missing.push('Dias do calendário — rode a migration_08_delivery_calendar.sql');
+    if (notifRes.error) missing.push('Registro de avisos — rode a migration_12_delivery_schedule.sql');
+    setProblems(missing);
+    if (!rulesRes.error) setRules((rulesRes.data as ScheduleRule[]) || []);
     const dates = (datesRes.data as DateOverride[]) || [];
     setOverrides(dates);
     setNotifiedSet(new Set([
@@ -75,29 +78,41 @@ export default function DeliveryCalendarAdmin() {
   const toggleDate = async (iso: string) => {
     const { state, fromRule, override } = dayState(iso, activeRules, map);
     setSaving(iso);
-    let err;
+    setDayMessage(null);
+    let err: { message: string } | null = null;
+    let result = '';
     if (state === 'open') {
       // Close it: block if a rule would otherwise produce it, else just drop the manual opening.
       ({ error: err } = fromRule
         ? await supabase.from('delivery_dates').upsert({ delivery_date: iso, is_open: false, notes: override?.notes || null }, { onConflict: 'delivery_date' })
         : await supabase.from('delivery_dates').delete().eq('delivery_date', iso));
+      result = fromRule ? 'bloqueado' : 'fechado';
     } else if (state === 'blocked' && fromRule) {
       // Un-block: go back to whatever the rule says.
       ({ error: err } = await supabase.from('delivery_dates').delete().eq('delivery_date', iso));
+      result = 'liberado de novo (volta a seguir a regra)';
     } else {
       ({ error: err } = await supabase.from('delivery_dates').upsert({ delivery_date: iso, is_open: true, notes: override?.notes || null }, { onConflict: 'delivery_date' }));
+      result = 'aberto para entrega';
     }
-    if (err) setError('Não foi possível salvar esse dia.');
+    const label = parseISODate(iso).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+    if (err) {
+      console.error('Calendar save failed:', err);
+      setDayMessage({ ok: false, text: `Não foi possível salvar ${label}: ${err.message}` });
+    } else {
+      setDayMessage({ ok: true, text: `${label} — ${result} ✓` });
+    }
     await load();
     setSaving(null);
   };
 
   const saveNote = async () => {
     if (!selectedNote) return;
-    await supabase.from('delivery_dates').upsert(
+    const { error: err } = await supabase.from('delivery_dates').upsert(
       { delivery_date: selectedNote.date, is_open: true, notes: selectedNote.text || null },
       { onConflict: 'delivery_date' },
     );
+    if (err) setError(`Não foi possível salvar a nota: ${err.message}`);
     setSelectedNote(null);
     load();
   };
@@ -117,7 +132,7 @@ export default function DeliveryCalendarAdmin() {
     }]);
     setSavingRule(false);
     if (err) {
-      setError('Não foi possível criar a regra. Confirme que a migration_12_delivery_schedule.sql foi executada.');
+      setError(`Não foi possível criar a regra: ${err.message}. Confirme que a migration_12_delivery_schedule.sql foi executada.`);
       return;
     }
     setRule({ ...EMPTY_RULE });
@@ -125,23 +140,27 @@ export default function DeliveryCalendarAdmin() {
   };
 
   const toggleRule = async (r: ScheduleRule) => {
-    await supabase.from('delivery_schedule_rules').update({ is_active: !r.is_active }).eq('id', r.id);
+    const { error: err } = await supabase.from('delivery_schedule_rules').update({ is_active: !r.is_active }).eq('id', r.id);
+    if (err) setError(`Não foi possível ${r.is_active ? 'pausar' : 'reativar'} a regra: ${err.message}`);
     load();
   };
 
   const removeRule = async (r: ScheduleRule) => {
     if (!window.confirm(`Apagar a regra "${describeRule(r)}"? Os dias que ela gerava deixam de estar abertos.`)) return;
-    await supabase.from('delivery_schedule_rules').delete().eq('id', r.id);
+    const { error: err } = await supabase.from('delivery_schedule_rules').delete().eq('id', r.id);
+    if (err) setError(`Não foi possível apagar a regra: ${err.message}`);
     load();
   };
 
   const endRuleToday = async (r: ScheduleRule) => {
-    await supabase.from('delivery_schedule_rules').update({ end_date: toISODate(new Date()) }).eq('id', r.id);
+    const { error: err } = await supabase.from('delivery_schedule_rules').update({ end_date: toISODate(new Date()) }).eq('id', r.id);
+    if (err) setError(`Não foi possível encerrar a regra: ${err.message}`);
     load();
   };
 
   const saveLead = async () => {
-    await supabase.from('site_settings').update({ value: leadDays, updated_at: new Date().toISOString() }).eq('key', 'delivery_lead_days');
+    const { error: err } = await supabase.from('site_settings').update({ value: leadDays, updated_at: new Date().toISOString() }).eq('key', 'delivery_lead_days');
+    if (err) { setError(`Não foi possível salvar: ${err.message}`); return; }
     setLeadSaved(true);
     setTimeout(() => setLeadSaved(false), 2000);
   };
@@ -191,7 +210,21 @@ export default function DeliveryCalendarAdmin() {
         dias soltos no calendário abaixo.
       </p>
 
-      {error && <div style={{ padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', background: '#ffebee', color: '#c62828', border: '1px solid #ef9a9a' }}>{error}</div>}
+      {error && (
+        <div role="alert" style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 10000, maxWidth: '420px', padding: '1rem 1.25rem', borderRadius: '10px', background: '#ffebee', color: '#c62828', border: '1px solid #ef9a9a', boxShadow: '0 10px 30px rgba(0,0,0,0.2)', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+          <span style={{ flex: 1, lineHeight: 1.5 }}>{error}</span>
+          <button type="button" onClick={() => setError('')} aria-label="Fechar" style={{ background: 'none', border: 'none', color: '#c62828', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1 }}>✕</button>
+        </div>
+      )}
+      {problems.length > 0 && (
+        <div style={{ padding: '1rem 1.25rem', borderRadius: '10px', marginBottom: '1.5rem', background: '#fff4e5', color: '#7a4a00', border: '1px solid #f0d9b5', lineHeight: 1.7 }}>
+          <strong>⚠️ Falta uma etapa no banco de dados, por isso alguns botões não salvam:</strong>
+          <ul style={{ margin: '0.5rem 0 0 1.1rem', padding: 0 }}>
+            {problems.map(p => <li key={p}>{p}</li>)}
+          </ul>
+          <span style={{ fontSize: '0.85rem' }}>No Supabase: SQL Editor → cole o conteúdo do arquivo → Run.</span>
+        </div>
+      )}
 
       {/* ---------- Rules */}
       <div style={card}>
@@ -299,6 +332,11 @@ export default function DeliveryCalendarAdmin() {
         <p style={{ fontSize: '0.8rem', color: '#95a5a6', marginBottom: '1rem', lineHeight: 1.6 }}>
           Clique num dia para abrir ou bloquear só aquele dia (feriado, viagem…). Isso não muda a regra.
         </p>
+        {dayMessage && (
+          <div role="status" style={{ padding: '0.7rem 1rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.9rem', fontWeight: 'bold', background: dayMessage.ok ? '#e8f5e9' : '#ffebee', color: dayMessage.ok ? '#2e7d32' : '#c62828', border: `1px solid ${dayMessage.ok ? '#a5d6a7' : '#ef9a9a'}` }}>
+            {dayMessage.text}
+          </div>
+        )}
 
         {loading ? <p style={{ color: '#7f8c8d' }}>Carregando...</p> : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.4rem' }}>
