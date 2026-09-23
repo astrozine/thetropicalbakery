@@ -28,8 +28,9 @@ CREATE TABLE IF NOT EXISTS public.admins (
 
 ALTER TABLE public.admins ENABLE ROW LEVEL SECURITY;
 
-INSERT INTO public.admins (email, note)
-VALUES ('astrozine@gmail.com', 'Owner')
+INSERT INTO public.admins (email, note) VALUES
+    ('elisabeth.vandam@gmail.com', 'Main admin'),
+    ('astrozine@gmail.com',        'Andrew')
 ON CONFLICT (email) DO NOTHING;
 
 -- Answers "is the person making this request an admin?" for every rule below.

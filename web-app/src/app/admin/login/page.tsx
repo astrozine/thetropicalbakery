@@ -11,6 +11,22 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Lets an owner in with their Google account instead of a password. Safe to
+  // offer here because getting in still requires being on the `admins` list —
+  // signing in successfully is not the same as being allowed through.
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError('');
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/admin` },
+    });
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -57,6 +73,26 @@ export default function AdminLogin() {
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1.5rem 0 1rem' }}>
+          <span style={{ flex: 1, height: '1px', background: '#e8e1d7' }} />
+          <span style={{ fontSize: '0.75rem', color: '#a89a90', textTransform: 'uppercase', letterSpacing: '1px' }}>ou</span>
+          <span style={{ flex: 1, height: '1px', background: '#e8e1d7' }} />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          style={{
+            width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd',
+            background: '#fff', color: '#3c2a21', fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+          }}
+        >
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" style={{ width: '18px' }} />
+          Entrar com Google
+        </button>
       </div>
     </div>
   );
