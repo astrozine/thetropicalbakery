@@ -10,6 +10,7 @@ interface RetreatRoom {
   image_url: string;
   airbnb_nightly_rate: number;
   max_guests: number;
+  gallery: string[] | null;
 }
 
 export default function AdminRetreatsPage() {
@@ -59,6 +60,28 @@ export default function AdminRetreatsPage() {
     setSaving(null);
 
     // Clear message after 3 seconds
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  const handleUpdateGallery = async (roomId: string, raw: string) => {
+    const gallery = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    setSaving(roomId);
+    setMessage(null);
+
+    const { error } = await supabase
+      .from('retreat_rooms')
+      .update({ gallery, updated_at: new Date().toISOString() })
+      .eq('id', roomId);
+
+    if (error) {
+      console.error('Error updating gallery:', error);
+      setMessage({ type: 'error', text: `Erro ao salvar as fotos de ${roomId} (a migration_10 foi executada?)` });
+    } else {
+      setMessage({ type: 'success', text: gallery.length ? 'Galeria atualizada!' : 'Galeria vazia — voltando às fotos padrão.' });
+      setRooms(rooms.map(r => r.id === roomId ? { ...r, gallery } : r));
+    }
+
+    setSaving(null);
     setTimeout(() => setMessage(null), 3000);
   };
 
@@ -194,6 +217,26 @@ export default function AdminRetreatsPage() {
                     {saving === room.id ? 'Salvando...' : 'Salvar Preço'}
                   </button>
                 </div>
+              </div>
+              <div style={{ marginTop: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#594a42', marginBottom: '0.5rem' }}>
+                  Fotos da galeria (uma URL por linha, na ordem de exibição):
+                </label>
+                <textarea
+                  id={`gallery-${room.id}`}
+                  defaultValue={(room.gallery || []).join(String.fromCharCode(10))}
+                  rows={4}
+                  placeholder="Deixe vazio para usar as fotos padrão do site"
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid rgba(212,175,55,0.4)', background: 'white', fontSize: '0.9rem', color: '#594a42', resize: 'vertical' }}
+                />
+                <button
+                  onClick={() => handleUpdateGallery(room.id, (document.getElementById(`gallery-${room.id}`) as HTMLTextAreaElement).value)}
+                  disabled={saving === room.id}
+                  className="btn btn-secondary"
+                  style={{ marginTop: '0.5rem', padding: '0.6rem 1.25rem' }}
+                >
+                  {saving === room.id ? 'Salvando...' : 'Salvar Galeria'}
+                </button>
               </div>
             </div>
 

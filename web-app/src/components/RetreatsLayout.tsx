@@ -5,6 +5,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 import RetreatPricingCalculator from '@/components/RetreatPricingCalculator';
+import RoomsAccordion from '@/components/RoomsAccordion';
 import { supabase } from '@/lib/supabase';
 
 export interface RetreatsLayoutProps {
@@ -242,10 +243,10 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
       </section>
 
       {/* Suites Section */}
-      <section style={{ background: 'var(--color-background)', padding: 'clamp(4rem, 8vw, 8rem) 2rem' }}>
+      <section style={{ background: 'var(--color-background)', padding: 'clamp(4rem, 8vw, 8rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <ScrollReveal>
-            <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
               <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, marginBottom: '1rem', display: 'block' }}>
                 {texts.suites.subtitle}
               </span>
@@ -258,91 +259,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             </div>
           </ScrollReveal>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-            {/* Penthouse */}
-            <ScrollReveal>
-              <div style={{
-                background: '#fff',
-                overflow: 'hidden',
-                border: '1px solid rgba(212,175,55,0.3)',
-                transition: 'transform 0.3s, box-shadow 0.3s',
-              }}>
-                <div style={{ position: 'relative' }}>
-                  <ZoomableImage src={roomImages.penthouse} alt="Penthouse" style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }} />
-                  <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: '#d4af37', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>
-                    {texts.suites.penthouse.capacity}
-                  </div>
-                </div>
-                <div style={{ padding: '2rem' }}>
-                  <h3 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '0.75rem' }}>
-                    {texts.suites.penthouse.title}
-                  </h3>
-                  <p style={{ color: '#594a42', lineHeight: '1.7', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-                    {texts.suites.penthouse.description}
-                  </p>
-                  <a href="https://www.airbnb.com/rooms/1257394362209121684?viralityEntryPoint=1&s=76" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ width: '100%', textAlign: 'center' }}>
-                    {texts.suites.penthouse.cta}
-                  </a>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* Big Suite */}
-            <ScrollReveal>
-              <div style={{
-                background: '#fff',
-                overflow: 'hidden',
-                border: '1px solid rgba(212,175,55,0.3)',
-                transition: 'transform 0.3s, box-shadow 0.3s',
-              }}>
-                <div style={{ position: 'relative' }}>
-                  <ZoomableImage src={roomImages.big_suite} alt="Big Suite" style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }} />
-                  <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: '#d4af37', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>
-                    {texts.suites.bigSuite.capacity}
-                  </div>
-                </div>
-                <div style={{ padding: '2rem' }}>
-                  <h3 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '0.75rem' }}>
-                    {texts.suites.bigSuite.title}
-                  </h3>
-                  <p style={{ color: '#594a42', lineHeight: '1.7', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-                    {texts.suites.bigSuite.description}
-                  </p>
-                  <a href="https://www.airbnb.com/rooms/589851889015316995?guests=1&adults=1&s=67&unique_share_id=c014bdfc-a020-454b-8ad3-b7ad34d1d84f" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ width: '100%', textAlign: 'center' }}>
-                    {texts.suites.bigSuite.cta}
-                  </a>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* Small Suite */}
-            <ScrollReveal>
-              <div style={{
-                background: '#fff',
-                overflow: 'hidden',
-                border: '1px solid rgba(212,175,55,0.3)',
-                transition: 'transform 0.3s, box-shadow 0.3s',
-              }}>
-                <div style={{ position: 'relative' }}>
-                  <ZoomableImage src={roomImages.small_suite} alt="Standard Suite" style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }} />
-                  <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: '#d4af37', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>
-                    {texts.suites.smallSuite.capacity}
-                  </div>
-                </div>
-                <div style={{ padding: '2rem' }}>
-                  <h3 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '0.75rem' }}>
-                    {texts.suites.smallSuite.title}
-                  </h3>
-                  <p style={{ color: '#594a42', lineHeight: '1.7', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-                    {texts.suites.smallSuite.description}
-                  </p>
-                  <a href="https://www.airbnb.com/rooms/873138853997998343?guests=1&adults=1&s=67&unique_share_id=932bf745-0053-450d-8afd-7a6008f1f21e" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ width: '100%', textAlign: 'center' }}>
-                    {texts.suites.smallSuite.cta}
-                  </a>
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
+          <RoomsAccordion onInquire={(name) => { setSelectedInterest(name); setIsModalOpen(true); }} />
         </div>
       </section>
 
