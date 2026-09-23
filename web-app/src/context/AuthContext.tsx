@@ -9,13 +9,34 @@ export interface UserProfile {
   full_name: string | null;
   email: string | null;
   phone: string | null;
+  /** The assembled one-line address. Kept in step with the fields below. */
   address: string | null;
   delivery_zone: string | null;
+
+  // A delivery address split into fields, so nobody has to guess at a CEP
+  // and the weekly route can be grouped by neighbourhood.
+  address_street: string | null;
+  address_number: string | null;
+  address_complement: string | null;
+  address_neighborhood: string | null;
+  address_city: string | null;
+  address_postal_code: string | null;
+  address_reference: string | null;
+
   is_vegan: boolean;
   is_gluten_free: boolean;
   is_sugar_free: boolean;
   is_salt_free: boolean;
   is_oil_free: boolean;
+
+  /** Never guessed at, never substituted — this one has to be exactly right. */
+  allergies: string | null;
+  birth_date: string | null;
+  household_size: number | null;
+  favorite_flavors: string | null;
+  avoid_ingredients: string | null;
+  how_found_us: string | null;
+  marketing_opt_in: boolean | null;
 }
 
 export type OAuthProvider = 'google' | 'facebook';

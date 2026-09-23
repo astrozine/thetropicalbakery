@@ -166,15 +166,21 @@ a {
   border-color: var(--color-primary);
 }
 
+/* Filled gold foil, never outlined. The old version was a gold border with gold
+   text on cream, which is far too little contrast to read, and its hover state
+   put white text on gold — worse still. Dark cocoa on foil reads cleanly on
+   every background we use. */
 .btn-secondary {
-  background-color: transparent;
+  background-color: var(--color-secondary);
   border: 1px solid var(--color-secondary);
-  color: var(--color-secondary);
+  color: var(--color-primary);
+  font-weight: 700;
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-secondary);
-  color: var(--color-white);
+  background-color: #c19b2b;
+  border-color: #c19b2b;
+  color: var(--color-primary);
 }
 
 .hero-section {

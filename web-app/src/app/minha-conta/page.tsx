@@ -4,65 +4,102 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth, formatBrazilianPhone } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
+import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
+import { SUBSCRIPTION_ZONES, formatBRL } from '@/lib/deliveryZones';
+import { DIETARY_FIELDS, DietaryKey } from '@/lib/subscriptions';
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
-  fontSize: '0.8rem',
+  fontSize: '0.75rem',
   fontWeight: 600,
   color: 'var(--color-primary)',
-  marginBottom: '0.5rem',
+  marginBottom: '0.4rem',
   textTransform: 'uppercase',
-  letterSpacing: '1px',
+  letterSpacing: '0.08em',
 };
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  padding: '0.9rem 1rem',
+  padding: '0.85rem 1rem',
   border: '1px solid rgba(212,175,55,0.5)',
   borderRadius: '8px',
-  background: 'rgba(255,255,255,0.8)',
+  background: 'rgba(255,255,255,0.85)',
   fontFamily: 'var(--font-body)',
   fontSize: '1rem',
   outline: 'none',
 };
 
-const DIETARY: { key: DietaryKey; label: string }[] = [
-  { key: 'is_vegan', label: 'Vegano' },
-  { key: 'is_gluten_free', label: 'Sem Glúten' },
-  { key: 'is_sugar_free', label: 'Sem Açúcar' },
-  { key: 'is_salt_free', label: 'Sem Sal' },
-  { key: 'is_oil_free', label: 'Sem Óleo' },
-];
-
-type DietaryKey = 'is_vegan' | 'is_gluten_free' | 'is_sugar_free' | 'is_salt_free' | 'is_oil_free';
+const sectionTitle: React.CSSProperties = {
+  fontFamily: 'var(--font-heading)',
+  fontSize: '1.3rem',
+  color: 'var(--color-primary)',
+  marginBottom: '1.25rem',
+  paddingBottom: '0.6rem',
+  borderBottom: '1px solid rgba(212,175,55,0.3)',
+};
 
 export default function MyAccountPage() {
   const { user, profile, loading, saveProfile, signOut } = useAuth();
 
-  const [form, setForm] = useState({
+  const [basics, setBasics] = useState({
     full_name: '',
     phone: '',
-    address: '',
-    is_vegan: false,
-    is_gluten_free: false,
-    is_sugar_free: false,
-    is_salt_free: false,
-    is_oil_free: false,
+    birth_date: '',
+    household_size: '',
+    delivery_zone: SUBSCRIPTION_ZONES[0]?.id ?? 'zone1',
   });
+  const [address, setAddress] = useState<AddressValue>(EMPTY_ADDRESS);
+  const [dietary, setDietary] = useState<Record<DietaryKey, boolean>>({
+    is_vegan: false, is_gluten_free: false, is_sugar_free: false,
+    is_salt_free: false, is_oil_free: false,
+  });
+  const [tastes, setTastes] = useState({
+    allergies: '',
+    favorite_flavors: '',
+    avoid_ingredients: '',
+  });
+
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
-    setForm({
+
+    setBasics({
       full_name: profile.full_name || '',
       phone: profile.phone || '',
-      address: profile.address || '',
+      birth_date: profile.birth_date || '',
+      household_size: profile.household_size ? String(profile.household_size) : '',
+      delivery_zone: profile.delivery_zone || SUBSCRIPTION_ZONES[0]?.id || 'zone1',
+    });
+
+    setAddress({
+      address_postal_code: profile.address_postal_code || '',
+      address_street: profile.address_street || '',
+      address_number: profile.address_number || '',
+      address_complement: profile.address_complement || '',
+      address_neighborhood: profile.address_neighborhood || '',
+      // Anyone who filled in the old single-line address before the split keeps
+      // it visible in "Rua" until they tidy it up, rather than losing it.
+      address_city: profile.address_city || 'Ubatuba',
+      address_reference: profile.address_reference || '',
+      ...(!profile.address_street && profile.address
+        ? { address_street: profile.address }
+        : {}),
+    });
+
+    setDietary({
       is_vegan: profile.is_vegan,
       is_gluten_free: profile.is_gluten_free,
       is_sugar_free: profile.is_sugar_free,
       is_salt_free: profile.is_salt_free,
       is_oil_free: profile.is_oil_free,
+    });
+
+    setTastes({
+      allergies: profile.allergies || '',
+      favorite_flavors: profile.favorite_flavors || '',
+      avoid_ingredients: profile.avoid_ingredients || '',
     });
   }, [profile]);
 
@@ -70,7 +107,22 @@ export default function MyAccountPage() {
     e.preventDefault();
     setSaving(true);
     setSaved(false);
-    await saveProfile(form);
+
+    await saveProfile({
+      full_name: basics.full_name || null,
+      phone: basics.phone || null,
+      birth_date: basics.birth_date || null,
+      household_size: basics.household_size ? Number(basics.household_size) : null,
+      delivery_zone: basics.delivery_zone,
+      ...address,
+      // Keep the one-line version in step for the WhatsApp order messages.
+      address: addressToOneLine(address),
+      ...dietary,
+      allergies: tastes.allergies || null,
+      favorite_flavors: tastes.favorite_flavors || null,
+      avoid_ingredients: tastes.avoid_ingredients || null,
+    });
+
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
@@ -78,7 +130,7 @@ export default function MyAccountPage() {
 
   return (
     <main style={{ minHeight: '100vh', paddingTop: '8rem', paddingBottom: '6rem', background: 'var(--color-background)' }}>
-      <div className="container" style={{ maxWidth: '640px', margin: '0 auto', padding: '0 1.5rem' }}>
+      <div className="container" style={{ maxWidth: '720px', margin: '0 auto', padding: '0 1.5rem' }}>
 
         <h1 style={{
           fontSize: 'clamp(2rem, 5vw, 2.75rem)',
@@ -100,55 +152,100 @@ export default function MyAccountPage() {
           </>
         ) : (
           <>
-            <p style={{ color: '#7a6a61', marginBottom: '2.5rem', fontSize: '0.9rem' }}>
-              Estes dados são preenchidos automaticamente nos seus pedidos. Altere quando quiser.
+            <p style={{ color: '#7a6a61', marginBottom: '2.5rem', fontSize: '0.92rem', lineHeight: 1.7 }}>
+              Tudo aqui é preenchido automaticamente nos seus pedidos e na sua assinatura.
+              Quanto mais completo, mais a Dolly acerta na sua caixa.
             </p>
 
-            <form onSubmit={handleSave} className="liquid-glass-card" style={{ padding: '2rem 1.75rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div>
-                  <label style={labelStyle}>Nome Completo</label>
-                  <input
-                    type="text"
-                    value={form.full_name}
-                    onChange={e => setForm({ ...form, full_name: e.target.value })}
-                    placeholder="Ex: João da Silva"
-                    style={inputStyle}
-                  />
+            <form onSubmit={handleSave} className="liquid-glass-card" style={{ padding: 'clamp(1.5rem, 4vw, 2rem)' }}>
+
+              {/* ------------------------------------------------ WHO YOU ARE */}
+              <h2 style={sectionTitle}>Seus dados</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '2.5rem' }}>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div style={{ flex: '2 1 220px' }}>
+                    <label style={labelStyle}>Nome completo</label>
+                    <input
+                      type="text"
+                      value={basics.full_name}
+                      onChange={e => setBasics({ ...basics, full_name: e.target.value })}
+                      placeholder="Ex: Ana Souza"
+                      style={inputStyle}
+                    />
+                  </div>
+                  <div style={{ flex: '1 1 170px' }}>
+                    <label style={labelStyle}>WhatsApp (com DDD)</label>
+                    <input
+                      type="tel"
+                      value={basics.phone}
+                      onChange={e => setBasics({ ...basics, phone: e.target.value })}
+                      placeholder="(12) 99123-4567"
+                      style={inputStyle}
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label style={labelStyle}>WhatsApp (com DDD)</label>
-                  <input
-                    type="tel"
-                    value={form.phone}
-                    onChange={e => setForm({ ...form, phone: e.target.value })}
-                    placeholder="(12) 99123-4567"
-                    style={inputStyle}
-                  />
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div style={{ flex: '1 1 180px' }}>
+                    <label style={labelStyle}>
+                      Aniversário{' '}
+                      <span style={{ textTransform: 'none', fontWeight: 400, color: '#a89a90' }}>(ganha surpresa)</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={basics.birth_date}
+                      onChange={e => setBasics({ ...basics, birth_date: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                  <div style={{ flex: '1 1 180px' }}>
+                    <label style={labelStyle}>Quantas pessoas em casa</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={20}
+                      value={basics.household_size}
+                      onChange={e => setBasics({ ...basics, household_size: e.target.value })}
+                      placeholder="2"
+                      style={inputStyle}
+                    />
+                  </div>
                 </div>
+              </div>
 
-                <div>
-                  <label style={labelStyle}>Endereço de Entrega</label>
-                  <input
-                    type="text"
-                    value={form.address}
-                    onChange={e => setForm({ ...form, address: e.target.value })}
-                    placeholder="Rua, Número, Bairro, CEP"
-                    style={inputStyle}
-                  />
-                </div>
+              {/* ------------------------------------------------------ ADDRESS */}
+              <h2 style={sectionTitle}>Endereço de entrega</h2>
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={labelStyle}>Região</label>
+                <select
+                  value={basics.delivery_zone}
+                  onChange={e => setBasics({ ...basics, delivery_zone: e.target.value })}
+                  style={{ ...inputStyle, cursor: 'pointer' }}
+                >
+                  {SUBSCRIPTION_ZONES.map(z => (
+                    <option key={z.id} value={z.id}>
+                      {z.label}{z.fee > 0 ? ` — entrega ${formatBRL(z.fee)}` : ' — entrega inclusa'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ marginBottom: '2.5rem' }}>
+                <AddressFields value={address} onChange={setAddress} />
+              </div>
 
+              {/* ------------------------------------------------------- TASTES */}
+              <h2 style={sectionTitle}>Restrições e preferências</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
                 <div>
-                  <label style={labelStyle}>Restrições Alimentares</label>
+                  <label style={labelStyle}>Restrições alimentares</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-                    {DIETARY.map(({ key, label }) => {
-                      const on = form[key];
+                    {DIETARY_FIELDS.map(({ key, label }) => {
+                      const on = dietary[key];
                       return (
                         <button
                           key={key}
                           type="button"
-                          onClick={() => setForm({ ...form, [key]: !on })}
+                          onClick={() => setDietary({ ...dietary, [key]: !on })}
                           style={{
                             padding: '0.5rem 1rem',
                             borderRadius: '20px',
@@ -167,13 +264,52 @@ export default function MyAccountPage() {
                     })}
                   </div>
                 </div>
+
+                <div>
+                  <label style={labelStyle}>Alergias</label>
+                  <input
+                    type="text"
+                    value={tastes.allergies}
+                    onChange={e => setTastes({ ...tastes, allergies: e.target.value })}
+                    placeholder="Ex: castanha de caju, amendoim"
+                    style={{ ...inputStyle, borderColor: tastes.allergies ? '#c0392b' : 'rgba(212,175,55,0.5)' }}
+                  />
+                  <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.4rem' }}>
+                    Aparece destacado em vermelho na cozinha toda semana.
+                  </p>
+                </div>
+
+                <div>
+                  <label style={labelStyle}>Sabores que você ama</label>
+                  <input
+                    type="text"
+                    value={tastes.favorite_flavors}
+                    onChange={e => setTastes({ ...tastes, favorite_flavors: e.target.value })}
+                    placeholder="Ex: cacau intenso, coco, maracujá"
+                    style={inputStyle}
+                  />
+                </div>
+
+                <div>
+                  <label style={labelStyle}>O que você prefere não receber</label>
+                  <input
+                    type="text"
+                    value={tastes.avoid_ingredients}
+                    onChange={e => setTastes({ ...tastes, avoid_ingredients: e.target.value })}
+                    placeholder="Ex: banana, hortelã"
+                    style={inputStyle}
+                  />
+                  <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.4rem' }}>
+                    Não é alergia — só não é a sua praia. A Dolly troca por outra coisa.
+                  </p>
+                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={saving}
                 className="btn btn-primary"
-                style={{ width: '100%', padding: '1.1rem', marginTop: '2rem', borderRadius: '8px', fontSize: '1rem' }}
+                style={{ width: '100%', padding: '1.1rem', marginTop: '2.5rem', borderRadius: '8px', fontSize: '1rem' }}
               >
                 {saving ? 'Salvando...' : saved ? '✅ Dados salvos!' : 'Salvar meus dados'}
               </button>

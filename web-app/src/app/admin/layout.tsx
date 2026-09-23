@@ -121,6 +121,7 @@ export default function AdminLayout({
 
   const navItems = [
     { name: 'Visão Geral', path: '/admin' },
+    { name: 'Assinaturas', path: '/admin/assinaturas' },
     { name: 'Caixas da Semana', path: '/admin/caixas' },
     { name: 'Fila de Espera', path: '/admin/waitlist' },
     { name: 'Inscrições em Cursos', path: '/admin/inscricoes' },
@@ -129,6 +130,7 @@ export default function AdminLayout({
     { name: 'Retiros (Imagens)', path: '/admin/retreats' },
     { name: 'Conteúdo do Site', path: '/admin/content' },
     { name: 'CRM & Campanhas', path: '/admin/crm' },
+    { name: 'Candidaturas', path: '/admin/vagas' },
   ];
 
   return (

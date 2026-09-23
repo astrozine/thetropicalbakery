@@ -38,9 +38,11 @@ export default function Footer() {
         <div>
           <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Menu</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, lineHeight: '2' }}>
+            <li><Link href="/assinatura" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>Assinatura Semanal</Link></li>
             <li><Link href="/" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Fazer Pedido</Link></li>
             <li><Link href="/cursos" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Cursos com Dolly</Link></li>
             <li><Link href="/#about" style={{ color: '#e8e1d7', textDecoration: 'none' }}>Nossa História</Link></li>
+            <li><Link href="/trabalhe-conosco" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Trabalhe Conosco</Link></li>
           </ul>
         </div>
         <div>

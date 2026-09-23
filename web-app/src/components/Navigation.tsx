@@ -36,9 +36,12 @@ export default function Navigation() {
     }
   };
 
-  const links = [
+  const links: { name: string; path: string; highlight?: boolean }[] = [
     { name: 'Início', path: '/' },
-    { name: 'Caixas da Semana', path: '/caixas' },
+    // The weekly subscription is the core of the business, so it leads and is
+    // the only item given the foil treatment.
+    { name: 'Assinatura', path: '/assinatura', highlight: true },
+    { name: 'Caixa de Degustação', path: '/caixas' },
     { name: 'Menu de Eventos', path: '/menu' },
     { name: 'Retiros', path: '/retreats' },
   ];
@@ -65,6 +68,24 @@ export default function Navigation() {
     { name: '🇦🇷 Español', path: '/es/retiros' },
     { name: '✈️ English', path: '/en/retreats' },
   ];
+
+  /**
+   * The word "Idioma" is marked notranslate, so Google Translate leaves it
+   * alone — which is right for the language names, but means a Dutch or German
+   * visitor sees a Portuguese word they can't read. So we label it in the
+   * language of their own device instead, and fall back to "Language", which is
+   * the most widely recognised of the options.
+   */
+  const [langLabel, setLangLabel] = useState('Idioma');
+
+  useEffect(() => {
+    const LABELS: Record<string, string> = {
+      pt: 'Idioma', en: 'Language', es: 'Idioma', it: 'Lingua',
+      fr: 'Langue', de: 'Sprache', nl: 'Taal',
+    };
+    const deviceLang = (navigator.language || 'pt').slice(0, 2).toLowerCase();
+    setLangLabel(LABELS[deviceLang] || 'Language');
+  }, []);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isRetreatsDropdownOpen, setIsRetreatsDropdownOpen] = useState(false);
@@ -123,11 +144,16 @@ export default function Navigation() {
             <Link key={link.path} href={link.path} style={{
               marginLeft: '1.5rem',
               textDecoration: 'none',
-              color: pathname === link.path ? '#d4af37' : '#3c2a21',
-              fontWeight: pathname === link.path ? 'bold' : 'normal',
+              color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#3c2a21',
+              fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
               textTransform: 'uppercase',
               letterSpacing: '1px',
-              fontSize: '0.9rem'
+              fontSize: '0.9rem',
+              ...(link.highlight ? {
+                background: '#d4af37',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+              } : {}),
             }}>
               {link.name}
             </Link>
@@ -186,7 +212,7 @@ export default function Navigation() {
             onMouseLeave={() => setIsRetreatsDropdownOpen(false)}
           >
             <span style={{ color: '#3c2a21', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              🌐 Idioma ▾
+              🌐 {langLabel} ▾
             </span>
             {isRetreatsDropdownOpen && (
               <div style={{ position: 'absolute', top: '100%', left: 0, background: 'rgba(253,250,243,0.95)', backdropFilter: 'blur(10px)', minWidth: '200px', padding: '1rem 0', borderRadius: '8px', boxShadow: '0 10px 30px rgba(60,42,33,0.1)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -370,13 +396,19 @@ export default function Navigation() {
                 onClick={closeMenu}
                 style={{
                   display: 'block',
-                  padding: '1rem 0',
+                  padding: link.highlight ? '0.9rem 1rem' : '1rem 0',
                   textDecoration: 'none',
-                  color: pathname === link.path ? '#d4af37' : '#3c2a21',
-                  fontWeight: pathname === link.path ? 'bold' : '500',
+                  color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#3c2a21',
+                  fontWeight: link.highlight || pathname === link.path ? 'bold' : '500',
                   fontSize: '1.2rem',
-                  borderBottom: '1px solid rgba(0,0,0,0.06)',
+                  borderBottom: link.highlight ? 'none' : '1px solid rgba(0,0,0,0.06)',
                   letterSpacing: '0.5px',
+                  ...(link.highlight ? {
+                    background: '#d4af37',
+                    borderRadius: '8px',
+                    margin: '0.5rem 0',
+                    textAlign: 'center' as const,
+                  } : {}),
                 }}
               >
                 {link.name}
@@ -486,7 +518,7 @@ export default function Navigation() {
                 cursor: 'pointer',
                 textAlign: 'left'
               }}>
-              🌐 IDIOMA <span>{mobileLangOpen ? '▲' : '▼'}</span>
+              🌐 {langLabel.toUpperCase()} <span>{mobileLangOpen ? '▲' : '▼'}</span>
             </button>
             {mobileLangOpen && [
               { code: 'pt', name: 'Português' },

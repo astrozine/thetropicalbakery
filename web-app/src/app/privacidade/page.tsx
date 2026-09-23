@@ -78,6 +78,7 @@ export default function PrivacyPolicyPage() {
             <li style={liStyle}><strong>Google e Facebook</strong> — apenas se você optar por entrar com essas contas</li>
             <li style={liStyle}><strong>WhatsApp/Twilio</strong> — para enviar confirmações e notificações sobre seu pedido</li>
             <li style={liStyle}><strong>Google Translate</strong> — para traduzir o conteúdo do site para visitantes de outros idiomas</li>
+            <li style={liStyle}><strong>ViaCEP</strong> — quando você digita seu CEP, consultamos a base pública dos Correios para preencher rua, bairro e cidade automaticamente. Enviamos apenas o CEP, nunca seu nome ou endereço completo</li>
           </ul>
         </section>
 

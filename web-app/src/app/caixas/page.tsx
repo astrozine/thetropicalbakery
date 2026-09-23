@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import StripedBackground from '@/components/StripedBackground';
 import WhatsAppCheckout from '@/components/WhatsAppCheckout';
 import ScrollReveal from '@/components/ScrollReveal';
 import WaitlistCapture from '@/components/WaitlistCapture';
@@ -78,9 +80,33 @@ export default function CaixasPage() {
               Preparando o Próximo Lote...
             </h1>
             
-            <p className="desktop-only" style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.9)', marginBottom: '3rem', maxWidth: '800px', margin: '0 auto 3rem auto', lineHeight: '1.8' }}>
-              Nossas Caixas de Degustação são edições limitadas lançadas semanalmente. O lote atual já esgotou ou estamos preparando o próximo menu surpresa com nossos melhores doces veganos, sem glúten e sem açúcar.
+            <p className="desktop-only" style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.9)', maxWidth: '800px', margin: '0 auto 2rem auto', lineHeight: '1.8' }}>
+              Cada Caixa de Degustação é uma edição única, feita à mão e lançada uma vez por semana.
+              O lote desta semana já encontrou suas casas — o próximo já está sendo desenhado.
             </p>
+
+            {/* Someone who arrived at a sold-out lot is the single most likely
+                person on the site to subscribe. Offer it before the waitlist. */}
+            <div style={{
+              maxWidth: '620px', margin: '0 auto 3rem', padding: '1.5rem',
+              background: 'rgba(212,175,55,0.14)', border: '1px solid rgba(212,175,55,0.5)',
+              borderRadius: '16px', backdropFilter: 'blur(6px)',
+            }}>
+              <p style={{ color: '#d4af37', fontWeight: 700, fontSize: '1.05rem', marginBottom: '0.6rem' }}>
+                Cansado de perder o lote?
+              </p>
+              <p style={{ color: 'rgba(253,250,243,0.88)', fontSize: '0.95rem', lineHeight: 1.75, marginBottom: '1.25rem' }}>
+                Assinantes recebem uma caixa toda semana, com prioridade nas edições limitadas
+                e a partir de R$ 79 por caixa.
+              </p>
+              <Link href="/assinatura" style={{
+                display: 'inline-block', background: '#d4af37', color: '#3c2a21',
+                padding: '0.9rem 2rem', borderRadius: '8px', textDecoration: 'none',
+                fontWeight: 700, fontSize: '0.98rem',
+              }}>
+                Ver a assinatura semanal
+              </Link>
+            </div>
 
             {/* Mobile Carousel */}
             <div className="mobile-only hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: '1rem', padding: '0.5rem', marginBottom: '2rem', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
@@ -173,7 +199,37 @@ export default function CaixasPage() {
         </div>
       </section>
 
-      <Marquee text="NOSSAS CAIXAS DE DEGUSTAÇÃO ✦ NOSSAS CAIXAS DE DEGUSTAÇÃO ✦ " speed={120} />
+      {/* Offered after the one-off purchase, where the value of not having to
+          come back and do this every week is most obvious. */}
+      <StripedBackground tone="dark" bandHeight={80} style={{ padding: 'clamp(3.5rem, 8vw, 5.5rem) 1.5rem' }}>
+        <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{
+            color: '#d4af37', fontSize: '0.72rem', textTransform: 'uppercase',
+            letterSpacing: '0.2em', marginBottom: '1rem',
+          }}>
+            Assinatura Semanal
+          </p>
+          <h2 style={{
+            fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.7rem, 4.5vw, 2.6rem)',
+            color: '#fdfaf3', marginBottom: '1.25rem', lineHeight: 1.2,
+          }}>
+            Ou receba uma caixa nova toda semana
+          </h2>
+          <p style={{ color: 'rgba(253,250,243,0.85)', lineHeight: 1.85, marginBottom: '2rem' }}>
+            Sem precisar voltar aqui, sem correr atrás do lote. A partir de R$ 79 por caixa,
+            com prioridade nas edições limitadas e entrega inclusa em Itamambuca.
+          </p>
+          <Link href="/assinatura" style={{
+            display: 'inline-block', background: '#d4af37', color: '#3c2a21',
+            padding: '1.1rem 2.5rem', borderRadius: '10px', textDecoration: 'none',
+            fontWeight: 700, fontSize: '1.02rem',
+          }}>
+            Conhecer os planos
+          </Link>
+        </div>
+      </StripedBackground>
+
+      <Marquee text="CAIXA DE DEGUSTAÇÃO SEMANAL ✦ FEITA À MÃO EM ITAMAMBUCA ✦ " speed={120} />
 
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes pulse {

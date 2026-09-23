@@ -4,13 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
+import { DELIVERY_ZONES } from '@/lib/deliveryZones';
 
-const DELIVERY_ZONES = [
-  { id: 'zone1', label: 'Itamambuca', fee: 0, minBoxes: 1 },
-  { id: 'zone2', label: 'Praia do Félix, Prumirim, Praia Vermelha, Perequê-Açú', fee: 15, minBoxes: 1 },
-  { id: 'zone3', label: 'Ubatuba (Centro), Praia Grande, Puruba, Ubatumirim', fee: 25, minBoxes: 1 },
-  { id: 'zone4', label: 'Paraty, Picinguaba (Somente Atacado/Eventos)', fee: 100, minBoxes: 10 },
-];
 
 interface WhatsAppCheckoutProps {
   activeTastingBoxId?: string;
