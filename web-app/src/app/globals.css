@@ -199,6 +199,30 @@ a {
   }
 }
 
+.hero-side-image {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(200px, 19vw, 360px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-side-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 24px;
+  box-shadow: 0 30px 70px rgba(60, 42, 33, 0.35);
+}
+
+.hero-side-image-left { left: clamp(-40px, -2vw, 0px); transform: translateY(-50%) rotate(-6deg); }
+.hero-side-image-right { right: clamp(-40px, -2vw, 0px); transform: translateY(-50%) rotate(6deg); }
+
+@media (max-width: 1400px) {
+  .hero-side-image { display: none; }
+}
+
 .hero-background {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;

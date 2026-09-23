@@ -157,7 +157,9 @@ export default function CaixasPage() {
           style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
             backgroundSize: 'cover', backgroundPosition: 'center',
-            backgroundImage: `url(${activeBox.image_url}), linear-gradient(rgba(60, 42, 33, 0.85), rgba(60, 42, 33, 0.85))`
+            backgroundImage: `url(${activeBox.image_url}), linear-gradient(180deg, rgba(60,42,33,0.55) 0%, rgba(60,42,33,0.9) 65%, rgba(60,42,33,0.95) 100%)`,
+            backgroundBlendMode: 'overlay',
+            backgroundColor: 'var(--color-primary)',
           }}
         />
         

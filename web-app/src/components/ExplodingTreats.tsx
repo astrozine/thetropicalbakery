@@ -29,10 +29,10 @@ export default function ExplodingTreats() {
   }, [selectedId]);
 
   const treats = [
-    { id: '1', src: '/treats/media_1789712796150.jpg', mobile: { x: -80, y: -160, scale: 0.55 }, desktop: { x: -340, y: -160, scale: 1.0 }, rotate: -15 },
-    { id: '2', src: '/treats/media_1789712814475.jpg', mobile: { x: 80, y: -130, scale: 0.6 }, desktop: { x: 340, y: -140, scale: 1.0 }, rotate: 20 },
-    { id: '3', src: '/treats/media_1789712835955.jpg', mobile: { x: -80, y: 100, scale: 0.5 }, desktop: { x: -360, y: 130, scale: 1.0 }, rotate: -25 },
-    { id: '4', src: '/treats/media_1789712972031.jpg', mobile: { x: 80, y: 110, scale: 0.55 }, desktop: { x: 360, y: 150, scale: 1.0 }, rotate: 10 },
+    { id: '1', src: '/treats/media_1789712796150.jpg', mobile: { x: -80, y: -160, scale: 0.55 }, desktop: { x: -380, y: -160, scale: 1.0 }, rotate: -15 },
+    { id: '2', src: '/treats/media_1789712814475.jpg', mobile: { x: 80, y: -130, scale: 0.6 }, desktop: { x: 380, y: -140, scale: 1.0 }, rotate: 20 },
+    { id: '3', src: '/treats/media_1789712835955.jpg', mobile: { x: -80, y: 100, scale: 0.5 }, desktop: { x: -400, y: 140, scale: 1.0 }, rotate: -25 },
+    { id: '4', src: '/treats/media_1789712972031.jpg', mobile: { x: 80, y: 110, scale: 0.55 }, desktop: { x: 400, y: 160, scale: 1.0 }, rotate: 10 },
   ];
 
   const tags = ['Sem Açúcar Refinado', 'Sem Sal', 'Sem Glúten', 'Sem Processados'];
@@ -193,8 +193,8 @@ export default function ExplodingTreats() {
             backdropFilter: 'blur(16px)',
             border: '1px solid rgba(212,175,55,0.4)',
             borderRadius: '22px',
-            padding: '1.75rem 2.25rem',
-            maxWidth: '420px',
+            padding: '2rem 2.5rem',
+            maxWidth: '480px',
             textAlign: 'center',
             boxShadow: '0 25px 50px -12px rgba(60,42,33,0.3)',
             pointerEvents: 'auto',
@@ -203,7 +203,7 @@ export default function ExplodingTreats() {
           <span style={{ display: 'inline-block', color: '#a6832b', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
             🌴 Itamambuca · Ubatuba
           </span>
-          <h2 style={{ color: '#3c2a21', fontWeight: 800, fontSize: '1.5rem', marginBottom: '1rem', lineHeight: 1.2, fontFamily: 'var(--font-heading)' }}>
+          <h2 style={{ color: '#3c2a21', fontWeight: 700, fontSize: 'clamp(1.5rem, 3.4vw, 1.9rem)', marginBottom: '1.1rem', lineHeight: 1.35, letterSpacing: '0.01em', fontFamily: 'var(--font-heading)' }}>
             Veganos Chegando em Itamambuca
           </h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', justifyContent: 'center', marginBottom: '1.5rem' }}>

@@ -64,6 +64,12 @@ export default async function Home() {
             )}
           </div>
         )}
+        <div className="hero-side-image hero-side-image-left">
+          <img src="/box3.jpg" alt="Caixa de Degustação The Tropical Bakery" />
+        </div>
+        <div className="hero-side-image hero-side-image-right">
+          <img src="/box1.jpg" alt="Caixa de Degustação The Tropical Bakery" />
+        </div>
         <div className="container hero-content fade-in" style={{ padding: '0' }}>
           <ExplodingTreats />
         </div>
