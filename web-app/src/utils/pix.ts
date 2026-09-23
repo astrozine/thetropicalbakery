@@ -6,8 +6,8 @@ export interface PixData {
 }
 
 export async function generatePixData({ value, transactionId }: PixData) {
-  // Using a placeholder PIX Key until the user specifies one
-  const pixKey = "pix@thetropicalbakery.com.br"; // TODO: Update with real key
+  // CPF registered as a Pix key with the receiving bank account.
+  const pixKey = "23968541863";
   
   const qrCodePix = QrCodePix({
       version: '01',
