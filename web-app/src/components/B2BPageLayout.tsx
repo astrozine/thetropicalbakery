@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import SplitHero from '@/components/SplitHero';
 import ZoomableImage from '@/components/ZoomableImage';
 import StripedBackground from '@/components/StripedBackground';
 
@@ -47,39 +47,17 @@ export default function B2BPageLayout({
 }: B2BPageLayoutProps) {
   return (
     <main className="min-h-screen" style={{ background: 'var(--color-background)' }}>
-      {/* Hero */}
-      <section style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', paddingTop: 'clamp(7rem, 14vw, 9rem)', paddingBottom: 'clamp(4.5rem, 9vw, 6.5rem)' }}>
-        <div
-          style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
-            backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
-            backgroundImage: `url(${heroImage}), linear-gradient(rgba(60, 42, 33, 0.72), rgba(60, 42, 33, 0.72))`,
-            backgroundBlendMode: 'overlay',
-            backgroundColor: 'var(--color-primary)',
-          }}
-        />
-        {itamambucaBadge && (
-          <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 2, width: '86px', opacity: 0.95 }}>
-            <Image src="/itamambuca-lockup.png" alt="The Tropical Bakery — Itamambuca" width={172} height={220} style={{ width: '100%', height: 'auto' }} />
-          </div>
-        )}
-        <div className="container relative z-10 text-center fade-in px-4">
-          <span className="text-secondary tracking-[4px] uppercase text-sm md:text-base mb-4 block font-semibold">
-            {eyebrow}
-          </span>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
-            {title}
-          </h1>
-          <p style={{ color: '#f5efe2', fontSize: '1.15rem', maxWidth: '680px', margin: '0 auto', lineHeight: 1.8 }}>
-            {intro}
-          </p>
-          {regionNote && (
-            <p style={{ marginTop: '1.25rem', display: 'inline-block', background: 'rgba(212,175,55,0.18)', border: '1px solid rgba(212,175,55,0.5)', color: '#fdfaf3', padding: '0.5rem 1.25rem', borderRadius: '30px', fontSize: '0.85rem', letterSpacing: '0.03em' }}>
-              📍 {regionNote}
-            </p>
-          )}
-        </div>
-      </section>
+      <SplitHero
+        eyebrow={eyebrow}
+        title={title}
+        intro={intro}
+        image={heroImage}
+        imageAlt={title}
+        regionNote={regionNote}
+        itamambucaBadge={itamambucaBadge}
+        ctaHref={whatsappHref}
+        ctaLabel={whatsappLabel}
+      />
 
       {/* Partnership options */}
       <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(3.5rem, 7vw, 5.5rem)', paddingBottom: '1rem' }}>

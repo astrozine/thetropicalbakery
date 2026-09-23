@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import SplitHero from '@/components/SplitHero';
 import Link from 'next/link';
 import ZoomableImage from '@/components/ZoomableImage';
 import StripedBackground from '@/components/StripedBackground';
@@ -45,33 +45,17 @@ const OFFERINGS = [
 export default function TravelManagersPage() {
   return (
     <main className="min-h-screen" style={{ background: 'var(--color-background)' }}>
-      {/* Hero */}
-      <section style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', paddingTop: 'clamp(7rem, 14vw, 9rem)', paddingBottom: 'clamp(4.5rem, 9vw, 6.5rem)' }}>
-        <div
-          style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
-            backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
-            backgroundImage: 'url(/retreats/Beach shot Itamambuca.webp), linear-gradient(rgba(60, 42, 33, 0.72), rgba(60, 42, 33, 0.72))',
-            backgroundBlendMode: 'overlay',
-            backgroundColor: 'var(--color-primary)',
-          }}
-        />
-        <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 2, width: '90px', opacity: 0.95 }}>
-          <Image src="/itamambuca-lockup.png" alt="The Tropical Bakery — Itamambuca" width={172} height={220} style={{ width: '100%', height: 'auto' }} />
-        </div>
-        <div className="container relative z-10 text-center fade-in px-4">
-          <span className="text-secondary tracking-[4px] uppercase text-sm md:text-base mb-4 block font-semibold">
-            Organizadores &amp; Travel Managers
-          </span>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6" style={{ fontFamily: 'var(--font-heading)', lineHeight: '1.15' }}>
-            Um Pacote Completo para o Grupo que Você Organiza
-          </h1>
-          <p style={{ color: '#f5efe2', fontSize: '1.15rem', maxWidth: '740px', margin: '0 auto', lineHeight: 1.8 }}>
-            Você tem um grupo interessado em saúde, yoga e natureza? Monte um retiro em Itamambuca com hospedagem, cursos,
-            comida e experiências — tudo através de uma única parceria, com comissão para você.
-          </p>
-        </div>
-      </section>
+      <SplitHero
+        eyebrow="Organizadores & Travel Managers"
+        title="Um Pacote Completo para o Grupo que Você Organiza"
+        intro="Você tem um grupo interessado em saúde, yoga e natureza? Monte um retiro em Itamambuca com hospedagem, cursos, comida e experiências — tudo através de uma única parceria, com comissão para você."
+        image="/retreats/real-itamambuca-aerial.jpg"
+        imageAlt="Itamambuca vista do alto"
+        accentImage="/retreats/Room with open ripada door.jpg"
+        itamambucaBadge
+        ctaHref="https://wa.me/5511932119196?text=Ol%C3%A1%21%20Tenho%20interesse%20em%20organizar%20um%20grupo%20para%20os%20Retiros%20da%20Tropical%20Bakery."
+        ctaLabel="Falar com o Comercial"
+      />
 
       {/* Everything we offer */}
       <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(3.5rem, 7vw, 5.5rem)', paddingBottom: '1rem' }}>
