@@ -1,0 +1,84 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+
+/**
+ * Deliberately renders nothing for signed-out visitors: signing in is offered at
+ * the purchase points, not pushed in the navigation. Signed-in customers get a
+ * quiet confirmation of who they are, plus a way out.
+ */
+export default function AccountMenu({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
+  const { user, profile, signOut } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!user) return null;
+
+  const displayName = (profile?.full_name || user.email || '').split(' ')[0];
+  const avatarUrl = user.user_metadata?.avatar_url as string | undefined;
+
+  const avatar = avatarUrl
+    ? <img src={avatarUrl} alt="" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+    : (
+      <span style={{
+        width: '28px', height: '28px', borderRadius: '50%', background: '#d4af37', color: '#fff',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700,
+      }}>
+        {(displayName[0] || '?').toUpperCase()}
+      </span>
+    );
+
+  if (variant === 'mobile') {
+    return (
+      <div style={{ padding: '1.5rem 0 0.5rem 0', borderTop: '1px solid rgba(0,0,0,0.06)', marginTop: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+          {avatar}
+          <span className="notranslate" translate="no" style={{ color: '#3c2a21', fontWeight: 600 }}>{displayName}</span>
+        </div>
+        <button
+          onClick={signOut}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+            color: '#594a42', fontSize: '1rem', textDecoration: 'underline',
+          }}
+        >
+          Sair
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{ position: 'relative', marginLeft: '1.5rem', cursor: 'pointer' }}
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        {avatar}
+        <span className="notranslate" translate="no" style={{
+          color: '#3c2a21', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px',
+        }}>
+          {displayName}
+        </span>
+      </div>
+      {isOpen && (
+        <div style={{
+          position: 'absolute', top: '100%', right: 0, background: 'rgba(253,250,243,0.95)',
+          backdropFilter: 'blur(10px)', minWidth: '160px', padding: '0.5rem 0', borderRadius: '8px',
+          boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
+        }}>
+          <button
+            onClick={signOut}
+            style={{
+              width: '100%', textAlign: 'left', padding: '0.5rem 1.5rem', background: 'none',
+              border: 'none', cursor: 'pointer', color: '#594a42', fontSize: '0.9rem', textTransform: 'uppercase',
+            }}
+          >
+            Sair
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

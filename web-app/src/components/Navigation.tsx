@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import AccountMenu from '@/components/AccountMenu';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,6 +69,11 @@ export default function Navigation() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isRetreatsDropdownOpen, setIsRetreatsDropdownOpen] = useState(false);
   const [isCursosDropdownOpen, setIsCursosDropdownOpen] = useState(false);
+
+  // Mobile Accordion States
+  const [mobileCursosOpen, setMobileCursosOpen] = useState(false);
+  const [mobileB2bOpen, setMobileB2bOpen] = useState(false);
+  const [mobileLangOpen, setMobileLangOpen] = useState(false);
 
   return (
     <>
@@ -168,8 +174,13 @@ export default function Navigation() {
             )}
           </div>
 
-          {/* Custom Language Switcher */}
-          <div 
+          {/* Custom Language Switcher — each language name must stay in its own
+              language regardless of the page's current translation, otherwise a
+              French-speaking visitor can't recognize "Português" once the whole
+              menu has been auto-translated into French. */}
+          <div
+            className="notranslate"
+            translate="no"
             style={{ position: 'relative', marginLeft: '1.5rem', cursor: 'pointer' }}
             onMouseEnter={() => setIsRetreatsDropdownOpen(true)}
             onMouseLeave={() => setIsRetreatsDropdownOpen(false)}
@@ -249,7 +260,9 @@ export default function Navigation() {
             )}
           </div>
           
-          <button 
+          <AccountMenu />
+
+          <button
             onClick={() => setIsCartOpen(true)}
             style={{ marginLeft: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center' }}
           >
@@ -371,18 +384,27 @@ export default function Navigation() {
             ))}
             
             {/* Cursos Section Header */}
-            <div style={{ 
-              padding: '1.5rem 0 0.5rem 0', 
-              fontWeight: 'bold', 
-              color: '#3c2a21', 
-              fontSize: '0.85rem',
-              textTransform: 'uppercase',
-              letterSpacing: '2px',
-              opacity: 0.6,
-            }}>
-              CURSOS
-            </div>
-            {cursosLinks.map((link) => (
+            <button 
+              onClick={() => setMobileCursosOpen(!mobileCursosOpen)}
+              style={{ 
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '1.5rem 0 0.5rem 0', 
+                fontWeight: 'bold', 
+                color: '#3c2a21', 
+                fontSize: '0.85rem',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                opacity: 0.8,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left'
+              }}>
+              CURSOS <span>{mobileCursosOpen ? '▲' : '▼'}</span>
+            </button>
+            {mobileCursosOpen && cursosLinks.map((link) => (
               <Link 
                 key={link.path} 
                 href={link.path} 
@@ -395,6 +417,7 @@ export default function Navigation() {
                   fontWeight: pathname === link.path ? 'bold' : '400',
                   fontSize: '1.1rem',
                   borderBottom: '1px solid rgba(0,0,0,0.04)',
+                  animation: 'fadeIn 0.2s ease-out'
                 }}
               >
                 {link.name}
@@ -402,18 +425,27 @@ export default function Navigation() {
             ))}
             
             {/* B2B Section Header */}
-            <div style={{ 
-              padding: '1.5rem 0 0.5rem 0', 
-              fontWeight: 'bold', 
-              color: '#3c2a21', 
-              fontSize: '0.85rem',
-              textTransform: 'uppercase',
-              letterSpacing: '2px',
-              opacity: 0.6,
-            }}>
-              PARCEIROS B2B
-            </div>
-            {b2bLinks.map((link) => (
+            <button 
+              onClick={() => setMobileB2bOpen(!mobileB2bOpen)}
+              style={{ 
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '1.5rem 0 0.5rem 0', 
+                fontWeight: 'bold', 
+                color: '#3c2a21', 
+                fontSize: '0.85rem',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                opacity: 0.8,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left'
+              }}>
+              PARCEIROS B2B <span>{mobileB2bOpen ? '▲' : '▼'}</span>
+            </button>
+            {mobileB2bOpen && b2bLinks.map((link) => (
               <Link 
                 key={link.path} 
                 href={link.path} 
@@ -426,17 +458,37 @@ export default function Navigation() {
                   fontWeight: pathname === link.path ? 'bold' : '400',
                   fontSize: '1.1rem',
                   borderBottom: '1px solid rgba(0,0,0,0.04)',
+                  animation: 'fadeIn 0.2s ease-out'
                 }}
               >
                 {link.name}
               </Link>
             ))}
             
-            {/* Language Section Header */}
-            <div style={{ padding: '1.5rem 0 0.5rem 0', fontWeight: 'bold', color: '#3c2a21', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.6 }}>
-              🌐 IDIOMA
-            </div>
-            {[
+            {/* Language Section Header — kept untranslated, same reason as desktop */}
+            <button
+              className="notranslate"
+              translate="no"
+              onClick={() => setMobileLangOpen(!mobileLangOpen)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '1.5rem 0 0.5rem 0', 
+                fontWeight: 'bold', 
+                color: '#3c2a21', 
+                fontSize: '0.85rem',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                opacity: 0.8,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left'
+              }}>
+              🌐 IDIOMA <span>{mobileLangOpen ? '▲' : '▼'}</span>
+            </button>
+            {mobileLangOpen && [
               { code: 'pt', name: 'Português' },
               { code: 'en', name: 'English' },
               { code: 'es', name: 'Español' },
@@ -445,13 +497,17 @@ export default function Navigation() {
               { code: 'de', name: 'Deutsch' },
               { code: 'nl', name: 'Nederlands' }
             ].map((lang) => (
-              <button 
+              <button
                 key={lang.code}
+                className="notranslate"
+                translate="no"
                 onClick={() => { changeLanguage(lang.code); closeMenu(); }}
-                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '0.8rem 0 0.8rem 1rem', color: '#594a42', fontSize: '1.1rem', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '0.8rem 0 0.8rem 1rem', color: '#594a42', fontSize: '1.1rem', borderBottom: '1px solid rgba(0,0,0,0.04)', animation: 'fadeIn 0.2s ease-out' }}>
                 {lang.name}
               </button>
             ))}
+
+            <AccountMenu variant="mobile" />
           </div>
         </div>
       )}

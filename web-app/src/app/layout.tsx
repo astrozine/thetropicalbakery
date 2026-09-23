@@ -49,9 +49,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body suppressHydrationWarning className="min-h-full flex flex-col">
         <Providers>
           <Navigation />
           <CartDrawer />
@@ -68,9 +69,30 @@ export default function RootLayout({
             function googleTranslateElementInit() {
               new google.translate.TranslateElement({
                 pageLanguage: 'pt',
-                includedLanguages: 'pt,en,es,it,fr,de,nl'
+                includedLanguages: 'pt,en,es,it,fr,de,nl',
+                autoDisplay: false
               }, 'google_translate_element');
             }
+
+            // Google's script re-asserts the top banner's inline styles (with its own
+            // !important) on its own timer, so a plain inline override loses that fight
+            // no matter how often we reapply it. Use !important on our side too, watch
+            // for the banner via MutationObserver for an instant reaction, and poll as
+            // a fallback for whatever timer Google uses internally.
+            function suppressGoogleTranslateBanner() {
+              document.body.style.setProperty('top', '0px', 'important');
+              document.documentElement.style.setProperty('margin-top', '0px', 'important');
+              document.querySelectorAll(
+                'iframe.goog-te-banner-frame, .goog-te-banner-frame, body > .skiptranslate, iframe[id^=":"]'
+              ).forEach(function(el) {
+                el.style.setProperty('display', 'none', 'important');
+                el.style.setProperty('visibility', 'hidden', 'important');
+                el.style.setProperty('height', '0px', 'important');
+              });
+            }
+            suppressGoogleTranslateBanner();
+            setInterval(suppressGoogleTranslateBanner, 250);
+            new MutationObserver(suppressGoogleTranslateBanner).observe(document.body, { childList: true, attributes: true, subtree: false });
           `}
         </Script>
       </body>

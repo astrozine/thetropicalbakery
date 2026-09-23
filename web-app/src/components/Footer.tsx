@@ -56,8 +56,11 @@ export default function Footer() {
       </div>
       
       <div className="container" style={{ textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem', color: '#b2bec3' }}>
-        <p style={{ fontSize: '0.85rem' }}>
+        <p style={{ fontSize: '0.85rem', marginBottom: '0.75rem' }}>
           &copy; {new Date().getFullYear()} The Tropical Bakery. All rights reserved.
+        </p>
+        <p style={{ fontSize: '0.8rem' }}>
+          <Link href="/privacidade" style={{ color: '#b2bec3', textDecoration: 'underline' }}>Política de Privacidade</Link>
         </p>
       </div>
     </footer>

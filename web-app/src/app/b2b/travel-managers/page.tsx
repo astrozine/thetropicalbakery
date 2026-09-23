@@ -17,9 +17,16 @@ export default function AffiliatesPage() {
 
       <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '4rem', alignItems: 'center' }}>
         
-        <div style={{ flex: '1 1 400px' }} className="fade-in">
-          <div className="liquid-glass-card" style={{ padding: '3rem' }}>
-            <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)' }}>Como Funciona a Parceria?</h2>
+        <div style={{ flex: '1 1 400px', position: 'relative' }} className="fade-in">
+          <div style={{ position: 'absolute', top: '-25px', left: '-25px', zIndex: 10 }}>
+            <img
+              src="/hero-logo-transparent.png"
+              alt="The Tropical Bakery Logo"
+              style={{ width: '140px', animation: 'tilt-playful 6s ease-in-out infinite' }}
+            />
+          </div>
+          <div className="liquid-glass-card" style={{ padding: '3rem', position: 'relative' }}>
+            <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)', paddingLeft: '3rem' }}>Como Funciona a Parceria?</h2>
             
             <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', color: '#594a42', lineHeight: '1.8' }}>
               Se você é instrutora de yoga, guia turística, ou simplesmente a pessoa que organiza as viagens do seu grupo (especialmente da Argentina!), temos uma oportunidade incrível.

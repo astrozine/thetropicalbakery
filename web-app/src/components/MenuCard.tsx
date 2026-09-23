@@ -130,12 +130,12 @@ export default function MenuCard({ item }: MenuCardProps) {
           />
           
           {/* Drawer Content */}
-          <div style={{ position: 'relative', background: 'white', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '2rem 1.5rem', paddingBottom: '3rem', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 -10px 40px rgba(0,0,0,0.2)', animation: 'slideUp 0.3s ease-out' }}>
+          <div style={{ position: 'relative', background: 'white', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '2rem 1.5rem', paddingBottom: 'calc(3rem + 70px)', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 -10px 40px rgba(0,0,0,0.2)', animation: 'slideUp 0.3s ease-out' }}>
             
             {/* Handle */}
             <div style={{ width: '40px', height: '5px', background: '#e0e0e0', borderRadius: '3px', margin: '0 auto 1.5rem' }} />
 
-            <img src={item.image} alt={item.name} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '12px', marginBottom: '1.5rem' }} />
+            <img src={item.image} alt={item.name} style={{ width: '100%', height: '35vh', minHeight: '250px', objectFit: 'cover', borderRadius: '12px', marginBottom: '1.5rem' }} />
             
             <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
               {item.name}

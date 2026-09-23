@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
+import SocialLoginPrompt from '@/components/SocialLoginPrompt';
 
 interface CrmRegistrationModalProps {
   isOpen: boolean;
@@ -12,6 +14,7 @@ interface CrmRegistrationModalProps {
 }
 
 export default function CrmRegistrationModal({ isOpen, onClose, interestType, specificInterest }: CrmRegistrationModalProps) {
+  const { user, profile } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
@@ -23,6 +26,14 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
   const availableFocusAreas = interestType === 'curso' 
     ? ['Culinária Vegana', 'Culinária Sem Glúten', 'Substituições Saudáveis (SOS-Free)', 'Receitas Práticas', 'Empreendedorismo na Confeitaria']
     : ['Yoga & Meditação', 'Confeitaria Saudável', 'Relaxamento & Natureza', 'Transição para o Veganismo'];
+
+  useEffect(() => {
+    if (profile) {
+      if (profile.full_name) setName(profile.full_name);
+      if (profile.phone) setWhatsapp(profile.phone);
+    }
+    if (user?.email) setEmail(user.email);
+  }, [profile, user]);
 
   const toggleFocusArea = (area: string) => {
     setFocusAreas(prev => 
@@ -150,6 +161,8 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                 )}
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
+                  <SocialLoginPrompt message="Entre para preencher seus dados automaticamente:" />
+                  
                   <label style={{ display: 'block' }}>
                     <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.4rem' }}>Nome Completo *</span>
                     <input 

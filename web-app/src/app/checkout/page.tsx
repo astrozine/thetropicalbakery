@@ -2,17 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
+import SocialLoginPrompt from '@/components/SocialLoginPrompt';
 import { generatePixData } from '@/utils/pix';
 
 import { supabase } from '@/lib/supabase';
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
+  const { user, profile, saveProfile } = useAuth();
   const [step, setStep] = useState(1);
   const [pixPayload, setPixPayload] = useState('');
   const [pixQR, setPixQR] = useState('');
   const [copied, setCopied] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,6 +23,34 @@ export default function CheckoutPage() {
     address: '',
     date: ''
   });
+
+  // Pre-fill with anything the customer already gave us (box order form, or their account)
+  useEffect(() => {
+    const savedName = localStorage.getItem('checkout_fullName');
+    const savedPhone = localStorage.getItem('checkout_phone');
+    setFormData(prev => ({
+      ...prev,
+      name: prev.name || savedName || '',
+      whatsapp: prev.whatsapp || savedPhone || '',
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (!profile && !user) return;
+    setFormData(prev => ({
+      ...prev,
+      name: profile?.full_name || prev.name,
+      whatsapp: profile?.phone || prev.whatsapp,
+      address: profile?.address || prev.address,
+      email: user?.email || prev.email,
+    }));
+  }, [profile, user]);
+
+  // Keep it in sync for the next form that reads these keys (e.g. the tasting box checkout)
+  useEffect(() => {
+    if (formData.name) localStorage.setItem('checkout_fullName', formData.name);
+    if (formData.whatsapp) localStorage.setItem('checkout_phone', formData.whatsapp);
+  }, [formData.name, formData.whatsapp]);
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +66,13 @@ export default function CheckoutPage() {
     setPixPayload(payload);
     setPixQR(base64);
     setStep(2);
+
+    // Remember these details so the next order is one click lighter.
+    await saveProfile({
+      full_name: formData.name,
+      phone: formData.whatsapp,
+      address: formData.address,
+    });
 
     // Save to Supabase 'orders' table
     try {
@@ -135,7 +173,11 @@ export default function CheckoutPage() {
             {step === 1 ? (
               <form onSubmit={handleCheckout} className="liquid-glass-card" style={{ padding: '3rem 2rem' }}>
                 <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '2rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>Informações de Entrega</h2>
-                
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <SocialLoginPrompt />
+                </div>
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Nome Completo</label>

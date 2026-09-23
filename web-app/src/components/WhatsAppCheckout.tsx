@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
+import SocialLoginPrompt from '@/components/SocialLoginPrompt';
 
 const DELIVERY_ZONES = [
   { id: 'zone1', label: 'Itamambuca', fee: 0, minBoxes: 1 },
@@ -14,9 +15,10 @@ const DELIVERY_ZONES = [
 interface WhatsAppCheckoutProps {
   activeTastingBoxId?: string;
   priceOverride?: number;
+  maxQuantity?: number;
 }
 
-export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride }: WhatsAppCheckoutProps = {}) {
+export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride, maxQuantity }: WhatsAppCheckoutProps = {}) {
   const [boxCount, setBoxCount] = useState(1);
   const [fullName, setFullName] = useState('');
   const [whatsappNumber, setWhatsappNumber] = useState('');
@@ -32,7 +34,7 @@ export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride }: 
   
   const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { user, profile, signInWithGoogle, signInWithFacebook, updateProfile } = useAuth();
+  const { user, profile, saveProfile } = useAuth();
 
   const pricePerBox = priceOverride || 99;
   const selectedZone = DELIVERY_ZONES.find(z => z.id === zoneId);
@@ -46,12 +48,33 @@ export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride }: 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Load from localStorage on mount
   useEffect(() => {
-    if (profile) {
-      if (profile.full_name) setFullName(profile.full_name);
-      if (profile.phone) setWhatsappNumber(profile.phone);
-    }
+    const savedName = localStorage.getItem('checkout_fullName');
+    const savedPhone = localStorage.getItem('checkout_phone');
+    if (savedName) setFullName(savedName);
+    if (savedPhone) setWhatsappNumber(savedPhone);
+  }, []);
+
+  // A signed-in customer should never retype anything they've already given us.
+  useEffect(() => {
+    if (!profile) return;
+    if (profile.full_name) setFullName(profile.full_name);
+    if (profile.phone) setWhatsappNumber(profile.phone);
+    if (profile.address) setAddress(profile.address);
+    if (profile.delivery_zone) setZoneId(profile.delivery_zone);
+    setIsVegan(profile.is_vegan);
+    setIsGlutenFree(profile.is_gluten_free);
+    setIsSugarFree(profile.is_sugar_free);
+    setIsSaltFree(profile.is_salt_free);
+    setIsOilFree(profile.is_oil_free);
   }, [profile]);
+
+  // Save to localStorage when changed
+  useEffect(() => {
+    if (fullName) localStorage.setItem('checkout_fullName', fullName);
+    if (whatsappNumber) localStorage.setItem('checkout_phone', whatsappNumber);
+  }, [fullName, whatsappNumber]);
 
   const handleZoneChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newZoneId = e.target.value;
@@ -67,6 +90,13 @@ export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride }: 
   const handleBoxCountChange = (delta: number) => {
     const newCount = boxCount + delta;
     const minBoxes = selectedZone ? selectedZone.minBoxes : 1;
+    const limit = maxQuantity ?? 999;
+    
+    if (newCount > limit) {
+      alert(`Desculpe, temos apenas ${limit} unidades disponíveis.`);
+      return;
+    }
+    
     if (newCount >= minBoxes) {
       setBoxCount(newCount);
     } else {
@@ -83,13 +113,19 @@ export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride }: 
     setLoading(true);
 
     try {
-      if (user) {
-        // Save missing info to profile if they are logged in
-        await updateProfile({
-          full_name: fullName,
-          phone: whatsappNumber,
-        });
-      }
+      // Remember everything for next time. saveProfile never throws, so a
+      // profile hiccup can't take the order down with it.
+      await saveProfile({
+        full_name: fullName,
+        phone: whatsappNumber,
+        address,
+        delivery_zone: zoneId,
+        is_vegan: isVegan,
+        is_gluten_free: isGlutenFree,
+        is_sugar_free: isSugarFree,
+        is_salt_free: isSaltFree,
+        is_oil_free: isOilFree,
+      });
 
       // 1. If this is a tasting box, we decrement the inventory
       if (activeTastingBoxId) {
@@ -105,37 +141,38 @@ export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride }: 
       // 2. Save to CRM (users table)
       const randomPassword = Math.random().toString(36).slice(-8);
       
+      const crmRecord = {
+        full_name: fullName,
+        location: `${address} - ${selectedZone?.label}`,
+        is_vegan: isVegan,
+        is_gluten_free: isGlutenFree,
+        is_sugar_free: isSugarFree,
+        is_salt_free: isSaltFree,
+        is_oil_free: isOilFree,
+        // Ties this CRM record to their account when they're signed in.
+        auth_user_id: user?.id ?? null,
+        email: user?.email ?? null,
+      };
+
       const { error: insertError } = await supabase
         .from('users')
         .insert([{
-          full_name: fullName,
+          ...crmRecord,
           whatsapp_number: whatsappNumber,
           password_hash: randomPassword,
-          location: `${address} - ${selectedZone?.label}`,
-          is_vegan: isVegan,
-          is_gluten_free: isGlutenFree,
-          is_sugar_free: isSugarFree,
-          is_salt_free: isSaltFree,
-          is_oil_free: isOilFree,
         }]);
 
       if (insertError && insertError.code === '23505') {
-        // If user already exists (unique whatsapp_number), update their details
+        // Returning customer (whatsapp_number is unique) — refresh their details.
         await supabase
           .from('users')
-          .update({
-            full_name: fullName,
-            location: `${address} - ${selectedZone?.label}`,
-            is_vegan: isVegan,
-            is_gluten_free: isGlutenFree,
-            is_sugar_free: isSugarFree,
-            is_salt_free: isSaltFree,
-            is_oil_free: isOilFree,
-          })
+          .update(crmRecord)
           .eq('whatsapp_number', whatsappNumber);
+      } else if (insertError) {
+        console.error("Insert error:", insertError);
       }
 
-      // 2. Redirect to WhatsApp
+      // 3. Redirect to WhatsApp
       const storeWhatsappNumber = '5511932119196'; 
       let message = `Olá Tropical Bakery! Gostaria de encomendar ${boxCount} Surprise Treat Box(es).\n\n`;
       message += `*Nome:* ${fullName}\n`;
@@ -161,13 +198,13 @@ export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride }: 
       const whatsappUrl = `https://wa.me/${storeWhatsappNumber}?text=${encodedMessage}`;
       window.open(whatsappUrl, '_blank');
       
-      // Reset form
-      setFullName('');
-      setAddress('');
+      // We purposefully DO NOT reset form so it stays filled for their next purchase
+      // setFullName('');
+      // setAddress('');
       
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert("Ocorreu um erro ao processar seu pedido. Tente novamente.");
+      alert("Ocorreu um erro ao processar seu pedido: " + (e.message || "Erro desconhecido."));
     } finally {
       setLoading(false);
     }
@@ -232,34 +269,28 @@ export default function WhatsAppCheckout({ activeTastingBoxId, priceOverride }: 
           <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: '1.6' }}>Entregas exclusivas para Itamambuca, praias vizinhas e eventos em Paraty. Preencha seus dados para montarmos uma caixa perfeita para suas restrições!</p>
         </div>
         
-        {!user && (
-          <div style={{ background: '#fdfaf3', padding: '1.2rem', borderRadius: '16px', border: '1px solid #e8e1d7', textAlign: 'center' }}>
-            <p style={{ fontSize: '0.9rem', color: '#594a42', marginBottom: '1rem', fontWeight: 600 }}>Já tem cadastro? Entre para um checkout mais rápido:</p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button onClick={signInWithGoogle} style={{ padding: '0.6rem 1.2rem', background: '#fff', border: '1px solid #ccc', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '18px' }}/> Google
-              </button>
-              <button onClick={signInWithFacebook} style={{ padding: '0.6rem 1.2rem', background: '#1877F2', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <img src="https://www.svgrepo.com/show/448224/facebook.svg" alt="Facebook" style={{ width: '18px', filter: 'brightness(0) invert(1)' }}/> Facebook
-              </button>
-            </div>
-          </div>
-        )}
+        <SocialLoginPrompt message="Já tem cadastro? Entre para um checkout mais rápido:" />
 
         {/* Basic Info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: '#fdfaf3', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7' }}>
-          <label style={{ fontSize: '0.9rem', fontWeight: 600, color: '#594a42' }}>Nome Completo:</label>
+          <label htmlFor="checkoutName" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#594a42' }}>Nome Completo:</label>
           <input 
+            id="checkoutName"
             type="text" 
+            name="name"
+            autoComplete="name"
             value={fullName}
             onChange={e => setFullName(e.target.value)}
             placeholder="Ex: Maria Silva"
             style={{ width: '100%', padding: '0.8rem 1rem', fontSize: '1rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)', fontFamily: 'inherit', marginBottom: '0.5rem' }}
           />
 
-          <label style={{ fontSize: '0.9rem', fontWeight: 600, color: '#594a42' }}>WhatsApp (com DDD):</label>
+          <label htmlFor="checkoutPhone" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#594a42' }}>WhatsApp (com DDD):</label>
           <input 
-            type="text" 
+            id="checkoutPhone"
+            type="tel" 
+            name="tel"
+            autoComplete="tel"
             value={whatsappNumber}
             onChange={e => setWhatsappNumber(e.target.value)}
             placeholder="Ex: 11999999999"

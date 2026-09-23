@@ -66,6 +66,7 @@ export default function AdminLayout({
   const navItems = [
     { name: 'Visão Geral', path: '/admin' },
     { name: 'Caixas da Semana', path: '/admin/caixas' },
+    { name: 'Fila de Espera', path: '/admin/waitlist' },
     { name: 'Catálogo de Doces', path: '/admin/treats' },
     { name: 'Cursos', path: '/admin/courses' },
     { name: 'Retiros (Imagens)', path: '/admin/retreats' },
@@ -100,7 +101,7 @@ export default function AdminLayout({
         top: 0,
         left: 0,
         bottom: 0,
-        zIndex: 50,
+        zIndex: 99999,
         transform: isMobile ? (isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)') : 'none',
         transition: 'transform 0.3s ease-in-out'
       }}>
@@ -156,7 +157,7 @@ export default function AdminLayout({
       {isMobile && isSidebarOpen && (
         <div 
           onClick={() => setIsSidebarOpen(false)}
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 40 }}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 99998 }}
         />
       )}
 

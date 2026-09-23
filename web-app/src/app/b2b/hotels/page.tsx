@@ -6,11 +6,20 @@ export default function HotelsPage() {
   return (
     <main style={{ minHeight: '80vh' }}>
       <div className="container" style={{ padding: '6rem 2rem' }}>
-        <div className="liquid-glass-card fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          
-          <div style={{ textAlign: 'center', borderBottom: '2px solid rgba(212,175,55,0.3)', paddingBottom: '1.5rem', width: '100%', marginBottom: '1rem' }}>
-            <h1 style={{ fontSize: '3rem', color: '#3c2a21', letterSpacing: '1px' }}>Parcerias para Hotéis</h1>
-            </div>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: '-10px', left: '10px', zIndex: 10 }}>
+            <img
+              src="/hero-logo-transparent.png"
+              alt="The Tropical Bakery Logo"
+              style={{ width: '140px', animation: 'tilt-playful 6s ease-in-out infinite' }}
+            />
+          </div>
+
+          <div className="liquid-glass-card fade-in" style={{ padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem', flexWrap: 'wrap', alignItems: 'center', position: 'relative' }}>
+
+          <div style={{ textAlign: 'center', borderBottom: '2px solid rgba(212,175,55,0.3)', paddingBottom: '1.5rem', width: '100%', marginBottom: '1rem', paddingLeft: '7rem' }}>
+            <h1 style={{ fontSize: '3rem', color: '#3c2a21', letterSpacing: '1px', fontFamily: 'var(--font-heading)', fontWeight: 800 }}>Parcerias para Hotéis</h1>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }}>
@@ -36,6 +45,7 @@ export default function HotelsPage() {
               </a>
             </div>
           </div>
+        </div>
         </div>
         </div>
       </div>

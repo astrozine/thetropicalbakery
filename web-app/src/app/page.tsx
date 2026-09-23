@@ -5,6 +5,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import ExplodingTreats from '@/components/ExplodingTreats';
 import ZoomableImage from '@/components/ZoomableImage';
 import ModalCard from '@/components/ModalCard';
+import WaitlistCapture from '@/components/WaitlistCapture';
 import { supabase } from '@/lib/supabase';
 
 export const revalidate = 0; // Ensures fresh data is fetched for the homepage
@@ -48,9 +49,10 @@ export default async function Home() {
         </div>
       </section>
 
-      <Marquee text="100% VEGAN ✦ GLUTEN-FREE ✦ SOS-FREE ✦ THE TROPICAL BAKERY ✦ ITAMAMBUCA ✦" />
+      {/* Scrolling Text Banner */}
+      <Marquee text="THE TROPICAL BAKERY ✦ ITAMAMBUCA ✦ VEGAN ✦ " speed={300} />
 
-      {/* About Section */}
+      {/* Philosophy Section */}
       <section className="container" style={{ padding: '12rem 2rem', position: 'relative' }}>
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexWrap: 'wrap', gap: '4rem', alignItems: 'center' }}>
           <div style={{ flex: '1 1 500px', textAlign: 'left' }}>
@@ -125,12 +127,8 @@ export default async function Home() {
                 </div>
               </div>
             ) : (
-              <div style={{ padding: '4rem 2rem', background: 'white', borderRadius: '24px', boxShadow: '0 10px 30px rgba(60, 42, 33, 0.05)' }}>
-                <h2 style={{ fontSize: '2.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>Fique de Olho!</h2>
-                <p style={{ fontSize: '1.1rem', color: '#594a42', marginBottom: '2rem' }}>O lote de Caixas de Degustação desta semana já esgotou ou ainda não foi lançado.</p>
-                <a href="https://instagram.com/thetropicalbakery" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ borderRadius: '40px' }}>
-                  Acompanhar no Instagram
-                </a>
+              <div style={{ padding: '3rem 1rem', background: 'white', borderRadius: '24px', boxShadow: '0 10px 30px rgba(60, 42, 33, 0.05)' }}>
+                <WaitlistCapture theme="light" />
               </div>
             )}
           </ScrollReveal>

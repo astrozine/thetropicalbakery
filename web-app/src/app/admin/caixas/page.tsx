@@ -15,6 +15,8 @@ interface TastingBox {
   is_active: boolean;
 }
 
+import Link from 'next/link';
+
 export default function AdminCaixas() {
   const [boxes, setBoxes] = useState<TastingBox[]>([]);
   const [loading, setLoading] = useState(true);
@@ -140,7 +142,17 @@ export default function AdminCaixas() {
 
   return (
     <div>
-      <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '2rem' }}>Gerenciar Caixas de Degustação</h1>
+      <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '1rem' }}>Gerenciar Caixas de Degustação</h1>
+      
+      <div style={{ background: '#f8f9fa', padding: '1rem 1.5rem', borderRadius: '8px', borderLeft: '4px solid #d4af37', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h3 style={{ margin: 0, color: '#2c3e50' }}>Gerenciar Fila de Espera</h3>
+          <p style={{ margin: '0.5rem 0 0 0', color: '#7f8c8d', fontSize: '0.9rem' }}>Veja e gerencie todos que estão aguardando o próximo lote.</p>
+        </div>
+        <Link href="/admin/waitlist" style={{ background: '#d4af37', color: 'white', padding: '0.6rem 1.2rem', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' }}>
+          Ver Fila de Espera
+        </Link>
+      </div>
       
       <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '3rem' }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>{editingId ? 'Editar Lote' : 'Novo Lote'}</h2>

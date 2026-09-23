@@ -356,6 +356,14 @@ a {
 }
 
 /* Marquee */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .marquee-container {
   overflow: hidden;
   white-space: nowrap;
@@ -367,9 +375,9 @@ a {
 }
 
 .marquee-content {
-  display: inline-block;
+  display: inline-flex;
   white-space: nowrap;
-  animation: marquee 30s linear infinite;
+  width: max-content;
 }
 
 .marquee-text {
@@ -379,11 +387,18 @@ a {
   padding-right: 2rem;
   text-transform: uppercase;
   letter-spacing: 4px;
+  flex-shrink: 0;
+  min-width: 100%;
 }
 
 @keyframes marquee {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-50%, 0, 0); }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes tilt-playful {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
 }
 
 /* Parallax Banner */
@@ -472,19 +487,23 @@ a {
   }
 }
 
-/* Hide Google Translate Banner and Widget */
+/* Hide Google Translate Banner and Widget Aggressively */
 iframe.goog-te-banner-frame,
 .goog-te-banner-frame.skiptranslate,
-.goog-te-banner-frame {
+.goog-te-banner-frame,
+.skiptranslate > iframe.goog-te-banner-frame {
   display: none !important;
+  visibility: hidden !important;
 }
 #google_translate_element,
 #google_translate_element_mobile,
 .goog-te-gadget {
   display: none !important;
+  visibility: hidden !important;
 }
-body, html {
-  top: 0 !important;
+body { 
+  top: 0px !important; 
+  position: static !important; 
 }
 /* Hide the Google tooltips that appear when hovering over translated text */
 .goog-tooltip, .goog-tooltip:hover {

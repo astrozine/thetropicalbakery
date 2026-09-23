@@ -95,26 +95,33 @@ export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
         }} />
 
         {/* Floating scattered images */}
-        <ZoomableImage
-          src="/retreats/Beach shot Itamambuca.webp"
-          alt="Beach"
-          style={{ position: 'absolute', top: '8%', left: '3%', width: 'clamp(100px, 18vw, 240px)', borderRadius: '12px', transform: 'rotate(-8deg)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 2 }}
-        />
+        {/* Original Treat Images Restored */}
         <ZoomableImage
           src="/menu-items/1000215018.jpg"
           alt="Tropical Treats"
-          style={{ position: 'absolute', top: '12%', right: '4%', width: 'clamp(90px, 16vw, 220px)', borderRadius: '12px', transform: 'rotate(12deg)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 2 }}
-        />
-        <ZoomableImage
-          src="/retreats/Room with open ripada door.jpg"
-          alt="Suite"
-          style={{ position: 'absolute', bottom: '15%', left: '5%', width: 'clamp(100px, 17vw, 230px)', borderRadius: '12px', transform: 'rotate(6deg)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 2 }}
+          style={{ position: 'absolute', top: '15%', right: '12%', width: 'clamp(90px, 16vw, 220px)', borderRadius: '12px', transform: 'rotate(12deg)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 2 }}
         />
         <ZoomableImage
           src="/menu-items/Screenshot_20260513_114809_Edits.jpg"
           alt="Tropical Treats"
-          style={{ position: 'absolute', bottom: '18%', right: '3%', width: 'clamp(90px, 15vw, 210px)', borderRadius: '12px', transform: 'rotate(-10deg)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 2 }}
+          style={{ position: 'absolute', bottom: '20%', left: '15%', width: 'clamp(90px, 15vw, 210px)', borderRadius: '12px', transform: 'rotate(-10deg)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 2 }}
         />
+
+        {/* Large Side Images - Brought more inward and made bigger */}
+        <div style={{ position: 'absolute', top: '15%', left: '8%', width: 'clamp(250px, 40vw, 550px)', zIndex: 1, opacity: 0.9, transform: 'rotate(-4deg)' }}>
+          <img
+            src="/assets/tropical_event_retreat.jpg"
+            alt="Event Retreat Treats"
+            style={{ width: '100%', borderRadius: '24px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)', objectFit: 'cover' }}
+          />
+        </div>
+        <div style={{ position: 'absolute', bottom: '15%', right: '8%', width: 'clamp(250px, 40vw, 550px)', zIndex: 1, opacity: 0.9, transform: 'rotate(4deg)' }}>
+          <img
+            src="/assets/tropical_event_evening.jpg"
+            alt="Evening Retreat Event"
+            style={{ width: '100%', borderRadius: '24px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)', objectFit: 'cover' }}
+          />
+        </div>
 
         {/* Center Content */}
         <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '0 2rem', maxWidth: '800px' }}>
