@@ -90,7 +90,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
         <div style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'url("/assets/retreats_beach_bg_1789884804918.jpg")',
+          backgroundImage: 'url("/retreats/real-itamambuca-aerial.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           filter: 'brightness(0.45)',
@@ -113,15 +113,15 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
         {/* Large Side Images - Brought more inward and made bigger */}
         <div style={{ position: 'absolute', top: '15%', left: '8%', width: 'clamp(250px, 40vw, 550px)', zIndex: 1, opacity: 0.9, transform: 'rotate(-4deg)' }}>
           <img
-            src="/assets/tropical_event_retreat.jpg"
-            alt="Event Retreat Treats"
+            src="/retreats/real-itamambuca-coast.jpg"
+            alt="Praia de Itamambuca vista do alto"
             style={{ width: '100%', borderRadius: '24px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)', objectFit: 'cover' }}
           />
         </div>
         <div style={{ position: 'absolute', bottom: '15%', right: '8%', width: 'clamp(250px, 40vw, 550px)', zIndex: 1, opacity: 0.9, transform: 'rotate(4deg)' }}>
           <img
-            src="/assets/tropical_event_evening.jpg"
-            alt="Evening Retreat Event"
+            src="/retreats/real-prumirim-island.jpg"
+            alt="Ilha do Prumirim"
             style={{ width: '100%', borderRadius: '24px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)', objectFit: 'cover' }}
           />
         </div>
@@ -188,7 +188,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             flex: '1 1 50%',
             minWidth: '300px',
             minHeight: '450px',
-            backgroundImage: 'url("/assets/retreats_waterfall_bg_1789884815000.jpg")',
+            backgroundImage: 'url("/retreats/real-cachoeira.jpg")',
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }} />
