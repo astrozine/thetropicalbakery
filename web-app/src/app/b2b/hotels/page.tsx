@@ -7,7 +7,7 @@ export default function HotelsPage() {
       eyebrow="Parcerias para Hotéis"
       title="Uma Tropical Bakery Dentro do Seu Hotel"
       intro="Transforme qualquer canto do seu hotel — recepção, lounge, sala de café — num ponto de venda que encanta hóspedes e gera receita extra, sem contratar ninguém e sem abrir mão da sua cozinha."
-      heroImage="/assets/realistic_hotel.jpg"
+      heroImages={["/b2b-hero/treat-0.jpg", "/b2b-hero/treat-1.jpg"]}
       options={[
         {
           icon: '🧊',

@@ -7,7 +7,7 @@ export default function AffiliatesPage() {
       eyebrow="Programa de Afiliados"
       title="Indique. A Gente Entrega. Você Ganha."
       intro="Você conhece restaurantes, organiza eventos ou tem uma audiência que confia em você? Vire um afiliado e ganhe uma comissão sobre cada caixa vendida através da sua indicação."
-      heroImage="/assets/iphone_passion_fruit_1789717184997.jpg"
+      heroImages={["/b2b-hero/treat-6.jpg", "/b2b-hero/treat-2.jpg"]}
       optionsHeading="Como Funciona"
       options={[
         {

@@ -7,7 +7,7 @@ export default function RestaurantsPage() {
       eyebrow="Parcerias para Restaurantes"
       title="Sobremesas com a Cara do Seu Restaurante"
       intro="Atenda o público que busca opções sem glúten, veganas, sem óleo, sem açúcar refinado ou sal — sem sobrecarregar sua cozinha. A Dolly cria a sobremesa, você recebe pronta, sua equipe só finaliza o prato."
-      heroImage="/assets/tropical_restaurant_vegan_1789884909542.jpg"
+      heroImages={["/b2b-hero/treat-3.jpg", "/b2b-hero/treat-2.jpg"]}
       options={[
         {
           icon: '🎨',

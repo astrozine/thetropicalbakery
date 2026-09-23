@@ -13,7 +13,7 @@ interface B2BPageLayoutProps {
   eyebrow: string;
   title: string;
   intro: string;
-  heroImage: string;
+  heroImages: string[];
   optionsHeading?: string;
   options: PartnershipOption[];
   whyChooseUs: string[];
@@ -34,7 +34,7 @@ export default function B2BPageLayout({
   eyebrow,
   title,
   intro,
-  heroImage,
+  heroImages,
   optionsHeading = 'Formas de Parceria',
   options,
   whyChooseUs,
@@ -51,7 +51,7 @@ export default function B2BPageLayout({
         eyebrow={eyebrow}
         title={title}
         intro={intro}
-        image={heroImage}
+        images={heroImages}
         imageAlt={title}
         regionNote={regionNote}
         itamambucaBadge={itamambucaBadge}

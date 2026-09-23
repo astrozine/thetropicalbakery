@@ -7,7 +7,7 @@ export default function BakeriesPage() {
       eyebrow="Parcerias para Padarias"
       title="A Vitrine Inclusiva que Seus Clientes Estão Pedindo"
       intro="Atenda o público que busca opções sem glúten, veganas, sem óleo, sem açúcar refinado ou sal — sem sobrecarregar sua produção. A Dolly cria, você recebe pronto para vender."
-      heroImage="/assets/realistic_bakery.jpg"
+      heroImages={["/b2b-hero/treat-4.jpg", "/b2b-hero/treat-5.jpg"]}
       options={[
         {
           icon: '🎨',

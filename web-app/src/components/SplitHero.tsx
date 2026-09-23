@@ -5,7 +5,10 @@ interface SplitHeroProps {
   eyebrow: string;
   title: string;
   intro: string;
-  image: string;
+  /** A single wide photo. Use `images` instead for portrait photos. */
+  image?: string;
+  /** Portrait (3:4) photos shown side by side, uncropped. */
+  images?: string[];
   imageAlt: string;
   regionNote?: string;
   itamambucaBadge?: boolean;
@@ -21,7 +24,7 @@ interface SplitHeroProps {
  * thing seen. The photo is never overlaid or dimmed — that's the whole point.
  */
 export default function SplitHero({
-  eyebrow, title, intro, image, imageAlt, regionNote, itamambucaBadge, ctaHref, ctaLabel, accentImage,
+  eyebrow, title, intro, image, images, imageAlt, regionNote, itamambucaBadge, ctaHref, ctaLabel, accentImage,
 }: SplitHeroProps) {
   return (
     <section style={{ display: 'flex', flexWrap: 'wrap-reverse', background: '#3c2a21', overflow: 'hidden' }}>
@@ -58,8 +61,12 @@ export default function SplitHero({
       </div>
 
       {/* Photo */}
-      <div style={{ flex: '1 1 460px', position: 'relative', minHeight: 'clamp(340px, 46vw, 620px)' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url("${image}")`, backgroundSize: 'cover', backgroundPosition: 'center' }} role="img" aria-label={imageAlt} />
+      <div style={{ flex: '1 1 460px', position: 'relative', minHeight: images?.length ? undefined : 'clamp(340px, 46vw, 620px)', display: images?.length ? 'grid' : 'block', gridTemplateColumns: images?.length ? `repeat(${images.length}, 1fr)` : undefined, gap: '4px' }}>
+        {images?.length ? images.map((src, i) => (
+          <div key={i} role="img" aria-label={`${imageAlt} ${i + 1}`} style={{ aspectRatio: '3 / 4', backgroundImage: `url("${src}")`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        )) : (
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: `url("${image}")`, backgroundSize: 'cover', backgroundPosition: 'center' }} role="img" aria-label={imageAlt} />
+        )}
         {/* Thin gold inner frame */}
         <div style={{ position: 'absolute', inset: 'clamp(12px, 1.6vw, 22px)', border: '1px solid rgba(212,175,55,0.7)', pointerEvents: 'none' }} />
         {accentImage && (
