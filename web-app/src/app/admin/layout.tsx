@@ -44,6 +44,7 @@ export default function AdminLayout({
   // 'denied'         — signed in, but not an admin
   // 'unprotected'    — the security migration hasn't been run yet
   const [access, setAccess] = useState<'checking' | 'allowed' | 'denied' | 'unprotected'>('checking');
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -78,6 +79,25 @@ export default function AdminLayout({
 
     return () => subscription.unsubscribe();
   }, [pathname, router]);
+
+  // Slack-bell-style unread count for the inbox: total inbound items minus
+  // however many have moved past "new" in inbox_status. Approximate but
+  // cheap — the inbox page itself computes the exact per-item state.
+  useEffect(() => {
+    if (access !== 'allowed') return;
+    const loadUnread = async () => {
+      const [jobs, orders, courses, waitlist, handled] = await Promise.all([
+        supabase.from('job_applications').select('id', { count: 'exact', head: true }),
+        supabase.from('orders').select('id', { count: 'exact', head: true }),
+        supabase.from('course_registrations').select('id', { count: 'exact', head: true }),
+        supabase.from('waitlist').select('id', { count: 'exact', head: true }),
+        supabase.from('inbox_status').select('source_id', { count: 'exact', head: true }).neq('status', 'new'),
+      ]);
+      const total = (jobs.count || 0) + (orders.count || 0) + (courses.count || 0) + (waitlist.count || 0);
+      setUnreadCount(Math.max(0, total - (handled.count || 0)));
+    };
+    loadUnread();
+  }, [access]);
 
   if (loading && pathname !== '/admin/login') {
     return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Carregando...</div>;
@@ -121,6 +141,8 @@ export default function AdminLayout({
 
   const navItems = [
     { name: 'Visão Geral', path: '/admin' },
+    { name: 'Caixa de Entrada', path: '/admin/inbox', badge: unreadCount },
+    { name: 'Calendário de Entregas', path: '/admin/calendario' },
     { name: 'Assinaturas', path: '/admin/assinaturas' },
     { name: 'Caixas da Semana', path: '/admin/caixas' },
     { name: 'Fila de Espera', path: '/admin/waitlist' },
@@ -186,7 +208,9 @@ export default function AdminLayout({
                   <Link href={item.path} 
                     onClick={() => { if(isMobile) setIsSidebarOpen(false); }}
                     style={{
-                    display: 'block',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                     padding: '1rem 1.5rem',
                     color: isActive ? '#d4af37' : '#ecf0f1',
                     background: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
@@ -195,7 +219,12 @@ export default function AdminLayout({
                     borderLeft: isActive ? '4px solid #d4af37' : '4px solid transparent',
                     transition: 'all 0.2s'
                   }}>
-                    {item.name}
+                    <span>{item.name}</span>
+                    {!!item.badge && (
+                      <span style={{ background: '#e74c3c', color: 'white', fontSize: '0.72rem', fontWeight: 'bold', padding: '0.15rem 0.5rem', borderRadius: '20px', minWidth: '18px', textAlign: 'center' }}>
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 </li>
               );

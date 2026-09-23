@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ZoomableImage from '@/components/ZoomableImage';
 import StripedBackground from '@/components/StripedBackground';
+import OrganicDivider from '@/components/OrganicDivider';
+import BlobAccent from '@/components/BlobAccent';
 
 const OFFERINGS = [
   {
@@ -73,9 +75,13 @@ export default function TravelManagersPage() {
         </div>
       </section>
 
+      <OrganicDivider color="var(--color-background)" direction="down" height={70} style={{ marginTop: '-1px' }} />
+
       {/* Everything we offer */}
-      <section className="container pt-20 pb-4 px-4 max-w-6xl mx-auto">
-        <h2 style={{ textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#3c2a21', marginBottom: '1rem' }}>
+      <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(1rem, 3vw, 2rem)', paddingBottom: '1rem' }}>
+        <BlobAccent color="#2e4432" size={220} opacity={0.06} rotate={20} style={{ top: '-40px', left: '-60px' }} />
+        <BlobAccent color="#d4af37" size={180} opacity={0.09} rotate={-15} style={{ top: '10px', right: '-40px' }} />
+        <h2 style={{ position: 'relative', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#3c2a21', marginBottom: '1rem' }}>
           Tudo o Que Você Pode Incluir no Pacote
         </h2>
         <p style={{ textAlign: 'center', color: '#7a6a61', maxWidth: '640px', margin: '0 auto 3rem', lineHeight: 1.8 }}>

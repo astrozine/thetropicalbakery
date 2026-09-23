@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
+import DeliveryDatePicker from '@/components/DeliveryDatePicker';
 import { generatePixData } from '@/utils/pix';
 
 import { supabase } from '@/lib/supabase';
@@ -15,6 +16,7 @@ export default function CheckoutPage() {
   const [pixPayload, setPixPayload] = useState('');
   const [pixQR, setPixQR] = useState('');
   const [copied, setCopied] = useState(false);
+  const [dateError, setDateError] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -58,6 +60,11 @@ export default function CheckoutPage() {
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.whatsapp || !formData.address) return;
+    if (!formData.date) {
+      setDateError(true);
+      return;
+    }
+    setDateError(false);
     
     // Generate Pix Code
     const transactionId = `ORD${Date.now()}`.substring(0, 25);
@@ -205,7 +212,8 @@ export default function CheckoutPage() {
 
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Data de Entrega Desejada</label>
-                    <input required type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} style={{ width: '100%', padding: '1rem', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-body)', outline: 'none' }} />
+                    <DeliveryDatePicker value={formData.date} onChange={date => { setFormData({ ...formData, date }); setDateError(false); }} />
+                    {dateError && <p style={{ color: '#c0392b', fontSize: '0.85rem', marginTop: '0.5rem' }}>Escolha uma data de entrega.</p>}
                   </div>
                 </div>
 
