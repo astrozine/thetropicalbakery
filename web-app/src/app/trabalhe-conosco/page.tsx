@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import StripedBackground from '@/components/StripedBackground';
 import ScrollReveal from '@/components/ScrollReveal';
+import PayEstimator from '@/components/PayEstimator';
 
 const ROLES = [
   {
@@ -187,6 +188,13 @@ export default function CareersPage() {
               </ScrollReveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Pay estimator */}
+      <section style={{ padding: '0 1.5rem clamp(2rem, 5vw, 3rem)' }}>
+        <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+          <PayEstimator />
         </div>
       </section>
 

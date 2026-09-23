@@ -6,6 +6,10 @@ import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
+import { formatBRL } from '@/lib/deliveryZones';
+
+// Price is stored as a formatted string like "28,00" or "R$ 28,00".
+const parsePrice = (price: string) => parseFloat(price.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
 
 export default function CartDrawer() {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
@@ -227,9 +231,14 @@ export default function CartDrawer() {
                       />
                       <div style={{ flex: 1 }}>
                         <h4 style={{ color: '#3c2a21', fontWeight: 600, fontSize: '1.25rem', marginBottom: '0.25rem' }}>{item.name}</h4>
-                        <p style={{ color: '#d4af37', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                        <p style={{ color: '#d4af37', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.15rem' }}>
                           R$ {item.price} <span style={{ fontSize: '0.85rem', fontWeight: 400, color: '#7a6a61' }}>por unidade</span>
                         </p>
+                        {item.quantity > 1 && (
+                          <p style={{ color: '#3c2a21', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.5rem' }}>
+                            {formatBRL(parsePrice(item.price) * item.quantity)} <span style={{ fontSize: '0.8rem', fontWeight: 400, color: '#7a6a61' }}>({item.quantity}x)</span>
+                          </p>
+                        )}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', background: 'white', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', padding: '0.2rem' }}>
                             <button onClick={() => updateQuantity(item.id, item.quantity - (item.batch_multiplier || 1))} style={{ padding: '0.4rem 0.8rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.4rem' }}>-</button>

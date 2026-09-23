@@ -29,6 +29,19 @@ export default function Navigation() {
   const closeMenu = () => setIsOpen(false);
 
   const changeLanguage = (langCode: string) => {
+    if (langCode === 'pt') {
+      // The site's own language: asking Google Translate to translate
+      // Portuguese into Portuguese doesn't no-op, it actually runs the
+      // translation pass and mangles words. Clearing its cookie and
+      // reloading restores the real, original text instead.
+      const host = window.location.hostname;
+      const expire = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      document.cookie = `googtrans=; ${expire}`;
+      document.cookie = `googtrans=; ${expire} domain=${host};`;
+      document.cookie = `googtrans=; ${expire} domain=.${host};`;
+      window.location.reload();
+      return;
+    }
     const selectNode = document.querySelector('.goog-te-combo') as HTMLSelectElement;
     if (selectNode) {
       selectNode.value = langCode;

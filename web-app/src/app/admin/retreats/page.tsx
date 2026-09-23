@@ -8,6 +8,8 @@ interface RetreatRoom {
   id: string;
   name: string;
   image_url: string;
+  airbnb_nightly_rate: number;
+  max_guests: number;
 }
 
 export default function AdminRetreatsPage() {
@@ -55,8 +57,29 @@ export default function AdminRetreatsPage() {
     }
     
     setSaving(null);
-    
+
     // Clear message after 3 seconds
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  const handleUpdatePricing = async (roomId: string, nightlyRate: number, maxGuests: number) => {
+    setSaving(roomId);
+    setMessage(null);
+
+    const { error } = await supabase
+      .from('retreat_rooms')
+      .update({ airbnb_nightly_rate: nightlyRate, max_guests: maxGuests, updated_at: new Date().toISOString() })
+      .eq('id', roomId);
+
+    if (error) {
+      console.error('Error updating pricing:', error);
+      setMessage({ type: 'error', text: `Erro ao atualizar o preço de ${roomId}` });
+    } else {
+      setMessage({ type: 'success', text: 'Preço atualizado com sucesso!' });
+      setRooms(rooms.map(r => r.id === roomId ? { ...r, airbnb_nightly_rate: nightlyRate, max_guests: maxGuests } : r));
+    }
+
+    setSaving(null);
     setTimeout(() => setMessage(null), 3000);
   };
 
@@ -126,6 +149,49 @@ export default function AdminRetreatsPage() {
                     style={{ padding: '0.75rem 1.5rem', whiteSpace: 'nowrap' }}
                   >
                     {saving === room.id ? 'Salvando...' : 'Salvar'}
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 160px' }}>
+                  <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#594a42', marginBottom: '0.5rem' }}>
+                    Diária no Airbnb (R$):
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    defaultValue={room.airbnb_nightly_rate}
+                    id={`rate-${room.id}`}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid rgba(212,175,55,0.4)', background: 'white', fontSize: '1rem', color: '#594a42' }}
+                  />
+                </div>
+                <div style={{ flex: '1 1 140px' }}>
+                  <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#594a42', marginBottom: '0.5rem' }}>
+                    Máx. hóspedes:
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    min="1"
+                    defaultValue={room.max_guests}
+                    id={`guests-${room.id}`}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid rgba(212,175,55,0.4)', background: 'white', fontSize: '1rem', color: '#594a42' }}
+                  />
+                </div>
+                <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'flex-end' }}>
+                  <button
+                    onClick={() => {
+                      const rateInput = document.getElementById(`rate-${room.id}`) as HTMLInputElement;
+                      const guestsInput = document.getElementById(`guests-${room.id}`) as HTMLInputElement;
+                      handleUpdatePricing(room.id, Number(rateInput.value) || 0, Number(guestsInput.value) || 1);
+                    }}
+                    disabled={saving === room.id}
+                    className="btn btn-secondary"
+                    style={{ padding: '0.75rem 1.5rem', whiteSpace: 'nowrap' }}
+                  >
+                    {saving === room.id ? 'Salvando...' : 'Salvar Preço'}
                   </button>
                 </div>
               </div>

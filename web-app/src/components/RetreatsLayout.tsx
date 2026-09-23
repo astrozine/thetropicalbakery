@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
+import RetreatPricingCalculator from '@/components/RetreatPricingCalculator';
 import { supabase } from '@/lib/supabase';
 
 export interface RetreatsLayoutProps {
@@ -341,6 +342,19 @@ export default function RetreatsLayout({ texts }: RetreatsLayoutProps) {
             </ScrollReveal>
           </div>
         </div>
+      </section>
+
+      {/* Pricing Calculator */}
+      <section style={{ padding: 'clamp(4rem, 8vw, 6rem) 1.5rem', background: 'linear-gradient(180deg, #2e4432 0%, #3c2a21 100%)' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '1rem' }}>
+            Reserva Fora do Airbnb
+          </span>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', lineHeight: '1.15' }}>
+            O Pacote Completo, Não Só a Estadia
+          </h2>
+        </div>
+        <RetreatPricingCalculator whatsappNumber={WHATSAPP_NUMBER} />
       </section>
 
       {/* Photo Gallery — cinematic grid */}
