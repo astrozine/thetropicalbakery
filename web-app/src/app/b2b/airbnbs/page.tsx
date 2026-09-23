@@ -39,10 +39,13 @@ export default function AirbnbsPage() {
               <li>Conteúdo foto-perfeito que valoriza seus reviews.</li>
             </ul>
 
-            <div style={{ marginTop: '3rem' }}>
+            <div style={{ marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <a href="https://wa.me/5511932119196?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20uma%20parceria%20para%20Airbnb!" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.2rem', borderRadius: '4px', letterSpacing: '1px', display: 'inline-block' }}>
                 Fale Conosco no WhatsApp
               </a>
+              <Link href="/trabalhe-conosco" className="btn btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.2rem', borderRadius: '4px', letterSpacing: '1px', display: 'inline-block' }}>
+                Trabalhe Conosco
+              </Link>
             </div>
           </div>
         </div>

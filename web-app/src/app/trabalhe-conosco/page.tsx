@@ -106,15 +106,23 @@ export default function CareersPage() {
       <StripedBackground tone="dark" bandHeight={92} style={{ paddingTop: 'clamp(7rem, 12vw, 9rem)', paddingBottom: 'clamp(3.5rem, 7vw, 5.5rem)' }}>
         <div style={{ maxWidth: '760px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center' }}>
           <img src="/logo-gold.webp" alt="" style={{ height: 'clamp(64px, 10vw, 88px)', margin: '0 auto 1.75rem', display: 'block' }} />
+          <span style={{
+            display: 'inline-block', border: '1px solid rgba(212,175,55,0.6)', color: '#d4af37',
+            padding: '0.4rem 1.1rem', borderRadius: '30px', fontSize: '0.72rem',
+            textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: '1.5rem',
+          }}>
+            Ubatuba · Perequê-Açu · Taquaral · Praia do Prumirim
+          </span>
           <h1 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.2rem, 6.5vw, 4rem)',
             lineHeight: 1.1, color: '#fdfaf3', marginBottom: '1.25rem',
           }}>
-            Trabalhe com a gente
+            Trabalhe com a gente<br />aqui do seu lado da praia
           </h1>
           <p style={{ fontSize: 'clamp(1rem, 2.3vw, 1.15rem)', color: 'rgba(253,250,243,0.85)', lineHeight: 1.85 }}>
             Somos uma confeitaria pequena em Itamambuca, crescendo devagar e com cuidado.
-            Estamos montando a equipe que vai fazer, escolher e entregar as caixas de cada semana.
+            Estamos montando a equipe que vai fazer, escolher e entregar as caixas de cada semana —
+            gente da nossa região, que conhece as estradas e as praias tão bem quanto a gente.
           </p>
         </div>
       </StripedBackground>

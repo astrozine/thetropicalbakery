@@ -46,7 +46,7 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Seja um Parceiro</h3>
+          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Parcerias</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, lineHeight: '2' }}>
             <li><Link href="/b2b/hotels" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Hotéis</Link></li>
             <li><Link href="/b2b/pousadas" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Pousadas</Link></li>

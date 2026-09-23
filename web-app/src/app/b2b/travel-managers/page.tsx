@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import ZoomableImage from '@/components/ZoomableImage';
 
 export default function AffiliatesPage() {
@@ -39,15 +40,20 @@ export default function AffiliatesPage() {
               <li><strong>Fácil de Vender:</strong> Uma experiência transformadora em Itamambuca (Ubatuba), muito procurada por grupos.</li>
             </ul>
 
-            <a 
-              href="https://wa.me/5511932119196?text=Ol%C3%A1%21%20Tenho%20interesse%20em%20organizar%20um%20grupo%20para%20os%20Retiros%20da%20Tropical%20Bakery." 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <a
+              href="https://wa.me/5511932119196?text=Ol%C3%A1%21%20Tenho%20interesse%20em%20organizar%20um%20grupo%20para%20os%20Retiros%20da%20Tropical%20Bakery."
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn btn-primary"
-              style={{ width: '100%', fontSize: '1.1rem', letterSpacing: '1px' }}
+              style={{ flex: '1 1 200px', fontSize: '1.1rem', letterSpacing: '1px', textAlign: 'center' as const }}
             >
               Falar com o Comercial
             </a>
+            <Link href="/trabalhe-conosco" className="btn btn-secondary" style={{ flex: '1 1 200px', fontSize: '1.1rem', letterSpacing: '1px', textAlign: 'center' as const }}>
+              Trabalhe Conosco
+            </Link>
+            </div>
           </div>
         </div>
 

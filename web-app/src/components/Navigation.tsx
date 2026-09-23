@@ -61,6 +61,9 @@ export default function Navigation() {
     { name: 'Padarias', path: '/b2b/bakeries' },
     { name: 'Travel Managers', path: '/b2b/travel-managers' },
     { name: 'Afiliados', path: '/b2b/affiliates' },
+    // Not a B2B account, but it belongs in the same "ways to partner with us"
+    // menu — and this is where a job seeker would naturally look first.
+    { name: 'Trabalhe Conosco', path: '/trabalhe-conosco' },
   ];
 
   const retreatLangs = [
@@ -253,7 +256,7 @@ export default function Navigation() {
               alignItems: 'center',
               gap: '0.5rem'
             }}>
-              Parceiros B2B ▾
+              Parcerias ▾
             </span>
             {isDropdownOpen && (
               <div style={{
@@ -475,7 +478,7 @@ export default function Navigation() {
                 cursor: 'pointer',
                 textAlign: 'left'
               }}>
-              PARCEIROS B2B <span>{mobileB2bOpen ? '▲' : '▼'}</span>
+              PARCERIAS <span>{mobileB2bOpen ? '▲' : '▼'}</span>
             </button>
             {mobileB2bOpen && b2bLinks.map((link) => (
               <Link 

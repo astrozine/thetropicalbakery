@@ -38,10 +38,13 @@ export default function AffiliatesPage() {
               <li><strong>Acesso VIP:</strong> Seja o primeiro a experimentar nossos novos sabores e lançamentos sazonais.</li>
             </ul>
 
-            <div style={{ marginTop: '3rem' }}>
+            <div style={{ marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <a href="https://wa.me/5511932119196?text=Ol%C3%A1%2C%20quero%20ser%20um%20Afiliado%20da%20The%20Tropical%20Bakery!" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.2rem', borderRadius: '4px', letterSpacing: '1px', display: 'inline-block' }}>
                 Quero Ser Afiliado
               </a>
+              <Link href="/trabalhe-conosco" className="btn btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.2rem', borderRadius: '4px', letterSpacing: '1px', display: 'inline-block' }}>
+                Trabalhe Conosco
+              </Link>
             </div>
           </div>
         </div>
