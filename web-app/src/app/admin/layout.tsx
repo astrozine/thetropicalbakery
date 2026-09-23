@@ -154,6 +154,7 @@ export default function AdminLayout({
     { name: 'Anúncio Especial', path: '/admin/anuncio' },
     { name: 'CRM & Campanhas', path: '/admin/crm' },
     { name: 'Candidaturas', path: '/admin/vagas' },
+    { name: 'Administradores', path: '/admin/administradores' },
   ];
 
   return (

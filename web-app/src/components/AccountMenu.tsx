@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 /**
  * Deliberately renders nothing for signed-out visitors: signing in is offered at
@@ -12,6 +13,19 @@ import { useAuth } from '@/context/AuthContext';
 export default function AccountMenu({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
   const { user, profile, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Only shows the admin link to people on the `admins` list. This is a
+  // convenience — the real gate is the database (is_admin() + RLS).
+  const userId = user?.id;
+  useEffect(() => {
+    if (!userId) { setIsAdmin(false); return; }
+    let cancelled = false;
+    supabase.rpc('is_admin').then(({ data, error }) => {
+      if (!cancelled) setIsAdmin(!error && data === true);
+    });
+    return () => { cancelled = true; };
+  }, [userId]);
 
   if (!user) return null;
 
@@ -42,6 +56,14 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
         >
           Minha Conta
         </Link>
+        {isAdmin && (
+          <Link
+            href="/admin"
+            style={{ display: 'block', color: '#8a6d1f', fontSize: '1rem', fontWeight: 700, textDecoration: 'none', marginBottom: '0.75rem' }}
+          >
+            Administração
+          </Link>
+        )}
         <button
           onClick={signOut}
           style={{
@@ -84,6 +106,17 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
           >
             Minha Conta
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              style={{
+                display: 'block', padding: '0.5rem 1.5rem', color: '#8a6d1f', fontWeight: 700,
+                fontSize: '0.9rem', textTransform: 'uppercase', textDecoration: 'none',
+              }}
+            >
+              Administração
+            </Link>
+          )}
           <button
             onClick={signOut}
             style={{
