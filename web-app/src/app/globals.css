@@ -221,6 +221,13 @@ a {
 .hero-side-image-left { left: clamp(-40px, -2vw, 0px); transform: translateY(-50%) rotate(-6deg); }
 .hero-side-image-right { right: clamp(-40px, -2vw, 0px); transform: translateY(-50%) rotate(6deg); }
 
+/* On very wide screens, pull the photos in toward the content instead of leaving them stranded at the edges.
+   Below ~1720px the max() resolves to the original edge position, so laptops are unchanged. */
+@media (min-width: 1721px) {
+  .hero-side-image-left { left: max(clamp(-40px, -2vw, 0px), calc(50% - 860px)); }
+  .hero-side-image-right { right: max(clamp(-40px, -2vw, 0px), calc(50% - 860px)); }
+}
+
 @media (max-width: 1400px) {
   .hero-side-image { display: none; }
 }

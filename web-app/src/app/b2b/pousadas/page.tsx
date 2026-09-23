@@ -7,7 +7,8 @@ export default function PousadasPage() {
       eyebrow="Parcerias para Pousadas"
       title="O Toque Doce que Vira Avaliação 5 Estrelas"
       intro="Sua pousada já oferece hospitalidade de verdade — deixe a gente cuidar da parte doce. Café da manhã inesquecível, ou uma mini loja que se paga sozinha."
-      heroImages={["/b2b-hero/treat-9.jpg", "/b2b-hero/treat-7.jpg"]}
+      heroScene="/assets/glamorous_pousada_1789884603550.jpg"
+      heroTreats={["/b2b-hero/treat-9.jpg", "/b2b-hero/treat-7.jpg"]}
       regionNote="Atendemos toda a região: Itamambuca, Ubatuba, praias vizinhas e eventos em Paraty."
       options={[
         {

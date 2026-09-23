@@ -118,6 +118,12 @@ export default function SubscriptionPage() {
 
       {/* ---------------------------------------------------------------- HERO */}
       <StripedBackground tone="dark" bandHeight={96} style={{ paddingTop: 'clamp(7rem, 12vw, 10rem)', paddingBottom: 'clamp(4rem, 8vw, 7rem)' }}>
+        <div className="hero-side-image hero-side-image-left">
+          <img src="/box2.jpg" alt="Caixa de Degustação The Tropical Bakery" />
+        </div>
+        <div className="hero-side-image hero-side-image-right">
+          <img src="/box4.jpg" alt="Caixa de Degustação The Tropical Bakery" />
+        </div>
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center' }}>
           <img src="/logo-gold.webp" alt="" style={{ height: 'clamp(72px, 12vw, 104px)', margin: '0 auto 2rem', display: 'block' }} />
 
