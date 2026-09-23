@@ -1,5 +1,6 @@
 'use client';
 
+import ImagePicker from '@/components/ImagePicker';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
@@ -117,15 +118,8 @@ export default function SiteContentAdmin() {
         
         <form onSubmit={handleSave} style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: '1fr 1fr' }}>
           
-          <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            {formData.image_url && (
-              <img src={formData.image_url} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />
-            )}
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Imagem da Seção</label>
-              <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
-              {uploading && <span style={{ fontSize: '0.8rem', color: '#7f8c8d', marginLeft: '1rem' }}>Fazendo upload...</span>}
-            </div>
+          <div style={{ gridColumn: '1 / -1' }}>
+            <ImagePicker label="Imagem da Seção" imageUrl={formData.image_url} uploading={uploading} onChange={handleImageUpload} />
           </div>
 
           <div>

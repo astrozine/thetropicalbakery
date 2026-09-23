@@ -1,5 +1,6 @@
 'use client';
 
+import ImagePicker from '@/components/ImagePicker';
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
@@ -20,6 +21,7 @@ import Link from 'next/link';
 import ToggleSwitch from '@/components/ToggleSwitch';
 import BoxItemsEditor from '@/components/BoxItemsEditor';
 import { BoxItem } from '@/lib/allergens';
+import { uploadPublicImage } from '@/lib/imageUpload';
 
 export default function AdminCaixas() {
   const [boxes, setBoxes] = useState<TastingBox[]>([]);
@@ -59,19 +61,7 @@ export default function AdminCaixas() {
       setUploading(true);
       if (!e.target.files || e.target.files.length === 0) return;
       
-      const file = e.target.files[0];
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `boxes/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('uploads')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from('uploads').getPublicUrl(filePath);
-      setImageUrl(data.publicUrl);
+      setImageUrl(await uploadPublicImage(e.target.files[0], 'boxes'));
     } catch (error) {
       alert('Error uploading image!');
       console.error(error);
@@ -209,13 +199,8 @@ export default function AdminCaixas() {
             <p style={{ fontSize: '0.8rem', color: '#7f8c8d', marginTop: '0.2rem' }}>(Calculado automaticamente pelas compras no WhatsApp. Edite manualmente apenas se houver cancelamentos ou vendas externas)</p>
           </div>
 
-          <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '2rem', alignItems: 'center' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Imagem da Caixa</label>
-              <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
-              {uploading && <span> Enviando...</span>}
-            </div>
-            {imageUrl && <img src={imageUrl} alt="Preview" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }} />}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <ImagePicker label="Imagem da Caixa" imageUrl={imageUrl} uploading={uploading} onChange={handleImageUpload} />
           </div>
 
           <div style={{ gridColumn: '1 / -1' }}>

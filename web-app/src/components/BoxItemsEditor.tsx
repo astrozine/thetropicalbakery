@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { ALLERGENS, ALLERGEN_GROUPS, BoxItem, TREAT_EMOJIS, newBoxItem } from '@/lib/allergens';
 import { uploadPublicImage } from '@/lib/imageUpload';
+import ImagePicker from '@/components/ImagePicker';
 
 interface Props {
   items: BoxItem[];
@@ -110,17 +111,7 @@ function ItemEditor({ item, onChange }: { item: BoxItem; onChange: (i: BoxItem) 
           placeholder="Conte como é: textura, sabor, o que ele tem de especial…" style={{ ...field, resize: 'vertical' }} />
       </div>
 
-      <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
-        <div>
-          <label style={label}>Foto deste doce</label>
-          <input type="file" accept="image/*" onChange={upload} disabled={uploading} />
-          {uploading && <span style={{ marginLeft: '0.5rem', fontSize: '0.85rem' }}>Enviando…</span>}
-        </div>
-        {item.image_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.image_url} alt="" style={{ width: '96px', height: '96px', objectFit: 'cover', borderRadius: '10px' }} />
-        )}
-      </div>
+      <ImagePicker label="Foto deste doce" imageUrl={item.image_url} uploading={uploading} onChange={upload} />
 
       <div>
         <label style={label}>Ingredientes</label>
