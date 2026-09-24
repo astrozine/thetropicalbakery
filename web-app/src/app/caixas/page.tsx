@@ -200,7 +200,13 @@ export default function CaixasPage() {
               Edição Limitada • {formatBatchDate(activeBox.batch_date_label)}
             </span>
             <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem' }}>
-              {activeBox.title}
+              {(() => {
+                // "Chegada da Primavera: Sensações Amarelas" -> the theme after the colon is set in the site gold.
+                const i = activeBox.title.indexOf(':');
+                const gold: React.CSSProperties = { color: '#d4af37', textShadow: '0 2px 18px rgba(0,0,0,0.35)' };
+                if (i === -1) return <span style={gold}>{activeBox.title}</span>;
+                return <>{activeBox.title.slice(0, i + 1)} <span style={gold}>{activeBox.title.slice(i + 1).trim()}</span></>;
+              })()}
             </h1>
             <p style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.9)', marginBottom: '2.5rem', lineHeight: '1.8' }}>
               {activeBox.description}

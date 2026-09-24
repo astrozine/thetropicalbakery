@@ -18,7 +18,7 @@ const VIDEOS = [
   {
     id: 'Ls_sI4zdm_M',
     who: 'Dr. Alan Goldhamer',
-    credential: 'Quiroprata (DC) e fundador do TrueNorth Health Center, em Santa Rosa, Califórnia: um centro de saúde com internação, focado em alimentação vegetal integral sem sal, óleo e açúcar e em jejum supervisionado.',
+    credential: 'Fundador do TrueNorth Health Center, em Santa Rosa, Califórnia: um centro de saúde com internação, focado em alimentação vegetal integral sem sal, óleo e açúcar e em jejum supervisionado.',
     caption: 'Por que sal, óleo e açúcar viciam o paladar, e como largar.',
     source: 'Entrevista do HappyCow',
   },
@@ -92,7 +92,7 @@ export function InspirationSection() {
           </h2>
           <p style={{ color: '#594a42', fontSize: '1.08rem', lineHeight: 1.85, maxWidth: '720px', margin: '0 auto' }}>
             Boa parte das ideias por trás da Tropical Bakery vem de dois profissionais de saúde americanos que estudamos:
-            o médico Joel Fuhrman, de Nova Jersey, e o quiroprata Alan Goldhamer, fundador de um centro de saúde na Califórnia.
+            o médico Joel Fuhrman, de Nova Jersey, e o Dr. Alan Goldhamer, fundador do TrueNorth Health Center, na Califórnia.
             A gente não segue todas as regras deles. Mas entender a lógica nos ajudou a nos sentirmos bem todos os dias,
             e queremos dividir esse raciocínio com você.
           </p>
