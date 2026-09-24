@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
+import AdminSidebarNav from './AdminSidebarNav';
 
 /**
  * Asks the database whether the signed-in person is on the admin list.
@@ -139,24 +140,6 @@ export default function AdminLayout({
     );
   }
 
-  const navItems = [
-    { name: 'Visão Geral', path: '/admin' },
-    { name: 'Caixa de Entrada', path: '/admin/inbox', badge: unreadCount },
-    { name: 'Calendário de Entregas', path: '/admin/calendario' },
-    { name: 'Assinaturas', path: '/admin/assinaturas' },
-    { name: 'Caixas da Semana', path: '/admin/caixas' },
-    { name: 'Fila de Espera', path: '/admin/waitlist' },
-    { name: 'Inscrições em Cursos', path: '/admin/inscricoes' },
-    { name: 'Catálogo de Doces', path: '/admin/treats' },
-    { name: 'Cursos', path: '/admin/courses' },
-    { name: 'Retiros (Imagens)', path: '/admin/retreats' },
-    { name: 'Manutenção & Reparos', path: '/admin/manutencao' },
-    { name: 'Anúncio Especial', path: '/admin/anuncio' },
-    { name: 'CRM & Campanhas', path: '/admin/crm' },
-    { name: 'Candidaturas', path: '/admin/vagas' },
-    { name: 'Administradores', path: '/admin/administradores' },
-  ];
-
   return (
     <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', background: '#f5f6fa' }}>
       
@@ -176,7 +159,7 @@ export default function AdminLayout({
       {/* Sidebar Navigation */}
       <aside style={{ 
         width: '280px', 
-        background: '#2c3e50', 
+        background: '#22323f', 
         color: 'white', 
         display: 'flex', 
         flexDirection: 'column',
@@ -188,7 +171,7 @@ export default function AdminLayout({
         transform: isMobile ? (isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)') : 'none',
         transition: 'transform 0.3s ease-in-out'
       }}>
-        <div style={{ padding: '2rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '1.6rem 1.5rem 1.4rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h2 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-heading)', letterSpacing: '1px' }}>
               The Tropical Bakery
@@ -199,39 +182,10 @@ export default function AdminLayout({
             <button onClick={() => setIsSidebarOpen(false)} style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
           )}
         </div>
+        {/* 70s stripe */}
+        <div aria-hidden style={{ height: '6px', background: 'linear-gradient(90deg, #f4c542 0 25%, #e2792a 25% 50%, #d9453a 50% 75%, #9bab3c 75% 100%)' }} />
 
-        <nav style={{ flex: 1, padding: '1.5rem 0', overflowY: 'auto' }}>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {navItems.map((item) => {
-              const isActive = pathname === item.path;
-              return (
-                <li key={item.path}>
-                  <Link href={item.path} 
-                    onClick={() => { if(isMobile) setIsSidebarOpen(false); }}
-                    style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '1rem 1.5rem',
-                    color: isActive ? '#d4af37' : '#ecf0f1',
-                    background: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
-                    textDecoration: 'none',
-                    fontWeight: isActive ? 'bold' : 'normal',
-                    borderLeft: isActive ? '4px solid #d4af37' : '4px solid transparent',
-                    transition: 'all 0.2s'
-                  }}>
-                    <span>{item.name}</span>
-                    {!!item.badge && (
-                      <span style={{ background: '#e74c3c', color: 'white', fontSize: '0.72rem', fontWeight: 'bold', padding: '0.15rem 0.5rem', borderRadius: '20px', minWidth: '18px', textAlign: 'center' }}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+        <AdminSidebarNav pathname={pathname} unreadCount={unreadCount} onNavigate={() => { if (isMobile) setIsSidebarOpen(false); }} />
 
         <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '1rem', wordBreak: 'break-all' }}>
