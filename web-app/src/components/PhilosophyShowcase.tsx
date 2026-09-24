@@ -6,7 +6,6 @@ import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
 import { DELIVERY_ZONES, formatBRL } from '@/lib/deliveryZones';
 import { BOX_SIZES, SINGLE_PIECE_FROM } from '@/lib/boxSizes';
-import { STORE_ADDRESS_LINES, STORE_MAPS_URL } from '@/lib/siteContact';
 
 const FOOTNOTES = [
   '* Algumas criações podem conter açúcar de coco ou pequenos toques de chocolate que contêm pequenas quantidades de açúcar refinado.',
@@ -174,12 +173,12 @@ const panels: Panel[] = [
             </div>
           ))}
         </div>
-        <address style={{ fontStyle: 'normal', marginTop: '1.1rem', lineHeight: 1.7, color: '#594a42' }}>
-          <strong style={{ color: '#3c2a21' }}>The Tropical Bakery</strong>
-          {STORE_ADDRESS_LINES.map(line => <span key={line} style={{ display: 'block' }}>{line}</span>)}
-        </address>
+        <p style={{ marginTop: '1.1rem', color: '#594a42', lineHeight: 1.7 }}>
+          <strong style={{ color: '#3c2a21' }}>Retirada no home bakery:</strong> escolha a retirada ao fazer o pedido e o
+          endereço aparece na sua conta assim que o pagamento for confirmado.
+        </p>
         <div className="phil-cta-row">
-          <a href={STORE_MAPS_URL} target="_blank" rel="noopener noreferrer" className="phil-cta phil-cta-ghost">Como chegar</a>
+          <Link href="/minha-conta" className="phil-cta phil-cta-ghost">Ver minha conta</Link>
         </div>
       </>
     ),

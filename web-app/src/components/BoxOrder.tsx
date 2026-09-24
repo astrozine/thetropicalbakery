@@ -69,7 +69,7 @@ export default function BoxOrder({ box, maxQuantity }: BoxOrderProps) {
         <img
           src={box.image_url}
           alt={box.title}
-          style={{ width: '100%', aspectRatio: '4 / 5', objectFit: 'cover', borderRadius: '24px', boxShadow: '0 15px 30px rgba(0,0,0,0.15)', display: 'block' }}
+          style={{ width: '100%', height: 'auto', maxHeight: '640px', objectFit: 'contain', background: '#f5efe2', borderRadius: '24px', boxShadow: '0 15px 30px rgba(0,0,0,0.15)', display: 'block' }}
         />
         <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#d4af37', color: '#fff', borderRadius: '50%', fontWeight: 'bold', fontSize: '1.1rem', width: '68px', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(212,175,55,0.4)', transform: 'rotate(15deg)' }}>
           R${Math.round(box.price)}
@@ -81,7 +81,7 @@ export default function BoxOrder({ box, maxQuantity }: BoxOrderProps) {
         <div>
           <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '0.75rem' }}>Peça Sua Caixa</h2>
           <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: 1.6 }}>
-            Escolha o dia da entrega e pague por Pix em seguida. Entregas em Itamambuca, praias vizinhas e eventos em Paraty.
+            Escolha o dia e pague por Pix em seguida. Receba em casa (Itamambuca, praias vizinhas e eventos em Paraty) ou retire no nosso home bakery: você escolhe no próximo passo.
           </p>
         </div>
 

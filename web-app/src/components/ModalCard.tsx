@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BOX_SIZES, BoxSize } from '@/lib/boxSizes';
+import { formatBRL } from '@/lib/deliveryZones';
+import { STORE_WHATSAPP } from '@/lib/siteContact';
 
 interface ModalCardProps {
   imageSrc: string;
@@ -18,10 +21,10 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
   const [whatsapp, setWhatsapp] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  const [size, setSize] = useState<BoxSize | null>(null);
   const router = useRouter();
 
-  const WHATSAPP_NUMBER = "5511932119196";
-  
   const handleOrder = async (orderType: 'CAIXA_DEGUSTACAO' | 'EVENTO') => {
     setErrorMsg(''); // clear previous errors
     if (!name || !whatsapp) {
@@ -39,7 +42,10 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
           customer_name: name,
           customer_whatsapp: whatsapp,
           order_type: orderType,
-          items: { title, description } // Which highlight they clicked
+          // Which highlight they clicked, and for a box order how much of it
+          items: orderType === 'CAIXA_DEGUSTACAO'
+            ? { title, description, quantity, box_pieces: size?.pieces ?? null, unit_price: size?.price ?? null }
+            : { title, description }
         }
       ]);
 
@@ -52,8 +58,15 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
 
     if (orderType === 'CAIXA_DEGUSTACAO') {
       // Redirect to WhatsApp with prefilled message
-      const text = `Olá! Meu nome é ${name}. Gostaria de fazer o pedido da caixa degustação: ${title}`;
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
+      const boxes = `${quantity} ${quantity === 1 ? 'caixa' : 'caixas'} de degustação`;
+      const text =
+        `Olá! Meu nome é ${name}. Vi "${title}" no site e gostaria de pedir *${boxes}*` +
+        (size ? ` de ${size.pieces} peças (R$ ${size.price} cada)` : '') + `.
+` +
+        (size ? `Total estimado: ${formatBRL(quantity * size.price)}
+` : '') +
+        `Podem me passar as datas de entrega disponíveis? 🌴`;
+      window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(text)}`, '_blank');
       setIsOpen(false);
     } else {
       // Redirect to events menu
@@ -143,6 +156,40 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
               <h3 style={{ fontSize: '1.8rem', color: '#3c2a21', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>{title}</h3>
               <p style={{ color: '#594a42', fontSize: '1rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>{description}</p>
               
+              <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '1rem', textAlign: 'left' }}>
+                <h4 style={{ marginBottom: '0.75rem', color: '#3c2a21', fontSize: '1.1rem', textAlign: 'center' }}>Quantas caixas você quer?</h4>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                  {BOX_SIZES.map(option => {
+                    const selected = size?.pieces === option.pieces;
+                    return (
+                      <button
+                        key={option.pieces}
+                        type="button"
+                        aria-pressed={selected}
+                        onClick={() => setSize(selected ? null : option)}
+                        style={{ flex: 1, padding: '0.6rem 0.25rem', borderRadius: '10px', cursor: 'pointer', textAlign: 'center', lineHeight: 1.3, background: selected ? '#d4af37' : '#fdf7ee', color: selected ? 'white' : '#3c2a21', border: `1px solid ${selected ? '#d4af37' : '#e8e1d7'}` }}
+                      >
+                        <strong style={{ display: 'block' }}>{option.pieces} peças</strong>
+                        <span style={{ fontSize: '0.85rem' }}>R$ {option.price}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+                  <span style={{ fontWeight: 600, color: '#3c2a21' }}>Quantidade de caixas</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+                    <button type="button" aria-label="Menos" onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #e8e1d7', background: '#fff', color: '#3c2a21', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold' }}>-</button>
+                    <span aria-live="polite" style={{ minWidth: '1.5rem', textAlign: 'center', fontSize: '1.2rem', fontWeight: 'bold', color: '#3c2a21' }}>{quantity}</span>
+                    <button type="button" aria-label="Mais" onClick={() => setQuantity(q => Math.min(20, q + 1))} style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: '#d4af37', color: '#fff', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold' }}>+</button>
+                  </div>
+                </div>
+                {size && (
+                  <p style={{ marginTop: '0.9rem', textAlign: 'right', color: '#3c2a21' }}>
+                    {quantity} × R$ {size.price} = <strong>{formatBRL(quantity * size.price)}</strong>
+                  </p>
+                )}
+              </div>
+
               <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
                 <h4 style={{ marginBottom: '1rem', color: '#3c2a21', fontSize: '1.1rem' }}>Preencha seus dados para continuar</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

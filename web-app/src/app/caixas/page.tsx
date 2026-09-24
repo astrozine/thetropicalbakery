@@ -10,6 +10,7 @@ import WaitlistCapture from '@/components/WaitlistCapture';
 import Marquee from '@/components/Marquee';
 import BoxContents from '@/components/BoxContents';
 import { BoxItem } from '@/lib/allergens';
+import { formatBatchDate } from '@/lib/batchDate';
 
 interface TastingBox {
   id: string;
@@ -169,7 +170,7 @@ export default function CaixasPage() {
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
           <ScrollReveal>
             <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.5rem' }}>
-              Edição Limitada • {activeBox.batch_date_label}
+              Edição Limitada • {formatBatchDate(activeBox.batch_date_label)}
             </span>
             <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem' }}>
               {activeBox.title}

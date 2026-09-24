@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import PickupInfoAdmin from '@/components/PickupInfoAdmin';
 import {
   ScheduleRule, DateOverride, WEEKDAY_NAMES, describeRule, dayState, overrideMap,
   openDatesBetween, toISODate, parseISODate,
@@ -332,6 +333,9 @@ export default function DeliveryCalendarAdmin() {
           O cliente não consegue escolher uma data mais próxima que isso (a caixa precisa ser feita). Ex.: com 2, um pedido feito na quarta só pode ser entregue de sexta em diante.
         </p>
       </div>
+
+      {/* ---------- Pickup address (private) */}
+      <PickupInfoAdmin />
 
       {/* ---------- Calendar */}
       <div style={card}>

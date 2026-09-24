@@ -1,0 +1,16 @@
+.vercel
+.env*
+
+# Heavy design source files and local CLI cache: keep on Dropbox, not in git
+/3d items/
+/Assets/
+/Exports/
+/Graphic Design Elements for 3D/
+/Images Treats Website/
+/Logos/
+/Paradise Pantry/
+/Plan/
+/Sunbaked Letters/
+/Sweet Escape E-Book/
+/Tests and Resized Images/
+/supabase/.temp/

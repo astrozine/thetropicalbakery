@@ -143,7 +143,7 @@ export default function AddressFields({ value, onChange, required = false }: Add
             type="text"
             autoComplete="address-line1"
             required={required}
-            placeholder="Ex: Rua Quatorze"
+            placeholder="Ex: Rua das Palmeiras"
             value={value.address_street}
             onChange={e => set({ address_street: e.target.value })}
             style={inputStyle}

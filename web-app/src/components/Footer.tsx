@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { STORE_ADDRESS_LINES, STORE_MAPS_URL, STORE_WHATSAPP, STORE_WHATSAPP_DISPLAY } from '@/lib/siteContact';
+import { STORE_WHATSAPP, STORE_WHATSAPP_DISPLAY } from '@/lib/siteContact';
 
 export default function Footer() {
   const handleScrollToTop = () => {
@@ -58,13 +58,13 @@ export default function Footer() {
         </div>
         <div>
           <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Contato</h3>
-          <address style={{ fontStyle: 'normal', lineHeight: '1.9', color: '#e8e1d7' }}>
-            <strong style={{ color: '#fdfaf3' }}>The Tropical Bakery</strong>
-            {STORE_ADDRESS_LINES.map(line => <span key={line} style={{ display: 'block' }}>{line}</span>)}
-          </address>
+          <p style={{ lineHeight: 1.7, color: '#e8e1d7', fontSize: '0.92rem' }}>
+            Home bakery em Itamambuca, Ubatuba · SP.<br />
+            Quem escolhe <strong>retirada</strong> recebe o endereço na sua conta assim que o pedido é confirmado.
+          </p>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0.75rem 0 0', lineHeight: '2' }}>
             <li><a href={`https://wa.me/${STORE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>WhatsApp {STORE_WHATSAPP_DISPLAY}</a></li>
-            <li><a href={STORE_MAPS_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#e8e1d7', textDecoration: 'none' }}>Como chegar</a></li>
+            <li><Link href="/minha-conta" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Minha conta e retiradas</Link></li>
           </ul>
         </div>
       </div>

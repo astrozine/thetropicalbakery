@@ -12,7 +12,7 @@
 -- ----------------------------------------------------------------------------
 -- PART 1 — A proper delivery address, split into fields
 --
--- One free-text address box means we get "Rua Quatorze, Casa 114, Praia do
+-- One free-text address box means we get "Rua das Palmeiras, Casa 10, Praia do
 -- Itamambuca, Ubatuba" with no CEP, and whoever is delivering has to guess.
 -- Separate fields also let us group the weekly route by neighbourhood.
 --

@@ -223,7 +223,7 @@ export default function AdminCaixas() {
             <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
               <div>
                 <label style={label}>Data do Lote</label>
-                <input type="date" required value={batchDateLabel} onChange={e => setBatchDateLabel(e.target.value)} style={input} />
+                <input type="date" required min="2020-01-01" max="2100-12-31" value={batchDateLabel} onChange={e => setBatchDateLabel(e.target.value)} style={input} />
               </div>
               <div>
                 <label style={label}>Preço (R$)</label>
