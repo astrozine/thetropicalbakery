@@ -167,16 +167,18 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
 
   return (
     <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '1.5rem', overflow: 'hidden' }}>
-      <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', padding: '1rem 1.25rem', background: 'white', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-        <span aria-hidden style={{ display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none', color: '#a6832b' }}>▸</span>
-        <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#2c3e50' }}>{isPublic ? '🔎 Encontre o doce ideal: alergias e preferências' : '🔎 Refinar busca'}</span>
+      {/* A filled, mid-brown bar so it reads as something to press (light enough to keep the emoji visible). */}
+      <style>{`.trm-toggle { transition: filter .15s; } .trm-toggle:hover { filter: brightness(1.12); }`}</style>
+      <button type="button" className="trm-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', padding: '1rem 1.25rem', background: 'linear-gradient(135deg, #7a5540 0%, #93694f 100%)', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+        <span aria-hidden style={{ display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none', color: '#f4d675', fontSize: '1.05rem' }}>▸</span>
+        <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>{isPublic ? '🔎 Encontre o doce ideal: alergias e preferências' : '🔎 Refinar busca'}</span>
         {active > 0 && (
-          <span style={{ background: '#d4af37', color: '#fff', borderRadius: '10px', padding: '0.05rem 0.6rem', fontSize: '0.78rem', fontWeight: 700 }}>
+          <span style={{ background: '#f4d675', color: '#3c2a21', borderRadius: '10px', padding: '0.05rem 0.6rem', fontSize: '0.78rem', fontWeight: 800 }}>
             {active} {active === 1 ? 'filtro' : 'filtros'}
           </span>
         )}
-        <span style={{ marginLeft: 'auto', fontSize: '0.85rem', color: '#7f8c8d' }}>
+        <span style={{ marginLeft: 'auto', fontSize: '0.85rem', color: 'rgba(255,255,255,0.88)', fontWeight: 600 }}>
           Mostrando {shown} de {treats.length} doces · {open ? 'fechar' : 'abrir'}
         </span>
       </button>
