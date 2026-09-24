@@ -6,6 +6,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import MenuCard from '@/components/MenuCard';
 import SquiggleArrows from '@/components/SquiggleArrows';
 import EventLeadCapture from '@/components/EventLeadCapture';
+import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 
 interface Treat {
   id: string;
@@ -13,6 +14,7 @@ interface Treat {
   description: string;
   price: number;
   image_url: string;
+  is_available: boolean;
   min_batch_size: number;
   batch_multiplier: number;
   emoji?: string | null;
@@ -24,6 +26,8 @@ interface Treat {
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<Treat[]>([]);
   const [loading, setLoading] = useState(true);
+  // Customers mostly arrive with an allergy in mind, so the panel starts on "Sem" (free of).
+  const [refine, setRefine] = useState<RefineState>({ ...emptyRefine, mode: 'free' });
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -40,6 +44,8 @@ export default function MenuPage() {
     };
     fetchMenu();
   }, []);
+
+  const visibleItems = menuItems.filter(t => matchesRefine(t, refine, { hideUnknownWhenFree: true }));
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--color-background)', paddingBottom: '6rem' }}>
@@ -106,9 +112,26 @@ export default function MenuPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: '#7f8c8d' }}>Carregando doces maravilhosos...</div>
         ) : (
+          <>
+          <div style={{ maxWidth: '1000px', margin: '0 auto 2.5rem' }}>
+            <TreatRefineMenu variant="public" treats={menuItems} value={refine} onChange={setRefine} shown={visibleItems.length} />
+          </div>
+
+          {visibleItems.length === 0 && (
+            <div style={{ textAlign: 'center', color: '#594a42', padding: '2rem 1rem' }}>
+              <p style={{ marginBottom: '1rem' }}>Nenhum doce combina com essa busca. Tente tirar algum filtro, ou fale com a gente no WhatsApp: podemos adaptar um doce para você.</p>
+              {refineCount(refine) > 0 && (
+                <button type="button" onClick={() => setRefine({ ...emptyRefine, mode: refine.mode })}
+                  style={{ padding: '0.7rem 1.5rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}>
+                  Limpar filtros
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-            {menuItems.map((item, idx) => (
-              <ScrollReveal key={idx}>
+            {visibleItems.map(item => (
+              <ScrollReveal key={item.id}>
                 <MenuCard item={{
                   id: item.id,
                   name: item.name,
@@ -125,6 +148,7 @@ export default function MenuPage() {
               </ScrollReveal>
             ))}
           </div>
+          </>
         )}
 
         <p style={{ maxWidth: '760px', margin: '3rem auto 0', textAlign: 'center', color: '#7a6a61', fontSize: '0.85rem', lineHeight: 1.75 }}>
