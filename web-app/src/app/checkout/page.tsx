@@ -20,6 +20,8 @@ const parsePrice = (price: string) => parseFloat(price.replace(/[^\d,]/g, '').re
 const labelStyle: React.CSSProperties = { display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' };
 const inputStyle: React.CSSProperties = { width: '100%', padding: '1rem', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-body)', outline: 'none' };
 
+type PayMethod = 'pix' | 'card' | 'paypal';
+
 interface PlacedOrder {
   items: CartItem[];
   subtotal: number;
@@ -43,6 +45,16 @@ export default function CheckoutPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [placed, setPlaced] = useState<PlacedOrder | null>(null);
+  // Card and PayPal only appear once their keys are in Vercel (see /api/pay/methods).
+  const [payMethod, setPayMethod] = useState<PayMethod>('pix');
+  const [available, setAvailable] = useState<{ card: boolean; paypal: boolean }>({ card: false, paypal: false });
+
+  useEffect(() => {
+    fetch('/api/pay/methods', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(j => setAvailable({ card: !!j.card, paypal: !!j.paypal }))
+      .catch(() => { /* Pix only */ });
+  }, []);
 
   const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', address: '', date: '' });
   const [affiliateCode, setAffiliateCode] = useState('');
@@ -135,8 +147,11 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
 
-    const transactionId = `ORD${Date.now()}`.substring(0, 25);
-    const { payload, base64 } = await generatePixData({ value: total, transactionId });
+    // The reference doubles as the Pix transaction id (max 25 letters/numbers) and as the
+    // key card and PayPal payments come back with, so it carries a random tail.
+    const transactionId = `ORD${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
+    const method: PayMethod = (payMethod === 'card' && available.card) || (payMethod === 'paypal' && available.paypal) ? payMethod : 'pix';
+    const { payload, base64 } = method === 'pix' ? await generatePixData({ value: total, transactionId }) : { payload: '', base64: '' };
 
     const restrictions = DIETARY_FIELDS.filter(d => dietary[d.key]).map(d => d.label);
     const itemsSummary = items.map(i => `${i.quantity}x ${i.name}`).join(', ');
@@ -162,12 +177,14 @@ export default function CheckoutPage() {
       pix_transaction_id: transactionId,
       status: 'PENDING',
     };
+    const paymentProvider = method === 'card' ? 'mercadopago' : method;
     // A partner's code, so their portal can count the sale.
     const extras = affiliateCode.trim() ? { affiliate_code: affiliateCode.trim().toUpperCase() } : {};
     let saved = true;
     const full = await supabase.from('orders').insert([{
       ...base,
       ...extras,
+      payment_provider: paymentProvider,
       order_kind: hasBox ? 'box' : 'events',
       fulfillment: isPickup ? 'pickup' : 'delivery',
       user_id: user?.id ?? null,
@@ -182,6 +199,13 @@ export default function CheckoutPage() {
         console.error('Error saving order:', plain.error);
         saved = false;
       }
+    }
+
+    // A card or PayPal payment needs the saved order (that's what it's matched to).
+    if (!saved && method !== 'pix') {
+      setError('Não conseguimos registrar o pedido agora. Tente de novo em instantes ou pague por Pix.');
+      setSubmitting(false);
+      return;
     }
 
     if (hasBox) {
@@ -217,6 +241,27 @@ export default function CheckoutPage() {
         p_tags: hasBox ? ['cliente'] : ['eventos'],
         p_source: 'checkout',
       });
+    }
+
+    // Card / PayPal: hand the customer to the payment page. The order is already saved,
+    // so the cart can be emptied; if the payment fails the return page offers a retry.
+    if (method !== 'pix') {
+      try {
+        const res = await fetch(`/api/pay/${method === 'card' ? 'mercadopago' : 'paypal'}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reference: transactionId }),
+        });
+        const json = await res.json();
+        if (!res.ok || !json.url) throw new Error(json.error || 'Não foi possível abrir o pagamento.');
+        clearCart();
+        try { localStorage.removeItem(DATE_KEY); } catch { /* ignore */ }
+        window.location.href = json.url;
+        return;
+      } catch (err) {
+        setError(`${err instanceof Error ? err.message : 'Não foi possível abrir o pagamento.'} Seu pedido foi guardado: tente de novo ou pague por Pix.`);
+        setSubmitting(false);
+        return;
+      }
     }
 
     setPlaced({
@@ -467,13 +512,44 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div style={{ marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(212,175,55,0.3)', textAlign: 'center' }}>
-                  <button type="submit" disabled={submitting} className="btn btn-primary" style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem', borderRadius: '8px', opacity: submitting ? 0.7 : 1 }}>
-                    {submitting ? 'Gerando seu Pix...' : 'Continuar para Pagamento ➔'}
-                  </button>
-                  <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '1rem' }}>
-                    🔒 Pagamento 100% seguro via Pix
-                  </p>
+                <div style={{ marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(212,175,55,0.3)' }}>
+                  {(available.card || available.paypal) && (
+                    <div style={{ marginBottom: '1.75rem' }}>
+                      <label style={labelStyle}>Como você quer pagar?</label>
+                      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        {([
+                          ['pix', '⚡', 'Pix', 'Na hora · sem taxa', true],
+                          ['card', '💳', 'Cartão de crédito', 'Parcele em até 6x', available.card],
+                          ['paypal', '🅿️', 'PayPal', 'Inclusive cartões de fora do Brasil', available.paypal],
+                        ] as const).filter(m => m[4]).map(([value, emoji, title, hint]) => {
+                          const on = payMethod === value;
+                          return (
+                            <button
+                              key={value}
+                              type="button"
+                              aria-pressed={on}
+                              onClick={() => setPayMethod(value)}
+                              style={{ flex: '1 1 170px', textAlign: 'left', padding: '0.9rem 1rem', borderRadius: '12px', cursor: 'pointer', border: `2px solid ${on ? '#d4af37' : '#e8e1d7'}`, background: on ? 'rgba(212,175,55,0.14)' : 'rgba(255,255,255,0.7)', color: '#3c2a21' }}
+                            >
+                              <span style={{ fontSize: '1.4rem' }} aria-hidden>{emoji}</span>{' '}
+                              <strong>{title}</strong>
+                              <span style={{ display: 'block', fontSize: '0.8rem', color: '#7a6a61', marginTop: '0.2rem' }}>{hint}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  <div style={{ textAlign: 'center' }}>
+                    <button type="submit" disabled={submitting} className="btn btn-primary" style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem', borderRadius: '8px', opacity: submitting ? 0.7 : 1 }}>
+                      {submitting
+                        ? (payMethod === 'pix' ? 'Gerando seu Pix...' : 'Abrindo o pagamento...')
+                        : payMethod === 'card' ? 'Pagar com cartão ➔' : payMethod === 'paypal' ? 'Pagar com PayPal ➔' : 'Continuar para Pagamento ➔'}
+                    </button>
+                    <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '1rem' }}>
+                      🔒 {payMethod === 'pix' ? 'Pagamento 100% seguro via Pix' : payMethod === 'card' ? 'Pagamento seguro pelo Mercado Pago — não guardamos os dados do seu cartão' : 'Pagamento seguro pelo PayPal — não guardamos os dados do seu cartão'}
+                    </p>
+                  </div>
                 </div>
               </form>
             ) : (

@@ -88,8 +88,9 @@ special "backyard" market with its own logos (`public/itamambuca-lockup.png`, `i
 **Ordering and payment**
 - One checkout for everything: `src/app/checkout/page.tsx`, two steps (details, then **Pix QR +
   copia-e-cola**). Pix key is the CPF in `src/utils/pix.ts` (a wrong key gave "chave não
-  encontrada" once; it works now). Card payments are **not built** (needs a Mercado Pago/Stripe
-  decision from Andrew). Cart lives in `src/context/CartContext.tsx`; items have `kind: 'box' |
+  encontrada" once; it works now). Card (Mercado Pago) and PayPal are built as optional extra
+  methods (see `web-app/CLAUDE.md` "Card and PayPal payments" and `web-app/SETUP_payments.md`); they
+  only appear once Andrew has put the keys in Vercel. Cart lives in `src/context/CartContext.tsx`; items have `kind: 'box' |
   'events'`. Box orders come from `BoxOrder.tsx` on `/caixas`; events items from `MenuCard.tsx`.
 - Box orders use the **box delivery calendar**; Menu de Eventos orders use a plain date field
   (min 3 days). They are deliberately separate.
@@ -171,7 +172,7 @@ widget cookie (`googtrans`); choosing Português clears it and reloads.
   redeploy with `RESEND_API_KEY` finished, or the "send e-mail to customers" button won't work.
 - **Twilio/WhatsApp automation is blocked** (company registration). WhatsApp messages are copy-paste
   for now.
-- Card payments (Mercado Pago for Brazilian cards + Pix; foreign cards via PayPal/Stripe with a fee).
+- Card + PayPal code is done; Andrew still has to create the accounts and add the keys (`SETUP_payments.md`).
 - Yearly: update `minimum_wage` in `site_settings` (no admin UI yet; `/admin/configuracoes` offered).
 - English/Spanish versions of the new retreat sections; more video placements for the inspiration section.
 - A full mobile audit needs Andrew's phone screenshots (you can't test mobile).

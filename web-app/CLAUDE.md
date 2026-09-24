@@ -59,3 +59,26 @@ that only add columns or policies to existing tables need nothing extra.
   agreed gross (hourly × hours, or a fixed monthly wage) — CLT charges are not modelled there; the
   estimator on `/trabalhe-conosco` is the separate tool for that.
 - `my_portals()` tells the account menu which private links to show. Schema: `migration_16_portals.sql`.
+
+
+# Card and PayPal payments
+
+- Pix is still the default and is confirmed by hand. Card (Mercado Pago **Checkout Pro**, redirect, cards
+  only, up to 6x) and PayPal (Orders v2, redirect, BRL) are extra methods that switch on when their
+  env vars exist: `/api/pay/methods` tells the checkout what to show. Setup guide for Andrew:
+  `SETUP_payments.md`. Schema: `migration_18_card_payments.sql`.
+- Env vars (Vercel only, never `NEXT_PUBLIC_`, never committed): `MERCADOPAGO_ACCESS_TOKEN`,
+  `MERCADOPAGO_WEBHOOK_SECRET`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_ENV` (`sandbox`|`live`),
+  `SUPABASE_SERVICE_ROLE_KEY`.
+- The service-role key is the ONE exception to "never use it": payment webhooks have no logged-in
+  user. It is used only in `src/lib/payments/server.ts` (find an order by reference, mark it paid).
+  Do not import that file from client code or use the key anywhere else.
+- Flow: checkout inserts the order (reference = `orders.pix_transaction_id`) -> `/api/pay/<provider>`
+  builds the payment page from the amount **stored in the order** -> customer returns to
+  `/checkout/retorno`. Mercado Pago also calls `/api/webhooks/mercadopago`; PayPal is captured in
+  `/api/pay/paypal/capture` on return.
+- Never mark an order paid from anything the visitor sends. `confirmMercadoPagoPayment` and
+  `capturePayPalOrder` re-fetch the payment from the provider and check reference **and amount**.
+  `markOrderPaid` is idempotent and also moves `inbox_status` to `confirmed`.
+- Known limit: `total_price` is computed in the browser (same as Pix). Server-side price recomputation
+  would need item ids in the order; not done.
