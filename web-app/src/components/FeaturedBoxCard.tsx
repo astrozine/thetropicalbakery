@@ -38,6 +38,10 @@ function parseNumbered(text: string): { intro: string; items: string[] } | null 
  */
 export default function FeaturedBoxCard({ title, description, imageUrl, dateLabel }: FeaturedBoxCardProps) {
   const numbered = parseNumbered(description);
+  // "Chegada da Primavera: Sensações Amarelas" -> the part after the colon is the theme; give it its own colour and size.
+  const colon = title.indexOf(':');
+  const lead = colon > 0 ? title.slice(0, colon + 1) : title;
+  const theme = colon > 0 ? title.slice(colon + 1).trim() : '';
 
   return (
     <div className="fbc">
@@ -46,6 +50,8 @@ export default function FeaturedBoxCard({ title, description, imageUrl, dateLabe
         .fbc-grid { display: grid; grid-template-columns: 1fr; }
         .fbc-photo { display: flex; align-items: center; justify-content: center; background: #f5efe2; }
         .fbc-photo img { display: block; width: 100%; height: auto; max-height: 640px; object-fit: contain; }
+        .fbc-theme { display: block; margin-top: 0.1em; font-size: 1.22em; line-height: 1.05; color: #e39a14; }
+        .fbc-cta .btn.fbc-btn, .fbc-cta .btn.fbc-btn:hover { color: #3c2a21; font-weight: 800; letter-spacing: 0.14em; }
         .fbc-text { padding: clamp(1.75rem, 4vw, 3rem); display: flex; flex-direction: column; justify-content: center; }
         .fbc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
         .fbc-list li { display: flex; gap: 0.8rem; align-items: baseline; color: #594a42; line-height: 1.55; font-size: 1.02rem; }
@@ -67,7 +73,8 @@ export default function FeaturedBoxCard({ title, description, imageUrl, dateLabe
             Apenas esta semana!{dateLabel ? ` • ${dateLabel}` : ''}
           </span>
           <h2 style={{ fontSize: 'clamp(1.8rem, 3.6vw, 2.7rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '1.25rem' }}>
-            {title}
+            {lead}
+            {theme && <span className="fbc-theme">{theme}</span>}
           </h2>
           {numbered ? (
             <>
@@ -88,7 +95,7 @@ export default function FeaturedBoxCard({ title, description, imageUrl, dateLabe
         <SquiggleCta>
           <Link
             href="/caixas"
-            className="btn btn-primary"
+            className="btn btn-primary fbc-btn"
             style={{ padding: '1.1rem 2rem', display: 'block', width: '100%', textAlign: 'center', background: 'linear-gradient(135deg, #d4af37, #c19b2e)', border: 'none', borderRadius: '40px' }}
           >
             Reservar Minha Caixa
