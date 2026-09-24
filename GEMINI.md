@@ -81,7 +81,7 @@ special "backyard" market with its own logos (`public/itamambuca-lockup.png`, `i
   `anon` only what visitors need.
 - Migration status: 02–05 were run earlier, as far as we know. **06–14 were being run by Andrew as they were written;
   do not assume any of them ran.** 12 (delivery schedule + order columns), 13 (box items) and 14
-  (treat ingredients/allergens) and 15 (e-mail preferences) are the newest. Ask, or look for the in-app warnings.
+  (treat ingredients/allergens) 15 (e-mail preferences) and 16 (partner/worker portals) are the newest. Ask, or look for the in-app warnings.
 
 ## 5. Feature map (where things live)
 
@@ -123,6 +123,11 @@ first; the unique `(email, message_key)` index is what stops a second copy), pub
 `email_contact_upsert` RPC in every form. Transactional topics ignore unsubscribes; marketing never
 may. Admin UI: `/admin/emails`. Schema: `migration_15_email_preferences.sql`. See `web-app/CLAUDE.md`
 for the rules.
+
+**Private areas**: `/parceiro` (B2B partners: their deal, restock requests, monthly goal, affiliate
+totals) and `/equipe` (staff: shifts, hours, pay). Both are gated by an e-mail match against
+`partners` / `workers`, managed in `/admin/parceiros` and `/admin/equipe`. Partners apply through
+`PartnerApply` on the B2B pages. Schema: `migration_16_portals.sql`. Types/labels: `src/lib/portals.ts`.
 
 **Public pages**: `/` home, `/assinatura`, `/caixas`, `/menu`, `/retreats` (+ `/en/retreats`,
 `/es/retiros`, but the newest retreat sections are Portuguese only), `/cursos`, `/b2b/*`,
@@ -167,8 +172,6 @@ widget cookie (`googtrans`); choosing Português clears it and reloads.
 - **Twilio/WhatsApp automation is blocked** (company registration). WhatsApp messages are copy-paste
   for now.
 - Card payments (Mercado Pago for Brazilian cards + Pix; foreign cards via PayPal/Stripe with a fee).
-- B2B partner portal (business login, orders, goals), affiliate login + commission tracking,
-  worker portal (schedule, pay).
 - Yearly: update `minimum_wage` in `site_settings` (no admin UI yet; `/admin/configuracoes` offered).
 - English/Spanish versions of the new retreat sections; more video placements for the inspiration section.
 - A full mobile audit needs Andrew's phone screenshots (you can't test mobile).

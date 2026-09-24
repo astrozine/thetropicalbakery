@@ -4,6 +4,7 @@ import B2BPageLayout from '@/components/B2BPageLayout';
 export default function HotelsPage() {
   return (
     <B2BPageLayout
+      partnerKind="hotel"
       eyebrow="Parcerias para Hotéis"
       title="Uma Tropical Bakery Dentro do Seu Hotel"
       intro="Transforme qualquer canto do seu hotel — recepção, lounge, sala de café — num ponto de venda que encanta hóspedes e gera receita extra, sem contratar ninguém e sem abrir mão da sua cozinha."

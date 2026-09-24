@@ -6,19 +6,19 @@ const coursesData = [
     slug: 'turismo-gastronomico',
     title: 'Turismo Gastronômico',
     description: 'Imersão de 1 dia em Ubatuba.',
-    image: '/assets/surfers_retreat_treats_1789884582282.jpg'
+    image: '/retreats/Surfer girl.webp'
   },
   {
     slug: 'capacitacao-profissional',
     title: 'Capacitação Profissional',
     description: 'Para cozinheiros particulares locais.',
-    image: '/assets/chef_training_1789884593538.jpg'
+    image: '/dolly-course2.jpg'
   },
   {
     slug: 'saude-bem-estar',
     title: 'Saúde e Bem-Estar',
     description: 'Transição suave para o veganismo.',
-    image: '/dolly-course3.jpg'
+    image: '/dolly-course2.jpg'
   }
 ];
 

@@ -4,6 +4,7 @@ import B2BPageLayout from '@/components/B2BPageLayout';
 export default function BakeriesPage() {
   return (
     <B2BPageLayout
+      partnerKind="padaria"
       eyebrow="Parcerias para Padarias"
       title="A Vitrine Inclusiva que Seus Clientes Estão Pedindo"
       intro="Atenda o público que busca opções sem glúten, veganas, sem óleo, sem açúcar refinado ou sal — sem sobrecarregar sua produção. A Dolly cria, você recebe pronto para vender."

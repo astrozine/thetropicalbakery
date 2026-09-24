@@ -4,6 +4,7 @@ import B2BPageLayout from '@/components/B2BPageLayout';
 export default function AirbnbsPage() {
   return (
     <B2BPageLayout
+      partnerKind="airbnb"
       eyebrow="Parcerias para Airbnbs"
       title="Avaliações 5 Estrelas Começam no Café da Manhã"
       intro="Uma casa de temporada em Itamambuca, Félix ou Prumirim já vende o paraíso. A gente entrega a parte gastronômica que faz o hóspede comentar na review."

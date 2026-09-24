@@ -14,6 +14,7 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
   const { user, profile, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [portals, setPortals] = useState<{ is_partner: boolean; is_worker: boolean }>({ is_partner: false, is_worker: false });
 
   // Only shows the admin link to people on the `admins` list. This is a
   // convenience — the real gate is the database (is_admin() + RLS).
@@ -23,6 +24,11 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
     let cancelled = false;
     supabase.rpc('is_admin').then(({ data, error }) => {
       if (!cancelled) setIsAdmin(!error && data === true);
+    });
+    // Which private areas this person has (partner portal, team area).
+    supabase.rpc('my_portals').then(({ data, error }) => {
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!cancelled && !error && row) setPortals({ is_partner: !!row.is_partner, is_worker: !!row.is_worker });
     });
     return () => { cancelled = true; };
   }, [userId]);
@@ -56,6 +62,16 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
         >
           Minha Conta
         </Link>
+        {portals.is_partner && (
+          <Link href="/parceiro" style={{ display: 'block', color: '#594a42', fontSize: '1rem', textDecoration: 'none', marginBottom: '0.75rem' }}>
+            Portal do Parceiro
+          </Link>
+        )}
+        {portals.is_worker && (
+          <Link href="/equipe" style={{ display: 'block', color: '#594a42', fontSize: '1rem', textDecoration: 'none', marginBottom: '0.75rem' }}>
+            Área da Equipe
+          </Link>
+        )}
         {isAdmin && (
           <Link
             href="/admin"
@@ -106,6 +122,16 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
           >
             Minha Conta
           </Link>
+          {portals.is_partner && (
+            <Link href="/parceiro" style={{ display: 'block', padding: '0.5rem 1.5rem', color: '#594a42', fontSize: '0.9rem', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Portal do Parceiro
+            </Link>
+          )}
+          {portals.is_worker && (
+            <Link href="/equipe" style={{ display: 'block', padding: '0.5rem 1.5rem', color: '#594a42', fontSize: '0.9rem', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Área da Equipe
+            </Link>
+          )}
           {isAdmin && (
             <Link
               href="/admin"

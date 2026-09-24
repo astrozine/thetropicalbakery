@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import StripedBackground from '@/components/StripedBackground';
@@ -344,6 +345,18 @@ export default function CareersPage() {
           )}
         </div>
       </StripedBackground>
+      {/* Already on the team */}
+      <section style={{ padding: 'clamp(2.5rem, 6vw, 4rem) 1.5rem', background: '#fdf7ee' }}>
+        <div style={{ maxWidth: '620px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ color: '#594a42', lineHeight: 1.8, marginBottom: '1.25rem' }}>
+            <strong>Já trabalha com a gente?</strong> Sua escala, suas horas e o que você tem a receber ficam na área da equipe.
+          </p>
+          <Link href="/equipe" className="btn btn-secondary" style={{ padding: '0.9rem 1.75rem', display: 'inline-block' }}>
+            Entrar na Área da Equipe
+          </Link>
+        </div>
+      </section>
+
 
     </main>
   );

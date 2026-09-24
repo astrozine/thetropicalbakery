@@ -4,6 +4,7 @@ import B2BPageLayout from '@/components/B2BPageLayout';
 export default function AffiliatesPage() {
   return (
     <B2BPageLayout
+      partnerKind="afiliado"
       eyebrow="Programa de Afiliados"
       title="Indique. A Gente Entrega. Você Ganha."
       intro="Você conhece restaurantes, organiza eventos ou tem uma audiência que confia em você? Vire um afiliado e ganhe uma comissão sobre cada caixa vendida através da sua indicação."

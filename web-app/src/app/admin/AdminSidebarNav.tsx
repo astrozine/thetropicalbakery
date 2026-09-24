@@ -64,11 +64,13 @@ const buildGroups = (): NavGroup[] => [
       { name: 'E-mails', path: '/admin/emails', emoji: '✉️', hint: 'Escrever e enviar e-mails para clientes, parceiros e candidatos' },
       { name: 'Faixa de Anúncio', path: '/admin/anuncio', emoji: '🎉', hint: 'O aviso especial que aparece no topo da página inicial' },
       { name: 'Clientes & Campanhas', path: '/admin/crm', emoji: '💌', hint: 'Lista de clientes e mensagens em massa' },
+      { name: 'Parceiros B2B', path: '/admin/parceiros', emoji: '🤝', hint: 'Hotéis, pousadas, restaurantes, afiliados e os pedidos de reposição' },
     ],
   },
   {
     id: 'equipe', name: 'Equipe & Casa', emoji: '🏡', accent: '#5aa9e6', shade: '#3a5a78',
     items: [
+      { name: 'Escala da Equipe', path: '/admin/equipe', emoji: '📋', hint: 'Quem trabalha com a gente, turnos e pagamento' },
       { name: 'Candidaturas de Emprego', path: '/admin/vagas', emoji: '🧑‍🍳', hint: 'Pessoas que querem trabalhar com a gente' },
       { name: 'Contatos de Reparos', path: '/admin/manutencao', emoji: '🔧', hint: 'Encanador, eletricista, geladeira, forno…' },
       { name: 'Administradores', path: '/admin/administradores', emoji: '🔑', hint: 'Quem pode entrar neste painel' },

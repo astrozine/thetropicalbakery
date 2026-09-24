@@ -2,6 +2,8 @@ import React from 'react';
 import SplitHero from '@/components/SplitHero';
 import ZoomableImage from '@/components/ZoomableImage';
 import StripedBackground from '@/components/StripedBackground';
+import PartnerApply from '@/components/PartnerApply';
+import { PartnerKind } from '@/lib/portals';
 
 export interface PartnershipOption {
   icon: string;
@@ -25,6 +27,8 @@ interface B2BPageLayoutProps {
   galleryImages: string[];
   regionNote?: string;
   itamambucaBadge?: boolean;
+  /** Which kind of partner this page is for, pre-picked in the application form. */
+  partnerKind?: PartnerKind;
   children?: React.ReactNode;
 }
 
@@ -47,6 +51,7 @@ export default function B2BPageLayout({
   galleryImages,
   regionNote,
   itamambucaBadge,
+  partnerKind = 'outro',
   children,
 }: B2BPageLayoutProps) {
   return (
@@ -100,6 +105,8 @@ export default function B2BPageLayout({
           {whatsappLabel}
         </a>
       </section>
+
+      <PartnerApply defaultKind={partnerKind} whatsappHref={whatsappHref} />
 
       {/* Treat Gallery Strip */}
       <StripedBackground tone="dark" bandHeight={64}>

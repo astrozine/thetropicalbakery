@@ -26,6 +26,7 @@ interface PlacedOrder {
   fee: number;
   total: number;
   isBox: boolean;
+  isPickup: boolean;
   date: string;
   zoneLabel: string;
   saved: boolean;
@@ -44,7 +45,9 @@ export default function CheckoutPage() {
   const [placed, setPlaced] = useState<PlacedOrder | null>(null);
 
   const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', address: '', date: '' });
+  const [affiliateCode, setAffiliateCode] = useState('');
   const [zoneId, setZoneId] = useState('zone1');
+  const [fulfillment, setFulfillment] = useState<'delivery' | 'pickup'>('delivery');
   const [dietary, setDietary] = useState<Record<DietaryKey, boolean>>({
     is_vegan: false, is_gluten_free: false, is_sugar_free: false, is_salt_free: false, is_oil_free: false,
   });
@@ -52,8 +55,10 @@ export default function CheckoutPage() {
   const boxItems = items.filter(i => i.kind === 'box');
   const hasBox = boxItems.length > 0;
   const boxCount = boxItems.reduce((n, i) => n + i.quantity, 0);
+  // Pickup is only for boxes. The address is never on the site: it appears in Minha Conta once the Pix is confirmed.
+  const isPickup = hasBox && fulfillment === 'pickup';
   const zone = getZone(zoneId);
-  const deliveryFee = hasBox ? (zone?.fee ?? 0) : 0;
+  const deliveryFee = hasBox && !isPickup ? (zone?.fee ?? 0) : 0;
   const total = totalPrice + deliveryFee;
 
   // Pre-fill with anything the customer already gave us (earlier order, or their account)
@@ -103,10 +108,15 @@ export default function CheckoutPage() {
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.whatsapp || !formData.address) return;
+    if (!formData.name || !formData.whatsapp || (!isPickup && !formData.address)) return;
     setError('');
 
-    if (hasBox && zone && boxCount < zone.minBoxes) {
+    if (isPickup && !user) {
+      setError('Para retirar, entre na sua conta acima. É na sua conta que mostramos o endereço e a data de retirada.');
+      return;
+    }
+
+    if (hasBox && !isPickup && zone && boxCount < zone.minBoxes) {
       setError(`O pedido mínimo para esta região é de ${zone.minBoxes} caixas.`);
       return;
     }
@@ -135,8 +145,9 @@ export default function CheckoutPage() {
     await saveProfile({
       full_name: formData.name,
       phone: formData.whatsapp,
-      address: formData.address,
-      ...(hasBox ? { delivery_zone: zoneId, ...dietary } : {}),
+      // A pickup has no delivery address, so don't overwrite the one on their account.
+      ...(isPickup ? {} : { address: formData.address }),
+      ...(hasBox ? { ...(isPickup ? {} : { delivery_zone: zoneId }), ...dietary } : {}),
     } as never);
 
     // Save to Supabase 'orders'. Extra columns come from migration 12; if it
@@ -145,17 +156,22 @@ export default function CheckoutPage() {
       customer_name: formData.name,
       customer_email: formData.email,
       customer_whatsapp: formData.whatsapp.replace(/\D/g, ''),
-      delivery_address: formData.address,
+      delivery_address: isPickup ? 'RETIRADA no home bakery' : formData.address,
       requested_date: formData.date || null,
       total_price: total,
       pix_transaction_id: transactionId,
       status: 'PENDING',
     };
+    // A partner's code, so their portal can count the sale.
+    const extras = affiliateCode.trim() ? { affiliate_code: affiliateCode.trim().toUpperCase() } : {};
     let saved = true;
     const full = await supabase.from('orders').insert([{
       ...base,
+      ...extras,
       order_kind: hasBox ? 'box' : 'events',
-      delivery_zone: hasBox ? zoneId : null,
+      fulfillment: isPickup ? 'pickup' : 'delivery',
+      user_id: user?.id ?? null,
+      delivery_zone: hasBox && !isPickup ? zoneId : null,
       delivery_fee: deliveryFee,
       dietary_notes: restrictions.length ? restrictions.join(', ') : null,
       items_summary: itemsSummary,
@@ -182,7 +198,7 @@ export default function CheckoutPage() {
       const { error: crmError } = await supabase.rpc('upsert_crm_customer', {
         p_full_name: formData.name,
         p_whatsapp_number: formData.whatsapp,
-        p_location: `${formData.address} - ${zone?.label ?? ''}`,
+        p_location: isPickup ? 'Retirada no home bakery' : `${formData.address} - ${zone?.label ?? ''}`,
         p_email: user?.email ?? (formData.email || null),
         p_is_vegan: dietary.is_vegan,
         p_is_gluten_free: dietary.is_gluten_free,
@@ -204,8 +220,8 @@ export default function CheckoutPage() {
     }
 
     setPlaced({
-      items: [...items], subtotal: totalPrice, fee: deliveryFee, total, isBox: hasBox,
-      date: formData.date, zoneLabel: zone?.label ?? '', saved,
+      items: [...items], subtotal: totalPrice, fee: deliveryFee, total, isBox: hasBox, isPickup,
+      date: formData.date, zoneLabel: isPickup ? 'Retirada' : (zone?.label ?? ''), saved,
     });
     setPixPayload(payload);
     setPixQR(base64);
@@ -241,13 +257,14 @@ export default function CheckoutPage() {
   const shownFee = step === 2 && placed ? placed.fee : deliveryFee;
   const shownTotal = step === 2 && placed ? placed.total : total;
   const shownIsBox = step === 2 && placed ? placed.isBox : hasBox;
+  const shownIsPickup = step === 2 && placed ? placed.isPickup : isPickup;
 
   const waProof = placed
     ? `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(
         `Olá Tropical Bakery! Acabei de fazer um pedido pelo site 🌴\n\n` +
         placed.items.map(i => `*${i.quantity}x* ${i.name}`).join('\n') +
         `\n\n*Total:* ${formatBRL(placed.total)}` +
-        (placed.date ? `\n*Entrega:* ${new Date(placed.date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}` : '') +
+        (placed.date ? `\n*${placed.isPickup ? 'Retirada' : 'Entrega'}:* ${new Date(placed.date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}` : '') +
         `\n\nVou enviar o comprovante do Pix por aqui.`
       )}`
     : '';
@@ -300,9 +317,9 @@ export default function CheckoutPage() {
                   <span>{formatBRL(shownSubtotal)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#555' }}>
-                  <span>Entrega</span>
+                  <span>{shownIsPickup ? 'Retirada' : 'Entrega'}</span>
                   <span style={{ color: 'var(--color-secondary)', fontWeight: 'bold' }}>
-                    {shownIsBox ? (shownFee === 0 ? 'Grátis' : formatBRL(shownFee)) : 'A combinar'}
+                    {shownIsPickup ? 'Retirada (grátis)' : shownIsBox ? (shownFee === 0 ? 'Grátis' : formatBRL(shownFee)) : 'A combinar'}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(212,175,55,0.3)' }}>
@@ -317,7 +334,7 @@ export default function CheckoutPage() {
           <div style={{ flex: '2 1 500px' }}>
             {step === 1 ? (
               <form onSubmit={handleCheckout} className="liquid-glass-card" style={{ padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem)' }}>
-                <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '2rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>Informações de Entrega</h2>
+                <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '2rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>{isPickup ? 'Informações de Retirada' : 'Informações de Entrega'}</h2>
 
                 <div style={{ marginBottom: '1.5rem' }}>
                   <LoginPanel />
@@ -342,6 +359,38 @@ export default function CheckoutPage() {
 
                   {hasBox && (
                     <div>
+                      <label style={labelStyle}>Como você quer receber?</label>
+                      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        {([
+                          ['delivery', '🛵', 'Receber em casa', 'Entregamos no seu endereço'],
+                          ['pickup', '🛍️', 'Retirar no home bakery', 'Grátis · endereço liberado na sua conta'],
+                        ] as const).map(([value, emoji, title, hint]) => {
+                          const on = fulfillment === value;
+                          return (
+                            <button
+                              key={value}
+                              type="button"
+                              aria-pressed={on}
+                              onClick={() => { setFulfillment(value); setError(''); }}
+                              style={{ flex: '1 1 220px', textAlign: 'left', padding: '0.9rem 1rem', borderRadius: '12px', cursor: 'pointer', border: `2px solid ${on ? '#d4af37' : '#e8e1d7'}`, background: on ? 'rgba(212,175,55,0.14)' : 'rgba(255,255,255,0.7)', color: '#3c2a21' }}
+                            >
+                              <span style={{ fontSize: '1.4rem' }} aria-hidden>{emoji}</span>{' '}
+                              <strong>{title}</strong>
+                              <span style={{ display: 'block', fontSize: '0.8rem', color: '#7a6a61', marginTop: '0.2rem' }}>{hint}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {isPickup && (
+                        <p style={{ fontSize: '0.82rem', color: '#7a6a61', marginTop: '0.6rem', lineHeight: 1.6 }}>
+                          Por segurança, o endereço não fica público: depois que confirmarmos o seu Pix, ele aparece em <strong>Minha Conta</strong>, junto com o dia da retirada. Por isso a retirada pede que você esteja com a conta ativa (acima).
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {hasBox && !isPickup && (
+                    <div>
                       <label style={labelStyle}>Região de Entrega</label>
                       <select value={zoneId} onChange={e => setZoneId(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
                         {DELIVERY_ZONES.map(z => (
@@ -351,10 +400,12 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  <div>
-                    <label style={labelStyle}>Endereço Completo</label>
-                    <input required type="text" placeholder="Rua, Número, Bairro, Pousada / referência" value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} style={inputStyle} />
-                  </div>
+                  {!isPickup && (
+                    <div>
+                      <label style={labelStyle}>Endereço Completo</label>
+                      <input required type="text" placeholder="Rua, Número, Bairro, Pousada / referência" value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} style={inputStyle} />
+                    </div>
+                  )}
 
                   {hasBox && (
                     <div>
@@ -382,9 +433,19 @@ export default function CheckoutPage() {
                   )}
 
                   <div>
+                    <label style={labelStyle}>Código de indicação <span style={{ textTransform: 'none', fontWeight: 400, color: '#a89a90' }}>(opcional)</span></label>
+                    <input
+                      type="text" value={affiliateCode}
+                      onChange={e => setAffiliateCode(e.target.value.toUpperCase().replace(/\s/g, ''))}
+                      placeholder="Quem te indicou? Digite o código"
+                      style={{ ...inputStyle, letterSpacing: '0.05em' }}
+                    />
+                  </div>
+
+                  <div>
                     {hasBox ? (
                       <>
-                        <label style={labelStyle}>Quando você quer receber sua caixa?</label>
+                        <label style={labelStyle}>{isPickup ? 'Quando você quer retirar sua caixa?' : 'Quando você quer receber sua caixa?'}</label>
                         <DeliveryCalendar value={formData.date} onChange={setDate} />
                       </>
                     ) : (
@@ -428,12 +489,18 @@ export default function CheckoutPage() {
                   <div style={{ margin: '0 auto 2rem', maxWidth: '440px', padding: '1rem 1.25rem', borderRadius: '16px', background: 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)', color: '#fdfaf3', textAlign: 'left', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <span style={{ fontSize: '2rem' }} aria-hidden>🎉</span>
                     <div>
-                      <p style={{ fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700 }}>Sua caixa chega</p>
+                      <p style={{ fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700 }}>{placed.isPickup ? 'Sua caixa fica pronta para retirada' : 'Sua caixa chega'}</p>
                       <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem' }}>
                         {new Date(placed.date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
                       </p>
                     </div>
                   </div>
+                )}
+
+                {placed?.isPickup && (
+                  <p style={{ margin: '-0.75rem auto 2rem', maxWidth: '440px', fontSize: '0.9rem', lineHeight: 1.7, color: '#594a42' }}>
+                    🔒 O endereço para retirada aparece em <Link href="/minha-conta" style={{ color: '#a6832b', fontWeight: 700, textDecoration: 'underline' }}>Minha Conta</Link> assim que confirmarmos o seu Pix.
+                  </p>
                 )}
 
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>

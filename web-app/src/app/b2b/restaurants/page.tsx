@@ -4,6 +4,7 @@ import B2BPageLayout from '@/components/B2BPageLayout';
 export default function RestaurantsPage() {
   return (
     <B2BPageLayout
+      partnerKind="restaurante"
       eyebrow="Parcerias para Restaurantes"
       title="Sobremesas com a Cara do Seu Restaurante"
       intro="Atenda o público que busca opções sem glúten, veganas, sem óleo, sem açúcar refinado ou sal — sem sobrecarregar sua cozinha. A Dolly cria a sobremesa, você recebe pronta, sua equipe só finaliza o prato."

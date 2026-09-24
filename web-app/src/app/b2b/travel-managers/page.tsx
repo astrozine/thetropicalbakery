@@ -1,5 +1,6 @@
 import React from 'react';
 import SplitHero from '@/components/SplitHero';
+import PartnerApply from '@/components/PartnerApply';
 import Link from 'next/link';
 import ZoomableImage from '@/components/ZoomableImage';
 import StripedBackground from '@/components/StripedBackground';
@@ -121,6 +122,8 @@ export default function TravelManagersPage() {
           ))}
         </div>
       </StripedBackground>
+      <PartnerApply defaultKind="outro" whatsappHref="https://wa.me/5511932119196?text=Ol%C3%A1%21%20Tenho%20interesse%20em%20organizar%20um%20grupo%20para%20os%20Retiros%20da%20Tropical%20Bakery." />
+
     </main>
   );
 }

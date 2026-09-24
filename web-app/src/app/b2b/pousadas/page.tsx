@@ -4,6 +4,7 @@ import B2BPageLayout from '@/components/B2BPageLayout';
 export default function PousadasPage() {
   return (
     <B2BPageLayout
+      partnerKind="pousada"
       eyebrow="Parcerias para Pousadas"
       title="O Toque Doce que Vira Avaliação 5 Estrelas"
       intro="Sua pousada já oferece hospitalidade de verdade — deixe a gente cuidar da parte doce. Café da manhã inesquecível, ou uma mini loja que se paga sozinha."

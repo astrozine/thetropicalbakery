@@ -44,3 +44,18 @@ that only add columns or policies to existing tables need nothing extra.
   e-mail, with the right tags (checkout, waitlist, subscription, course sign-up, job application all
   do this). It merges tags and never resurrects an unsubscribe.
 - Schema: `migration_15_email_preferences.sql`.
+
+# Private areas: partner portal and team area
+
+- **Partners** (`/parceiro`) and **workers** (`/equipe`) are gated exactly like `/admin`: a row in
+  `partners` / `workers` whose `email` matches the logged-in address. Every policy is "your own row,
+  or admin" — never widen that.
+- A partner applies from any B2B page (`PartnerApply` → `partner_apply` RPC), lands as `pendente`,
+  and Dolly approves in `/admin/parceiros`. Restock requests from the portal appear there too.
+- Affiliates: `partners.affiliate_code` is typed by customers at checkout and stored on
+  `orders.affiliate_code`; `affiliate_summary()` (SECURITY DEFINER) gives that affiliate their own
+  totals without exposing the orders table. The site never moves money — payouts are arranged manually.
+- Workers: `work_shifts` rows drive the schedule, the hours and the pay shown in `/equipe`. Pay is the
+  agreed gross (hourly × hours, or a fixed monthly wage) — CLT charges are not modelled there; the
+  estimator on `/trabalhe-conosco` is the separate tool for that.
+- `my_portals()` tells the account menu which private links to show. Schema: `migration_16_portals.sql`.

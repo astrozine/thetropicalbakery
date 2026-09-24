@@ -23,7 +23,7 @@ export default function CapacitacaoProfissionalPage() {
           style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
             backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
-            backgroundImage: 'url(/assets/chef_training_1789884593538.jpg), linear-gradient(rgba(46, 68, 50, 0.8), rgba(46, 68, 50, 0.8))',
+            backgroundImage: 'url("/dolly-course2.jpg"), linear-gradient(rgba(46, 68, 50, 0.8), rgba(46, 68, 50, 0.8))',
             backgroundBlendMode: 'overlay',
             backgroundColor: 'var(--color-accent)'
           }}
@@ -49,7 +49,7 @@ export default function CapacitacaoProfissionalPage() {
               style={{
                 width: '100%',
                 aspectRatio: '4/5',
-                backgroundImage: 'url(/assets/chef_training_1789884593538.jpg)',
+                backgroundImage: 'url("/dolly-course2.jpg")',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 borderRadius: '12px',
