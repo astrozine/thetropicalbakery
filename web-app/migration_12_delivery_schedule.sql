@@ -69,6 +69,12 @@ ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS delivery_fee    numeric;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS dietary_notes   text;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS items_summary   text;
 
+-- Data API access for the two new tables (Supabase no longer grants it automatically
+-- from 2026-10-30; RLS above still decides who can do what).
+GRANT SELECT ON public.delivery_schedule_rules TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.delivery_schedule_rules TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.delivery_notifications TO authenticated, service_role;
+
 COMMIT;
 
 SELECT 'rules' AS what, count(*)::text AS n FROM public.delivery_schedule_rules
