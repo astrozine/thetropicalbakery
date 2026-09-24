@@ -29,6 +29,13 @@ export interface UserProfile {
   is_salt_free: boolean;
   is_oil_free: boolean;
 
+  // The detailed picture (migration 19). The five booleans above are kept in
+  // step with these, so older screens keep working. Ids: src/lib/dietary.ts.
+  diet_tags: string[] | null;
+  /** Allergen ids the person must avoid — the same ids each treat declares. */
+  allergens_avoid: string[] | null;
+  diet_notes: string | null;
+
   /** Never guessed at, never substituted — this one has to be exactly right. */
   allergies: string | null;
   birth_date: string | null;
@@ -239,7 +246,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       payload.phone = `+${user.phone.replace(/\D/g, '')}`;
     }
 
-    const { error } = await supabase.from('user_profiles').upsert(payload);
+    let { error } = await supabase.from('user_profiles').upsert(payload);
+
+    // Migration 19 not run yet: save everything else rather than nothing.
+    if (error && /diet_tags|allergens_avoid|diet_notes/.test(error.message)) {
+      delete payload.diet_tags;
+      delete payload.allergens_avoid;
+      delete payload.diet_notes;
+      ({ error } = await supabase.from('user_profiles').upsert(payload));
+    }
 
     if (error) {
       console.error('Could not save profile:', error);

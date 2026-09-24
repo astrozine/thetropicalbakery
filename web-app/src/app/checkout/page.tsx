@@ -9,7 +9,8 @@ import DeliveryCalendar from '@/components/DeliveryCalendar';
 import { generatePixData } from '@/utils/pix';
 import { supabase } from '@/lib/supabase';
 import { DELIVERY_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
-import { DIETARY_FIELDS, DietaryKey } from '@/lib/subscriptions';
+import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
+import { dietSummary, legacyFlags, tagsFromLegacy } from '@/lib/dietary';
 import { fetchSchedule, selectableDates, toISODate } from '@/lib/deliverySchedule';
 
 const STORE_WHATSAPP = '5511932119196';
@@ -60,9 +61,7 @@ export default function CheckoutPage() {
   const [affiliateCode, setAffiliateCode] = useState('');
   const [zoneId, setZoneId] = useState('zone1');
   const [fulfillment, setFulfillment] = useState<'delivery' | 'pickup'>('delivery');
-  const [dietary, setDietary] = useState<Record<DietaryKey, boolean>>({
-    is_vegan: false, is_gluten_free: false, is_sugar_free: false, is_salt_free: false, is_oil_free: false,
-  });
+  const [diet, setDiet] = useState<DietaryValue>({ tags: [], allergens: [], notes: '' });
 
   const boxItems = items.filter(i => i.kind === 'box');
   const hasBox = boxItems.length > 0;
@@ -99,9 +98,11 @@ export default function CheckoutPage() {
     }));
     if (profile) {
       if (profile.delivery_zone) setZoneId(profile.delivery_zone);
-      setDietary({
-        is_vegan: profile.is_vegan, is_gluten_free: profile.is_gluten_free, is_sugar_free: profile.is_sugar_free,
-        is_salt_free: profile.is_salt_free, is_oil_free: profile.is_oil_free,
+      // An account from before migration 19 only has the five booleans.
+      setDiet({
+        tags: profile.diet_tags?.length ? profile.diet_tags : tagsFromLegacy(profile),
+        allergens: profile.allergens_avoid || [],
+        notes: profile.diet_notes || '',
       });
     }
   }, [profile, user]);
@@ -153,7 +154,9 @@ export default function CheckoutPage() {
     const method: PayMethod = (payMethod === 'card' && available.card) || (payMethod === 'paypal' && available.paypal) ? payMethod : 'pix';
     const { payload, base64 } = method === 'pix' ? await generatePixData({ value: total, transactionId }) : { payload: '', base64: '' };
 
-    const restrictions = DIETARY_FIELDS.filter(d => dietary[d.key]).map(d => d.label);
+    // One readable line for the kitchen, plus the structured version for matching.
+    const dietaryNotes = dietSummary(diet.tags, diet.allergens, diet.notes);
+    const flags = legacyFlags(diet.tags);
     const itemsSummary = items.map(i => `${i.quantity}x ${i.name}`).join(', ');
 
     // Remember these details so the next order is one click lighter.
@@ -162,7 +165,11 @@ export default function CheckoutPage() {
       phone: formData.whatsapp,
       // A pickup has no delivery address, so don't overwrite the one on their account.
       ...(isPickup ? {} : { address: formData.address }),
-      ...(hasBox ? { ...(isPickup ? {} : { delivery_zone: zoneId }), ...dietary } : {}),
+      ...(hasBox && !isPickup ? { delivery_zone: zoneId } : {}),
+      ...flags,
+      diet_tags: diet.tags,
+      allergens_avoid: diet.allergens,
+      diet_notes: diet.notes.trim() || null,
     } as never);
 
     // Save to Supabase 'orders'. Extra columns come from migration 12; if it
@@ -181,7 +188,7 @@ export default function CheckoutPage() {
     // A partner's code, so their portal can count the sale.
     const extras = affiliateCode.trim() ? { affiliate_code: affiliateCode.trim().toUpperCase() } : {};
     let saved = true;
-    const full = await supabase.from('orders').insert([{
+    const rich = {
       ...base,
       ...extras,
       payment_provider: paymentProvider,
@@ -190,14 +197,19 @@ export default function CheckoutPage() {
       user_id: user?.id ?? null,
       delivery_zone: hasBox && !isPickup ? zoneId : null,
       delivery_fee: deliveryFee,
-      dietary_notes: restrictions.length ? restrictions.join(', ') : null,
+      dietary_notes: dietaryNotes || null,
       items_summary: itemsSummary,
-    }]);
+    };
+    const full = await supabase.from('orders').insert([{ ...rich, diet_tags: diet.tags, allergens_avoid: diet.allergens }]);
     if (full.error) {
-      const plain = await supabase.from('orders').insert([base]);
-      if (plain.error) {
-        console.error('Error saving order:', plain.error);
-        saved = false;
+      // Migration 19 missing: the readable line still carries everything.
+      const mid = await supabase.from('orders').insert([rich]);
+      if (mid.error) {
+        const plain = await supabase.from('orders').insert([base]);
+        if (plain.error) {
+          console.error('Error saving order:', plain.error);
+          saved = false;
+        }
       }
     }
 
@@ -218,19 +230,32 @@ export default function CheckoutPage() {
         }
       }
 
-      // Feed the CRM through the controlled function (the customer list itself stays private).
-      const { error: crmError } = await supabase.rpc('upsert_crm_customer', {
-        p_full_name: formData.name,
-        p_whatsapp_number: formData.whatsapp,
-        p_location: isPickup ? 'Retirada no home bakery' : `${formData.address} - ${zone?.label ?? ''}`,
-        p_email: user?.email ?? (formData.email || null),
-        p_is_vegan: dietary.is_vegan,
-        p_is_gluten_free: dietary.is_gluten_free,
-        p_is_sugar_free: dietary.is_sugar_free,
-        p_is_salt_free: dietary.is_salt_free,
-        p_is_oil_free: dietary.is_oil_free,
-      });
-      if (crmError) console.error('CRM save error:', crmError);
+    }
+
+    // Feed the CRM through the controlled function (the customer list itself stays
+    // private). Everyone who orders lands here, box or event, with their diet — that
+    // is what lets Dolly write to "quem evita castanha" instead of to everybody.
+    const crmArgs = {
+      p_full_name: formData.name,
+      p_whatsapp_number: formData.whatsapp,
+      p_location: isPickup ? 'Retirada no home bakery' : `${formData.address}${hasBox && zone ? ` - ${zone.label}` : ''}`,
+      p_email: user?.email ?? (formData.email || null),
+      p_is_vegan: flags.is_vegan,
+      p_is_gluten_free: flags.is_gluten_free,
+      p_is_sugar_free: flags.is_sugar_free,
+      p_is_salt_free: flags.is_salt_free,
+      p_is_oil_free: flags.is_oil_free,
+    };
+    const { error: crmError } = await supabase.rpc('upsert_crm_customer', {
+      ...crmArgs,
+      p_diet_tags: diet.tags,
+      p_allergens: diet.allergens,
+      p_diet_notes: diet.notes.trim() || null,
+    });
+    // Migration 19 not run yet: still record the customer with the old fields.
+    if (crmError) {
+      const { error: retry } = await supabase.rpc('upsert_crm_customer', crmArgs);
+      if (retry) console.error('CRM save error:', retry);
     }
 
     // Keep them on the right e-mail list: box buyers hear about boxes, event orders about events.
@@ -240,6 +265,13 @@ export default function CheckoutPage() {
         p_full_name: formData.name,
         p_tags: hasBox ? ['cliente'] : ['eventos'],
         p_source: 'checkout',
+      });
+      // And what they can eat, so campaigns can be aimed properly.
+      await supabase.rpc('email_contact_set_diet', {
+        p_email: formData.email,
+        p_diet_tags: diet.tags,
+        p_allergens: diet.allergens,
+        p_notes: diet.notes.trim() || null,
       });
     }
 
@@ -452,30 +484,14 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {hasBox && (
-                    <div>
-                      <label style={labelStyle}>Restrições Alimentares</label>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-                        {DIETARY_FIELDS.map(({ key, label }) => {
-                          const on = dietary[key];
-                          return (
-                            <button
-                              key={key}
-                              type="button"
-                              onClick={() => setDietary({ ...dietary, [key]: !on })}
-                              style={{
-                                padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid',
-                                borderColor: on ? '#d4af37' : '#e8e1d7', background: on ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.7)',
-                                color: on ? '#3c2a21' : '#7a6a61', fontWeight: on ? 700 : 500, fontSize: '0.85rem', cursor: 'pointer',
-                              }}
-                            >
-                              {on ? '✓ ' : ''}{label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+                  <div>
+                    <label style={labelStyle}>Restrições Alimentares</label>
+                    <p style={{ fontSize: '0.85rem', color: '#7a6a61', lineHeight: 1.65, margin: '-0.25rem 0 0.85rem' }}>
+                      Quanto mais você contar, melhor a gente cuida de você: conferimos cada doce contra a sua lista
+                      e só te avisamos das novidades que combinam com o seu jeito de comer.
+                    </p>
+                    <DietaryPicker value={diet} onChange={setDiet} />
+                  </div>
 
                   <div>
                     <label style={labelStyle}>Código de indicação <span style={{ textTransform: 'none', fontWeight: 400, color: '#a89a90' }}>(opcional)</span></label>

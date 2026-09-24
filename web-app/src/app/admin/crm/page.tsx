@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
+import { DIET_TAGS, allergensFrom, dietTagsFrom, tagsFromLegacy } from '@/lib/dietary';
+import { ALLERGENS } from '@/lib/allergens';
 
 interface CrmRow {
   id: string;
@@ -15,6 +17,9 @@ interface CrmRow {
   is_sugar_free: boolean;
   is_salt_free: boolean;
   is_oil_free: boolean;
+  diet_tags?: string[] | null;
+  allergens_avoid?: string[] | null;
+  diet_notes?: string | null;
   created_at: string;
 }
 
@@ -30,6 +35,9 @@ interface ProfileRow {
   is_sugar_free: boolean;
   is_salt_free: boolean;
   is_oil_free: boolean;
+  diet_tags?: string[] | null;
+  allergens_avoid?: string[] | null;
+  diet_notes?: string | null;
   created_at: string;
 }
 
@@ -44,7 +52,13 @@ interface Customer {
   hasAccount: boolean;
   ordered: boolean;
   createdAt: string;
+  /** Readable labels for the card. */
   dietary: string[];
+  /** Ids, for the filters. */
+  dietIds: string[];
+  allergenIds: string[];
+  allergies: string[];
+  dietNotes: string | null;
   itamambuca: boolean;
 }
 
@@ -65,17 +79,24 @@ const phoneKey = (v: string | null | undefined) => {
   return d.length >= 8 ? d.slice(-8) : '';
 };
 
-const dietaryTags = (r: {
+/**
+ * What this person eats. Prefers the detailed list (migration 19) and falls
+ * back to the five old booleans for anyone recorded before that.
+ */
+const dietOf = (r: {
   is_vegan: boolean; is_gluten_free: boolean; is_sugar_free: boolean;
   is_salt_free: boolean; is_oil_free: boolean;
+  diet_tags?: string[] | null; allergens_avoid?: string[] | null; diet_notes?: string | null;
 }) => {
-  const tags: string[] = [];
-  if (r.is_vegan) tags.push('Vegano');
-  if (r.is_gluten_free) tags.push('Sem Glúten');
-  if (r.is_sugar_free) tags.push('Sem Açúcar');
-  if (r.is_salt_free) tags.push('Sem Sal');
-  if (r.is_oil_free) tags.push('Sem Óleo');
-  return tags;
+  const ids = r.diet_tags?.length ? r.diet_tags : tagsFromLegacy(r);
+  const allergenIds = r.allergens_avoid || [];
+  return {
+    dietIds: ids,
+    allergenIds,
+    dietary: dietTagsFrom(ids).map(t => `${t.emoji} ${t.label}`),
+    allergies: allergensFrom(allergenIds).map(a => `${a.emoji} ${a.label}`),
+    dietNotes: r.diet_notes || null,
+  };
 };
 
 const formatPhone = (v: string | null) => {
@@ -91,6 +112,8 @@ export default function CRMAdmin() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [onlyItamambuca, setOnlyItamambuca] = useState(false);
+  const [dietFilter, setDietFilter] = useState('');
+  const [allergenFilter, setAllergenFilter] = useState('');
 
   useEffect(() => {
     load();
@@ -145,7 +168,7 @@ export default function CRMAdmin() {
         ordered: true,
         createdAt: c.created_at,
         // The CRM row is written at order time, so it's the fresher record.
-        dietary: dietaryTags(c),
+        ...dietOf(c),
         itamambuca: isItamambucaAddress(address),
       };
     });
@@ -163,7 +186,7 @@ export default function CRMAdmin() {
         hasAccount: true,
         ordered: false,
         createdAt: p.created_at,
-        dietary: dietaryTags(p),
+        ...dietOf(p),
         itamambuca: isItamambucaAddress(p.address),
       });
     }
@@ -177,13 +200,25 @@ export default function CRMAdmin() {
     const q = search.trim().toLowerCase();
     let list = customers;
     if (onlyItamambuca) list = list.filter(c => c.itamambuca);
+    if (dietFilter) list = list.filter(c => c.dietIds.includes(dietFilter));
+    if (allergenFilter) list = list.filter(c => c.allergenIds.includes(allergenFilter));
     if (!q) return list;
     return list.filter(c =>
-      [c.name, c.email, c.address, c.whatsapp, ...c.dietary]
+      [c.name, c.email, c.address, c.whatsapp, c.dietNotes, ...c.dietary, ...c.allergies]
         .filter(Boolean)
         .some(v => String(v).toLowerCase().includes(q)),
     );
-  }, [customers, search, onlyItamambuca]);
+  }, [customers, search, onlyItamambuca, dietFilter, allergenFilter]);
+
+  // Only offer a filter for something at least one person actually marked.
+  const dietOptions = useMemo(
+    () => DIET_TAGS.map(t => ({ ...t, n: customers.filter(c => c.dietIds.includes(t.id)).length })).filter(o => o.n > 0),
+    [customers],
+  );
+  const allergenOptions = useMemo(
+    () => ALLERGENS.map(a => ({ ...a, n: customers.filter(c => c.allergenIds.includes(a.id)).length })).filter(o => o.n > 0),
+    [customers],
+  );
 
   const stats = useMemo(() => ({
     total: customers.length,
@@ -251,6 +286,22 @@ export default function CRMAdmin() {
         >
           📍 Só Itamambuca{onlyItamambuca ? ' ✓' : ''}
         </button>
+        <select
+          value={dietFilter}
+          onChange={e => setDietFilter(e.target.value)}
+          style={{ padding: '0.9rem 1rem', borderRadius: '8px', border: dietFilter ? '1px solid #d4af37' : '1px solid #dfe4ea', background: dietFilter ? '#fdf7ee' : 'white', fontSize: '0.9rem', fontWeight: 700, color: dietFilter ? '#8a6d1f' : '#7f8c8d', cursor: 'pointer' }}
+        >
+          <option value="">🍽️ Todo jeito de comer</option>
+          {dietOptions.map(o => <option key={o.id} value={o.id}>{o.emoji} {o.label} ({o.n})</option>)}
+        </select>
+        <select
+          value={allergenFilter}
+          onChange={e => setAllergenFilter(e.target.value)}
+          style={{ padding: '0.9rem 1rem', borderRadius: '8px', border: allergenFilter ? '1px solid #c0392b' : '1px solid #dfe4ea', background: allergenFilter ? '#fdecea' : 'white', fontSize: '0.9rem', fontWeight: 700, color: allergenFilter ? '#a03027' : '#7f8c8d', cursor: 'pointer' }}
+        >
+          <option value="">🚫 Qualquer alergia</option>
+          {allergenOptions.map(o => <option key={o.id} value={o.id}>Evita {o.label} ({o.n})</option>)}
+        </select>
       </div>
 
       {filtered.length === 0 ? (
@@ -305,13 +356,28 @@ export default function CRMAdmin() {
                   <h4 style={{ fontSize: '0.8rem', color: '#95a5a6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Restrições Alimentares</h4>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     {c.dietary.length > 0 ? c.dietary.map(tag => (
-                      <span key={tag} style={{ background: '#fdf7ee', color: '#d4af37', border: '1px solid #e8e1d7', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                      <span key={tag} style={{ background: '#fdf7ee', color: '#8a6d1f', border: '1px solid #e8e1d7', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
                         {tag}
                       </span>
                     )) : (
                       <span style={{ color: '#bdc3c7', fontSize: '0.9rem' }}>Nenhuma registrada.</span>
                     )}
                   </div>
+                  {c.allergies.length > 0 && (
+                    <>
+                      <h4 style={{ fontSize: '0.8rem', color: '#c0392b', textTransform: 'uppercase', letterSpacing: '1px', margin: '0.85rem 0 0.5rem' }}>⚠️ Evita</h4>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {c.allergies.map(a => (
+                          <span key={a} style={{ background: '#fdecea', color: '#a03027', border: '1px solid #f5c6cb', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                            {a}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  {c.dietNotes && (
+                    <p style={{ fontSize: '0.83rem', color: '#7f8c8d', lineHeight: 1.6, marginTop: '0.6rem', fontStyle: 'italic' }}>“{c.dietNotes}”</p>
+                  )}
                 </div>
 
                 {digitsOnly(c.whatsapp) && (

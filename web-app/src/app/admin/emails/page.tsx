@@ -5,6 +5,8 @@ import { supabase } from '@/lib/supabase';
 import { CAMPAIGNS, CampaignValues, campaignById } from '@/lib/email/campaigns';
 import { SITE_URL, renderEmail } from '@/lib/email/layout';
 import { EMAIL_TOPICS, MARKETING_TOPICS, TAG_LABELS, ContactTag, canReceive, topicById } from '@/lib/emailTopics';
+import DietTargeting, { DietTargetingValue, EMPTY_TARGETING } from './DietTargeting';
+import { matchDiet } from '@/lib/dietary';
 
 interface SendRow {
   message_key: string;
@@ -20,6 +22,8 @@ interface ContactRow {
   tags: string[] | null;
   opted_out: string[] | null;
   unsubscribed_all: boolean;
+  diet_tags?: string[] | null;
+  allergens_avoid?: string[] | null;
 }
 
 const card: React.CSSProperties = { background: 'white', borderRadius: '12px', padding: 'clamp(1.25rem, 3vw, 1.75rem)', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' };
@@ -40,6 +44,7 @@ export default function AdminEmailsPage() {
   const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
   const [testEmail, setTestEmail] = useState('');
   const [showPreview, setShowPreview] = useState(true);
+  const [diet, setDiet] = useState<DietTargetingValue>(EMPTY_TARGETING);
 
   const campaign = campaignById(campaignId)!;
   const topic = topicById(campaign.topic)!;
@@ -51,30 +56,56 @@ export default function AdminEmailsPage() {
     setValues({});
     setDry(null);
     setResult(null);
+    setDiet(EMPTY_TARGETING);
   }, [campaignId]);
 
   const load = async () => {
     const [c, s, me] = await Promise.all([
-      supabase.from('email_contacts').select('email, tags, opted_out, unsubscribed_all'),
+      supabase.from('email_contacts').select('email, tags, opted_out, unsubscribed_all, diet_tags, allergens_avoid'),
       supabase.from('email_sends').select('message_key, topic, subject, template, sent_at, email').order('sent_at', { ascending: false }).limit(400),
       supabase.auth.getUser(),
     ]);
-    if (c.error) {
+    let rows = (c.data as ContactRow[]) || null;
+    let failure = c.error?.message || '';
+    let notice = '';
+
+    // Migration 19 not run yet: the e-mails still work, just without diet targeting.
+    if (failure && /diet_tags|allergens_avoid/.test(failure)) {
+      const plain = await supabase.from('email_contacts').select('email, tags, opted_out, unsubscribed_all');
+      rows = (plain.data as ContactRow[]) || null;
+      failure = plain.error?.message || '';
+      if (!failure) notice = 'Rode a migration_19_dietary_profiles.sql no Supabase para poder falar com cada restrição alimentar.';
+    }
+
+    if (failure) {
       setSetupError('Rode a migration_15_email_preferences.sql no Supabase para ativar os e-mails.');
     } else {
-      setSetupError('');
-      setContacts((c.data as ContactRow[]) || []);
+      setSetupError(notice);
+      setContacts(rows || []);
     }
     setSends((s.data as SendRow[]) || []);
     if (me.data.user?.email) setTestEmail(prev => prev || me.data.user!.email!);
   };
 
   // Local estimate, so the numbers move as soon as the campaign changes.
+  // Who the campaign itself allows (before any diet narrowing) — also what the
+  // diet panel counts against.
   const audience = useMemo(() => {
     let list = contacts.filter(c => canReceive(campaign.topic, c));
     if (campaign.tags?.length) list = list.filter(c => campaign.tags!.some(t => (c.tags || []).includes(t)));
     return list;
   }, [contacts, campaign]);
+
+  // What the diet panel narrows it down to. Mirrors the API so the numbers agree.
+  const targeted = useMemo(() => {
+    let list = audience;
+    if (diet.tags.length) list = list.filter(c => diet.tags.some(t => (c.diet_tags || []).includes(t)));
+    if (diet.avoiding.length) list = list.filter(c => diet.avoiding.some(a => (c.allergens_avoid || []).includes(a)));
+    if (diet.skipConflicts && diet.contains.length) {
+      list = list.filter(c => !matchDiet(c.allergens_avoid, diet.contains, diet.mayContain).conflicts.length);
+    }
+    return list;
+  }, [audience, diet]);
 
   const previewHtml = useMemo(() => {
     const content = campaign.build(values);
@@ -92,7 +123,7 @@ export default function AdminEmailsPage() {
     const res = await fetch('/api/email/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token ?? ''}` },
-      body: JSON.stringify({ campaignId, values, ...body }),
+      body: JSON.stringify({ campaignId, values, diet, ...body }),
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || 'Falha no envio');
@@ -224,7 +255,8 @@ export default function AdminEmailsPage() {
           <p style={{ fontSize: '0.85rem', color: '#7f8c8d', lineHeight: 1.6, background: '#f8f9fa', padding: '0.75rem 1rem', borderRadius: '8px' }}>
             Vai para: <strong>{topic.audience}</strong>
             {campaign.tags?.length ? ` (só quem está marcado como ${campaign.tags.map(t => TAG_LABELS[t]).join(' ou ')})` : ''} ·{' '}
-            <strong>{audience.length}</strong> pessoa(s) hoje.
+            <strong>{targeted.length}</strong> pessoa(s) hoje
+            {targeted.length !== audience.length && <> (de {audience.length}, filtrado por restrição)</>}.
           </p>
 
           {campaign.fields.map(f => (
@@ -245,6 +277,8 @@ export default function AdminEmailsPage() {
             <p style={{ ...lbl, marginBottom: '0.5rem' }}>Assunto que vai aparecer</p>
             <p style={{ color: '#2c3e50', fontWeight: 'bold' }}>{campaign.subject(values) || '—'}</p>
           </div>
+
+          <DietTargeting value={diet} onChange={setDiet} audience={audience} />
 
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
             <button type="button" onClick={check} disabled={!!busy} style={{ ...dark, background: '#7f8c8d' }}>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { MARKETING_TOPICS, TAG_LABELS, ContactTag } from '@/lib/emailTopics';
+import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
 
 interface Prefs {
   email: string;
@@ -12,6 +13,9 @@ interface Prefs {
   opted_out: string[] | null;
   unsubscribed_all: boolean;
   tags: string[] | null;
+  diet_tags?: string[] | null;
+  allergens_avoid?: string[] | null;
+  diet_notes?: string | null;
 }
 
 const card: React.CSSProperties = {
@@ -48,6 +52,9 @@ function EmailPreferences() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  const [diet, setDiet] = useState<DietaryValue>({ tags: [], allergens: [], notes: '' });
+  const [dietSaving, setDietSaving] = useState(false);
+  const [dietSaved, setDietSaved] = useState(false);
 
   useEffect(() => {
     if (!token) { setLoading(false); return; }
@@ -71,6 +78,11 @@ function EmailPreferences() {
       } else {
         setPrefs(row);
       }
+      setDiet({
+        tags: row.diet_tags || [],
+        allergens: row.allergens_avoid || [],
+        notes: row.diet_notes || '',
+      });
       setLoading(false);
     };
     load();
@@ -101,6 +113,27 @@ function EmailPreferences() {
     if (wantIt) out.delete(topicId); else out.add(topicId);
     // Switching something back on means they're not fully unsubscribed any more.
     save({ ...prefs, opted_out: Array.from(out), unsubscribed_all: wantIt ? false : prefs.unsubscribed_all });
+  };
+
+  /** What they can eat. Saved on its own button, so it never fights the switches above. */
+  const saveDiet = async () => {
+    setDietSaving(true);
+    setDietSaved(false);
+    setError('');
+    const { data, error: err } = await supabase.rpc('email_prefs_set_diet', {
+      p_token: token,
+      p_diet_tags: diet.tags,
+      p_allergens: diet.allergens,
+      p_notes: diet.notes.trim() || null,
+    });
+    setDietSaving(false);
+    if (err || !data) {
+      setError(err?.message && /function/.test(err.message)
+        ? 'Esta parte ainda está sendo preparada. Fale com a gente no WhatsApp que anotamos na hora.'
+        : 'Não conseguimos salvar. Tente de novo ou fale com a gente no WhatsApp.');
+      return;
+    }
+    setDietSaved(true);
   };
 
   const unsubscribeAll = () => prefs && save({ ...prefs, opted_out: [], unsubscribed_all: true });
@@ -209,6 +242,24 @@ function EmailPreferences() {
               {saving && <span style={{ color: '#7a6a61', fontSize: '0.9rem' }}>Salvando…</span>}
               {saved && !saving && <span style={{ color: '#0b6b3a', fontSize: '0.9rem', fontWeight: 700 }}>Salvo ✓</span>}
               {error && <span style={{ color: '#c0392b', fontSize: '0.9rem' }}>{error}</span>}
+            </div>
+
+            {/* ------------------------------------------------- what they eat */}
+            <div style={{ borderTop: '1px solid #eee7db', marginTop: '2rem', paddingTop: '1.75rem' }}>
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
+                🍽️ O que você pode comer
+              </h2>
+              <p style={{ color: '#594a42', fontSize: '0.92rem', lineHeight: 1.75, marginBottom: '1.25rem' }}>
+                Conte pra gente e a gente confere <strong>cada doce</strong> antes de te mandar qualquer novidade —
+                você só recebe o que combina com você, e avisamos direitinho quando algo leva o que você evita. 💛
+              </p>
+              <DietaryPicker value={diet} onChange={setDiet} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginTop: '1.1rem' }}>
+                <button type="button" onClick={saveDiet} disabled={dietSaving} className="btn btn-primary" style={{ padding: '0.8rem 1.6rem' }}>
+                  {dietSaving ? 'Salvando…' : 'Salvar minhas restrições'}
+                </button>
+                {dietSaved && !dietSaving && <span style={{ color: '#0b6b3a', fontSize: '0.9rem', fontWeight: 700 }}>Salvo ✓</span>}
+              </div>
             </div>
 
             <p style={{ color: '#a89a90', fontSize: '0.8rem', lineHeight: 1.7, marginTop: '1.75rem' }}>

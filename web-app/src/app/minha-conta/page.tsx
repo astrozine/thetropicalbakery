@@ -9,7 +9,9 @@ import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/
 import MySubscription from '@/components/MySubscription';
 import MyPickups from '@/components/MyPickups';
 import { SUBSCRIPTION_ZONES, formatBRL, isItamambuca } from '@/lib/deliveryZones';
-import { DIETARY_FIELDS, DietaryKey } from '@/lib/subscriptions';
+import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
+import { legacyFlags, tagsFromLegacy } from '@/lib/dietary';
+import { supabase } from '@/lib/supabase';
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
@@ -52,10 +54,7 @@ export default function MyAccountPage() {
     delivery_zone: SUBSCRIPTION_ZONES[0]?.id ?? 'zone1',
   });
   const [address, setAddress] = useState<AddressValue>(EMPTY_ADDRESS);
-  const [dietary, setDietary] = useState<Record<DietaryKey, boolean>>({
-    is_vegan: false, is_gluten_free: false, is_sugar_free: false,
-    is_salt_free: false, is_oil_free: false,
-  });
+  const [diet, setDiet] = useState<DietaryValue>({ tags: [], allergens: [], notes: '' });
   const [tastes, setTastes] = useState({
     allergies: '',
     favorite_flavors: '',
@@ -91,12 +90,11 @@ export default function MyAccountPage() {
         : {}),
     });
 
-    setDietary({
-      is_vegan: profile.is_vegan,
-      is_gluten_free: profile.is_gluten_free,
-      is_sugar_free: profile.is_sugar_free,
-      is_salt_free: profile.is_salt_free,
-      is_oil_free: profile.is_oil_free,
+    // An account from before migration 19 only has the five booleans.
+    setDiet({
+      tags: profile.diet_tags?.length ? profile.diet_tags : tagsFromLegacy(profile),
+      allergens: profile.allergens_avoid || [],
+      notes: profile.diet_notes || '',
     });
 
     setTastes({
@@ -120,11 +118,41 @@ export default function MyAccountPage() {
       ...address,
       // Keep the one-line version in step for the WhatsApp order messages.
       address: addressToOneLine(address),
-      ...dietary,
+      ...legacyFlags(diet.tags),
+      diet_tags: diet.tags,
+      allergens_avoid: diet.allergens,
+      diet_notes: diet.notes.trim() || null,
       allergies: tastes.allergies || null,
       favorite_flavors: tastes.favorite_flavors || null,
       avoid_ingredients: tastes.avoid_ingredients || null,
     });
+
+    // Keep the CRM list and the e-mail audience in step, so a change here also
+    // changes which announcements reach this person. Never fails the save.
+    const flags = legacyFlags(diet.tags);
+    if (basics.phone) {
+      await supabase.rpc('upsert_crm_customer', {
+        p_full_name: basics.full_name || null,
+        p_whatsapp_number: basics.phone,
+        p_email: user?.email ?? null,
+        p_is_vegan: flags.is_vegan,
+        p_is_gluten_free: flags.is_gluten_free,
+        p_is_sugar_free: flags.is_sugar_free,
+        p_is_salt_free: flags.is_salt_free,
+        p_is_oil_free: flags.is_oil_free,
+        p_diet_tags: diet.tags,
+        p_allergens: diet.allergens,
+        p_diet_notes: tastes.allergies || null,
+      }).then(({ error }) => { if (error) console.error('CRM sync:', error.message); });
+    }
+    if (user?.email) {
+      await supabase.rpc('email_contact_set_diet', {
+        p_email: user.email,
+        p_diet_tags: diet.tags,
+        p_allergens: diet.allergens,
+        p_notes: tastes.allergies || null,
+      }).then(({ error }) => { if (error) console.error('E-mail diet sync:', error.message); });
+    }
 
     setSaving(false);
     setSaved(true);
@@ -300,31 +328,10 @@ export default function MyAccountPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
                 <div>
                   <label style={labelStyle}>Restrições alimentares</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-                    {DIETARY_FIELDS.map(({ key, label }) => {
-                      const on = dietary[key];
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          onClick={() => setDietary({ ...dietary, [key]: !on })}
-                          style={{
-                            padding: '0.5rem 1rem',
-                            borderRadius: '20px',
-                            border: '1px solid',
-                            borderColor: on ? '#d4af37' : '#e8e1d7',
-                            background: on ? 'rgba(212,175,55,0.15)' : 'transparent',
-                            color: on ? '#3c2a21' : '#7a6a61',
-                            fontWeight: on ? 700 : 500,
-                            fontSize: '0.85rem',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {on ? '✓ ' : ''}{label}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <p style={{ fontSize: '0.8rem', color: '#7a6a61', lineHeight: 1.6, margin: '-0.25rem 0 0.85rem' }}>
+                    A gente confere isto contra cada doce antes de te mandar qualquer novidade.
+                  </p>
+                  <DietaryPicker value={diet} onChange={setDiet} compact={false} showNotes={false} />
                 </div>
 
                 <div>

@@ -82,3 +82,27 @@ that only add columns or policies to existing tables need nothing extra.
   `markOrderPaid` is idempotent and also moves `inbox_status` to `confirmed`.
 - Known limit: `total_price` is computed in the browser (same as Pix). Server-side price recomputation
   would need item ids in the order; not done.
+
+
+# Dietary profiles: one vocabulary, from the treat to the e-mail
+
+- Three layers, defined in `src/lib/dietary.ts` (`DIET_TAGS`) and `src/lib/allergens.ts` (`ALLERGENS`):
+  how someone eats ('jeito'), what they avoid for their health ('saude'), and what makes them ill.
+- **The allergy layer reuses the treat ids.** A customer's `allergens_avoid` holds the same ids each
+  treat declares in `contains` / `may_contain`, so `matchDiet()` compares them directly. Never invent a
+  second list of allergen names — add to `ALLERGENS` and both sides move together.
+- The five old booleans (`is_vegan`…`is_oil_free`) are still written, derived from the tags by
+  `legacyFlags()`; `tagsFromLegacy()` reads an old row. Keep both in step on every write.
+- Stored in four places on purpose: `user_profiles` (the person edits it), `users` (the CRM Dolly works
+  from), `email_contacts` (what the campaign filters read), `orders` (what the kitchen sees for that
+  order). Schema: `migration_19_dietary_profiles.sql`.
+- Anonymous visitors write their own diet through SECURITY DEFINER RPCs — `email_contact_set_diet`
+  (checkout) and `email_prefs_set_diet` (the token on /preferencias). Neither can read anyone back.
+- `DietaryPicker` is the one UI for all of it (checkout, Minha Conta, /preferencias). `compact` folds
+  everything past the five familiar chips away, so the checkout doesn't grow a wall of boxes.
+- Campaigns: `/admin/emails` -> `DietTargeting` narrows the audience and describes what the box
+  contains (pulled from `tasting_boxes.items` so nothing is typed twice). The send route then puts a
+  **per-person** line at the top of each copy via `dietLine()` — a warning when it clashes, a plain
+  "conferimos" when it doesn't. Default is to warn, not to exclude; excluding is an explicit tick.
+- Every read of the new columns must survive migration 19 being absent (fall back to the old
+  columns/booleans) — the same rule the rest of the admin follows.

@@ -98,6 +98,10 @@ special "backyard" market with its own logos (`public/itamambuca-lockup.png`, `i
   Thursday", "1st Saturday of the month" + per-day overrides + minimum lead days), admin UI
   `admin/calendario`, customer UI `DeliveryCalendar.tsx` (bright, celebratory). Tables:
   `delivery_schedule_rules`, `delivery_dates` (overrides), `delivery_notifications`.
+- Dietary profiles: `src/lib/dietary.ts` (tags) + `src/lib/allergens.ts` (allergies, the SAME ids the
+  treats declare). One `DietaryPicker` used at checkout, Minha Conta and /preferencias; `/admin/emails`
+  can aim a campaign at a restriction and gives each reader a personal safety line. See
+  `web-app/CLAUDE.md` "Dietary profiles" and `migration_19_dietary_profiles.sql`.
 - Delivery zones and fees: `src/lib/deliveryZones.ts`. Subscriptions: `src/lib/subscriptions.ts`,
   `SubscriptionSignup.tsx`, `MySubscription.tsx`.
 

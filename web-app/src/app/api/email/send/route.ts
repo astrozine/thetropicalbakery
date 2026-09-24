@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { campaignById } from '@/lib/email/campaigns';
 import { FROM_ADDRESS, SITE_URL, plainTextFallback, renderEmail } from '@/lib/email/layout';
 import { canReceive, topicById } from '@/lib/emailTopics';
+import { dietLine, matchDiet } from '@/lib/dietary';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -17,7 +18,31 @@ interface Contact {
   tags: string[] | null;
   opted_out: string[] | null;
   unsubscribed_all: boolean;
+  /** Migration 19. Missing on a database where it hasn't been run. */
+  diet_tags?: string[] | null;
+  allergens_avoid?: string[] | null;
 }
+
+/** How the admin narrowed the audience, and what this week's treats contain. */
+interface DietTargeting {
+  /** Only people who marked at least one of these diet tags. */
+  tags?: string[];
+  /** Only people who avoid at least one of these allergens. */
+  avoiding?: string[];
+  /** What the box/treat this message is about really contains. */
+  contains?: string[];
+  mayContain?: string[];
+  /** Leave out anyone whose allergens clash with `contains`. */
+  skipConflicts?: boolean;
+}
+
+const CONTACT_COLUMNS = 'email, full_name, token, tags, opted_out, unsubscribed_all, diet_tags, allergens_avoid';
+const CONTACT_COLUMNS_LEGACY = 'email, full_name, token, tags, opted_out, unsubscribed_all';
+
+/** The personal line, wrapped so it stands out in the message. */
+const dietBlock = (line: string, warning: boolean) => line
+  ? `<div style="margin:0 0 18px;padding:12px 14px;border-radius:10px;background:${warning ? '#fdf0e8' : '#eef6ef'};border:1px solid ${warning ? '#f0c9ae' : '#cde3d1'};color:#3c2a21;font-size:15px;line-height:1.55;">${line}</div>`
+  : '';
 
 /**
  * Sends one campaign to everyone who is allowed to receive it, and logs every
@@ -39,11 +64,12 @@ export async function POST(req: NextRequest) {
   const { data: isAdmin } = await supabase.rpc('is_admin');
   if (!isAdmin) return NextResponse.json({ error: 'Apenas administradores.' }, { status: 403 });
 
-  const { campaignId, values, dryRun, testEmail } = (await req.json()) as {
+  const { campaignId, values, dryRun, testEmail, diet } = (await req.json()) as {
     campaignId: string;
     values: Record<string, string>;
     dryRun?: boolean;
     testEmail?: string;
+    diet?: DietTargeting;
   };
 
   const campaign = campaignById(campaignId);
@@ -62,9 +88,16 @@ export async function POST(req: NextRequest) {
   const content = campaign.build(values);
 
   // ---- Who is allowed to get it -------------------------------------------
-  const { data: contactRows, error: contactsError } = await supabase
+  let { data: contactRows, error: contactsError } = await supabase
     .from('email_contacts')
-    .select('email, full_name, token, tags, opted_out, unsubscribed_all');
+    .select(CONTACT_COLUMNS);
+
+  // Migration 19 not run yet: fall back to a plain list (no diet targeting).
+  if (contactsError && /diet_tags|allergens_avoid/.test(contactsError.message)) {
+    ({ data: contactRows, error: contactsError } = await supabase
+      .from('email_contacts')
+      .select(CONTACT_COLUMNS_LEGACY));
+  }
 
   if (contactsError) {
     const missingTable = /email_contacts/.test(contactsError.message);
@@ -78,6 +111,19 @@ export async function POST(req: NextRequest) {
   let eligible = contacts.filter(c => canReceive(campaign.topic, c));
   if (campaign.tags?.length) {
     eligible = eligible.filter(c => campaign.tags!.some(t => (c.tags || []).includes(t)));
+  }
+
+  // ---- Narrowed to a diet, if the admin asked for that -------------------
+  const boxContains = diet?.contains || [];
+  const boxMayContain = diet?.mayContain || [];
+  if (diet?.tags?.length) {
+    eligible = eligible.filter(c => diet.tags!.some(t => (c.diet_tags || []).includes(t)));
+  }
+  if (diet?.avoiding?.length) {
+    eligible = eligible.filter(c => diet.avoiding!.some(a => (c.allergens_avoid || []).includes(a)));
+  }
+  if (diet?.skipConflicts && boxContains.length) {
+    eligible = eligible.filter(c => !matchDiet(c.allergens_avoid, boxContains, boxMayContain).conflicts.length);
   }
 
   // A test goes only to the address given, ignoring the audience.
@@ -119,12 +165,18 @@ export async function POST(req: NextRequest) {
     const unsubscribeUrl = person.token ? `${SITE_URL}/preferencias?token=${person.token}&sair=1` : prefsUrl;
     const firstName = (person.full_name || '').trim().split(' ')[0];
 
+    // What this person told us they avoid, checked against what this really
+    // contains. Everyone else sees exactly the message as previewed.
+    const match = matchDiet(person.allergens_avoid, boxContains, boxMayContain);
+    const personal = (boxContains.length || boxMayContain.length)
+      ? dietBlock(dietLine(match, (person.allergens_avoid || []).length), match.status !== 'safe')
+      : '';
+
     const layout = {
       ...content,
-      heading: firstName ? content.heading : content.heading,
-      body: firstName
-        ? `<p style="color:#3c2a21;font-size:16px;font-weight:bold;margin:0 0 14px;">Oi, ${firstName}!</p>${content.body}`
-        : content.body,
+      body: (firstName
+        ? `<p style="color:#3c2a21;font-size:16px;font-weight:bold;margin:0 0 14px;">Oi, ${firstName}!</p>`
+        : '') + personal + content.body,
       ...(topic.transactional ? {} : { prefsUrl, unsubscribeUrl, reason: campaign.reason }),
     };
 
