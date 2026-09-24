@@ -45,7 +45,7 @@ function MenuLink({ item, onChange }: { item: BoxItem; onChange: (i: BoxItem) =>
             <input type="number" min="1" value={item.menu_min_batch || ''} onChange={e => onChange({ ...item, menu_min_batch: parseInt(e.target.value) || 1 })} style={fieldStyle} />
           </div>
           <div style={{ flex: '1 1 120px' }}>
-            <label style={{ ...labelStyle, fontSize: '0.8rem' }}>Múltiplos de</label>
+            <label style={{ ...labelStyle, fontSize: '0.8rem' }}>Aumenta de quanto em quanto</label>
             <input type="number" min="1" value={item.menu_batch_multiplier || ''} onChange={e => onChange({ ...item, menu_batch_multiplier: parseInt(e.target.value) || 1 })} style={fieldStyle} />
           </div>
         </div>

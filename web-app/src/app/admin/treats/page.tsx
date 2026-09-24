@@ -101,7 +101,7 @@ export default function TreatsAdmin() {
         ...details,
         is_available: formData.is_available ?? true,
         min_batch_size: formData.min_batch_size ?? 1,
-        batch_multiplier: formData.batch_multiplier ?? 1,
+        batch_multiplier: formData.batch_multiplier || 1,
       }]);
       if (error) {
         alert('Erro ao criar doce: ' + error.message + hint(error.message));
@@ -176,14 +176,24 @@ export default function TreatsAdmin() {
               <div>
                 <label style={label}>Pedido Mínimo (un.)</label>
                 <input type="number" min="1" required value={formData.min_batch_size || ''} onChange={e => setFormData({ ...formData, min_batch_size: parseInt(e.target.value) })} style={field} />
-                <small style={{ color: '#7f8c8d' }}>Ex: 10</small>
+                <small style={{ color: '#7f8c8d' }}>Menos que isso o cliente não consegue pedir.</small>
               </div>
               <div>
-                <label style={label}>Multiplicador do Lote</label>
-                <input type="number" min="1" required value={formData.batch_multiplier || ''} onChange={e => setFormData({ ...formData, batch_multiplier: parseInt(e.target.value) })} style={field} />
-                <small style={{ color: '#7f8c8d' }}>Ex: 10 (10, 20, 30…)</small>
+                <label style={label}>Aumentar de quanto em quanto</label>
+                <input type="number" min="1" placeholder="1" value={formData.batch_multiplier || ''} onChange={e => setFormData({ ...formData, batch_multiplier: parseInt(e.target.value) })} style={field} />
+                <small style={{ color: '#7f8c8d' }}>Use 1 se o cliente pode pedir qualquer quantidade.</small>
               </div>
             </div>
+
+            {(formData.min_batch_size || 0) > 0 && (
+              <p style={{ background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '8px', padding: '0.7rem 1rem', fontSize: '0.9rem', color: '#594a42', marginTop: '-0.5rem' }}>
+                👀 O cliente poderá pedir:{' '}
+                <strong>
+                  {[0, 1, 2, 3].map(i => (formData.min_batch_size || 1) + i * (formData.batch_multiplier || 1)).join(', ')}…
+                </strong>{' '}
+                unidades.
+              </p>
+            )}
 
             <ToggleSwitch
               checked={formData.is_available ?? true}
@@ -249,7 +259,7 @@ export default function TreatsAdmin() {
 
               <div style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: '1.5rem', background: '#f8f9fa', padding: '0.5rem', borderRadius: '4px' }}>
                 <div><strong>Min:</strong> {treat.min_batch_size} un.</div>
-                <div><strong>Lote:</strong> múltiplos de {treat.batch_multiplier}</div>
+                <div><strong>Aumenta de:</strong> {treat.batch_multiplier} em {treat.batch_multiplier}</div>
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
