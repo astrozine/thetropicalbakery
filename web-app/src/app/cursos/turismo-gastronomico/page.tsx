@@ -24,7 +24,7 @@ export default function TurismoGastronomicoPage() {
           style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
             backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
-            backgroundImage: 'url("/retreats/Surfer girl.webp"), linear-gradient(rgba(60, 42, 33, 0.7), rgba(60, 42, 33, 0.7))',
+            backgroundImage: 'url(/assets/surfers_retreat_treats_1789884582282.jpg), linear-gradient(rgba(60, 42, 33, 0.7), rgba(60, 42, 33, 0.7))',
             backgroundBlendMode: 'overlay',
             backgroundColor: 'var(--color-primary)'
           }}
@@ -50,7 +50,7 @@ export default function TurismoGastronomicoPage() {
               style={{
                 width: '100%',
                 aspectRatio: '4/5',
-                backgroundImage: 'url("/retreats/Surfer girl.webp")',
+                backgroundImage: 'url(/assets/surfers_retreat_treats_1789884582282.jpg)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 borderRadius: '12px',

@@ -171,7 +171,7 @@ export default function CursosPage() {
                       style={{
                         width: '100%',
                         aspectRatio: '4/5',
-                        backgroundImage: 'url("/retreats/Surfer girl.webp")',
+                        backgroundImage: 'url(/assets/surfers_retreat_treats_1789884582282.jpg)',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         border: '1px solid var(--color-secondary)'
@@ -261,7 +261,7 @@ export default function CursosPage() {
                       style={{
                         width: '100%',
                         aspectRatio: '4/5',
-                        backgroundImage: 'url("/dolly-course2.jpg")',
+                        backgroundImage: 'url(/assets/chef_training_1789884593538.jpg)',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         border: '1px solid rgba(212,175,55,0.4)'
