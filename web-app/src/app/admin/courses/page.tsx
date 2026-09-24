@@ -138,13 +138,15 @@ export default function CoursesAdmin() {
     <div>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '2rem' }}>Cursos</h1>
 
+      <div className="courses-layout">
+
       {/* Editor Form */}
-      <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '3rem' }}>
+      <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
         <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#3c2a21' }}>
           {editingId ? 'Editar Curso' : 'Adicionar Novo Curso'}
         </h2>
         
-        <form onSubmit={handleSave} style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: '1fr 1fr' }}>
+        <form onSubmit={handleSave} style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))' }}>
           
           <div style={{ gridColumn: '1 / -1' }}>
             <ImagePicker label="Imagem da Capa" imageUrl={formData.image_url} uploading={uploading} onChange={handleImageUpload} />
@@ -219,45 +221,55 @@ export default function CoursesAdmin() {
         </form>
       </div>
 
-      {/* Courses List */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-        {courses.map(course => (
-          <div key={course.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ position: 'relative', height: '180px', background: '#f5f6fa' }}>
-              {course.image_url ? (
-                <img src={course.image_url} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#bdc3c7' }}>Sem Foto</div>
-              )}
-              {!course.is_active && (
-                <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#e74c3c', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  Inativo
+      {/* Courses: a slim column beside the form, one compact row per course */}
+      <aside className="courses-column" aria-label="Cursos cadastrados">
+        <h2 style={{ fontSize: '1.05rem', color: '#3c2a21', margin: '0 0 1rem' }}>
+          Cursos cadastrados <span style={{ color: '#95a5a6', fontWeight: 500 }}>({courses.length})</span>
+        </h2>
+        <div style={{ display: 'grid', gap: '0.75rem' }}>
+          {courses.map(course => (
+            <div key={course.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.06)', padding: '0.75rem', outline: editingId === course.id ? '2px solid #d4af37' : 'none' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                <div style={{ position: 'relative', width: '76px', height: '76px', flexShrink: 0, borderRadius: '8px', overflow: 'hidden', background: '#f5f6fa' }}>
+                  {course.image_url ? (
+                    <img src={course.image_url} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#bdc3c7', fontSize: '0.7rem', textAlign: 'center' }}>Sem foto</div>
+                  )}
                 </div>
-              )}
-            </div>
-            
-            <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <h3 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem', color: '#2c3e50' }}>{course.title}</h3>
-              <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '1.2rem', margin: '0 0 1rem' }}>R$ {course.price.toFixed(2).replace('.', ',')}</p>
-              
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-                <button 
-                  onClick={() => handleEdit(course)}
-                  style={{ flex: 1, padding: '0.5rem', background: '#f1c40f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                >
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <h3 style={{ fontSize: '0.98rem', margin: '0 0 0.2rem', color: '#2c3e50', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{course.title}</h3>
+                  <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '1rem', margin: 0 }}>
+                    R$ {course.price.toFixed(2).replace('.', ',')}
+                    {!course.is_active && (
+                      <span style={{ marginLeft: '0.5rem', background: '#e74c3c', color: 'white', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold', verticalAlign: 'middle' }}>Inativo</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.65rem' }}>
+                <button onClick={() => handleEdit(course)} style={{ flex: 1, padding: '0.4rem', background: '#f1c40f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem' }}>
                   Editar
                 </button>
-                <button 
-                  onClick={() => handleDelete(course.id)}
-                  style={{ flex: 1, padding: '0.5rem', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                >
+                <button onClick={() => handleDelete(course.id)} style={{ flex: 1, padding: '0.4rem', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem' }}>
                   Excluir
                 </button>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+          {courses.length === 0 && <p style={{ color: '#95a5a6', fontSize: '0.9rem' }}>Nenhum curso ainda.</p>}
+        </div>
+      </aside>
+
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .courses-layout { display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
+        @media (min-width: 1100px) {
+          .courses-layout { grid-template-columns: minmax(0, 1fr) 340px; }
+          .courses-column { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; padding-right: 4px; }
+        }
+      ` }} />
 
     </div>
   );
