@@ -11,6 +11,10 @@ import Marquee from '@/components/Marquee';
 import BoxContents from '@/components/BoxContents';
 import { BoxItem } from '@/lib/allergens';
 import { formatBatchDate } from '@/lib/batchDate';
+import HeroBoxCard, { HeroBoxStrip, type HeroBoxPhoto } from '@/components/HeroBoxCard';
+
+// Real photos of earlier boxes, used whenever the database has too few of its own.
+const FALLBACK_BOX_PHOTOS: HeroBoxPhoto[] = ['/box1.jpg', '/box2.jpg', '/box3.jpg', '/box4.jpg'].map(src => ({ src }));
 
 interface TastingBox {
   id: string;
@@ -27,8 +31,21 @@ interface TastingBox {
 export default function CaixasPage() {
   const [activeBox, setActiveBox] = useState<TastingBox | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pastPhotos, setPastPhotos] = useState<HeroBoxPhoto[]>([]);
 
   useEffect(() => {
+    const fetchPastBoxes = async () => {
+      const { data } = await supabase
+        .from('tasting_boxes')
+        .select('title, image_url')
+        .eq('is_active', false)
+        .not('image_url', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(8);
+      if (data) setPastPhotos(data.filter(b => b.image_url).map(b => ({ src: b.image_url as string, caption: b.title })));
+    };
+    fetchPastBoxes();
+
     const fetchActiveBox = async () => {
       const { data, error } = await supabase
         .from('tasting_boxes')
@@ -144,6 +161,12 @@ export default function CaixasPage() {
   }
 
   const remainingQuantity = Math.max(0, activeBox.total_quantity - activeBox.sold_quantity);
+  // Earlier boxes first, then the stock photos, never the box that is on sale now. Alternate them left/right.
+  const seen = new Set<string>([activeBox.image_url]);
+  const heroPhotos = [...pastPhotos, ...FALLBACK_BOX_PHOTOS].filter(p => !seen.has(p.src) && seen.add(p.src));
+  const leftPhotos = heroPhotos.filter((_, i) => i % 2 === 0).slice(0, 4);
+  const rightPhotos = heroPhotos.filter((_, i) => i % 2 === 1).slice(0, 4);
+
   const percentageSold = Math.min(100, (activeBox.sold_quantity / activeBox.total_quantity) * 100);
 
   return (
@@ -167,7 +190,11 @@ export default function CaixasPage() {
           }}
         />
         
+        <HeroBoxCard side="left" photos={leftPhotos} />
+        <HeroBoxCard side="right" photos={rightPhotos} delayMs={2750} />
+
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
+          <HeroBoxStrip photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} />
           <ScrollReveal>
             <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.5rem' }}>
               Edição Limitada • {formatBatchDate(activeBox.batch_date_label)}
