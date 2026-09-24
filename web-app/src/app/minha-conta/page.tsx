@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth, formatBrazilianPhone } from '@/context/AuthContext';
@@ -10,7 +10,8 @@ import MySubscription from '@/components/MySubscription';
 import MyPickups from '@/components/MyPickups';
 import { SUBSCRIPTION_ZONES, formatBRL, isItamambuca } from '@/lib/deliveryZones';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
-import { legacyFlags, tagsFromLegacy } from '@/lib/dietary';
+import AccountSection from '@/components/AccountSection';
+import { allergensFrom, dietTagsFrom, legacyFlags, tagsFromLegacy } from '@/lib/dietary';
 import { supabase } from '@/lib/supabase';
 
 const labelStyle: React.CSSProperties = {
@@ -34,14 +35,23 @@ const inputStyle: React.CSSProperties = {
   outline: 'none',
 };
 
-const sectionTitle: React.CSSProperties = {
-  fontFamily: 'var(--font-heading)',
-  fontSize: '1.3rem',
-  color: 'var(--color-primary)',
-  marginBottom: '1.25rem',
-  paddingBottom: '0.6rem',
-  borderBottom: '1px solid rgba(212,175,55,0.3)',
-};
+const FOLD_ORDER = ['dados', 'endereco', 'dieta', 'gostos'] as const;
+type FoldId = typeof FOLD_ORDER[number];
+
+/** Which folds are filled in. Pure, so it can run before the form state has caught up with the profile. */
+function completeness(
+  b: { full_name: string; phone: string; birth_date: string; household_size: string },
+  a: AddressValue,
+  d: DietaryValue,
+  t: { allergies: string; favorite_flavors: string; avoid_ingredients: string },
+): Record<FoldId, boolean> {
+  return {
+    dados: !!(b.full_name.trim() && b.phone.trim() && b.birth_date && b.household_size),
+    endereco: !!(a.address_street.trim() && a.address_number.trim() && a.address_neighborhood.trim()),
+    dieta: d.tags.length + d.allergens.length > 0 || !!t.allergies.trim(),
+    gostos: !!(t.favorite_flavors.trim() || t.avoid_ingredients.trim()),
+  };
+}
 
 export default function MyAccountPage() {
   const { user, profile, loading, saveProfile, signOut } = useAuth();
@@ -63,19 +73,24 @@ export default function MyAccountPage() {
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [openIds, setOpenIds] = useState<string[]>([]);
+  // What was last saved, to tell when there are unsaved changes.
+  const [baseline, setBaseline] = useState('');
+  const openedFirst = useRef(false);
+
+  const toggle = (id: string) => setOpenIds(ids => (ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]));
 
   useEffect(() => {
     if (!profile) return;
 
-    setBasics({
+    const b = {
       full_name: profile.full_name || '',
       phone: profile.phone || '',
       birth_date: profile.birth_date || '',
       household_size: profile.household_size ? String(profile.household_size) : '',
       delivery_zone: profile.delivery_zone || SUBSCRIPTION_ZONES[0]?.id || 'zone1',
-    });
-
-    setAddress({
+    };
+    const a: AddressValue = {
       address_postal_code: profile.address_postal_code || '',
       address_street: profile.address_street || '',
       address_number: profile.address_number || '',
@@ -88,21 +103,38 @@ export default function MyAccountPage() {
       ...(!profile.address_street && profile.address
         ? { address_street: profile.address }
         : {}),
-    });
-
+    };
     // An account from before migration 19 only has the five booleans.
-    setDiet({
+    const d: DietaryValue = {
       tags: profile.diet_tags?.length ? profile.diet_tags : tagsFromLegacy(profile),
       allergens: profile.allergens_avoid || [],
       notes: profile.diet_notes || '',
-    });
-
-    setTastes({
+    };
+    const t = {
       allergies: profile.allergies || '',
       favorite_flavors: profile.favorite_flavors || '',
       avoid_ingredients: profile.avoid_ingredients || '',
-    });
+    };
+
+    setBasics(b);
+    setAddress(a);
+    setDiet(d);
+    setTastes(t);
+    setBaseline(JSON.stringify({ basics: b, address: a, diet: d, tastes: t }));
+
+    // The first time, open the first fold that still needs something from them.
+    if (!openedFirst.current) {
+      openedFirst.current = true;
+      const c = completeness(b, a, d, t);
+      const firstTodo = FOLD_ORDER.find(id => !c[id]);
+      if (firstTodo) setOpenIds([firstTodo]);
+    }
   }, [profile]);
+
+  // Everything the form holds, as one comparable string.
+  const snapshot = JSON.stringify({ basics, address, diet, tastes });
+  const dirty = baseline !== '' && snapshot !== baseline;
+  const done = completeness(basics, address, diet, tastes);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,10 +186,24 @@ export default function MyAccountPage() {
       }).then(({ error }) => { if (error) console.error('E-mail diet sync:', error.message); });
     }
 
+    setBaseline(snapshot);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
+
+  const firstName = (basics.full_name || profile?.full_name || '').trim().split(' ')[0];
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
+  const checks = Object.values(done);
+  const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  const addressSummary = [
+    [address.address_street, address.address_number].filter(Boolean).join(', '),
+    address.address_neighborhood,
+  ].filter(Boolean).join(' · ');
+  const dietSummaryLine = [
+    dietTagsFrom(diet.tags).map(t => t.label).join(', '),
+    diet.allergens.length ? `${diet.allergens.length} ${diet.allergens.length === 1 ? 'alergia' : 'alergias'}: ${allergensFrom(diet.allergens).map(a => a.label).join(', ')}` : '',
+  ].filter(Boolean).join(' · ');
 
   const inItamambuca = isItamambuca({
     delivery_zone: basics.delivery_zone,
@@ -247,190 +293,206 @@ export default function MyAccountPage() {
               </div>
             )}
 
-            <form onSubmit={handleSave} className="liquid-glass-card" style={{ padding: 'clamp(1.5rem, 4vw, 2rem)' }}>
+            <form onSubmit={handleSave}>
 
-              {/* ------------------------------------------------ WHO YOU ARE */}
-              <h2 style={sectionTitle}>Seus dados</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem', marginBottom: '2.5rem' }}>
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                  <div style={{ flex: '2 1 220px' }}>
-                    <label style={labelStyle}>Nome completo</label>
-                    <input
-                      type="text"
-                      value={basics.full_name}
-                      onChange={e => setBasics({ ...basics, full_name: e.target.value })}
-                      placeholder="Ex: Ana Souza"
-                      style={inputStyle}
-                    />
+              {/* ------------------------------------------------- profile header */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap',
+                padding: 'clamp(1.25rem, 3vw, 1.75rem)', marginBottom: '1.25rem', borderRadius: '24px',
+                background: 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)', color: '#fdfaf3',
+                boxShadow: '0 16px 40px rgba(60,42,33,0.18)',
+              }}>
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatarUrl} alt="" style={{ width: '68px', height: '68px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #d4af37' }} />
+                ) : (
+                  <span aria-hidden style={{ width: '68px', height: '68px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)' }}>
+                    {(firstName[0] || '🌴').toUpperCase()}
+                  </span>
+                )}
+                <div style={{ flex: '1 1 220px', minWidth: 0 }}>
+                  <p style={{ fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700, margin: 0 }}>Seu perfil</p>
+                  <p className="notranslate" translate="no" style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.3rem, 3.5vw, 1.7rem)', margin: '0.15rem 0 0.6rem', lineHeight: 1.15 }}>
+                    {firstName ? `Oi, ${firstName}!` : 'Bem-vindo(a)!'}
+                  </p>
+                  <div style={{ height: '8px', borderRadius: '999px', background: 'rgba(255,255,255,0.18)', overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, #ffd166, #d4af37)', transition: 'width .5s' }} />
                   </div>
-                  <div style={{ flex: '1 1 170px' }}>
-                    <label style={labelStyle}>WhatsApp (com DDD)</label>
-                    <input
-                      type="tel"
-                      value={basics.phone}
-                      onChange={e => setBasics({ ...basics, phone: e.target.value })}
-                      placeholder="(12) 99123-4567"
-                      style={inputStyle}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                  <div style={{ flex: '1 1 180px' }}>
-                    <label style={labelStyle}>
-                      Aniversário{' '}
-                      <span style={{ textTransform: 'none', fontWeight: 400, color: '#a89a90' }}>(ganha surpresa)</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={basics.birth_date}
-                      onChange={e => setBasics({ ...basics, birth_date: e.target.value })}
-                      style={inputStyle}
-                    />
-                  </div>
-                  <div style={{ flex: '1 1 180px' }}>
-                    <label style={labelStyle}>Quantas pessoas em casa</label>
-                    <input
-                      type="number"
-                      min={1}
-                      max={20}
-                      value={basics.household_size}
-                      onChange={e => setBasics({ ...basics, household_size: e.target.value })}
-                      placeholder="2"
-                      style={inputStyle}
-                    />
-                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'rgba(253,250,243,0.8)', margin: '0.5rem 0 0' }}>
+                    {pct === 100
+                      ? '🎉 Perfil completo — a Dolly já sabe tudo para acertar na sua caixa.'
+                      : `${pct}% completo — quanto mais a Dolly conhece, mais a caixa é a sua cara.`}
+                  </p>
                 </div>
               </div>
 
-              {/* ------------------------------------------------------ ADDRESS */}
-              <h2 style={sectionTitle}>Endereço de entrega</h2>
-              <div style={{ marginBottom: '1.25rem' }}>
-                <label style={labelStyle}>Região</label>
-                <select
-                  value={basics.delivery_zone}
-                  onChange={e => setBasics({ ...basics, delivery_zone: e.target.value })}
-                  style={{ ...inputStyle, cursor: 'pointer' }}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: '0.75rem' }}>
+                <button type="button" onClick={() => setOpenIds([...FOLD_ORDER, 'conta'])}
+                  style={{ background: 'none', border: 'none', color: '#8a6d1f', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'underline' }}>
+                  Abrir tudo
+                </button>
+                <button type="button" onClick={() => setOpenIds([])}
+                  style={{ background: 'none', border: 'none', color: '#7a6a61', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'underline' }}>
+                  Fechar tudo
+                </button>
+              </div>
+
+              <div style={{ display: 'grid', gap: '0.9rem' }}>
+
+                {/* --------------------------------------------------- WHO YOU ARE */}
+                <AccountSection
+                  id="dados" emoji="👤" accent="#e2792a" title="Seus dados"
+                  open={openIds.includes('dados')} onToggle={() => toggle('dados')}
+                  status={done.dados ? { label: 'Completo', tone: 'ok' } : { label: 'Falta preencher', tone: 'todo' }}
+                  summary={[basics.full_name, basics.phone].filter(Boolean).join(' · ') || 'Nome, WhatsApp, aniversário…'}
                 >
-                  {SUBSCRIPTION_ZONES.map(z => (
-                    <option key={z.id} value={z.id}>
-                      {z.label}{z.fee > 0 ? ` — entrega ${formatBRL(z.fee)}` : ' — entrega inclusa'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div style={{ marginBottom: '2.5rem' }}>
-                <AddressFields value={address} onChange={setAddress} />
-              </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                      <div style={{ flex: '2 1 220px' }}>
+                        <label style={labelStyle}>Nome completo</label>
+                        <input type="text" value={basics.full_name} onChange={e => setBasics({ ...basics, full_name: e.target.value })} placeholder="Ex: Ana Souza" style={inputStyle} />
+                      </div>
+                      <div style={{ flex: '1 1 170px' }}>
+                        <label style={labelStyle}>WhatsApp (com DDD)</label>
+                        <input type="tel" value={basics.phone} onChange={e => setBasics({ ...basics, phone: e.target.value })} placeholder="(12) 99123-4567" style={inputStyle} />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                      <div style={{ flex: '1 1 180px' }}>
+                        <label style={labelStyle}>
+                          Aniversário <span style={{ textTransform: 'none', fontWeight: 400, color: '#a89a90' }}>(ganha surpresa 🎂)</span>
+                        </label>
+                        <input type="date" value={basics.birth_date} onChange={e => setBasics({ ...basics, birth_date: e.target.value })} style={inputStyle} />
+                      </div>
+                      <div style={{ flex: '1 1 180px' }}>
+                        <label style={labelStyle}>Quantas pessoas em casa</label>
+                        <input type="number" min={1} max={20} value={basics.household_size} onChange={e => setBasics({ ...basics, household_size: e.target.value })} placeholder="2" style={inputStyle} />
+                      </div>
+                    </div>
+                  </div>
+                </AccountSection>
 
-              {/* ------------------------------------------------------- TASTES */}
-              <h2 style={sectionTitle}>Restrições e preferências</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
-                <div>
-                  <label style={labelStyle}>Restrições alimentares</label>
-                  <p style={{ fontSize: '0.8rem', color: '#7a6a61', lineHeight: 1.6, margin: '-0.25rem 0 0.85rem' }}>
-                    A gente confere isto contra cada doce antes de te mandar qualquer novidade.
+                {/* ------------------------------------------------------ ADDRESS */}
+                <AccountSection
+                  id="endereco" emoji="🏡" accent="#5aa9e6" title="Onde entregamos"
+                  open={openIds.includes('endereco')} onToggle={() => toggle('endereco')}
+                  status={done.endereco ? { label: 'Completo', tone: 'ok' } : { label: 'Falta preencher', tone: 'todo' }}
+                  summary={addressSummary || 'Rua, número, bairro e ponto de referência'}
+                >
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <label style={labelStyle}>Região</label>
+                    <select value={basics.delivery_zone} onChange={e => setBasics({ ...basics, delivery_zone: e.target.value })} style={{ ...inputStyle, cursor: 'pointer' }}>
+                      {SUBSCRIPTION_ZONES.map(z => (
+                        <option key={z.id} value={z.id}>
+                          {z.label}{z.fee > 0 ? ` — entrega ${formatBRL(z.fee)}` : ' — entrega inclusa'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <AddressFields value={address} onChange={setAddress} />
+                </AccountSection>
+
+                {/* ---------------------------------------------- DIET + ALLERGIES */}
+                <AccountSection
+                  id="dieta" emoji="🌱" accent="#9bab3c" title="Restrições e alergias"
+                  open={openIds.includes('dieta')} onToggle={() => toggle('dieta')}
+                  status={done.dieta ? { label: 'Preenchido', tone: 'ok' } : { label: 'Conte pra gente', tone: 'todo' }}
+                  summary={dietSummaryLine || 'Vegano, sem glúten, alergias…'}
+                >
+                  <p style={{ fontSize: '0.86rem', color: '#7a6a61', lineHeight: 1.7, margin: '0 0 1rem' }}>
+                    A gente confere isto contra <strong>cada doce</strong> antes de te mandar qualquer novidade.
                   </p>
-                  <DietaryPicker value={diet} onChange={setDiet} compact={false} showNotes={false} />
-                </div>
+                  <DietaryPicker value={diet} onChange={setDiet} showNotes={false} />
 
-                <div>
-                  <label style={labelStyle}>Alergias</label>
-                  <input
-                    type="text"
-                    value={tastes.allergies}
-                    onChange={e => setTastes({ ...tastes, allergies: e.target.value })}
-                    placeholder="Ex: castanha de caju, amendoim"
-                    style={{ ...inputStyle, borderColor: tastes.allergies ? '#c0392b' : 'rgba(212,175,55,0.5)' }}
-                  />
-                  <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.4rem' }}>
-                    Aparece destacado em vermelho na cozinha toda semana.
+                  <div style={{ marginTop: '1.4rem' }}>
+                    <label style={labelStyle}>Alergias, com as suas palavras</label>
+                    <input
+                      type="text" value={tastes.allergies}
+                      onChange={e => setTastes({ ...tastes, allergies: e.target.value })}
+                      placeholder="Ex: castanha de caju, amendoim"
+                      style={{ ...inputStyle, borderColor: tastes.allergies ? '#c0392b' : 'rgba(212,175,55,0.5)' }}
+                    />
+                    <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.4rem' }}>
+                      Aparece destacado em vermelho na cozinha toda semana.
+                    </p>
+                  </div>
+                </AccountSection>
+
+                {/* ---------------------------------------------------------- TASTES */}
+                <AccountSection
+                  id="gostos" emoji="💛" accent="#d9453a" title="Seus gostos"
+                  open={openIds.includes('gostos')} onToggle={() => toggle('gostos')}
+                  status={done.gostos ? { label: 'Preenchido', tone: 'ok' } : { label: 'Opcional', tone: 'quiet' }}
+                  summary={tastes.favorite_flavors ? `Ama: ${tastes.favorite_flavors}` : 'Sabores que você ama e o que prefere não receber'}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+                    <div>
+                      <label style={labelStyle}>Sabores que você ama</label>
+                      <input type="text" value={tastes.favorite_flavors} onChange={e => setTastes({ ...tastes, favorite_flavors: e.target.value })} placeholder="Ex: cacau intenso, coco, maracujá" style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>O que você prefere não receber</label>
+                      <input type="text" value={tastes.avoid_ingredients} onChange={e => setTastes({ ...tastes, avoid_ingredients: e.target.value })} placeholder="Ex: banana, hortelã" style={inputStyle} />
+                      <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.4rem' }}>
+                        Não é alergia — só não é a sua praia. A Dolly troca por outra coisa.
+                      </p>
+                    </div>
+                  </div>
+                </AccountSection>
+
+                {/* --------------------------------------------- ACCOUNT + PRIVACY */}
+                <AccountSection
+                  id="conta" emoji="🔐" accent="#8b7d72" title="Conta e privacidade"
+                  open={openIds.includes('conta')} onToggle={() => toggle('conta')}
+                  status={{ label: 'Segura', tone: 'quiet' }}
+                  summary={<span className="notranslate" translate="no">{user.email || formatBrazilianPhone(user.phone) || '—'}</span>}
+                >
+                  <p style={{ color: '#7a6a61', fontSize: '0.88rem', lineHeight: 1.75, margin: '0 0 0.9rem' }}>
+                    <strong style={{ color: '#3c2a21' }}>Como você entrou:</strong>{' '}
+                    <span className="notranslate" translate="no">{user.email || formatBrazilianPhone(user.phone) || '—'}</span>
                   </p>
-                </div>
-
-                <div>
-                  <label style={labelStyle}>Sabores que você ama</label>
-                  <input
-                    type="text"
-                    value={tastes.favorite_flavors}
-                    onChange={e => setTastes({ ...tastes, favorite_flavors: e.target.value })}
-                    placeholder="Ex: cacau intenso, coco, maracujá"
-                    style={inputStyle}
-                  />
-                </div>
-
-                <div>
-                  <label style={labelStyle}>O que você prefere não receber</label>
-                  <input
-                    type="text"
-                    value={tastes.avoid_ingredients}
-                    onChange={e => setTastes({ ...tastes, avoid_ingredients: e.target.value })}
-                    placeholder="Ex: banana, hortelã"
-                    style={inputStyle}
-                  />
-                  <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.4rem' }}>
-                    Não é alergia — só não é a sua praia. A Dolly troca por outra coisa.
+                  <p style={{ color: '#7a6a61', fontSize: '0.88rem', lineHeight: 1.75, margin: '0 0 1.1rem' }}>
+                    Para excluir sua conta e seus dados, fale com a gente pelo{' '}
+                    <a href="https://wa.me/5511932119196" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>WhatsApp</a>.
+                    Veja também nossa{' '}
+                    <Link href="/privacidade" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>Política de Privacidade</Link>
+                    {' '}e as suas{' '}
+                    <Link href="/preferencias" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>preferências de e-mail</Link>.
                   </p>
-                </div>
+                  <button type="button" onClick={signOut}
+                    style={{ background: 'none', border: '1px solid #d9cfc2', borderRadius: '8px', padding: '0.6rem 1.2rem', color: '#594a42', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer' }}>
+                    Sair da conta
+                  </button>
+                </AccountSection>
+
               </div>
 
               <button
                 type="submit"
                 disabled={saving}
                 className="btn btn-primary"
-                style={{ width: '100%', padding: '1.1rem', marginTop: '2.5rem', borderRadius: '8px', fontSize: '1rem' }}
+                style={{ width: '100%', padding: '1.1rem', marginTop: '1.75rem', borderRadius: '8px', fontSize: '1rem' }}
               >
                 {saving ? 'Salvando...' : saved ? '✅ Dados salvos!' : 'Salvar meus dados'}
               </button>
+
+              {/* Appears when something has changed, so nobody leaves without saving. */}
+              {dirty && (
+                <div role="status" style={{
+                  position: 'fixed', left: '50%', bottom: '1.25rem', transform: 'translateX(-50%)', zIndex: 60,
+                  display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.7rem 0.8rem 0.7rem 1.25rem',
+                  background: '#3c2a21', color: '#fdfaf3', borderRadius: '999px', boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
+                  maxWidth: 'calc(100vw - 2rem)',
+                }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>✏️ Alterações não salvas</span>
+                  <button type="submit" disabled={saving}
+                    style={{ background: '#d4af37', color: '#3c2a21', border: 'none', borderRadius: '999px', padding: '0.55rem 1.2rem', fontWeight: 800, fontSize: '0.88rem', cursor: 'pointer' }}>
+                    {saving ? 'Salvando…' : 'Salvar'}
+                  </button>
+                </div>
+              )}
             </form>
 
-            <div style={{
-              marginTop: '2rem',
-              padding: '1.25rem',
-              background: '#fdfaf3',
-              border: '1px solid #e8e1d7',
-              borderRadius: '12px',
-              fontSize: '0.85rem',
-              color: '#7a6a61',
-              lineHeight: 1.7,
-            }}>
-              <p style={{ marginBottom: '0.5rem' }}>
-                <strong style={{ color: '#3c2a21' }}>Como você entrou:</strong>{' '}
-                <span className="notranslate" translate="no">
-                  {user.email || formatBrazilianPhone(user.phone) || '—'}
-                </span>
-              </p>
-              <p>
-                Para excluir sua conta e seus dados, fale com a gente pelo{' '}
-                <a
-                  href="https://wa.me/5511932119196"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: 'var(--color-secondary)', fontWeight: 600 }}
-                >
-                  WhatsApp
-                </a>. Veja também nossa{' '}
-                <Link href="/privacidade" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>
-                  Política de Privacidade
-                </Link>.
-              </p>
-            </div>
-
-            <button
-              onClick={signOut}
-              style={{
-                marginTop: '1.5rem',
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                color: '#7a6a61',
-                fontSize: '0.9rem',
-                textDecoration: 'underline',
-                cursor: 'pointer',
-              }}
-            >
-              Sair da conta
-            </button>
           </>
         )}
       </div>
