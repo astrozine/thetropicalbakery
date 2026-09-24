@@ -193,6 +193,16 @@ export default function CheckoutPage() {
       if (crmError) console.error('CRM save error:', crmError);
     }
 
+    // Keep them on the right e-mail list: box buyers hear about boxes, event orders about events.
+    if (formData.email) {
+      await supabase.rpc('email_contact_upsert', {
+        p_email: formData.email,
+        p_full_name: formData.name,
+        p_tags: hasBox ? ['cliente'] : ['eventos'],
+        p_source: 'checkout',
+      });
+    }
+
     setPlaced({
       items: [...items], subtotal: totalPrice, fee: deliveryFee, total, isBox: hasBox,
       date: formData.date, zoneLabel: zone?.label ?? '', saved,

@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Marquee from '@/components/Marquee';
 import ScrollReveal from '@/components/ScrollReveal';
 import ExplodingTreats from '@/components/ExplodingTreats';
-import ZoomableImage from '@/components/ZoomableImage';
+import PhilosophyShowcase from '@/components/PhilosophyShowcase';
 import ModalCard from '@/components/ModalCard';
 import WaitlistCapture from '@/components/WaitlistCapture';
 import Link from 'next/link';
@@ -77,51 +77,8 @@ export default async function Home() {
       {/* Scrolling Text Banner */}
       <Marquee text="THE TROPICAL BAKERY ✦ ITAMAMBUCA ✦ VEGAN ✦ " speed={300} />
 
-      {/* Philosophy Section */}
-      <section className="container" style={{ padding: '12rem 2rem', position: 'relative' }}>
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexWrap: 'wrap', gap: '4rem', alignItems: 'center' }}>
-          <div style={{ flex: '1 1 500px', textAlign: 'left' }}>
-            <ScrollReveal className="liquid-glass-card">
-              <div style={{ padding: '4rem 3rem' }}>
-              <h2 className="text-primary" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', marginBottom: '2rem', fontFamily: 'var(--font-heading)' }}>
-                Nossa Filosofia
-              </h2>
-              <p style={{ fontSize: '1.2rem', marginBottom: '3rem', color: '#594a42', lineHeight: '1.8', whiteSpace: 'pre-line' }}>
-                {getText('home-about', `Na The Tropical Bakery, acreditamos que a indulgência não precisa comprometer a saúde.\n\nNossas Surprise Treat Boxes são criadas para serem SOS-Free (sem adição de sal, óleo ou açúcar refinado), 100% Veganas e Sem Glúten. Focamos em criações tropicais densas em nutrientes, vibrantes e deliciosas para quem vive ou visita Itamambuca e Ubatuba.`)}
-              </p>
-              
-              <div className="features-grid" style={{ gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-                <div className="feature-item">
-                  <div className="feature-icon" style={{ color: '#d4af37' }}>🌿</div>
-                  <h3 className="feature-title">Vegano & Natural</h3>
-                  <p style={{ color: '#7a6a61' }}>Ingredientes puros, sem concessões.</p>
-                </div>
-                <div className="feature-item">
-                  <div className="feature-icon" style={{ color: '#d4af37' }}>🌾</div>
-                  <h3 className="feature-title">Sem Glúten</h3>
-                  <p style={{ color: '#7a6a61' }}>Seguro e delicioso para todos.</p>
-                </div>
-                <div className="feature-item">
-                  <div className="feature-icon" style={{ color: '#d4af37' }}>🎁</div>
-                  <h3 className="feature-title">Surpresa Semanal</h3>
-                  <p style={{ color: '#7a6a61' }}>Entregue fresquinho em Itamambuca!</p>
-                </div>
-              </div>
-            </div>
-            </ScrollReveal>
-          </div>
-
-          <div style={{ flex: '1 1 400px', display: 'flex', justifyContent: 'center' }}>
-            <ScrollReveal>
-              <ZoomableImage 
-                src={getContent('home-about', "/menu-items/1000240473 - Edited (1).jpg")} 
-                alt="Filosofia Tropical" 
-                style={{ width: '100%', maxWidth: '500px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', objectFit: 'cover', aspectRatio: '4/5' }} 
-              />
-            </ScrollReveal>
-          </div>
-        </div>
-      </section>
+      {/* Philosophy Section: accordions for the story, boxes, prices, ingredients, events and delivery */}
+      <PhilosophyShowcase featuredImage={getContent('home-about', '/menu-items/1000240473 - Edited (1).jpg')} />
 
       {/* Parallax Banner 1 */}
       <section 

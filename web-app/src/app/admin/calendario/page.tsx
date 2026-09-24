@@ -177,14 +177,25 @@ export default function DeliveryCalendarAdmin() {
     setNotifyResult('');
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch('/api/notify-delivery-dates', {
+      const res = await fetch('/api/email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token ?? ''}` },
-        body: JSON.stringify({ dates: unnotified }),
+        body: JSON.stringify({ campaignId: 'delivery-dates', values: { dates: unnotified.join(',') } }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Falha ao enviar');
-      setNotifyResult(`✅ E-mail enviado para ${json.sent} cliente(s).`);
+
+      // Remember which dates have been announced, so the list above doesn't offer them again.
+      await supabase.from('delivery_notifications').upsert(
+        unnotified.map(d => ({ delivery_date: d, notified_at: new Date().toISOString() })),
+        { onConflict: 'delivery_date' },
+      );
+
+      setNotifyResult(
+        `✅ E-mail enviado para ${json.sent} cliente(s).` +
+        (json.skipped ? ` ${json.skipped} já tinham recebido este aviso.` : '') +
+        (json.remaining ? ` Faltam ${json.remaining} — clique de novo para continuar.` : ''),
+      );
       load();
     } catch (err) {
       setNotifyResult(`❌ ${err instanceof Error ? err.message : 'Falha ao enviar'}`);
@@ -411,8 +422,10 @@ export default function DeliveryCalendarAdmin() {
               <button onClick={() => navigator.clipboard.writeText(whatsappMessage)} style={{ ...dark, background: '#25D366' }}>📋 Copiar mensagem para WhatsApp</button>
             </div>
             <p style={{ color: '#95a5a6', fontSize: '0.8rem', lineHeight: 1.6 }}>
-              O envio automático por WhatsApp ainda não está disponível (aguardando o registro da empresa no Twilio).
-              Por enquanto, copie a mensagem acima e envie pela sua lista de transmissão do WhatsApp.
+              Só recebe quem aceita e-mails sobre a Caixa de Degustação, e ninguém recebe o mesmo aviso duas vezes.
+              Outros tipos de e-mail ficam em <strong>Divulgação → E-mails</strong>.
+              O envio automático por WhatsApp ainda não está disponível (aguardando o registro da empresa no Twilio);
+              por enquanto, copie a mensagem acima e envie pela sua lista de transmissão.
             </p>
           </>
         )}

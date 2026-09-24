@@ -609,3 +609,116 @@ body {
   .hh-side-left .hh-card:nth-child(2) { margin-right: clamp(20px, 3vw, 60px); }
   .hh-side-right .hh-card:nth-child(2) { margin-left: clamp(20px, 3vw, 60px); }
 }
+
+/* --- Homepage "Nossa Filosofia" showcase (PhilosophyShowcase) --- */
+.phil-section {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(3.5rem, 9vw, 8rem) 1rem clamp(4rem, 9vw, 8rem);
+  color: #fdfaf3;
+  background:
+    linear-gradient(rgba(44, 30, 23, 0.88), rgba(44, 30, 23, 0.96)),
+    url(/iphone_cacao_pod.jpg) center / cover no-repeat;
+}
+.phil-inner { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; }
+
+/* Photos: an overlapping trio above the heading on phones, scattered around it on wide screens. */
+.phil-collage { position: relative; z-index: 1; display: flex; justify-content: center; align-items: center; margin-bottom: 2.25rem; }
+.phil-photo {
+  width: clamp(96px, 27vw, 160px);
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55);
+  transform: rotate(var(--tilt, 0deg));
+  animation: hh-float 7s ease-in-out infinite;
+}
+.phil-photo + .phil-photo { margin-left: -1.1rem; }
+.phil-photo-a { --tilt: 3deg; z-index: 2; width: clamp(112px, 32vw, 190px); animation-delay: -2s; }
+.phil-photo-b { --tilt: -9deg; }
+.phil-photo-c { --tilt: 10deg; animation-delay: -4s; }
+
+@media (min-width: 1000px) {
+  .phil-collage { position: absolute; inset: 0; display: block; margin: 0; pointer-events: none; }
+  .phil-photo { position: absolute; pointer-events: auto; margin: 0 !important; width: clamp(130px, 14vw, 230px); }
+  .phil-photo-a { --tilt: -8deg; top: clamp(3rem, 7vw, 6rem); left: clamp(1rem, 4vw, 5rem); width: clamp(140px, 15vw, 250px); }
+  .phil-photo-b { --tilt: 9deg; top: clamp(6rem, 12vw, 11rem); right: clamp(1rem, 4vw, 5rem); }
+  .phil-photo-c { display: none; }
+}
+@media (min-width: 1500px) {
+  .phil-photo-c { display: block; --tilt: -6deg; top: 36rem; right: 1.5vw; width: clamp(150px, 11vw, 200px); }
+}
+
+.phil-glance { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-top: clamp(1.75rem, 4vw, 2.5rem); }
+.phil-glance-chip {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.55rem 1.05rem; border-radius: 999px;
+  background: rgba(253, 250, 243, 0.1); border: 1px solid rgba(212, 175, 55, 0.5);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  font-size: 0.92rem; font-weight: 600; color: #fdfaf3;
+}
+
+.phil-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.phil-card {
+  background: #fdfaf3; color: #3c2a21;
+  border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 22px; overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+.phil-card:hover { transform: translateY(-3px); border-color: #d4af37; }
+.phil-card[data-open="true"] { border-color: #d4af37; box-shadow: 0 20px 46px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.55); }
+.phil-head {
+  width: 100%; display: flex; align-items: center; gap: 1rem; padding: 1.05rem 1.15rem;
+  background: none; border: none; cursor: pointer; text-align: left; color: inherit; font: inherit;
+}
+.phil-head:focus-visible { outline: 3px solid #d4af37; outline-offset: -3px; border-radius: 22px; }
+.phil-icon {
+  flex-shrink: 0; width: 56px; height: 56px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 1.7rem;
+  background: linear-gradient(135deg, #fdf1d6, #fbe3a8);
+}
+.phil-badge {
+  display: inline-block; margin-bottom: 0.3rem; padding: 0.15rem 0.6rem; border-radius: 999px;
+  background: #d4af37; color: #3c2a21; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.phil-title { display: block; font-family: var(--font-heading); font-size: clamp(1.05rem, 2.6vw, 1.25rem); line-height: 1.2; color: #3c2a21; }
+.phil-glance-text { display: block; margin-top: 0.3rem; font-size: 0.88rem; line-height: 1.45; color: #7a6a61; }
+.phil-plus {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 1.4rem; line-height: 1;
+  background: #f5efe2; color: #3c2a21; transition: transform 0.3s, background 0.3s, color 0.3s;
+}
+.phil-card[data-open="true"] .phil-plus { transform: rotate(45deg); background: #d4af37; color: #fff; }
+
+/* Height animation without measuring: a grid row going 0fr -> 1fr. */
+.phil-body {
+  display: grid; grid-template-rows: 0fr; visibility: hidden;
+  transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s 0.4s;
+}
+.phil-card[data-open="true"] .phil-body { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+.phil-body-inner { min-height: 0; overflow: hidden; }
+.phil-body-pad { padding: 0.25rem 1.25rem 1.5rem; line-height: 1.75; color: #3c2a21; }
+.phil-body-pad p + p { margin-top: 0.9rem; }
+.phil-quote {
+  padding: 0.85rem 1rem; border-left: 3px solid #d4af37; border-radius: 0 12px 12px 0;
+  background: #fdf1d6; font-style: italic; color: #594a42;
+}
+.phil-chip { padding: 0.3rem 0.8rem; border-radius: 999px; background: #f5efe2; border: 1px solid #e8e1d7; font-size: 0.85rem; font-weight: 600; color: #594a42; }
+.phil-cta-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.25rem; }
+.phil-cta {
+  display: inline-block; padding: 0.75rem 1.4rem; border-radius: 999px;
+  background: #d4af37; color: #3c2a21; border: 1px solid #d4af37; font-weight: 700; font-size: 0.92rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.phil-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(212, 175, 55, 0.4); }
+.phil-cta-ghost { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  .phil-photo { animation: none; }
+  .phil-card, .phil-plus, .phil-body { transition: none; }
+}

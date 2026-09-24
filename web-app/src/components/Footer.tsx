@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { STORE_ADDRESS_LINES, STORE_MAPS_URL, STORE_WHATSAPP, STORE_WHATSAPP_DISPLAY } from '@/lib/siteContact';
 
 export default function Footer() {
   const handleScrollToTop = () => {
@@ -55,6 +56,17 @@ export default function Footer() {
             <li><Link href="/b2b/bakeries" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Padarias</Link></li>
           </ul>
         </div>
+        <div>
+          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Contato</h3>
+          <address style={{ fontStyle: 'normal', lineHeight: '1.9', color: '#e8e1d7' }}>
+            <strong style={{ color: '#fdfaf3' }}>The Tropical Bakery</strong>
+            {STORE_ADDRESS_LINES.map(line => <span key={line} style={{ display: 'block' }}>{line}</span>)}
+          </address>
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0.75rem 0 0', lineHeight: '2' }}>
+            <li><a href={`https://wa.me/${STORE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>WhatsApp {STORE_WHATSAPP_DISPLAY}</a></li>
+            <li><a href={STORE_MAPS_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#e8e1d7', textDecoration: 'none' }}>Como chegar</a></li>
+          </ul>
+        </div>
       </div>
       
       <div className="container" style={{ textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem', color: '#b2bec3' }}>
@@ -63,6 +75,8 @@ export default function Footer() {
         </p>
         <p style={{ fontSize: '0.8rem' }}>
           <Link href="/privacidade" style={{ color: '#b2bec3', textDecoration: 'underline' }}>Política de Privacidade</Link>
+          {' · '}
+          <Link href="/preferencias" style={{ color: '#b2bec3', textDecoration: 'underline' }}>Preferências de e-mail</Link>
         </p>
       </div>
     </footer>

@@ -61,6 +61,7 @@ const buildGroups = (): NavGroup[] => [
   {
     id: 'divulgacao', name: 'Divulgação', emoji: '📣', accent: '#9bab3c', shade: '#36536f',
     items: [
+      { name: 'E-mails', path: '/admin/emails', emoji: '✉️', hint: 'Escrever e enviar e-mails para clientes, parceiros e candidatos' },
       { name: 'Faixa de Anúncio', path: '/admin/anuncio', emoji: '🎉', hint: 'O aviso especial que aparece no topo da página inicial' },
       { name: 'Clientes & Campanhas', path: '/admin/crm', emoji: '💌', hint: 'Lista de clientes e mensagens em massa' },
     ],

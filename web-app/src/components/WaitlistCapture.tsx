@@ -78,6 +78,10 @@ export default function WaitlistCapture({ theme = 'dark' }: { theme?: 'light' | 
       setErrorMsg('Ocorreu um erro ao entrar na fila de espera. Tente novamente.');
       console.error(error);
     } else {
+      // Add them to the e-mail list so they hear when the next batch opens.
+      await supabase.rpc('email_contact_upsert', {
+        p_email: formData.email, p_full_name: formData.name, p_tags: ['cliente'], p_source: 'fila_de_espera',
+      });
       if (formData.name) localStorage.setItem('checkout_fullName', formData.name);
       if (formData.whatsapp) localStorage.setItem('checkout_phone', formData.whatsapp);
       setSuccess(true);

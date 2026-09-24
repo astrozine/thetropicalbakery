@@ -153,6 +153,12 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
       allergies,
     } as never);
 
+    if (email.trim()) {
+      await supabase.rpc('email_contact_upsert', {
+        p_email: email.trim(), p_full_name: fullName, p_tags: ['cliente', 'assinante'], p_source: 'assinatura',
+      });
+    }
+
     setSubmitting(false);
     setDone(true);
   };

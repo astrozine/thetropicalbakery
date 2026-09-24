@@ -78,6 +78,14 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
 
       if (error) throw error;
 
+      // Interested in courses/retreats -> the matching e-mail list.
+      await supabase.rpc('email_contact_upsert', {
+        p_email: email.trim(),
+        p_full_name: name.trim(),
+        p_tags: /retiro/i.test(interestType || '') ? ['retiros', 'cursos'] : ['cursos'],
+        p_source: 'inscricao_curso',
+      });
+
       setStatus('success');
       
       // Auto-close modal after 3 seconds

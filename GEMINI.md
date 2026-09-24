@@ -81,7 +81,7 @@ special "backyard" market with its own logos (`public/itamambuca-lockup.png`, `i
   `anon` only what visitors need.
 - Migration status: 02–05 were run earlier, as far as we know. **06–14 were being run by Andrew as they were written;
   do not assume any of them ran.** 12 (delivery schedule + order columns), 13 (box items) and 14
-  (treat ingredients/allergens) are the newest. Ask, or look for the in-app warnings.
+  (treat ingredients/allergens) and 15 (e-mail preferences) are the newest. Ask, or look for the in-app warnings.
 
 ## 5. Feature map (where things live)
 
@@ -115,6 +115,14 @@ calendar, subscriptions, boxes, waitlist, course sign-ups, treat catalog, course
 and prices, maintenance-contacts catalogue, special announcement banner, CRM and campaigns,
 job applications, **Administradores** (add/remove admins). The account menu shows an
 "Administração" link only to admins. Use `ToggleSwitch` for on/off settings and `ImagePicker` for photos.
+
+**E-mail**: topics/lists in `src/lib/emailTopics.ts`, templates in `src/lib/email/campaigns.ts`,
+shell in `src/lib/email/layout.ts`, sending in `POST /api/email/send` (writes an `email_sends` row
+first; the unique `(email, message_key)` index is what stops a second copy), public preference page
+`/preferencias?token=…` backed by SECURITY DEFINER functions, contacts collected through the
+`email_contact_upsert` RPC in every form. Transactional topics ignore unsubscribes; marketing never
+may. Admin UI: `/admin/emails`. Schema: `migration_15_email_preferences.sql`. See `web-app/CLAUDE.md`
+for the rules.
 
 **Public pages**: `/` home, `/assinatura`, `/caixas`, `/menu`, `/retreats` (+ `/en/retreats`,
 `/es/retiros`, but the newest retreat sections are Portuguese only), `/cursos`, `/b2b/*`,
