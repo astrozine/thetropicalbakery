@@ -2,12 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { InboxSummary } from './InboxFeed';
 
 export default function AdminDashboard() {
   return (
     <div>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '2rem' }}>Visão Geral</h1>
-      
+
+      <InboxSummary />
+
+      <h2 style={{ fontSize: '1.2rem', color: '#7f8c8d', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Atalhos</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
         
         {/* Catálogo de Doces Card */}
