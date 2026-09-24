@@ -11,12 +11,14 @@ const VIDEOS = [
   {
     id: 'A9jE_KzW6J0',
     who: 'Dr. Joel Fuhrman',
+    credential: 'Médico de família com certificação nos EUA (MD), autor de vários best-sellers do New York Times e presidente da Nutritional Research Foundation. Atende em Nova Jersey.',
     caption: 'O que ele chama de dieta “nutritariana” e os seis grupos G-BOMBS.',
     source: 'Canal oficial do Dr. Fuhrman',
   },
   {
     id: 'Ls_sI4zdm_M',
     who: 'Dr. Alan Goldhamer',
+    credential: 'Quiroprata (DC) e fundador do TrueNorth Health Center, em Santa Rosa, Califórnia: um centro de saúde com internação, focado em alimentação vegetal integral sem sal, óleo e açúcar e em jejum supervisionado.',
     caption: 'Por que sal, óleo e açúcar viciam o paladar, e como largar.',
     source: 'Entrevista do HappyCow',
   },
@@ -67,6 +69,7 @@ function VideoCard({ v }: { v: typeof VIDEOS[number] }) {
       </div>
       <figcaption style={{ padding: '0.85rem 0.25rem 0' }}>
         <strong style={{ color: '#3c2a21', display: 'block', fontSize: '1rem' }}>{v.who}</strong>
+        <span style={{ color: '#8a6d1f', fontSize: '0.82rem', lineHeight: 1.55, display: 'block', margin: '0.15rem 0 0.45rem' }}>{v.credential}</span>
         <span style={{ color: '#594a42', fontSize: '0.9rem', lineHeight: 1.6, display: 'block' }}>{v.caption}</span>
         <span style={{ color: '#a89a90', fontSize: '0.75rem' }}>{v.source} · conteúdo público de terceiros no YouTube</span>
       </figcaption>
@@ -88,7 +91,8 @@ export function InspirationSection() {
             Por que a gente come (e cozinha) assim
           </h2>
           <p style={{ color: '#594a42', fontSize: '1.08rem', lineHeight: 1.85, maxWidth: '720px', margin: '0 auto' }}>
-            Boa parte das ideias por trás da Tropical Bakery vem de dois nomes que estudamos: Joel Fuhrman e Alan Goldhamer.
+            Boa parte das ideias por trás da Tropical Bakery vem de dois profissionais de saúde americanos que estudamos:
+            o médico Joel Fuhrman, de Nova Jersey, e o quiroprata Alan Goldhamer, fundador de um centro de saúde na Califórnia.
             A gente não segue todas as regras deles. Mas entender a lógica nos ajudou a nos sentirmos bem todos os dias,
             e queremos dividir esse raciocínio com você.
           </p>
