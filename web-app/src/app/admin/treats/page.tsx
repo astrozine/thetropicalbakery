@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
 import ToggleSwitch from '@/components/ToggleSwitch';
 import { AllergenFields, EmojiField, IngredientsField } from '@/components/TreatDetailsFields';
+import TreatInfo from '@/components/TreatInfo';
+import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { syncTreatIntoBoxes } from '@/lib/treatSync';
 
@@ -37,6 +39,7 @@ export default function TreatsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Treat>>({});
   const [uploading, setUploading] = useState(false);
+  const [refine, setRefine] = useState<RefineState>(emptyRefine);
 
   useEffect(() => {
     fetchTreats();
@@ -137,6 +140,8 @@ export default function TreatsAdmin() {
 
   if (loading) return <div style={{ padding: '2rem' }}>Carregando doces...</div>;
 
+  const visibleTreats = treats.filter(t => matchesRefine(t, refine));
+
   return (
     <div style={{ maxWidth: '1400px' }}>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Catálogo de Doces (Menu de Eventos)</h1>
@@ -229,9 +234,24 @@ export default function TreatsAdmin() {
         </div>
       </form>
 
+      {/* Refine the list: folders of allergens and ingredients, opened accordion-style */}
+      <TreatRefineMenu treats={treats} value={refine} onChange={setRefine} shown={visibleTreats.length} />
+
+      {visibleTreats.length === 0 && (
+        <div style={{ ...card, textAlign: 'center', color: '#7f8c8d' }}>
+          <p style={{ marginBottom: '1rem' }}>Nenhum doce combina com esses filtros.</p>
+          {refineCount(refine) > 0 && (
+            <button type="button" onClick={() => setRefine({ ...emptyRefine, mode: refine.mode })}
+              style={{ padding: '0.6rem 1.25rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+              Limpar filtros
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Treats List */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-        {treats.map(treat => (
+        {visibleTreats.map(treat => (
           <div key={treat.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
             <div style={{ position: 'relative', height: '200px', background: '#f5f6fa' }}>
               {treat.image_url ? (
@@ -256,6 +276,12 @@ export default function TreatsAdmin() {
                   <span style={{ color: '#e67e22', fontWeight: 'bold' }}> — falta preencher</span>
                 )}
               </p>
+
+              {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length > 0 && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <TreatInfo ingredients={treat.ingredients} contains={treat.contains} may_contain={treat.may_contain} showEmptyNote={false} />
+                </div>
+              )}
 
               <div style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: '1.5rem', background: '#f8f9fa', padding: '0.5rem', borderRadius: '4px' }}>
                 <div><strong>Min:</strong> {treat.min_batch_size} un.</div>
