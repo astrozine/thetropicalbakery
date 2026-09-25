@@ -3,6 +3,7 @@ import Marquee from '@/components/Marquee';
 import ScrollReveal from '@/components/ScrollReveal';
 import ExplodingTreats from '@/components/ExplodingTreats';
 import PhilosophyShowcase from '@/components/PhilosophyShowcase';
+import PhotoShowcase from '@/components/PhotoShowcase';
 import FeaturedBoxCard from '@/components/FeaturedBoxCard';
 import { formatBatchDate } from '@/lib/batchDate';
 import ModalCard from '@/components/ModalCard';
@@ -81,6 +82,9 @@ export default async function Home() {
 
       {/* Philosophy Section: accordions for the story, boxes, prices, ingredients, events and delivery */}
       <PhilosophyShowcase featuredImage={getContent('home-about', '/menu-items/1000240473 - Edited (1).jpg')} />
+
+      {/* Full-colour photo band: the branded paper and the treats */}
+      <PhotoShowcase />
 
       {/* Parallax Banner 1 */}
       <section 

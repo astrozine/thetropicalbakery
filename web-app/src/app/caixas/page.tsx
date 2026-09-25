@@ -242,7 +242,7 @@ export default function CaixasPage() {
 
       {/* Offered after the one-off purchase, where the value of not having to
           come back and do this every week is most obvious. */}
-      <StripedBackground tone="dark" bandHeight={80} style={{ padding: 'clamp(3.5rem, 8vw, 5.5rem) 1.5rem' }}>
+      <StripedBackground tone="dark" bandHeight={80} image="/textures/copacabana-baker.webp" imagePosition="80% 55%" style={{ padding: 'clamp(3.5rem, 8vw, 5.5rem) 1.5rem' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
           <p style={{
             color: '#d4af37', fontSize: '0.72rem', textTransform: 'uppercase',

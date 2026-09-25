@@ -20,6 +20,13 @@ interface StripedBackgroundProps {
   tone?: Tone;
   /** Band height in px. Bigger reads calmer and more expensive. */
   bandHeight?: number;
+  /**
+   * A photo laid behind the text, desaturated and tinted cocoa so it adds texture without
+   * competing with the heading. Use it for headers; it replaces the stripes.
+   */
+  image?: string;
+  /** CSS background-position for `image`, to choose which part of the photo shows. */
+  imagePosition?: string;
   id?: string;
   style?: React.CSSProperties;
   className?: string;
@@ -44,6 +51,8 @@ export default function StripedBackground({
   children,
   tone = 'dark',
   bandHeight = 88,
+  image,
+  imagePosition = 'center',
   id,
   style,
   className,
@@ -75,6 +84,19 @@ export default function StripedBackground({
         ...style,
       }}
     >
+      {image && (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              backgroundImage: `url("${image}")`, backgroundSize: 'cover', backgroundPosition: imagePosition,
+              filter: 'grayscale(1) sepia(0.45) contrast(1.1)',
+            }}
+          />
+          <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'rgba(60,42,33,0.66)' }} />
+        </>
+      )}
       {/* A soft vignette so the stripes recede behind the text instead of
           competing with it. */}
       <div

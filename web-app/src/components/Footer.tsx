@@ -11,14 +11,19 @@ export default function Footer() {
 
   return (
     <footer className="footer fade-in relative" style={{
-      backgroundImage: 'linear-gradient(rgba(60, 42, 33, 0.9), rgba(60, 42, 33, 0.9)), url(/iphone_cacao_pod.jpg)',
-      backgroundAttachment: 'fixed',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
+      backgroundColor: '#3c2a21',
+      overflow: 'hidden',
       color: '#fdfaf3',
       padding: '6rem 2rem 3rem'
     }}>
-      <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+      {/* The bakery photo, desaturated and tinted cocoa so it gives texture without hurting the links. */}
+      <div aria-hidden style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        backgroundImage: 'url(/textures/copacabana-baker.webp)', backgroundSize: 'cover', backgroundPosition: 'center 65%',
+        filter: 'grayscale(1) sepia(0.45) contrast(1.1)',
+      }} />
+      <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(60,42,33,0.82) 0%, rgba(60,42,33,0.72) 100%)' }} />
+      <div className="container" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
         <div>
           <img src="/logo.svg" alt="The Tropical Bakery" style={{ height: '60px', marginBottom: '1rem', filter: 'brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(5deg)' }} />
           <p style={{ marginBottom: '2rem', color: '#e8e1d7' }}>A melhor experiência de confeitaria saudável em Ubatuba.</p>
@@ -70,7 +75,7 @@ export default function Footer() {
         </div>
       </div>
       
-      <div className="container" style={{ textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem', color: '#b2bec3' }}>
+      <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem', color: '#b2bec3' }}>
         <p style={{ fontSize: '0.85rem', marginBottom: '0.75rem' }}>
           &copy; {new Date().getFullYear()} The Tropical Bakery. All rights reserved.
         </p>
