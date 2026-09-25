@@ -100,7 +100,7 @@ export default function CaixasPage() {
           
           <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
             
-            <h1 style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem', color: '#d4af37' }}>
+            <h1 style={{ fontSize: 'clamp(1.85rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem', color: '#d4af37' }}>
               Preparando o Próximo Lote...
             </h1>
             
@@ -202,7 +202,7 @@ export default function CaixasPage() {
             <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.5rem' }}>
               Edição Limitada • {formatBatchDate(activeBox.batch_date_label)}
             </span>
-            <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem' }}>
+            <h1 style={{ fontSize: 'clamp(1.95rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem' }}>
               {(() => {
                 // "Chegada da Primavera: Sensações Amarelas" -> the theme after the colon is set in the site gold.
                 const i = activeBox.title.indexOf(':');
@@ -279,7 +279,7 @@ export default function CaixasPage() {
       <StripedBackground tone="dark" bandHeight={80} image="/textures/copacabana-baker.webp" imagePosition="80% 55%" style={{ padding: 'clamp(3.5rem, 8vw, 5.5rem) 1.5rem' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
           <p style={{
-            color: '#d4af37', fontSize: '0.72rem', textTransform: 'uppercase',
+            color: '#d4af37', fontSize: '0.8rem', textTransform: 'uppercase',
             letterSpacing: '0.2em', marginBottom: '1rem',
           }}>
             Assinatura Semanal

@@ -150,7 +150,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             {texts.hero.location}
           </span>
           <h1 style={{
-            fontSize: 'clamp(2.5rem, 7vw, 5.5rem)',
+            fontSize: 'clamp(1.95rem, 7vw, 5.5rem)',
             color: '#fff',
             fontFamily: 'var(--font-heading)',
             lineHeight: '1.1',

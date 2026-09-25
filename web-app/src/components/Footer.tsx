@@ -79,7 +79,7 @@ export default function Footer() {
         <p style={{ fontSize: '0.85rem', marginBottom: '0.75rem' }}>
           &copy; {new Date().getFullYear()} The Tropical Bakery. All rights reserved.
         </p>
-        <p style={{ fontSize: '0.8rem' }}>
+        <p className="footer-legal" style={{ fontSize: '0.8rem' }}>
           <Link href="/privacidade" style={{ color: '#b2bec3', textDecoration: 'underline' }}>Política de Privacidade</Link>
           {' · '}
           <Link href="/preferencias" style={{ color: '#b2bec3', textDecoration: 'underline' }}>Preferências de e-mail</Link>

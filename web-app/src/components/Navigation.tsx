@@ -129,7 +129,7 @@ export default function Navigation() {
         alignItems: 'center',
         justifyContent: 'center',
         gap: '0.5rem',
-        fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
+        fontSize: 'clamp(0.78rem, 2vw, 0.9rem)',
         padding: 'clamp(0.5rem, 1.5vw, 0.8rem)'
       }}>
         <span>🌴 Entregas exclusivas: Itamambuca, Ubatuba e Região. Eventos em Paraty! 🌴</span>
@@ -319,15 +319,22 @@ export default function Navigation() {
 
         {/* Mobile Menu Toggle & Cart */}
         <div className="md:hidden glass-pill actions-pill flex items-center gap-4">
-          <button 
+          {/* 44x44 is the smallest a thumb hits reliably (Apple HIG); the glyph stays 1.5rem. */}
+          <button
             onClick={() => setIsCartOpen(true)}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              fontSize: '1.5rem', 
+            aria-label="Abrir o carrinho"
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '1.5rem',
               cursor: 'pointer',
               color: '#3c2a21',
-              position: 'relative'
+              position: 'relative',
+              minWidth: '44px',
+              minHeight: '44px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             🛒
@@ -348,7 +355,15 @@ export default function Navigation() {
             )}
           </button>
           
-          <button onClick={() => setIsOpen(!isOpen)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#3c2a21' }}>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? 'Fechar o menu' : 'Abrir o menu'}
+            aria-expanded={isOpen}
+            style={{
+              background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#3c2a21',
+              minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
             {isOpen ? '✕' : '☰'}
           </button>
         </div>

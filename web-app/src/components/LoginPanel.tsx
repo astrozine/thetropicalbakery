@@ -287,7 +287,7 @@ export default function LoginPanel({
         </p>
       )}
 
-      <p style={{ fontSize: '0.7rem', color: '#a89a90', marginTop: '1rem' }}>
+      <p className="login-fineprint" style={{ fontSize: '0.7rem', color: '#a89a90', marginTop: '1rem' }}>
         Ao entrar, você concorda com nossa{' '}
         <Link href="/privacidade" style={{ color: '#a89a90', textDecoration: 'underline' }}>
           Política de Privacidade

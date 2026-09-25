@@ -115,7 +115,7 @@ export default function CareersPage() {
           <img src="/logo-gold.webp" alt="" style={{ height: 'clamp(64px, 10vw, 88px)', margin: '0 auto 1.75rem', display: 'block' }} />
           <span style={{
             display: 'inline-block', border: '1px solid rgba(212,175,55,0.6)', color: '#d4af37',
-            padding: '0.4rem 1.1rem', borderRadius: '30px', fontSize: '0.72rem',
+            padding: '0.4rem 1.1rem', borderRadius: '30px', fontSize: '0.8rem',
             textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: '1.5rem',
           }}>
             Ubatuba · Perequê-Açu · Taquaral · Praia do Prumirim
@@ -308,13 +308,13 @@ export default function CareersPage() {
 
                 <label style={{
                   display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer',
-                  color: '#594a42', fontSize: '0.95rem',
+                  color: '#594a42', fontSize: '0.95rem', minHeight: '44px',
                 }}>
                   <input
                     type="checkbox"
                     checked={form.has_transport}
                     onChange={e => setForm({ ...form, has_transport: e.target.checked })}
-                    style={{ width: '18px', height: '18px', accentColor: '#d4af37' }}
+                    style={{ width: '22px', height: '22px', accentColor: '#d4af37', flexShrink: 0 }}
                   />
                   Tenho transporte próprio (moto ou carro)
                 </label>

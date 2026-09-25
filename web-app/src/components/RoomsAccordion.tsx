@@ -99,7 +99,7 @@ export default function RoomsAccordion({ onInquire }: Props) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={optimizedSrc(room.photos[0], 256)} alt="" loading="lazy" decoding="async" style={{ width: '104px', height: '78px', objectFit: 'cover', borderRadius: '12px', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'inline-block', background: 'rgba(212,175,55,0.16)', color: '#8a6d1f', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.2rem 0.65rem', borderRadius: '20px', marginBottom: '0.4rem' }}>
+                <span style={{ display: 'inline-block', background: 'rgba(212,175,55,0.16)', color: '#8a6d1f', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.2rem 0.65rem', borderRadius: '20px', marginBottom: '0.4rem' }}>
                   {room.capacity}
                 </span>
                 <h3 style={{ fontSize: 'clamp(1.05rem, 2.4vw, 1.4rem)', color: '#3c2a21', margin: 0, lineHeight: 1.2 }}>{room.name}</h3>

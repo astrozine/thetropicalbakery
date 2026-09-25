@@ -301,7 +301,9 @@ a {
 
 .section-title {
   text-align: center;
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  /* The floor is what a phone gets (5vw only overtakes it above ~800px), so it is
+     deliberately phone-sized; big screens still reach 4rem. */
+  font-size: clamp(1.95rem, 5vw, 4rem);
   color: var(--color-primary);
   margin-bottom: 4rem;
 }
@@ -743,7 +745,7 @@ body {
 .crs-hero { position: relative; min-height: min(92vh, 860px); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #2a1c15; padding: 6rem 1.25rem 5rem; }
 .crs-hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(.42) saturate(1.1); transform: scale(1.05); }
 .crs-hero-inner { position: relative; z-index: 3; text-align: center; max-width: 860px; }
-.crs-hero-title { font-family: var(--font-heading); font-size: clamp(2.6rem, 8vw, 5.6rem); color: #fff; line-height: 1.02; margin-bottom: 1.4rem; text-shadow: 0 6px 30px rgba(0,0,0,.35); }
+.crs-hero-title { font-family: var(--font-heading); font-size: clamp(1.95rem, 8vw, 5.6rem); color: #fff; line-height: 1.02; margin-bottom: 1.4rem; text-shadow: 0 6px 30px rgba(0,0,0,.35); }
 .crs-hero-tagline { font-size: clamp(1.05rem, 2.6vw, 1.35rem); color: rgba(253, 250, 243, .92); line-height: 1.75; max-width: 700px; margin: 0 auto 2.2rem; }
 .crs-hero-actions { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; }
 .crs-hero-price { margin-top: 1.3rem; color: #f4d675; font-weight: 700; letter-spacing: .05em; }
@@ -873,4 +875,85 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .crs-float, .crs-rain-drops, .crs-rain-cloud, .crs-trick { animation: none; }
   .crs-trick-inner { transition: none; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PHONE POLISH
+   Measured on a real iPhone SE (375px) and iPhone 14 (390px) in Chrome, then
+   fixed. Everything here is inside a max-width query, so the desktop layout
+   Andrew likes is mathematically untouched.
+
+   Three rules, from Apple's HIG and Google's Material guidance:
+     · nothing you tap is smaller than 44×44px
+     · no text under 12px
+     · a heading should not eat the whole screen
+   ════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  /* ---- 1. Tap targets -----------------------------------------------------
+     The footer menus were 19px tall — a thumb covers three links at once. */
+  .footer li > a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.1rem 0;
+  }
+  .footer li { line-height: 1.35; }
+
+  /* The two most-used buttons on the site (cart, menu) measured 33×38 and 22×38. */
+  .actions-pill { padding: 0.25rem 0.55rem !important; gap: 0.35rem !important; }
+  .actions-pill > button {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Legal and secondary links sat at 14–18px tall. */
+  .footer-legal a,
+  .login-fineprint a {
+    display: inline-block;
+    padding: 0.55rem 0;
+  }
+
+  /* Checkboxes drawn by the browser are ~16px. Grow the box and the row it sits in. */
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  label:has(> input[type="checkbox"]),
+  label:has(> input[type="radio"]) { min-height: 44px; }
+
+  /* ---- 2. Text that was too small to read --------------------------------- */
+  .hh-tag { font-size: 0.76rem; }
+  .phil-badge { font-size: 0.78rem; }
+  .crs-trick-label,
+  .crs-course-eyebrow { font-size: 0.78rem; }
+  .login-fineprint { font-size: 0.78rem !important; }
+
+  /* ---- 3. Headings ---------------------------------------------------------
+     Long Portuguese words ("DEGUSTAÇÃO", "SENSAÇÕES") used to break out of
+     their box. Let them wrap anywhere rather than spill off the screen. */
+  h1, h2, h3, .section-title, .crs-hero-title {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  /* Tighter leading, since big type on a narrow screen looks airy and loose. */
+  h1, .crs-hero-title { line-height: 1.08; }
+
+  /* ---- 4. Forms -----------------------------------------------------------
+     "CEP · Rua · Número" in one row left Rua a few characters wide and stranded
+     Número on a line of its own. On a phone the two short fields pair up and the
+     street name gets the full width. */
+  .addr-row .addr-cep,
+  .addr-row .addr-num { flex: 1 1 0 !important; order: 1; min-width: 0; }
+  .addr-row .addr-street { flex: 1 1 100% !important; order: 2; }
+}
+
+/* Very narrow phones (iPhone SE and older Androids). */
+@media (max-width: 400px) {
+  .section-title { margin-bottom: 2.5rem; }
 }

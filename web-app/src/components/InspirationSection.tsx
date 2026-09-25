@@ -141,7 +141,7 @@ export function InspirationTeaser({ href = '/retreats#inspiracao' }: { href?: st
       style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', maxWidth: '900px', margin: '0 auto', padding: '1.25rem 1.6rem', background: '#f5efe2', border: '1px solid #e8e1d7', borderRadius: '16px', textDecoration: 'none' }}
     >
       <span>
-        <span style={{ display: 'block', color: '#a6832b', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+        <span style={{ display: 'block', color: '#a6832b', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
           Inspiração por trás da nossa dieta e do nosso pensamento
         </span>
         <span style={{ color: '#3c2a21', fontSize: '1rem', lineHeight: 1.5 }}>

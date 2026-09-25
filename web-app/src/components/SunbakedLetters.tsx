@@ -23,7 +23,7 @@ export default function SunbakedLetters({ tone = 'light' }: { tone?: 'light' | '
         boxShadow: dark ? '0 16px 40px rgba(0,0,0,0.25)' : '0 8px 24px rgba(60,42,33,0.08)',
       }}
     >
-      <p style={{ fontSize: '0.72rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: dark ? '#ffd166' : '#a6832b', marginBottom: '0.6rem' }}>
+      <p style={{ fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: dark ? '#ffd166' : '#a6832b', marginBottom: '0.6rem' }}>
         Para ir mais fundo
       </p>
       <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.5rem, 4vw, 2.1rem)', color: dark ? '#fdfaf3' : '#3c2a21', lineHeight: 1.15, marginBottom: '0.75rem' }}>

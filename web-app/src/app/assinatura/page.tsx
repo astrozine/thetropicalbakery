@@ -126,14 +126,14 @@ export default function SubscriptionPage() {
 
           <span style={{
             display: 'inline-block', border: '1px solid rgba(212,175,55,0.6)', color: '#d4af37',
-            padding: '0.4rem 1.1rem', borderRadius: '30px', fontSize: '0.72rem',
+            padding: '0.4rem 1.1rem', borderRadius: '30px', fontSize: '0.8rem',
             textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '1.75rem',
           }}>
             Assinatura Semanal
           </span>
 
           <h1 style={{
-            fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.4rem, 7vw, 4.6rem)',
+            fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.95rem, 7vw, 4.6rem)',
             lineHeight: 1.05, color: '#fdfaf3', marginBottom: '1.5rem',
           }}>
             Caixa de Degustação,<br />
@@ -298,7 +298,7 @@ export default function SubscriptionPage() {
                       <span style={{
                         position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)',
                         background: '#d4af37', color: '#3c2a21', padding: '0.3rem 1rem',
-                        borderRadius: '20px', fontSize: '0.68rem', fontWeight: 800,
+                        borderRadius: '20px', fontSize: '0.78rem', fontWeight: 800,
                         textTransform: 'uppercase', letterSpacing: '0.12em', whiteSpace: 'nowrap',
                       }}>
                         {plan.badge}

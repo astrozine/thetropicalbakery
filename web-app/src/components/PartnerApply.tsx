@@ -31,7 +31,8 @@ const input: React.CSSProperties = {
   borderRadius: '8px', background: 'rgba(255,255,255,0.9)', fontFamily: 'var(--font-body)', fontSize: '1rem',
 };
 const label: React.CSSProperties = {
-  display: 'block', fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase',
+  // 0.8rem = 12.8px: the smallest a form label should ever be on a phone.
+  display: 'block', fontSize: '0.8rem', letterSpacing: '0.12em', textTransform: 'uppercase',
   color: '#a6832b', fontWeight: 700, marginBottom: '0.4rem',
 };
 
@@ -211,7 +212,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
                           <img src={optimizedSrc(t.image_url, 256)} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                         )}
                       </span>
-                      <span style={{ display: 'block', padding: '0.35rem 0.4rem 0.45rem', fontSize: '0.74rem', lineHeight: 1.25, fontWeight: on ? 700 : 500, color: '#3c2a21' }}>{t.name}</span>
+                      <span style={{ display: 'block', padding: '0.35rem 0.4rem 0.45rem', fontSize: '0.8rem', lineHeight: 1.25, fontWeight: on ? 700 : 500, color: '#3c2a21' }}>{t.name}</span>
                       {flag && <span style={{ display: 'block', padding: '0 0.4rem 0.45rem', fontSize: '0.68rem', lineHeight: 1.25, color: m?.status === 'unsafe' ? '#b03a2e' : '#8a5a00', fontWeight: 700 }}>{flag}</span>}
                       {on && <span aria-hidden style={{ position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>✓</span>}
                     </button>
@@ -237,7 +238,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
           </button>
 
           <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#7a6a61' }}>
-            Já é parceiro? <Link href="/parceiro" style={{ color: '#8a6d1f', fontWeight: 700 }}>Entrar no portal</Link>
+            Já é parceiro? <Link href="/parceiro" style={{ color: '#8a6d1f', fontWeight: 700, display: 'inline-block', padding: '0.6rem 0.25rem' }}>Entrar no portal</Link>
           </p>
         </form>
       </div>

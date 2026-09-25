@@ -98,7 +98,7 @@ export default function ExplodingTreats() {
         {/* Fixed Pinned CTA Action Area */}
         <div style={{ width: '90%', marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
            <div style={{ background: 'rgba(253,250,243,0.72)', backdropFilter: 'blur(14px)', border: '1px solid rgba(212,175,55,0.4)', padding: '1.1rem 1.25rem', borderRadius: '18px', textAlign: 'center' }}>
-            <span style={{ display: 'block', color: '#a6832b', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            <span style={{ display: 'block', color: '#a6832b', fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               🌴 Itamambuca · Ubatuba
             </span>
             <p style={{ color: '#3c2a21', fontWeight: 800, fontSize: '0.95rem', margin: '0 0 0.65rem', fontFamily: 'var(--font-heading)' }}>
@@ -106,7 +106,7 @@ export default function ExplodingTreats() {
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', justifyContent: 'center' }}>
               {tags.map(tag => (
-                <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#3c2a21', fontSize: '0.65rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#3c2a21', fontSize: '0.78rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)' }}>
                   {tag}
                 </span>
               ))}
@@ -200,7 +200,7 @@ export default function ExplodingTreats() {
             pointerEvents: 'auto',
           }}
         >
-          <span style={{ display: 'inline-block', color: '#a6832b', fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+          <span style={{ display: 'inline-block', color: '#a6832b', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
             🌴 Itamambuca · Ubatuba
           </span>
           <h2 style={{ color: '#3c2a21', fontWeight: 700, fontSize: 'clamp(1.5rem, 3.4vw, 1.9rem)', marginBottom: '1.1rem', lineHeight: 1.35, letterSpacing: '0.01em', fontFamily: 'var(--font-heading)' }}>
@@ -208,7 +208,7 @@ export default function ExplodingTreats() {
           </h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
             {tags.map(tag => (
-              <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#3c2a21', fontSize: '0.72rem', fontWeight: 700, padding: '0.35rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.35)' }}>
+              <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#3c2a21', fontSize: '0.8rem', fontWeight: 700, padding: '0.35rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.35)' }}>
                 {tag}
               </span>
             ))}

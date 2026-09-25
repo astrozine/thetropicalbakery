@@ -117,8 +117,9 @@ export default function AddressFields({ value, onChange, required = false }: Add
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        <div style={{ flex: '0 1 180px' }}>
+      {/* On a phone this row becomes: CEP + Número side by side, then Rua full width (see globals.css). */}
+      <div className="addr-row" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        <div className="addr-cep" style={{ flex: '0 1 180px' }}>
           <label style={labelStyle}>CEP</label>
           <input
             type="text"
@@ -129,7 +130,7 @@ export default function AddressFields({ value, onChange, required = false }: Add
             onChange={e => handleCEP(e.target.value)}
             style={inputStyle}
           />
-          <p style={{ fontSize: '0.72rem', marginTop: '0.35rem', minHeight: '1rem', color: lookupState === 'notfound' ? '#b9770e' : '#7a6a61' }}>
+          <p style={{ fontSize: '0.8rem', marginTop: '0.35rem', minHeight: '1rem', color: lookupState === 'notfound' ? '#b9770e' : '#7a6a61' }}>
             {lookupState === 'loading' && 'Buscando endereço...'}
             {lookupState === 'found' && '✓ Endereço encontrado'}
             {lookupState === 'notfound' && 'CEP não encontrado — preencha abaixo'}
@@ -137,7 +138,7 @@ export default function AddressFields({ value, onChange, required = false }: Add
           </p>
         </div>
 
-        <div style={{ flex: '3 1 240px' }}>
+        <div className="addr-street" style={{ flex: '3 1 240px' }}>
           <label style={labelStyle}>Rua / Avenida</label>
           <input
             type="text"
@@ -150,7 +151,7 @@ export default function AddressFields({ value, onChange, required = false }: Add
           />
         </div>
 
-        <div style={{ flex: '0 1 120px' }}>
+        <div className="addr-num" style={{ flex: '0 1 120px' }}>
           <label style={labelStyle}>Número</label>
           <input
             type="text"
