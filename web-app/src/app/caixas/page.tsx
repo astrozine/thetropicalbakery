@@ -11,12 +11,14 @@ import Marquee from '@/components/Marquee';
 import BoxContents from '@/components/BoxContents';
 import { BoxItem } from '@/lib/allergens';
 import { formatBatchDate } from '@/lib/batchDate';
+import { BoxWindowFields, deliveryWindowLabel, hasDeliveryWindow, longDay } from '@/lib/boxWindow';
+import { useBoxSale } from '@/lib/useBoxSale';
 import HeroBoxCard, { HeroBoxStrip, type HeroBoxPhoto } from '@/components/HeroBoxCard';
 
 // Real photos of earlier boxes, used whenever the database has too few of its own.
 const FALLBACK_BOX_PHOTOS: HeroBoxPhoto[] = ['/box1.jpg', '/box2.jpg', '/box3.jpg', '/box4.jpg'].map(src => ({ src }));
 
-interface TastingBox {
+interface TastingBox extends BoxWindowFields {
   id: string;
   title: string;
   description: string;
@@ -32,6 +34,7 @@ export default function CaixasPage() {
   const [activeBox, setActiveBox] = useState<TastingBox | null>(null);
   const [loading, setLoading] = useState(true);
   const [pastPhotos, setPastPhotos] = useState<HeroBoxPhoto[]>([]);
+  const sale = useBoxSale(activeBox);
 
   useEffect(() => {
     const fetchPastBoxes = async () => {
@@ -221,8 +224,39 @@ export default function CaixasPage() {
               <div style={{ width: '100%', height: '12px', background: 'rgba(255,255,255,0.2)', borderRadius: '6px', overflow: 'hidden' }}>
                 <div style={{ width: `${percentageSold}%`, height: '100%', background: remainingQuantity <= 5 ? '#ff7675' : '#d4af37', transition: 'width 1s ease-in-out' }} />
               </div>
-              {remainingQuantity <= 5 && remainingQuantity > 0 && (
+              {remainingQuantity <= 5 && remainingQuantity > 0 && sale?.state === 'open' && (
                 <p style={{ color: '#ff7675', marginTop: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold', animation: 'pulse 2s infinite', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>Corra! O lote está quase no fim.</p>
+              )}
+
+              {/* The two windows: when it arrives, and until when you can order */}
+              {sale && (hasDeliveryWindow(activeBox) || sale.closesOn || sale.state !== 'open') && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center', marginTop: '1rem' }}>
+                  {hasDeliveryWindow(activeBox) && (
+                    <span style={{ background: 'rgba(212,175,55,0.2)', border: '1px solid rgba(212,175,55,0.6)', color: '#fdfaf3', borderRadius: '999px', padding: '0.35rem 0.9rem', fontSize: '0.88rem', fontWeight: 600 }}>
+                      🚚 Entregas {deliveryWindowLabel(activeBox)}
+                    </span>
+                  )}
+                  {sale.state === 'open' && sale.closesOn && (
+                    <span style={{ background: 'rgba(212,175,55,0.2)', border: '1px solid rgba(212,175,55,0.6)', color: '#fdfaf3', borderRadius: '999px', padding: '0.35rem 0.9rem', fontSize: '0.88rem', fontWeight: 600 }}>
+                      ⏳ Pedidos até {longDay(sale.closesOn)}
+                    </span>
+                  )}
+                  {sale.state === 'soon' && sale.opensOn && (
+                    <span style={{ background: '#d4af37', color: '#3c2a21', borderRadius: '999px', padding: '0.35rem 0.9rem', fontSize: '0.88rem', fontWeight: 800 }}>
+                      🔔 Pedidos abrem {longDay(sale.opensOn)}
+                    </span>
+                  )}
+                  {sale.state === 'closed' && (
+                    <span style={{ background: '#fdfaf3', color: '#3c2a21', borderRadius: '999px', padding: '0.35rem 0.9rem', fontSize: '0.88rem', fontWeight: 800 }}>
+                      🔒 Pedidos encerrados para esta edição
+                    </span>
+                  )}
+                  {sale.state === 'soldout' && (
+                    <span style={{ background: '#ff7675', color: '#fff', borderRadius: '999px', padding: '0.35rem 0.9rem', fontSize: '0.88rem', fontWeight: 800 }}>
+                      Esgotada
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           </ScrollReveal>
@@ -235,7 +269,7 @@ export default function CaixasPage() {
       <section id="order" style={{ padding: '4rem 2rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <ScrollReveal>
-            <BoxOrder box={activeBox} maxQuantity={remainingQuantity} />
+            <BoxOrder box={activeBox} maxQuantity={remainingQuantity} sale={sale} />
           </ScrollReveal>
         </div>
       </section>

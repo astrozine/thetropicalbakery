@@ -16,6 +16,8 @@ interface Props {
   /** Days to mark as "yours" (e.g. a subscriber's own deliveries). */
   highlight?: string[];
   title?: string;
+  /** Only offer days inside this range (a box edition's delivery window, YYYY-MM-DD). */
+  window?: { from?: string | null; until?: string | null };
 }
 
 const daysUntil = (iso: string) => {
@@ -35,16 +37,32 @@ const countdown = (iso: string) => {
  * everything else recedes. Picking one turns it into a small celebration,
  * because the day the box arrives is the best day of the week.
  */
-export default function DeliveryCalendar({ value, onChange, highlight = [], title = 'Dia da Caixa' }: Props) {
+export default function DeliveryCalendar({ value, onChange, highlight = [], title = 'Dia da Caixa', window: range }: Props) {
   const [schedule, setSchedule] = useState<DeliverySchedule | null>(null);
   const [monthOffset, setMonthOffset] = useState(0);
 
   useEffect(() => { fetchSchedule().then(setSchedule); }, []);
 
-  const selectable = useMemo(() => (schedule ? new Set(selectableDates(schedule)) : new Set<string>()), [schedule]);
+  const from = range?.from || null;
+  const until = range?.until || null;
+  const selectable = useMemo(() => {
+    if (!schedule) return new Set<string>();
+    return new Set(selectableDates(schedule).filter(d => (!from || d >= from) && (!until || d <= until)));
+  }, [schedule, from, until]);
   const overrides = useMemo(() => overrideMap(schedule?.overrides || []), [schedule]);
   const sortedSelectable = useMemo(() => Array.from(selectable).sort(), [selectable]);
   const nextBoxDay = sortedSelectable[0];
+
+  // Open on the month of the first day that can be picked (an edition may deliver next month).
+  const firstPick = value || nextBoxDay;
+  const [jumped, setJumped] = useState(false);
+  if (!jumped && firstPick) {
+    const now = new Date();
+    const d = parseISODate(firstPick);
+    const offset = (d.getFullYear() - now.getFullYear()) * 12 + d.getMonth() - now.getMonth();
+    setJumped(true);
+    if (offset > 0) setMonthOffset(offset);
+  }
   const mine = useMemo(() => new Set(highlight), [highlight]);
   const interactive = !!onChange;
 
@@ -66,6 +84,13 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
   }
 
   if (sortedSelectable.length === 0) {
+    if (from || until) {
+      return (
+        <div style={{ padding: '1.25rem', background: '#fff4e5', border: '1px solid #f0d9b5', borderRadius: '14px', color: '#7a4a00', fontSize: '0.92rem', lineHeight: 1.7 }}>
+          Não há mais dias de entrega disponíveis para esta edição. Fale com a gente no WhatsApp ou entre na lista da próxima caixa. 🌴
+        </div>
+      );
+    }
     return (
       <div style={{ padding: '1.25rem', background: '#fff4e5', border: '1px solid #f0d9b5', borderRadius: '14px', color: '#7a4a00', fontSize: '0.92rem', lineHeight: 1.7 }}>
         Ainda não abrimos as próximas datas de entrega. Fale com a gente no WhatsApp para saber quando sai a próxima caixa. 🌴

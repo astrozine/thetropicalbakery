@@ -6,10 +6,14 @@ import { useCart } from '@/context/CartContext';
 import DeliveryCalendar from '@/components/DeliveryCalendar';
 import { formatBRL } from '@/lib/deliveryZones';
 import { optimizedSrc } from '@/lib/thumbs';
+import Link from 'next/link';
+import { BoxWindowFields, SaleState, longDay } from '@/lib/boxWindow';
 
 interface BoxOrderProps {
-  box: { id: string; title: string; image_url: string; price: number };
+  box: { id: string; title: string; image_url: string; price: number } & Partial<BoxWindowFields>;
   maxQuantity: number;
+  /** Whether the box can be ordered today (ordering window + stock). Null while loading. */
+  sale?: { state: SaleState; opensOn: string | null; closesOn: string | null } | null;
 }
 
 const DATE_KEY = 'checkout_delivery_date';
@@ -19,7 +23,7 @@ const DATE_KEY = 'checkout_delivery_date';
  * two-step Pix checkout as every other purchase. Name, address, region and
  * dietary restrictions are collected there, once.
  */
-export default function BoxOrder({ box, maxQuantity }: BoxOrderProps) {
+export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
   const router = useRouter();
   const { addToCart, removeFromCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -44,6 +48,7 @@ export default function BoxOrder({ box, maxQuantity }: BoxOrderProps) {
   };
 
   const goToCheckout = () => {
+    if (sale && sale.state !== 'open') return;
     if (!date) {
       setError('Escolha o dia em que você quer receber sua caixa no calendário.');
       return;
@@ -86,7 +91,26 @@ export default function BoxOrder({ box, maxQuantity }: BoxOrderProps) {
           </p>
         </div>
 
-        <DeliveryCalendar value={date} onChange={pickDate} title="Escolha o dia da sua caixa" />
+        {sale && sale.state !== 'open' ? (
+          <div style={{ padding: '1.5rem', background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '16px', color: '#3c2a21', lineHeight: 1.7 }}>
+            <p style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.4rem' }}>
+              {sale.state === 'soldout' ? 'Esta edição esgotou 🧡'
+                : sale.state === 'soon' ? `Os pedidos abrem ${sale.opensOn ? longDay(sale.opensOn) : 'em breve'}`
+                : 'Os pedidos desta edição foram encerrados'}
+            </p>
+            <p style={{ color: '#594a42', fontSize: '0.95rem', marginBottom: '1rem' }}>
+              {sale.state === 'soon'
+                ? 'Volte nesse dia para garantir a sua. Assinantes têm prioridade em todas as edições.'
+                : 'A próxima caixa já está sendo preparada. Assinantes recebem toda semana, sem correr atrás do lote.'}
+            </p>
+            <Link href="/assinatura" className="btn btn-primary" style={{ padding: '0.9rem 1.6rem', display: 'inline-block' }}>Conhecer a assinatura</Link>
+          </div>
+        ) : (
+          <>
+        <DeliveryCalendar value={date} onChange={pickDate} title="Escolha o dia da sua caixa" window={{ from: box.delivery_from, until: box.delivery_until }} />
+        {sale?.closesOn && (
+          <p style={{ fontSize: '0.88rem', color: '#8a5a00', marginTop: '-0.5rem' }}>⏳ Pedidos para esta edição até <strong>{longDay(sale.closesOn)}</strong>, ou até esgotar.</p>
+        )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#3c2a21', background: '#fdf7ee', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7', flexWrap: 'wrap' }}>
           <label style={{ fontSize: '1.1rem', fontWeight: 600, flex: 1, minWidth: '120px' }}>Quantidade:</label>
@@ -110,6 +134,8 @@ export default function BoxOrder({ box, maxQuantity }: BoxOrderProps) {
         <button type="button" onClick={goToCheckout} className="btn btn-primary" style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem', borderRadius: '40px' }}>
           Continuar para o pagamento ➔
         </button>
+          </>
+        )}
       </div>
     </div>
   );

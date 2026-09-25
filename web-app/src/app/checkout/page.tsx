@@ -12,6 +12,7 @@ import { DELIVERY_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
 import { dietSummary, legacyFlags, tagsFromLegacy } from '@/lib/dietary';
 import { fetchSchedule, selectableDates, toISODate } from '@/lib/deliverySchedule';
+import { BoxWindowFields, inDeliveryWindow, longDay, saleState } from '@/lib/boxWindow';
 
 const STORE_WHATSAPP = '5511932119196';
 const DATE_KEY = 'checkout_delivery_date';
@@ -66,6 +67,20 @@ export default function CheckoutPage() {
   const boxItems = items.filter(i => i.kind === 'box');
   const hasBox = boxItems.length > 0;
   const boxCount = boxItems.reduce((n, i) => n + i.quantity, 0);
+
+  // The boxes in the cart as the database has them now: their delivery window, ordering window
+  // and stock. The calendar only offers days inside the window.
+  const boxIdsKey = boxItems.map(i => i.tasting_box_id).filter(Boolean).sort().join(',');
+  const [boxRows, setBoxRows] = useState<(BoxWindowFields & { id: string; title: string })[]>([]);
+  useEffect(() => {
+    if (!boxIdsKey) return;
+    supabase.from('tasting_boxes').select('*').in('id', boxIdsKey.split(','))
+      .then(({ data }) => setBoxRows((data as (BoxWindowFields & { id: string; title: string })[]) || []));
+  }, [boxIdsKey]);
+  const boxWindow = {
+    from: boxRows.map(b => b.delivery_from).filter(Boolean).sort().pop() || null,   // latest start
+    until: boxRows.map(b => b.delivery_until).filter(Boolean).sort()[0] || null,    // earliest end
+  };
   // Pickup is only for boxes. The address is never on the site: it appears in Minha Conta once the Pix is confirmed.
   const isPickup = hasBox && fulfillment === 'pickup';
   const zone = getZone(zoneId);
@@ -137,9 +152,23 @@ export default function CheckoutPage() {
     if (hasBox) {
       // The date must really be a box day (a stale saved date may no longer be).
       const schedule = await fetchSchedule();
-      if (!formData.date || !selectableDates(schedule).includes(formData.date)) {
+      const selectable = selectableDates(schedule);
+      if (!formData.date || !selectable.includes(formData.date)) {
         setError('Escolha um dia de entrega no calendário acima.');
         return;
+      }
+      // Re-read each box: ordering window, delivery window and stock can change while someone shops.
+      const { data: fresh } = await supabase.from('tasting_boxes').select('*').in('id', boxItems.map(i => i.tasting_box_id).filter(Boolean) as string[]);
+      for (const item of boxItems) {
+        const row = (fresh as (BoxWindowFields & { id: string; title: string })[] | null)?.find(b => b.id === item.tasting_box_id);
+        if (!row) continue;
+        const { state, opensOn } = saleState(row, schedule.leadDays, inDeliveryWindow(selectable, row));
+        if (state === 'soldout') { setError(`"${row.title}" esgotou. Tire a caixa do carrinho para continuar.`); return; }
+        if (state === 'soon') { setError(`Os pedidos de "${row.title}" abrem ${opensOn ? longDay(opensOn) : 'em breve'}.`); return; }
+        if (state === 'closed') { setError(`Os pedidos de "${row.title}" foram encerrados. Tire a caixa do carrinho para continuar.`); return; }
+        if (!inDeliveryWindow([formData.date], row).length) { setError('Esse dia está fora das entregas desta edição. Escolha outro dia no calendário.'); return; }
+        const left = Math.max(0, row.total_quantity - row.sold_quantity);
+        if (row.total_quantity > 0 && item.quantity > left) { setError(`Restam só ${left} unidades de "${row.title}". Ajuste a quantidade no carrinho.`); return; }
       }
     } else if (!formData.date) {
       setError('Escolha uma data de entrega.');
@@ -510,7 +539,7 @@ export default function CheckoutPage() {
                     {hasBox ? (
                       <>
                         <label style={labelStyle}>{isPickup ? 'Quando você quer retirar sua caixa?' : 'Quando você quer receber sua caixa?'}</label>
-                        <DeliveryCalendar value={formData.date} onChange={setDate} />
+                        <DeliveryCalendar value={formData.date} onChange={setDate} window={boxWindow} />
                       </>
                     ) : (
                       <>

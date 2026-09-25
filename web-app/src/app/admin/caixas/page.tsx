@@ -9,8 +9,9 @@ import BoxItemsEditor from '@/components/BoxItemsEditor';
 import { BoxItem } from '@/lib/allergens';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { pushTreatDetails } from '@/lib/treatSync';
+import { BoxWindowFields, SaleState, deliveryWindowLabel, lastOrderDay, longDay, saleState } from '@/lib/boxWindow';
 
-interface TastingBox {
+interface TastingBox extends BoxWindowFields {
   id: string;
   title: string;
   description: string;
@@ -22,6 +23,16 @@ interface TastingBox {
   is_active: boolean;
   items?: BoxItem[] | null;
 }
+
+const WINDOW_KEYS = ['delivery_from', 'delivery_until', 'orders_open_from', 'orders_close_on'] as const;
+
+/** Box state in the admin list, in words. */
+const SALE_LABEL: Record<SaleState, { text: string; color: string; bg: string }> = {
+  open: { text: 'Pedidos abertos', color: '#1e6b3c', bg: '#e6f4ec' },
+  soon: { text: 'Pedidos ainda não abriram', color: '#1a5276', bg: '#eaf2f8' },
+  closed: { text: 'Pedidos encerrados', color: '#7f8c8d', bg: '#f1f2f6' },
+  soldout: { text: 'Esgotada', color: '#c0392b', bg: '#fdecea' },
+};
 
 const input: React.CSSProperties = { width: '100%', padding: '0.8rem', border: '1px solid #ccc', borderRadius: '6px' };
 const label: React.CSSProperties = { display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' };
@@ -44,9 +55,17 @@ export default function AdminCaixas() {
   const [isActive, setIsActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [items, setItems] = useState<BoxItem[]>([]);
+  // Delivery window (customers pick a day inside it) and ordering window (migration 21).
+  const [deliveryFrom, setDeliveryFrom] = useState('');
+  const [deliveryUntil, setDeliveryUntil] = useState('');
+  const [ordersOpen, setOrdersOpen] = useState('');
+  const [ordersClose, setOrdersClose] = useState('');
+  const [leadDays, setLeadDays] = useState(2);
 
   useEffect(() => {
     fetchBoxes();
+    supabase.from('site_settings').select('value').eq('key', 'delivery_lead_days').maybeSingle()
+      .then(({ data }) => { if (data) setLeadDays(Number(data.value) || 0); });
   }, []);
 
   const fetchBoxes = async () => {
@@ -85,6 +104,10 @@ export default function AdminCaixas() {
     setPrice(99);
     setIsActive(false);
     setItems([]);
+    setDeliveryFrom('');
+    setDeliveryUntil('');
+    setOrdersOpen('');
+    setOrdersClose('');
   };
 
   const handleEdit = (box: TastingBox) => {
@@ -98,6 +121,10 @@ export default function AdminCaixas() {
     setPrice(box.price);
     setIsActive(box.is_active);
     setItems(box.items || []);
+    setDeliveryFrom(box.delivery_from || '');
+    setDeliveryUntil(box.delivery_until || '');
+    setOrdersOpen(box.orders_open_from || '');
+    setOrdersClose(box.orders_close_on || '');
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -107,6 +134,12 @@ export default function AdminCaixas() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const windowProblem =
+      deliveryFrom && deliveryUntil && deliveryUntil < deliveryFrom ? 'O último dia de entrega vem antes do primeiro.'
+      : ordersOpen && ordersClose && ordersClose < ordersOpen ? 'O fim dos pedidos vem antes do início.'
+      : ordersClose && deliveryUntil && ordersClose > deliveryUntil ? 'Os pedidos fecham depois do último dia de entrega.'
+      : '';
+    if (windowProblem) { alert(windowProblem); return; }
     setSaving(true);
 
     // 1. Treats ticked "also add to the Menu de Eventos" are created there first, so the box can point at them.
@@ -154,11 +187,23 @@ export default function AdminCaixas() {
       sold_quantity: soldQuantity,
       price,
       is_active: isActive,
+      delivery_from: deliveryFrom || null,
+      delivery_until: deliveryUntil || null,
+      orders_open_from: ordersOpen || null,
+      orders_close_on: ordersClose || null,
     };
 
-    const { error } = editingId
-      ? await supabase.from('tasting_boxes').update(payload).eq('id', editingId)
-      : await supabase.from('tasting_boxes').insert([payload]);
+    const save = (body: Record<string, unknown>) => editingId
+      ? supabase.from('tasting_boxes').update(body).eq('id', editingId)
+      : supabase.from('tasting_boxes').insert([body]);
+    let { error } = await save(payload);
+    if (error && /delivery_from|delivery_until|orders_open_from|orders_close_on/.test(error.message)) {
+      // Migration 21 not run yet: save everything else, and say what's missing.
+      const rest: Record<string, unknown> = { ...payload };
+      WINDOW_KEYS.forEach(k => delete rest[k]);
+      ({ error } = await save(rest));
+      if (!error) alert('Caixa salva, mas sem as janelas de entrega e de pedidos. Rode a migration_21_box_windows.sql no Supabase e salve de novo.');
+    }
     if (error) {
       alert(`Erro ao salvar: ${error.message}${hint(error.message)}`);
       setSaving(false);
@@ -238,6 +283,47 @@ export default function AdminCaixas() {
                 <input type="number" required value={soldQuantity} onChange={e => setSoldQuantity(Number(e.target.value))} style={input} />
               </div>
             </div>
+
+            {/* The two windows */}
+            <div style={{ background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '10px', padding: '1rem 1.1rem', display: 'grid', gap: '0.9rem' }}>
+              <div>
+                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🚚 Janela de entrega</p>
+                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os dias em que esta edição sai. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas.</p>
+                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Primeiro dia
+                    <input type="date" value={deliveryFrom} onChange={e => setDeliveryFrom(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
+                  </label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Último dia
+                    <input type="date" value={deliveryUntil} min={deliveryFrom || undefined} onChange={e => setDeliveryUntil(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
+                  </label>
+                </div>
+              </div>
+              <div>
+                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>⏳ Janela de pedidos</p>
+                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Quando os pedidos são aceitos. Se esgotar antes, fecha sozinho.</p>
+                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Abre em <span style={{ fontWeight: 400, color: '#95a5a6' }}>(vazio = já)</span>
+                    <input type="date" value={ordersOpen} onChange={e => setOrdersOpen(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
+                  </label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Último dia para pedir <span style={{ fontWeight: 400, color: '#95a5a6' }}>(vazio = automático)</span>
+                    <input type="date" value={ordersClose} min={ordersOpen || undefined} max={deliveryUntil || undefined} onChange={e => setOrdersClose(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
+                  </label>
+                </div>
+              </div>
+              {(() => {
+                const w = { total_quantity: totalQuantity, sold_quantity: soldQuantity, delivery_from: deliveryFrom || null, delivery_until: deliveryUntil || null, orders_open_from: ordersOpen || null, orders_close_on: ordersClose || null };
+                const close = lastOrderDay(w, leadDays);
+                if (!deliveryFrom && !deliveryUntil && !ordersOpen && !ordersClose) {
+                  return <p style={{ fontSize: '0.85rem', color: '#8a5a00' }}>Sem janelas: o cliente escolhe qualquer dia aberto do calendário, e os pedidos ficam abertos até esgotar.</p>;
+                }
+                return (
+                  <p style={{ fontSize: '0.88rem', color: '#2c3e50', lineHeight: 1.6, background: '#fff', borderRadius: '8px', padding: '0.6rem 0.8rem' }}>
+                    👀 O cliente vai ver: {deliveryWindowLabel(w) ? <>entregas <strong>{deliveryWindowLabel(w)}</strong>. </> : ''}
+                    Pedidos {ordersOpen ? <>de <strong>{longDay(ordersOpen)}</strong> </> : ''}{close ? <>até <strong>{longDay(close)}</strong>{!ordersClose && <> (último dia de entrega menos {leadDays} {leadDays === 1 ? 'dia' : 'dias'} de antecedência)</>}</> : 'enquanto houver dias de entrega'}, ou até esgotar.
+                  </p>
+                );
+              })()}
+            </div>
             <p style={{ fontSize: '0.8rem', color: '#7f8c8d', marginTop: '-0.5rem' }}>
               A quantidade vendida é calculada automaticamente pelos pedidos. Edite manualmente apenas se houver cancelamentos ou vendas externas.
             </p>
@@ -298,6 +384,17 @@ export default function AdminCaixas() {
                 <p style={{ color: '#7f8c8d', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
                   <strong>Data:</strong> {box.batch_date_label} · <strong>{(box.items || []).length}</strong> doces
                 </p>
+                {(() => {
+                  const st = saleState(box, leadDays, null);
+                  const lbl = SALE_LABEL[st.state];
+                  return (
+                    <p style={{ fontSize: '0.85rem', color: '#594a42', margin: '0.2rem 0 0', display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
+                      <span style={{ background: lbl.bg, color: lbl.color, fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '6px' }}>{lbl.text}</span>
+                      {deliveryWindowLabel(box) && <span>🚚 Entregas {deliveryWindowLabel(box)}</span>}
+                      {st.closesOn && <span>· ⏳ pedidos até {longDay(st.closesOn)}</span>}
+                    </p>
+                  );
+                })()}
 
                 <div style={{ marginTop: '0.75rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.3rem', fontWeight: 'bold' }}>
