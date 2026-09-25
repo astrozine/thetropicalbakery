@@ -238,13 +238,13 @@ export default function TreatsAdmin() {
       <style>{`
         .treats-aside { margin-bottom: 1.5rem; }
         @media (min-width: 1280px) {
-          .treats-layout { display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 1.75rem; align-items: start; }
+          .treats-layout { display: grid; grid-template-columns: minmax(320px, 380px) minmax(0, 1fr); gap: 1.75rem; align-items: start; }
           .treats-aside { position: sticky; top: 7.5rem; max-height: calc(100vh - 9rem); overflow-y: auto; margin-bottom: 0; padding: 2px 6px 10px 2px; }
         }
       `}</style>
       <div className="treats-layout">
       <aside className="treats-aside" aria-label="Refinar busca">
-        <TreatRefineMenu treats={treats} value={refine} onChange={setRefine} shown={visibleTreats.length} defaultOpen />
+        <TreatRefineMenu treats={treats} value={refine} onChange={setRefine} shown={visibleTreats.length} defaultOpen sheetBelow={1280} fabBottom="5.75rem" />
       </aside>
 
       <div className="treats-main">

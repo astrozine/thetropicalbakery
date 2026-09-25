@@ -48,7 +48,7 @@ export default function MenuPage() {
   const visibleItems = menuItems.filter(t => matchesRefine(t, refine, { hideUnknownWhenFree: true }));
 
   return (
-    <main style={{ minHeight: '100vh', background: 'var(--color-background)', paddingBottom: '6rem' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--color-background)', paddingBottom: '6rem', overflowX: 'clip' }}>
       
       {/* Header Section */}
       <section style={{ 
@@ -117,13 +117,13 @@ export default function MenuPage() {
           <style>{`
             .menu-aside { margin-bottom: 2.5rem; }
             @media (min-width: 1024px) {
-              .menu-layout { display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 2rem; align-items: start; }
+              .menu-layout { display: grid; grid-template-columns: minmax(320px, 380px) minmax(0, 1fr); gap: 2rem; align-items: start; }
               .menu-aside { position: sticky; top: 7.5rem; max-height: calc(100vh - 9rem); overflow-y: auto; margin-bottom: 0; padding: 2px 6px 10px 2px; }
             }
           `}</style>
           <div className="menu-layout">
           <aside className="menu-aside" aria-label="Filtro de alergias e preferências">
-            <TreatRefineMenu variant="public" treats={menuItems} value={refine} onChange={setRefine} shown={visibleItems.length} />
+            <TreatRefineMenu variant="public" treats={menuItems} value={refine} onChange={setRefine} shown={visibleItems.length} sheetBelow={1024} fabBottom="5.5rem" />
           </aside>
 
           <div className="menu-main">

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALLERGENS, ALLERGEN_GROUPS } from '@/lib/allergens';
 
 /** The bits of a treat the refine menu looks at. */
@@ -76,16 +76,67 @@ const MODES: { id: RefineMode; label: string; help: string }[] = [
   { id: 'free', label: '🌱 Livre de', help: 'Mostra os doces que não têm NENHUM dos itens marcados, nem como traço.' },
 ];
 
-export default function TreatRefineMenu({ treats, value, onChange, shown, variant = 'admin', defaultOpen = false }: {
+export default function TreatRefineMenu({ treats, value, onChange, shown, variant = 'admin', defaultOpen = false, sheetBelow, fabBottom = '1rem' }: {
   treats: RefinableTreat[]; value: RefineState; onChange: (next: RefineState) => void; shown: number;
   /** 'public' is the customer-facing look: no admin-only folder, friendlier wording, open by default. */
   variant?: 'admin' | 'public';
   /** Start expanded (the public look always does). Used when it sits in a side column. */
   defaultOpen?: boolean;
+  /** Below this viewport width the panel becomes a bottom sheet (a bar in the page, plus a floating button once it scrolls away). */
+  sheetBelow?: number;
+  /** Distance of the floating button from the bottom edge (leave room for a tab bar). */
+  fabBottom?: string;
 }) {
   const isPublic = variant === 'public';
   const [open, setOpen] = useState(isPublic || defaultOpen);
   const [openFolders, setOpenFolders] = useState<string[]>([]);
+
+  // Phone/tablet: a bottom sheet instead of an inline panel.
+  const [narrow, setNarrow] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [barPassed, setBarPassed] = useState(false);
+  const barRef = useRef<HTMLButtonElement>(null);
+  const sheet = narrow && !!sheetBelow;
+
+  useEffect(() => {
+    if (!sheetBelow) return;
+    const mq = window.matchMedia(`(max-width: ${sheetBelow - 1}px)`);
+    const update = () => setNarrow(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, [sheetBelow]);
+
+  // While the sheet is open, the page behind it must not scroll; Escape closes it.
+  useEffect(() => {
+    if (!sheet || !sheetOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSheetOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => { document.body.style.overflow = previous; window.removeEventListener('keydown', onKey); };
+  }, [sheet, sheetOpen]);
+
+  // The floating button only appears once the in-page bar has scrolled up out of view (not before you've reached it).
+  // A scroll check rather than an IntersectionObserver: that one never fires when the page jumps straight past the bar.
+  useEffect(() => {
+    if (!sheet) return;
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      const bar = barRef.current;
+      if (bar) setBarPassed(bar.getBoundingClientRect().bottom < 72);
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(check); };
+    check();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [sheet]);
 
   const toggleFolder = (id: string) =>
     setOpenFolders(f => (f.includes(id) ? f.filter(x => x !== id) : [...f, id]));
@@ -167,34 +218,16 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
     );
   };
 
-  return (
-    <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '1.5rem', overflow: 'hidden' }}>
-      {/* A filled, mid-brown bar so it reads as something to press (light enough to keep the emoji visible). */}
-      <style>{`.trm-toggle { transition: filter .15s; } .trm-toggle:hover { filter: brightness(1.12); }`}</style>
-      <button type="button" className="trm-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', padding: '1rem 1.25rem', background: 'linear-gradient(135deg, #7a5540 0%, #93694f 100%)', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-        <span aria-hidden style={{ display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none', color: '#f4d675', fontSize: '1.05rem' }}>▸</span>
-        <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>{isPublic ? '🔎 Encontre o doce ideal: alergias e preferências' : '🔎 Refinar busca'}</span>
-        {active > 0 && (
-          <span style={{ background: '#f4d675', color: '#3c2a21', borderRadius: '10px', padding: '0.05rem 0.6rem', fontSize: '0.78rem', fontWeight: 800 }}>
-            {active} {active === 1 ? 'filtro' : 'filtros'}
-          </span>
-        )}
-        <span style={{ marginLeft: 'auto', fontSize: '0.85rem', color: 'rgba(255,255,255,0.88)', fontWeight: 600 }}>
-          Mostrando {shown} de {treats.length} doces · {open ? 'fechar' : 'abrir'}
-        </span>
-      </button>
-
-      {open && (
-        <div style={{ padding: '0 1.25rem 1.25rem', display: 'grid', gap: '1rem', borderTop: '1px solid #eef1f4' }}>
+  const bodyContent = (
+    <>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', paddingTop: '1rem' }}>
             <input type="search" value={value.search} onChange={e => onChange({ ...value, search: e.target.value })}
               placeholder="Buscar pelo nome do doce…"
               style={{ flex: '1 1 240px', padding: '0.65rem 0.8rem', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.95rem' }} />
-            <div role="group" aria-label="Como usar os itens marcados" style={{ display: 'inline-flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid #dfe4ea' }}>
+            <div role="group" aria-label="Como usar os itens marcados" style={{ display: 'flex', flex: '1 1 260px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #dfe4ea' }}>
               {modes.map(m => (
                 <button key={m.id} type="button" onClick={() => onChange({ ...value, mode: m.id })} aria-pressed={value.mode === m.id}
-                  style={{ padding: '0.6rem 0.9rem', border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, background: value.mode === m.id ? '#3c2a21' : '#fff', color: value.mode === m.id ? '#fff' : '#7f8c8d' }}>
+                  style={{ flex: 1, whiteSpace: 'nowrap', padding: '0.6rem 0.5rem', border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, background: value.mode === m.id ? '#3c2a21' : '#fff', color: value.mode === m.id ? '#fff' : '#7f8c8d' }}>
                   {m.label}
                 </button>
               ))}
@@ -252,8 +285,78 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
               ),
             )}
           </div>
+    </>
+  );
+
+  return (
+    <>
+    <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '1.5rem', overflow: 'hidden' }}>
+      {/* A filled, mid-brown bar so it reads as something to press (light enough to keep the emoji visible). */}
+      <style>{`
+        .trm-toggle { transition: filter .15s; } .trm-toggle:hover { filter: brightness(1.12); }
+        .trm-fab { position: fixed; left: 50%; transform: translateX(-50%); z-index: 950; display: inline-flex; align-items: center; gap: .5rem;
+          padding: .8rem 1.3rem; border: none; border-radius: 999px; background: linear-gradient(135deg, #7a5540, #93694f); color: #fff;
+          font-weight: 800; font-size: .95rem; box-shadow: 0 10px 28px rgba(60,42,33,.4); cursor: pointer; white-space: nowrap; }
+        .trm-fab-count { background: rgba(255,255,255,.22); border-radius: 999px; padding: .05rem .55rem; font-size: .78rem; font-weight: 700; }
+        .trm-backdrop { position: fixed; inset: 0; z-index: 9990; background: rgba(0,0,0,.5); display: flex; align-items: flex-end; }
+        .trm-sheet { width: 100%; max-height: 88vh; max-height: 88dvh; background: #fff; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; box-shadow: 0 -10px 40px rgba(0,0,0,.3); }
+        .trm-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid #eef1f4; }
+        .trm-sheet-body { overflow-y: auto; padding: 1rem 1.25rem; display: grid; gap: 1rem; align-content: start; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+        .trm-sheet-foot { display: flex; gap: .6rem; padding: .9rem 1.25rem calc(.9rem + env(safe-area-inset-bottom)); border-top: 1px solid #eef1f4; }
+      `}</style>
+      <button type="button" ref={barRef} className="trm-toggle" onClick={() => (sheet ? setSheetOpen(true) : setOpen(o => !o))} aria-expanded={sheet ? sheetOpen : open}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', padding: '1rem 1.25rem', background: 'linear-gradient(135deg, #7a5540 0%, #93694f 100%)', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+        <span aria-hidden style={{ display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none', color: '#f4d675', fontSize: '1.05rem' }}>▸</span>
+        <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>{isPublic ? '🔎 Encontre o doce ideal: alergias e preferências' : '🔎 Refinar busca'}</span>
+        {active > 0 && (
+          <span style={{ background: '#f4d675', color: '#3c2a21', borderRadius: '10px', padding: '0.05rem 0.6rem', fontSize: '0.78rem', fontWeight: 800 }}>
+            {active} {active === 1 ? 'filtro' : 'filtros'}
+          </span>
+        )}
+        <span style={{ marginLeft: 'auto', fontSize: '0.85rem', color: 'rgba(255,255,255,0.88)', fontWeight: 600 }}>
+          Mostrando {shown} de {treats.length} doces · {open && !sheet ? 'fechar' : 'abrir'}
+        </span>
+      </button>
+
+      {open && !sheet && (
+        <div style={{ padding: '0 1.25rem 1.25rem', display: 'grid', gap: '1rem', borderTop: '1px solid #eef1f4' }}>
+          {bodyContent}
         </div>
       )}
     </div>
+
+      {sheet && (
+        <>
+          {barPassed && !sheetOpen && (
+            <button type="button" className="trm-fab" style={{ bottom: `calc(${fabBottom} + env(safe-area-inset-bottom))` }} onClick={() => setSheetOpen(true)}>
+              <span aria-hidden>🔎</span> Filtrar{active > 0 ? ` · ${active}` : ''}
+              <span className="trm-fab-count">{shown}/{treats.length}</span>
+            </button>
+          )}
+          {sheetOpen && (
+            <div className="trm-backdrop" onClick={() => setSheetOpen(false)}>
+              <div className="trm-sheet" role="dialog" aria-modal="true" aria-label={isPublic ? 'Alergias e preferências' : 'Refinar busca'} onClick={e => e.stopPropagation()}>
+                <div className="trm-sheet-head">
+                  <div>
+                    <strong style={{ display: 'block', fontSize: '1.05rem', color: '#3c2a21' }}>{isPublic ? '🔎 Alergias e preferências' : '🔎 Refinar busca'}</strong>
+                    <span style={{ fontSize: '0.82rem', color: '#7f8c8d' }}>Mostrando {shown} de {treats.length} doces</span>
+                  </div>
+                  <button type="button" aria-label="Fechar" onClick={() => setSheetOpen(false)} style={{ width: '40px', height: '40px', flexShrink: 0, borderRadius: '50%', border: 'none', background: '#f1f2f6', fontSize: '1.2rem', cursor: 'pointer', color: '#3c2a21' }}>✕</button>
+                </div>
+                <div className="trm-sheet-body">{bodyContent}</div>
+                <div className="trm-sheet-foot">
+                  {active > 0 && (
+                    <button type="button" onClick={() => onChange({ ...emptyRefine, mode: value.mode })} style={{ padding: '0.85rem 1.1rem', background: '#ecf0f1', color: '#2c3e50', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}>Limpar</button>
+                  )}
+                  <button type="button" onClick={() => setSheetOpen(false)} style={{ flex: 1, padding: '0.85rem 1.1rem', background: '#3c2a21', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 800, fontSize: '1rem', cursor: 'pointer' }}>
+                    Ver {shown} {shown === 1 ? 'doce' : 'doces'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </>
   );
 }
