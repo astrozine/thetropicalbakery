@@ -17,6 +17,8 @@ interface Props {
   compact?: boolean;
   /** The free-text field. Off in the tightest places. */
   showNotes?: boolean;
+  /** 'business': a hotel, restaurant... saying what its guests or clients need, instead of what "I" eat. */
+  audience?: 'me' | 'business';
 }
 
 const chip = (on: boolean): React.CSSProperties => ({
@@ -54,8 +56,11 @@ const countPill = (n: number): React.CSSProperties => ({
  * here is what lets us tell that person "esta caixa é segura para você" later —
  * the allergy ids are the same ones each treat declares.
  */
-export default function DietaryPicker({ value, onChange, compact = true, showNotes = true }: Props) {
+export default function DietaryPicker({ value, onChange, compact = true, showNotes = true, audience = 'me' }: Props) {
   const { tags, allergens, notes } = value;
+  const biz = audience === 'business';
+  const groupLabel = (id: string, fallback: string) =>
+    biz ? (id === 'jeito' ? 'Estilo de alimentação dos clientes' : id === 'saude' ? 'Restrições de saúde dos clientes' : fallback) : fallback;
   const [openMore, setOpenMore] = useState(!compact);
   const [openAllergens, setOpenAllergens] = useState(!compact);
 
@@ -83,7 +88,7 @@ export default function DietaryPicker({ value, onChange, compact = true, showNot
       <div>
         <button type="button" aria-expanded={openMore} onClick={() => setOpenMore(o => !o)} style={expander(openMore)}>
           <span aria-hidden>{openMore ? '▾' : '▸'}</span>
-          Mais sobre como você come
+          {biz ? 'Mais estilos de alimentação e restrições de saúde' : 'Mais sobre como você come'}
           <span style={countPill(moreCount)}>{moreCount || '+'}</span>
         </button>
         {openMore && (
@@ -93,7 +98,7 @@ export default function DietaryPicker({ value, onChange, compact = true, showNot
               if (!items.length) return null;
               return (
                 <div key={group.id}>
-                  <p style={groupTitle}>{group.label}</p>
+                  <p style={groupTitle}>{groupLabel(group.id, group.label)}</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
                     {items.map(t => {
                       const on = tags.includes(t.id);
@@ -121,8 +126,12 @@ export default function DietaryPicker({ value, onChange, compact = true, showNot
         {openAllergens && (
           <div style={{ display: 'grid', gap: '1rem', padding: '1rem 0.25rem 0' }}>
             <p style={{ fontSize: '0.85rem', color: '#7a6a61', lineHeight: 1.65, margin: 0 }}>
-              Marque o que você precisa evitar. A gente confere <strong>cada doce</strong> da caixa contra a sua lista
-              e te avisa antes — inclusive quando é só risco de contato na mesma cozinha. 💛
+              {biz ? (
+                <>Marque o que o seu negócio precisa evitar. A gente confere <strong>cada doce</strong> contra a lista e avisa com honestidade, inclusive quando é só risco de contato na mesma cozinha. 💛</>
+              ) : (
+                <>Marque o que você precisa evitar. A gente confere <strong>cada doce</strong> da caixa contra a sua lista
+                e te avisa antes — inclusive quando é só risco de contato na mesma cozinha. 💛</>
+              )}
             </p>
             {ALLERGEN_GROUPS.map(group => {
               const items = ALLERGENS.filter(a => a.group === group.id);

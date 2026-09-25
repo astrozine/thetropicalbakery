@@ -6,12 +6,16 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { PARTNER_KINDS, PartnerKind } from '@/lib/portals';
 import { optimizedSrc } from '@/lib/thumbs';
+import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
+import { dietSummary, matchDiet } from '@/lib/dietary';
 
 interface PickTreat {
   id: string;
   name: string;
   image_url: string | null;
   emoji: string | null;
+  contains: string[] | null;
+  may_contain: string[] | null;
 }
 
 interface Props {
@@ -47,8 +51,10 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
   // "What would drive your clients wild?": a photo picker over the treats that are on the menu.
   const [treats, setTreats] = useState<PickTreat[]>([]);
   const [picked, setPicked] = useState<string[]>([]);
+  // What the business's own guests or clients need (diets and allergies).
+  const [diet, setDiet] = useState<DietaryValue>({ tags: [], allergens: [], notes: '' });
   React.useEffect(() => {
-    supabase.from('treats').select('id, name, image_url, emoji').eq('is_available', true).order('name')
+    supabase.from('treats').select('id, name, image_url, emoji, contains, may_contain').eq('is_available', true).order('name')
       .then(({ data, error: e }) => { if (!e && data) setTreats(data as PickTreat[]); });
   }, []);
   const togglePick = (id: string) => setPicked(p => (p.includes(id) ? p.filter(x => x !== id) : [...p, id]));
@@ -56,6 +62,9 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
   const showPicker = treats.length > 0 && form.kind !== 'afiliado';
   // The picks travel inside the message the partner sends, so Dolly reads them next to the note.
   const pickLine = showPicker && chosen.length > 0 ? `Itens que fariam meus clientes pirarem: ${chosen.join(', ')}` : '';
+  const dietText = dietSummary(diet.tags, diet.allergens);
+  const dietLine = showPicker && dietText ? `Restrições que o meu negócio precisa atender: ${dietText}` : '';
+  const extraLines = [dietLine, pickLine].filter(Boolean);
 
   // Anything we already know about them is filled in.
   React.useEffect(() => {
@@ -79,7 +88,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
       p_whatsapp: form.whatsapp.trim() || null,
       p_address: null,
       p_neighborhood: form.neighborhood.trim() || null,
-      p_notes: [form.notes.trim(), pickLine].filter(Boolean).join('\n\n') || null,
+      p_notes: [form.notes.trim(), ...extraLines].filter(Boolean).join('\n\n') || null,
     });
     setSending(false);
     if (err) {
@@ -91,8 +100,8 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
     setDone(true);
   };
 
-  const whatsappWithPicks = pickLine && whatsappHref.includes('text=')
-    ? `${whatsappHref}${encodeURIComponent('. ' + pickLine)}`
+  const whatsappWithPicks = extraLines.length > 0 && whatsappHref.includes('text=')
+    ? `${whatsappHref}${encodeURIComponent('. ' + extraLines.join('. '))}`
     : whatsappHref;
 
   if (done) {
@@ -168,20 +177,33 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
 
           {showPicker && (
             <div>
+              <span style={label}>Que restrições alimentares e alergias o seu negócio precisa atender?</span>
+              <p style={{ fontSize: '0.88rem', color: '#7a6a61', lineHeight: 1.6, margin: '0 0 0.75rem' }}>
+                Pense nos seus hóspedes ou clientes. Marque o que se aplica (é opcional): a gente ajusta a proposta e avisa abaixo os doces que contêm o que você marcou.
+              </p>
+              <DietaryPicker value={diet} onChange={setDiet} compact showNotes={false} audience="business" />
+            </div>
+          )}
+
+          {showPicker && (
+            <div>
               <span style={label}>Quais itens fariam seus clientes pirarem?</span>
               <p style={{ fontSize: '0.88rem', color: '#7a6a61', lineHeight: 1.6, margin: '0 0 0.75rem' }}>
-                Toque nos que você imagina vendendo ou servindo. Escolha quantos quiser: eles vão junto com a sua mensagem.
+                Toque nos que você imagina vendendo ou servindo. Escolha quantos quiser: eles vão junto com a sua mensagem.{diet.allergens.length > 0 && ' Os que contêm o que você marcou acima aparecem avisados.'}
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(104px, 1fr))', gap: '0.6rem', maxHeight: '340px', overflowY: 'auto', padding: '2px' }}>
                 {treats.map(t => {
                   const on = picked.includes(t.id);
+                  const m = diet.allergens.length ? matchDiet(diet.allergens, t.contains, t.may_contain) : null;
+                  const flag = m && m.status === 'unsafe' ? `⚠ contém ${m.conflicts.map(a => a.label).join(', ')}`
+                    : m && m.status === 'may' ? `🔸 pode conter ${m.traces.map(a => a.label).join(', ')}` : '';
                   return (
                     <button
                       key={t.id}
                       type="button"
                       aria-pressed={on}
                       onClick={() => togglePick(t.id)}
-                      style={{ position: 'relative', textAlign: 'center', padding: 0, borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', background: '#fff', border: `2px solid ${on ? '#d4af37' : '#e8e1d7'}`, boxShadow: on ? '0 6px 18px rgba(212,175,55,0.35)' : 'none' }}
+                      style={{ position: 'relative', textAlign: 'center', padding: 0, borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', background: '#fff', border: `2px solid ${on ? '#d4af37' : '#e8e1d7'}`, boxShadow: on ? '0 6px 18px rgba(212,175,55,0.35)' : 'none', opacity: m && m.status === 'unsafe' && !on ? 0.55 : 1 }}
                     >
                       <span style={{ display: 'block', aspectRatio: '1', background: '#f5efe2' }}>
                         {t.image_url && (
@@ -190,6 +212,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
                         )}
                       </span>
                       <span style={{ display: 'block', padding: '0.35rem 0.4rem 0.45rem', fontSize: '0.74rem', lineHeight: 1.25, fontWeight: on ? 700 : 500, color: '#3c2a21' }}>{t.name}</span>
+                      {flag && <span style={{ display: 'block', padding: '0 0.4rem 0.45rem', fontSize: '0.68rem', lineHeight: 1.25, color: m?.status === 'unsafe' ? '#b03a2e' : '#8a5a00', fontWeight: 700 }}>{flag}</span>}
                       {on && <span aria-hidden style={{ position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>✓</span>}
                     </button>
                   );
