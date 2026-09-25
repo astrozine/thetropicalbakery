@@ -21,6 +21,24 @@
 
 BEGIN;
 
+-- The orders table was first created by hand, so no earlier migration defines its basic
+-- columns and some databases are missing a few. Every column the checkout and this
+-- migration use is added here; a column that already exists is simply left alone.
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_name       text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_email      text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_whatsapp   text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS delivery_address    text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS requested_date      date;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS total_price         numeric;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS pix_transaction_id  text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS status              text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS created_at          timestamptz NOT NULL DEFAULT now();
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS order_kind          text;   -- 'box' | 'events'
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS delivery_zone       text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS delivery_fee        numeric;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS dietary_notes       text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS items_summary       text;
+
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS fulfillment text;   -- 'delivery' | 'pickup'
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;
 CREATE INDEX IF NOT EXISTS orders_user_idx ON public.orders (user_id) WHERE user_id IS NOT NULL;
@@ -42,7 +60,9 @@ CREATE POLICY "Admins can manage pickup info"
     ON public.pickup_info FOR ALL TO authenticated
     USING (public.is_admin()) WITH CHECK (public.is_admin());
 
--- Data API access. Deliberately NO grant to anon: visitors can never read this table.
+-- Data API access. Deliberately NO access for anon: visitors can never read this table.
+-- (Supabase hands new tables to anon automatically until 2026-10-30, so take it away explicitly.)
+REVOKE ALL ON public.pickup_info FROM anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.pickup_info TO authenticated, service_role;
 
 -- ------------------------------------------------------------- order progress
@@ -63,6 +83,7 @@ CREATE POLICY "Admins can manage inbox status"
     ON public.inbox_status FOR ALL TO authenticated
     USING (public.is_admin()) WITH CHECK (public.is_admin());
 
+REVOKE ALL ON public.inbox_status FROM anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.inbox_status TO authenticated, service_role;
 
 -- ------------------------------------------------------------- customer lookup
@@ -122,4 +143,7 @@ COMMIT;
 SELECT 'pickup_info rows' AS what, count(*)::text AS n FROM public.pickup_info
 UNION ALL
 SELECT 'anon can read pickup_info?',
-       has_table_privilege('anon', 'public.pickup_info', 'SELECT')::text;   -- must say false
+       has_table_privilege('anon', 'public.pickup_info', 'SELECT')::text     -- must say false
+UNION ALL
+SELECT 'row security on for pickup_info?',
+       (SELECT relrowsecurity::text FROM pg_class WHERE oid = 'public.pickup_info'::regclass);   -- must say true

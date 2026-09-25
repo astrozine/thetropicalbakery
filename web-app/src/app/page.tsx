@@ -149,6 +149,20 @@ export default async function Home() {
                     description="Texturas marcantes e ingredientes frescos, pensados para surpreender os paladares mais exigentes."
                   />
                 </ScrollReveal>
+                <ScrollReveal delay={0.3}>
+                  <ModalCard 
+                    imageSrc="/box3.jpg"
+                    title="Surpresa Artesanal"
+                    description="Cada detalhe é cuidadosamente montado para oferecer uma experiência gastronômica única."
+                  />
+                </ScrollReveal>
+                <ScrollReveal delay={0.4}>
+                  <ModalCard 
+                    imageSrc="/box4.jpg"
+                    title="Requinte em Caixa"
+                    description="A união perfeita entre saúde, estética e sabor inesquecível em uma única apresentação."
+                  />
+                </ScrollReveal>
               </>
             )}
           </div>

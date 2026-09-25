@@ -6,6 +6,8 @@
  * Server-side only (used by the API routes).
  */
 
+import { SUBSTACK_URL } from '@/lib/siteContact';
+
 export const SITE_URL = 'https://thetropicalbakery.com';
 export const STORE_WHATSAPP = '5511932119196';
 export const FROM_ADDRESS = 'The Tropical Bakery <nao-responda@thetropicalbakery.com>';
@@ -109,6 +111,10 @@ export function renderEmail(o: LayoutOptions): string {
       </div>
 
       <div style="text-align:center;padding:22px 8px 0;">
+        <p style="color:${TEXT};font-size:13px;line-height:1.7;margin:0 0 16px;">
+          Para ir mais fundo: <a href="${SUBSTACK_URL}" style="color:${GOLD};font-weight:bold;text-decoration:underline;">Sunbaked Letters</a>,
+          a newsletter da Dolly no Substack <span style="color:${MUTED};">(em inglês)</span>.
+        </p>
         <p style="margin:0 0 10px;">
           ${FOOTER_LINKS.map(
             l => `<a href="${SITE_URL}${l.path}" style="color:${TEXT};font-size:12px;text-decoration:none;margin:0 6px;">${l.label}</a>`,
@@ -137,6 +143,8 @@ export function plainTextFallback(o: LayoutOptions): string {
     '',
     strip(o.body),
     o.cta ? `\n${o.cta.label}: ${o.cta.href}` : '',
+    '',
+    `Para ir mais fundo: Sunbaked Letters, a newsletter da Dolly no Substack (em inglês): ${SUBSTACK_URL}`,
     '',
     `The Tropical Bakery — Itamambuca, Ubatuba/SP`,
     SITE_URL,

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import OtherCourses from '@/components/OtherCourses';
+import SunbakedLetters from '@/components/SunbakedLetters';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 
 export default function CapacitacaoProfissionalPage() {
@@ -77,6 +78,11 @@ export default function CapacitacaoProfissionalPage() {
 
       {/* Cross Navigation */}
       <OtherCourses currentSlug="capacitacao-profissional" />
+
+      {/* For people who are already this deep in: Dolly's newsletter */}
+      <section style={{ padding: '0 1.5rem 4rem', background: '#fdfaf3' }}>
+        <SunbakedLetters tone="dark" />
+      </section>
 
       <CrmRegistrationModal 
         isOpen={isModalOpen}

@@ -113,10 +113,20 @@ export default function MenuPage() {
           <div style={{ textAlign: 'center', padding: '3rem', color: '#7f8c8d' }}>Carregando doces maravilhosos...</div>
         ) : (
           <>
-          <div style={{ maxWidth: '1000px', margin: '0 auto 2.5rem' }}>
+          {/* Allergy/preference finder: a sticky left column on desktop, above the treats on phones. */}
+          <style>{`
+            .menu-aside { margin-bottom: 2.5rem; }
+            @media (min-width: 1024px) {
+              .menu-layout { display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 2rem; align-items: start; }
+              .menu-aside { position: sticky; top: 7.5rem; max-height: calc(100vh - 9rem); overflow-y: auto; margin-bottom: 0; padding: 2px 6px 10px 2px; }
+            }
+          `}</style>
+          <div className="menu-layout">
+          <aside className="menu-aside" aria-label="Filtro de alergias e preferências">
             <TreatRefineMenu variant="public" treats={menuItems} value={refine} onChange={setRefine} shown={visibleItems.length} />
-          </div>
+          </aside>
 
+          <div className="menu-main">
           {visibleItems.length === 0 && (
             <div style={{ textAlign: 'center', color: '#594a42', padding: '2rem 1rem' }}>
               <p style={{ marginBottom: '1rem' }}>Nenhum doce combina com essa busca. Tente tirar algum filtro, ou fale com a gente no WhatsApp: podemos adaptar um doce para você.</p>
@@ -129,7 +139,7 @@ export default function MenuPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
             {visibleItems.map(item => (
               <ScrollReveal key={item.id}>
                 <MenuCard item={{
@@ -147,6 +157,8 @@ export default function MenuPage() {
                 }} />
               </ScrollReveal>
             ))}
+          </div>
+          </div>
           </div>
           </>
         )}

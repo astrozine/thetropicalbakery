@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import ZoomableImage from '@/components/ZoomableImage';
 import OtherCourses from '@/components/OtherCourses';
+import SunbakedLetters from '@/components/SunbakedLetters';
 import { InspirationTeaser } from '@/components/InspirationSection';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 
@@ -90,6 +91,11 @@ export default function SaudeBemEstarPage() {
 
       {/* Cross Navigation */}
       <OtherCourses currentSlug="saude-bem-estar" />
+
+      {/* For people who are already this deep in: Dolly's newsletter */}
+      <section style={{ padding: '0 1.5rem 4rem', background: '#fdfaf3' }}>
+        <SunbakedLetters tone="dark" />
+      </section>
 
       <CrmRegistrationModal 
         isOpen={isModalOpen}

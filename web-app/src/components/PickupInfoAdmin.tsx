@@ -42,7 +42,7 @@ export default function PickupInfoAdmin() {
   };
 
   return (
-    <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', marginBottom: '2rem' }}>
+    <div style={{ background: 'white', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
       <h2 style={{ fontSize: '1.15rem', color: '#2c3e50', marginBottom: '0.4rem' }}>🛍️ Retirada no home bakery</h2>
       <p style={{ fontSize: '0.85rem', color: '#7f8c8d', lineHeight: 1.7, marginBottom: '1.1rem' }}>
         O endereço <strong>nunca aparece no site</strong>. Só o cliente que escolheu retirada vê, em Minha Conta, depois que você marcar

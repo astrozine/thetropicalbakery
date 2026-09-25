@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
+import { SunbakedLettersNote } from '@/components/SunbakedLetters';
 
 interface CrmRegistrationModalProps {
   isOpen: boolean;
@@ -19,6 +20,8 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [dateStr, setDateStr] = useState('');
+  const [groupSize, setGroupSize] = useState('');
+  const [message, setMessage] = useState('');
   const [focusAreas, setFocusAreas] = useState<string[]>([]);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -64,17 +67,29 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
     setErrorMsg('');
 
     try {
-      const { data, error } = await supabase.from('course_registrations').insert([
-        {
-          customer_name: name.trim(),
-          email: email.trim(),
-          customer_whatsapp: formatWhatsApp(whatsapp),
-          interest_type: interestType,
-          specific_interest: specificInterest,
-          requested_date: dateStr,
-          focus_areas: focusAreas
-        }
-      ]);
+      const row = {
+        customer_name: name.trim(),
+        email: email.trim(),
+        customer_whatsapp: formatWhatsApp(whatsapp),
+        interest_type: interestType,
+        specific_interest: specificInterest,
+        requested_date: dateStr,
+        focus_areas: focusAreas,
+      };
+      const extra = { group_size: groupSize ? Number(groupSize) : null, message: message.trim() || null };
+
+      let { error } = await supabase.from('course_registrations').insert([{ ...row, ...extra }]);
+
+      // If the message/group-size columns aren't in the database yet (migration 18), never lose
+      // what the customer wrote: keep it inside the interest line and save the rest as before.
+      if (error && (extra.group_size || extra.message)) {
+        const folded = [
+          specificInterest,
+          extra.group_size ? `${extra.group_size} pessoa(s)` : '',
+          extra.message ? `Mensagem: ${extra.message}` : '',
+        ].filter(Boolean).join(' | ');
+        ({ error } = await supabase.from('course_registrations').insert([{ ...row, specific_interest: folded }]));
+      }
 
       if (error) throw error;
 
@@ -95,9 +110,11 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
         setName('');
         setWhatsapp('');
         setDateStr('');
+        setGroupSize('');
+        setMessage('');
         setFocusAreas([]);
         setStatus('idle');
-      }, 3000);
+      }, 12000); // long enough to read the confirmation and open the newsletter link
 
     } catch (err: any) {
       console.error(err);
@@ -158,6 +175,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                 <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>✨</div>
                 <h3 style={{ color: '#3c2a21', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>Reserva Recebida!</h3>
                 <p style={{ color: '#594a42' }}>Você receberá uma mensagem no WhatsApp com os detalhes da sua reserva.</p>
+                <SunbakedLettersNote />
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -215,6 +233,40 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                     onChange={e => setDateStr(e.target.value)}
                     style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
                   />
+                </label>
+
+                <label style={{ display: 'block' }}>
+                  <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.4rem' }}>
+                    Quantas pessoas? <span style={{ fontWeight: 400, color: '#7a6a61' }}>(opcional)</span>
+                  </span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={500}
+                    value={groupSize}
+                    onChange={e => setGroupSize(e.target.value)}
+                    placeholder={interestType === 'retiro' ? 'Ex: 8' : 'Ex: 2'}
+                    style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
+                  />
+                </label>
+
+                <label style={{ display: 'block' }}>
+                  <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.4rem' }}>
+                    Conte o que você imagina <span style={{ fontWeight: 400, color: '#7a6a61' }}>(opcional)</span>
+                  </span>
+                  <textarea
+                    rows={4}
+                    maxLength={1500}
+                    value={message}
+                    onChange={e => setMessage(e.target.value)}
+                    placeholder={interestType === 'retiro'
+                      ? 'Ex: um grupo de amigas, 3 noites, queremos yoga de manhã e aula de confeitaria. Alguém é celíaca…'
+                      : 'Ex: nunca fiz confeitaria vegana, quero aprender receitas sem glúten para a minha família…'}
+                    style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit', resize: 'vertical' }}
+                  />
+                  <span style={{ display: 'block', fontSize: '0.78rem', color: '#7a6a61', marginTop: '0.3rem' }}>
+                    Quanto mais a gente souber, melhor conseguimos preparar a sua experiência.
+                  </span>
                 </label>
 
                 <div style={{ background: 'white', padding: '1.25rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)' }}>

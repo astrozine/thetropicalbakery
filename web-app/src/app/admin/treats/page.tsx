@@ -234,9 +234,20 @@ export default function TreatsAdmin() {
         </div>
       </form>
 
-      {/* Refine the list: folders of allergens and ingredients, opened accordion-style */}
-      <TreatRefineMenu treats={treats} value={refine} onChange={setRefine} shown={visibleTreats.length} />
+      {/* Refine the list: folders of allergens and ingredients. A sticky left column on wide screens, above the list otherwise. */}
+      <style>{`
+        .treats-aside { margin-bottom: 1.5rem; }
+        @media (min-width: 1280px) {
+          .treats-layout { display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 1.75rem; align-items: start; }
+          .treats-aside { position: sticky; top: 7.5rem; max-height: calc(100vh - 9rem); overflow-y: auto; margin-bottom: 0; padding: 2px 6px 10px 2px; }
+        }
+      `}</style>
+      <div className="treats-layout">
+      <aside className="treats-aside" aria-label="Refinar busca">
+        <TreatRefineMenu treats={treats} value={refine} onChange={setRefine} shown={visibleTreats.length} defaultOpen />
+      </aside>
 
+      <div className="treats-main">
       {visibleTreats.length === 0 && (
         <div style={{ ...card, textAlign: 'center', color: '#7f8c8d' }}>
           <p style={{ marginBottom: '1rem' }}>Nenhum doce combina com esses filtros.</p>
@@ -250,7 +261,7 @@ export default function TreatsAdmin() {
       )}
 
       {/* Treats List */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '1.5rem' }}>
         {visibleTreats.map(treat => (
           <div key={treat.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
             <div style={{ position: 'relative', height: '200px', background: '#f5f6fa' }}>
@@ -299,6 +310,8 @@ export default function TreatsAdmin() {
             </div>
           </div>
         ))}
+      </div>
+      </div>
       </div>
     </div>
   );

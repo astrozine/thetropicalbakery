@@ -12,6 +12,8 @@ interface Registration {
   specific_interest: string | null;
   requested_date: string | null;
   focus_areas: string[] | null;
+  group_size: number | null;
+  message: string | null;
   created_at: string;
 }
 
@@ -58,7 +60,7 @@ export default function CourseRegistrationsAdmin() {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
     return rows.filter(r =>
-      [r.customer_name, r.email, r.customer_whatsapp, r.interest_type, r.specific_interest,
+      [r.customer_name, r.email, r.customer_whatsapp, r.interest_type, r.specific_interest, r.message,
         ...(r.focus_areas || [])]
         .filter(Boolean)
         .some(v => String(v).toLowerCase().includes(q)),
@@ -123,6 +125,7 @@ export default function CourseRegistrationsAdmin() {
                   {r.interest_type && <div><strong>{r.interest_type}</strong></div>}
                   {r.specific_interest && <div>{r.specific_interest}</div>}
                   {r.requested_date && <div style={{ color: '#7f8c8d' }}>📅 Data desejada: {formatDate(r.requested_date)}</div>}
+                  {r.group_size ? <div style={{ color: '#7f8c8d' }}>👥 {r.group_size} {r.group_size === 1 ? 'pessoa' : 'pessoas'}</div> : null}
                 </div>
                 {r.focus_areas && r.focus_areas.length > 0 && (
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.6rem' }}>
@@ -135,8 +138,20 @@ export default function CourseRegistrationsAdmin() {
                 )}
               </div>
 
+              {/* What they wrote to us, in the empty middle of the card, at a comfortable reading width */}
+              <div style={{ flex: '2 1 320px', maxWidth: '640px', minWidth: 0 }}>
+                <h4 style={{ fontSize: '0.8rem', color: '#95a5a6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Mensagem</h4>
+                {r.message ? (
+                  <p style={{ margin: 0, padding: '0.85rem 1.1rem', background: '#fdf7ee', borderLeft: '4px solid #d4af37', borderRadius: '0 10px 10px 0', color: '#2c3e50', fontSize: '0.95rem', lineHeight: 1.75, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+                    {r.message}
+                  </p>
+                ) : (
+                  <p style={{ margin: 0, color: '#b2bec3', fontSize: '0.88rem', fontStyle: 'italic' }}>Não deixou mensagem.</p>
+                )}
+              </div>
+
               {digitsOnly(r.customer_whatsapp) && (
-                <div style={{ flex: '0 0 auto' }}>
+                <div style={{ flex: '0 0 auto', marginLeft: 'auto' }}>
                   <a
                     href={`https://wa.me/${digitsOnly(r.customer_whatsapp).length <= 11 ? '55' + digitsOnly(r.customer_whatsapp) : digitsOnly(r.customer_whatsapp)}`}
                     target="_blank"

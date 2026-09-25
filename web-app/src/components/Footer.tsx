@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { STORE_WHATSAPP, STORE_WHATSAPP_DISPLAY } from '@/lib/siteContact';
+import { STORE_WHATSAPP, STORE_WHATSAPP_DISPLAY, SUBSTACK_URL } from '@/lib/siteContact';
 
 export default function Footer() {
   const handleScrollToTop = () => {
@@ -65,6 +65,7 @@ export default function Footer() {
           <ul style={{ listStyle: 'none', padding: 0, margin: '0.75rem 0 0', lineHeight: '2' }}>
             <li><a href={`https://wa.me/${STORE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>WhatsApp {STORE_WHATSAPP_DISPLAY}</a></li>
             <li><Link href="/minha-conta" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Minha conta e retiradas</Link></li>
+            <li><a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#e8e1d7', textDecoration: 'none' }}>Sunbaked Letters, a newsletter ↗</a></li>
           </ul>
         </div>
       </div>

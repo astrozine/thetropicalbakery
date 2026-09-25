@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
+import { SunbakedLettersNote } from '@/components/SunbakedLetters';
 import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
 import { SUBSCRIPTION_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
 import { SubscriptionPlan, DIETARY_FIELDS, DietaryKey, monthlyTotal } from '@/lib/subscriptions';
@@ -213,6 +214,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
         <p style={{ fontSize: '0.8rem', color: '#a89a90', marginTop: '1.25rem' }}>
           Quer adiantar? Toque acima e a mensagem já vai pronta.
         </p>
+        <SunbakedLettersNote />
       </div>
     );
   }

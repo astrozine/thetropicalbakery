@@ -76,13 +76,15 @@ const MODES: { id: RefineMode; label: string; help: string }[] = [
   { id: 'free', label: '🌱 Livre de', help: 'Mostra os doces que não têm NENHUM dos itens marcados, nem como traço.' },
 ];
 
-export default function TreatRefineMenu({ treats, value, onChange, shown, variant = 'admin' }: {
+export default function TreatRefineMenu({ treats, value, onChange, shown, variant = 'admin', defaultOpen = false }: {
   treats: RefinableTreat[]; value: RefineState; onChange: (next: RefineState) => void; shown: number;
   /** 'public' is the customer-facing look: no admin-only folder, friendlier wording, open by default. */
   variant?: 'admin' | 'public';
+  /** Start expanded (the public look always does). Used when it sits in a side column. */
+  defaultOpen?: boolean;
 }) {
   const isPublic = variant === 'public';
-  const [open, setOpen] = useState(isPublic);
+  const [open, setOpen] = useState(isPublic || defaultOpen);
   const [openFolders, setOpenFolders] = useState<string[]>([]);
 
   const toggleFolder = (id: string) =>

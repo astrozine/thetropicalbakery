@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import ZoomableImage from '@/components/ZoomableImage';
 import OtherCourses from '@/components/OtherCourses';
+import SunbakedLetters from '@/components/SunbakedLetters';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 
 export default function TurismoGastronomicoPage() {
@@ -85,6 +86,11 @@ export default function TurismoGastronomicoPage() {
 
       {/* Cross Navigation */}
       <OtherCourses currentSlug="turismo-gastronomico" />
+
+      {/* For people who are already this deep in: Dolly's newsletter */}
+      <section style={{ padding: '0 1.5rem 4rem', background: '#fdfaf3' }}>
+        <SunbakedLetters tone="dark" />
+      </section>
 
       <CrmRegistrationModal 
         isOpen={isModalOpen}

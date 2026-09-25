@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
 import CourseAccordionWrapper from '@/components/CourseAccordionWrapper';
+import SunbakedLetters from '@/components/SunbakedLetters';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 
 interface Course {
@@ -224,8 +225,7 @@ export default function CursosPage() {
               style={{
                 position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
                 backgroundAttachment: 'fixed', backgroundSize: 'cover', backgroundPosition: 'center',
-                backgroundImage: 'url(/dolly-course2.jpg), linear-gradient(rgba(46, 68, 50, 0.9), rgba(46, 68, 50, 0.9))',
-                backgroundBlendMode: 'overlay',
+                backgroundImage: 'linear-gradient(rgba(46, 68, 50, 0.9), rgba(46, 68, 50, 0.9))',
                 backgroundColor: 'var(--color-accent)'
               }}
             />
@@ -360,6 +360,10 @@ export default function CursosPage() {
             </div>
           </ScrollReveal>
         </div>
+      </section>
+
+      <section style={{ padding: '0 1.5rem 4rem' }}>
+        <SunbakedLetters />
       </section>
 
       <CrmRegistrationModal 

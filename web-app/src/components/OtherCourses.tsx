@@ -1,24 +1,27 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
+// Each card uses the same photo as that course's own page (or, where that page's photo isn't a
+// real one, a real treat from its gallery), so the card previews what you'll find inside.
 const coursesData = [
   {
     slug: 'turismo-gastronomico',
     title: 'Turismo Gastronômico',
     description: 'Imersão de 1 dia em Ubatuba.',
-    image: '/retreats/Surfer girl.webp'
+    image: '/assets/surfers_retreat_treats_1789884582282.jpg'
   },
   {
     slug: 'capacitacao-profissional',
     title: 'Capacitação Profissional',
     description: 'Para cozinheiros particulares locais.',
-    image: '/dolly-course2.jpg'
+    image: '/assets/chef_training_1789884593538.jpg'
   },
   {
     slug: 'saude-bem-estar',
     title: 'Saúde e Bem-Estar',
     description: 'Transição suave para o veganismo.',
-    image: '/dolly-course2.jpg'
+    image: '/menu-items/20260620_163438.jpg'
   }
 ];
 
@@ -56,11 +59,13 @@ export default function OtherCourses({ currentSlug }: { currentSlug: string }) {
                 flexDirection: 'column'
               }}
               >
-                <div style={{ width: '100%', height: '200px', overflow: 'hidden' }}>
-                  <img 
-                    src={course.image} 
-                    alt={course.title} 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                <div style={{ position: 'relative', width: '100%', height: '200px', overflow: 'hidden' }}>
+                  <Image
+                    src={course.image}
+                    alt={course.title}
+                    fill
+                    sizes="(max-width: 700px) 100vw, 450px"
+                    style={{ objectFit: 'cover' }}
                   />
                 </div>
                 <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>

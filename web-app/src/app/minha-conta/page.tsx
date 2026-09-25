@@ -8,6 +8,7 @@ import LoginPanel from '@/components/LoginPanel';
 import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
 import MySubscription from '@/components/MySubscription';
 import MyPickups from '@/components/MyPickups';
+import SunbakedLetters from '@/components/SunbakedLetters';
 import { SUBSCRIPTION_ZONES, formatBRL, isItamambuca } from '@/lib/deliveryZones';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
 import AccountSection from '@/components/AccountSection';
@@ -492,6 +493,11 @@ export default function MyAccountPage() {
                 </div>
               )}
             </form>
+
+            {/* For people who've gone this deep into their own profile: Dolly's newsletter */}
+            <div style={{ marginTop: '2.5rem' }}>
+              <SunbakedLetters />
+            </div>
 
           </>
         )}

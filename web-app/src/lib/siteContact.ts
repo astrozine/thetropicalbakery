@@ -4,6 +4,9 @@ export const STORE_WHATSAPP = '5511932119196';
 export const STORE_WHATSAPP_DISPLAY = '+55 11 93211-9196';
 export const STORE_INSTAGRAM_URL = 'https://www.instagram.com/_thetropicalbakery_/';
 
+/** Dolly's Substack, "Sunbaked Letters" (written in English). */
+export const SUBSTACK_URL = 'https://substack.com/@thetropicalbakery?r=5uip7u';
+
 // The physical address is deliberately NOT here: this file ships to every visitor's browser.
 // It lives in the private pickup_info table and is only returned to customers with a confirmed
 // pickup order (see migration_17_pickup.sql).

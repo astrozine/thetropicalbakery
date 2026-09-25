@@ -11,7 +11,7 @@ import {
 const WEEKDAY = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const MONTH_NAME = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-const card: React.CSSProperties = { background: 'white', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', marginBottom: '2rem' };
+const card: React.CSSProperties = { background: 'white', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', marginBottom: '1.5rem' };
 const field: React.CSSProperties = { padding: '0.65rem', borderRadius: '8px', border: '1px solid #dfe4ea', background: 'white', fontSize: '0.95rem' };
 const lbl: React.CSSProperties = { display: 'block', fontSize: '0.78rem', fontWeight: 'bold', color: '#7f8c8d', marginBottom: '0.3rem' };
 const dark: React.CSSProperties = { background: '#2c3e50', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' };
@@ -214,9 +214,9 @@ export default function DeliveryCalendarAdmin() {
   const cells: (string | null)[] = [...Array(firstWeekday).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => toISODate(new Date(year, month, i + 1)))];
 
   return (
-    <div style={{ maxWidth: '820px' }}>
+    <div style={{ maxWidth: '1500px' }}>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Calendário de Entregas das Caixas</h1>
-      <p style={{ color: '#7f8c8d', marginBottom: '2rem', lineHeight: 1.7 }}>
+      <p style={{ color: '#7f8c8d', marginBottom: '1.5rem', lineHeight: 1.7, maxWidth: '900px' }}>
         Vale só para a <strong>Caixa de Degustação</strong> (pedido avulso e assinatura). Os itens do Menu de Eventos
         têm a data combinada por fora e não usam este calendário. Defina uma regra (ex.: toda sexta) e ajuste
         dias soltos no calendário abaixo.
@@ -238,6 +238,17 @@ export default function DeliveryCalendarAdmin() {
         </div>
       )}
 
+      <style>{`
+        .cal-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 1.75rem; align-items: start; }
+        .cal-col-right { order: -1; }
+        @media (min-width: 1100px) {
+          .cal-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+          .cal-col-right { order: 0; }
+        }
+      `}</style>
+
+      <div className="cal-cols">
+      <div className="cal-col">
       {/* ---------- Rules */}
       <div style={card}>
         <h2 style={{ fontSize: '1.15rem', color: '#2c3e50', marginBottom: '1rem' }}>Regras de entrega</h2>
@@ -337,6 +348,9 @@ export default function DeliveryCalendarAdmin() {
       {/* ---------- Pickup address (private) */}
       <PickupInfoAdmin />
 
+      </div>
+
+      <div className="cal-col cal-col-right">
       {/* ---------- Calendar */}
       <div style={card}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -373,7 +387,7 @@ export default function DeliveryCalendarAdmin() {
                     onClick={() => !isPast && toggleDate(iso)}
                     disabled={isPast || saving === iso}
                     style={{
-                      width: '100%', aspectRatio: '1', borderRadius: '10px', border: 'none', cursor: isPast ? 'default' : 'pointer',
+                      width: '100%', aspectRatio: '1.15', borderRadius: '10px', border: 'none', cursor: isPast ? 'default' : 'pointer',
                       background: bg, color, fontWeight: 700, fontSize: '0.95rem', opacity: saving === iso ? 0.5 : 1,
                       textDecoration: info.state === 'blocked' ? 'line-through' : 'none',
                     }}
@@ -434,6 +448,8 @@ export default function DeliveryCalendarAdmin() {
           </>
         )}
         {notifyResult && <p style={{ marginTop: '1rem', fontWeight: 'bold', color: notifyResult.startsWith('✅') ? '#0b6b3a' : '#c0392b' }}>{notifyResult}</p>}
+      </div>
+      </div>
       </div>
     </div>
   );
