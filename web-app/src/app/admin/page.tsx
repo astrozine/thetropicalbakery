@@ -14,7 +14,7 @@ export default function AdminDashboard() {
       <div className="admin-overview">
         <QuickMenu />
         <aside className="admin-overview__inbox" aria-label="Chegou agora">
-          <InboxSummary limit={5} />
+          <InboxSummary limit={6} />
         </aside>
       </div>
 
@@ -24,6 +24,10 @@ export default function AdminDashboard() {
         @media (min-width: 1100px) {
           .admin-overview { grid-template-columns: minmax(0, 1fr) 400px; }
           .admin-overview__inbox { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; }
+        }
+        /* Big screens: split the width roughly in half so the two sides feel balanced. */
+        @media (min-width: 1500px) {
+          .admin-overview { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
         }
       ` }} />
     </div>
