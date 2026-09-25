@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -48,6 +48,18 @@ export default function AdminLayout({
   const [access, setAccess] = useState<'checking' | 'allowed' | 'denied' | 'unprotected'>('checking');
   const [unreadCount, setUnreadCount] = useState(0);
   const [partnerCount, setPartnerCount] = useState(0);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+
+  // The little account menu closes when you click anywhere else, or press Escape.
+  useEffect(() => {
+    if (!accountOpen) return;
+    const away = (e: MouseEvent) => { if (!accountRef.current?.contains(e.target as Node)) setAccountOpen(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setAccountOpen(false); };
+    document.addEventListener('mousedown', away);
+    document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('mousedown', away); document.removeEventListener('keydown', esc); };
+  }, [accountOpen]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -172,10 +184,15 @@ export default function AdminLayout({
         color: 'white', 
         display: 'flex', 
         flexDirection: 'column',
-        position: isMobile ? 'fixed' : 'static',
+        // Desktop: pinned to the window and exactly as tall as it, so the menu scrolls inside
+        // and the account chip below is always where you can see it (not at the foot of a long page).
+        position: isMobile ? 'fixed' : 'sticky',
         top: 0,
         left: 0,
-        bottom: 0,
+        bottom: isMobile ? 0 : undefined,
+        height: isMobile ? undefined : '100vh',
+        alignSelf: isMobile ? undefined : 'flex-start',
+        flexShrink: 0,
         zIndex: 99999,
         transform: isMobile ? (isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)') : 'none',
         transition: 'transform 0.3s ease-in-out'
@@ -196,12 +213,25 @@ export default function AdminLayout({
 
         <AdminSidebarNav pathname={pathname} unreadCount={unreadCount} partnerCount={partnerCount} onNavigate={() => { if (isMobile) setIsSidebarOpen(false); }} />
 
-        <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <div style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '1rem', wordBreak: 'break-all' }}>
-            {user?.email}
-          </div>
-          <button onClick={handleLogout} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', width: '100%', transition: 'all 0.2s' }}>
-            Sair
+        {/* Account chip: who is signed in, and Sair one deliberate click away (never a bare button in the list). */}
+        <div ref={accountRef} style={{ position: 'relative', padding: '0.75rem 0.9rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          {accountOpen && (
+            <div role="menu" style={{ position: 'absolute', left: '0.9rem', right: '0.9rem', bottom: 'calc(100% - 0.25rem)', background: '#2e455c', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', padding: '0.4rem', boxShadow: '0 -10px 28px rgba(0,0,0,0.35)' }}>
+              <Link href="/" role="menuitem" style={{ display: 'block', padding: '0.6rem 0.8rem', borderRadius: '8px', color: '#dfe7ee', textDecoration: 'none', fontSize: '0.9rem' }}>
+                🌐 Ver o site
+              </Link>
+              <button role="menuitem" onClick={handleLogout} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.6rem 0.8rem', borderRadius: '8px', background: 'transparent', border: 'none', color: '#ffb4ab', cursor: 'pointer', fontSize: '0.9rem', fontFamily: 'inherit' }}>
+                🚪 Sair da conta
+              </button>
+            </div>
+          )}
+          <button type="button" onClick={() => setAccountOpen(o => !o)} aria-haspopup="menu" aria-expanded={accountOpen}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.5rem 0.6rem', background: accountOpen ? 'rgba(255,255,255,0.1)' : 'transparent', border: 'none', borderRadius: '10px', cursor: 'pointer', color: '#fff', textAlign: 'left', fontFamily: 'inherit' }}>
+            <span aria-hidden style={{ width: '2rem', height: '2rem', borderRadius: '50%', background: '#f4c542', color: '#3c2a21', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0 }}>
+              {(user?.email || '?')[0].toUpperCase()}
+            </span>
+            <span style={{ flex: 1, minWidth: 0, fontSize: '0.8rem', opacity: 0.85, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</span>
+            <span aria-hidden style={{ fontSize: '0.7rem', opacity: 0.7, transform: accountOpen ? 'rotate(180deg)' : 'none' }}>▲</span>
           </button>
         </div>
       </aside>
@@ -215,7 +245,7 @@ export default function AdminLayout({
       )}
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, padding: isMobile ? '1.25rem 1rem 6.5rem' : '2rem', overflowY: 'auto', minWidth: 0 }}>
+      <main style={{ flex: 1, padding: isMobile ? '1.25rem 1rem 6.5rem' : '2rem', overflowX: 'clip', minWidth: 0 }}>
         {access === 'unprotected' && (
           <div style={{
             background: '#fff4e5', border: '1px solid #ffb74d', borderLeft: '5px solid #f57c00',
