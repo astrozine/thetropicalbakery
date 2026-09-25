@@ -28,7 +28,13 @@ export interface NavGroup {
 export const PINNED: Omit<NavItem, 'badge'>[] = [
   { name: 'Visão Geral', path: '/admin', word: 'Resumo', emoji: '🏠', hint: 'Resumo do que está acontecendo' },
   { name: 'Caixa de Entrada', path: '/admin/inbox', word: 'Mensagens', emoji: '📥', hint: 'Tudo o que chega do site: pedidos, candidaturas, contatos' },
+  // Communication with people: as prominent as the orders, so not buried in a group.
+  { name: 'Clientes & Campanhas', path: '/admin/crm', word: 'Clientes', emoji: '💌', hint: 'Lista de clientes e mensagens em massa' },
+  { name: 'Parceiros B2B', path: '/admin/parceiros', word: 'Parceiros', emoji: '🤝', hint: 'Hotéis, pousadas, restaurantes, afiliados e os pedidos de reposição' },
 ];
+
+/** Where the big "+" goes: the form to make the box of the week (it is the first thing on that page). */
+export const NEW_BOX_PATH = '/admin/caixas';
 
 export const buildGroups = (): NavGroup[] => [
   {
@@ -59,8 +65,6 @@ export const buildGroups = (): NavGroup[] => [
     items: [
       { name: 'E-mails', path: '/admin/emails', word: 'E-mails', emoji: '✉️', hint: 'Escrever e enviar e-mails para clientes, parceiros e candidatos' },
       { name: 'Faixa de Anúncio', path: '/admin/anuncio', word: 'Anúncio', emoji: '🎉', hint: 'O aviso especial que aparece no topo da página inicial' },
-      { name: 'Clientes & Campanhas', path: '/admin/crm', word: 'Clientes', emoji: '💌', hint: 'Lista de clientes e mensagens em massa' },
-      { name: 'Parceiros B2B', path: '/admin/parceiros', word: 'Parceiros', emoji: '🤝', hint: 'Hotéis, pousadas, restaurantes, afiliados e os pedidos de reposição' },
     ],
   },
   {

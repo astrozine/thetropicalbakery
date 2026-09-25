@@ -35,10 +35,10 @@ const textOn = (hex: string) => {
 export default function QuickMenu() {
   const cells = useMemo<Cell[]>(() => {
     const out: Cell[] = [];
-    const inbox = PINNED.find(p => p.path === '/admin/inbox');
-    if (inbox) {
-      out.push({ key: inbox.path, path: inbox.path, emoji: inbox.emoji, word: inbox.word, name: inbox.name, hint: inbox.hint, accent: '#f4c542', header: '📥 Novidades' });
-    }
+    PINNED.filter(p => p.path !== '/admin').forEach((item, i) => out.push({
+      key: item.path, path: item.path, emoji: item.emoji, word: item.word, name: item.name, hint: item.hint, accent: '#f4c542',
+      header: i === 0 ? '⭐ Principais' : undefined,
+    }));
     buildGroups().forEach(g => g.items.forEach((item, i) => out.push({
       key: item.path, path: item.path, emoji: item.emoji, word: item.word, name: item.name, hint: item.hint, accent: g.accent,
       header: i === 0 ? `${g.emoji} ${g.name}` : undefined,

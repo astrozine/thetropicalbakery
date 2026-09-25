@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { PINNED, buildGroups, type NavItem } from './adminNav';
+import { NEW_BOX_PATH, PINNED, buildGroups, type NavItem } from './adminNav';
 
 /**
  * The admin menu, grouped by what you're trying to do. Groups open on click (not hover: hover
@@ -12,8 +12,8 @@ import { PINNED, buildGroups, type NavItem } from './adminNav';
 
 const STORAGE_KEY = 'admin_nav_open_groups';
 
-export default function AdminSidebarNav({ pathname, unreadCount, onNavigate }: {
-  pathname: string; unreadCount: number; onNavigate?: () => void;
+export default function AdminSidebarNav({ pathname, unreadCount, partnerCount = 0, onNavigate }: {
+  pathname: string; unreadCount: number; partnerCount?: number; onNavigate?: () => void;
 }) {
   const groups = useMemo(buildGroups, []);
   const [open, setOpen] = useState<Set<string>>(new Set());
@@ -71,7 +71,8 @@ export default function AdminSidebarNav({ pathname, unreadCount, onNavigate }: {
     );
   };
 
-  const pinned = PINNED.map(p => ({ ...p, badge: p.path === '/admin/inbox' ? unreadCount : undefined }));
+  const badgeFor = (path: string) => (path === '/admin/inbox' ? unreadCount : path === '/admin/parceiros' ? partnerCount : undefined);
+  const pinned = PINNED.map(p => ({ ...p, badge: badgeFor(p.path) }));
 
   return (
     <nav aria-label="Menu do painel" style={{ flex: 1, overflowY: 'auto', paddingBottom: '1rem' }}>
@@ -83,9 +84,22 @@ export default function AdminSidebarNav({ pathname, unreadCount, onNavigate }: {
         />
       </div>
 
-      {/* Always-visible, most used */}
-      <div style={{ padding: '0.4rem 0 0.6rem' }}>
-        {pinned.filter(matches).map(item => renderLink(item, '#f4c542'))}
+      {/* The one thing Dolly does every week */}
+      <div style={{ padding: '0.4rem 0.9rem 0.5rem' }}>
+        <Link href={NEW_BOX_PATH} onClick={onNavigate} title="Montar a caixa de degustação da semana"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.7rem 0.9rem', borderRadius: '14px', textDecoration: 'none', background: 'linear-gradient(135deg, #f4c542, #e2a52a)', color: '#3c2a21', fontWeight: 800, fontSize: '0.98rem', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
+          <span aria-hidden style={{ width: '2rem', height: '2rem', borderRadius: '50%', background: '#3c2a21', color: '#f4c542', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', lineHeight: 1, paddingBottom: '0.15rem' }}>+</span>
+          Nova caixa da semana
+        </Link>
+      </div>
+
+      {/* Always-visible, most used: the overview and orders, then the people we talk to */}
+      <div style={{ padding: '0.2rem 0 0.6rem' }}>
+        {pinned.filter(matches).slice(0, 2).map(item => renderLink(item, '#f4c542'))}
+        {pinned.filter(matches).length > 2 && (
+          <p style={{ margin: '0.7rem 1.4rem 0.2rem', fontSize: '0.68rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#8ea3b5', fontWeight: 800 }}>Comunicação</p>
+        )}
+        {pinned.filter(matches).slice(2).map(item => renderLink(item, '#f4c542'))}
       </div>
 
       {/* Groups */}

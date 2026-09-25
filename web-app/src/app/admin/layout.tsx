@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import AdminSidebarNav from './AdminSidebarNav';
+import { NEW_BOX_PATH } from './adminNav';
 
 /**
  * Asks the database whether the signed-in person is on the admin list.
@@ -46,6 +47,7 @@ export default function AdminLayout({
   // 'unprotected'    — the security migration hasn't been run yet
   const [access, setAccess] = useState<'checking' | 'allowed' | 'denied' | 'unprotected'>('checking');
   const [unreadCount, setUnreadCount] = useState(0);
+  const [partnerCount, setPartnerCount] = useState(0);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -96,6 +98,13 @@ export default function AdminLayout({
       ]);
       const total = (jobs.count || 0) + (orders.count || 0) + (courses.count || 0) + (waitlist.count || 0);
       setUnreadCount(Math.max(0, total - (handled.count || 0)));
+
+      // Partners waiting for approval + restock requests nobody has answered.
+      const [pending, restock] = await Promise.all([
+        supabase.from('partners').select('id', { count: 'exact', head: true }).eq('status', 'pendente'),
+        supabase.from('partner_restock_requests').select('id', { count: 'exact', head: true }).eq('status', 'novo'),
+      ]);
+      setPartnerCount((pending.count || 0) + (restock.count || 0));
     };
     loadUnread();
   }, [access]);
@@ -185,7 +194,7 @@ export default function AdminLayout({
         {/* 70s stripe */}
         <div aria-hidden style={{ height: '6px', background: 'linear-gradient(90deg, #f4c542 0 25%, #e2792a 25% 50%, #d9453a 50% 75%, #9bab3c 75% 100%)' }} />
 
-        <AdminSidebarNav pathname={pathname} unreadCount={unreadCount} onNavigate={() => { if (isMobile) setIsSidebarOpen(false); }} />
+        <AdminSidebarNav pathname={pathname} unreadCount={unreadCount} partnerCount={partnerCount} onNavigate={() => { if (isMobile) setIsSidebarOpen(false); }} />
 
         <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '1rem', wordBreak: 'break-all' }}>
@@ -206,7 +215,7 @@ export default function AdminLayout({
       )}
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+      <main style={{ flex: 1, padding: isMobile ? '1.25rem 1rem 6.5rem' : '2rem', overflowY: 'auto', minWidth: 0 }}>
         {access === 'unprotected' && (
           <div style={{
             background: '#fff4e5', border: '1px solid #ffb74d', borderLeft: '5px solid #f57c00',
@@ -220,6 +229,46 @@ export default function AdminLayout({
         )}
         {children}
       </main>
+
+      {/* Phones: the four things that matter live in a thumb-reach bar, with the big + in the middle. */}
+      {isMobile && (
+        <nav aria-label="Atalhos principais" style={{
+          position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'grid', gridTemplateColumns: '1fr 1fr 72px 1fr 1fr', alignItems: 'end',
+          background: '#22323f', borderTop: '1px solid rgba(255,255,255,0.12)', padding: '0.4rem 0.25rem calc(0.4rem + env(safe-area-inset-bottom))',
+          boxShadow: '0 -6px 20px rgba(0,0,0,0.25)',
+        }}>
+          {([
+            { href: '/admin', emoji: '🏠', label: 'Início', badge: 0 },
+            { href: '/admin/inbox', emoji: '📥', label: 'Entrada', badge: unreadCount },
+          ] as const).map(t => <TabLink key={t.href} {...t} active={pathname === t.href} />)}
+
+          <Link href={NEW_BOX_PATH} aria-label="Nova caixa da semana" style={{
+            justifySelf: 'center', marginTop: '-1.6rem', width: '60px', height: '60px', borderRadius: '50%', textDecoration: 'none',
+            background: 'linear-gradient(135deg, #f4c542, #e2a52a)', color: '#3c2a21', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '2.4rem', fontWeight: 300, lineHeight: 1, paddingBottom: '0.3rem', border: '4px solid #22323f', boxShadow: '0 6px 14px rgba(0,0,0,0.4)',
+          }}>+</Link>
+
+          {([
+            { href: '/admin/crm', emoji: '💌', label: 'Clientes', badge: 0 },
+            { href: '/admin/parceiros', emoji: '🤝', label: 'Parceiros', badge: partnerCount },
+          ] as const).map(t => <TabLink key={t.href} {...t} active={pathname === t.href} />)}
+        </nav>
+      )}
     </div>
+  );
+}
+
+function TabLink({ href, emoji, label, badge, active }: { href: string; emoji: string; label: string; badge: number; active: boolean }) {
+  return (
+    <Link href={href} aria-current={active ? 'page' : undefined} style={{
+      position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.1rem', padding: '0.3rem 0.2rem', textDecoration: 'none',
+      color: active ? '#f4c542' : '#c9d5df', fontSize: '0.68rem', fontWeight: active ? 800 : 600,
+    }}>
+      <span aria-hidden style={{ fontSize: '1.4rem', lineHeight: 1.1 }}>{emoji}</span>
+      {label}
+      {badge > 0 && (
+        <span style={{ position: 'absolute', top: '0.05rem', right: 'calc(50% - 1.5rem)', background: '#e74c3c', color: '#fff', fontSize: '0.62rem', fontWeight: 800, minWidth: '17px', textAlign: 'center', padding: '0.05rem 0.3rem', borderRadius: '999px' }}>{badge}</span>
+      )}
+    </Link>
   );
 }
