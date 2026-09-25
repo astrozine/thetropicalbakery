@@ -143,7 +143,7 @@ export default function TreatsAdmin() {
   const visibleTreats = treats.filter(t => matchesRefine(t, refine));
 
   return (
-    <div style={{ maxWidth: '1400px' }}>
+    <div style={{ maxWidth: '2200px' }}>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Catálogo de Doces (Menu de Eventos)</h1>
       <p style={{ color: '#7f8c8d', marginBottom: '2rem', lineHeight: 1.7, maxWidth: '760px' }}>
         Os mesmos doces podem estar aqui e dentro das Caixas de Degustação. Ingredientes e alérgenos que você mudar aqui são atualizados
@@ -155,9 +155,9 @@ export default function TreatsAdmin() {
       </h2>
 
       <form onSubmit={handleSave} style={{ marginBottom: '3rem' }}>
-        <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))', alignItems: 'start' }}>
 
-          {/* LEFT: the menu item */}
+          {/* 1: the menu item */}
           <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
             <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>🧁 Sobre o doce</h3>
 
@@ -220,11 +220,16 @@ export default function TreatsAdmin() {
             </div>
           </div>
 
-          {/* RIGHT: ingredients + allergens */}
+          {/* 2: what's in it */}
           <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
-            <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>🌿 Ingredientes e alérgenos</h3>
+            <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>🌿 Ingredientes</h3>
             <EmojiField emoji={formData.emoji || '🍫'} onChange={emoji => setFormData({ ...formData, emoji })} />
             <IngredientsField ingredients={formData.ingredients || []} onChange={ingredients => setFormData({ ...formData, ingredients })} />
+          </div>
+
+          {/* 3: allergens, "contém" and "pode conter" side by side */}
+          <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
+            <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>⚠️ Alérgenos</h3>
             <AllergenFields
               contains={formData.contains || []}
               mayContain={formData.may_contain || []}

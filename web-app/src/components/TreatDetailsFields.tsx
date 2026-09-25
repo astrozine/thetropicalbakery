@@ -7,7 +7,34 @@ import { ALLERGENS, ALLERGEN_GROUPS, TREAT_EMOJIS } from '@/lib/allergens';
 export const fieldStyle: React.CSSProperties = { width: '100%', padding: '0.7rem', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.95rem' };
 export const labelStyle: React.CSSProperties = { display: 'block', marginBottom: '0.4rem', fontWeight: 'bold', fontSize: '0.9rem', color: '#2c3e50' };
 
-/** Chip picker for one list of allergens ("contém" or "pode conter"). */
+/** One accordion row: a title, a short note on the right, optional chips underneath (both visible while closed), and a body that opens on tap. */
+export function Fold({ title, summary, chips, defaultOpen = false, children }: {
+  title: string; summary?: React.ReactNode; chips?: React.ReactNode; defaultOpen?: boolean; children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div style={{ border: '1px solid #eef1f4', borderRadius: '10px', background: '#fff', overflow: 'hidden' }}>
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen(o => !o)}
+        style={{ width: '100%', display: 'flex', alignItems: 'flex-start', gap: '0.6rem', padding: '0.55rem 0.8rem', background: open ? '#fdf7ee' : '#fff', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+      >
+        <span aria-hidden style={{ display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none', color: '#a6832b', flexShrink: 0, lineHeight: 1.5 }}>▸</span>
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#2c3e50', lineHeight: 1.5 }}>{title}</span>
+            {summary && <span style={{ marginLeft: 'auto', flexShrink: 0 }}>{summary}</span>}
+          </span>
+          {chips && <span style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.35rem' }}>{chips}</span>}
+        </span>
+      </button>
+      {open && <div style={{ padding: '0.55rem 0.8rem 0.8rem' }}>{children}</div>}
+    </div>
+  );
+}
+
+/** Chip picker for one list of allergens ("contém" or "pode conter"). Each group folds shut and shows what is picked. */
 export function AllergenPicker({ title, hint, tone, selected, onToggle }: {
   title: string; hint: string; tone: 'contains' | 'may'; selected: string[]; onToggle: (id: string) => void;
 }) {
@@ -15,34 +42,50 @@ export function AllergenPicker({ title, hint, tone, selected, onToggle }: {
     ? { bg: '#fdecea', border: '#e74c3c', color: '#c0392b' }
     : { bg: '#fff4e0', border: '#e6a23c', color: '#8a5a00' };
   return (
-    <div style={{ marginBottom: '1.1rem' }}>
+    <div>
       <p style={{ ...labelStyle, marginBottom: '0.15rem' }}>{title}</p>
-      <p style={{ fontSize: '0.78rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>{hint}</p>
-      {ALLERGEN_GROUPS.map(g => (
-        <div key={g.id} style={{ marginBottom: '0.55rem' }}>
-          <p style={{ fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#95a5a6', marginBottom: '0.3rem' }}>{g.label}</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-            {ALLERGENS.filter(a => a.group === g.id).map(a => {
-              const active = selected.includes(a.id);
-              return (
-                <button
-                  key={a.id}
-                  type="button"
-                  title={a.hint}
-                  onClick={() => onToggle(a.id)}
-                  style={{
-                    padding: '0.35rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', cursor: 'pointer',
-                    border: `1px solid ${active ? on.border : '#dfe4ea'}`, background: active ? on.bg : '#fff',
-                    color: active ? on.color : '#7f8c8d', fontWeight: active ? 700 : 500,
-                  }}
-                >
-                  {a.emoji} {a.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      ))}
+      <p style={{ fontSize: '0.78rem', color: '#7f8c8d', marginBottom: '0.6rem', lineHeight: 1.5 }}>{hint}</p>
+      <div style={{ display: 'grid', gap: '0.45rem' }}>
+        {ALLERGEN_GROUPS.map(g => {
+          const inGroup = ALLERGENS.filter(a => a.group === g.id);
+          const picked = inGroup.filter(a => selected.includes(a.id));
+          return (
+            <Fold
+              key={g.id}
+              title={g.label}
+              summary={picked.length === 0 ? <span style={{ fontSize: '0.74rem', color: '#b2bec3' }}>nenhum</span> : undefined}
+              chips={picked.length > 0
+                ? picked.map(a => (
+                    <span key={a.id} style={{ padding: '0.1rem 0.55rem', borderRadius: '20px', fontSize: '0.74rem', fontWeight: 700, background: on.bg, border: `1px solid ${on.border}`, color: on.color, whiteSpace: 'nowrap' }}>
+                      {a.emoji} {a.label}
+                    </span>
+                  ))
+                : undefined}
+            >
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                {inGroup.map(a => {
+                  const active = selected.includes(a.id);
+                  return (
+                    <button
+                      key={a.id}
+                      type="button"
+                      title={a.hint}
+                      onClick={() => onToggle(a.id)}
+                      style={{
+                        padding: '0.35rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', cursor: 'pointer',
+                        border: `1px solid ${active ? on.border : '#dfe4ea'}`, background: active ? on.bg : '#fff',
+                        color: active ? on.color : '#7f8c8d', fontWeight: active ? 700 : 500,
+                      }}
+                    >
+                      {a.emoji} {a.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </Fold>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -53,7 +96,7 @@ export function AllergenFields({ contains, mayContain, onChange }: {
 }) {
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter(x => x !== id) : [...list, id]);
   return (
-    <div style={{ background: '#fafbfc', border: '1px solid #eef1f4', borderRadius: '10px', padding: '1rem' }}>
+    <div style={{ background: '#fafbfc', border: '1px solid #eef1f4', borderRadius: '10px', padding: '1rem', display: 'grid', gap: '1.25rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 270px), 1fr))', alignItems: 'start' }}>
       <AllergenPicker
         title="⚠️ Contém" tone="contains" selected={contains}
         onToggle={id => onChange({ contains: toggle(contains, id), may_contain: mayContain })}
@@ -106,8 +149,7 @@ export function IngredientsField({ ingredients, onChange }: { ingredients: strin
 
 export function EmojiField({ emoji, onChange }: { emoji: string; onChange: (e: string) => void }) {
   return (
-    <div>
-      <label style={labelStyle}>Emoji</label>
+    <Fold title="Emoji do doce" summary={<span style={{ fontSize: '1.35rem', lineHeight: 1 }}>{emoji}</span>}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
         {TREAT_EMOJIS.map(e => (
           <button key={e} type="button" onClick={() => onChange(e)}
@@ -116,6 +158,6 @@ export function EmojiField({ emoji, onChange }: { emoji: string; onChange: (e: s
           </button>
         ))}
       </div>
-    </div>
+    </Fold>
   );
 }
