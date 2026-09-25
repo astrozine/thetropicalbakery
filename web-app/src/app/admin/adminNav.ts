@@ -74,6 +74,7 @@ export const buildGroups = (): NavGroup[] => [
       { name: 'Candidaturas de Emprego', path: '/admin/vagas', word: 'Vagas', emoji: '🧑‍🍳', hint: 'Pessoas que querem trabalhar com a gente' },
       { name: 'Contatos de Reparos', path: '/admin/manutencao', word: 'Reparos', emoji: '🔧', hint: 'Encanador, eletricista, geladeira, forno…' },
       { name: 'Administradores', path: '/admin/administradores', word: 'Acesso', emoji: '🔑', hint: 'Quem pode entrar neste painel' },
+      { name: 'Ver como (clientes, parceiros, equipe)', path: '/admin/ver-como', word: 'Ver como', emoji: '👀', hint: 'Veja o login e a área de cada pessoa exatamente como ela vê' },
     ],
   },
 ];

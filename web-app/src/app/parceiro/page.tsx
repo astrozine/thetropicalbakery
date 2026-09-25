@@ -9,6 +9,8 @@ import { formatBRL } from '@/lib/deliveryZones';
 import {
   Partner, RestockRequest, PARTNER_STATUS, RESTOCK_STATUS, partnerKind,
 } from '@/lib/portals';
+import { exactEmail, isAdmin, previewIdFromUrl } from '@/lib/portalPreview';
+import PreviewBanner from '@/components/PreviewBanner';
 
 const STORE_WHATSAPP = '5511932119196';
 
@@ -25,6 +27,14 @@ const input: React.CSSProperties = {
   borderRadius: '8px', background: 'rgba(255,255,255,0.9)', fontFamily: 'var(--font-body)', fontSize: '1rem',
 };
 
+/** The same numbers as the database's affiliate_summary(), worked out for any partner (admin preview). */
+async function affiliateSummaryFor(p: Partner) {
+  if (!p.affiliate_code) return { data: { orders_count: 0, revenue: 0, commission: 0 } };
+  const { data } = await supabase.from('orders').select('total_price').ilike('affiliate_code', exactEmail(p.affiliate_code));
+  const revenue = (data || []).reduce((sum, o: { total_price: number | null }) => sum + Number(o.total_price || 0), 0);
+  return { data: { orders_count: (data || []).length, revenue, commission: Math.round(revenue * (p.commission_pct || 0)) / 100 } };
+}
+
 /**
  * The partner's own area: where their parceria stands, what Dolly wrote to them,
  * a restock request that reaches the bakery's inbox, and — for affiliates — what
@@ -37,6 +47,8 @@ export default function PartnerPortalPage() {
   const [affiliate, setAffiliate] = useState<{ orders_count: number; revenue: number; commission: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [notSetUp, setNotSetUp] = useState(false);
+  /** An admin looking at someone else's portal: everything is shown, nothing can be sent. */
+  const [preview, setPreview] = useState(false);
 
   const [form, setForm] = useState({ items: '', wanted_date: '', notes: '' });
   const [sending, setSending] = useState(false);
@@ -46,15 +58,27 @@ export default function PartnerPortalPage() {
   useEffect(() => {
     if (!user) { setLoading(false); return; }
     const load = async () => {
-      const { data, error } = await supabase.from('partners').select('*').limit(1).maybeSingle();
+      const previewId = previewIdFromUrl();
+      const asAdmin = !!previewId && await isAdmin();
+      setPreview(asAdmin);
+
+      // Always the signed-in person's own row, matched by e-mail. (Admins can read every row, so
+      // without this filter an admin would have seen whichever partner happened to come first.)
+      const query = asAdmin
+        ? supabase.from('partners').select('*').eq('id', previewId!)
+        : supabase.from('partners').select('*').ilike('email', exactEmail(user.email || ''));
+      const { data, error } = await query.limit(1).maybeSingle();
       if (error && /partners/.test(error.message)) setNotSetUp(true);
       const row = (data as Partner) || null;
       setPartner(row);
 
       if (row) {
+        const hasCode = row.kind === 'afiliado' || !!row.affiliate_code;
         const [reqs, aff] = await Promise.all([
-          supabase.from('partner_restock_requests').select('*').order('created_at', { ascending: false }),
-          row.kind === 'afiliado' || row.affiliate_code ? supabase.rpc('affiliate_summary') : Promise.resolve({ data: null }),
+          supabase.from('partner_restock_requests').select('*').eq('partner_id', row.id).order('created_at', { ascending: false }),
+          !hasCode ? Promise.resolve({ data: null })
+            : asAdmin ? affiliateSummaryFor(row)
+            : supabase.rpc('affiliate_summary'),
         ]);
         setRequests((reqs.data as RestockRequest[]) || []);
         const a = Array.isArray(aff.data) ? aff.data[0] : aff.data;
@@ -67,6 +91,7 @@ export default function PartnerPortalPage() {
 
   const submitRestock = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (preview) { setError('Pré-visualização: nada é enviado em nome do parceiro.'); return; }
     if (!partner || !form.items.trim()) return;
     setSending(true);
     setError('');
@@ -83,7 +108,7 @@ export default function PartnerPortalPage() {
     }
     setForm({ items: '', wanted_date: '', notes: '' });
     setSent(true);
-    const { data } = await supabase.from('partner_restock_requests').select('*').order('created_at', { ascending: false });
+    const { data } = await supabase.from('partner_restock_requests').select('*').eq('partner_id', partner.id).order('created_at', { ascending: false });
     setRequests((data as RestockRequest[]) || []);
   };
 
@@ -138,6 +163,7 @@ export default function PartnerPortalPage() {
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(7rem, 12vw, 9rem) 1rem 4rem' }}>
+      {preview && <PreviewBanner who={partner.business_name} area="Portal do Parceiro" />}
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
 
         {/* Header */}

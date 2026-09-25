@@ -44,6 +44,11 @@ interface LoginPanelProps {
   message?: string;
   /** Small print under the headline explaining what they get out of it. */
   subMessage?: string;
+  /**
+   * Admin demo ("Ver como"): shown even to a signed-in admin, and nothing is sent. Sending a code
+   * or link just moves to the next step, so the whole flow can be seen.
+   */
+  demo?: boolean;
 }
 
 /**
@@ -57,6 +62,7 @@ interface LoginPanelProps {
 export default function LoginPanel({
   message = 'Entre e não digite seus dados de novo',
   subMessage = 'Seu nome, WhatsApp e endereço ficam salvos para o próximo pedido.',
+  demo = false,
 }: LoginPanelProps) {
   const {
     user, availableMethods,
@@ -79,11 +85,12 @@ export default function LoginPanel({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  if (user || availableMethods.length === 0) return null;
+  if ((user && !demo) || availableMethods.length === 0) return null;
 
   const activeTab: 'phone' | 'email' = hasPhone && hasEmail ? tab : (hasPhone ? 'phone' : 'email');
 
   const run = async (fn: () => Promise<{ error?: string }>, onOk: () => void) => {
+    if (demo) { setError(''); onOk(); return; }
     setBusy(true);
     setError('');
     const { error: err } = await fn();
@@ -93,7 +100,9 @@ export default function LoginPanel({
   };
 
   const submitPhone = () => run(() => sendPhoneCode(phone), () => setCodeSent(true));
-  const submitCode = () => run(() => verifyPhoneCode(phone, code), () => { /* session arrives via listener */ });
+  const submitCode = () => demo
+    ? setError('Demonstração: aqui a pessoa entraria na conta.')
+    : run(() => verifyPhoneCode(phone, code), () => { /* session arrives via listener */ });
   const submitEmail = () => run(() => sendEmailLink(email), () => setLinkSent(true));
 
   // These inputs sit inside the checkout <form>. Enter must trigger the login
@@ -136,7 +145,7 @@ export default function LoginPanel({
                 key={provider}
                 type="button"
                 disabled={busy}
-                onClick={() => run(() => signInWithProvider(provider), () => {})}
+                onClick={() => run(() => signInWithProvider(provider), () => { if (demo) setError(`Demonstração: aqui abriria o login com ${label}.`); })}
                 className="notranslate"
                 translate="no"
                 style={{

@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import { formatBRL } from '@/lib/deliveryZones';
+import { exactEmail, isAdmin, previewIdFromUrl } from '@/lib/portalPreview';
+import PreviewBanner from '@/components/PreviewBanner';
 import { MONTH_NAMES, SHIFT_STATUS, Worker, WorkShift, monthPay, shiftHours, workerRole } from '@/lib/portals';
 
 const STORE_WHATSAPP = '5511932119196';
@@ -32,16 +34,24 @@ export default function WorkerPortalPage() {
   const [loading, setLoading] = useState(true);
   const [notSetUp, setNotSetUp] = useState(false);
   const [monthOffset, setMonthOffset] = useState(0);
+  const [preview, setPreview] = useState(false);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
     const load = async () => {
-      const { data, error } = await supabase.from('workers').select('*').limit(1).maybeSingle();
+      const previewId = previewIdFromUrl();
+      const asAdmin = !!previewId && await isAdmin();
+      setPreview(asAdmin);
+      // The signed-in person's own row by e-mail (an admin can read every row, so filter explicitly).
+      const query = asAdmin
+        ? supabase.from('workers').select('*').eq('id', previewId!)
+        : supabase.from('workers').select('*').ilike('email', exactEmail(user.email || ''));
+      const { data, error } = await query.limit(1).maybeSingle();
       if (error && /workers/.test(error.message)) setNotSetUp(true);
       const row = (data as Worker) || null;
       setWorker(row);
       if (row) {
-        const { data: s } = await supabase.from('work_shifts').select('*').order('shift_date');
+        const { data: s } = await supabase.from('work_shifts').select('*').eq('worker_id', row.id).order('shift_date');
         setShifts((s as WorkShift[]) || []);
       }
       setLoading(false);
@@ -108,6 +118,7 @@ export default function WorkerPortalPage() {
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(7rem, 12vw, 9rem) 1rem 4rem' }}>
+      {preview && worker && <PreviewBanner who={worker.full_name} area="Área da Equipe" />}
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
 
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
