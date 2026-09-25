@@ -5,12 +5,22 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { PARTNER_KINDS, PartnerKind } from '@/lib/portals';
+import { optimizedSrc } from '@/lib/thumbs';
+
+interface PickTreat {
+  id: string;
+  name: string;
+  image_url: string | null;
+  emoji: string | null;
+}
 
 interface Props {
   /** Pre-picked on each B2B page, e.g. 'pousada' on the pousadas page. */
   defaultKind: PartnerKind;
   whatsappHref: string;
 }
+
+const on0 = (chosen: string[]) => (chosen.length === 0 ? '#a89a90' : '#8a6d1f');
 
 const input: React.CSSProperties = {
   width: '100%', padding: '0.85rem 1rem', border: '1px solid rgba(212,175,55,0.5)',
@@ -34,6 +44,19 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
 
+  // "What would drive your clients wild?": a photo picker over the treats that are on the menu.
+  const [treats, setTreats] = useState<PickTreat[]>([]);
+  const [picked, setPicked] = useState<string[]>([]);
+  React.useEffect(() => {
+    supabase.from('treats').select('id, name, image_url, emoji').eq('is_available', true).order('name')
+      .then(({ data, error: e }) => { if (!e && data) setTreats(data as PickTreat[]); });
+  }, []);
+  const togglePick = (id: string) => setPicked(p => (p.includes(id) ? p.filter(x => x !== id) : [...p, id]));
+  const chosen = treats.filter(t => picked.includes(t.id)).map(t => t.name);
+  const showPicker = treats.length > 0 && form.kind !== 'afiliado';
+  // The picks travel inside the message the partner sends, so Dolly reads them next to the note.
+  const pickLine = showPicker && chosen.length > 0 ? `Itens que fariam meus clientes pirarem: ${chosen.join(', ')}` : '';
+
   // Anything we already know about them is filled in.
   React.useEffect(() => {
     setForm(f => ({
@@ -56,7 +79,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
       p_whatsapp: form.whatsapp.trim() || null,
       p_address: null,
       p_neighborhood: form.neighborhood.trim() || null,
-      p_notes: form.notes.trim() || null,
+      p_notes: [form.notes.trim(), pickLine].filter(Boolean).join('\n\n') || null,
     });
     setSending(false);
     if (err) {
@@ -67,6 +90,10 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
     }
     setDone(true);
   };
+
+  const whatsappWithPicks = pickLine && whatsappHref.includes('text=')
+    ? `${whatsappHref}${encodeURIComponent('. ' + pickLine)}`
+    : whatsappHref;
 
   if (done) {
     return (
@@ -82,7 +109,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/parceiro" className="btn btn-primary" style={{ padding: '0.9rem 1.6rem' }}>Ir para o portal</Link>
-            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.9rem 1.6rem' }}>Falar agora</a>
+            <a href={whatsappWithPicks} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.9rem 1.6rem' }}>Falar agora</a>
           </div>
         </div>
       </section>
@@ -138,6 +165,41 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
               <input id="pa-hood" type="text" value={form.neighborhood} onChange={e => setForm({ ...form, neighborhood: e.target.value })} placeholder="Itamambuca" style={input} />
             </div>
           </div>
+
+          {showPicker && (
+            <div>
+              <span style={label}>Quais itens fariam seus clientes pirarem?</span>
+              <p style={{ fontSize: '0.88rem', color: '#7a6a61', lineHeight: 1.6, margin: '0 0 0.75rem' }}>
+                Toque nos que você imagina vendendo ou servindo. Escolha quantos quiser: eles vão junto com a sua mensagem.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(104px, 1fr))', gap: '0.6rem', maxHeight: '340px', overflowY: 'auto', padding: '2px' }}>
+                {treats.map(t => {
+                  const on = picked.includes(t.id);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => togglePick(t.id)}
+                      style={{ position: 'relative', textAlign: 'center', padding: 0, borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', background: '#fff', border: `2px solid ${on ? '#d4af37' : '#e8e1d7'}`, boxShadow: on ? '0 6px 18px rgba(212,175,55,0.35)' : 'none' }}
+                    >
+                      <span style={{ display: 'block', aspectRatio: '1', background: '#f5efe2' }}>
+                        {t.image_url && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={optimizedSrc(t.image_url, 256)} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        )}
+                      </span>
+                      <span style={{ display: 'block', padding: '0.35rem 0.4rem 0.45rem', fontSize: '0.74rem', lineHeight: 1.25, fontWeight: on ? 700 : 500, color: '#3c2a21' }}>{t.name}</span>
+                      {on && <span aria-hidden style={{ position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+              <p style={{ fontSize: '0.85rem', color: on0(chosen), marginTop: '0.6rem', fontWeight: 600 }}>
+                {chosen.length === 0 ? 'Nenhum escolhido ainda (opcional).' : `${chosen.length} ${chosen.length === 1 ? 'item escolhido' : 'itens escolhidos'}: ${chosen.join(', ')}`}
+              </p>
+            </div>
+          )}
 
           <div>
             <label style={label} htmlFor="pa-notes">O que você tem em mente</label>

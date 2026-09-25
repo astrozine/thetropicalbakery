@@ -147,7 +147,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
             onClick={(e) => e.stopPropagation()}
             style={{
               background: '#fdfaf3', padding: '2.5rem', borderRadius: '16px',
-              maxWidth: '550px', width: '100%',
+              maxWidth: '1040px', width: '100%',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
               border: '1px solid rgba(212,175,55,0.3)',
               position: 'relative'
@@ -166,7 +166,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#3c2a21', marginBottom: '0.5rem', lineHeight: '1.1' }}>
               {interestType === 'curso' ? 'Agendar Curso' : 'Agendar Retiro'}
             </h2>
-            <p style={{ color: '#594a42', marginBottom: '2rem', fontSize: '1rem' }}>
+            <p style={{ color: '#594a42', marginBottom: '2rem', fontSize: '1rem', maxWidth: '760px' }}>
               Insira seus dados abaixo. Nossa equipe entrará em contato para confirmar a disponibilidade da data e alinhar os detalhes da sua experiência <b>{specificInterest}</b>.
             </p>
 
@@ -186,7 +186,14 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                    </div>
                 )}
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
+                {/* Two columns on a computer (you + the day | what you imagine); one column on a phone. */}
+                <style>{`
+                  .crm-cols { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+                  .crm-col { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
+                  @media (min-width: 900px) { .crm-cols { grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; } }
+                `}</style>
+                <div className="crm-cols">
+                <div className="crm-col">
                   <LoginPanel />
                   
                   <label style={{ display: 'block' }}>
@@ -222,8 +229,10 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                       style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
                     />
                   </label>
-                </div>
 
+
+                </div>
+                <div className="crm-col">
                 <label style={{ display: 'block' }}>
                   <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.4rem' }}>Data Desejada *</span>
                   <input 
@@ -234,7 +243,6 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                     style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.2)', fontFamily: 'inherit' }}
                   />
                 </label>
-
                 <label style={{ display: 'block' }}>
                   <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.4rem' }}>
                     Quantas pessoas? <span style={{ fontWeight: 400, color: '#7a6a61' }}>(opcional)</span>
@@ -255,7 +263,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                     Conte o que você imagina <span style={{ fontWeight: 400, color: '#7a6a61' }}>(opcional)</span>
                   </span>
                   <textarea
-                    rows={4}
+                    rows={3}
                     maxLength={1500}
                     value={message}
                     onChange={e => setMessage(e.target.value)}
@@ -303,12 +311,14 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                     ))}
                   </div>
                 </div>
+                </div>
+                </div>
 
                 <button 
                   type="submit"
                   disabled={status === 'submitting'}
                   className="btn btn-primary"
-                  style={{ width: '100%', padding: '1rem', marginTop: '0.5rem', opacity: status === 'submitting' ? 0.7 : 1 }}
+                  style={{ width: '100%', maxWidth: '520px', alignSelf: 'center', padding: '1rem', marginTop: '0.5rem', opacity: status === 'submitting' ? 0.7 : 1 }}
                 >
                   {status === 'submitting' ? 'Processando...' : 'Fazer Reserva'}
                 </button>
