@@ -183,6 +183,9 @@ export default function CheckoutPage() {
       total_price: total,
       pix_transaction_id: transactionId,
       status: 'PENDING',
+      // The orders table requires this column (it was created for the first lead forms), so every
+      // save must carry it or the database refuses the whole order.
+      order_type: hasBox ? 'CAIXA_DEGUSTACAO' : 'EVENTO',
     };
     const paymentProvider = method === 'card' ? 'mercadopago' : method;
     // A partner's code, so their portal can count the sale.
