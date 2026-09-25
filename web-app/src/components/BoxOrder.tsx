@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import DeliveryCalendar from '@/components/DeliveryCalendar';
 import { formatBRL } from '@/lib/deliveryZones';
+import { optimizedSrc } from '@/lib/thumbs';
 
 interface BoxOrderProps {
   box: { id: string; title: string; image_url: string; price: number };
@@ -67,7 +68,7 @@ export default function BoxOrder({ box, maxQuantity }: BoxOrderProps) {
       <div style={{ flex: '1 1 340px', minWidth: '260px', position: 'relative' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={box.image_url}
+          src={optimizedSrc(box.image_url, 1080)}
           alt={box.title}
           style={{ width: '100%', height: 'auto', maxHeight: '640px', objectFit: 'contain', background: '#f5efe2', borderRadius: '24px', boxShadow: '0 15px 30px rgba(0,0,0,0.15)', display: 'block' }}
         />

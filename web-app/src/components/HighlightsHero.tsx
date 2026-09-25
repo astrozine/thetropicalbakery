@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { optimizedSrc } from '@/lib/thumbs';
 
 interface Highlight {
   id: string;
@@ -25,7 +26,7 @@ function Card({ h, tilt, delay }: { h: Highlight; tilt: number; delay: number })
       style={{ ['--tilt' as string]: `${tilt}deg`, animationDelay: `${delay}s` }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={h.image_url} alt={h.title} loading="lazy" />
+      <img src={optimizedSrc(h.image_url, 384)} alt={h.title} loading="lazy" decoding="async" />
       <figcaption>
         <span className="hh-tag">Destaque anterior</span>
         <strong>{h.title}</strong>

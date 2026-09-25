@@ -117,7 +117,7 @@ export default function TravelManagersPage() {
       {/* Treat Gallery Strip */}
       <StripedBackground tone="dark" bandHeight={64}>
         <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap', padding: '3rem 2rem' }}>
-          {['/menu-items/Screenshot_20260810_135948_Photos.jpg', '/menu-items/20260620_163438.jpg', '/menu-items/1000231026_3b42196b4ea44c55b3834d9f1bf36302-2_17_2026, 8_48_32 AM.png', '/menu-items/Screenshot_20260708_144013_Gallery.jpg'].map((src, i) => (
+          {['/menu-items/Screenshot_20260810_135948_Photos.jpg', '/menu-items/20260620_163438.jpg', '/menu-items/1000231026_3b42196b4ea44c55b3834d9f1bf36302-2_17_2026_8_48_32_AM.webp', '/menu-items/Screenshot_20260708_144013_Gallery.jpg'].map((src, i) => (
             <ZoomableImage key={i} src={src} alt="Criação Tropical" style={{ width: '200px', height: '200px', objectFit: 'cover', borderRadius: '12px', border: '2px solid rgba(212,175,55,0.3)' }} />
           ))}
         </div>

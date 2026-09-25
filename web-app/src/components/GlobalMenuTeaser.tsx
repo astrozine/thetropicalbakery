@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import menuItems from '@/data/menu.json';
+import { thumb } from '@/lib/thumbs';
 
 export default function GlobalMenuTeaser() {
   const pathname = usePathname() || '';
@@ -58,8 +59,10 @@ export default function GlobalMenuTeaser() {
             display: 'block'
           }}>
             <img 
-              src={item.image} 
+              src={thumb(item.image)} 
               alt={item.name} 
+              loading="lazy"
+              decoding="async"
               style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
               onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
               onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}

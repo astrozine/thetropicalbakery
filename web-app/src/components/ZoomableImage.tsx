@@ -2,13 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { optimizedSrc, type OptimizedWidth } from '@/lib/thumbs';
 
 interface ZoomableImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
+  /** Width of the resized copy shown in the page; the full photo opens on click. */
+  thumbWidth?: OptimizedWidth;
 }
 
-export default function ZoomableImage({ src, alt, style, className, ...props }: ZoomableImageProps) {
+export default function ZoomableImage({ src, alt, style, className, thumbWidth = 750, ...props }: ZoomableImageProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -96,8 +99,10 @@ export default function ZoomableImage({ src, alt, style, className, ...props }: 
   return (
     <>
       <img
-        src={src}
+        src={optimizedSrc(src, thumbWidth)}
         alt={alt}
+        loading="lazy"
+        decoding="async"
         style={{ cursor: 'pointer', ...style }}
         className={className}
         onClick={() => setIsOpen(true)}

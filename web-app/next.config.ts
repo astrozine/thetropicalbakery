@@ -15,6 +15,7 @@ const hosts = Array.from(new Set([
 
 const nextConfig: NextConfig = {
   images: {
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       ...hosts.map(hostname => ({
         protocol: 'https' as const,
@@ -26,6 +27,19 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        // Photos in /public: kept by the browser for a day, and quietly refreshed for a week after that.
+        source: '/:all*(jpg|jpeg|png|webp|avif|gif|svg|ico)',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }],
+      },
+      {
+        source: '/fonts/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=2592000' }],
+      },
+    ];
   },
 };
 

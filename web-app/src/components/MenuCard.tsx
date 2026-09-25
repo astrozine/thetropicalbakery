@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import TreatInfo, { hasTreatInfo } from '@/components/TreatInfo';
 import { allergenById } from '@/lib/allergens';
+import Image from 'next/image';
+import { canOptimize } from '@/lib/thumbs';
 
 interface MenuCardProps {
   item: {
@@ -67,10 +69,13 @@ export default function MenuCard({ item }: MenuCardProps) {
         }}
       >
         <div style={{ height: isMobile ? '160px' : '260px', overflow: 'hidden', position: 'relative' }}>
-          <img 
-            src={item.image} 
-            alt={item.name} 
-            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' }}
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            sizes="(max-width: 768px) 50vw, 340px"
+            unoptimized={!canOptimize(item.image)}
+            style={{ objectFit: 'cover', transition: 'transform 0.3s' }}
           />
           {isMobile && (
             <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255,255,255,0.8)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>

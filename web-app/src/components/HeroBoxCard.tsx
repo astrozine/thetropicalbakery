@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { optimizedSrc } from '@/lib/thumbs';
 
 export interface HeroBoxPhoto {
   src: string;
@@ -37,7 +38,7 @@ export default function HeroBoxCard({ photos, side, delayMs = 0 }: { photos: Her
         {photos.map((p, i) => (
           <img
             key={p.src}
-            src={p.src}
+            src={optimizedSrc(p.src, 750)}
             alt={p.caption ? `Caixa anterior: ${p.caption}` : 'Caixa de degustação anterior'}
             loading="lazy"
             style={{ opacity: i === index % count ? 1 : 0 }}
@@ -81,7 +82,7 @@ export function HeroBoxStrip({ photos }: { photos: HeroBoxPhoto[] }) {
     <div className="hero-box-strip" aria-hidden={false}>
       {shown.map((p, i) => (
         <div key={p.src} className="hero-box-strip__item" style={{ transform: `rotate(${i === 0 ? -4 : 3.5}deg)`, marginTop: i === 0 ? 0 : '1.2rem' }}>
-          <img src={p.src} alt={p.caption ? `Caixa anterior: ${p.caption}` : 'Caixa de degustação anterior'} loading="lazy" />
+          <img src={optimizedSrc(p.src, 384)} alt={p.caption ? `Caixa anterior: ${p.caption}` : 'Caixa de degustação anterior'} loading="lazy" decoding="async" />
         </div>
       ))}
       <style dangerouslySetInnerHTML={{ __html: `

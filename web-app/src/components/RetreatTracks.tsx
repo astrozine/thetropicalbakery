@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { EXPERIENCE_PHOTOS } from '@/lib/retreatRooms';
+import { optimizedSrc } from '@/lib/thumbs';
 
 interface Props {
   onInquire: (interest: string) => void;
@@ -63,7 +64,7 @@ export default function RetreatTracks({ onInquire }: Props) {
           {TRACKS.map(t => (
             <div key={t.title} style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(60,42,33,0.08)', display: 'flex', flexDirection: 'column' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={t.photo} alt="" loading="lazy" style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
+              <img src={optimizedSrc(t.photo, 750)} alt="" loading="lazy" decoding="async" style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
               <div style={{ padding: '1.6rem 1.5rem 1.75rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
                 <h3 style={{ fontSize: '1.4rem', color: '#3c2a21', marginBottom: '0.5rem' }}>{t.title}</h3>
                 <p style={{ color: '#7a6a61', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: '1.1rem' }}>{t.intro}</p>

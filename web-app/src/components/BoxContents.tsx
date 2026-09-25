@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { BoxItem, summarizeAllergens } from '@/lib/allergens';
 import TreatInfo, { AllergenChips } from '@/components/TreatInfo';
+import { optimizedSrc } from '@/lib/thumbs';
 
 const chip = (tone: 'contains' | 'may'): React.CSSProperties => ({
   display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.28rem 0.7rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600,
@@ -67,7 +68,7 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
                   <div style={{ padding: '0.25rem 1.25rem 1.6rem', display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', alignItems: 'start' }}>
                     {item.image_url && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={item.image_url} alt={item.name} loading="lazy" style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', borderRadius: '16px', display: 'block' }} />
+                      <img src={optimizedSrc(item.image_url, 750)} alt={item.name} loading="lazy" decoding="async" style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', borderRadius: '16px', display: 'block' }} />
                     )}
                     <div style={{ gridColumn: item.image_url ? undefined : '1 / -1' }}>
                       {item.description && (

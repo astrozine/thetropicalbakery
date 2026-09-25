@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RETREAT_ROOMS, RetreatRoomInfo } from '@/lib/retreatRooms';
+import { optimizedSrc } from '@/lib/thumbs';
 
 interface Props {
   onInquire: (roomName: string) => void;
@@ -20,7 +21,7 @@ function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           key={photos[i]}
-          src={photos[i]}
+          src={optimizedSrc(photos[i], 1080)}
           alt={`${alt} — foto ${i + 1}`}
           loading="lazy"
           style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
@@ -56,7 +57,7 @@ function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
               style={{ flex: '0 0 auto', width: '84px', height: '64px', borderRadius: '8px', overflow: 'hidden', padding: 0, cursor: 'pointer', border: n === i ? '2px solid #d4af37' : '2px solid transparent', opacity: n === i ? 1 : 0.65 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <img src={optimizedSrc(src, 384)} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </button>
           ))}
         </div>
@@ -96,7 +97,7 @@ export default function RoomsAccordion({ onInquire }: Props) {
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={room.photos[0]} alt="" loading="lazy" style={{ width: '104px', height: '78px', objectFit: 'cover', borderRadius: '12px', flexShrink: 0 }} />
+              <img src={optimizedSrc(room.photos[0], 256)} alt="" loading="lazy" decoding="async" style={{ width: '104px', height: '78px', objectFit: 'cover', borderRadius: '12px', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ display: 'inline-block', background: 'rgba(212,175,55,0.16)', color: '#8a6d1f', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.2rem 0.65rem', borderRadius: '20px', marginBottom: '0.4rem' }}>
                   {room.capacity}

@@ -33,7 +33,7 @@ export default function RestaurantsPage() {
         'Potencial de empratamento deslumbrante para experiências gastronômicas sofisticadas.',
       ]}
       whatsappHref="https://wa.me/5511932119196?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20uma%20parceria%20para%20Restaurante!"
-      galleryImages={['/menu-items/1000234513 - Edited.jpg', '/menu-items/Screenshot_20260415_110305_Gallery.jpg', '/menu-items/20260208_082125_0000.png', '/menu-items/Screenshot_20260221_093613_Photos.jpg']}
+      galleryImages={['/menu-items/1000234513 - Edited.jpg', '/menu-items/Screenshot_20260415_110305_Gallery.jpg', '/menu-items/20260208_082125_0000.webp', '/menu-items/Screenshot_20260221_093613_Photos.jpg']}
     />
   );
 }
