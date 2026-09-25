@@ -73,28 +73,28 @@ export default function QuickMenu() {
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .admin-quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(156px, 1fr)); gap: 0.6rem 0.75rem; }
+        .admin-quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 0.75rem 1rem; }
         .admin-quick-cell { display: flex; flex-direction: column; min-width: 0; }
         .admin-quick-head {
-          height: 1.5rem; display: flex; align-items: flex-end; border-bottom: 4px solid transparent;
+          height: 1.8rem; display: flex; align-items: flex-end; border-bottom: 4px solid transparent;
           border-radius: 4px 4px 0 0; margin-bottom: -4px; position: relative; z-index: 1;
         }
         .admin-quick-head span {
           display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-          font-size: 0.76rem; font-weight: 800; line-height: 1; padding: 0.3rem 0.6rem; border-radius: 7px 7px 0 0;
+          font-size: 0.86rem; font-weight: 800; line-height: 1; padding: 0.38rem 0.75rem; border-radius: 7px 7px 0 0;
         }
         .admin-quick-tile {
-          flex: 1; display: flex; flex-direction: column; gap: 0.1rem; text-decoration: none;
-          background: #fff; border-radius: 0 0 12px 12px; padding: 0.85rem 0.9rem 0.85rem;
+          flex: 1; display: flex; flex-direction: column; gap: 0.15rem; text-decoration: none;
+          background: #fff; border-radius: 0 0 12px 12px; padding: 1.15rem 1.2rem 1.2rem; min-height: 9.5rem;
           border: 1px solid #eef1f4; border-top: 4px solid var(--tile-accent);
           box-shadow: 0 3px 6px rgba(0,0,0,0.05); transition: transform .15s ease, box-shadow .15s ease;
         }
         .admin-quick-tile:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.12); }
         .admin-quick-tile:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--tile-accent); }
-        .admin-quick-tile__emoji { font-size: 1.6rem; line-height: 1.1; }
-        .admin-quick-tile__word { font-size: 1.3rem; font-weight: 800; color: #2c3e50; font-family: var(--font-heading); line-height: 1.15; overflow-wrap: anywhere; }
-        .admin-quick-tile__name { font-size: 0.76rem; color: #7f8c8d; line-height: 1.35; margin-top: 0.15rem; }
-        @media (max-width: 520px) { .admin-quick-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; } .admin-quick-tile__word { font-size: 1.15rem; } }
+        .admin-quick-tile__emoji { font-size: 2.3rem; line-height: 1.1; }
+        .admin-quick-tile__word { font-size: 1.55rem; font-weight: 800; color: #2c3e50; font-family: var(--font-heading); line-height: 1.15; overflow-wrap: anywhere; }
+        .admin-quick-tile__name { font-size: 0.9rem; color: #7f8c8d; line-height: 1.35; margin-top: 0.25rem; }
+        @media (max-width: 520px) { .admin-quick-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; } .admin-quick-tile__word { font-size: 1.1rem; } .admin-quick-tile { padding: 0.9rem; min-height: 0; } .admin-quick-tile__emoji { font-size: 1.8rem; } }
         @media (prefers-reduced-motion: reduce) { .admin-quick-tile { transition: none; } .admin-quick-tile:hover { transform: none; } }
       ` }} />
     </nav>
