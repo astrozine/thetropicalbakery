@@ -119,7 +119,7 @@ export default function PartnerPortalPage() {
 
   if (!user) {
     return (
-      <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(7rem, 12vw, 9rem) 1rem 4rem' }}>
+      <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(4.5rem, 12vw, 9rem) 1rem 4rem' }}>
         <div style={{ maxWidth: '520px', margin: '0 auto', textAlign: 'center' }}>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.8rem, 5vw, 2.6rem)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
             Portal do Parceiro
@@ -135,7 +135,7 @@ export default function PartnerPortalPage() {
 
   if (!partner) {
     return (
-      <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(7rem, 12vw, 9rem) 1rem 4rem' }}>
+      <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(4.5rem, 12vw, 9rem) 1rem 4rem' }}>
         <div style={{ maxWidth: '560px', margin: '0 auto', ...card, textAlign: 'center' }}>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.6rem, 4.5vw, 2.2rem)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
             Ainda não achamos sua parceria
@@ -162,7 +162,7 @@ export default function PartnerPortalPage() {
   const goalPct = partner.monthly_goal > 0 ? Math.min(100, Math.round((delivered / partner.monthly_goal) * 100)) : 0;
 
   return (
-    <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(7rem, 12vw, 9rem) 1rem 4rem' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(4.5rem, 12vw, 9rem) 1rem 4rem' }}>
       {preview && <PreviewBanner who={partner.business_name} area="Portal do Parceiro" />}
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
 

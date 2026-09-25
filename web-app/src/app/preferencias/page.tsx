@@ -140,7 +140,7 @@ function EmailPreferences() {
   const resubscribe = () => prefs && save({ ...prefs, opted_out: [], unsubscribed_all: false });
 
   return (
-    <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(7rem, 12vw, 9rem) 1rem 4rem' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(4.5rem, 12vw, 9rem) 1rem 4rem' }}>
       <div style={{ maxWidth: '640px', margin: '0 auto 2rem', textAlign: 'center' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo-gold.webp" alt="" style={{ height: '72px', margin: '0 auto 1.5rem', display: 'block' }} />

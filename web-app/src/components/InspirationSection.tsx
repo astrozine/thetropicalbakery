@@ -81,7 +81,7 @@ export function InspirationSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="inspiracao" style={{ background: '#fdfaf3', padding: 'clamp(4rem, 8vw, 7rem) clamp(1rem, 4vw, 2rem)' }}>
+    <section id="inspiracao" style={{ background: '#fdfaf3', padding: 'clamp(2.25rem, 8vw, 7rem) clamp(1rem, 4vw, 2rem)' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.75rem' }}>
           <span style={{ color: '#a6832b', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '1rem' }}>

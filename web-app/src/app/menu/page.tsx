@@ -52,7 +52,7 @@ export default function MenuPage() {
       
       {/* Header Section */}
       <section style={{ 
-        padding: 'clamp(3rem, 5vw, 6rem) 1rem', 
+        padding: 'clamp(2rem, 5vw, 6rem) 1rem', 
         background: '#fdfaf3',
         maxWidth: '1400px',
         margin: '0 auto'
@@ -99,7 +99,7 @@ export default function MenuPage() {
       </section>
 
       {/* Gallery / Events Menu Section */}
-      <section id="portfolio" style={{ padding: 'clamp(3rem, 6vw, 5rem) 2rem', maxWidth: '1400px', margin: '0 auto' }}>
+      <section id="portfolio" style={{ padding: 'clamp(2rem, 6vw, 5rem) 2rem', maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <h2 style={{ fontSize: 'clamp(1.6rem, 4vw, 3rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
             Nosso Portfólio

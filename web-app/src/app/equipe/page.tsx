@@ -78,7 +78,7 @@ export default function WorkerPortalPage() {
 
   if (!user) {
     return (
-      <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(7rem, 12vw, 9rem) 1rem 4rem' }}>
+      <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(4.5rem, 12vw, 9rem) 1rem 4rem' }}>
         <div style={{ maxWidth: '520px', margin: '0 auto', textAlign: 'center' }}>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.8rem, 5vw, 2.6rem)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
             Área da Equipe
@@ -94,7 +94,7 @@ export default function WorkerPortalPage() {
 
   if (!worker) {
     return (
-      <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(7rem, 12vw, 9rem) 1rem 4rem' }}>
+      <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(4.5rem, 12vw, 9rem) 1rem 4rem' }}>
         <div style={{ maxWidth: '560px', margin: '0 auto', ...card, textAlign: 'center' }}>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.6rem, 4.5vw, 2.2rem)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
             Esta conta não está na equipe
@@ -117,7 +117,7 @@ export default function WorkerPortalPage() {
   const firstName = worker.full_name.split(' ')[0];
 
   return (
-    <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(7rem, 12vw, 9rem) 1rem 4rem' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--color-background)', padding: 'clamp(4.5rem, 12vw, 9rem) 1rem 4rem' }}>
       {preview && worker && <PreviewBanner who={worker.full_name} area="Área da Equipe" />}
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
 

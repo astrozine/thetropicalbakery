@@ -38,7 +38,7 @@ export default function SplitHero({
       {/* Text panel */}
       <div style={{
         flex: '1 1 460px', display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        padding: 'clamp(3rem, 6vw, 5.5rem) clamp(1.5rem, 5vw, 4.5rem)',
+        padding: 'clamp(2rem, 6vw, 5.5rem) clamp(1.5rem, 5vw, 4.5rem)',
         position: 'relative',
       }}>
         {kicker && (

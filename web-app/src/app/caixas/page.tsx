@@ -14,6 +14,7 @@ import { formatBatchDate } from '@/lib/batchDate';
 import { BoxWindowFields, deliveryWindowLabel, hasDeliveryWindow, longDay } from '@/lib/boxWindow';
 import { useBoxSale } from '@/lib/useBoxSale';
 import HeroBoxCard, { HeroBoxStrip, type HeroBoxPhoto } from '@/components/HeroBoxCard';
+import MobileBuyBar from '@/components/MobileBuyBar';
 
 // Real photos of earlier boxes, used whenever the database has too few of its own.
 const FALLBACK_BOX_PHOTOS: HeroBoxPhoto[] = ['/box1.jpg', '/box2.jpg', '/box3.jpg', '/box4.jpg'].map(src => ({ src }));
@@ -81,7 +82,7 @@ export default function CaixasPage() {
         <section style={{ 
           flex: 1,
           position: 'relative',
-          padding: 'clamp(4rem, 8vw, 6rem) 1rem', 
+          padding: 'clamp(2.25rem, 8vw, 6rem) 1rem', 
           textAlign: 'center',
           color: '#fdfaf3',
           display: 'flex',
@@ -178,7 +179,7 @@ export default function CaixasPage() {
       {/* Hero Section */}
       <section style={{ 
         position: 'relative',
-        padding: 'clamp(6rem, 8vw, 8rem) 1rem clamp(2rem, 5vw, 4rem) 1rem', 
+        padding: 'clamp(3.5rem, 8vw, 8rem) 1rem clamp(2rem, 5vw, 4rem) 1rem', 
         textAlign: 'center',
         color: '#fdfaf3',
         overflow: 'hidden'
@@ -305,6 +306,15 @@ export default function CaixasPage() {
       </StripedBackground>
 
       <Marquee text="CAIXA DE DEGUSTAÇÃO SEMANAL ✦ FEITA À MÃO EM ITAMAMBUCA ✦ " speed={120} />
+
+      {/* Phones only: keeps the price and one tap to order under the thumb the whole way down. */}
+      <MobileBuyBar
+        kicker={remainingQuantity > 0 ? `Restam ${remainingQuantity}` : 'Caixa da semana'}
+        price={`R$ ${Math.round(activeBox.price)}`}
+        note={activeBox.batch_date_label ? formatBatchDate(activeBox.batch_date_label) : undefined}
+        label="Pedir"
+        targetId="#order"
+      />
 
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes pulse {

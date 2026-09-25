@@ -107,7 +107,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
 
   if (done) {
     return (
-      <section style={{ padding: 'clamp(3rem, 7vw, 5rem) 1.5rem', background: '#fdf7ee' }}>
+      <section style={{ padding: 'clamp(2rem, 7vw, 5rem) 1.5rem', background: '#fdf7ee' }}>
         <div style={{ maxWidth: '560px', margin: '0 auto', textAlign: 'center', background: '#fff', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '20px', padding: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
           <p style={{ fontSize: '2.4rem', marginBottom: '0.75rem' }}>🤝</p>
           <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.5rem, 4vw, 2rem)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
@@ -127,7 +127,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
   }
 
   return (
-    <section id="ser-parceiro" style={{ padding: 'clamp(3rem, 7vw, 5rem) 1.5rem', background: '#fdf7ee' }}>
+    <section id="ser-parceiro" style={{ padding: 'clamp(2rem, 7vw, 5rem) 1.5rem', background: '#fdf7ee' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <span style={{ ...label, display: 'block' }}>Quero ser parceiro</span>

@@ -957,3 +957,113 @@ body {
 @media (max-width: 400px) {
   .section-title { margin-bottom: 2.5rem; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PHONE LAYOUT — the app-like pass
+   ════════════════════════════════════════════════════════════════════════════
+   Measured first, then fixed. The home page was 14 screens tall, /retiros 18.6,
+   and the first "buy" button sat 5–7 screens down. The first screen of the home
+   page carried 118 characters of text — a logo and nothing else.
+
+   Three things were wrong, and all three are what separates a desktop site that
+   reflows from a site designed for a phone:
+
+     1. NO MIDDLE IN THE TYPE SCALE. Sizes went 15px → 29px with almost nothing
+        between, so everything read as either fine print or a billboard. Apps use
+        a tight ladder (12 · 14 · 16 · 20 · 26 · 32) where each step has a job.
+     2. DESKTOP WHITESPACE. Sections carried 12rem of padding — 192px above and
+        below — which is elegant on a 27" screen and a wall of nothing on a phone.
+     3. GRIDS BECOMING TOWERS. A 3-across card grid stacks into a 4-screen column.
+        Instagram, TikTok and every good shop scroll those sideways instead.
+
+   Everything below is inside a phone-width query. Desktop is untouched.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+
+  /* ---- 1. The type ladder -------------------------------------------------
+     --step-3 is the only "big" size on a phone. Anything louder than this is
+     shouting on a 390px screen. */
+  :root {
+    --step-0: 0.8rem;    /* 12.8px — labels, eyebrows, badges */
+    --step-1: 0.95rem;   /* 15.2px — body */
+    --step-2: 1.15rem;   /* 18.4px — card titles, the tier that was missing */
+    --step-3: 1.45rem;   /* 23.2px — section headings */
+    --step-4: 1.85rem;   /* 29.6px — one per screen, at most */
+  }
+
+  /* The missing middle: card titles were sharing a size with body text, so a
+     card had no internal hierarchy at all. */
+  .menu-card h3,
+  .tb-card-title { font-size: var(--step-2) !important; line-height: 1.25; }
+
+  /* Section headings step down so the page doesn't read as one long shout. */
+  .section-title { font-size: var(--step-4) !important; margin-bottom: 1.5rem !important; }
+
+  /* ---- 2. Vertical rhythm -------------------------------------------------
+     Roughly a third of the desktop padding. This alone takes several screens
+     off every long page. */
+  .menu-section { padding: 3rem 1rem !important; }
+  #order { padding: 2.5rem 1rem !important; }
+  .footer { padding: 3rem 1.25rem 2rem !important; }
+  .parallax-banner { min-height: 40vh !important; }
+
+  /* ---- 3. Rails instead of towers ----------------------------------------
+     A horizontal, snapping scroller: the phone pattern for "here are several
+     things, have a look". One row instead of four screens of stacked cards.
+     Cards keep their own styling; only the container changes. */
+  .tb-rail {
+    display: flex !important;
+    grid-template-columns: none !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.85rem !important;
+    /* bleed to the screen edges so the next card peeks in — that peek is what
+       tells a thumb there is more to the right */
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding: 0.25rem 1rem 1rem;
+    scroll-padding-left: 1rem;
+    scrollbar-width: none;
+  }
+  .tb-rail::-webkit-scrollbar { display: none; }
+  .tb-rail > * {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+    min-width: 0;
+  }
+  /* A hint under a rail, so nobody misses that it scrolls. */
+  .tb-rail-hint {
+    display: block;
+    font-size: var(--step-0);
+    color: #a89a90;
+    margin: -0.4rem 0 1.25rem;
+    text-align: center;
+  }
+
+  /* ---- 4. Room for the sticky buy bar ------------------------------------- */
+  body.has-buybar { padding-bottom: 76px; }
+}
+
+@media (min-width: 768px) {
+  /* The rail hint is a phone-only affordance. */
+  .tb-rail-hint { display: none; }
+}
+
+/* The floating header tucks away on the way down and returns on the way up —
+   the same behaviour as Instagram, Safari and most reading apps. It gives the
+   whole screen back to the content instead of parking two pills over it. */
+@media (max-width: 767px) {
+  .mobile-header-nav .glass-pill {
+    transition: transform .3s cubic-bezier(.16,1,.3,1), opacity .25s;
+  }
+  .mobile-header-nav[data-tucked="true"] .glass-pill {
+    transform: translateY(-140%);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mobile-header-nav .glass-pill { transition: none; }
+}

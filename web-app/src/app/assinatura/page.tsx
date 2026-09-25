@@ -7,6 +7,7 @@ import StripedBackground from '@/components/StripedBackground';
 import HighlightsHero from '@/components/HighlightsHero';
 import DeliveryCalendar from '@/components/DeliveryCalendar';
 import SubscriptionSignup from '@/components/SubscriptionSignup';
+import MobileBuyBar from '@/components/MobileBuyBar';
 import ScrollReveal from '@/components/ScrollReveal';
 import { SubscriptionPlan, monthlySavings } from '@/lib/subscriptions';
 import { formatBRL } from '@/lib/deliveryZones';
@@ -119,7 +120,7 @@ export default function SubscriptionPage() {
     <main style={{ background: 'var(--color-background)' }}>
 
       {/* ---------------------------------------------------------------- HERO */}
-      <StripedBackground tone="dark" bandHeight={96} image="/textures/copacabana-baker.webp" imagePosition="35% 60%" style={{ paddingTop: 'clamp(7rem, 12vw, 10rem)', paddingBottom: 'clamp(4rem, 8vw, 7rem)' }}>
+      <StripedBackground tone="dark" bandHeight={96} image="/textures/copacabana-baker.webp" imagePosition="35% 60%" style={{ paddingTop: 'clamp(4.5rem, 12vw, 10rem)', paddingBottom: 'clamp(2.25rem, 8vw, 7rem)' }}>
         <HighlightsHero>
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center' }}>
           <img src="/logo-gold.webp" alt="" style={{ height: 'clamp(72px, 12vw, 104px)', margin: '0 auto 2rem', display: 'block' }} />
@@ -164,7 +165,7 @@ export default function SubscriptionPage() {
       </StripedBackground>
 
       {/* -------------------------------------------------------- HOW IT WORKS */}
-      <section style={{ padding: 'clamp(4rem, 9vw, 7rem) 1.5rem' }}>
+      <section style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 1.5rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <ScrollReveal>
             <h2 style={{
@@ -197,7 +198,7 @@ export default function SubscriptionPage() {
       </section>
 
       {/* ---------------------------------------------------- DELIVERY CALENDAR */}
-      <section style={{ padding: '0 1.5rem clamp(4rem, 9vw, 7rem)' }}>
+      <section style={{ padding: '0 1.5rem clamp(2.25rem, 9vw, 7rem)' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto' }}>
           <ScrollReveal>
             <h2 style={{
@@ -215,7 +216,7 @@ export default function SubscriptionPage() {
       </section>
 
       {/* ------------------------------------------------------ INSIDE THE BOX */}
-      <StripedBackground tone="light" bandHeight={72} style={{ padding: 'clamp(4rem, 9vw, 7rem) 1.5rem' }}>
+      <StripedBackground tone="light" bandHeight={72} style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 1.5rem' }}>
         <div style={{
           maxWidth: '1000px', margin: '0 auto', display: 'flex', gap: 'clamp(2rem, 5vw, 4rem)',
           alignItems: 'center', flexWrap: 'wrap',
@@ -250,7 +251,7 @@ export default function SubscriptionPage() {
       </StripedBackground>
 
       {/* ---------------------------------------------------------------- PLANS */}
-      <section id="planos" style={{ padding: 'clamp(4rem, 9vw, 7rem) 1.5rem' }}>
+      <section id="planos" style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 1.5rem' }}>
         <div style={{ maxWidth: '1150px', margin: '0 auto' }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
@@ -373,7 +374,7 @@ export default function SubscriptionPage() {
       </section>
 
       {/* ------------------------------------------------------ WHY SUBSCRIBE */}
-      <StripedBackground tone="dark" bandHeight={80} style={{ padding: 'clamp(4rem, 9vw, 7rem) 1.5rem' }}>
+      <StripedBackground tone="dark" bandHeight={80} style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 1.5rem' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
@@ -398,7 +399,7 @@ export default function SubscriptionPage() {
       </StripedBackground>
 
       {/* ------------------------------------------------------------ SIGNUP */}
-      <section id="reservar" style={{ padding: 'clamp(4rem, 9vw, 7rem) 1.5rem' }}>
+      <section id="reservar" style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 1.5rem' }}>
         {!loading && plans.length > 0 && (
           <SubscriptionSignup
             plans={plans}
@@ -408,12 +409,12 @@ export default function SubscriptionPage() {
         )}
       </section>
 
-      <section style={{ padding: '0 1.5rem clamp(3rem, 6vw, 4.5rem)' }}>
+      <section style={{ padding: '0 1.5rem clamp(2rem, 6vw, 4.5rem)' }}>
         <InspirationTeaser />
       </section>
 
       {/* --------------------------------------------------------------- FAQ */}
-      <section style={{ padding: '0 1.5rem clamp(4rem, 9vw, 7rem)' }}>
+      <section style={{ padding: '0 1.5rem clamp(2.25rem, 9vw, 7rem)' }}>
         <div style={{ maxWidth: '760px', margin: '0 auto' }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.7rem, 4.5vw, 2.5rem)',
@@ -451,7 +452,7 @@ export default function SubscriptionPage() {
       {/* ------------------------------------------------- CLOSING CTA
           Repeated here on purpose: by this point someone has read the plans and
           had their objections answered, and shouldn't have to scroll back up. */}
-      <StripedBackground tone="dark" bandHeight={84} style={{ padding: 'clamp(4rem, 9vw, 6.5rem) 1.5rem' }}>
+      <StripedBackground tone="dark" bandHeight={84} style={{ padding: 'clamp(2.25rem, 9vw, 6.5rem) 1.5rem' }}>
         <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.8rem, 5vw, 2.8rem)',
@@ -484,6 +485,17 @@ export default function SubscriptionPage() {
         </div>
       </StripedBackground>
 
-    </main>
+          {/* Phones only: the plans were five screens down, so the price rides along instead. */}
+      {plans.length > 0 && (
+        <MobileBuyBar
+          kicker="Assinatura semanal"
+          price={`a partir de ${formatBRL(Math.min(...plans.map(p => p.price_per_box)))}`}
+          note="por caixa"
+          label="Ver planos"
+          targetId="#planos"
+        />
+      )}
+
+</main>
   );
 }

@@ -126,7 +126,8 @@ export default async function Home() {
             <p className="text-center" style={{ marginBottom: '3rem', color: '#594a42', fontSize: '1.1rem' }}>Um gostinho do que você pode encontrar na sua caixa surpresa!</p>
           </ScrollReveal>
           
-          <div className="menu-grid">
+          {/* On a phone this scrolls sideways (see .tb-rail); on desktop it stays a grid. */}
+          <div className="menu-grid tb-rail">
             {highlights && highlights.length > 0 ? (
               highlights.map((highlight, idx) => (
                 <ScrollReveal delay={idx * 0.1} key={highlight.id}>

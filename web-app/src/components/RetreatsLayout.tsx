@@ -196,7 +196,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             backgroundPosition: 'center'
           }} />
           {/* Text side */}
-          <div style={{ flex: '1 1 50%', minWidth: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(3rem, 6vw, 6rem)' }}>
+          <div style={{ flex: '1 1 50%', minWidth: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(2rem, 6vw, 6rem)' }}>
             <ScrollReveal>
               <div style={{ maxWidth: '500px' }}>
                 <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, marginBottom: '1rem', display: 'block' }}>
@@ -245,7 +245,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
       </section>
 
       {/* Suites Section */}
-      <section style={{ background: 'var(--color-background)', padding: 'clamp(4rem, 8vw, 8rem) clamp(1rem, 4vw, 2rem)' }}>
+      <section style={{ background: 'var(--color-background)', padding: 'clamp(2.25rem, 8vw, 8rem) clamp(1rem, 4vw, 2rem)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <ScrollReveal>
             <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
@@ -270,7 +270,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
       <InspirationSection />
 
       {/* Pricing Calculator */}
-      <section style={{ padding: 'clamp(4rem, 8vw, 6rem) 1.5rem', background: 'linear-gradient(180deg, #2e4432 0%, #3c2a21 100%)' }}>
+      <section style={{ padding: 'clamp(2.25rem, 8vw, 6rem) 1.5rem', background: 'linear-gradient(180deg, #2e4432 0%, #3c2a21 100%)' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '1rem' }}>
             Reserva Fora do Airbnb
@@ -300,7 +300,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
 
       {/* Final CTA */}
       <section style={{
-        padding: 'clamp(4rem, 8vw, 8rem) 2rem',
+        padding: 'clamp(2.25rem, 8vw, 8rem) 2rem',
         background: 'linear-gradient(180deg, #3c2a21 0%, #2e4432 100%)',
         textAlign: 'center'
       }}>

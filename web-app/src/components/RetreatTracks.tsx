@@ -46,7 +46,7 @@ const TRACKS = [
 
 export default function RetreatTracks({ onInquire }: Props) {
   return (
-    <section style={{ background: '#f5efe2', padding: 'clamp(4rem, 8vw, 7rem) clamp(1rem, 4vw, 2rem)' }}>
+    <section style={{ background: '#f5efe2', padding: 'clamp(2.25rem, 8vw, 7rem) clamp(1rem, 4vw, 2rem)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <span style={{ color: '#a6832b', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '1rem' }}>

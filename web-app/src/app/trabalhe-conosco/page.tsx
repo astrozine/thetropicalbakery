@@ -110,7 +110,7 @@ export default function CareersPage() {
   return (
     <main style={{ background: 'var(--color-background)' }}>
 
-      <StripedBackground tone="dark" bandHeight={92} image="/textures/copacabana-baker.webp" imagePosition="75% 30%" style={{ paddingTop: 'clamp(7rem, 12vw, 9rem)', paddingBottom: 'clamp(3.5rem, 7vw, 5.5rem)' }}>
+      <StripedBackground tone="dark" bandHeight={92} image="/textures/copacabana-baker.webp" imagePosition="75% 30%" style={{ paddingTop: 'clamp(4.5rem, 12vw, 9rem)', paddingBottom: 'clamp(3.5rem, 7vw, 5.5rem)' }}>
         <div style={{ maxWidth: '760px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center' }}>
           <img src="/logo-gold.webp" alt="" style={{ height: 'clamp(64px, 10vw, 88px)', margin: '0 auto 1.75rem', display: 'block' }} />
           <span style={{
@@ -135,7 +135,7 @@ export default function CareersPage() {
       </StripedBackground>
 
       {/* Roles */}
-      <section style={{ padding: 'clamp(4rem, 8vw, 6rem) 1.5rem' }}>
+      <section style={{ padding: 'clamp(2.25rem, 8vw, 6rem) 1.5rem' }}>
         <div style={{ maxWidth: '1150px', margin: '0 auto' }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.8rem, 5vw, 2.8rem)',
@@ -205,7 +205,7 @@ export default function CareersPage() {
       </section>
 
       {/* Application form */}
-      <StripedBackground tone="light" bandHeight={72} style={{ padding: 'clamp(4rem, 8vw, 6rem) 1.5rem' }}>
+      <StripedBackground tone="light" bandHeight={72} style={{ padding: 'clamp(2.25rem, 8vw, 6rem) 1.5rem' }}>
         <div id="candidatar" style={{ maxWidth: '720px', margin: '0 auto' }}>
           {done ? (
             <div style={{

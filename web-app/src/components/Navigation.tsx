@@ -110,6 +110,27 @@ export default function Navigation() {
   // Mobile Accordion States
   const [mobileCursosOpen, setMobileCursosOpen] = useState(false);
   const [mobileB2bOpen, setMobileB2bOpen] = useState(false);
+
+  // The floating pills sit ON TOP of the page, so while you read they cover the
+  // text underneath. Every app solves this the same way: tuck the bar away when
+  // the reader scrolls down, bring it straight back when they scroll up.
+  const [tucked, setTucked] = useState(false);
+  useEffect(() => {
+    let last = window.scrollY;
+    let frame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const down = y > last;
+        // Never hide near the top, and ignore tiny jitters.
+        if (Math.abs(y - last) > 6) setTucked(down && y > 160);
+        last = y;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', onScroll); };
+  }, []);
   const [mobileLangOpen, setMobileLangOpen] = useState(false);
 
   return (
@@ -135,7 +156,7 @@ export default function Navigation() {
         <span>🌴 Entregas exclusivas: Itamambuca, Ubatuba e Região. Eventos em Paraty! 🌴</span>
       </div>
 
-      <nav className="mobile-header-nav" style={{
+      <nav className="mobile-header-nav" data-tucked={tucked && !isOpen ? 'true' : 'false'} style={{
         position: 'sticky',
         top: 0,
         width: '100%',

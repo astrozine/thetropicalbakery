@@ -25,7 +25,7 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
   const summary = summarizeAllergens(visible);
 
   return (
-    <section style={{ padding: 'clamp(3rem, 7vw, 5rem) 1rem 0' }}>
+    <section style={{ padding: 'clamp(2rem, 7vw, 5rem) 1rem 0' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <span style={{ color: '#a6832b', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.9rem' }}>
