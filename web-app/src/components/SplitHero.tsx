@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import HeroPhoto from './HeroPhoto';
 
 interface SplitHeroProps {
   eyebrow: string;
@@ -74,30 +75,33 @@ export default function SplitHero({
       {/* Photo */}
       <div style={{ flex: '1 1 460px', position: 'relative', minHeight: images?.length ? undefined : 'clamp(360px, 46vw, 760px)', display: images?.length ? 'grid' : 'block', gridTemplateColumns: images?.length ? `repeat(${images.length}, 1fr)` : undefined, gap: '4px' }}>
         {images?.length ? images.map((src, i) => (
-          <div key={i} role="img" aria-label={`${imageAlt} ${i + 1}`} style={{ aspectRatio: '3 / 4', backgroundImage: `url("${src}")`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          <HeroPhoto key={i} src={src} alt={`${imageAlt} ${i + 1}`} preload sizes={`(min-width: 900px) ${Math.round(50 / images.length)}vw, ${Math.round(100 / images.length)}vw`}
+            style={{ aspectRatio: '3 / 4' }} />
         )) : (
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: `url("${image}")`, backgroundSize: 'cover', backgroundPosition: 'center' }} role="img" aria-label={imageAlt} />
+          <HeroPhoto src={image ?? ''} alt={imageAlt} preload sizes="(min-width: 900px) 50vw, 100vw"
+            style={{ position: 'absolute', inset: 0 }} />
         )}
         {/* Thin gold inner frame */}
         <div style={{ position: 'absolute', inset: 'clamp(12px, 1.6vw, 22px)', border: '1px solid rgba(212,175,55,0.7)', pointerEvents: 'none' }} />
         {accentImage && (
-          <div style={{
+          <HeroPhoto src={accentImage} alt="" preload fadeFrame sizes="(min-width: 900px) 16vw, 30vw" style={{
             position: 'absolute', left: 'clamp(24px, 4vw, 56px)', bottom: 'clamp(24px, 4vw, 56px)',
             width: 'clamp(110px, 16vw, 200px)', aspectRatio: '1', borderRadius: '14px',
-            backgroundImage: `url("${accentImage}")`, backgroundSize: 'cover', backgroundPosition: 'center',
             border: '3px solid #fdfaf3', boxShadow: '0 18px 40px rgba(0,0,0,0.4)', transform: 'rotate(-5deg)',
           }} />
         )}
         {treats && treats.length > 0 && (
           <div style={{ position: 'absolute', left: 'clamp(20px, 3.5vw, 56px)', bottom: 'clamp(20px, 3.5vw, 56px)', display: 'flex' }}>
             {treats.map((src, i) => (
-              <div
+              <HeroPhoto
                 key={src}
-                role="img"
-                aria-label={`${imageAlt} — doces ${i + 1}`}
+                src={src}
+                alt={`${imageAlt} — doces ${i + 1}`}
+                preload
+                fadeFrame
+                sizes="(min-width: 900px) 13vw, 30vw"
                 style={{
                   width: 'clamp(96px, 13vw, 210px)', aspectRatio: '3 / 4', borderRadius: '12px',
-                  backgroundImage: `url("${src}")`, backgroundSize: 'cover', backgroundPosition: 'center',
                   border: '3px solid #fdfaf3', boxShadow: '0 18px 40px rgba(0,0,0,0.45)',
                   transform: `rotate(${i % 2 === 0 ? -5 : 4}deg) translateY(${i % 2 === 0 ? 0 : -18}px)`,
                   marginLeft: i === 0 ? 0 : 'clamp(-34px, -2.5vw, -18px)',
