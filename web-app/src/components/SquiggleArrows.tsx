@@ -24,21 +24,23 @@ export default function SquiggleArrows() {
           filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
         }
 
-        /* Desktop positions */
-        @media (min-width: 768px) {
-          .arrow-1 { top: -20px; left: -140px; transform: scale(1.5); }
-          .arrow-2 { top: 40px; left: -160px; transform: scale(1.5); }
-          .arrow-3 { top: 10px; right: -140px; transform: scale(1.5) scaleX(-1); }
-          .arrow-4 { bottom: -60px; right: -120px; transform: scale(1.5) scaleX(-1); }
+        /* Wide screens: two arrows on each side, tips touching the edge of the box (the last one lines up
+           with the send button). */
+        @media (min-width: 900px) {
+          .arrow-1 { top: -20px; left: -80px; transform: scale(1.5); }
+          .arrow-2 { top: 130px; left: -75px; transform: scale(1.5); }
+          .arrow-3 { top: 10px; right: -75px; transform: scale(1.5) scaleX(-1); }
+          .arrow-4 { bottom: 60px; right: -75px; transform: scale(1.5) scaleX(-1); }
         }
         
-        /* Mobile positions - hide some or reposition */
-        @media (max-width: 767px) {
-          .arrow-1 { top: -60px; left: -30px; transform: rotate(30deg) scale(1.5); }
-          .arrow-2 { display: none; }
-          .arrow-3 { display: none; }
-          .arrow-4 { bottom: -70px; right: -30px; transform: rotate(-30deg) scale(1.5) scaleX(-1); }
+        /* Phones: there is no side gutter, so the arrows sit in the space above the box, one over each
+           top corner, with the tips tucked under its edge. Nothing floats in empty space. */
+        @media (max-width: 899px) {
+          .arrow-1 { top: -50px; left: 14px; transform: none; }
+          .arrow-3 { top: -50px; right: 14px; transform: scaleX(-1); }
+          .arrow-2, .arrow-4 { display: none; }
         }
+        @media (prefers-reduced-motion: reduce) { .squiggle-arrow { animation: none; } }
       `}</style>
 
       {/* Top Left Arrow */}

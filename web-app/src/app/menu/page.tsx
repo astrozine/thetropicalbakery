@@ -193,7 +193,7 @@ export default function MenuPage() {
       </section>
 
       {/* Last stop for anyone who browsed the catalogue instead of tapping photos: the same "build it together" path. */}
-      <section id="orcamento" style={{ padding: 'clamp(2.25rem, 6vw, 5rem) 1rem', background: '#fdfaf3' }}>
+      <section id="orcamento" style={{ padding: 'clamp(4rem, 8vw, 5rem) 1rem clamp(2.25rem, 6vw, 5rem)', background: '#fdfaf3' }}>
         <div style={{ position: 'relative', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
           <SquiggleArrows />
           <div style={{ position: 'relative', zIndex: 11, background: 'rgba(253,250,243,0.96)', border: '1px solid rgba(212,175,55,0.45)', borderRadius: '22px', padding: 'clamp(1.25rem, 4vw, 2rem)', boxShadow: '0 12px 34px rgba(60,42,33,0.12)', color: '#3c2a21' }}>
