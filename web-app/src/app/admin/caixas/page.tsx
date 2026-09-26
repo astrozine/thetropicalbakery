@@ -63,6 +63,8 @@ export default function AdminCaixas() {
   const [ordersOpen, setOrdersOpen] = useState('');
   const [ordersClose, setOrdersClose] = useState('');
   const [leadDays, setLeadDays] = useState(2);
+  /** After saving a box that is live: offer to tell the waiting list and customers. */
+  const [announce, setAnnounce] = useState<{ title: string; treats: string; quantity: number } | null>(null);
 
   useEffect(() => {
     fetchBoxes();
@@ -221,6 +223,7 @@ export default function AdminCaixas() {
     }
 
     setSaving(false);
+    setAnnounce(isActive ? { title, treats: cleanItems.map(i => `${i.emoji} ${i.name}`).join('\n'), quantity: totalQuantity } : null);
     resetForm();
     fetchBoxes();
   };
@@ -235,6 +238,26 @@ export default function AdminCaixas() {
   return (
     <div style={{ maxWidth: '1400px' }}>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '1rem' }}>Gerenciar Caixas de Degustação</h1>
+
+      {announce && (
+        <div role="status" style={{ background: '#e6f4ec', border: '1px solid #b7e1c6', borderRadius: '12px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem 1.25rem', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ color: '#1e6b3c', lineHeight: 1.6 }}>
+            <strong>✅ Caixa salva e no ar.</strong><br />
+            Quem está na fila de espera e os clientes que querem saber das caixas ainda não foram avisados.
+          </div>
+          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <Link
+              href={`/admin/emails?campaign=box-live&title=${encodeURIComponent(announce.title)}&treats=${encodeURIComponent(announce.treats)}&quantity=${announce.quantity}`}
+              style={{ background: '#d4af37', color: 'white', padding: '0.7rem 1.2rem', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' }}
+            >
+              📧 Avisar a fila de espera e os clientes
+            </Link>
+            <button type="button" onClick={() => setAnnounce(null)} style={{ background: 'white', border: '1px solid #b7e1c6', color: '#1e6b3c', padding: '0.7rem 1rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+              Agora não
+            </button>
+          </div>
+        </div>
+      )}
 
       <div style={{ background: '#f8f9fa', padding: '1rem 1.5rem', borderRadius: '8px', borderLeft: '4px solid #d4af37', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>

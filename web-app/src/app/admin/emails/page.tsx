@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { CAMPAIGNS, CampaignValues, campaignById } from '@/lib/email/campaigns';
 import { SITE_URL, renderEmail } from '@/lib/email/layout';
@@ -49,16 +49,30 @@ export default function AdminEmailsPage() {
 
   const campaign = campaignById(campaignId)!;
   const topic = topicById(campaign.topic)!;
+  // Values that arrived in the link (e.g. from the box page's "Avisar a fila" button), applied once.
+  const pendingValues = useRef<CampaignValues | null>(null);
 
   useEffect(() => { load(); }, []);
 
   useEffect(() => {
     // A different campaign means a different audience and a different key.
-    setValues({});
+    setValues(pendingValues.current ?? {});
+    pendingValues.current = null;
     setDry(null);
     setResult(null);
     setDiet(EMPTY_TARGETING);
   }, [campaignId]);
+
+  // /admin/emails?campaign=box-live&title=...&treats=...: open that campaign with the fields already filled in.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const wanted = campaignById(q.get('campaign') || '');
+    if (!wanted) return;
+    const filled: CampaignValues = {};
+    wanted.fields.forEach(f => { const v = q.get(f.name); if (v) filled[f.name] = v; });
+    pendingValues.current = filled;
+    setCampaignId(wanted.id);
+  }, []);
 
   const load = async () => {
     const [c, s, me] = await Promise.all([
