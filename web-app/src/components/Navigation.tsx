@@ -60,7 +60,7 @@ export default function Navigation() {
   ];
 
   const cursosLinks = [
-    { name: 'Todos os Cursos', path: '/cursos' },
+    { name: 'Todos os Cursos', path: '/cursos', highlight: true },
     { name: 'Turismo Gastronômico', path: '/cursos/turismo-gastronomico' },
     { name: 'Capacitação Profissional', path: '/cursos/capacitacao-profissional' },
     { name: 'Saúde e Bem-Estar', path: '/cursos/saude-bem-estar' },
@@ -230,7 +230,20 @@ export default function Navigation() {
                 gap: '0.5rem'
               }}>
                 {cursosLinks.map((link) => (
-                  <Link key={link.path} href={link.path} style={{ padding: '0.5rem 1.5rem', color: pathname === link.path ? '#d4af37' : '#594a42', textDecoration: 'none', fontWeight: pathname === link.path ? 'bold' : 'normal', fontSize: '0.9rem', textTransform: 'uppercase' }}>
+                  <Link key={link.path} href={link.path} style={{
+                    padding: '0.5rem 1.5rem',
+                    color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
+                    textDecoration: 'none',
+                    fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
+                    fontSize: '0.9rem',
+                    textTransform: 'uppercase',
+                    ...(link.highlight ? {
+                      background: '#d4af37',
+                      borderRadius: '6px',
+                      margin: '0 0.75rem',
+                      padding: '0.5rem 0.75rem',
+                    } : {}),
+                  }}>
                     {link.name}
                   </Link>
                 ))}
@@ -311,11 +324,17 @@ export default function Navigation() {
                 {b2bLinks.map((link) => (
                   <Link key={link.path} href={link.path} style={{
                     padding: '0.5rem 1.5rem',
-                    color: link.highlight ? '#d4af37' : pathname === link.path ? '#d4af37' : '#594a42',
+                    color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
                     textDecoration: 'none',
                     fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
                     fontSize: '0.9rem',
-                    textTransform: 'uppercase'
+                    textTransform: 'uppercase',
+                    ...(link.highlight ? {
+                      background: '#d4af37',
+                      borderRadius: '6px',
+                      margin: '0 0.75rem',
+                      padding: '0.5rem 0.75rem',
+                    } : {}),
                   }}>
                     {link.name}
                   </Link>
@@ -498,11 +517,17 @@ export default function Navigation() {
                   display: 'block',
                   padding: '0.8rem 0 0.8rem 1rem',
                   textDecoration: 'none',
-                  color: pathname === link.path ? '#d4af37' : '#594a42',
-                  fontWeight: pathname === link.path ? 'bold' : '400',
+                  color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
+                  fontWeight: link.highlight || pathname === link.path ? 'bold' : '400',
                   fontSize: '1.1rem',
-                  borderBottom: '1px solid rgba(0,0,0,0.04)',
-                  animation: 'fadeIn 0.2s ease-out'
+                  borderBottom: link.highlight ? 'none' : '1px solid rgba(0,0,0,0.04)',
+                  animation: 'fadeIn 0.2s ease-out',
+                  ...(link.highlight ? {
+                    background: '#d4af37',
+                    borderRadius: '8px',
+                    margin: '0.3rem 0',
+                    padding: '0.8rem 1rem',
+                  } : {}),
                 }}
               >
                 {link.name}
@@ -539,11 +564,17 @@ export default function Navigation() {
                   display: 'block',
                   padding: '0.8rem 0 0.8rem 1rem',
                   textDecoration: 'none',
-                  color: link.highlight ? '#d4af37' : pathname === link.path ? '#d4af37' : '#594a42',
+                  color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
                   fontWeight: link.highlight || pathname === link.path ? 'bold' : '400',
                   fontSize: '1.1rem',
-                  borderBottom: '1px solid rgba(0,0,0,0.04)',
-                  animation: 'fadeIn 0.2s ease-out'
+                  borderBottom: link.highlight ? 'none' : '1px solid rgba(0,0,0,0.04)',
+                  animation: 'fadeIn 0.2s ease-out',
+                  ...(link.highlight ? {
+                    background: '#d4af37',
+                    borderRadius: '8px',
+                    margin: '0.3rem 0',
+                    padding: '0.8rem 1rem',
+                  } : {}),
                 }}
               >
                 {link.name}
