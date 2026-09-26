@@ -251,9 +251,10 @@ export default function AdminCaixas() {
       <form onSubmit={handleSubmit} style={{ marginBottom: '3rem' }}>
         <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))', alignItems: 'start' }}>
 
-          {/* LEFT: the box itself */}
-          <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
-            <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>📦 Dados da caixa</h3>
+          {/* LEFT: the box itself + its picture */}
+          <div style={{ display: 'grid', gap: '1.5rem', alignContent: 'start' }}>
+            <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
+              <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>📦 Dados da caixa</h3>
 
             <div>
               <label style={label}>Título</label>
@@ -265,7 +266,7 @@ export default function AdminCaixas() {
               <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder="Uma frase sobre o tema desta edição. Se ficar vazio, usamos a lista dos doces." style={input} />
             </div>
 
-            <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
+            <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
               <div>
                 <label style={label}>Data do Lote</label>
                 <input type="date" required min="2020-01-01" max="2100-12-31" value={batchDateLabel} onChange={e => setBatchDateLabel(e.target.value)} style={input} />
@@ -284,8 +285,30 @@ export default function AdminCaixas() {
               </div>
             </div>
 
-            {/* The two windows */}
-            <div style={{ background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '10px', padding: '1rem 1.1rem', display: 'grid', gap: '0.9rem' }}>
+            <p style={{ fontSize: '0.8rem', color: '#7f8c8d' }}>
+              A quantidade vendida é calculada automaticamente pelos pedidos. Edite manualmente apenas se houver cancelamentos ou vendas externas.
+            </p>
+            </div>
+
+            <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
+              <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>🖼️ Imagem e visibilidade</h3>
+            <ImagePicker label="Imagem da Caixa" imageUrl={imageUrl} uploading={uploading} onChange={handleImageUpload} />
+
+            <ToggleSwitch
+              checked={isActive}
+              onChange={setIsActive}
+              label="Mostrar esta caixa no site"
+              onText="Ativado — aparecendo no site"
+              offText="Desativado — escondida do site"
+              helper="Ao ativar, as outras caixas são desativadas automaticamente."
+            />
+            </div>
+          </div>
+
+          {/* RIGHT: when it goes out, then the treats inside */}
+          <div style={{ display: 'grid', gap: '1.5rem', alignContent: 'start' }}>
+            <div style={{ ...card, background: '#fdf7ee', border: '1px solid #e8e1d7', display: 'grid', gap: '1.1rem' }}>
+              <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>📅 Datas de entrega e pedidos</h3>
               <div>
                 <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🚚 Janela de entrega prevista</p>
                 <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os dias em que esta leva está planejada para sair. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas. <strong>Se a janela passar e ainda houver caixas, a venda continua</strong>: as entregas passam a valer a partir do primeiro dia livre do calendário.</p>
@@ -320,21 +343,20 @@ export default function AdminCaixas() {
                 );
               })()}
             </div>
-            <p style={{ fontSize: '0.8rem', color: '#7f8c8d', marginTop: '-0.5rem' }}>
-              A quantidade vendida é calculada automaticamente pelos pedidos. Edite manualmente apenas se houver cancelamentos ou vendas externas.
+
+          <div style={card}>
+            <h3 style={{ fontSize: '1.2rem', color: '#2c3e50', marginBottom: '0.25rem' }}>🍫 Doces desta caixa</h3>
+            <p style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: '1rem', lineHeight: 1.6 }}>
+              Um doce de cada vez: nome, descrição, foto, ingredientes e alérgenos. Você também pode repetir doces do Menu de Eventos
+              ou mandar um doce novo para lá. O site monta tudo numa lista que abre e fecha.
             </p>
+            <BoxItemsEditor items={items} onChange={setItems} />
+          </div>
+          </div>
+        </div>
 
-            <ImagePicker label="Imagem da Caixa" imageUrl={imageUrl} uploading={uploading} onChange={handleImageUpload} />
-
-            <ToggleSwitch
-              checked={isActive}
-              onChange={setIsActive}
-              label="Mostrar esta caixa no site"
-              onText="Ativado — aparecendo no site"
-              offText="Desativado — escondida do site"
-              helper="Ao ativar, as outras caixas são desativadas automaticamente."
-            />
-
+        {/* Save bar: stays in view while scrolling a long treat list */}
+        <div style={{ ...card, position: 'sticky', bottom: '0.75rem', zIndex: 5, marginTop: '1.5rem', padding: '0.9rem 1.25rem', boxShadow: '0 -2px 12px rgba(0,0,0,0.12)' }}>
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <button type="submit" disabled={saving} style={{ background: '#d4af37', color: 'white', padding: '0.8rem 2rem', border: 'none', borderRadius: '6px', cursor: saving ? 'wait' : 'pointer', fontWeight: 'bold', opacity: saving ? 0.7 : 1 }}>
                 {saving ? 'Salvando…' : editingId ? 'Atualizar Lote' : 'Criar Lote'}
@@ -345,17 +367,6 @@ export default function AdminCaixas() {
                 </button>
               )}
             </div>
-          </div>
-
-          {/* RIGHT: the treats inside */}
-          <div style={card}>
-            <h3 style={{ fontSize: '1.2rem', color: '#2c3e50', marginBottom: '0.25rem' }}>🍫 Doces desta caixa</h3>
-            <p style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: '1rem', lineHeight: 1.6 }}>
-              Um doce de cada vez: nome, descrição, foto, ingredientes e alérgenos. Você também pode repetir doces do Menu de Eventos
-              ou mandar um doce novo para lá. O site monta tudo numa lista que abre e fecha.
-            </p>
-            <BoxItemsEditor items={items} onChange={setItems} />
-          </div>
         </div>
       </form>
 
