@@ -9,7 +9,8 @@ import BoxItemsEditor from '@/components/BoxItemsEditor';
 import { BoxItem } from '@/lib/allergens';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { pushTreatDetails } from '@/lib/treatSync';
-import { BoxWindowFields, SaleState, deliveryWindowLabel, lastOrderDay, longDay, saleState } from '@/lib/boxWindow';
+import { BoxWindowFields, SaleState, deliveryWindowLabel, longDay, saleState } from '@/lib/boxWindow';
+import { toISODate } from '@/lib/deliverySchedule';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 
 interface TastingBox extends BoxWindowFields {
@@ -137,8 +138,6 @@ export default function AdminCaixas() {
     e.preventDefault();
     const windowProblem =
       deliveryFrom && deliveryUntil && deliveryUntil < deliveryFrom ? 'O último dia de entrega vem antes do primeiro.'
-      : ordersOpen && ordersClose && ordersClose < ordersOpen ? 'O fim dos pedidos vem antes do início.'
-      : ordersClose && deliveryUntil && ordersClose > deliveryUntil ? 'Os pedidos fecham depois do último dia de entrega.'
       : '';
     if (windowProblem) { brandAlert(windowProblem); return; }
     setSaving(true);
@@ -288,8 +287,8 @@ export default function AdminCaixas() {
             {/* The two windows */}
             <div style={{ background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '10px', padding: '1rem 1.1rem', display: 'grid', gap: '0.9rem' }}>
               <div>
-                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🚚 Janela de entrega</p>
-                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os dias em que esta edição sai. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas.</p>
+                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🚚 Janela de entrega prevista</p>
+                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os dias em que esta leva está planejada para sair. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas. <strong>Se a janela passar e ainda houver caixas, a venda continua</strong>: as entregas passam a valer a partir do primeiro dia livre do calendário.</p>
                 <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Primeiro dia
                     <input type="date" value={deliveryFrom} onChange={e => setDeliveryFrom(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
@@ -300,27 +299,23 @@ export default function AdminCaixas() {
                 </div>
               </div>
               <div>
-                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>⏳ Janela de pedidos</p>
-                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Quando os pedidos são aceitos. Se esgotar antes, fecha sozinho.</p>
+                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🔔 Abertura dos pedidos</p>
+                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os pedidos ficam abertos até a caixa <strong>esgotar</strong> ou você <strong>desativá-la</strong> no botão abaixo. Só a data de abertura é opcional, para deixar uma caixa pronta para uma data futura.</p>
                 <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Abre em <span style={{ fontWeight: 400, color: '#95a5a6' }}>(vazio = já)</span>
                     <input type="date" value={ordersOpen} onChange={e => setOrdersOpen(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
                   </label>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Último dia para pedir <span style={{ fontWeight: 400, color: '#95a5a6' }}>(vazio = automático)</span>
-                    <input type="date" value={ordersClose} min={ordersOpen || undefined} max={deliveryUntil || undefined} onChange={e => setOrdersClose(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
-                  </label>
                 </div>
               </div>
               {(() => {
-                const w = { total_quantity: totalQuantity, sold_quantity: soldQuantity, delivery_from: deliveryFrom || null, delivery_until: deliveryUntil || null, orders_open_from: ordersOpen || null, orders_close_on: ordersClose || null };
-                const close = lastOrderDay(w, leadDays);
-                if (!deliveryFrom && !deliveryUntil && !ordersOpen && !ordersClose) {
-                  return <p style={{ fontSize: '0.85rem', color: '#8a5a00' }}>Sem janelas: o cliente escolhe qualquer dia aberto do calendário, e os pedidos ficam abertos até esgotar.</p>;
+                const w = { total_quantity: totalQuantity, sold_quantity: soldQuantity, delivery_from: deliveryFrom || null, delivery_until: deliveryUntil || null, orders_open_from: ordersOpen || null, orders_close_on: null };
+                if (!deliveryFrom && !deliveryUntil && !ordersOpen) {
+                  return <p style={{ fontSize: '0.85rem', color: '#8a5a00' }}>Sem datas: o cliente escolhe qualquer dia aberto do calendário, e os pedidos ficam abertos até esgotar.</p>;
                 }
                 return (
                   <p style={{ fontSize: '0.88rem', color: '#2c3e50', lineHeight: 1.6, background: '#fff', borderRadius: '8px', padding: '0.6rem 0.8rem' }}>
                     👀 O cliente vai ver: {deliveryWindowLabel(w) ? <>entregas <strong>{deliveryWindowLabel(w)}</strong>. </> : ''}
-                    Pedidos {ordersOpen ? <>de <strong>{longDay(ordersOpen)}</strong> </> : ''}{close ? <>até <strong>{longDay(close)}</strong>{!ordersClose && <> (último dia de entrega menos {leadDays} {leadDays === 1 ? 'dia' : 'dias'} de antecedência)</>}</> : 'enquanto houver dias de entrega'}, ou até esgotar.
+                    Pedidos {ordersOpen ? <>abrem em <strong>{longDay(ordersOpen)}</strong> e </> : ''}seguem abertos até esgotar ou você desativar a caixa.
                   </p>
                 );
               })()}
@@ -387,13 +382,13 @@ export default function AdminCaixas() {
                 </p>
                 {(() => {
                   const st = saleState(box, null);
-                  const closeOn = lastOrderDay(box, leadDays);
+                  const windowOver = !!box.delivery_until && box.delivery_until < toISODate(new Date());
                   const lbl = SALE_LABEL[st.state];
                   return (
                     <p style={{ fontSize: '0.85rem', color: '#594a42', margin: '0.2rem 0 0', display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
                       <span style={{ background: lbl.bg, color: lbl.color, fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '6px' }}>{lbl.text}</span>
-                      {deliveryWindowLabel(box) && <span>🚚 Entregas {deliveryWindowLabel(box)}</span>}
-                      {closeOn && <span>· ⏳ pedidos até {longDay(closeOn)}</span>}
+                      {deliveryWindowLabel(box) && <span>🚚 Entregas previstas {deliveryWindowLabel(box)}</span>}
+                      {windowOver && st.state === 'open' && <span>· ↻ janela já passou, segue à venda a partir do próximo dia livre</span>}
                     </p>
                   );
                 })()}

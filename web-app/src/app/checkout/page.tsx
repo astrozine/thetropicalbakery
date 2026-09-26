@@ -77,10 +77,7 @@ export default function CheckoutPage() {
     supabase.from('tasting_boxes').select('*').in('id', boxIdsKey.split(','))
       .then(({ data }) => setBoxRows((data as (BoxWindowFields & { id: string; title: string })[]) || []));
   }, [boxIdsKey]);
-  const boxWindow = {
-    from: boxRows.map(b => b.delivery_from).filter(Boolean).sort().pop() || null,   // latest start
-    until: boxRows.map(b => b.delivery_until).filter(Boolean).sort()[0] || null,    // earliest end
-  };
+  const boxWindows = boxRows.map(b => ({ from: b.delivery_from, until: b.delivery_until }));   // each one rolls over on its own
   // Pickup is only for boxes. The address is never on the site: it appears in Minha Conta once the Pix is confirmed.
   const isPickup = hasBox && fulfillment === 'pickup';
   const zone = getZone(zoneId);
@@ -166,7 +163,7 @@ export default function CheckoutPage() {
         if (state === 'soldout') { setError(`"${row.title}" esgotou. Tire a caixa do carrinho para continuar.`); return; }
         if (state === 'soon') { setError(`Os pedidos de "${row.title}" abrem ${opensOn ? longDay(opensOn) : 'em breve'}.`); return; }
         if (state === 'closed') { setError(`Os pedidos de "${row.title}" foram encerrados. Tire a caixa do carrinho para continuar.`); return; }
-        if (!inDeliveryWindow([formData.date], row).length) { setError('Esse dia está fora das entregas desta edição. Escolha outro dia no calendário.'); return; }
+        if (!inDeliveryWindow([formData.date], row, selectable).length) { setError('Esse dia está fora das entregas desta edição. Escolha outro dia no calendário.'); return; }
         const left = Math.max(0, row.total_quantity - row.sold_quantity);
         if (row.total_quantity > 0 && item.quantity > left) { setError(`Restam só ${left} unidades de "${row.title}". Ajuste a quantidade no carrinho.`); return; }
       }
@@ -539,7 +536,7 @@ export default function CheckoutPage() {
                     {hasBox ? (
                       <>
                         <label style={labelStyle}>{isPickup ? 'Quando você quer retirar sua caixa?' : 'Quando você quer receber sua caixa?'}</label>
-                        <DeliveryCalendar value={formData.date} onChange={setDate} window={boxWindow} />
+                        <DeliveryCalendar value={formData.date} onChange={setDate} windows={boxWindows} />
                       </>
                     ) : (
                       <>

@@ -8,7 +8,7 @@ import PhotoShowcase from '@/components/PhotoShowcase';
 import FeaturedBoxCard from '@/components/FeaturedBoxCard';
 import { formatBatchDate } from '@/lib/batchDate';
 import { fetchSchedule, selectableDates } from '@/lib/deliverySchedule';
-import { inDeliveryWindow, noUpcomingEdition, saleState } from '@/lib/boxWindow';
+import { inDeliveryWindow, isRolledOver, noUpcomingEdition, saleState, shortDay } from '@/lib/boxWindow';
 import NoBoxNotice from '@/components/NoBoxNotice';
 import ModalCard from '@/components/ModalCard';
 import Link from 'next/link';
@@ -38,10 +38,16 @@ export default async function Home() {
   // A box only counts as "on sale" if a customer could really order it: a delivery day is left
   // to pick and its ordering window is open. Otherwise say there is no box yet and offer the waiting list.
   let boxOnSale = !!activeBox;
+  let boxDateLabel = activeBox ? formatBatchDate(activeBox.batch_date_label) : '';
   if (activeBox) {
     const schedule = await fetchSchedule();
-    const choosable = inDeliveryWindow(selectableDates(schedule), activeBox);
+    const all = selectableDates(schedule);
+    const choosable = inDeliveryWindow(all, activeBox);
     boxOnSale = !noUpcomingEdition(saleState(activeBox, choosable).state, choosable);
+    // The planned batch date is over but there are boxes left: say when they arrive now.
+    if (choosable.length && isRolledOver(all, { from: activeBox.delivery_from, until: activeBox.delivery_until })) {
+      boxDateLabel = `entregas a partir de ${shortDay(choosable[0])}`;
+    }
   }
 
   const getContent = (sectionId: string, fallbackUrl: string) => {
@@ -116,7 +122,7 @@ export default async function Home() {
                 title={activeBox.title}
                 description={activeBox.description}
                 imageUrl={activeBox.image_url}
-                dateLabel={formatBatchDate(activeBox.batch_date_label)}
+                dateLabel={boxDateLabel}
               />
             ) : (
               <NoBoxNotice variant="card" />

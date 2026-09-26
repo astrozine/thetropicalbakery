@@ -5,6 +5,7 @@ import {
   DeliverySchedule, fetchSchedule, selectableDates, dayState, overrideMap,
   toISODate, parseISODate, describeRule,
 } from '@/lib/deliverySchedule';
+import { windowedDates } from '@/lib/boxWindow';
 
 const WEEKDAY = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const MONTH_NAME = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -18,6 +19,8 @@ interface Props {
   title?: string;
   /** Only offer days inside this range (a box edition's delivery window, YYYY-MM-DD). */
   window?: { from?: string | null; until?: string | null };
+  /** Several boxes at once (checkout): a day must suit every one of them. Each window rolls over on its own. */
+  windows?: { from?: string | null; until?: string | null }[];
 }
 
 const daysUntil = (iso: string) => {
@@ -37,7 +40,7 @@ const countdown = (iso: string) => {
  * everything else recedes. Picking one turns it into a small celebration,
  * because the day the box arrives is the best day of the week.
  */
-export default function DeliveryCalendar({ value, onChange, highlight = [], title = 'Dia da Caixa', window: range }: Props) {
+export default function DeliveryCalendar({ value, onChange, highlight = [], title = 'Dia da Caixa', window: range, windows }: Props) {
   const [schedule, setSchedule] = useState<DeliverySchedule | null>(null);
   const [monthOffset, setMonthOffset] = useState(0);
 
@@ -45,10 +48,18 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
 
   const from = range?.from || null;
   const until = range?.until || null;
+  const windowsKey = (windows || []).map(w => `${w.from || ''}~${w.until || ''}`).join('|');
+  const hasWindow = !!(from || until || windowsKey.replace(/[~|]/g, ''));
   const selectable = useMemo(() => {
     if (!schedule) return new Set<string>();
-    return new Set(selectableDates(schedule).filter(d => (!from || d >= from) && (!until || d <= until)));
-  }, [schedule, from, until]);
+    const all = selectableDates(schedule);
+    // A window that is over (while the box is still on sale) stops limiting the days, see boxWindow.ts.
+    const wins = [{ from, until }, ...(windows || [])];
+    let days = all;
+    for (const w of wins) days = windowedDates(days, w, all);
+    return new Set(days);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schedule, from, until, windowsKey]);
   const overrides = useMemo(() => overrideMap(schedule?.overrides || []), [schedule]);
   const sortedSelectable = useMemo(() => Array.from(selectable).sort(), [selectable]);
   const nextBoxDay = sortedSelectable[0];
@@ -84,7 +95,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
   }
 
   if (sortedSelectable.length === 0) {
-    if (from || until) {
+    if (hasWindow) {
       return (
         <div style={{ padding: '1.25rem', background: '#fff4e5', border: '1px solid #f0d9b5', borderRadius: '14px', color: '#7a4a00', fontSize: '0.92rem', lineHeight: 1.7 }}>
           Não há mais dias de entrega disponíveis para esta edição. Fale com a gente no WhatsApp ou entre na lista da próxima caixa. 🌴

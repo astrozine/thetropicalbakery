@@ -11,7 +11,7 @@ import BoxContents from '@/components/BoxContents';
 import { BoxItem } from '@/lib/allergens';
 import { formatBatchDate } from '@/lib/batchDate';
 import BoxItemList from '@/components/BoxItemList';
-import { BoxWindowFields, deliveryWindowLabel, hasDeliveryWindow, longDay, noUpcomingEdition } from '@/lib/boxWindow';
+import { BoxWindowFields, longDay, noUpcomingEdition } from '@/lib/boxWindow';
 import NoBoxNotice from '@/components/NoBoxNotice';
 import { useBoxSale } from '@/lib/useBoxSale';
 import HeroBoxCard, { HeroBoxStrip, type HeroBoxPhoto } from '@/components/HeroBoxCard';
@@ -118,7 +118,7 @@ export default function CaixasPage() {
           <HeroBoxStrip photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} />
           <ScrollReveal>
             <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.5rem' }}>
-              Edição Limitada • {formatBatchDate(activeBox.batch_date_label)}
+              Edição Limitada • {sale?.rolledOver ? `entregas ${sale.windowLabel}` : formatBatchDate(activeBox.batch_date_label)}
             </span>
             <h1 style={{ fontSize: 'clamp(1.95rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem' }}>
               {(() => {
@@ -147,16 +147,11 @@ export default function CaixasPage() {
               )}
 
               {/* The two windows: when it arrives, and until when you can order */}
-              {sale && (hasDeliveryWindow(activeBox) || sale.closesOn || sale.state !== 'open') && (
+              {sale && (sale.windowLabel || sale.state !== 'open') && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center', marginTop: '1rem' }}>
-                  {hasDeliveryWindow(activeBox) && (
+                  {sale.windowLabel && (
                     <span style={{ background: 'rgba(212,175,55,0.2)', border: '1px solid rgba(212,175,55,0.6)', color: '#fdfaf3', borderRadius: '999px', padding: '0.35rem 0.9rem', fontSize: '0.88rem', fontWeight: 600 }}>
-                      🚚 Entregas {deliveryWindowLabel(activeBox)}
-                    </span>
-                  )}
-                  {sale.state === 'open' && sale.closesOn && (
-                    <span style={{ background: 'rgba(212,175,55,0.2)', border: '1px solid rgba(212,175,55,0.6)', color: '#fdfaf3', borderRadius: '999px', padding: '0.35rem 0.9rem', fontSize: '0.88rem', fontWeight: 600 }}>
-                      ⏳ Pedidos até {longDay(sale.closesOn)}
+                      🚚 Entregas {sale.windowLabel}
                     </span>
                   )}
                   {sale.state === 'soon' && sale.opensOn && (
@@ -228,7 +223,7 @@ export default function CaixasPage() {
       <MobileBuyBar
         kicker={remainingQuantity > 0 ? `Restam ${remainingQuantity}` : 'Caixa da semana'}
         price={`R$ ${Math.round(activeBox.price)}`}
-        note={activeBox.batch_date_label ? formatBatchDate(activeBox.batch_date_label) : undefined}
+        note={sale?.rolledOver ? `entregas ${sale.windowLabel}` : activeBox.batch_date_label ? formatBatchDate(activeBox.batch_date_label) : undefined}
         label="Pedir"
         targetId="#order"
       />

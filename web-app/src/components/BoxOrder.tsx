@@ -14,7 +14,7 @@ interface BoxOrderProps {
   box: { id: string; title: string; image_url: string; price: number } & Partial<BoxWindowFields>;
   maxQuantity: number;
   /** Whether the box can be ordered today (ordering window + stock). Null while loading. */
-  sale?: { state: SaleState; opensOn: string | null; closesOn: string | null } | null;
+  sale?: { state: SaleState; opensOn: string | null } | null;
 }
 
 const DATE_KEY = 'checkout_delivery_date';
@@ -114,9 +114,6 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
         ) : (
           <>
         <DeliveryCalendar value={date} onChange={pickDate} title="Escolha o dia da sua caixa" window={{ from: box.delivery_from, until: box.delivery_until }} />
-        {sale?.closesOn && (
-          <p style={{ fontSize: '0.88rem', color: '#8a5a00', marginTop: '-0.5rem' }}>⏳ Pedidos para esta edição até <strong>{longDay(sale.closesOn)}</strong>, ou até esgotar.</p>
-        )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#3c2a21', background: '#fdf7ee', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7', flexWrap: 'wrap' }}>
           <label style={{ fontSize: '1.1rem', fontWeight: 600, flex: 1, minWidth: '120px' }}>Quantidade:</label>
