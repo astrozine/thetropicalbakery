@@ -84,7 +84,7 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
         onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
         onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
       >
-        <div style={{ position: 'relative', width: '100%', height: '450px', background: '#e8e1d7', overflow: 'hidden' }}>
+        <div className="menu-card-photo" style={{ position: 'relative', width: '100%', height: '450px', background: '#e8e1d7', overflow: 'hidden' }}>
           <Image src={imageSrc} alt={title} fill style={{ objectFit: 'cover' }} className="menu-image" />
         </div>
         <div className="menu-content">

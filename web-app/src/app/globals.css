@@ -1047,11 +1047,65 @@ body {
 
   /* ---- 4. Room for the sticky buy bar ------------------------------------- */
   body.has-buybar { padding-bottom: 76px; }
+
+  /* ---- 5. Homepage highlights rail ----------------------------------------
+     Sits inside section (1rem) + container (1rem) padding, so it bleeds the full
+     2rem to reach the screen edge. Cards are photo-first (4:5, not a 450px tower)
+     and narrow enough that the next one clearly peeks in. */
+  .tb-highlights-rail {
+    margin-left: -2rem;
+    margin-right: -2rem;
+    padding: 0.25rem 1rem 0.5rem;
+    scroll-padding-left: 1rem;
+  }
+  .tb-highlights-rail > .menu-card { flex: 0 0 72%; }
+  .tb-highlights-rail .menu-card-photo { height: auto !important; aspect-ratio: 4 / 5; }
+  .tb-highlights-rail .menu-content { padding: 1rem 1.1rem 1.2rem; }
+  .tb-highlights-rail .menu-desc {
+    margin-bottom: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* A soft fade on the right edge says "there is more behind this". */
+  .tb-rail-wrap { position: relative; }
+  .tb-rail-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; right: -2rem; bottom: 3.25rem;
+    width: 2.25rem;
+    background: linear-gradient(to right, rgba(253,250,243,0), #fdfaf3 85%);
+    pointer-events: none;
+  }
+
+  .tb-rail-nav { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; margin-top: 0.25rem; }
+  .tb-rail-dots { display: flex; gap: 0.15rem; }
+  .tb-rail-dots button {
+    /* 24px tap target around a small dot */
+    position: relative;
+    width: 24px; height: 24px;
+    padding: 0; border: 0; background: none; cursor: pointer;
+  }
+  .tb-rail-dots button::before {
+    content: '';
+    position: absolute; left: 50%; top: 50%;
+    width: 8px; height: 8px;
+    transform: translate(-50%, -50%);
+    border-radius: 999px;
+    background: #d9cfc2;
+    transition: width .25s, background .25s;
+  }
+  .tb-rail-dots button.is-active::before { width: 22px; background: #d4af37; }
+  .tb-rail-nav .tb-rail-hint { margin: 0; }
 }
 
 @media (min-width: 768px) {
-  /* The rail hint is a phone-only affordance. */
-  .tb-rail-hint { display: none; }
+  /* The rail hint and dots are phone-only affordances. */
+  .tb-rail-hint,
+  .tb-rail-nav { display: none; }
 }
 
 /* The floating header tucks away on the way down and returns on the way up —

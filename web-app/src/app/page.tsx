@@ -12,6 +12,7 @@ import { fetchSchedule, selectableDates } from '@/lib/deliverySchedule';
 import { inDeliveryWindow, isRolledOver, noUpcomingEdition, saleState, shortDay } from '@/lib/boxWindow';
 import NoBoxNotice from '@/components/NoBoxNotice';
 import ModalCard from '@/components/ModalCard';
+import HighlightsRail from '@/components/HighlightsRail';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
@@ -149,51 +150,31 @@ export default async function Home() {
             <p className="text-center" style={{ marginBottom: '3rem', color: '#594a42', fontSize: '1.1rem' }}>Um gostinho do que você pode encontrar na sua caixa surpresa!</p>
           </ScrollReveal>
           
-          {/* On a phone this scrolls sideways (see .tb-rail); on desktop it stays a grid. */}
-          <div className="menu-grid tb-rail">
-            {highlights && highlights.length > 0 ? (
-              highlights.map((highlight, idx) => (
-                <ScrollReveal delay={idx * 0.1} key={highlight.id}>
-                  <ModalCard 
+          {/* On a phone this scrolls sideways with dots + a hint (HighlightsRail); on desktop it stays a grid.
+              No per-card ScrollReveal: cards clipped off to the right never count as "in view" and stayed invisible. */}
+          <ScrollReveal>
+            <HighlightsRail>
+              {highlights && highlights.length > 0 ? (
+                highlights.map((highlight) => (
+                  <ModalCard
+                    key={highlight.id}
                     imageSrc={highlight.image_url}
                     title={highlight.title}
                     description={highlight.description}
                   />
-                </ScrollReveal>
-              ))
-            ) : (
-              <>
-                <ScrollReveal delay={0.1}>
-                  <ModalCard 
-                    imageSrc="/box1.jpg"
-                    title="O Clássico Tropical"
-                    description="Uma seleção primorosa de doces refinados com o toque inconfundível da nossa padaria."
-                  />
-                </ScrollReveal>
-                <ScrollReveal delay={0.2}>
-                  <ModalCard 
-                    imageSrc="/box2.jpg"
-                    title="Seleção Premium"
-                    description="Texturas marcantes e ingredientes frescos, pensados para surpreender os paladares mais exigentes."
-                  />
-                </ScrollReveal>
-                <ScrollReveal delay={0.3}>
-                  <ModalCard 
-                    imageSrc="/box3.jpg"
-                    title="Surpresa Artesanal"
-                    description="Cada detalhe é cuidadosamente montado para oferecer uma experiência gastronômica única."
-                  />
-                </ScrollReveal>
-                <ScrollReveal delay={0.4}>
-                  <ModalCard 
-                    imageSrc="/box4.jpg"
-                    title="Requinte em Caixa"
-                    description="A união perfeita entre saúde, estética e sabor inesquecível em uma única apresentação."
-                  />
-                </ScrollReveal>
-              </>
-            )}
-          </div>
+                ))
+              ) : (
+                [
+                  { src: '/box1.jpg', title: 'O Clássico Tropical', desc: 'Uma seleção primorosa de doces refinados com o toque inconfundível da nossa padaria.' },
+                  { src: '/box2.jpg', title: 'Seleção Premium', desc: 'Texturas marcantes e ingredientes frescos, pensados para surpreender os paladares mais exigentes.' },
+                  { src: '/box3.jpg', title: 'Surpresa Artesanal', desc: 'Cada detalhe é cuidadosamente montado para oferecer uma experiência gastronômica única.' },
+                  { src: '/box4.jpg', title: 'Requinte em Caixa', desc: 'A união perfeita entre saúde, estética e sabor inesquecível em uma única apresentação.' },
+                ].map((c) => (
+                  <ModalCard key={c.src} imageSrc={c.src} title={c.title} description={c.desc} />
+                ))
+              )}
+            </HighlightsRail>
+          </ScrollReveal>
         </div>
       </section>
     </main>
