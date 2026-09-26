@@ -539,8 +539,8 @@ export default function SubscriptionPage() {
           {/* Phones only: the plans were five screens down, so the price rides along instead. */}
       {plans.length > 0 && (
         <MobileBuyBar
-          kicker="Assinatura semanal"
-          price={`a partir de ${formatBRL(Math.min(...plans.map(p => p.price_per_box)))}`}
+          kicker="Assinatura · a partir de"
+          price={formatBRL(Math.min(...plans.map(p => p.price_per_box)))}
           note="por caixa"
           label="Ver planos"
           targetId="#planos"

@@ -109,14 +109,16 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
             opacity: 0;
             pointer-events: none;
           }
-          .tb-buybar__price { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+          /* The price gives way to the button, never the other way round: a long price wraps or is clipped
+             instead of sliding underneath the button (large phone fonts made "a partir de R$ 89" do that). */
+          .tb-buybar__price { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; flex: 1 1 0; overflow: hidden; }
           .tb-buybar__kicker {
             font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
             color: #a6832b; font-weight: 800;
             max-height: 2em; overflow: hidden;
             transition: max-height .28s, opacity .28s, margin .28s;
           }
-          .tb-buybar__price strong { font-family: var(--font-heading); font-size: 1.3rem; color: #3c2a21; white-space: nowrap; }
+          .tb-buybar__price strong { font-family: var(--font-heading); font-size: 1.3rem; color: #3c2a21; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
           .tb-buybar__note {
             font-size: 0.75rem; color: #7a6a61; white-space: nowrap;
             overflow: hidden; text-overflow: ellipsis;
