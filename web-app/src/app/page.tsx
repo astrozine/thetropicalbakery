@@ -126,6 +126,7 @@ export default async function Home() {
               <FeaturedBoxCard
                 title={activeBox.title}
                 description={activeBox.description}
+                items={activeBox.items}
                 imageUrl={activeBox.image_url}
                 dateLabel={boxDateLabel}
               />

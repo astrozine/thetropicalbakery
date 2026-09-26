@@ -8,7 +8,10 @@ import { SunbakedLettersNote } from '@/components/SunbakedLetters';
 import FormSideRails, { RailCard, RailSteps } from '@/components/FormSideRails';
 import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
 import { SUBSCRIPTION_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
-import { SubscriptionPlan, DIETARY_FIELDS, DietaryKey, monthlyTotal } from '@/lib/subscriptions';
+import { SubscriptionPlan, DIETARY_FIELDS, DietaryKey } from '@/lib/subscriptions';
+import BoxSizePicker from '@/components/BoxSizePicker';
+import { DEFAULT_TREAT_COUNT, TreatCount, planBoxPrice, sizeText } from '@/lib/boxSizes';
+import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
 
 const STORE_WHATSAPP = '5511932119196';
 
@@ -48,6 +51,8 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
   const [zoneId, setZoneId] = useState(SUBSCRIPTION_ZONES[0]?.id ?? 'zone1');
   const [address, setAddress] = useState<AddressValue>(EMPTY_ADDRESS);
   const [boxesPerWeek, setBoxesPerWeek] = useState(1);
+  const [boxSize, setBoxSize] = useState<TreatCount>(DEFAULT_TREAT_COUNT);
+  const sizePrices = useBoxSizePrices();
   const [allergies, setAllergies] = useState('');
   const [referredBy, setReferredBy] = useState('');
   const [message, setMessage] = useState('');
@@ -95,7 +100,12 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
   const plan = plans.find(p => p.id === selectedPlanId) ?? plans[0];
   const zone = getZone(zoneId);
   const deliveryFee = zone?.fee ?? 0;
-  const total = plan ? monthlyTotal(plan, boxesPerWeek, deliveryFee) : 0;
+  // Every plan takes its usual discount off every size (create_subscription does the same sum in SQL).
+  const basePerBox = Math.max(0, ...plans.map(p => Number(p.price_per_box) || 0));
+  const perBoxFor = (p: SubscriptionPlan, size: TreatCount = boxSize) => planBoxPrice(Number(p.price_per_box), basePerBox, sizePrices[size]);
+  const perBox = plan ? perBoxFor(plan) : 0;
+  const boxesMonthly = perBox * 4 * boxesPerWeek;
+  const total = boxesMonthly + deliveryFee * 4;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +123,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
     setSubmitting(true);
     setError('');
 
-    const { error: rpcError } = await supabase.rpc('create_subscription', {
+    const args = {
       p_plan_id: plan.id,
       p_full_name: fullName,
       p_whatsapp_number: whatsapp,
@@ -136,7 +146,15 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
       p_delivery_fee: deliveryFee,
       p_referred_by: referredBy || null,
       p_customer_message: message || null,
-    });
+    };
+    let { error: rpcError } = await supabase.rpc('create_subscription', { ...args, p_box_size: boxSize });
+    if (rpcError && (rpcError.code === 'PGRST202' || /p_box_size|create_subscription/.test(rpcError.message))) {
+      // Migration 24 not run yet: save without the size, and put the size in the note so Dolly sees it.
+      ({ error: rpcError } = await supabase.rpc('create_subscription', {
+        ...args,
+        p_customer_message: [`Caixa de ${sizeText(boxSize)}`, message].filter(Boolean).join(' · '),
+      }));
+    }
 
     if (rpcError) {
       console.error('Subscription error:', rpcError);
@@ -171,7 +189,8 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
     const lines = [
       `Olá Tropical Bakery! Quero assinar a Caixa de Degustação Semanal 🌴`,
       ``,
-      `*Plano:* ${plan.name} — ${formatBRL(plan.monthly_price)}/mês`,
+      `*Plano:* ${plan.name} — ${formatBRL(perBox * 4)}/mês`,
+      `*Tamanho:* caixa de ${sizeText(boxSize)}`,
       `*Caixas por semana:* ${boxesPerWeek}`,
       `*Nome:* ${fullName}`,
       `*Região:* ${zone?.label ?? '-'}`,
@@ -228,14 +247,14 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
         <RailCard title="Seu plano">
           <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-primary)' }}>{plan.name}</p>
           <p style={{ margin: '0.2rem 0 0', fontSize: '0.84rem', color: '#7a6a61', lineHeight: 1.5 }}>
-            {boxesPerWeek} {boxesPerWeek === 1 ? 'caixa' : 'caixas'} por semana · entrega {deliveryFee === 0 ? 'inclusa' : `${formatBRL(deliveryFee)}/semana`}
+            {boxesPerWeek} {boxesPerWeek === 1 ? 'caixa' : 'caixas'} de {sizeText(boxSize)} por semana · entrega {deliveryFee === 0 ? 'inclusa' : `${formatBRL(deliveryFee)}/semana`}
           </p>
           <div style={{ marginTop: '0.7rem', paddingTop: '0.7rem', borderTop: '1px solid #efe4c8' }}>
             <span style={{ display: 'block', fontSize: '0.75rem', color: '#594a42', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total por mês</span>
             <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.45rem', color: 'var(--color-primary)', whiteSpace: 'nowrap' }}>{formatBRL(total)}</span>
           </div>
           <p style={{ margin: '0.3rem 0 0', fontSize: '0.75rem', color: '#7a6a61' }}>
-            {formatBRL(plan.price_per_box)} por caixa{plan.commitment_months > 1 && ` · ${plan.commitment_months} meses`}
+            {formatBRL(perBox)} por caixa{plan.commitment_months > 1 && ` · ${plan.commitment_months} meses`}
           </p>
         </RailCard>
       )}
@@ -311,12 +330,28 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
                 }}
               >
                 <div style={{ fontWeight: 700, color: 'var(--color-primary)' }}>{p.name}</div>
-                <div style={{ fontSize: '0.85rem', color: '#7a6a61' }}>{formatBRL(p.monthly_price)}/mês</div>
+                <div style={{ fontSize: '0.85rem', color: '#7a6a61' }}>{formatBRL(perBoxFor(p) * 4)}/mês</div>
               </button>
             );
           })}
         </div>
       </div>
+
+      {/* Same three sizes as the one-off box, at this plan's price. */}
+      {plan && (
+        <div style={{ marginBottom: '1.75rem' }}>
+          <BoxSizePicker
+            value={boxSize}
+            onChange={setBoxSize}
+            priceOf={size => perBoxFor(plan, size)}
+            priceNote="por caixa"
+            title="Quantos doces em cada caixa?"
+          />
+          <p style={{ fontSize: '0.8rem', color: '#7a6a61', marginTop: '0.6rem' }}>
+            Quer mudar depois? Dá para aumentar ou diminuir a caixa a qualquer momento, é só avisar a Dolly.
+          </p>
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -451,8 +486,8 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
             display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#594a42', marginBottom: '0.4rem',
             flexWrap: 'wrap', gap: '0.25rem',
           }}>
-            <span>{boxesPerWeek} {boxesPerWeek === 1 ? 'caixa' : 'caixas'} por semana — plano {plan.name}</span>
-            <span>{formatBRL(plan.monthly_price * boxesPerWeek)}</span>
+            <span>{boxesPerWeek} {boxesPerWeek === 1 ? 'caixa' : 'caixas'} de {sizeText(boxSize)} por semana — plano {plan.name}</span>
+            <span>{formatBRL(boxesMonthly)}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#594a42' }}>
             <span>Entrega ({zone?.label.split(',')[0]})</span>
@@ -474,7 +509,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
             </span>
           </div>
           <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.6rem' }}>
-            Equivale a {formatBRL(plan.price_per_box)} por caixa
+            Equivale a {formatBRL(perBox)} por caixa
             {plan.commitment_months > 1 && ` · compromisso de ${plan.commitment_months} meses`}
           </p>
         </div>

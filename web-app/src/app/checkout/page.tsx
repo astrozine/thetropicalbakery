@@ -187,7 +187,7 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
         body: JSON.stringify({
-          items: items.map(i => ({ id: i.id, kind: i.kind ?? 'events', quantity: i.quantity, tasting_box_id: i.tasting_box_id })),
+          items: items.map(i => ({ id: i.id, kind: i.kind ?? 'events', quantity: i.quantity, tasting_box_id: i.tasting_box_id, box_size: i.box_size })),
           customer: { name: formData.name, email: formData.email, whatsapp: formData.whatsapp, address: formData.address },
           fulfillment: isPickup ? 'pickup' : 'delivery',
           zoneId,

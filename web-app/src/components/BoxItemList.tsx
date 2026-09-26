@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import type { BoxItem } from '@/lib/allergens';
 
 /**
  * A box description is typed as one run of text ("1. Tartelete… 2. Blissball… 3. …") or as lines.
@@ -69,10 +70,21 @@ function flavorEmojis(text: string): { emoji: string; label: string }[] {
 /**
  * The treats in a box, each on its own row with a glowing gold ✦ (the same star used across the site).
  * `dark` for the photo hero, `light` for white cards.
+ *
+ * When the box has its treats typed one by one in the admin (`items`), each row shows the treat's fun
+ * NAME in a little gold box, with its description (what it is made of) underneath. Boxes typed as one
+ * numbered paragraph still work: the paragraph is split into rows, without names.
  */
-export default function BoxItemList({ description, tone = 'dark' }: { description: string; tone?: 'dark' | 'light' }) {
-  const parsed = parseBoxItems(description);
+export default function BoxItemList({ description, items, tone = 'dark' }: { description: string; items?: BoxItem[] | null; tone?: 'dark' | 'light' }) {
+  const named = (items || []).filter(i => i.name?.trim());
   const dark = tone === 'dark';
+  // With named treats, the paragraph is only an intro. Skip it when it is just the old numbered list,
+  // or the "🍫 Name · 🥥 Name" line the admin writes when the intro is left empty.
+  const intro = description?.trim() || '';
+  const introShown = intro && !parseBoxItems(intro) && !named.some(i => intro.includes(i.name.trim())) ? intro : '';
+  const parsed = named.length > 0
+    ? { intro: introShown, items: named.map(i => i.description?.trim() || '') }
+    : parseBoxItems(description);
 
   if (!parsed) {
     return <p style={{ fontSize: '1.1rem', lineHeight: 1.7, color: dark ? 'rgba(253,250,243,0.9)' : '#594a42', margin: 0 }}>{description}</p>;
@@ -88,6 +100,14 @@ export default function BoxItemList({ description, tone = 'dark' }: { descriptio
         .bil li:hover { transform: translateX(4px); }
         .bil-star { flex-shrink: 0; width: 2.1rem; height: 2.1rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
           font-size: 1.15rem; line-height: 1; animation: bil-twinkle 3.2s ease-in-out infinite; animation-delay: calc(var(--i) * 0.45s); }
+        .bil-text { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; min-width: 0; }
+        .bil-name { display: inline-block; font-family: var(--font-heading); font-size: 1.02rem; line-height: 1.2; letter-spacing: 0.02em;
+          padding: 0.28rem 0.7rem 0.3rem; border-radius: 9px; transform: rotate(-1.2deg); max-width: 100%; overflow-wrap: anywhere; }
+        .bil li:nth-child(even) .bil-name { transform: rotate(1deg); }
+        .bil-dark .bil-name { background: linear-gradient(135deg, #f4d675, #d4af37); color: #3c2a21; box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35); }
+        .bil-light .bil-name { background: #3c2a21; color: #f4d675; box-shadow: 0 4px 12px rgba(60, 42, 33, 0.18); }
+        .bil-desc { font-size: 0.95rem; }
+        .bil-dark .bil-desc { color: rgba(253, 250, 243, 0.82); }
         .bil-flavors { display: flex; gap: 0.4rem; margin-top: 0.3rem; font-size: 1.2rem; line-height: 1.2; }
         .bil-dark .bil-intro { color: rgba(253, 250, 243, 0.9); }
         .bil-dark li { color: rgba(253, 250, 243, 0.96); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(244, 214, 117, 0.3); backdrop-filter: blur(6px); }
@@ -104,12 +124,14 @@ export default function BoxItemList({ description, tone = 'dark' }: { descriptio
       {parsed.intro && <p className="bil-intro">{parsed.intro}</p>}
       <ul>
         {parsed.items.map((item, i) => {
-          const flavors = flavorEmojis(item);
+          const name = named[i]?.name.trim();
+          const flavors = flavorEmojis(`${item} ${name ?? ''}`);
           return (
-            <li key={i} style={{ ['--i' as string]: i }}>
-              <span className="bil-star" aria-hidden>✦</span>
-              <span>
-                {item}
+            <li key={named[i]?.id ?? i} style={{ ['--i' as string]: i }}>
+              <span className="bil-star" aria-hidden>{named[i]?.emoji || '✦'}</span>
+              <span className={name ? 'bil-text' : undefined}>
+                {name && <span className="bil-name">{name}</span>}
+                {name ? item && <span className="bil-desc">{item}</span> : item}
                 {flavors.length > 0 && (
                   <span className="bil-flavors" aria-hidden>
                     {flavors.map(f => <span key={f.emoji} title={f.label}>{f.emoji}</span>)}

@@ -15,6 +15,8 @@ export interface CartItem {
   /** For boxes: which tasting_boxes row to decrement, and how many are left. */
   tasting_box_id?: string;
   max_quantity?: number;
+  /** For boxes: 2, 4 or 6 treats (the server prices it from this). Missing on older carts = 4. */
+  box_size?: number;
 }
 
 interface CartContextType {

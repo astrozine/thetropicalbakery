@@ -4,6 +4,7 @@ import { DELIVERY_ZONES, getZone } from '@/lib/deliveryZones';
 import { fetchSchedule, openDatesBetween, toISODate, parseISODate } from '@/lib/deliverySchedule';
 import { BoxWindowFields, inDeliveryWindow, saleState } from '@/lib/boxWindow';
 import { dietSummary } from '@/lib/dietary';
+import { fetchBoxSizePrices, isTreatCount, sizeText, toTreatCount, type TreatCount } from '@/lib/boxSizes';
 
 /**
  * Creates an order on the SERVER, pricing it from the database.
@@ -20,7 +21,7 @@ export class OrderError extends Error {
 }
 
 export interface OrderInput {
-  items: { id?: string; kind?: string; quantity?: number; tasting_box_id?: string }[];
+  items: { id?: string; kind?: string; quantity?: number; tasting_box_id?: string; box_size?: number }[];
   customer: { name?: string; email?: string; whatsapp?: string; address?: string };
   fulfillment?: string;
   zoneId?: string;
@@ -78,7 +79,8 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
   const rawItems = Array.isArray(input.items) ? input.items.slice(0, 40) : [];
   if (rawItems.length === 0) throw new OrderError(400, 'O carrinho está vazio.');
 
-  const boxWanted = new Map<string, number>();
+  const boxWanted = new Map<string, number>();   // box id -> boxes of every size together (the stock counts boxes)
+  const boxBySize = new Map<string, number>();   // `${box id}|${size}` -> boxes of that size
   const treatWanted = new Map<string, number>();
   for (const it of rawItems) {
     const qty = Number(it.quantity);
@@ -86,7 +88,10 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
     if (it.kind === 'box') {
       const id = String(it.tasting_box_id ?? '');
       if (!UUID.test(id)) throw new OrderError(400, 'Uma das caixas do carrinho não é válida.');
+      if (it.box_size != null && !isTreatCount(it.box_size)) throw new OrderError(400, 'Escolha uma caixa de 2, 4 ou 6 doces.');
+      const size = toTreatCount(it.box_size);
       boxWanted.set(id, (boxWanted.get(id) ?? 0) + qty);
+      boxBySize.set(`${id}|${size}`, (boxBySize.get(`${id}|${size}`) ?? 0) + qty);
     } else {
       const id = String(it.id ?? '');
       if (!UUID.test(id)) throw new OrderError(400, 'Um dos itens do carrinho não é válido.');
@@ -140,10 +145,17 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
       if (!inDeliveryWindow([date], row, selectable).length) throw new OrderError(409, 'Esse dia está fora das entregas desta edição. Escolha outro dia.');
       const left = row.total_quantity > 0 ? row.total_quantity - row.sold_quantity : Infinity;
       if (qty > left) throw new OrderError(409, `Restam só ${left} unidades de "${row.title}".`);
-      const unit = Number(row.price);
-      if (!(unit >= 0)) throw new OrderError(500, 'Preço da caixa inválido.');
+    }
+    // Every box is priced by its size (2, 4 or 6 treats) from the settings Dolly edits in /admin/caixas.
+    const { prices } = await fetchBoxSizePrices(db);
+    for (const [key, qty] of boxBySize) {
+      const [id, sizeStr] = key.split('|');
+      const row = boxRows.find(b => b.id === id)!;
+      const size = Number(sizeStr) as TreatCount;
+      const unit = Number(prices[size]);
+      if (!(unit > 0)) throw new OrderError(500, 'Preço da caixa inválido.');
       subtotal += unit * qty;
-      lines.push({ name: row.title, quantity: qty, unit });
+      lines.push({ name: `${row.title} (${sizeText(size)})`, quantity: qty, unit });
     }
   } else if (parseISODate(date) < addDays(today, 3)) {
     throw new OrderError(400, 'Encomendas do Menu de Eventos precisam de pelo menos 3 dias de antecedência.');

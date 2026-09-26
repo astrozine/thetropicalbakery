@@ -21,6 +21,8 @@ export interface Subscription {
   plan_id: string;
   status: SubscriptionStatus;
   boxes_per_week: number;
+  /** 2, 4 or 6 treats per box (migration 24; missing before it runs = 4). */
+  box_size?: number | null;
   full_name: string;
   whatsapp_number: string;
   email: string | null;

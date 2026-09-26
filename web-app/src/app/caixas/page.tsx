@@ -17,8 +17,10 @@ import { useBoxSale } from '@/lib/useBoxSale';
 import HeroBoxCard, { HeroBoxStrip, type HeroBoxPhoto } from '@/components/HeroBoxCard';
 import MobileBuyBar from '@/components/MobileBuyBar';
 import BoxesLeftBadge from '@/components/BoxesLeftBadge';
+import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
+import { TREAT_COUNTS } from '@/lib/boxSizes';
 
-// Real photos of earlier boxes, used whenever the database has too few of its own.
+// Real photos of earlier boxes, only for the "no box yet" notice (the hero shows the current box only).
 const FALLBACK_BOX_PHOTOS: HeroBoxPhoto[] = ['/box1.jpg', '/box2.jpg', '/box3.jpg', '/box4.jpg'].map(src => ({ src }));
 
 interface TastingBox extends BoxWindowFields {
@@ -31,6 +33,8 @@ interface TastingBox extends BoxWindowFields {
   sold_quantity: number;
   price: number;
   items?: BoxItem[] | null;
+  /** Extra photos of this box (migration 24). */
+  gallery?: string[] | null;
 }
 
 export default function CaixasPage() {
@@ -38,6 +42,7 @@ export default function CaixasPage() {
   const [loading, setLoading] = useState(true);
   const [pastPhotos, setPastPhotos] = useState<HeroBoxPhoto[]>([]);
   const sale = useBoxSale(activeBox);
+  const sizePrices = useBoxSizePrices();
 
   useEffect(() => {
     const fetchPastBoxes = async () => {
@@ -87,9 +92,12 @@ export default function CaixasPage() {
   // left the order form capped at zero, so a box that was on sale could not be bought.
   const limited = activeBox.total_quantity > 0;
   const remainingQuantity = limited ? Math.max(0, activeBox.total_quantity - activeBox.sold_quantity) : 999;
-  // Earlier boxes first, then the stock photos, never the box that is on sale now. Alternate them left/right.
-  const seen = new Set<string>([activeBox.image_url]);
-  const heroPhotos = [...pastPhotos, ...FALLBACK_BOX_PHOTOS].filter(p => !seen.has(p.src) && seen.add(p.src));
+  // Only photos of THIS box: its main photo, the extra photos, then each treat's own photo. Alternate them left/right.
+  const seen = new Set<string>();
+  const heroPhotos: HeroBoxPhoto[] = [
+    ...[activeBox.image_url, ...(Array.isArray(activeBox.gallery) ? activeBox.gallery : [])].map(src => ({ src })),
+    ...(activeBox.items || []).filter(i => i.image_url).map(i => ({ src: i.image_url, caption: i.name })),
+  ].filter(p => p.src && !seen.has(p.src) && seen.add(p.src));
   const leftPhotos = heroPhotos.filter((_, i) => i % 2 === 0).slice(0, 4);
   const rightPhotos = heroPhotos.filter((_, i) => i % 2 === 1).slice(0, 4);
 
@@ -116,12 +124,12 @@ export default function CaixasPage() {
           }}
         />
         
-        <HeroBoxCard side="left" photos={leftPhotos} />
-        <HeroBoxCard side="right" photos={rightPhotos} delayMs={2750} />
+        <HeroBoxCard side="left" photos={leftPhotos} tag="Nesta caixa" />
+        <HeroBoxCard side="right" photos={rightPhotos} delayMs={2750} tag="Nesta caixa" />
         {limited && sale?.state === 'open' && <BoxesLeftBadge remaining={remainingQuantity} />}
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
-          <HeroBoxStrip photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} />
+          <HeroBoxStrip photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} tag="Nesta caixa" />
           <ScrollReveal>
             <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.5rem' }}>
               Edição Limitada • {sale?.rolledOver ? `entregas ${sale.windowLabel}` : formatBatchDate(activeBox.batch_date_label)}
@@ -136,7 +144,7 @@ export default function CaixasPage() {
               })()}
             </h1>
             <div style={{ maxWidth: '680px', margin: '0 auto 2.5rem' }}>
-              <BoxItemList description={activeBox.description} tone="dark" />
+              <BoxItemList description={activeBox.description} items={activeBox.items} tone="dark" />
             </div>
 
             {/* Scarcity Counter. The count and the bar only mean something for a limited batch; the
@@ -193,7 +201,7 @@ export default function CaixasPage() {
       <section id="order" style={{ padding: '4rem 2rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <ScrollReveal>
-            <BoxOrder box={activeBox} maxQuantity={remainingQuantity} sale={sale} />
+            <BoxOrder box={activeBox} maxQuantity={remainingQuantity} sale={sale} prices={sizePrices} />
           </ScrollReveal>
         </div>
       </section>
@@ -232,8 +240,8 @@ export default function CaixasPage() {
 
       {/* Phones only: keeps the price and one tap to order under the thumb the whole way down. */}
       <MobileBuyBar
-        kicker={limited && remainingQuantity > 0 ? `Restam ${remainingQuantity}` : 'Caixa da semana'}
-        price={`R$ ${Math.round(activeBox.price)}`}
+        kicker={`${limited && remainingQuantity > 0 ? `Restam ${remainingQuantity}` : 'Caixa da semana'} · a partir de`}
+        price={`R$ ${Math.round(Math.min(...TREAT_COUNTS.map(n => sizePrices[n])))}`}
         note={sale?.rolledOver ? `entregas ${sale.windowLabel}` : activeBox.batch_date_label ? formatBatchDate(activeBox.batch_date_label) : undefined}
         label="Pedir"
         targetId="#order"

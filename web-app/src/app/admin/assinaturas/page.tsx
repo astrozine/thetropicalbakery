@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Subscription, SubscriptionStatus, STATUS_LABELS, DIETARY_FIELDS } from '@/lib/subscriptions';
+import { Subscription, SubscriptionPlan, SubscriptionStatus, STATUS_LABELS, DIETARY_FIELDS } from '@/lib/subscriptions';
+import { TREAT_COUNTS, TreatCount, planBoxPrice, toTreatCount } from '@/lib/boxSizes';
+import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
 import { getZone, formatBRL } from '@/lib/deliveryZones';
 
 interface DeliveryRow {
@@ -49,6 +51,8 @@ const card: React.CSSProperties = {
 export default function SubscriptionsAdmin() {
   const [tab, setTab] = useState<'subscribers' | 'roster'>('subscribers');
   const [subs, setSubs] = useState<Subscription[]>([]);
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const sizePrices = useBoxSizePrices();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -73,6 +77,27 @@ export default function SubscriptionsAdmin() {
     }
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    supabase.from('subscription_plans').select('*').then(({ data }) => setPlans((data || []) as SubscriptionPlan[]));
+  }, []);
+
+  /** Bigger or smaller box: the monthly price follows (plan discount on the new size, same sum as create_subscription). */
+  const changeSize = async (s: Subscription, size: TreatCount) => {
+    const plan = plans.find(p => p.id === s.plan_id);
+    const base = Math.max(0, ...plans.filter(p => p.is_active).map(p => Number(p.price_per_box) || 0));
+    const patch: Record<string, unknown> = { box_size: size, updated_at: new Date().toISOString() };
+    if (plan) patch.monthly_price = planBoxPrice(Number(plan.price_per_box), base, sizePrices[size]) * 4 * (s.boxes_per_week || 1);
+    const { error: err } = await supabase.from('subscriptions').update(patch).eq('id', s.id);
+    if (err) {
+      console.error(err);
+      setError(/box_size/.test(err.message)
+        ? 'Para mudar o tamanho da caixa, rode a migration_24_box_sizes_and_names.sql no Supabase primeiro.'
+        : 'Não foi possível mudar o tamanho. Tente de novo.');
+      return;
+    }
+    loadSubs();
+  };
 
   const loadRoster = useCallback(async (date: string) => {
     setRosterLoading(true);
@@ -246,6 +271,13 @@ export default function SubscriptionsAdmin() {
                   <div style={{ flex: '1 1 210px' }}>
                     <div style={{ fontSize: '0.9rem', color: '#2c3e50', lineHeight: 1.9 }}>
                       <div><strong>{s.boxes_per_week}</strong> caixa(s)/semana</div>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        Caixa de
+                        <select value={toTreatCount(s.box_size)} onChange={e => changeSize(s, toTreatCount(e.target.value))}
+                          style={{ padding: '0.2rem 0.4rem', borderRadius: '6px', border: '1px solid #dfe4ea', fontWeight: 700 }}>
+                          {TREAT_COUNTS.map(n => <option key={n} value={n}>{n} doces</option>)}
+                        </select>
+                      </label>
                       <div>{formatBRL(Number(s.monthly_price || 0))}/mês</div>
                       <div style={{ color: '#7f8c8d' }}>Próxima: {formatDate(s.next_delivery_on)}</div>
                       {s.committed_until && <div style={{ color: '#7f8c8d', fontSize: '0.82rem' }}>Compromisso até {formatDate(s.committed_until)}</div>}

@@ -35,6 +35,11 @@ function MenuLink({ item, onChange }: { item: BoxItem; onChange: (i: BoxItem) =>
           style={{ width: '18px', height: '18px' }} />
         Também adicionar este doce ao Menu de Eventos
       </label>
+      {item.add_to_menu && !(item.menu_price && item.menu_price > 0) && (
+        <p style={{ fontSize: '0.8rem', color: '#8a5a00', margin: '0.6rem 0 0', lineHeight: 1.5 }}>
+          Sem preço, ele entra no Menu de Eventos <strong>escondido</strong> (&quot;Fora do menu&quot;). Coloque o preço aqui ou lá para ele aparecer.
+        </p>
+      )}
       {item.add_to_menu && (
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
           <div style={{ flex: '1 1 120px' }}>
@@ -74,12 +79,13 @@ function ItemEditor({ item, onChange }: { item: BoxItem; onChange: (i: BoxItem) 
   return (
     <div style={{ display: 'grid', gap: '1.1rem', padding: '1.25rem', borderTop: '1px solid #eef1f4' }}>
       <div>
-        <label style={labelStyle}>Nome do doce</label>
-        <input type="text" value={item.name} onChange={e => onChange({ ...item, name: e.target.value })} placeholder="Ex: Tortinha de Maracujá com Cacau" style={fieldStyle} />
+        <label style={labelStyle}>Nome do doce ✨</label>
+        <input type="text" value={item.name} onChange={e => onChange({ ...item, name: e.target.value })} placeholder="Um apelido divertido. Ex: Sol de Abacaxi, Zebra Cítrica" style={fieldStyle} />
+        <p style={{ fontSize: '0.78rem', color: '#95a5a6', marginTop: '0.3rem' }}>Aparece numa caixinha dourada no site, em cima da descrição.</p>
       </div>
       <EmojiField emoji={item.emoji} onChange={emoji => onChange({ ...item, emoji })} />
       <div>
-        <label style={labelStyle}>Descrição deste doce</label>
+        <label style={labelStyle}>Do que ele é feito (a frase embaixo do nome)</label>
         <textarea value={item.description} onChange={e => onChange({ ...item, description: e.target.value })} rows={3}
           placeholder="Conte como é: textura, sabor, o que ele tem de especial…" style={{ ...fieldStyle, resize: 'vertical' }} />
       </div>
@@ -164,7 +170,8 @@ export default function BoxItemsEditor({ items, onChange }: Props) {
     onChange(next);
   };
   const add = () => {
-    const item = newBoxItem();
+    // New treats also go to the Menu de Eventos by default (hidden there until they have a price).
+    const item: BoxItem = { ...newBoxItem(), add_to_menu: true, menu_price: 0, menu_min_batch: 10, menu_batch_multiplier: 10 };
     onChange([...items, item]);
     setOpen(item.id);
   };

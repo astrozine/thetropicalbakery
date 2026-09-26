@@ -14,6 +14,8 @@ import { SubscriptionPlan, monthlySavings } from '@/lib/subscriptions';
 import { formatBRL } from '@/lib/deliveryZones';
 import WhatsAppGate from '@/components/WhatsAppGate';
 import { OriginSeal } from '@/components/BelgiumBrazil';
+import { planBoxPrice } from '@/lib/boxSizes';
+import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
 
 /** The single-box price we compare plans against. */
 const BASE_BOX_PRICE = 99;
@@ -37,7 +39,7 @@ const HOW_IT_WORKS = [
 ];
 
 const INSIDE_THE_BOX = [
-  'De 5 a 7 doces autorais, diferentes a cada semana',
+  'Caixa de 2, 4 ou 6 doces autorais (você escolhe), diferentes a cada semana',
   'Sempre veganos, sem glúten e sem açúcar refinado',
   'Um cartão escrito à mão contando o que é cada doce',
   'Ingredientes locais de Ubatuba quando a estação permite',
@@ -95,6 +97,10 @@ export default function SubscriptionPage() {
   const [selectedPlanId, setSelectedPlanId] = useState('');
   const [loading, setLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const sizePrices = useBoxSizePrices();
+  // A plan's price for the 2- and 6-treat box: the plan's usual discount on that size (same sum as the form and the database).
+  const basePerBox = Math.max(0, ...plans.map(p => Number(p.price_per_box) || 0));
+  const sizePrice = (plan: SubscriptionPlan, size: 2 | 4 | 6) => planBoxPrice(Number(plan.price_per_box), basePerBox, sizePrices[size]);
 
   useEffect(() => {
     const load = async () => {
@@ -377,8 +383,11 @@ export default function SubscriptionPage() {
                       <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.95rem', opacity: 0.7, alignSelf: 'flex-end', marginLeft: '0.3rem' }}>/mês</span>
                     </div>
                     <p style={{ fontSize: '0.85rem', opacity: 0.75, marginBottom: savings > 0 ? '0.6rem' : '1.75rem' }}>
-                      {formatBRL(plan.price_per_box)} por caixa
+                      {formatBRL(plan.price_per_box)} por caixa de 4 doces
                       {plan.commitment_months > 1 && ` · ${plan.commitment_months} meses`}
+                      <span style={{ display: 'block', marginTop: '0.2rem' }}>
+                        ou 2 doces por {formatBRL(sizePrice(plan, 2))} · 6 por {formatBRL(sizePrice(plan, 6))}
+                      </span>
                     </p>
                     {savings > 0 && (
                       <p style={{
@@ -540,7 +549,7 @@ export default function SubscriptionPage() {
       {plans.length > 0 && (
         <MobileBuyBar
           kicker="Assinatura · a partir de"
-          price={formatBRL(Math.min(...plans.map(p => p.price_per_box)))}
+          price={formatBRL(Math.min(...plans.map(p => sizePrice(p, 2))))}
           note="por caixa"
           label="Ver planos"
           targetId="#planos"

@@ -5,10 +5,13 @@ import Link from 'next/link';
 import ZoomableImage from '@/components/ZoomableImage';
 import SquiggleCta from '@/components/SquiggleCta';
 import BoxItemList from '@/components/BoxItemList';
+import type { BoxItem } from '@/lib/allergens';
 
 interface FeaturedBoxCardProps {
   title: string;
   description: string;
+  /** The treats typed one by one in the admin (with their names), when there are any. */
+  items?: BoxItem[] | null;
   imageUrl: string;
   /** Already formatted for reading, e.g. "23 de setembro". */
   dateLabel: string;
@@ -19,7 +22,7 @@ interface FeaturedBoxCardProps {
  * edge (cover, no bars): side by side with the text on a wide screen, stacked at its
  * own proportions on a phone. Tap the photo to see it full size.
  */
-export default function FeaturedBoxCard({ title, description, imageUrl, dateLabel }: FeaturedBoxCardProps) {
+export default function FeaturedBoxCard({ title, description, items, imageUrl, dateLabel }: FeaturedBoxCardProps) {
   // "Chegada da Primavera: Sensações Amarelas" -> the part after the colon is the theme; give it its own colour and size.
   const colon = title.indexOf(':');
   const lead = colon > 0 ? title.slice(0, colon + 1) : title;
@@ -56,7 +59,7 @@ export default function FeaturedBoxCard({ title, description, imageUrl, dateLabe
             {lead}
             {theme && <span className="fbc-theme">{theme}</span>}
           </h2>
-          <BoxItemList description={description} tone="light" />
+          <BoxItemList description={description} items={items} tone="light" />
         </div>
       </div>
 

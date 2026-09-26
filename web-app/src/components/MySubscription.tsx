@@ -173,6 +173,7 @@ export default function MySubscription() {
         {/* Plan facts */}
         <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '1.5rem', fontSize: '0.9rem', color: '#594a42' }}>
           <div><strong style={{ color: '#3c2a21' }}>{sub.boxes_per_week}x</strong> por semana</div>
+          <div>caixa de <strong style={{ color: '#3c2a21' }}>{sub.box_size || 4} doces</strong></div>
           <div><strong style={{ color: '#3c2a21' }}>{formatBRL(sub.monthly_price || 0)}</strong>/mês</div>
           {activeDietary.length > 0 && (
             <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
@@ -192,6 +193,9 @@ export default function MySubscription() {
           </a>
           <a href={`https://wa.me/5511932119196?text=${whatsappMessage('pausar minha assinatura')}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}>
             Pausar assinatura
+          </a>
+          <a href={`https://wa.me/5511932119196?text=${whatsappMessage(`mudar o tamanho da minha caixa (hoje ela tem ${sub.box_size || 4} doces; pode ser de 2, 4 ou 6)`)}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}>
+            Mudar tamanho da caixa
           </a>
           <a href={`https://wa.me/5511932119196?text=${whatsappMessage('falar sobre minha assinatura')}`} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}>
             Falar com a Dolly

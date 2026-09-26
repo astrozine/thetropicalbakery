@@ -11,12 +11,16 @@ import { optimizedSrc } from '@/lib/thumbs';
 import Link from 'next/link';
 import WaitlistCapture from '@/components/WaitlistCapture';
 import { BoxWindowFields, SaleState, longDay } from '@/lib/boxWindow';
+import BoxSizePicker from '@/components/BoxSizePicker';
+import { BoxSizePrices, DEFAULT_TREAT_COUNT, TreatCount, sizeText } from '@/lib/boxSizes';
 
 interface BoxOrderProps {
   box: { id: string; title: string; image_url: string; price: number } & Partial<BoxWindowFields>;
   maxQuantity: number;
   /** Whether the box can be ordered today (ordering window + stock). Null while loading. */
   sale?: { state: SaleState; opensOn: string | null } | null;
+  /** Price of the 2 / 4 / 6-treat box (from site_settings). The server charges the same. */
+  prices: BoxSizePrices;
 }
 
 const DATE_KEY = 'checkout_delivery_date';
@@ -26,10 +30,12 @@ const DATE_KEY = 'checkout_delivery_date';
  * two-step Pix checkout as every other purchase. Name, address, region and
  * dietary restrictions are collected there, once.
  */
-export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
+export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderProps) {
   const router = useRouter();
   const { addToCart, removeFromCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [size, setSize] = useState<TreatCount>(DEFAULT_TREAT_COUNT);
+  const unit = prices[size];
   const [date, setDate] = useState('');
   const [error, setError] = useState('');
 
@@ -56,16 +62,18 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
       setError('Escolha o dia em que você quer receber sua caixa no calendário.');
       return;
     }
-    const id = `box-${box.id}`;
+    const id = `box-${box.id}-${size}`;
     removeFromCart(id); // re-adding sets the exact quantity instead of stacking on an older order
+    removeFromCart(`box-${box.id}`); // a cart from before the sizes existed
     addToCart({
       id,
-      name: box.title,
-      price: box.price.toFixed(2).replace('.', ','),
+      name: `${box.title} (${sizeText(size)})`,
+      price: unit.toFixed(2).replace('.', ','),
       image: box.image_url,
       kind: 'box',
       tasting_box_id: box.id,
       max_quantity: maxQuantity,
+      box_size: size,
     }, { open: false, quantity });
     router.push('/checkout');
   };
@@ -83,7 +91,7 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
         {/* On phones the badge sits INSIDE the photo: hanging 10px past its edge made the whole page 2px wider than the screen. */}
         <style dangerouslySetInnerHTML={{ __html: '.box-price-badge{top:-10px;right:-10px}@media (max-width:767px){.box-price-badge{top:8px;right:8px}}' }} />
         <div className="box-price-badge" style={{ position: 'absolute', background: '#d4af37', color: '#fff', borderRadius: '50%', fontWeight: 'bold', fontSize: '1.1rem', width: '68px', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(212,175,55,0.4)', transform: 'rotate(15deg)' }}>
-          R${Math.round(box.price)}
+          R${Math.round(unit)}
         </div>
       </div>
 
@@ -122,8 +130,10 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
         <DeliveryCalendar value={date} onChange={pickDate} title="Escolha o dia da sua caixa" window={{ from: box.delivery_from, until: box.delivery_until }} />
         </TreatFlank>
 
+        <BoxSizePicker value={size} onChange={setSize} priceOf={s => prices[s]} />
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#3c2a21', background: '#fdf7ee', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7', flexWrap: 'wrap' }}>
-          <label style={{ fontSize: '1.1rem', fontWeight: 600, flex: 1, minWidth: '120px' }}>Quantidade:</label>
+          <label style={{ fontSize: '1.1rem', fontWeight: 600, flex: 1, minWidth: '120px' }}>Quantas caixas:</label>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <button type="button" onClick={() => changeQuantity(-1)} aria-label="Menos" style={{ width: '40px', height: '40px', borderRadius: '20px', border: 'none', background: '#fff', color: '#3c2a21', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 4px 10px rgba(0,0,0,0.08)' }}>-</button>
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold', width: '25px', textAlign: 'center' }}>{quantity}</span>
@@ -132,8 +142,8 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
         </div>
 
         <div style={{ fontSize: 'clamp(1.1rem, 3vw, 1.3rem)', color: '#3c2a21', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.5rem' }}>
-          <span>{quantity}x {formatBRL(box.price)}</span>
-          <strong>{formatBRL(quantity * box.price)}</strong>
+          <span>{quantity}x {sizeText(size)} · {formatBRL(unit)}</span>
+          <strong>{formatBRL(quantity * unit)}</strong>
         </div>
         <p style={{ fontSize: '0.8rem', color: '#7a6a61', marginTop: '-0.75rem', padding: '0 0.5rem' }}>
           + taxa de entrega conforme a região (Itamambuca é grátis), calculada no próximo passo.

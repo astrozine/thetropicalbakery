@@ -7,7 +7,9 @@ import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
 import ToggleSwitch from '@/components/ToggleSwitch';
 import BoxItemsEditor from '@/components/BoxItemsEditor';
-import { BoxItem } from '@/lib/allergens';
+import { BoxItem, newBoxItem } from '@/lib/allergens';
+import { parseBoxItems } from '@/components/BoxItemList';
+import { BoxSizePrices, DEFAULT_BOX_PRICES, SIZE_KEYS, TREAT_COUNTS, fetchBoxSizePrices } from '@/lib/boxSizes';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { pushTreatDetails } from '@/lib/treatSync';
 import { BoxWindowFields, SaleState, deliveryWindowLabel, longDay, saleState } from '@/lib/boxWindow';
@@ -25,6 +27,7 @@ interface TastingBox extends BoxWindowFields {
   price: number;
   is_active: boolean;
   items?: BoxItem[] | null;
+  gallery?: string[] | null;
 }
 
 const WINDOW_KEYS = ['delivery_from', 'delivery_until', 'orders_open_from', 'orders_close_on'] as const;
@@ -58,6 +61,13 @@ export default function AdminCaixas() {
   const [isActive, setIsActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [items, setItems] = useState<BoxItem[]>([]);
+  /** Extra photos of this box for the /caixas hero (migration 24). */
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  /** Prices of the 2 / 4 / 6-treat box: one set for every box and for the subscription (migration 24). */
+  const [sizePrices, setSizePrices] = useState<BoxSizePrices>(DEFAULT_BOX_PRICES);
+  const [sizePricesInDb, setSizePricesInDb] = useState(true);
+  const [sizeSaving, setSizeSaving] = useState('');
   // Delivery window (customers pick a day inside it) and ordering window (migration 21).
   const [deliveryFrom, setDeliveryFrom] = useState('');
   const [deliveryUntil, setDeliveryUntil] = useState('');
@@ -71,7 +81,56 @@ export default function AdminCaixas() {
     fetchBoxes();
     supabase.from('site_settings').select('value').eq('key', 'delivery_lead_days').maybeSingle()
       .then(({ data }) => { if (data) setLeadDays(Number(data.value) || 0); });
+    fetchBoxSizePrices(supabase).then(r => { setSizePrices(r.prices); setSizePricesInDb(r.fromDb); });
   }, []);
+
+  const saveSizePrices = async () => {
+    setSizeSaving('Salvando…');
+    for (const size of TREAT_COUNTS) {
+      const value = Number(sizePrices[size]);
+      if (!(value > 0)) { setSizeSaving(''); brandAlert(`Informe o preço da caixa de ${size} doces.`); return; }
+      const { data, error } = await supabase.from('site_settings')
+        .update({ value, updated_at: new Date().toISOString() }).eq('key', SIZE_KEYS[size]).select('key');
+      if (error || !data?.length) {
+        setSizeSaving('');
+        setSizePricesInDb(false);
+        brandAlert('Não foi possível salvar os preços. Rode a migration_24_box_sizes_and_names.sql no Supabase primeiro.');
+        return;
+      }
+    }
+    setSizePricesInDb(true);
+    setSizeSaving('Preços salvos ✓');
+    setTimeout(() => setSizeSaving(''), 2500);
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const files = Array.from(input.files || []);
+    if (files.length === 0) return;
+    setGalleryUploading(true);
+    try {
+      const urls: string[] = [];
+      for (const f of files) urls.push(await uploadPublicImage(f, 'boxes'));
+      setGallery(g => [...g, ...urls]);
+    } catch (error) {
+      brandAlert('Não foi possível enviar uma das fotos. Tente novamente.');
+      console.error(error);
+    } finally {
+      setGalleryUploading(false);
+      input.value = '';
+    }
+  };
+
+  /** The box was typed as one numbered paragraph: turn each line into a treat, so each can get its name. */
+  const listInDescription = items.length === 0 ? parseBoxItems(description) : null;
+  const importFromDescription = () => {
+    if (!listInDescription) return;
+    setItems(listInDescription.items.map(line => ({
+      ...newBoxItem(), description: line,
+      add_to_menu: true, menu_price: 0, menu_min_batch: 10, menu_batch_multiplier: 10,
+    })));
+    setDescription(listInDescription.intro);
+  };
 
   const fetchBoxes = async () => {
     setLoading(true);
@@ -109,6 +168,7 @@ export default function AdminCaixas() {
     setPrice(99);
     setIsActive(false);
     setItems([]);
+    setGallery([]);
     setDeliveryFrom('');
     setDeliveryUntil('');
     setOrdersOpen('');
@@ -126,6 +186,7 @@ export default function AdminCaixas() {
     setPrice(box.price);
     setIsActive(box.is_active);
     setItems(box.items || []);
+    setGallery(Array.isArray(box.gallery) ? box.gallery : []);
     setDeliveryFrom(box.delivery_from || '');
     setDeliveryUntil(box.delivery_until || '');
     setOrdersOpen(box.orders_open_from || '');
@@ -143,23 +204,24 @@ export default function AdminCaixas() {
       deliveryFrom && deliveryUntil && deliveryUntil < deliveryFrom ? 'O último dia de entrega vem antes do primeiro.'
       : '';
     if (windowProblem) { brandAlert(windowProblem); return; }
+    const unnamed = items.findIndex(i => !i.name.trim() && (i.description.trim() || i.image_url || i.ingredients.length));
+    if (unnamed >= 0) { brandAlert(`O doce ${unnamed + 1} ainda não tem nome. Dê um nome divertido a ele (aparece numa caixinha no site).`); return; }
     setSaving(true);
+    const hiddenInMenu: string[] = [];
 
     // 1. Treats ticked "also add to the Menu de Eventos" are created there first, so the box can point at them.
     const cleanItems: BoxItem[] = [];
     for (const it of items.filter(i => i.name.trim())) {
       let treatId = it.treat_id || null;
       if (it.add_to_menu && !treatId) {
-        if (!it.menu_price || it.menu_price <= 0) {
-          brandAlert(`Informe o preço unitário de "${it.name}" para adicioná-lo ao Menu de Eventos.`);
-          setSaving(false);
-          return;
-        }
+        // No price yet: it still goes to the Menu de Eventos, hidden until Dolly prices it there.
+        const priced = !!it.menu_price && it.menu_price > 0;
+        if (!priced) hiddenInMenu.push(it.name);
         const { data, error } = await supabase.from('treats').insert([{
           name: it.name, description: it.description, image_url: it.image_url, emoji: it.emoji,
           ingredients: it.ingredients, contains: it.contains, may_contain: it.may_contain,
-          price: it.menu_price, min_batch_size: it.menu_min_batch || 1, batch_multiplier: it.menu_batch_multiplier || 1,
-          is_available: true,
+          price: priced ? it.menu_price : 0, min_batch_size: it.menu_min_batch || 1, batch_multiplier: it.menu_batch_multiplier || 1,
+          is_available: priced,
         }]).select('id').single();
         if (error || !data) {
           brandAlert(`Erro ao adicionar "${it.name}" ao Menu de Eventos: ${error?.message ?? ''}${hint(error?.message ?? '')}`);
@@ -184,11 +246,13 @@ export default function AdminCaixas() {
       // The treats build the description; the paragraph is just an optional intro.
       description: description.trim() || cleanItems.map(i => `${i.emoji} ${i.name}`).join(' · '),
       items: cleanItems,
+      gallery,
       image_url: imageUrl,
       batch_date_label: batchDateLabel,
       total_quantity: totalQuantity,
       sold_quantity: soldQuantity,
-      price,
+      // The 4-treat price, kept on the box for anything that still reads one price.
+      price: sizePrices[4] || price,
       is_active: isActive,
       delivery_from: deliveryFrom || null,
       delivery_until: deliveryUntil || null,
@@ -200,6 +264,13 @@ export default function AdminCaixas() {
       ? supabase.from('tasting_boxes').update(body).eq('id', editingId)
       : supabase.from('tasting_boxes').insert([body]);
     let { error } = await save(payload);
+    if (error && /gallery/.test(error.message)) {
+      // Migration 24 not run yet: save without the extra photos.
+      const rest: Record<string, unknown> = { ...payload };
+      delete rest.gallery;
+      ({ error } = await save(rest));
+      if (!error && gallery.length) brandAlert('Caixa salva, mas sem as fotos extras. Rode a migration_24_box_sizes_and_names.sql no Supabase e salve de novo.');
+    }
     if (error && /delivery_from|delivery_until|orders_open_from|orders_close_on/.test(error.message)) {
       // Migration 21 not run yet: save everything else, and say what's missing.
       const rest: Record<string, unknown> = { ...payload };
@@ -224,6 +295,10 @@ export default function AdminCaixas() {
     }
 
     setSaving(false);
+    if (hiddenInMenu.length) {
+      const one = hiddenInMenu.length === 1;
+      brandAlert(`${hiddenInMenu.map(n => `"${n}"`).join(', ')} ${one ? 'entrou' : 'entraram'} no Menu de Eventos ${one ? 'escondido' : 'escondidos'}, porque ainda não ${one ? 'tem' : 'têm'} preço. Coloque o preço em Menu de Eventos para ${one ? 'ele aparecer' : 'eles aparecerem'}.`);
+    }
     setAnnounce(isActive ? { title, treats: cleanItems.map(i => `${i.emoji} ${i.name}`).join('\n'), quantity: totalQuantity } : null);
     resetForm();
     fetchBoxes();
@@ -296,10 +371,6 @@ export default function AdminCaixas() {
                 <input type="date" required min="2020-01-01" max="2100-12-31" value={batchDateLabel} onChange={e => setBatchDateLabel(e.target.value)} style={input} />
               </div>
               <div>
-                <label style={label}>Preço (R$)</label>
-                <input type="number" step="0.01" required value={price} onChange={e => setPrice(Number(e.target.value))} style={input} />
-              </div>
-              <div>
                 <label style={label}>Qtd. Total Produzida</label>
                 <input type="number" required value={totalQuantity} onChange={e => setTotalQuantity(Number(e.target.value))} style={input} />
               </div>
@@ -311,12 +382,60 @@ export default function AdminCaixas() {
 
             <p style={{ fontSize: '0.8rem', color: '#7f8c8d' }}>
               A quantidade vendida é calculada automaticamente pelos pedidos. Edite manualmente apenas se houver cancelamentos ou vendas externas.
+              Cada caixa conta como uma, seja de 2, 4 ou 6 doces.
             </p>
+            </div>
+
+            <div style={{ ...card, display: 'grid', gap: '1rem', background: '#fffdf6', border: '1px solid #f0e2bf' }}>
+              <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>🎁 Tamanhos e preços</h3>
+              <p style={{ fontSize: '0.85rem', color: '#7f8c8d', lineHeight: 1.6, margin: 0 }}>
+                O cliente escolhe uma caixa de 2, 4 ou 6 doces. Estes preços valem para <strong>todas as caixas</strong> e para a
+                <strong> assinatura</strong> (cada plano dá o mesmo desconto de sempre em cada tamanho).
+              </p>
+              <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+                {TREAT_COUNTS.map(size => (
+                  <label key={size} style={{ fontSize: '0.85rem', fontWeight: 700 }}>{size} doces (R$)
+                    <input type="number" step="0.01" min="1" value={sizePrices[size] || ''} onChange={e => setSizePrices(p => ({ ...p, [size]: Number(e.target.value) }))} style={{ ...input, marginTop: '0.3rem' }} />
+                  </label>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <button type="button" onClick={saveSizePrices} style={{ background: '#2c3e50', color: 'white', padding: '0.6rem 1.2rem', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  Salvar preços
+                </button>
+                {sizeSaving && <span style={{ color: '#1e6b3c', fontSize: '0.88rem', fontWeight: 700 }}>{sizeSaving}</span>}
+              </div>
+              {!sizePricesInDb && (
+                <p style={{ fontSize: '0.82rem', color: '#8a5a00', margin: 0 }}>
+                  Estes são os preços padrão. Para poder mudá-los aqui, rode a migration_24_box_sizes_and_names.sql no Supabase.
+                </p>
+              )}
             </div>
 
             <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>🖼️ Imagem e visibilidade</h3>
             <ImagePicker label="Imagem da Caixa" imageUrl={imageUrl} uploading={uploading} onChange={handleImageUpload} />
+
+            <div>
+              <label style={label}>Mais fotos desta caixa</label>
+              <p style={{ fontSize: '0.8rem', color: '#7f8c8d', margin: '0 0 0.6rem' }}>
+                Aparecem nos cartões de foto do topo da página /caixas, junto com a foto principal e as fotos de cada doce. Só fotos desta edição.
+              </p>
+              {gallery.length > 0 && (
+                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.7rem' }}>
+                  {gallery.map(src => (
+                    <div key={src} style={{ position: 'relative' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={src} alt="" style={{ width: '84px', height: '84px', objectFit: 'cover', borderRadius: '8px', display: 'block' }} />
+                      <button type="button" aria-label="Remover foto" onClick={() => setGallery(g => g.filter(x => x !== src))}
+                        style={{ position: 'absolute', top: '-8px', right: '-8px', width: '26px', height: '26px', borderRadius: '50%', border: 'none', background: '#e74c3c', color: '#fff', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} disabled={galleryUploading} />
+              {galleryUploading && <span style={{ marginLeft: '0.5rem', fontSize: '0.85rem', color: '#7f8c8d' }}>Enviando…</span>}
+            </div>
 
             <ToggleSwitch
               checked={isActive}
@@ -374,7 +493,18 @@ export default function AdminCaixas() {
               Um doce de cada vez: nome, descrição, foto, ingredientes e alérgenos. Você também pode repetir doces do Menu de Eventos
               ou mandar um doce novo para lá. O site monta tudo numa lista que abre e fecha.
             </p>
-            <BoxItemsEditor items={items} onChange={setItems} />
+            {listInDescription && (
+              <div style={{ background: '#fff8e6', border: '1px solid #f0d09a', borderRadius: '10px', padding: '0.9rem 1rem', marginBottom: '1rem' }}>
+                <p style={{ margin: '0 0 0.6rem', color: '#8a5a00', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                  Os {listInDescription.items.length} doces desta caixa estão escritos como uma lista no texto de abertura. Separe a lista em
+                  doces e dê um <strong>nome divertido</strong> a cada um.
+                </p>
+                <button type="button" onClick={importFromDescription} style={{ background: '#d4af37', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.6rem 1.1rem', fontWeight: 'bold', cursor: 'pointer' }}>
+                  ✨ Separar a lista em {listInDescription.items.length} doces
+                </button>
+              </div>
+            )}
+            <BoxItemsEditor key={items.length === 0 ? 'empty' : 'filled'} items={items} onChange={setItems} />
           </div>
           </div>
         </div>

@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **24**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **25**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -91,6 +91,10 @@ Verified live, 2026-09-26:
   nothing back, `reserve_box_stock` / `release_box_stock` exist and answer "permission denied" to anyone but the server, and the
   content tables read publicly but refuse an anonymous write. `orders.status` and `orders.total_price` both default to NULL, so a
   lead that sets neither is accepted — a lead that sets either one is rejected outright.
+- **Migration 24 (box sizes, box gallery, subscription size) is NOT run yet** (written 2026-09-26). Until it runs the site uses the
+  built-in prices 59 / 99 / 129 from `src/lib/boxSizes.ts`, the admin cannot change them, box gallery photos are not saved, and a new
+  subscription's size goes into its customer message. Boxes come in 2, 4 or 6 treats everywhere; the server prices every box line
+  by `box_size` from `site_settings` (box_price_2/4/6), never from `tasting_boxes.price` any more.
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the

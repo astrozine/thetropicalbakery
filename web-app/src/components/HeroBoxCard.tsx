@@ -15,7 +15,7 @@ export interface HeroBoxPhoto {
  * prefers reduced motion). `side` picks where it sits on wide screens; on narrow
  * screens the page shows a strip instead, so this card is hidden there.
  */
-export default function HeroBoxCard({ photos, side, delayMs = 0 }: { photos: HeroBoxPhoto[]; side: 'left' | 'right'; delayMs?: number }) {
+export default function HeroBoxCard({ photos, side, delayMs = 0, tag = 'Edição anterior' }: { photos: HeroBoxPhoto[]; side: 'left' | 'right'; delayMs?: number; /** Small label on the card. */ tag?: string }) {
   const [index, setIndex] = useState(0);
   const count = photos.length;
 
@@ -33,20 +33,20 @@ export default function HeroBoxCard({ photos, side, delayMs = 0 }: { photos: Her
   const current = photos[index % count];
 
   return (
-    <figure className={`hero-box-card hero-box-card--${side}`} aria-label="Foto de uma caixa anterior">
+    <figure className={`hero-box-card hero-box-card--${side}`} aria-label={tag}>
       <div className="hero-box-card__frame">
         {photos.map((p, i) => (
           <img
             key={p.src}
             src={optimizedSrc(p.src, 750)}
-            alt={p.caption ? `Caixa anterior: ${p.caption}` : 'Caixa de degustação anterior'}
+            alt={p.caption ? `${tag}: ${p.caption}` : tag}
             loading="lazy"
             style={{ opacity: i === index % count ? 1 : 0 }}
           />
         ))}
       </div>
       <figcaption>
-        <span className="hero-box-card__tag">Edição anterior</span>
+        <span className="hero-box-card__tag">{tag}</span>
         {current.caption && <span className="hero-box-card__name">{current.caption}</span>}
       </figcaption>
 
@@ -75,14 +75,14 @@ export default function HeroBoxCard({ photos, side, delayMs = 0 }: { photos: Her
 }
 
 /** On screens too narrow for side cards: two smaller tilted photos in a row above the badge. */
-export function HeroBoxStrip({ photos }: { photos: HeroBoxPhoto[] }) {
+export function HeroBoxStrip({ photos, tag = 'Edição anterior' }: { photos: HeroBoxPhoto[]; tag?: string }) {
   const shown = photos.slice(0, 2);
   if (shown.length === 0) return null;
   return (
     <div className="hero-box-strip" aria-hidden={false}>
       {shown.map((p, i) => (
         <div key={p.src} className="hero-box-strip__item" style={{ transform: `rotate(${i === 0 ? -4 : 3.5}deg)`, marginTop: i === 0 ? 0 : '1.2rem' }}>
-          <img src={optimizedSrc(p.src, 384)} alt={p.caption ? `Caixa anterior: ${p.caption}` : 'Caixa de degustação anterior'} loading="lazy" decoding="async" />
+          <img src={optimizedSrc(p.src, 384)} alt={p.caption ? `${tag}: ${p.caption}` : tag} loading="lazy" decoding="async" />
         </div>
       ))}
       <style dangerouslySetInnerHTML={{ __html: `
