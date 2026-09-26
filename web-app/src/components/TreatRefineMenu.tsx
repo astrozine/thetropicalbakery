@@ -138,8 +138,9 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
     };
   }, [sheet]);
 
+  // One folder open at a time, so the panel never grows into a wall of chips.
   const toggleFolder = (id: string) =>
-    setOpenFolders(f => (f.includes(id) ? f.filter(x => x !== id) : [...f, id]));
+    setOpenFolders(f => (f.includes(id) ? [] : [id]));
 
   const toggle = (key: 'allergens' | 'ingredients' | 'status', id: string) =>
     onChange({ ...value, [key]: value[key].includes(id) ? value[key].filter(x => x !== id) : [...value[key], id] });
@@ -213,7 +214,8 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
             <span style={{ marginLeft: 'auto', background: '#d4af37', color: '#fff', borderRadius: '10px', padding: '0.05rem 0.55rem', fontSize: '0.75rem' }}>{selected}</span>
           )}
         </button>
-        {isOpen && <div style={{ padding: '0.25rem 1rem 1rem' }}>{children}</div>}
+        {/* Long lists (ingredients) scroll inside the folder; the sheet already scrolls as a whole. */}
+        {isOpen && <div style={{ padding: '0.25rem 1rem 1rem', ...(sheet ? {} : { maxHeight: '16rem', overflowY: 'auto' }) }}>{children}</div>}
       </div>
     );
   };

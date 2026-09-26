@@ -7,7 +7,7 @@ import { NEW_BOX_PATH, PINNED, buildGroups, type NavItem } from './adminNav';
 /**
  * The admin menu, grouped by what you're trying to do. Groups open on click (not hover: hover
  * misfires with a mouse and doesn't exist on a phone), the group holding the current page opens
- * itself, and what you leave open is remembered on this device.
+ * itself, only one is open at a time, and which one is remembered on this device.
  */
 
 const STORAGE_KEY = 'admin_nav_open_groups';
@@ -21,28 +21,31 @@ export default function AdminSidebarNav({ pathname, unreadCount, partnerCount = 
 
   const activeGroupId = groups.find(g => g.items.some(i => pathname === i.path))?.id;
 
-  // Restore what was open, then make sure the group holding the current page is open.
+  const remember = (next: Set<string>) => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next))); } catch { /* ignore */ }
+  };
+
+  // Only one group is open at a time, so the menu never outgrows the screen. Restore the one that
+  // was open, unless the current page lives in another group: that one wins.
   useEffect(() => {
     let saved: string[] = [];
     try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { /* ignore */ }
-    const next = new Set(saved);
-    if (activeGroupId) next.add(activeGroupId);
-    setOpen(next);
+    const first = activeGroupId || saved.find(id => groups.some(g => g.id === id));
+    setOpen(new Set(first ? [first] : []));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!activeGroupId) return;
-    setOpen(prev => (prev.has(activeGroupId) ? prev : new Set(prev).add(activeGroupId)));
+    setOpen(prev => (prev.size === 1 && prev.has(activeGroupId) ? prev : new Set([activeGroupId])));
   }, [activeGroupId]);
 
-  const toggle = (id: string) => {
-    setOpen(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next))); } catch { /* ignore */ }
-      return next;
-    });
+  const toggle = (id: string, header: HTMLElement | null) => {
+    const next = open.has(id) ? new Set<string>() : new Set([id]);
+    setOpen(next);
+    remember(next);
+    // The group that was open above shrinks as this one opens; keep the header under the cursor.
+    if (next.size && header) setTimeout(() => header.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 280);
   };
 
   const q = query.trim().toLowerCase();
@@ -113,7 +116,7 @@ export default function AdminSidebarNav({ pathname, unreadCount, partnerCount = 
           <div key={g.id} style={{ background: g.shade, borderLeft: `4px solid ${g.accent}`, marginTop: '2px' }}>
             <button
               type="button"
-              onClick={() => toggle(g.id)}
+              onClick={e => toggle(g.id, e.currentTarget)}
               aria-expanded={isOpen}
               aria-controls={panelId}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '0.95rem 1rem', background: 'none', border: 'none', cursor: 'pointer', color: '#fff', textAlign: 'left' }}
