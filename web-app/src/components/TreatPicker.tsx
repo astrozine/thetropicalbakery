@@ -8,6 +8,10 @@ export interface PickableTreat {
   id: string;
   name: string;
   image_url: string | null;
+  /** Only when the picker loaded them itself: what "order now" needs to fill the cart. */
+  price?: number;
+  min_batch_size?: number;
+  batch_multiplier?: number;
 }
 
 interface Props {
@@ -52,7 +56,7 @@ export default function TreatPicker({
 
   useEffect(() => {
     if (given) return;
-    supabase.from('treats').select('id, name, image_url').eq('is_available', true).order('name')
+    supabase.from('treats').select('id, name, image_url, price, min_batch_size, batch_multiplier').eq('is_available', true).order('name')
       .then(({ data }) => setLoaded((data as PickableTreat[]) || []));
   }, [given]);
 

@@ -4,9 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import ScrollReveal from '@/components/ScrollReveal';
 import MenuCard from '@/components/MenuCard';
-import TreatPicker from '@/components/TreatPicker';
+import TreatPicker, { type PickableTreat } from '@/components/TreatPicker';
 import SquiggleArrows from '@/components/SquiggleArrows';
-import EventLeadCapture from '@/components/EventLeadCapture';
+import EventOrderSheet, { EventQuoteForm } from '@/components/EventOrder';
+import { useCart } from '@/context/CartContext';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 
 interface Treat {
@@ -29,6 +30,10 @@ export default function MenuPage() {
   const [loading, setLoading] = useState(true);
   // Customers mostly arrive with an allergy in mind, so the panel starts on "Sem" (free of).
   const [refine, setRefine] = useState<RefineState>({ ...emptyRefine, mode: 'free' });
+  // The quick pick's button opens one sheet with both ways to order (see EventOrder.tsx).
+  const [sheetPicks, setSheetPicks] = useState<PickableTreat[] | null>(null);
+  const { items: cartItems } = useCart();
+  const cartNames = cartItems.filter(i => i.kind === 'events').map(i => i.name);
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -86,14 +91,10 @@ export default function MenuPage() {
               <TreatPicker
                 hero
                 title="Escolha rápida"
-                subtitle="Toque nos doces que você quer servir e peça o orçamento. Sem formulário."
+                subtitle="Toque nos doces que você quer servir. Depois é só escolher: pedir agora ou montar junto com a gente."
                 initial={8}
-                ctaLabel="Pedir orçamento"
-                onAction={chosen => {
-                  const list = chosen.map(t => `• ${t.name}`).join('\n');
-                  const text = `Olá Tropical Bakery! 🌴 Estou montando um evento e escolhi estes doces no site:\n\n${list}\n\nPodem me passar um orçamento?`;
-                  window.open(`https://wa.me/5511932119196?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
-                }}
+                ctaLabel="Continuar"
+                onAction={chosen => setSheetPicks(chosen)}
               />
             </div>
 
@@ -183,15 +184,25 @@ export default function MenuPage() {
         </p>
       </section>
 
-      {/* The two-step form comes last now: you browse, then you ask. */}
+      {/* Last stop for anyone who browsed the catalogue instead of tapping photos: the same "build it together" path. */}
       <section id="orcamento" style={{ padding: 'clamp(2.25rem, 6vw, 5rem) 1rem', background: '#fdfaf3' }}>
         <div style={{ position: 'relative', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
           <SquiggleArrows />
-          <div style={{ position: 'relative', zIndex: 11 }}>
-            <EventLeadCapture />
+          <div style={{ position: 'relative', zIndex: 11, background: 'rgba(253,250,243,0.96)', border: '1px solid rgba(212,175,55,0.45)', borderRadius: '22px', padding: 'clamp(1.25rem, 4vw, 2rem)', boxShadow: '0 12px 34px rgba(60,42,33,0.12)', color: '#3c2a21' }}>
+            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.4rem, 4.5vw, 1.9rem)', lineHeight: 1.15, marginBottom: '0.5rem', textAlign: 'center' }}>
+              Quer ajuda para montar o seu evento?
+            </h2>
+            <p style={{ color: '#594a42', lineHeight: 1.65, textAlign: 'center', fontSize: '0.98rem', marginBottom: '1.25rem' }}>
+              {cartNames.length > 0
+                ? `Você já separou ${cartNames.length} ${cartNames.length === 1 ? 'doce' : 'doces'} no carrinho. Pode finalizar por lá, ou deixar o seu contato que a Dolly monta o orçamento com você.`
+                : 'Deixe seu contato e a Dolly monta o orçamento com você. Se preferir pedir direto, é só adicionar os doces ao carrinho.'}
+            </p>
+            <EventQuoteForm picks={cartNames} withNote />
           </div>
         </div>
       </section>
+
+      {sheetPicks && <EventOrderSheet picks={sheetPicks} onClose={() => setSheetPicks(null)} />}
 
     </main>
   );
