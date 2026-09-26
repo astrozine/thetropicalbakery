@@ -16,6 +16,7 @@ import NoBoxNotice from '@/components/NoBoxNotice';
 import { useBoxSale } from '@/lib/useBoxSale';
 import HeroBoxCard, { HeroBoxStrip, type HeroBoxPhoto } from '@/components/HeroBoxCard';
 import MobileBuyBar from '@/components/MobileBuyBar';
+import BoxesLeftBadge from '@/components/BoxesLeftBadge';
 
 // Real photos of earlier boxes, used whenever the database has too few of its own.
 const FALLBACK_BOX_PHOTOS: HeroBoxPhoto[] = ['/box1.jpg', '/box2.jpg', '/box3.jpg', '/box4.jpg'].map(src => ({ src }));
@@ -113,6 +114,7 @@ export default function CaixasPage() {
         
         <HeroBoxCard side="left" photos={leftPhotos} />
         <HeroBoxCard side="right" photos={rightPhotos} delayMs={2750} />
+        {sale?.state === 'open' && <BoxesLeftBadge remaining={remainingQuantity} />}
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
           <HeroBoxStrip photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} />
