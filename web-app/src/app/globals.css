@@ -681,12 +681,23 @@ body {
   display: flex; align-items: center; justify-content: center; font-size: 1.7rem;
   background: linear-gradient(135deg, #fdf1d6, #fbe3a8);
 }
+/* The text column is a size container: the badge shrinks with the room it has (cqw) so it stays on ONE line
+   instead of wrapping into a two-row pill on a narrow phone. */
+.phil-text { flex: 1; min-width: 0; container-type: inline-size; }
 .phil-badge {
-  display: inline-block; margin-bottom: 0.3rem; padding: 0.15rem 0.6rem; border-radius: 999px;
-  background: #d4af37; color: #3c2a21; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  display: inline-block; max-width: 100%; white-space: nowrap; margin-bottom: 0.3rem; padding: 0.15rem 0.6rem; border-radius: 999px;
+  background: #d4af37; color: #3c2a21; font-size: min(0.75rem, 5.4cqw); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
 }
-.phil-title { display: block; font-family: var(--font-heading); font-size: clamp(1.05rem, 2.6vw, 1.25rem); line-height: 1.2; color: #3c2a21; }
-.phil-glance-text { display: block; margin-top: 0.3rem; font-size: 0.88rem; line-height: 1.45; color: #7a6a61; }
+.phil-title { display: block; font-family: var(--font-heading); font-size: clamp(1.05rem, 2.6vw, 1.25rem); line-height: 1.2; color: #3c2a21; text-wrap: balance; }
+.phil-glance-text { display: block; margin-top: 0.3rem; font-size: 0.88rem; line-height: 1.45; color: #7a6a61; text-wrap: pretty; }
+/* Narrow phones: give the text more of the card (smaller icon, plus button and gaps) and a touch smaller type. */
+@media (max-width: 480px) {
+  .phil-head { gap: 0.7rem; padding: 0.95rem 0.9rem; }
+  .phil-icon { width: 44px; height: 44px; font-size: 1.4rem; }
+  .phil-plus { width: 32px; height: 32px; font-size: 1.25rem; }
+  .phil-title { font-size: clamp(0.95rem, 4.4vw, 1.1rem); }
+  .phil-glance-text { font-size: 0.82rem; }
+}
 .phil-plus {
   flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center; font-size: 1.4rem; line-height: 1;
@@ -940,7 +951,7 @@ body {
 
   /* ---- 2. Text that was too small to read --------------------------------- */
   .hh-tag { font-size: 0.76rem; }
-  .phil-badge { font-size: 0.78rem; }
+  .phil-badge { font-size: min(0.78rem, 5.4cqw); }
   .crs-trick-label,
   .crs-course-eyebrow { font-size: 0.78rem; }
   .login-fineprint { font-size: 0.78rem !important; }

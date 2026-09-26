@@ -242,7 +242,7 @@ export default function PhilosophyShowcase({ featuredImage }: { featuredImage: s
                     onClick={() => setOpen(isOpen ? null : panel.id)}
                   >
                     <span aria-hidden className="phil-icon">{panel.emoji}</span>
-                    <span style={{ flex: 1, minWidth: 0 }}>
+                    <span className="phil-text">
                       <span className="phil-badge">{panel.badge}</span>
                       <span className="phil-title">{panel.title}</span>
                       <span className="phil-glance-text">{panel.glance}</span>
