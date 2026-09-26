@@ -23,7 +23,7 @@ export function Fold({ title, summary, chips, defaultOpen = false, children }: {
         <span aria-hidden style={{ display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none', color: '#a6832b', flexShrink: 0, lineHeight: 1.5 }}>▸</span>
         <span style={{ flex: 1, minWidth: 0 }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#2c3e50', lineHeight: 1.5 }}>{title}</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#2c3e50', lineHeight: 1.5 }}>{title}</span>
             {summary && <span style={{ marginLeft: 'auto', flexShrink: 0 }}>{summary}</span>}
           </span>
           {chips && <span style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.35rem' }}>{chips}</span>}
@@ -53,10 +53,10 @@ export function AllergenPicker({ title, hint, tone, selected, onToggle }: {
             <Fold
               key={g.id}
               title={g.label}
-              summary={picked.length === 0 ? <span style={{ fontSize: '0.74rem', color: '#b2bec3' }}>nenhum</span> : undefined}
+              summary={picked.length === 0 ? <span style={{ fontSize: '0.75rem', color: '#b2bec3' }}>nenhum</span> : undefined}
               chips={picked.length > 0
                 ? picked.map(a => (
-                    <span key={a.id} style={{ padding: '0.1rem 0.55rem', borderRadius: '20px', fontSize: '0.74rem', fontWeight: 700, background: on.bg, border: `1px solid ${on.border}`, color: on.color, whiteSpace: 'nowrap' }}>
+                    <span key={a.id} style={{ padding: '0.1rem 0.55rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, background: on.bg, border: `1px solid ${on.border}`, color: on.color, whiteSpace: 'nowrap' }}>
                       {a.emoji} {a.label}
                     </span>
                   ))

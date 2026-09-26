@@ -111,14 +111,14 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
           }
           .tb-buybar__price { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
           .tb-buybar__kicker {
-            font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+            font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
             color: #a6832b; font-weight: 800;
             max-height: 2em; overflow: hidden;
             transition: max-height .28s, opacity .28s, margin .28s;
           }
           .tb-buybar__price strong { font-family: var(--font-heading); font-size: 1.3rem; color: #3c2a21; white-space: nowrap; }
           .tb-buybar__note {
-            font-size: 0.72rem; color: #7a6a61; white-space: nowrap;
+            font-size: 0.75rem; color: #7a6a61; white-space: nowrap;
             overflow: hidden; text-overflow: ellipsis;
             max-height: 2em;
             transition: max-height .28s, opacity .28s, margin .28s;

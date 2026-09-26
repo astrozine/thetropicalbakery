@@ -312,7 +312,7 @@ export default function MyAccountPage() {
                   </span>
                 )}
                 <div style={{ flex: '1 1 220px', minWidth: 0 }}>
-                  <p style={{ fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700, margin: 0 }}>Seu perfil</p>
+                  <p style={{ fontSize: '0.75rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700, margin: 0 }}>Seu perfil</p>
                   <p className="notranslate" translate="no" style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.3rem, 3.5vw, 1.7rem)', margin: '0.15rem 0 0.6rem', lineHeight: 1.15 }}>
                     {firstName ? `Oi, ${firstName}!` : 'Bem-vindo(a)!'}
                   </p>

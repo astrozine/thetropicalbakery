@@ -68,7 +68,7 @@ export default function MobileBottomNav() {
               {item.icon}
             </span>
             <span style={{
-              fontSize: '0.65rem',
+              fontSize: '0.75rem',
               fontWeight: isActive ? 600 : 400,
               textTransform: 'uppercase',
               letterSpacing: '0.5px'

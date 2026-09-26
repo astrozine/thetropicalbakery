@@ -172,7 +172,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
         .pa-links a:hover { border-color: #d4af37; color: #3c2a21; }
         .pa-photo { position: absolute; margin: 0; background: #fff; padding: 7px 7px 0; border-radius: 12px; box-shadow: 0 12px 28px rgba(60,42,33,0.16); }
         .pa-photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
-        .pa-photo figcaption { padding: 0.35rem 0.2rem 0.5rem; font-size: 0.74rem; line-height: 1.25; text-align: center; color: #6b5a4e; }
+        .pa-photo figcaption { padding: 0.35rem 0.2rem 0.5rem; font-size: 0.75rem; line-height: 1.25; text-align: center; color: #6b5a4e; }
       `}</style>
       <div className="pa-wrap">
         <aside className="pa-rail" aria-label="Como funciona e outras parcerias">
@@ -295,7 +295,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
                         )}
                       </span>
                       <span style={{ display: 'block', padding: '0.35rem 0.4rem 0.45rem', fontSize: '0.8rem', lineHeight: 1.25, fontWeight: on ? 700 : 500, color: '#3c2a21' }}>{t.name}</span>
-                      {flag && <span style={{ display: 'block', padding: '0 0.4rem 0.45rem', fontSize: '0.68rem', lineHeight: 1.25, color: m?.status === 'unsafe' ? '#b03a2e' : '#8a5a00', fontWeight: 700 }}>{flag}</span>}
+                      {flag && <span style={{ display: 'block', padding: '0 0.4rem 0.45rem', fontSize: '0.75rem', lineHeight: 1.25, color: m?.status === 'unsafe' ? '#b03a2e' : '#8a5a00', fontWeight: 700 }}>{flag}</span>}
                       {on && <span aria-hidden style={{ position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>✓</span>}
                     </button>
                   );

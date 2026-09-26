@@ -101,7 +101,7 @@ export default function TodasAsParcerias() {
       }}>
         <span style={{
           display: 'inline-block',
-          fontSize: '0.7rem',
+          fontSize: '0.75rem',
           letterSpacing: '0.18em',
           textTransform: 'uppercase',
           fontWeight: 800,
@@ -204,7 +204,7 @@ export default function TodasAsParcerias() {
                 <div style={{ direction: 'ltr' }}>
                   <span style={{
                     display: 'inline-block',
-                    fontSize: '0.68rem',
+                    fontSize: '0.75rem',
                     letterSpacing: '0.16em',
                     textTransform: 'uppercase',
                     fontWeight: 800,
@@ -286,7 +286,7 @@ export default function TodasAsParcerias() {
         marginBottom: 'clamp(3rem, 7vw, 5rem)',
       }}>
         <span style={{
-          fontSize: '0.7rem',
+          fontSize: '0.75rem',
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           fontWeight: 800,

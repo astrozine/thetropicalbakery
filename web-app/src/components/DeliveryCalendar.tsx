@@ -125,7 +125,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.9rem' }}>
         <div>
-          <p style={{ fontSize: '0.7rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700 }}>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700 }}>
             {title} <span style={{ display: 'inline-block', animation: 'dc-wiggle 2.4s ease-in-out infinite' }}>📦</span>
           </p>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.15rem, 3vw, 1.5rem)', color: '#3c2a21', lineHeight: 1.2 }}>
@@ -134,15 +134,15 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
         </div>
         <div style={{ display: 'flex', gap: '0.4rem' }}>
           <button type="button" aria-label="Mês anterior" disabled={monthOffset === 0} onClick={() => setMonthOffset(m => m - 1)}
-            style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', color: '#3c2a21', cursor: monthOffset === 0 ? 'default' : 'pointer', opacity: monthOffset === 0 ? 0.35 : 1 }}>‹</button>
+            style={{ width: '44px', height: '44px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', color: '#3c2a21', cursor: monthOffset === 0 ? 'default' : 'pointer', opacity: monthOffset === 0 ? 0.35 : 1 }}>‹</button>
           <button type="button" aria-label="Próximo mês" disabled={monthOffset >= 3} onClick={() => setMonthOffset(m => m + 1)}
-            style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', color: '#3c2a21', cursor: monthOffset >= 3 ? 'default' : 'pointer', opacity: monthOffset >= 3 ? 0.35 : 1 }}>›</button>
+            style={{ width: '44px', height: '44px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', color: '#3c2a21', cursor: monthOffset >= 3 ? 'default' : 'pointer', opacity: monthOffset >= 3 ? 0.35 : 1 }}>›</button>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 'clamp(3px, 1vw, 8px)' }}>
         {WEEKDAY.map((w, i) => (
-          <div key={i} style={{ textAlign: 'center', fontSize: '0.7rem', fontWeight: 700, color: '#b3a08a', paddingBottom: '0.2rem' }}>{w}</div>
+          <div key={i} style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#b3a08a', paddingBottom: '0.2rem' }}>{w}</div>
         ))}
         {cells.map((iso, i) => {
           if (!iso) return <div key={`b${i}`} />;
@@ -206,7 +206,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
         >
           <span style={{ fontSize: '2.2rem' }} aria-hidden>{value ? '🎉' : '🌴'}</span>
           <div>
-            <p style={{ fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700 }}>
+            <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700 }}>
               {value ? 'Sua caixa chega' : 'Próximo dia de caixa'}
             </p>
             <p style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.05rem, 3vw, 1.35rem)', lineHeight: 1.25 }}>

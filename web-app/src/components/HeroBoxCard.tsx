@@ -65,7 +65,7 @@ export default function HeroBoxCard({ photos, side, delayMs = 0 }: { photos: Her
         .hero-box-card__frame { position: relative; aspect-ratio: 3 / 4; border-radius: 10px; overflow: hidden; background: #3c2a21; }
         .hero-box-card__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.2s ease; }
         .hero-box-card figcaption { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0.7rem 0.5rem 0.9rem; color: #3c2a21; text-align: center; }
-        .hero-box-card__tag { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: #a6832b; font-weight: 700; }
+        .hero-box-card__tag { font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: #a6832b; font-weight: 700; }
         .hero-box-card__name { font-family: var(--font-heading); font-size: 0.9rem; line-height: 1.25; }
         @media (min-width: 1360px) { .hero-box-card { display: block; } }
         @media (prefers-reduced-motion: reduce) { .hero-box-card, .hero-box-card__frame img { transition: none; } }

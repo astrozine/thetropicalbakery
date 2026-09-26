@@ -199,7 +199,7 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
       border: `1px solid ${on ? palette.border : '#dfe4ea'}`, background: on ? palette.bg : '#fff', color: on ? palette.color : '#7f8c8d', fontWeight: on ? 700 : 500,
     };
   };
-  const countBadge: React.CSSProperties = { fontSize: '0.7rem', opacity: 0.7, fontWeight: 600 };
+  const countBadge: React.CSSProperties = { fontSize: '0.75rem', opacity: 0.7, fontWeight: 600 };
   const chipRow: React.CSSProperties = { display: 'flex', flexWrap: 'wrap', gap: '0.4rem' };
 
   const folder = (id: string, title: string, selected: number, children: React.ReactNode) => {

@@ -55,7 +55,7 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
                     {item.emoji || '🍫'}
                   </span>
                   <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: 'block', fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700 }}>Doce {idx + 1}</span>
+                    <span style={{ display: 'block', fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700 }}>Doce {idx + 1}</span>
                     <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.05rem, 2.8vw, 1.5rem)', color: '#3c2a21', lineHeight: 1.2 }}>{item.name}</span>
                   </span>
                   {item.contains?.length > 0 && !isOpen && (
@@ -89,14 +89,14 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
           <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', color: '#3c2a21', marginBottom: '1rem' }}>Alérgenos da caixa inteira</p>
           <div style={{ display: 'grid', gap: '1rem' }}>
             <div>
-              <p style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#b03a2e', fontWeight: 700, marginBottom: '0.5rem' }}>⚠️ Contém</p>
+              <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#b03a2e', fontWeight: 700, marginBottom: '0.5rem' }}>⚠️ Contém</p>
               {summary.contains.length > 0
                 ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}><AllergenChips ids={summary.contains.map(a => a.id)} tone="contains" /></div>
                 : <p style={{ color: '#7a6a61', fontSize: '0.9rem' }}>Nenhum dos principais alérgenos declarados.</p>}
             </div>
             {summary.mayContain.length > 0 && (
               <div>
-                <p style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#8a5a00', fontWeight: 700, marginBottom: '0.5rem' }}>🔸 Pode conter (contaminação cruzada)</p>
+                <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#8a5a00', fontWeight: 700, marginBottom: '0.5rem' }}>🔸 Pode conter (contaminação cruzada)</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}><AllergenChips ids={summary.mayContain.map(a => a.id)} tone="may" /></div>
               </div>
             )}

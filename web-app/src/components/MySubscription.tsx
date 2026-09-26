@@ -146,7 +146,7 @@ export default function MySubscription() {
                       cursor: 'pointer', textAlign: 'center',
                     }}
                   >
-                    <div style={{ fontSize: '0.7rem', color: '#a89a90', textTransform: 'uppercase' }}>{WEEKDAY[date.getDay()]}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#a89a90', textTransform: 'uppercase' }}>{WEEKDAY[date.getDay()]}</div>
                     <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#3c2a21' }}>{date.getDate()}</div>
                     <div style={{ fontSize: '1rem' }}>{meta.icon}</div>
                   </button>

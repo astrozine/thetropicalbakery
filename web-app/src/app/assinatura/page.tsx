@@ -335,7 +335,7 @@ export default function SubscriptionPage() {
                         // A tab hanging from the top edge: inside the card, so overflow:hidden never clips it.
                         position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
                         background: '#d4af37', color: '#3c2a21', padding: '0.35rem 1.1rem 0.4rem',
-                        borderRadius: '0 0 12px 12px', fontSize: '0.72rem', fontWeight: 800,
+                        borderRadius: '0 0 12px 12px', fontSize: '0.75rem', fontWeight: 800,
                         textTransform: 'uppercase', letterSpacing: '0.12em', whiteSpace: 'nowrap',
                       }}>
                         {plan.badge}

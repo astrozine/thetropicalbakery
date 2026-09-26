@@ -65,7 +65,7 @@ export default function AccountSection({ id, emoji, accent, title, summary, stat
           </span>
         </span>
         {status && tone && (
-          <span style={{ flexShrink: 0, background: tone.bg, color: tone.color, fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.04em', padding: '0.28rem 0.7rem', borderRadius: '999px', whiteSpace: 'nowrap' }}>
+          <span style={{ flexShrink: 0, background: tone.bg, color: tone.color, fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.04em', padding: '0.28rem 0.7rem', borderRadius: '999px', whiteSpace: 'nowrap' }}>
             {status.tone === 'ok' ? '✓ ' : ''}{status.label}
           </span>
         )}

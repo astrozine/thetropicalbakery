@@ -31,7 +31,7 @@ const chip = (on: boolean): React.CSSProperties => ({
 });
 
 const groupTitle: React.CSSProperties = {
-  fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase',
+  fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase',
   color: '#a6832b', fontWeight: 800, marginBottom: '0.5rem',
 };
 

@@ -18,7 +18,7 @@ const card: React.CSSProperties = {
   padding: 'clamp(1.25rem, 3vw, 2rem)', boxShadow: '0 8px 24px rgba(60,42,33,0.05)',
 };
 const label: React.CSSProperties = {
-  display: 'block', fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase',
+  display: 'block', fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase',
   color: '#a6832b', fontWeight: 700, marginBottom: '0.4rem',
 };
 

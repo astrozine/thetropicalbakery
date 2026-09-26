@@ -93,13 +93,13 @@ export default function MyPickups() {
                   <div aria-hidden style={{ width: '84px', flexShrink: 0, borderRadius: '14px', overflow: 'hidden', textAlign: 'center', background: '#fff', boxShadow: '0 6px 18px rgba(60,42,33,0.15)', border: '1px solid rgba(212,175,55,0.5)' }}>
                     <div style={{ background: '#d4af37', color: '#3c2a21', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.14em', padding: '0.25rem 0' }}>{MONTHS[date.getMonth()]}</div>
                     <div style={{ fontFamily: 'var(--font-heading)', fontSize: '2.1rem', lineHeight: 1.1, color: '#3c2a21', paddingTop: '0.25rem' }}>{date.getDate()}</div>
-                    <div style={{ fontSize: '0.72rem', color: '#7a6a61', paddingBottom: '0.35rem', textTransform: 'capitalize' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#7a6a61', paddingBottom: '0.35rem', textTransform: 'capitalize' }}>
                       {date.toLocaleDateString('pt-BR', { weekday: 'long' })}
                     </div>
                   </div>
                 )}
                 <div style={{ flex: '1 1 220px', minWidth: 0 }}>
-                  <p style={{ fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700 }}>
+                  <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700 }}>
                     {date ? `Retirada ${date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}` : 'Retirada — data a combinar'}
                   </p>
                   <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.05rem', color: '#3c2a21', lineHeight: 1.3 }}>
@@ -115,7 +115,7 @@ export default function MyPickups() {
                   return (
                     <li key={s.stage} style={{ textAlign: 'center' }}>
                       <div style={{ height: '6px', borderRadius: '3px', background: done ? '#d4af37' : '#e8e1d7', marginBottom: '0.4rem' }} />
-                      <span style={{ fontSize: '0.72rem', lineHeight: 1.3, color: done ? '#3c2a21' : '#a89a90', fontWeight: done ? 700 : 500 }}>{s.label}</span>
+                      <span style={{ fontSize: '0.75rem', lineHeight: 1.3, color: done ? '#3c2a21' : '#a89a90', fontWeight: done ? 700 : 500 }}>{s.label}</span>
                     </li>
                   );
                 })}
@@ -129,7 +129,7 @@ export default function MyPickups() {
 
               {o.pickup_address && (
                 <div style={{ marginTop: '1.1rem', padding: '1.1rem 1.25rem', borderRadius: '14px', background: 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)', color: '#fdfaf3' }}>
-                  <p style={{ fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700, marginBottom: '0.4rem' }}>
+                  <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700, marginBottom: '0.4rem' }}>
                     {o.stage === 'ready' ? '✅ Sua caixa está pronta! Onde retirar' : 'Onde retirar'}
                   </p>
                   <p style={{ whiteSpace: 'pre-line', lineHeight: 1.7, fontSize: '1rem' }}>{o.pickup_address}</p>

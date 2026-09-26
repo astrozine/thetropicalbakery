@@ -351,7 +351,7 @@ export default function Navigation() {
           >
             <span style={{ fontSize: '1.5rem' }}>🛒</span>
             {totalItems > 0 && (
-              <span style={{ position: 'absolute', top: '-5px', right: '-10px', background: '#e74c3c', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '50%' }}>
+              <span style={{ position: 'absolute', top: '-5px', right: '-10px', background: '#e74c3c', color: 'white', fontSize: '0.75rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '50%' }}>
                 {totalItems}
               </span>
             )}

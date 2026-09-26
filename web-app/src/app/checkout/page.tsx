@@ -375,7 +375,7 @@ export default function CheckoutPage() {
                     <div style={{ width: '4rem', height: '4rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.3)', position: 'relative', flexShrink: 0 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <span style={{ position: 'absolute', top: '-4px', right: '-4px', backgroundColor: 'var(--color-primary)', color: 'white', fontSize: '0.6rem', width: '1.2rem', height: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontWeight: 'bold' }}>{item.quantity}</span>
+                      <span style={{ position: 'absolute', top: '-4px', right: '-4px', backgroundColor: 'var(--color-primary)', color: 'white', fontSize: '0.75rem', width: '1.2rem', height: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontWeight: 'bold' }}>{item.quantity}</span>
                     </div>
                     <div style={{ flexGrow: 1 }}>
                       <p style={{ fontWeight: 600, color: 'var(--color-text)', fontSize: '0.9rem', lineHeight: 1.2, marginBottom: '0.2rem' }}>{item.name}</p>
@@ -578,7 +578,7 @@ export default function CheckoutPage() {
                   <div style={{ margin: '0 auto 2rem', maxWidth: '440px', padding: '1rem 1.25rem', borderRadius: '16px', background: 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)', color: '#fdfaf3', textAlign: 'left', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <span style={{ fontSize: '2rem' }} aria-hidden>🎉</span>
                     <div>
-                      <p style={{ fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700 }}>{placed.isPickup ? 'Sua caixa fica pronta para retirada' : 'Sua caixa chega'}</p>
+                      <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700 }}>{placed.isPickup ? 'Sua caixa fica pronta para retirada' : 'Sua caixa chega'}</p>
                       <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem' }}>
                         {new Date(placed.date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
                       </p>
