@@ -1,5 +1,9 @@
 @AGENTS.md
 
+**Read `../COORDINATION.md` first**: other agents (Claude, Gemini in Antigravity) work in this same repo at the same time.
+Stage files by name, never `git add -A`, never `git stash`, check `git status` before you commit, and test layouts at a real phone
+size with `tools/phone-check.mjs`.
+
 # Supabase migrations: explicit grants for new tables
 
 Supabase stopped auto-granting Data API access to **new** tables in the `public` schema on
@@ -80,8 +84,13 @@ that only add columns or policies to existing tables need nothing extra.
 - Never mark an order paid from anything the visitor sends. `confirmMercadoPagoPayment` and
   `capturePayPalOrder` re-fetch the payment from the provider and check reference **and amount**.
   `markOrderPaid` is idempotent and also moves `inbox_status` to `confirmed`.
-- Known limit: `total_price` is computed in the browser (same as Pix). Server-side price recomputation
-  would need item ids in the order; not done.
+- **Prices are computed on the server.** The checkout posts item ids, quantities, zone, day and diet to
+  `POST /api/checkout/order` (`src/lib/payments/order.ts`), which reads prices, stock, the delivery calendar and fees from the
+  database, reserves box stock with `reserve_box_stock` (service role only), saves the order with the service key and returns
+  the reference and the true total. The Pix code and the card/PayPal pages use that total. If you add another way to buy,
+  route it through `createOrder`; never trust an amount from the browser.
+- The `orders` table is private (admins only) and the public may only leave a lead (no status, no price): `migration_22`.
+  It has a `NOT NULL` column `order_type`; every insert must set it.
 
 
 # Dietary profiles: one vocabulary, from the treat to the e-mail

@@ -1,7 +1,8 @@
 # GEMINI.md — handoff for working on The Tropical Bakery
 
 This file is for Gemini (CLI or Code Assist) picking the project up when Claude isn't available.
-Read all of it before changing anything. `web-app/CLAUDE.md` and `web-app/AGENTS.md` are the same
+**Read `COORDINATION.md` first** (rules for working next to other agents: git hygiene, dev servers, phone checks,
+security rules). Read all of this file before changing anything. `web-app/CLAUDE.md` and `web-app/AGENTS.md` are the same
 kind of file for Claude; their rules apply to you too, and if you change a convention, update
 **this file and `web-app/CLAUDE.md`** so the two never drift apart.
 
@@ -57,7 +58,9 @@ special "backyard" market with its own logos (`public/itamambuca-lockup.png`, `i
   be replaced by CRLF" warnings are harmless. Shell heredocs that contain quotes or backslashes
   break easily on Windows; prefer editing files with your file tools.
 - Env vars (set in Vercel, never commit): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-  `RESEND_API_KEY`. There is **no service-role key** in the app on purpose.
+  `RESEND_API_KEY`. `SUPABASE_SERVICE_ROLE_KEY` is also set in Vercel, but it may be used ONLY by server code
+  that has no logged-in user (payments and `POST /api/checkout/order`: `src/lib/payments/server.ts`, `order.ts`).
+  Never in client code. Never ask Andrew to paste a key into a chat.
 
 ## 4. Backend: Supabase
 
@@ -79,15 +82,17 @@ special "backyard" market with its own logos (`public/itamambuca-lockup.png`, `i
 - **New tables must include explicit `GRANT`s in the migration** (Supabase stops auto-granting Data
   API access to new tables on 2026-10-30). See `web-app/CLAUDE.md` for the exact snippet. Give
   `anon` only what visitors need.
-- Migration status: 02–05 were run earlier, as far as we know. **06–14 were being run by Andrew as they were written;
-  do not assume any of them ran.** 12 (delivery schedule + order columns), 13 (box items) and 14
-  (treat ingredients/allergens) 15 (e-mail preferences) and 16 (partner/worker portals) are the newest. Ask, or look for the in-app warnings.
+- Migration status: 02–05 were run earlier, as far as we know. **Do not assume any later one ran.** Ask, or look for the
+  in-app warnings. Newest: 18 (card payments), 19 (dietary profiles), 20 (room photos), 21 (box delivery/ordering windows) and
+  **22 (locks down orders, content tables and uploads to admins, and adds the safe stock functions; must be run AFTER the
+  code that creates orders on the server is deployed)**. The next free number is 23 (check `ls web-app/migration_*.sql`).
 
 ## 5. Feature map (where things live)
 
 **Ordering and payment**
 - One checkout for everything: `src/app/checkout/page.tsx`, two steps (details, then **Pix QR +
-  copia-e-cola**). Pix key is the CPF in `src/utils/pix.ts` (a wrong key gave "chave não
+  copia-e-cola**). The browser only sends WHAT was picked; **`POST /api/checkout/order` prices and saves the order on the
+  server** (`src/lib/payments/order.ts`). Never compute a price or write an order from the browser again. Pix key is the CPF in `src/utils/pix.ts` (a wrong key gave "chave não
   encontrada" once; it works now). Card (Mercado Pago) and PayPal are built as optional extra
   methods (see `web-app/CLAUDE.md` "Card and PayPal payments" and `web-app/SETUP_payments.md`); they
   only appear once Andrew has put the keys in Vercel. Cart lives in `src/context/CartContext.tsx`; items have `kind: 'box' |

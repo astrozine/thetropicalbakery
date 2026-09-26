@@ -78,7 +78,9 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
           alt={box.title}
           style={{ width: '100%', height: 'auto', maxHeight: '640px', objectFit: 'contain', background: '#f5efe2', borderRadius: '24px', boxShadow: '0 15px 30px rgba(0,0,0,0.15)', display: 'block' }}
         />
-        <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#d4af37', color: '#fff', borderRadius: '50%', fontWeight: 'bold', fontSize: '1.1rem', width: '68px', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(212,175,55,0.4)', transform: 'rotate(15deg)' }}>
+        {/* On phones the badge sits INSIDE the photo: hanging 10px past its edge made the whole page 2px wider than the screen. */}
+        <style dangerouslySetInnerHTML={{ __html: '.box-price-badge{top:-10px;right:-10px}@media (max-width:767px){.box-price-badge{top:8px;right:8px}}' }} />
+        <div className="box-price-badge" style={{ position: 'absolute', background: '#d4af37', color: '#fff', borderRadius: '50%', fontWeight: 'bold', fontSize: '1.1rem', width: '68px', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(212,175,55,0.4)', transform: 'rotate(15deg)' }}>
           R${Math.round(box.price)}
         </div>
       </div>
