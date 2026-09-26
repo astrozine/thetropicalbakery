@@ -10,7 +10,7 @@ import { generatePixData } from '@/utils/pix';
 import { supabase } from '@/lib/supabase';
 import { DELIVERY_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
-import { dietSummary, legacyFlags, tagsFromLegacy } from '@/lib/dietary';
+import { legacyFlags, tagsFromLegacy } from '@/lib/dietary';
 import { fetchSchedule, selectableDates, toISODate } from '@/lib/deliverySchedule';
 import { BoxWindowFields, inDeliveryWindow, longDay, saleState } from '@/lib/boxWindow';
 
@@ -174,16 +174,43 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
 
-    // The reference doubles as the Pix transaction id (max 25 letters/numbers) and as the
-    // key card and PayPal payments come back with, so it carries a random tail.
-    const transactionId = `ORD${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
     const method: PayMethod = (payMethod === 'card' && available.card) || (payMethod === 'paypal' && available.paypal) ? payMethod : 'pix';
-    const { payload, base64 } = method === 'pix' ? await generatePixData({ value: total, transactionId }) : { payload: '', base64: '' };
 
-    // One readable line for the kitchen, plus the structured version for matching.
-    const dietaryNotes = dietSummary(diet.tags, diet.allergens, diet.notes);
+    // The server places the order and prices it from the database. This page only says WHAT was picked;
+    // what it costs (and the reference the Pix code and the card page use) comes back in the answer.
+    let order: { reference: string; subtotal: number; fee: number; total: number };
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/checkout/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+        body: JSON.stringify({
+          items: items.map(i => ({ id: i.id, kind: i.kind ?? 'events', quantity: i.quantity, tasting_box_id: i.tasting_box_id })),
+          customer: { name: formData.name, email: formData.email, whatsapp: formData.whatsapp, address: formData.address },
+          fulfillment: isPickup ? 'pickup' : 'delivery',
+          zoneId,
+          date: formData.date,
+          affiliateCode,
+          diet,
+          payMethod: method,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.reference) {
+        setError(json.error || 'Não conseguimos registrar o pedido agora. Tente de novo em instantes ou fale com a gente no WhatsApp.');
+        setSubmitting(false);
+        return;
+      }
+      order = json;
+    } catch {
+      setError('Sem conexão com o servidor. Confira sua internet e tente de novo.');
+      setSubmitting(false);
+      return;
+    }
+    const transactionId = order.reference;
+    const { payload, base64 } = method === 'pix' ? await generatePixData({ value: order.total, transactionId }) : { payload: '', base64: '' };
+
     const flags = legacyFlags(diet.tags);
-    const itemsSummary = items.map(i => `${i.quantity}x ${i.name}`).join(', ');
 
     // Remember these details so the next order is one click lighter.
     await saveProfile({
@@ -198,68 +225,7 @@ export default function CheckoutPage() {
       diet_notes: diet.notes.trim() || null,
     } as never);
 
-    // Save to Supabase 'orders'. Extra columns come from migration 12; if it
-    // hasn't been run yet, fall back to the original columns so no order is lost.
-    const base = {
-      customer_name: formData.name,
-      customer_email: formData.email,
-      customer_whatsapp: formData.whatsapp.replace(/\D/g, ''),
-      delivery_address: isPickup ? 'RETIRADA no home bakery' : formData.address,
-      requested_date: formData.date || null,
-      total_price: total,
-      pix_transaction_id: transactionId,
-      status: 'PENDING',
-      // The orders table requires this column (it was created for the first lead forms), so every
-      // save must carry it or the database refuses the whole order.
-      order_type: hasBox ? 'CAIXA_DEGUSTACAO' : 'EVENTO',
-    };
-    const paymentProvider = method === 'card' ? 'mercadopago' : method;
-    // A partner's code, so their portal can count the sale.
-    const extras = affiliateCode.trim() ? { affiliate_code: affiliateCode.trim().toUpperCase() } : {};
-    let saved = true;
-    const rich = {
-      ...base,
-      ...extras,
-      payment_provider: paymentProvider,
-      order_kind: hasBox ? 'box' : 'events',
-      fulfillment: isPickup ? 'pickup' : 'delivery',
-      user_id: user?.id ?? null,
-      delivery_zone: hasBox && !isPickup ? zoneId : null,
-      delivery_fee: deliveryFee,
-      dietary_notes: dietaryNotes || null,
-      items_summary: itemsSummary,
-    };
-    const full = await supabase.from('orders').insert([{ ...rich, diet_tags: diet.tags, allergens_avoid: diet.allergens }]);
-    if (full.error) {
-      // Migration 19 missing: the readable line still carries everything.
-      const mid = await supabase.from('orders').insert([rich]);
-      if (mid.error) {
-        const plain = await supabase.from('orders').insert([base]);
-        if (plain.error) {
-          console.error('Error saving order:', plain.error);
-          saved = false;
-        }
-      }
-    }
-
-    // A card or PayPal payment needs the saved order (that's what it's matched to).
-    if (!saved && method !== 'pix') {
-      setError('Não conseguimos registrar o pedido agora. Tente de novo em instantes ou pague por Pix.');
-      setSubmitting(false);
-      return;
-    }
-
-    if (hasBox) {
-      // Keep the limited-edition counter honest.
-      for (const box of boxItems) {
-        if (!box.tasting_box_id) continue;
-        const { data } = await supabase.from('tasting_boxes').select('sold_quantity').eq('id', box.tasting_box_id).single();
-        if (data) {
-          await supabase.from('tasting_boxes').update({ sold_quantity: data.sold_quantity + box.quantity }).eq('id', box.tasting_box_id);
-        }
-      }
-
-    }
+    const saved = true;   // the server saved it (or answered with an error above)
 
     // Feed the CRM through the controlled function (the customer list itself stays
     // private). Everyone who orders lands here, box or event, with their diet — that
@@ -326,7 +292,7 @@ export default function CheckoutPage() {
     }
 
     setPlaced({
-      items: [...items], subtotal: totalPrice, fee: deliveryFee, total, isBox: hasBox, isPickup,
+      items: [...items], subtotal: order.subtotal, fee: order.fee, total: order.total, isBox: hasBox, isPickup,
       date: formData.date, zoneLabel: isPickup ? 'Retirada' : (zone?.label ?? ''), saved,
     });
     setPixPayload(payload);
