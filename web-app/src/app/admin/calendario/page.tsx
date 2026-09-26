@@ -243,8 +243,15 @@ export default function DeliveryCalendarAdmin() {
         .cal-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 1.75rem; align-items: start; }
         .cal-col-right { order: -1; }
         @media (min-width: 1100px) {
-          .cal-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-          .cal-col-right { order: 0; }
+          .cal-cols { grid-template-columns: minmax(0, 1fr) 380px; }
+          .cal-col-right {
+            order: 0;
+            position: sticky;
+            top: 1.25rem;
+            max-height: calc(100vh - 2.5rem);
+            overflow-y: auto;
+            scrollbar-width: thin;
+          }
         }
       `}</style>
 

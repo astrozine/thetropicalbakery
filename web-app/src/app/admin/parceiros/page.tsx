@@ -139,29 +139,40 @@ export default function AdminPartnersPage() {
 
       {/* Add / edit */}
       <form onSubmit={save} style={{ ...card, marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.15rem', color: '#2c3e50', marginBottom: '1rem' }}>
+        <h2 style={{ fontSize: '1.15rem', color: '#2c3e50', marginBottom: '1.25rem' }}>
           {editingId ? 'Editar parceiro' : 'Novo parceiro'}
         </h2>
-        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))' }}>
+
+        {/* 2 columns on desktop, 1 on mobile */}
+        <div className="partner-form-grid">
+          {/* Row 1: business name + type */}
           <div><label style={lbl}>Nome do negócio *</label>
             <input required type="text" value={form.business_name} onChange={e => setForm({ ...form, business_name: e.target.value })} style={field} /></div>
           <div><label style={lbl}>Tipo</label>
             <select value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value })} style={field}>
               {PARTNER_KINDS.map(k => <option key={k.id} value={k.id}>{k.emoji} {k.label}</option>)}
             </select></div>
+
+          {/* Row 2: contact person + email */}
           <div><label style={lbl}>Pessoa de contato</label>
             <input type="text" value={form.contact_name} onChange={e => setForm({ ...form, contact_name: e.target.value })} style={field} /></div>
           <div><label style={lbl}>E-mail de acesso *</label>
             <input required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} style={field} />
             <small style={{ color: '#95a5a6' }}>É com este e-mail que a pessoa entra no portal.</small></div>
+
+          {/* Row 3: whatsapp + address */}
           <div><label style={lbl}>WhatsApp</label>
             <input type="tel" value={form.whatsapp} onChange={e => setForm({ ...form, whatsapp: e.target.value })} style={field} /></div>
           <div><label style={lbl}>Endereço</label>
             <input type="text" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} style={field} /></div>
+
+          {/* Row 4: neighbourhood + commission */}
           <div><label style={lbl}>Bairro / praia</label>
             <input type="text" value={form.neighborhood} onChange={e => setForm({ ...form, neighborhood: e.target.value })} placeholder="Itamambuca" style={field} /></div>
           <div><label style={lbl}>Comissão / margem (%)</label>
             <input type="number" step="0.5" min="0" value={form.commission_pct} onChange={e => setForm({ ...form, commission_pct: Number(e.target.value) })} style={field} /></div>
+
+          {/* Row 5: affiliate code + monthly goal */}
           <div><label style={lbl}>Código de afiliado</label>
             <input type="text" value={form.affiliate_code} onChange={e => setForm({ ...form, affiliate_code: e.target.value.toUpperCase().replace(/\s/g, '') })} placeholder="POUSADADOSOL" style={field} />
             <small style={{ color: '#95a5a6' }}>Só para afiliados. O cliente digita no checkout.</small></div>
@@ -169,7 +180,8 @@ export default function AdminPartnersPage() {
             <input type="number" min="0" value={form.monthly_goal} onChange={e => setForm({ ...form, monthly_goal: Number(e.target.value) })} style={field} /></div>
         </div>
 
-        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', marginTop: '1rem' }}>
+        {/* Textareas side by side (same 2-col grid) */}
+        <div className="partner-form-grid" style={{ marginTop: '1rem' }}>
           <div><label style={lbl}>Recado para o parceiro (aparece no portal dele)</label>
             <textarea rows={3} value={form.portal_message} onChange={e => setForm({ ...form, portal_message: e.target.value })} style={{ ...field, resize: 'vertical' }} /></div>
           <div><label style={lbl}>Anotações internas (o parceiro não vê)</label>
@@ -180,6 +192,11 @@ export default function AdminPartnersPage() {
           <button type="submit" disabled={saving} style={{ ...dark, background: '#d4af37' }}>{saving ? 'Salvando…' : editingId ? 'Salvar alterações' : 'Adicionar parceiro'}</button>
           {editingId && <button type="button" onClick={() => { setEditingId(null); setForm({ ...EMPTY }); }} style={{ ...dark, background: '#95a5a6' }}>Cancelar</button>}
         </div>
+
+        <style dangerouslySetInnerHTML={{ __html: `
+          .partner-form-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+          @media (min-width: 640px) { .partner-form-grid { grid-template-columns: 1fr 1fr; } }
+        ` }} />
       </form>
 
       {/* List */}
