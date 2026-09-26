@@ -158,18 +158,18 @@ export default function TreatPicker({
 
         /* The action: inline on a desktop, a bar under the thumb on a phone. */
         .tp__bar {
-          display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+          display: flex; align-items: center; gap: 0.75rem; flex-wrap: nowrap;
           margin-top: 1.1rem; padding: 0.85rem 1rem; border-radius: 16px;
           background: #3c2a21; color: #fdfaf3;
           transition: opacity .25s, transform .25s;
         }
         .tp__bar[data-on="false"] { opacity: 0; transform: translateY(8px); pointer-events: none; height: 0; margin: 0; padding: 0; overflow: hidden; }
-        .tp__count { font-size: 0.95rem; }
+        .tp__count { font-size: 0.95rem; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .tp__count strong { font-family: var(--font-heading); font-size: 1.35rem; color: #ffd166; margin-right: 0.15rem; }
         .tp__go {
-          margin-left: auto; min-height: 48px; padding: 0 1.5rem; border: none; border-radius: 999px;
+          flex-shrink: 0; margin-left: auto; min-height: 48px; padding: 0 1.5rem; border: none; border-radius: 999px;
           background: linear-gradient(135deg, #f4c542, #d4af37); color: #3c2a21;
-          font-family: inherit; font-weight: 800; font-size: 1rem; cursor: pointer;
+          font-family: inherit; font-weight: 800; font-size: 1rem; cursor: pointer; white-space: nowrap;
         }
         .tp__go:active { transform: scale(0.97); }
 
@@ -183,10 +183,11 @@ export default function TreatPicker({
             bottom: calc(74px + env(safe-area-inset-bottom, 0px));
             z-index: 998; margin: 0; border-radius: 999px; padding: 0.5rem 0.5rem 0.5rem 1.1rem;
             box-shadow: 0 10px 30px rgba(60,42,33,0.42);
+            flex-wrap: nowrap;
           }
-          .tp__bar[data-on="false"] { transform: translateY(130%); height: auto; padding: 0.5rem; }
+          .tp__bar[data-on="false"] { transform: translateY(200%); opacity: 0; height: auto; padding: 0.5rem 0.5rem 0.5rem 1.1rem; }
           .tp__count { font-size: 0.85rem; }
-          .tp__go { padding: 0 1.2rem; font-size: 0.95rem; }
+          .tp__go { padding: 0 1.2rem; font-size: 0.9rem; min-height: 44px; }
         }
         @media (prefers-reduced-motion: reduce) {
           .tp__card, .tp__tick, .tp__bar { transition: none; }

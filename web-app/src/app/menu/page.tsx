@@ -49,7 +49,7 @@ export default function MenuPage() {
   const visibleItems = menuItems.filter(t => matchesRefine(t, refine, { hideUnknownWhenFree: true }));
 
   return (
-    <main style={{ minHeight: '100vh', background: 'var(--color-background)', paddingBottom: '6rem', overflowX: 'clip' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--color-background)', paddingBottom: 'max(6rem, calc(90px + env(safe-area-inset-bottom, 0px) + 80px))', overflowX: 'clip' }}>
       
       {/* Header Section */}
       <section style={{ 

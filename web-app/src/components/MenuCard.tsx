@@ -173,7 +173,7 @@ export default function MenuCard({ item }: MenuCardProps) {
           />
           
           {/* Drawer Content */}
-          <div style={{ position: 'relative', background: 'white', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '2rem 1.5rem', paddingBottom: 'calc(3rem + 70px)', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 -10px 40px rgba(0,0,0,0.2)', animation: 'slideUp 0.3s ease-out' }}>
+          <div style={{ position: 'relative', background: 'white', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '2rem 1.5rem', paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px) + 80px)', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 -10px 40px rgba(0,0,0,0.2)', animation: 'slideUp 0.3s ease-out' }}>
             
             {/* Handle */}
             <div style={{ width: '40px', height: '5px', background: '#e0e0e0', borderRadius: '3px', margin: '0 auto 1.5rem' }} />

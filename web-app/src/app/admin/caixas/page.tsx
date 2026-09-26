@@ -386,13 +386,14 @@ export default function AdminCaixas() {
                   <strong>Data:</strong> {box.batch_date_label} · <strong>{(box.items || []).length}</strong> doces
                 </p>
                 {(() => {
-                  const st = saleState(box, leadDays, null);
+                  const st = saleState(box, null);
+                  const closeOn = lastOrderDay(box, leadDays);
                   const lbl = SALE_LABEL[st.state];
                   return (
                     <p style={{ fontSize: '0.85rem', color: '#594a42', margin: '0.2rem 0 0', display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
                       <span style={{ background: lbl.bg, color: lbl.color, fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '6px' }}>{lbl.text}</span>
                       {deliveryWindowLabel(box) && <span>🚚 Entregas {deliveryWindowLabel(box)}</span>}
-                      {st.closesOn && <span>· ⏳ pedidos até {longDay(st.closesOn)}</span>}
+                      {closeOn && <span>· ⏳ pedidos até {longDay(closeOn)}</span>}
                     </p>
                   );
                 })()}

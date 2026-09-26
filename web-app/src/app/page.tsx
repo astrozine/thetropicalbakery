@@ -41,7 +41,7 @@ export default async function Home() {
   if (activeBox) {
     const schedule = await fetchSchedule();
     const choosable = inDeliveryWindow(selectableDates(schedule), activeBox);
-    boxOnSale = !noUpcomingEdition(saleState(activeBox, schedule.leadDays, choosable).state, choosable);
+    boxOnSale = !noUpcomingEdition(saleState(activeBox, choosable).state, choosable);
   }
 
   const getContent = (sectionId: string, fallbackUrl: string) => {

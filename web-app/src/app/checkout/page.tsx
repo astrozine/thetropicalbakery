@@ -162,7 +162,7 @@ export default function CheckoutPage() {
       for (const item of boxItems) {
         const row = (fresh as (BoxWindowFields & { id: string; title: string })[] | null)?.find(b => b.id === item.tasting_box_id);
         if (!row) continue;
-        const { state, opensOn } = saleState(row, schedule.leadDays, inDeliveryWindow(selectable, row));
+        const { state, opensOn } = saleState(row, inDeliveryWindow(selectable, row));
         if (state === 'soldout') { setError(`"${row.title}" esgotou. Tire a caixa do carrinho para continuar.`); return; }
         if (state === 'soon') { setError(`Os pedidos de "${row.title}" abrem ${opensOn ? longDay(opensOn) : 'em breve'}.`); return; }
         if (state === 'closed') { setError(`Os pedidos de "${row.title}" foram encerrados. Tire a caixa do carrinho para continuar.`); return; }

@@ -1,11 +1,15 @@
 import { parseISODate, toISODate } from '@/lib/deliverySchedule';
 
 /**
- * The two windows of a Degustation Box edition (migration 21):
- *  - delivery window: the days this edition goes out; each customer picks one of them.
- *  - ordering window: the days orders are accepted.
- * Ordering is also closed once the box is sold out. A box with none of these dates set behaves as
- * before (any open calendar day, orders always open while there is stock).
+ * How a Degustation Box edition is offered (migration 21 added the dates):
+ *  - delivery window: the days this batch was planned to go out; each customer picks one of them.
+ *  - orders_open_from: a box set up ahead of time stays "soon" until that day.
+ *
+ * A box is on sale until it SELLS OUT or is switched off in the admin, never because a date passed.
+ * When the planned delivery window is over and stock is left, the box ROLLS OVER: every deliverable day
+ * from now on (calendar days, minimum notice already applied) is offered, so the next delivery is
+ * simply the first day that can still be picked. orders_close_on is kept in the database but no longer
+ * closes anything.
  */
 export interface BoxWindowFields {
   total_quantity: number;
@@ -18,40 +22,46 @@ export interface BoxWindowFields {
 
 export type SaleState = 'open' | 'soon' | 'closed' | 'soldout';
 
-const addDays = (iso: string, n: number) => {
-  const d = parseISODate(iso);
-  d.setDate(d.getDate() + n);
-  return toISODate(d);
-};
-
 export const hasDeliveryWindow = (b: BoxWindowFields) => !!(b.delivery_from || b.delivery_until);
 
-/** Keeps only the calendar days inside the box's delivery window. */
-export const inDeliveryWindow = (dates: string[], b: BoxWindowFields) =>
-  dates.filter(d => (!b.delivery_from || d >= b.delivery_from) && (!b.delivery_until || d <= b.delivery_until));
+export interface DayRange { from?: string | null; until?: string | null }
 
-/** Last day orders are taken: the explicit deadline, or the last delivery day minus the notice. */
-export function lastOrderDay(b: BoxWindowFields, leadDays: number): string | null {
-  if (b.orders_close_on) return b.orders_close_on;
-  if (b.delivery_until) return addDays(b.delivery_until, -leadDays);
-  return null;
+/**
+ * True when the planned window is over: there are deliverable days, but every one of them comes
+ * after the window's last day. (`all` = every day a customer could pick at all, lead time applied.)
+ */
+export function isRolledOver(all: string[], w: DayRange): boolean {
+  const until = w.until;
+  return !!until && all.length > 0 && all.every(d => d > until);
 }
 
 /**
- * Whether this box can be ordered today.
- * `choosable` = the delivery days a customer could still pick (already inside the window);
- * pass null when the calendar hasn't loaded yet.
+ * The days a customer may pick for a box: inside its delivery window, or, once that window is over
+ * and the box is still on sale, every deliverable day. `all` defaults to `dates`; pass the full list
+ * when checking a single day.
  */
-export function saleState(b: BoxWindowFields, leadDays: number, choosable: string[] | null, today = toISODate(new Date())): {
-  state: SaleState; opensOn: string | null; closesOn: string | null;
+export function windowedDates(dates: string[], w: DayRange, all: string[] = dates): string[] {
+  if (isRolledOver(all, w)) return dates;
+  return dates.filter(d => (!w.from || d >= w.from) && (!w.until || d <= w.until));
+}
+
+export const inDeliveryWindow = (dates: string[], b: BoxWindowFields, all: string[] = dates) =>
+  windowedDates(dates, { from: b.delivery_from, until: b.delivery_until }, all);
+
+/**
+ * Whether this box can be ordered today: on sale until it sells out (or is switched off, which
+ * removes it from the site altogether). `choosable` = the delivery days a customer could pick
+ * (already rolled over); pass null when the calendar hasn't loaded yet.
+ */
+export function saleState(b: BoxWindowFields, choosable: string[] | null, today = toISODate(new Date())): {
+  state: SaleState; opensOn: string | null;
 } {
-  const closesOn = lastOrderDay(b, leadDays);
   const opensOn = b.orders_open_from || null;
-  if (b.total_quantity > 0 && b.sold_quantity >= b.total_quantity) return { state: 'soldout', opensOn, closesOn };
-  if (opensOn && today < opensOn) return { state: 'soon', opensOn, closesOn };
-  if (closesOn && today > closesOn) return { state: 'closed', opensOn, closesOn };
-  if (hasDeliveryWindow(b) && choosable && choosable.length === 0) return { state: 'closed', opensOn, closesOn };
-  return { state: 'open', opensOn, closesOn };
+  if (b.total_quantity > 0 && b.sold_quantity >= b.total_quantity) return { state: 'soldout', opensOn };
+  if (opensOn && today < opensOn) return { state: 'soon', opensOn };
+  // Nothing at all to pick (the delivery calendar has no open day): can't take an order.
+  if (choosable && choosable.length === 0) return { state: 'closed', opensOn };
+  return { state: 'open', opensOn };
 }
 
 /**
@@ -83,3 +93,19 @@ export function deliveryWindowLabel(b: BoxWindowFields): string {
   if (b.delivery_until) return `até ${shortDay(b.delivery_until)}`;
   return '';
 }
+
+/**
+ * The last day someone may place an order. If orders_close_on is set explicitly, use that.
+ * Otherwise derive it from delivery_until minus leadDays (the automatic cutoff).
+ * Returns null when there is no close date to show.
+ */
+export function lastOrderDay(b: BoxWindowFields, leadDays: number): string | null {
+  if (b.orders_close_on) return b.orders_close_on;
+  if (b.delivery_until && leadDays > 0) {
+    const d = parseISODate(b.delivery_until);
+    d.setDate(d.getDate() - leadDays);
+    return toISODate(d);
+  }
+  return null;
+}
+
