@@ -179,19 +179,20 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           /* Phones: photos first, in a collage of their own; then the words. Nothing overlaps. */
           @media (max-width: 767px) {
             .rh { display: block; min-height: 0; padding: 1.25rem 0 3rem; }
-            .rh__photos { position: relative; inset: auto; width: min(92%, 480px); aspect-ratio: 1 / 0.84; margin: 0 auto 1rem; }
-            .rh__ph--bundt  { top: 0; right: 3%; bottom: auto; left: auto; width: 28%; transform: rotate(9deg); z-index: 3; }
-            .rh__ph--cake   { bottom: 0; left: 6%; top: auto; right: auto; width: 28%; transform: rotate(-9deg); z-index: 3; }
-            .rh__ph--coast  { top: 3%; left: 4%; width: 60%; transform: rotate(-4deg); }
-            .rh__ph--island { bottom: 4%; right: 2%; top: auto; left: auto; width: 52%; transform: rotate(4deg); z-index: 2; }
-            .rh__ph--coast img, .rh__ph--island img { opacity: 1; }
-            /* On a phone the photos are small, so the cards are compact and only just overhang the bottom edge. */
-            .rh__card { left: 0.4rem; bottom: -0.55rem; max-width: 94%; padding: 0.35rem 0.55rem; column-gap: 0.5rem; border-radius: 10px; box-shadow: 0 8px 18px rgba(0,0,0,0.35); }
-            .rh__card--right { left: auto; right: 0.4rem; grid-template-columns: 1fr; row-gap: 0.15rem; }
-            .rh__num { font-size: 1rem; }
+            /* The two place photos become polaroids: the "how far" note is written in the cream strip under the
+               picture, so it never covers the photo. The two treats float over their corners. The polaroids are
+               in the flow (their height follows the note), the treats are the only absolute pieces. */
+            .rh__photos { position: relative; inset: auto; width: min(92%, 480px); margin: 0 auto 1.25rem; padding-bottom: 0.5rem; }
+            .rh__ph--coast, .rh__ph--island { position: relative; top: auto; right: auto; bottom: auto; left: auto; padding: 6px 6px 0; background: #fdfaf3; border: 1px solid rgba(212,175,55,0.55); border-radius: 16px; box-shadow: 0 18px 36px rgba(0,0,0,0.5); }
+            .rh__ph--coast  { width: 68%; transform: rotate(-3deg); }
+            .rh__ph--island { width: 64%; margin: -0.6rem 0 0 auto; transform: rotate(3deg); z-index: 2; }
+            .rh__ph--coast img, .rh__ph--island img { opacity: 1; border-radius: 11px; box-shadow: none; aspect-ratio: 4 / 3; }
+            .rh__ph--bundt  { top: -2%; right: -1%; bottom: auto; left: auto; width: 29%; transform: rotate(9deg); z-index: 4; }
+            .rh__ph--cake   { bottom: 0; left: 1%; top: auto; right: auto; width: 29%; transform: rotate(-9deg); z-index: 4; }
+            .rh__card, .rh__card--right { position: static; left: auto; right: auto; bottom: auto; max-width: none; padding: 0.5rem 0.45rem 0.6rem; column-gap: 0.55rem; background: transparent; border: 0; border-radius: 0; box-shadow: none; grid-template-columns: auto 1fr; }
+            .rh__num { font-size: 1.15rem; }
             .rh__lbl { font-size: 0.72rem; line-height: 1.25; }
-            .rh__extra { margin-top: 0.3rem; padding-top: 0.3rem; font-size: 0.72rem; letter-spacing: 0.6px; }
-            .rh__ph--coast img, .rh__ph--island img { border-radius: 16px; box-shadow: 0 16px 32px rgba(0,0,0,0.5); }
+            .rh__extra { margin-top: 0.35rem; padding-top: 0.35rem; font-size: 0.62rem; letter-spacing: 0.9px; }
             .rh__ph--bundt, .rh__ph--cake { border-radius: 10px; box-shadow: 0 12px 26px rgba(0,0,0,0.5); }
             .rh__content { padding: 0 1.25rem; }
             .rh__ribbon { width: 130px; margin-bottom: 0.75rem; }
@@ -238,7 +239,15 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
               .rx__card { position: absolute; left: 2%; bottom: -1%; z-index: 3; display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 0.8rem; max-width: 62%; padding: 0.7rem 1.05rem 0.7rem 0.95rem; background: #3c2a21; color: #fdfaf3; border: 1px solid rgba(212,175,55,0.55); border-radius: 14px; box-shadow: 0 16px 34px rgba(60,42,33,0.4); }
               .rx__num { font-family: var(--font-heading); font-size: clamp(1.15rem, 2.4vw, 1.7rem); line-height: 1; color: #d4af37; white-space: nowrap; }
               .rx__lbl { font-size: clamp(0.72rem, 1.5vw, 0.8rem); line-height: 1.3; color: rgba(253,250,243,0.85); }
-              @media (max-width: 480px) { .rx__wide { border-width: 5px; border-radius: 16px; } .rx__card { padding: 0.5rem 0.7rem; column-gap: 0.55rem; } }
+              /* Phones: the card hangs below the photos, across the full width, so it never sits on the picture
+                 or squeezes its own words into a narrow column. */
+              @media (max-width: 767px) {
+                .rx { padding-bottom: 5.25rem; }
+                .rx__wide { border-width: 5px; border-radius: 16px; }
+                .rx__card { left: 0; right: 0; bottom: -3.75rem; max-width: none; padding: 0.65rem 0.9rem; column-gap: 0.75rem; }
+                .rx__num { font-size: 1.45rem; }
+                .rx__lbl { font-size: 0.78rem; }
+              }
             ` }} />
           </div>
           {/* Text side */}
