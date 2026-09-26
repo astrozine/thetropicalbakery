@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import StripedBackground from '@/components/StripedBackground';
 import ScrollReveal from '@/components/ScrollReveal';
 import PayEstimator from '@/components/PayEstimator';
+import FormSideRails, { RailCard, RailSteps } from '@/components/FormSideRails';
 
 const ROLES = [
   {
@@ -106,6 +107,37 @@ export default function CareersPage() {
     }
     setDone(true);
   };
+
+  // Desktop rail beside the form: the chosen role's days and what it asks, so nobody scrolls back up to check.
+  const role = ROLES.find(r => r.id === form.role);
+  const rail = (
+    <>
+      <RailCard title={role ? `${role.icon} ${role.title}` : 'Vagas abertas'}>
+        {role ? (
+          <>
+            <p style={{ margin: 0, fontSize: '0.84rem', color: '#594a42', lineHeight: 1.5 }}><strong>Quando:</strong> {role.when}</p>
+            <p style={{ margin: '0.5rem 0 0', fontSize: '0.82rem', color: '#7a6a61', lineHeight: 1.5 }}>{role.summary}</p>
+          </>
+        ) : (
+          <div style={{ display: 'grid', gap: '0.4rem' }}>
+            {ROLES.map(r => (
+              <p key={r.id} style={{ margin: 0, fontSize: '0.84rem', color: '#594a42', lineHeight: 1.4 }}>
+                <span aria-hidden>{r.icon}</span> <strong>{r.title}</strong><br />
+                <span style={{ color: '#7a6a61', fontSize: '0.78rem' }}>{r.when}</span>
+              </p>
+            ))}
+          </div>
+        )}
+      </RailCard>
+      <RailCard title="Como funciona">
+        <RailSteps steps={[
+          'Conte quem você é, sem currículo formal',
+          'A gente lê cada candidatura com atenção',
+          'Se fizer sentido, chamamos você no WhatsApp',
+        ]} />
+      </RailCard>
+    </>
+  );
 
   return (
     <main style={{ background: 'var(--color-background)' }}>
@@ -222,6 +254,7 @@ export default function CareersPage() {
               </p>
             </div>
           ) : (
+            <FormSideRails formWidth={720} rail={rail}>
             <form onSubmit={handleSubmit} style={{
               background: '#fff', border: '1px solid #e8e1d7', borderRadius: '20px',
               padding: 'clamp(1.5rem, 4vw, 2.5rem)',
@@ -342,6 +375,7 @@ export default function CareersPage() {
                 {submitting ? 'Enviando...' : 'Enviar candidatura'}
               </button>
             </form>
+            </FormSideRails>
           )}
         </div>
       </StripedBackground>

@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import { SunbakedLettersNote } from '@/components/SunbakedLetters';
+import FormSideRails, { RailCard, RailSteps } from '@/components/FormSideRails';
 import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
 import { SUBSCRIPTION_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
 import { SubscriptionPlan, DIETARY_FIELDS, DietaryKey, monthlyTotal } from '@/lib/subscriptions';
@@ -220,7 +221,36 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
     );
   }
 
+  // Desktop rail: the live total stays in view while they fill in the address, instead of only at the bottom.
+  const rail = (
+    <>
+      {plan && (
+        <RailCard title="Seu plano">
+          <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-primary)' }}>{plan.name}</p>
+          <p style={{ margin: '0.2rem 0 0', fontSize: '0.84rem', color: '#7a6a61', lineHeight: 1.5 }}>
+            {boxesPerWeek} {boxesPerWeek === 1 ? 'caixa' : 'caixas'} por semana · entrega {deliveryFee === 0 ? 'inclusa' : `${formatBRL(deliveryFee)}/semana`}
+          </p>
+          <div style={{ marginTop: '0.7rem', paddingTop: '0.7rem', borderTop: '1px solid #efe4c8' }}>
+            <span style={{ display: 'block', fontSize: '0.75rem', color: '#594a42', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total por mês</span>
+            <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.45rem', color: 'var(--color-primary)', whiteSpace: 'nowrap' }}>{formatBRL(total)}</span>
+          </div>
+          <p style={{ margin: '0.3rem 0 0', fontSize: '0.75rem', color: '#7a6a61' }}>
+            {formatBRL(plan.price_per_box)} por caixa{plan.commitment_months > 1 && ` · ${plan.commitment_months} meses`}
+          </p>
+        </RailCard>
+      )}
+      <RailCard title="Como funciona">
+        <RailSteps steps={[
+          'Você reserva agora, sem pagar nada',
+          'A Dolly te chama no WhatsApp, normalmente no mesmo dia',
+          'Pagamento por Pix e a primeira caixa sai na próxima entrega',
+        ]} />
+      </RailCard>
+    </>
+  );
+
   return (
+    <FormSideRails formWidth={760} rail={rail}>
     <form
       onSubmit={handleSubmit}
       style={{
@@ -470,5 +500,6 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
         Você não paga nada agora. A Dolly confirma sua vaga e o pagamento por WhatsApp.
       </p>
     </form>
+    </FormSideRails>
   );
 }
