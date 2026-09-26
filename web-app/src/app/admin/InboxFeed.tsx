@@ -271,6 +271,48 @@ const actionBtn = (bg: string, color: string, border = 'transparent'): React.CSS
   border: `1px solid ${border}`, background: bg, color, fontWeight: 700, fontSize: '0.83rem', cursor: 'pointer', whiteSpace: 'nowrap',
 });
 
+/**
+ * Layout for the cards and the lists around them. On a wide screen a card is a row: the message on the left, its buttons in a column
+ * on the right. On a phone that cannot work (the nowrap buttons push past the card's edge), so the card becomes a stack in the way
+ * mobile apps do it: the message, then ONE big primary button across the full width (next step, 48px tall), then WhatsApp / Concluir /
+ * Arquivar side by side underneath, each at least 44px tall for a thumb. The white box around the "Chegou agora" list is dropped on
+ * phones so the cards use the whole screen width, and the filter tabs become a swipeable strip instead of wrapping into rows.
+ */
+function InboxStyles() {
+  return (
+    <style dangerouslySetInnerHTML={{ __html: `
+      .inbox-card { background: #fff; padding: 1.15rem 1.5rem 1.15rem 1.75rem; border-radius: 12px; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+      .inbox-card--compact { padding: 0.9rem 1.1rem 0.9rem 1.25rem; gap: 1rem; }
+      .inbox-card__main { flex: 1 1 320px; min-width: 0; overflow-wrap: anywhere; }
+      .inbox-card__actions { display: flex; flex-direction: column; gap: 0.5rem; align-items: stretch; flex: 0 0 auto; margin-left: auto; }
+      .inbox-card__more { display: flex; gap: 0.4rem; justify-content: flex-end; flex-wrap: wrap; }
+      .inbox-summary { background: #fff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: clamp(1.25rem, 3vw, 2rem); margin-bottom: 2rem; border-top: 6px solid #d9453a; }
+      .inbox-toast { position: fixed; left: 50%; bottom: 2rem; transform: translateX(-50%); z-index: 50; max-width: 92vw; }
+
+      @media (max-width: 767px) {
+        /* clear the phone's bottom bar */
+        .inbox-toast { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+      }
+      @media (max-width: 640px) {
+        .inbox-summary { background: transparent; box-shadow: none; border-top: 0; border-radius: 0; padding: 0; margin-bottom: 1.25rem; }
+        .inbox-card, .inbox-card--compact { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 0.9rem; padding: 1rem 1rem 1rem 1.1rem; border-radius: 14px; }
+        .inbox-card__main { flex: none; width: 100%; }
+        .inbox-card__actions { flex-direction: row; flex-wrap: wrap; align-items: stretch; margin-left: 0; width: 100%; gap: 0.5rem; }
+        .inbox-card__more { display: contents; }
+        .inbox-btn { flex: 1 1 0; min-width: 6.5rem; min-height: 44px; justify-content: center; text-align: center; white-space: normal !important; font-size: 0.9rem !important; }
+        .inbox-btn--primary { flex: 1 1 100%; order: -1; min-height: 48px; font-size: 0.95rem !important; }
+
+        .inbox-strip { flex-wrap: nowrap !important; overflow-x: auto; margin-left: -1rem; margin-right: -1rem; padding: 0.15rem 1rem 0.5rem; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .inbox-strip::-webkit-scrollbar { display: none; }
+        .inbox-strip > * { flex: 0 0 auto; scroll-snap-align: start; }
+        .inbox-strip > button { min-height: 44px; }
+      }
+    ` }} />
+  );
+}
+
+const stamp = (iso: string) => new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
 function ItemCard({ row, onSet, compact }: {
   row: Row; onSet: (status: string, message: string) => void; compact?: boolean;
 }) {
@@ -289,16 +331,15 @@ function ItemCard({ row, onSet, compact }: {
 
   return (
     <div
+      className={`inbox-card${compact ? ' inbox-card--compact' : ''}`}
       style={{
-        background: 'white', padding: compact ? '0.9rem 1.1rem 0.9rem 1.25rem' : '1.15rem 1.5rem 1.15rem 1.75rem', borderRadius: '12px',
         boxShadow: urgency?.level === 'urgent' ? '0 2px 10px rgba(192,57,43,0.22)' : isUnread ? '0 2px 8px rgba(192,57,43,0.12)' : '0 2px 4px rgba(0,0,0,0.05)',
         border: urgency?.level === 'urgent' ? '1px solid rgba(192,57,43,0.55)' : isUnread ? '1px solid rgba(192,57,43,0.25)' : '1px solid transparent',
         borderLeft: `7px solid ${t.color}`,
         opacity: bucket === 'closed' ? 0.78 : 1,
-        display: 'flex', gap: compact ? '1rem' : '1.5rem', alignItems: 'center', flexWrap: 'wrap',
       }}
     >
-      <div style={{ flex: '1 1 320px', minWidth: 0 }}>
+      <div className="inbox-card__main">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
           <TypeTag type={item.type} large={!compact} />
           <span style={{ fontSize: '0.78rem', color: '#7f8c8d', fontWeight: 600 }}>
@@ -308,7 +349,7 @@ function ItemCard({ row, onSet, compact }: {
         <h3 style={{ fontSize: compact ? '1rem' : '1.15rem', margin: '0 0 0.2rem', color: '#2c3e50', fontWeight: isUnread ? 800 : 600 }}>{item.title}</h3>
         <p style={{ color: '#7f8c8d', fontSize: '0.88rem', margin: 0 }}>{item.subtitle}</p>
         <p style={{ color: '#95a5a6', fontSize: '0.78rem', marginTop: '0.3rem' }}>
-          {new Date(item.created_at).toLocaleString('pt-BR')}
+          {stamp(item.created_at)}
           {t.href && !compact && (
             <> · <Link href={t.href} style={{ color: t.color, fontWeight: 700, textDecoration: 'none' }}>Abrir em {t.hrefLabel} →</Link></>
           )}
@@ -319,9 +360,10 @@ function ItemCard({ row, onSet, compact }: {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'stretch', flex: '0 0 auto', marginLeft: 'auto' }}>
+      <div className="inbox-card__actions">
         {digitsOnly(item.whatsapp) && (
           <a
+            className="inbox-btn"
             href={waLink(item.whatsapp)}
             target="_blank" rel="noopener noreferrer"
             style={{ ...actionBtn('#25D366', 'white'), justifyContent: 'center', textDecoration: 'none' }}
@@ -332,6 +374,7 @@ function ItemCard({ row, onSet, compact }: {
 
         {next && (
           <button
+            className="inbox-btn inbox-btn--primary"
             onClick={() => onSet(next.status, next.status === last.status ? `Movido para ${BUCKETS.done.tab}` : `Marcado como “${next.label}”`)}
             title={`Avançar este item para: ${next.label}`}
             style={{ ...actionBtn('#2c3e50', 'white'), justifyContent: 'center' }}
@@ -341,19 +384,19 @@ function ItemCard({ row, onSet, compact }: {
         )}
 
         {(canSkipToDone || canArchive || canReopen) && (
-          <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+          <div className="inbox-card__more">
             {canSkipToDone && (
-              <button onClick={() => onSet(last.status, `Movido para ${BUCKETS.done.tab}`)} title="Pular direto para concluído" style={actionBtn('#e6f4ec', '#0b6b3a', '#b9e0c8')}>
+              <button className="inbox-btn" onClick={() => onSet(last.status, `Movido para ${BUCKETS.done.tab}`)} title="Pular direto para concluído" style={actionBtn('#e6f4ec', '#0b6b3a', '#b9e0c8')}>
                 ✓ Concluir
               </button>
             )}
             {canArchive && (
-              <button onClick={() => onSet('archived', `Movido para ${BUCKETS.closed.tab}`)} title="Tirar da frente (fica em Arquivados)" style={actionBtn('#f1f2f6', '#5d6d7e', '#dfe3ea')}>
+              <button className="inbox-btn" onClick={() => onSet('archived', `Movido para ${BUCKETS.closed.tab}`)} title="Tirar da frente (fica em Arquivados)" style={actionBtn('#f1f2f6', '#5d6d7e', '#dfe3ea')}>
                 🗄️ Arquivar
               </button>
             )}
             {canReopen && (
-              <button onClick={() => onSet('new', 'Reaberto: voltou para “Precisa de você”')} title="Voltar para “Precisa de você”" style={actionBtn('#fff', '#2c3e50', '#cfd6dd')}>
+              <button className="inbox-btn" onClick={() => onSet('new', 'Reaberto: voltou para “Precisa de você”')} title="Voltar para “Precisa de você”" style={actionBtn('#fff', '#2c3e50', '#cfd6dd')}>
                 ↩ Reabrir
               </button>
             )}
@@ -408,6 +451,7 @@ export function InboxFull() {
 
   return (
     <div>
+      <InboxStyles />
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>📥 Caixa de Entrada</h1>
       <p style={{ color: '#7f8c8d', marginBottom: '1.5rem', lineHeight: 1.7 }}>
         Tudo que chega de fora, num só lugar. Cada item passa por três etapas:{' '}
@@ -424,7 +468,7 @@ export function InboxFull() {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+      <div className="inbox-strip" style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
         {BUCKET_ORDER.map(b => (
           <button key={b} onClick={() => setTab(b)} style={tabStyle(tab === b, BUCKETS[b].color)}>
             <span>{BUCKETS[b].icon}</span> {BUCKETS[b].tab}
@@ -436,7 +480,7 @@ export function InboxFull() {
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+      <div className="inbox-strip" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         <button
           onClick={() => setTypeFilter('all')}
           style={{ padding: '0.45rem 0.95rem', borderRadius: '999px', border: '2px solid #2c3e50', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', background: typeFilter === 'all' ? '#2c3e50' : 'white', color: typeFilter === 'all' ? 'white' : '#2c3e50' }}
@@ -472,10 +516,9 @@ export function InboxFull() {
       )}
 
       {toast && (
-        <div role="status" style={{
-          position: 'fixed', left: '50%', bottom: '2rem', transform: 'translateX(-50%)', zIndex: 50,
+        <div role="status" className="inbox-toast" style={{
           background: '#2c3e50', color: '#fff', borderRadius: '12px', padding: '0.85rem 1.25rem', boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-          display: 'flex', gap: '1.25rem', alignItems: 'center', fontWeight: 600, maxWidth: '92vw',
+          display: 'flex', gap: '1.25rem', alignItems: 'center', fontWeight: 600,
         }}>
           <span>{toast.text}</span>
           <button onClick={toast.undo} style={{ background: 'none', border: 'none', color: '#f4d675', fontWeight: 800, cursor: 'pointer', fontSize: '0.95rem' }}>Desfazer</button>
@@ -498,7 +541,8 @@ export function InboxSummary({ limit = 6 }: { limit?: number }) {
   const shown = unread.slice(0, limit);
 
   return (
-    <section style={{ background: '#fff', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', padding: 'clamp(1.25rem, 3vw, 2rem)', marginBottom: '2rem', borderTop: '6px solid #d9453a' }}>
+    <section className="inbox-summary">
+      <InboxStyles />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.1rem' }}>
         <h2 style={{ fontSize: '1.4rem', color: '#2c3e50', margin: 0 }}>
           📥 Chegou agora
@@ -519,7 +563,7 @@ export function InboxSummary({ limit = 6 }: { limit?: number }) {
         <p style={{ color: '#7f8c8d', padding: '1rem 0' }}>Tudo visto! Nenhuma mensagem nova. 🎉</p>
       ) : (
         <>
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.1rem' }}>
+          <div className="inbox-strip" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.1rem' }}>
             {TYPE_ORDER.map(type => {
               const n = unread.filter(r => r.item.type === type).length;
               if (!n) return null;
