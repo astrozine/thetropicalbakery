@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { BUCKETS, BUCKET_ORDER, bucketOf, urgencyOf, urgencyRank, type Bucket, type Urgency } from './inboxStatus';
 
 type ItemType = 'job_application' | 'order' | 'retreat_inquiry' | 'course_inquiry' | 'waitlist' | 'contact_lead';
 
@@ -18,6 +19,8 @@ interface InboxItem {
   created_at: string;
   /** A box the customer will collect themselves. */
   pickup?: boolean;
+  /** The day an order is due out ('YYYY-MM-DD'), for the red "delivery is tomorrow" flag. */
+  dueDate?: string | null;
 }
 
 interface StatusStep {
@@ -140,6 +143,8 @@ function useInbox() {
           : `${money(o.total_price)}${o.requested_date ? ` · ${o.fulfillment === 'pickup' ? '🛍️ Retirada' : 'Entrega'} ${new Date(o.requested_date + 'T00:00:00').toLocaleDateString('pt-BR')}` : ''}`,
         whatsapp: o.customer_whatsapp, email: o.customer_email, created_at: o.created_at,
         pickup: o.fulfillment === 'pickup',
+        // A quote request's date is the event day, not a delivery we are late on.
+        dueDate: o.items?.kind === 'orcamento_evento' || o.status === 'ORCAMENTO' ? null : (o.requested_date || null),
       })),
       ...(coursesRes.data || []).map((c: any) => ({
         key: `course_registrations:${c.id}`, source_table: 'course_registrations', source_id: c.id,
@@ -173,15 +178,7 @@ function useInbox() {
 
   useEffect(() => { load(); }, [load]);
 
-  const advanceStatus = async (item: InboxItem) => {
-    // 'cancelled' is set only by "Liberar caixas" on /admin/caixas (it gives the boxes back), never by tapping
-    // through the steps, and a cancelled order is not reopened by a stray tap.
-    const flow = flowFor(item).filter(f => f.status !== 'cancelled');
-    const current = statusMap[item.key] || 'new';
-    if (current === 'cancelled') return;
-    const idx = flow.findIndex(f => f.status === current);
-    const next = flow[(idx + 1) % flow.length].status;
-
+  const setStatus = async (item: InboxItem, next: string) => {
     setStatusMap(prev => ({ ...prev, [item.key]: next }));
     await supabase.from('inbox_status').upsert(
       { source_table: item.source_table, source_id: item.source_id, status: next, updated_at: new Date().toISOString() },
@@ -189,7 +186,21 @@ function useInbox() {
     );
   };
 
-  return { items, statusMap, loading, advanceStatus };
+  /**
+   * One step forward. It stops at the last step (a finished item does not loop back to "new";
+   * "Reabrir" does that on purpose). 'cancelled' is set only by "Liberar caixas" on /admin/caixas
+   * (it gives the boxes back), never by walking through the steps, and a cancelled order is not reopened.
+   */
+  const advanceStatus = async (item: InboxItem) => {
+    const flow = flowFor(item).filter(f => f.status !== 'cancelled');
+    const current = statusMap[item.key] || 'new';
+    if (current === 'cancelled' || current === 'archived') return;
+    const idx = flow.findIndex(f => f.status === current);
+    const next = flow[idx + 1];
+    if (next) await setStatus(item, next.status);
+  };
+
+  return { items, statusMap, loading, advanceStatus, setStatus };
 }
 
 /** The big, coloured "what is this and where does it live" tag on every card. */
@@ -208,21 +219,86 @@ function TypeTag({ type, large }: { type: ItemType; large?: boolean }) {
   );
 }
 
-function ItemCard({ item, step, isUnread, onAdvance, compact }: {
-  item: InboxItem; step: StatusStep; isUnread: boolean; onAdvance: () => void; compact?: boolean;
+/** A message plus everything the screen needs to know about where it stands. */
+interface Row {
+  item: InboxItem;
+  status: string;
+  flow: StatusStep[];
+  step: StatusStep;
+  bucket: Bucket;
+  urgency: Urgency | null;
+}
+
+function describe(item: InboxItem, statusMap: Record<string, string>): Row {
+  const flow = flowFor(item);
+  const status = statusMap[item.key] || 'new';
+  const bucket = bucketOf(flow, status);
+  const step = flow.find(f => f.status === status)
+    ?? (status === 'archived' ? { status, icon: '🗄️', label: 'Arquivado', color: '#6c757d', bg: '#f1f2f6' } : flow[0]);
+  const urgency = urgencyOf({ bucket, status, createdAt: item.created_at, dueDate: item.dueDate, pickup: item.pickup });
+  return { item, status, flow, step, bucket, urgency };
+}
+
+/** "Where is this?" in one glance: the mail-style place it sits in, then the exact step. */
+function StatusBadge({ row }: { row: Row }) {
+  const b = BUCKETS[row.bucket];
+  return (
+    <span
+      title={`${b.label}: ${b.hint}`}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: b.bg, color: b.color, borderRadius: '999px', padding: '0.28rem 0.75rem', fontSize: '0.8rem', fontWeight: 800, whiteSpace: 'nowrap' }}
+    >
+      <span>{b.icon}</span>
+      <span>{b.label}</span>
+      {row.step.label !== b.label && <span style={{ fontWeight: 600, opacity: 0.85 }}>· {row.step.label}</span>}
+    </span>
+  );
+}
+
+function UrgencyBadge({ urgency }: { urgency: Urgency }) {
+  const urgent = urgency.level === 'urgent';
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: '0.35rem', borderRadius: '999px', padding: '0.28rem 0.75rem', fontSize: '0.8rem', fontWeight: 800, whiteSpace: 'nowrap',
+      background: urgent ? '#c0392b' : '#fff1e0', color: urgent ? '#fff' : '#b5560f',
+    }}>
+      {urgent ? '🚨' : '⏰'} {urgency.text}
+    </span>
+  );
+}
+
+const actionBtn = (bg: string, color: string, border = 'transparent'): React.CSSProperties => ({
+  display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.55rem 0.9rem', borderRadius: '999px',
+  border: `1px solid ${border}`, background: bg, color, fontWeight: 700, fontSize: '0.83rem', cursor: 'pointer', whiteSpace: 'nowrap',
+});
+
+function ItemCard({ row, onSet, compact }: {
+  row: Row; onSet: (status: string, message: string) => void; compact?: boolean;
 }) {
+  const { item, flow, status, bucket, urgency } = row;
   const t = TYPE_INFO[item.type];
+  const steps = flow.filter(f => f.status !== 'cancelled');
+  const idx = steps.findIndex(f => f.status === status);
+  const next = bucket === 'attention' || bucket === 'progress' ? steps[Math.max(idx, 0) + 1] : undefined;
+  const last = steps[steps.length - 1];
+  const canSkipToDone = !!next && next.status !== last.status;
+  // Orders keep their steps because the customer's own page reads them; an order is ended by cancelling it
+  // (Liberar caixas) rather than archiving, so only the other kinds of message can be archived.
+  const canArchive = item.type !== 'order' && bucket !== 'closed';
+  const canReopen = (bucket === 'done' || bucket === 'closed') && status !== 'cancelled';
+  const isUnread = bucket === 'attention';
+
   return (
     <div
       style={{
-        background: 'white', padding: compact ? '0.9rem 1.1rem 0.9rem 1.25rem' : '1.25rem 1.5rem 1.25rem 1.75rem', borderRadius: '12px',
-        boxShadow: isUnread ? '0 2px 8px rgba(192,57,43,0.12)' : '0 2px 4px rgba(0,0,0,0.05)',
-        border: isUnread ? '1px solid rgba(192,57,43,0.25)' : '1px solid transparent',
+        background: 'white', padding: compact ? '0.9rem 1.1rem 0.9rem 1.25rem' : '1.15rem 1.5rem 1.15rem 1.75rem', borderRadius: '12px',
+        boxShadow: urgency?.level === 'urgent' ? '0 2px 10px rgba(192,57,43,0.22)' : isUnread ? '0 2px 8px rgba(192,57,43,0.12)' : '0 2px 4px rgba(0,0,0,0.05)',
+        border: urgency?.level === 'urgent' ? '1px solid rgba(192,57,43,0.55)' : isUnread ? '1px solid rgba(192,57,43,0.25)' : '1px solid transparent',
         borderLeft: `7px solid ${t.color}`,
+        opacity: bucket === 'closed' ? 0.78 : 1,
         display: 'flex', gap: compact ? '1rem' : '1.5rem', alignItems: 'center', flexWrap: 'wrap',
       }}
     >
-      <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+      <div style={{ flex: '1 1 320px', minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
           <TypeTag type={item.type} large={!compact} />
           <span style={{ fontSize: '0.78rem', color: '#7f8c8d', fontWeight: 600 }}>
@@ -237,65 +313,126 @@ function ItemCard({ item, step, isUnread, onAdvance, compact }: {
             <> · <Link href={t.href} style={{ color: t.color, fontWeight: 700, textDecoration: 'none' }}>Abrir em {t.hrefLabel} →</Link></>
           )}
         </p>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.6rem' }}>
+          <StatusBadge row={row} />
+          {urgency && <UrgencyBadge urgency={urgency} />}
+        </div>
       </div>
 
-      {digitsOnly(item.whatsapp) && (
-        <a
-          href={waLink(item.whatsapp)}
-          target="_blank" rel="noopener noreferrer"
-          style={{ background: '#25D366', color: 'white', padding: '0.65rem 1.1rem', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.85rem', whiteSpace: 'nowrap' }}
-        >
-          WhatsApp
-        </a>
-      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'stretch', flex: '0 0 auto', marginLeft: 'auto' }}>
+        {digitsOnly(item.whatsapp) && (
+          <a
+            href={waLink(item.whatsapp)}
+            target="_blank" rel="noopener noreferrer"
+            style={{ ...actionBtn('#25D366', 'white'), justifyContent: 'center', textDecoration: 'none' }}
+          >
+            💬 WhatsApp
+          </a>
+        )}
 
-      <button
-        onClick={onAdvance}
-        title="Clique para avançar o status"
-        style={{
-          display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem', borderRadius: '20px',
-          border: 'none', cursor: 'pointer', background: step.bg, color: step.color, fontWeight: 'bold', fontSize: '0.85rem', whiteSpace: 'nowrap',
-        }}
-      >
-        <span style={{ fontSize: '1.1rem' }}>{step.icon}</span> {step.label}
-      </button>
+        {next && (
+          <button
+            onClick={() => onSet(next.status, next.status === last.status ? `Movido para ${BUCKETS.done.tab}` : `Marcado como “${next.label}”`)}
+            title={`Avançar este item para: ${next.label}`}
+            style={{ ...actionBtn('#2c3e50', 'white'), justifyContent: 'center' }}
+          >
+            {next.icon} {next.label} →
+          </button>
+        )}
+
+        {(canSkipToDone || canArchive || canReopen) && (
+          <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+            {canSkipToDone && (
+              <button onClick={() => onSet(last.status, `Movido para ${BUCKETS.done.tab}`)} title="Pular direto para concluído" style={actionBtn('#e6f4ec', '#0b6b3a', '#b9e0c8')}>
+                ✓ Concluir
+              </button>
+            )}
+            {canArchive && (
+              <button onClick={() => onSet('archived', `Movido para ${BUCKETS.closed.tab}`)} title="Tirar da frente (fica em Arquivados)" style={actionBtn('#f1f2f6', '#5d6d7e', '#dfe3ea')}>
+                🗄️ Arquivar
+              </button>
+            )}
+            {canReopen && (
+              <button onClick={() => onSet('new', 'Reaberto: voltou para “Precisa de você”')} title="Voltar para “Precisa de você”" style={actionBtn('#fff', '#2c3e50', '#cfd6dd')}>
+                ↩ Reabrir
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-const pill = (active: boolean): React.CSSProperties => ({
-  padding: '0.7rem 1.4rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
-  background: active ? '#2c3e50' : '#f1f2f6', color: active ? 'white' : '#7f8c8d',
+const tabStyle = (active: boolean, color: string): React.CSSProperties => ({
+  display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.1rem', borderRadius: '10px', cursor: 'pointer',
+  border: `2px solid ${active ? color : 'transparent'}`, fontWeight: 800, fontSize: '0.92rem',
+  background: active ? '#fff' : '#f1f2f6', color: active ? color : '#6b7a89', boxShadow: active ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
 });
 
-/** The full inbox page: status tabs plus a filter per kind of message. */
-export function InboxFull() {
-  const { items, statusMap, loading, advanceStatus } = useInbox();
-  const [filter, setFilter] = useState<'all' | 'unread'>('unread');
-  const [typeFilter, setTypeFilter] = useState<ItemType | 'all'>('all');
+const countStyle = (color: string, active: boolean): React.CSSProperties => ({
+  background: active ? color : '#dfe3ea', color: active ? '#fff' : '#5d6d7e', borderRadius: '999px', padding: '0.05rem 0.55rem', fontSize: '0.78rem', fontWeight: 800,
+});
 
-  const isNew = useCallback((i: InboxItem) => (statusMap[i.key] || 'new') === 'new', [statusMap]);
-  const unreadCount = useMemo(() => items.filter(isNew).length, [items, isNew]);
-  const pool = filter === 'unread' ? items.filter(isNew) : items;
-  const visible = typeFilter === 'all' ? pool : pool.filter(i => i.type === typeFilter);
+/** The full inbox page: mail-style tabs (needs you / in progress / done / archived), plus a filter per kind of message. */
+export function InboxFull() {
+  const { items, statusMap, loading, setStatus } = useInbox();
+  const [tab, setTab] = useState<Bucket | 'all'>('attention');
+  const [typeFilter, setTypeFilter] = useState<ItemType | 'all'>('all');
+  const [toast, setToast] = useState<{ text: string; undo: () => void } | null>(null);
+  const toastTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const rows = useMemo(() => items.map(i => describe(i, statusMap)), [items, statusMap]);
+  const counts = useMemo(() => {
+    const c: Record<Bucket, number> = { attention: 0, progress: 0, done: 0, closed: 0 };
+    rows.forEach(r => { c[r.bucket] += 1; });
+    return c;
+  }, [rows]);
+  const redFlags = useMemo(() => rows.filter(r => r.urgency?.level === 'urgent').length, [rows]);
+
+  const pool = tab === 'all' ? rows : rows.filter(r => r.bucket === tab);
+  // Red flags first, then the newest.
+  const visible = (typeFilter === 'all' ? pool : pool.filter(r => r.item.type === typeFilter))
+    .slice()
+    .sort((a, b) => urgencyRank(a.urgency) - urgencyRank(b.urgency) || (b.item.created_at || '').localeCompare(a.item.created_at || ''));
+
+  const act = (row: Row, next: string, message: string) => {
+    const before = row.status;
+    setStatus(row.item, next);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ text: message, undo: () => { setStatus(row.item, before); setToast(null); } });
+    toastTimer.current = setTimeout(() => setToast(null), 7000);
+  };
 
   if (loading) return <div style={{ padding: '2rem' }}>Carregando...</div>;
 
   return (
     <div>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>📥 Caixa de Entrada</h1>
-      <p style={{ color: '#7f8c8d', marginBottom: '2rem', lineHeight: 1.7 }}>
-        Tudo que chega de fora — candidaturas, pedidos, interesse em cursos e retiros, fila de espera —
-        num só lugar. Cada cartão mostra o tipo em destaque e a pasta do menu a que pertence.
-        Clique no selo de status para avançar a etapa.
+      <p style={{ color: '#7f8c8d', marginBottom: '1.5rem', lineHeight: 1.7 }}>
+        Tudo que chega de fora, num só lugar. Cada item passa por três etapas:{' '}
+        <strong style={{ color: BUCKETS.attention.color }}>{BUCKETS.attention.icon} Precisa de você</strong> →{' '}
+        <strong style={{ color: BUCKETS.progress.color }}>{BUCKETS.progress.icon} Em andamento</strong> →{' '}
+        <strong style={{ color: BUCKETS.done.color }}>{BUCKETS.done.icon} Concluído</strong>.
+        Use os botões de cada cartão para mover; <strong>🗄️ Arquivar</strong> tira da frente sem apagar.
+        Um <strong style={{ color: '#c0392b' }}>🚨 selo vermelho</strong> avisa o que não pode esperar.
       </p>
 
-      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-        <button onClick={() => setFilter('unread')} style={pill(filter === 'unread')}>
-          Não Vistos {unreadCount > 0 && `(${unreadCount})`}
-        </button>
-        <button onClick={() => setFilter('all')} style={pill(filter === 'all')}>
-          Tudo ({items.length})
+      {redFlags > 0 && (
+        <div style={{ background: '#fdecea', border: '1px solid rgba(192,57,43,0.4)', color: '#a93226', borderRadius: '12px', padding: '0.85rem 1.1rem', marginBottom: '1.25rem', fontWeight: 700 }}>
+          🚨 {redFlags} {redFlags === 1 ? 'item não pode esperar' : 'itens não podem esperar'} (entrega perto e ainda sem sair). Estão no topo da lista.
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+        {BUCKET_ORDER.map(b => (
+          <button key={b} onClick={() => setTab(b)} style={tabStyle(tab === b, BUCKETS[b].color)}>
+            <span>{BUCKETS[b].icon}</span> {BUCKETS[b].tab}
+            <span style={countStyle(BUCKETS[b].color, tab === b)}>{counts[b]}</span>
+          </button>
+        ))}
+        <button onClick={() => setTab('all')} style={tabStyle(tab === 'all', '#2c3e50')}>
+          Tudo <span style={countStyle('#2c3e50', tab === 'all')}>{rows.length}</span>
         </button>
       </div>
 
@@ -308,7 +445,7 @@ export function InboxFull() {
         </button>
         {TYPE_ORDER.map(type => {
           const t = TYPE_INFO[type];
-          const n = pool.filter(i => i.type === type).length;
+          const n = pool.filter(r => r.item.type === type).length;
           const active = typeFilter === type;
           return (
             <button
@@ -324,16 +461,24 @@ export function InboxFull() {
 
       {visible.length === 0 ? (
         <div style={{ background: 'white', padding: '3rem', borderRadius: '12px', textAlign: 'center', color: '#7f8c8d', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-          {filter === 'unread' ? 'Tudo visto! Nenhum item pendente. 🎉' : 'Nada por aqui ainda.'}
+          {tab === 'all' ? 'Nada por aqui ainda.' : BUCKETS[tab].empty}
         </div>
       ) : (
         <div style={{ display: 'grid', gap: '1rem' }}>
-          {visible.map(item => {
-            const flow = flowFor(item);
-            const current = statusMap[item.key] || 'new';
-            const step = flow.find(f => f.status === current) || flow[0];
-            return <ItemCard key={item.key} item={item} step={step} isUnread={current === 'new'} onAdvance={() => advanceStatus(item)} />;
-          })}
+          {visible.map(row => (
+            <ItemCard key={row.item.key} row={row} onSet={(next, message) => act(row, next, message)} />
+          ))}
+        </div>
+      )}
+
+      {toast && (
+        <div role="status" style={{
+          position: 'fixed', left: '50%', bottom: '2rem', transform: 'translateX(-50%)', zIndex: 50,
+          background: '#2c3e50', color: '#fff', borderRadius: '12px', padding: '0.85rem 1.25rem', boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+          display: 'flex', gap: '1.25rem', alignItems: 'center', fontWeight: 600, maxWidth: '92vw',
+        }}>
+          <span>{toast.text}</span>
+          <button onClick={toast.undo} style={{ background: 'none', border: 'none', color: '#f4d675', fontWeight: 800, cursor: 'pointer', fontSize: '0.95rem' }}>Desfazer</button>
         </div>
       )}
     </div>
@@ -342,9 +487,14 @@ export function InboxFull() {
 
 /** The "what just arrived" panel on the Visão Geral page: newest unseen items, plus a count per kind. */
 export function InboxSummary({ limit = 6 }: { limit?: number }) {
-  const { items, statusMap, loading, advanceStatus } = useInbox();
+  const { items, statusMap, loading, setStatus } = useInbox();
 
-  const unread = useMemo(() => items.filter(i => (statusMap[i.key] || 'new') === 'new'), [items, statusMap]);
+  const rows = useMemo(() => items.map(i => describe(i, statusMap)), [items, statusMap]);
+  const unread = useMemo(
+    () => rows.filter(r => r.bucket === 'attention')
+      .sort((a, b) => urgencyRank(a.urgency) - urgencyRank(b.urgency) || (b.item.created_at || '').localeCompare(a.item.created_at || '')),
+    [rows],
+  );
   const shown = unread.slice(0, limit);
 
   return (
@@ -371,7 +521,7 @@ export function InboxSummary({ limit = 6 }: { limit?: number }) {
         <>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.1rem' }}>
             {TYPE_ORDER.map(type => {
-              const n = unread.filter(i => i.type === type).length;
+              const n = unread.filter(r => r.item.type === type).length;
               if (!n) return null;
               const t = TYPE_INFO[type];
               return (
@@ -382,11 +532,9 @@ export function InboxSummary({ limit = 6 }: { limit?: number }) {
             })}
           </div>
           <div style={{ display: 'grid', gap: '0.75rem' }}>
-            {shown.map(item => {
-              const flow = flowFor(item);
-              const step = flow.find(f => f.status === 'new') || flow[0];
-              return <ItemCard key={item.key} item={item} step={step} isUnread compact onAdvance={() => advanceStatus(item)} />;
-            })}
+            {shown.map(row => (
+              <ItemCard key={row.item.key} row={row} compact onSet={next => setStatus(row.item, next)} />
+            ))}
           </div>
           {unread.length > shown.length && (
             <p style={{ textAlign: 'center', marginTop: '1rem' }}>
