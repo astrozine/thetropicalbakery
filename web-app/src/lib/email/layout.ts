@@ -203,7 +203,7 @@ function factsRow(facts: EmailFact[]): string {
     <td class="tb-fact" width="${w}%" valign="top" style="padding:0 4px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td class="tb-fact-in" height="96" valign="middle" bgcolor="${SAND}" style="height:96px;background:${SAND};border:1px solid ${LINE};border-radius:14px;padding:12px 10px;text-align:center;">
-          <div class="tb-fact-num" style="font-family:${HEADING_FONT};font-weight:700;font-size:${f.num.length > 7 ? 16 : 22}px;line-height:1.15;color:${GOLD_DEEP};">${esc(f.num)}</div>
+          <div class="tb-fact-num${f.num.length > 7 ? " tb-fact-num--long" : ""}" style="font-family:${HEADING_FONT};font-weight:700;font-size:${f.num.length > 7 ? 16 : 22}px;line-height:1.15;color:${GOLD_DEEP};">${esc(f.num)}</div>
           <div class="tb-fact-lbl" style="font-family:${BODY_FONT};font-size:12px;line-height:1.4;color:${TEXT};margin-top:6px;">${esc(f.label)}</div>
         </td></tr>
       </table>
@@ -288,6 +288,7 @@ export function renderEmail(o: LayoutOptions): string {
     .tb-fact { padding: 0 3px !important; }
     .tb-fact-in { padding: 10px 5px !important; height: 88px !important; }
     .tb-fact-num { font-size: 17px !important; }
+    .tb-fact-num--long { font-size: 12px !important; }
     .tb-fact-lbl { font-size: 11px !important; }
     .tb-tile div { font-size: 11px !important; }
   }

@@ -75,13 +75,13 @@ const MONTHS_SHORT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 's
 
 /** "2026-09-26" -> "26 set" (for the big-number tiles); anything else comes back as typed. */
 const shortDate = (iso: string) => {
-  const m = /^(d{4})-(d{2})-(d{2})$/.exec((iso || '').trim());
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((iso || '').trim());
   return m ? `${Number(m[3])} ${MONTHS_SHORT[Number(m[2]) - 1]}` : (iso || '').trim();
 };
 
 /** "2026-09-26" -> "sábado" */
 const weekday = (iso: string) => {
-  const m = /^(d{4})-(d{2})-(d{2})$/.exec((iso || '').trim());
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((iso || '').trim());
   return m ? WEEKDAYS[new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).getUTCDay()] : '';
 };
 
@@ -278,7 +278,7 @@ export const CAMPAIGNS: Campaign[] = [
     description: 'Nova turma de curso em Itamambuca.',
     reason: 'Você recebe este e-mail porque demonstrou interesse nos nossos cursos.',
     fields: [
-      { name: 'course', label: 'Nome do curso', type: 'text', required: true },
+      { name: 'course', label: 'Nome do curso', type: 'text', required: true, placeholder: 'Confeitaria Vegana Essencial' },
       { name: 'date', label: 'Data (AAAA-MM-DD)', type: 'date', required: true },
       { name: 'spots', label: 'Quantas vagas', type: 'number', placeholder: '8' },
       { name: 'intro', label: 'Sobre a turma', type: 'textarea' },
