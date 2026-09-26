@@ -872,6 +872,9 @@ body {
 .crs-course-actions { margin-top: auto; display: flex; gap: .6rem; flex-wrap: wrap; padding-top: .6rem; }
 .crs-course-actions .crs-btn { padding: .8rem 1.3rem; font-size: .92rem; }
 
+/* ── Todas as Parcerias index page ──────────────────────────────────────── */
+.b2b-index-cta:hover { background: #5a3d2e !important; transform: translateY(-2px); }
+
 @media (prefers-reduced-motion: reduce) {
   .crs-float, .crs-rain-drops, .crs-rain-cloud, .crs-trick { animation: none; }
   .crs-trick-inner { transition: none; }

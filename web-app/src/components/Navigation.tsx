@@ -67,6 +67,7 @@ export default function Navigation() {
   ];
 
   const b2bLinks = [
+    { name: 'Todas as Parcerias', path: '/b2b', highlight: true },
     { name: 'Hotéis', path: '/b2b/hotels' },
     { name: 'Pousadas', path: '/b2b/pousadas' },
     { name: 'Airbnbs', path: '/b2b/airbnbs' },
@@ -310,9 +311,9 @@ export default function Navigation() {
                 {b2bLinks.map((link) => (
                   <Link key={link.path} href={link.path} style={{
                     padding: '0.5rem 1.5rem',
-                    color: pathname === link.path ? '#d4af37' : '#594a42',
+                    color: link.highlight ? '#d4af37' : pathname === link.path ? '#d4af37' : '#594a42',
                     textDecoration: 'none',
-                    fontWeight: pathname === link.path ? 'bold' : 'normal',
+                    fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
                     fontSize: '0.9rem',
                     textTransform: 'uppercase'
                   }}>
@@ -538,8 +539,8 @@ export default function Navigation() {
                   display: 'block',
                   padding: '0.8rem 0 0.8rem 1rem',
                   textDecoration: 'none',
-                  color: pathname === link.path ? '#d4af37' : '#594a42',
-                  fontWeight: pathname === link.path ? 'bold' : '400',
+                  color: link.highlight ? '#d4af37' : pathname === link.path ? '#d4af37' : '#594a42',
+                  fontWeight: link.highlight || pathname === link.path ? 'bold' : '400',
                   fontSize: '1.1rem',
                   borderBottom: '1px solid rgba(0,0,0,0.04)',
                   animation: 'fadeIn 0.2s ease-out'
