@@ -33,6 +33,10 @@ export default function MenuPage() {
   const [refine, setRefine] = useState<RefineState>({ ...emptyRefine, mode: 'free' });
   // The quick pick's button opens one sheet with both ways to order (see EventOrder.tsx).
   const [sheetPicks, setSheetPicks] = useState<PickableTreat[] | null>(null);
+  // One list of chosen treats, shared by the photo quick pick and the catalogue below it,
+  // so what you tapped up there is still marked (and can be changed) down here.
+  const [picked, setPicked] = useState<string[]>([]);
+  const togglePick = (id: string) => setPicked(p => (p.includes(id) ? p.filter(x => x !== id) : [...p, id]));
   const { items: cartItems } = useCart();
   const cartNames = cartItems.filter(i => i.kind === 'events').map(i => i.name);
 
@@ -96,6 +100,8 @@ export default function MenuPage() {
                 subtitle="Toque nos doces que você quer servir. Depois é só escolher: pedir agora ou montar junto com a gente."
                 initial={8}
                 ctaLabel="Continuar"
+                picked={picked}
+                onPickedChange={setPicked}
                 onAction={chosen => setSheetPicks(chosen)}
               />
             </div>
@@ -140,7 +146,7 @@ export default function MenuPage() {
           `}</style>
           <div className="menu-layout">
           <aside className="menu-aside" aria-label="Filtro de alergias e preferências">
-            <TreatRefineMenu variant="public" treats={menuItems} value={refine} onChange={setRefine} shown={visibleItems.length} sheetBelow={1024} fabBottom="5.5rem" />
+            <TreatRefineMenu variant="public" treats={menuItems} value={refine} onChange={setRefine} shown={visibleItems.length} sheetBelow={1024} fabBottom={picked.length > 0 ? '9.5rem' : '5.5rem'} />
           </aside>
 
           <div className="menu-main">
@@ -159,7 +165,7 @@ export default function MenuPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {visibleItems.map(item => (
               <ScrollReveal key={item.id}>
-                <MenuCard item={{
+                <MenuCard picked={picked.includes(item.id)} onTogglePick={() => togglePick(item.id)} item={{
                   id: item.id,
                   name: item.name,
                   description: item.description,

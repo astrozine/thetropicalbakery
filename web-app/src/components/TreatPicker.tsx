@@ -29,6 +29,9 @@ interface Props {
   treats?: PickableTreat[];
   /** Hero use: bigger photos, tighter copy. */
   hero?: boolean;
+  /** Let the page own the chosen ids, so other parts of it (the catalogue) can show and change the same picks. */
+  picked?: string[];
+  onPickedChange?: (ids: string[]) => void;
 }
 
 /**
@@ -48,9 +51,16 @@ interface Props {
  */
 export default function TreatPicker({
   title, subtitle, initial = 8, ctaLabel, onAction, treats: given, hero = false,
+  picked: controlled, onPickedChange,
 }: Props) {
   const [loaded, setLoaded] = useState<PickableTreat[]>([]);
-  const [picked, setPicked] = useState<string[]>([]);
+  const [own, setOwn] = useState<string[]>([]);
+  const picked = controlled ?? own;
+  const setPicked = (fn: (p: string[]) => string[]) => {
+    const next = fn(picked);
+    if (controlled === undefined) setOwn(next);
+    onPickedChange?.(next);
+  };
   const [showAll, setShowAll] = useState(false);
   const [pop, setPop] = useState<string | null>(null);
 
