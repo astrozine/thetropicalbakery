@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import HeldBoxes from './HeldBoxes';
+import BoxStock from '../BoxStock';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
@@ -15,6 +16,7 @@ import { pushTreatDetails } from '@/lib/treatSync';
 import { BoxWindowFields, SaleState, deliveryWindowLabel, longDay, saleState } from '@/lib/boxWindow';
 import { toISODate } from '@/lib/deliverySchedule';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
+import { healBatchDate } from '@/lib/batchDate';
 
 interface TastingBox extends BoxWindowFields {
   id: string;
@@ -76,6 +78,9 @@ export default function AdminCaixas() {
   const [leadDays, setLeadDays] = useState(2);
   /** After saving a box that is live: offer to tell the waiting list and customers. */
   const [announce, setAnnounce] = useState<{ title: string; treats: string; quantity: number } | null>(null);
+  /** What the browser refused on the last save attempt, said in the save bar instead of an off-screen bubble. */
+  const [formProblem, setFormProblem] = useState('');
+  const firstInvalid = useRef(false);
 
   useEffect(() => {
     fetchBoxes();
@@ -180,26 +185,53 @@ export default function AdminCaixas() {
     setTitle(box.title);
     setDescription(box.description);
     setImageUrl(box.image_url);
-    setBatchDateLabel(box.batch_date_label);
+    setBatchDateLabel(healBatchDate(box.batch_date_label));
     setTotalQuantity(box.total_quantity);
     setSoldQuantity(box.sold_quantity);
     setPrice(box.price);
     setIsActive(box.is_active);
     setItems(box.items || []);
     setGallery(Array.isArray(box.gallery) ? box.gallery : []);
-    setDeliveryFrom(box.delivery_from || '');
-    setDeliveryUntil(box.delivery_until || '');
-    setOrdersOpen(box.orders_open_from || '');
-    setOrdersClose(box.orders_close_on || '');
+    setDeliveryFrom(healBatchDate(box.delivery_from || ''));
+    setDeliveryUntil(healBatchDate(box.delivery_until || ''));
+    setOrdersOpen(healBatchDate(box.orders_open_from || ''));
+    setOrdersClose(healBatchDate(box.orders_close_on || ''));
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  /**
+   * The quick stock buttons wrote new numbers. Move the list to match, and — if that same box is open
+   * in the form — its two quantity fields too, so saving the form does not put the old numbers back.
+   */
+  const applyStock = (id: string, total: number, sold: number) => {
+    setBoxes(list => list.map(b => (b.id === id ? { ...b, total_quantity: total, sold_quantity: sold } : b)));
+    if (editingId === id) { setTotalQuantity(total); setSoldQuantity(sold); }
   };
 
   const hint = (msg: string) =>
     /items|ingredients|contains|emoji/.test(msg) ? ' — Rode as migrations 13 e 14 no Supabase primeiro.' : '';
 
+  /**
+   * A field the browser refuses (empty title, impossible date) blocks the save with a bubble that,
+   * on a phone, sits far off screen next to the field — so the button looks broken. Say it in the
+   * save bar, which is always under the thumb, and jump to the field.
+   */
+  const handleInvalid = (e: React.FormEvent) => {
+    const el = e.target as HTMLInputElement;
+    if (!firstInvalid.current) {
+      firstInvalid.current = true;
+      setTimeout(() => { firstInvalid.current = false; }, 0);
+      const name = el.getAttribute('data-nome') || 'Um campo';
+      setFormProblem(`${name}: ${el.validationMessage || 'confira este campo'}`);
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      setTimeout(() => el.focus({ preventScroll: true }), 300);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormProblem('');
     const windowProblem =
       deliveryFrom && deliveryUntil && deliveryUntil < deliveryFrom ? 'O último dia de entrega vem antes do primeiro.'
       : '';
@@ -335,6 +367,9 @@ export default function AdminCaixas() {
         </div>
       )}
 
+      {/* The number that changes every day, before the long form that almost never does. */}
+      <BoxStock box={boxes.find(b => b.is_active) ?? null} onChanged={applyStock} />
+
       <div style={{ background: '#f8f9fa', padding: '1rem 1.5rem', borderRadius: '8px', borderLeft: '4px solid #d4af37', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h3 style={{ margin: 0, color: '#2c3e50' }}>Gerenciar Fila de Espera</h3>
@@ -347,7 +382,7 @@ export default function AdminCaixas() {
 
       <h2 style={{ fontSize: '1.5rem', marginBottom: '1.25rem', color: '#2c3e50' }}>{editingId ? 'Editar Lote' : 'Novo Lote'}</h2>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: '3rem' }}>
+      <form onSubmit={handleSubmit} onInvalid={handleInvalid} style={{ marginBottom: '3rem' }}>
         <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))', alignItems: 'start' }}>
 
           {/* LEFT: the box itself + its picture */}
@@ -357,7 +392,7 @@ export default function AdminCaixas() {
 
             <div>
               <label style={label}>Título</label>
-              <input type="text" required value={title} onChange={e => setTitle(e.target.value)} placeholder="Ex: Caixa Surpresa da Semana" style={input} />
+              <input type="text" required data-nome="Título" value={title} onChange={e => setTitle(e.target.value)} placeholder="Ex: Caixa Surpresa da Semana" style={input} />
             </div>
 
             <div>
@@ -368,7 +403,8 @@ export default function AdminCaixas() {
             <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))' }}>
               <div>
                 <label style={label}>Data do Lote</label>
-                <input type="date" required min="2020-01-01" max="2100-12-31" value={batchDateLabel} onChange={e => setBatchDateLabel(e.target.value)} style={input} />
+                <input type="date" required min="2020-01-01" max="2100-12-31" data-nome="Data do Lote"
+                  value={batchDateLabel} onChange={e => setBatchDateLabel(healBatchDate(e.target.value))} style={input} />
               </div>
               <div>
                 <label style={label}>Qtd. Total Produzida</label>
@@ -457,10 +493,10 @@ export default function AdminCaixas() {
                 <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os dias em que esta leva está planejada para sair. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas. <strong>Se a janela passar e ainda houver caixas, a venda continua</strong>: as entregas passam a valer a partir do primeiro dia livre do calendário.</p>
                 <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))' }}>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Primeiro dia
-                    <input type="date" value={deliveryFrom} onChange={e => setDeliveryFrom(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
+                    <input type="date" data-nome="Primeiro dia de entrega" value={deliveryFrom} onChange={e => setDeliveryFrom(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
                   </label>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Último dia
-                    <input type="date" value={deliveryUntil} min={deliveryFrom || undefined} onChange={e => setDeliveryUntil(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
+                    <input type="date" data-nome="Último dia de entrega" value={deliveryUntil} min={deliveryFrom || undefined} onChange={e => setDeliveryUntil(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
                   </label>
                 </div>
               </div>
@@ -469,7 +505,7 @@ export default function AdminCaixas() {
                 <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os pedidos ficam abertos até a caixa <strong>esgotar</strong> ou você <strong>desativá-la</strong> no botão abaixo. Só a data de abertura é opcional, para deixar uma caixa pronta para uma data futura.</p>
                 <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))' }}>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Abre em <span style={{ fontWeight: 400, color: '#95a5a6' }}>(vazio = já)</span>
-                    <input type="date" value={ordersOpen} onChange={e => setOrdersOpen(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
+                    <input type="date" data-nome="Abertura dos pedidos" value={ordersOpen} onChange={e => setOrdersOpen(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
                   </label>
                 </div>
               </div>
@@ -511,6 +547,11 @@ export default function AdminCaixas() {
 
         {/* Save bar: stays in view while scrolling a long treat list */}
         <div style={{ ...card, position: 'sticky', bottom: '0.75rem', zIndex: 5, marginTop: '1.5rem', padding: '0.9rem 1.25rem', boxShadow: '0 -2px 12px rgba(0,0,0,0.12)' }}>
+            {formProblem && (
+              <p role="alert" style={{ margin: '0 0 0.7rem', color: '#c0392b', fontWeight: 700, fontSize: '0.9rem', lineHeight: 1.45 }}>
+                ⚠️ {formProblem}
+              </p>
+            )}
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <button type="submit" disabled={saving} style={{ background: '#d4af37', color: 'white', padding: '0.8rem 2rem', border: 'none', borderRadius: '6px', cursor: saving ? 'wait' : 'pointer', fontWeight: 'bold', opacity: saving ? 0.7 : 1 }}>
                 {saving ? 'Salvando…' : editingId ? 'Atualizar Lote' : 'Criar Lote'}

@@ -4,6 +4,7 @@ import React from 'react';
 import QuickMenu from './QuickMenu';
 import OverviewHero from './OverviewHero';
 import CommsColumn from './CommsColumn';
+import BoxStock from './BoxStock';
 import { useAdminStats } from './adminStats';
 
 const greeting = () => {
@@ -33,6 +34,8 @@ export default function AdminDashboard() {
       <div className="admin-overview">
         <div className="admin-overview__hero">
           <OverviewHero stats={stats} />
+          {/* "Sobraram quantas?" right here: a box eaten at home is two taps, not a trip through the box form. */}
+          <BoxStock box={stats.box} onChanged={stats.reload} compact />
         </div>
 
         {/* Comms column wrapped in a soft blue-slate panel so it reads as a distinct zone */}

@@ -4,6 +4,20 @@
  * Show it the way a person would say it, and heal that year typo on the way.
  * Anything that isn't a date (an older free-text label) is shown untouched.
  */
+/**
+ * Typing "26" in the year of a date box gives the year 26, not 2026 ("0026-09-19"), and the form
+ * then refuses to save without saying why. Heal it as it is typed, so the save just works.
+ * Anything that is not a date (an older free-text label, a half-typed one) comes back untouched.
+ */
+export function healBatchDate(value: string | null | undefined): string {
+  if (!value) return '';
+  const m = /^(\d{1,6})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (!m) return value;
+  const year = Number(m[1]);
+  if (year >= 100) return value;
+  return `${year + 2000}-${m[2]}-${m[3]}`;
+}
+
 export function formatBatchDate(label: string | null | undefined): string {
   if (!label) return '';
   const m = /^(\d{4,6})-(\d{2})-(\d{2})$/.exec(label.trim());
