@@ -31,6 +31,41 @@ export function parseBoxItems(text: string): { intro: string; items: string[] } 
   return null;
 }
 
+/** Flavour keywords (accents removed, lower case) and the emoji that says it at a glance. */
+const FLAVOR_EMOJIS: { re: RegExp; emoji: string; label: string }[] = [
+  { re: /chocolate branco/, emoji: '🤍', label: 'chocolate branco' },
+  { re: /chocolate(?! branco)|cacau|brigadeiro/, emoji: '🍫', label: 'chocolate' },
+  { re: /coco/, emoji: '🥥', label: 'coco' },
+  { re: /abacaxi/, emoji: '🍍', label: 'abacaxi' },
+  { re: /manga/, emoji: '🥭', label: 'manga' },
+  { re: /limao|lima\b/, emoji: '🍋', label: 'limão' },
+  { re: /laranja|tangerina|mexerica/, emoji: '🍊', label: 'laranja' },
+  { re: /banana/, emoji: '🍌', label: 'banana' },
+  { re: /morango/, emoji: '🍓', label: 'morango' },
+  { re: /maracuja/, emoji: '💛', label: 'maracujá' },
+  { re: /goiaba/, emoji: '🍈', label: 'goiaba' },
+  { re: /uva/, emoji: '🍇', label: 'uva passa' },
+  { re: /cafe|espresso/, emoji: '☕', label: 'café' },
+  { re: /noz|nozes|peca\b|pecan|macadamia|avela/, emoji: '🌰', label: 'nozes' },
+  { re: /castanha|caju|amendoim|pistache|amendoa/, emoji: '🥜', label: 'castanhas' },
+  { re: /tamara/, emoji: '🌴', label: 'tâmara' },
+  { re: /caramel|doce de leite|pudim/, emoji: '🍮', label: 'caramelo' },
+  { re: /\bmel\b|geleia/, emoji: '🍯', label: 'geleia' },
+  { re: /canela|especiaria|gengibre/, emoji: '🫚', label: 'especiarias' },
+];
+
+/** Up to four flavour emojis for a treat, in the order the flavours appear in its name. */
+function flavorEmojis(text: string): { emoji: string; label: string }[] {
+  const t = text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const seen = new Set<string>();
+  return FLAVOR_EMOJIS
+    .map(f => ({ ...f, at: t.search(f.re) }))
+    .filter(f => f.at >= 0)
+    .sort((a, b) => a.at - b.at)
+    .filter(f => (seen.has(f.emoji) ? false : (seen.add(f.emoji), true)))
+    .slice(0, 4);
+}
+
 /**
  * The treats in a box, each on its own row with a glowing gold ✦ (the same star used across the site).
  * `dark` for the photo hero, `light` for white cards.
@@ -53,6 +88,7 @@ export default function BoxItemList({ description, tone = 'dark' }: { descriptio
         .bil li:hover { transform: translateX(4px); }
         .bil-star { flex-shrink: 0; width: 2.1rem; height: 2.1rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
           font-size: 1.15rem; line-height: 1; animation: bil-twinkle 3.2s ease-in-out infinite; animation-delay: calc(var(--i) * 0.45s); }
+        .bil-flavors { display: flex; gap: 0.4rem; margin-top: 0.3rem; font-size: 1.2rem; line-height: 1.2; }
         .bil-dark .bil-intro { color: rgba(253, 250, 243, 0.9); }
         .bil-dark li { color: rgba(253, 250, 243, 0.96); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(244, 214, 117, 0.3); backdrop-filter: blur(6px); }
         .bil-dark li:hover { border-color: rgba(244, 214, 117, 0.7); }
@@ -67,12 +103,22 @@ export default function BoxItemList({ description, tone = 'dark' }: { descriptio
       `}</style>
       {parsed.intro && <p className="bil-intro">{parsed.intro}</p>}
       <ul>
-        {parsed.items.map((item, i) => (
-          <li key={i} style={{ ['--i' as string]: i }}>
-            <span className="bil-star" aria-hidden>✦</span>
-            <span>{item}</span>
-          </li>
-        ))}
+        {parsed.items.map((item, i) => {
+          const flavors = flavorEmojis(item);
+          return (
+            <li key={i} style={{ ['--i' as string]: i }}>
+              <span className="bil-star" aria-hidden>✦</span>
+              <span>
+                {item}
+                {flavors.length > 0 && (
+                  <span className="bil-flavors" aria-hidden>
+                    {flavors.map(f => <span key={f.emoji} title={f.label}>{f.emoji}</span>)}
+                  </span>
+                )}
+              </span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
