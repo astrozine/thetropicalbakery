@@ -12,6 +12,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import { SubscriptionPlan, monthlySavings } from '@/lib/subscriptions';
 import { formatBRL } from '@/lib/deliveryZones';
 import WhatsAppGate from '@/components/WhatsAppGate';
+import { OriginSeal } from '@/components/BelgiumBrazil';
 
 /** The single-box price we compare plans against. */
 const BASE_BOX_PRICE = 99;
@@ -149,6 +150,9 @@ export default function SubscriptionPage() {
             Uma criação nova a cada semana, feita à mão pela Dolly em Itamambuca.
             Vegana, sem glúten, sem açúcar refinado — e sem nunca repetir a semana anterior.
           </p>
+
+          <OriginSeal tone="dark" style={{ marginBottom: '2.25rem' }} />
+          <br />
 
           <button onClick={scrollToSignup} className="btn btn-secondary" style={{
             background: '#d4af37', color: '#3c2a21', border: 'none', padding: '1.1rem 2.5rem',
@@ -314,7 +318,7 @@ export default function SubscriptionPage() {
                       borderColor: isSelected ? '#d4af37' : featured ? 'var(--color-primary)' : '#e8e1d7',
                       borderRadius: '20px',
                       padding: '2rem 1.5rem',
-                      paddingTop: plan.badge ? '2.25rem' : '2rem',
+                      paddingTop: plan.badge ? '3.1rem' : '2rem',
                       cursor: 'pointer',
                       position: 'relative',
                       overflow: 'hidden',
@@ -323,14 +327,15 @@ export default function SubscriptionPage() {
                       boxShadow: isSelected ? '0 18px 40px rgba(212,175,55,0.28)' : '0 8px 24px rgba(60,42,33,0.07)',
                       transition: 'box-shadow 0.25s, border-color 0.25s',
                       scrollSnapAlign: 'start',
-                      flex: '0 0 min(275px, 80vw)',
+                      flex: '0 0 min(300px, 82vw)',
                     }}
                   >
                     {plan.badge && (
                       <span style={{
-                        position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)',
-                        background: '#d4af37', color: '#3c2a21', padding: '0.3rem 1rem',
-                        borderRadius: '20px', fontSize: '0.78rem', fontWeight: 800,
+                        // A tab hanging from the top edge: inside the card, so overflow:hidden never clips it.
+                        position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                        background: '#d4af37', color: '#3c2a21', padding: '0.35rem 1.1rem 0.4rem',
+                        borderRadius: '0 0 12px 12px', fontSize: '0.72rem', fontWeight: 800,
                         textTransform: 'uppercase', letterSpacing: '0.12em', whiteSpace: 'nowrap',
                       }}>
                         {plan.badge}
@@ -354,17 +359,17 @@ export default function SubscriptionPage() {
                       {plan.tagline}
                     </p>
 
-                    <div style={{ marginBottom: '0.35rem', overflow: 'hidden' }}>
-                      <span style={{
-                        fontFamily: 'var(--font-heading)',
-                        fontSize: 'clamp(1.8rem, 6vw, 2.8rem)',
-                        lineHeight: 1,
-                        display: 'inline-block',
-                        maxWidth: '100%',
-                      }}>
-                        {formatBRL(plan.monthly_price)}
+                    {/* Menu-style price: small "R$", big whole number, small cents. The full
+                        "R$ 396,00" in the heading font was wider than the card and got clipped. */}
+                    <div style={{ marginBottom: '0.35rem', display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.15rem', fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
+                      <span style={{ fontSize: '1rem', marginTop: '0.35rem', opacity: 0.8 }}>R$</span>
+                      <span style={{ fontSize: 'clamp(2.4rem, 7vw, 3rem)' }}>
+                        {Math.floor(plan.monthly_price).toLocaleString('pt-BR')}
                       </span>
-                      <span style={{ fontSize: '0.95rem', opacity: 0.7 }}> /mês</span>
+                      <span style={{ fontSize: '1rem', marginTop: '0.35rem' }}>
+                        ,{String(Math.round((plan.monthly_price % 1) * 100)).padStart(2, '0')}
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.95rem', opacity: 0.7, alignSelf: 'flex-end', marginLeft: '0.3rem' }}>/mês</span>
                     </div>
                     <p style={{ fontSize: '0.85rem', opacity: 0.75, marginBottom: savings > 0 ? '0.6rem' : '1.75rem' }}>
                       {formatBRL(plan.price_per_box)} por caixa

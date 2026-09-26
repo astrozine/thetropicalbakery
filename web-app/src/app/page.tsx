@@ -5,6 +5,7 @@ import ExplodingTreats from '@/components/ExplodingTreats';
 import HomeTreatPicker from '@/components/HomeTreatPicker';
 import PhilosophyShowcase from '@/components/PhilosophyShowcase';
 import PhotoShowcase from '@/components/PhotoShowcase';
+import { OriginStory } from '@/components/BelgiumBrazil';
 import FeaturedBoxCard from '@/components/FeaturedBoxCard';
 import { formatBatchDate } from '@/lib/batchDate';
 import { fetchSchedule, selectableDates } from '@/lib/deliverySchedule';
@@ -99,10 +100,13 @@ export default async function Home() {
       <HomeTreatPicker />
 
       {/* Scrolling Text Banner */}
-      <Marquee text="THE TROPICAL BAKERY ✦ ITAMAMBUCA ✦ VEGAN ✦ " speed={300} />
+      <Marquee text="THE TROPICAL BAKERY ✦ MAESTRIA BELGA ✦ NATUREZA BRASILEIRA ✦ ITAMAMBUCA ✦ VEGAN ✦ " speed={300} />
 
       {/* Philosophy Section: accordions for the story, boxes, prices, ingredients, events and delivery */}
       <PhilosophyShowcase featuredImage={getContent('home-about', '/menu-items/1000240473 - Edited (1).jpg')} />
+
+      {/* Who makes it: Belgian skill + Brazilian nature. The one place the whole story is told. */}
+      <OriginStory />
 
       {/* Full-colour photo band: the branded paper and the treats */}
       <PhotoShowcase />

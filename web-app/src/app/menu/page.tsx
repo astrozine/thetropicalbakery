@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { OriginSeal } from '@/components/BelgiumBrazil';
 import { supabase } from '@/lib/supabase';
 import ScrollReveal from '@/components/ScrollReveal';
 import MenuCard from '@/components/MenuCard';
@@ -82,6 +83,7 @@ export default function MenuPage() {
             <h1 style={{ fontSize: 'clamp(1.95rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem', color: '#3c2a21' }}>
               Menu para Eventos
             </h1>
+            <OriginSeal text="Confeitaria de luxo · Técnica belga" style={{ marginBottom: '1.5rem' }} />
             
             {/* PHONE HERO: tapping photos beats reading a paragraph. By the time
                 someone has picked four treats they have already decided they want

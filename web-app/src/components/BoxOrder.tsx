@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { OriginSeal } from '@/components/BelgiumBrazil';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import DeliveryCalendar from '@/components/DeliveryCalendar';
@@ -92,6 +93,7 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
           <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: 1.6 }}>
             Escolha o dia e pague por Pix em seguida. Receba em casa (Itamambuca, praias vizinhas e eventos em Paraty) ou retire no nosso home bakery: você escolhe no próximo passo.
           </p>
+          <OriginSeal text="Técnica belga · Ingredientes brasileiros" style={{ marginTop: '0.9rem' }} />
         </div>
 
         {sale && sale.state !== 'open' ? (

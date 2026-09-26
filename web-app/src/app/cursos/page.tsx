@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { OriginSeal } from '@/components/BelgiumBrazil';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import SunbakedLetters from '@/components/SunbakedLetters';
@@ -71,6 +72,7 @@ export default function CursosPage() {
             doces 100% plant-based, sem glúten e sem açúcar refinado que ninguém consegue acreditar que são saudáveis.
             Nos cursos, você aprende o porquê de cada ingrediente, para criar as suas próprias receitas pelo resto da vida.
           </p>
+          <OriginSeal text="Aprenda a técnica belga com ingredientes brasileiros" style={{ marginBottom: '2rem' }} />
           <div className="crs-rain-points" style={{ maxWidth: '860px' }}>
             {['🌱 100% plant-based', '🌾 Sem glúten', '🍯 Sem açúcar refinado', '🧂 Sem sal e sem óleo', '🌴 Frutas da Mata Atlântica', '👩‍🍳 Mão na massa'].map(t => (
               <span key={t} style={{ background: '#fff', color: '#3c2a21', border: '1px solid #eadfcb' }}>{t}</span>
