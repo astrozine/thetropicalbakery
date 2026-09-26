@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatBRL } from '@/lib/deliveryZones';
 import { MONTH_NAMES, SHIFT_STATUS, WORKER_ROLES, Worker, WorkShift, monthPay, shiftHours, workerRole } from '@/lib/portals';
+import { brandConfirm } from '@/lib/brandDialog';
 
 const card: React.CSSProperties = { background: 'white', borderRadius: '12px', padding: 'clamp(1.25rem, 3vw, 1.75rem)', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' };
 const field: React.CSSProperties = { width: '100%', padding: '0.7rem', borderRadius: '8px', border: '1px solid #dfe4ea', fontSize: '0.95rem' };
@@ -73,7 +74,7 @@ export default function AdminTeamPage() {
   };
 
   const removeWorker = async (w: Worker) => {
-    if (!confirm(`Remover ${w.full_name} da equipe? Os turnos dele também saem.`)) return;
+    if (!(await brandConfirm(`Remover ${w.full_name} da equipe? Os turnos dele também saem.`, { danger: true, confirmLabel: 'Sim, remover' }))) return;
     await supabase.from('workers').delete().eq('id', w.id);
     load();
   };

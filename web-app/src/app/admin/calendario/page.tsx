@@ -7,6 +7,7 @@ import {
   ScheduleRule, DateOverride, WEEKDAY_NAMES, describeRule, dayState, overrideMap,
   openDatesBetween, toISODate, parseISODate,
 } from '@/lib/deliverySchedule';
+import { brandConfirm } from '@/lib/brandDialog';
 
 const WEEKDAY = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const MONTH_NAME = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -147,7 +148,7 @@ export default function DeliveryCalendarAdmin() {
   };
 
   const removeRule = async (r: ScheduleRule) => {
-    if (!window.confirm(`Apagar a regra "${describeRule(r)}"? Os dias que ela gerava deixam de estar abertos.`)) return;
+    if (!(await brandConfirm(`Apagar a regra "${describeRule(r)}"? Os dias que ela gerava deixam de estar abertos.`, { danger: true, confirmLabel: 'Sim, remover' }))) return;
     const { error: err } = await supabase.from('delivery_schedule_rules').delete().eq('id', r.id);
     if (err) setError(`Não foi possível apagar a regra: ${err.message}`);
     load();

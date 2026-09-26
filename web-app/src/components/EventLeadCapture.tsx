@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { brandAlert } from '@/lib/brandDialog';
 
 export default function EventLeadCapture() {
   const [step, setStep] = useState<0 | 1 | 2>(0);
@@ -17,9 +18,17 @@ export default function EventLeadCapture() {
     setStep(1);
   };
 
+  // Branded popup, then land on the empty field.
+  const askFor = (message: string, fieldId: string) => {
+    brandAlert(message, { title: 'Falta um detalhe', icon: '✦', confirmLabel: 'Entendi' }).then(() => {
+      document.getElementById(fieldId)?.focus();
+    });
+  };
+
   const nextStep = () => {
-    if (step === 1 && (!formData.name || !formData.whatsapp)) {
-      alert('Por favor, preencha nome e WhatsApp.');
+    if (step === 1 && (!formData.name.trim() || !formData.whatsapp.trim())) {
+      const missing = !formData.name.trim() ? 'elc-name' : 'elc-whatsapp';
+      askFor(missing === 'elc-name' ? 'Preencha o campo «Nome Completo» para continuar.' : 'Preencha o campo «WhatsApp» para continuar.', missing);
       return;
     }
     setStep(2);
@@ -28,7 +37,8 @@ export default function EventLeadCapture() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.date || !formData.guests) {
-      alert('Por favor, preencha a data e o número de convidados.');
+      const missing = !formData.date ? 'elc-date' : 'elc-guests';
+      askFor(missing === 'elc-date' ? 'Preencha o campo «Data» para continuar.' : 'Preencha o campo «Convidados» para continuar.', missing);
       return;
     }
     
@@ -67,6 +77,7 @@ export default function EventLeadCapture() {
             <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>Nome Completo</label>
             <input 
               type="text" 
+              id="elc-name"
               value={formData.name}
               onChange={e => setFormData({...formData, name: e.target.value})}
               style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: 'white', fontSize: '1rem', color: '#3c2a21' }}
@@ -77,6 +88,7 @@ export default function EventLeadCapture() {
             <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>WhatsApp</label>
             <input 
               type="tel" 
+              id="elc-whatsapp"
               value={formData.whatsapp}
               onChange={e => setFormData({...formData, whatsapp: e.target.value})}
               style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: 'white', fontSize: '1rem', color: '#3c2a21' }}
@@ -118,6 +130,7 @@ export default function EventLeadCapture() {
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>Data</label>
                 <input 
                   type="date" 
+                  id="elc-date"
                   value={formData.date}
                   onChange={e => setFormData({...formData, date: e.target.value})}
                   style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: 'white', fontSize: '1rem', color: '#3c2a21' }}
@@ -127,6 +140,7 @@ export default function EventLeadCapture() {
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>Convidados</label>
                 <input 
                   type="number" 
+                  id="elc-guests"
                   value={formData.guests}
                   onChange={e => setFormData({...formData, guests: e.target.value})}
                   style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', background: 'white', fontSize: '1rem', color: '#3c2a21' }}

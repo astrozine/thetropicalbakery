@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { brandConfirm } from '@/lib/brandDialog';
 
 interface MaintenanceContact {
   id: string;
@@ -90,7 +91,7 @@ export default function MaintenanceContactsAdmin() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Remover este contato da lista?')) return;
+    if (!(await brandConfirm('Remover este contato da lista?', { danger: true, confirmLabel: 'Sim, remover' }))) return;
     const { error } = await supabase.from('maintenance_contacts').delete().eq('id', id);
     if (error) {
       console.error('Error deleting contact:', error);

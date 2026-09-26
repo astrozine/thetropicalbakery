@@ -5,6 +5,7 @@ import ToggleSwitch from '@/components/ToggleSwitch';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
+import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 
 interface Course {
   id: string;
@@ -77,7 +78,7 @@ export default function CoursesAdmin() {
       setFormData({ ...formData, image_url: publicUrl });
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Erro ao fazer upload da imagem.');
+      brandAlert('Erro ao fazer upload da imagem.');
     } finally {
       setUploading(false);
     }
@@ -92,7 +93,7 @@ export default function CoursesAdmin() {
         .update(formData)
         .eq('id', editingId);
         
-      if (error) alert('Erro ao atualizar curso: ' + error.message);
+      if (error) brandAlert('Erro ao atualizar curso: ' + error.message);
     } else {
       const { error } = await supabase
         .from('courses')
@@ -101,7 +102,7 @@ export default function CoursesAdmin() {
           is_active: formData.is_active ?? true,
         }]);
         
-      if (error) alert('Erro ao criar curso: ' + error.message);
+      if (error) brandAlert('Erro ao criar curso: ' + error.message);
     }
 
     setEditingId(null);
@@ -116,14 +117,14 @@ export default function CoursesAdmin() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este curso?')) return;
+    if (!(await brandConfirm('Tem certeza que deseja excluir este curso?', { danger: true, confirmLabel: 'Sim, remover' }))) return;
     
     const { error } = await supabase
       .from('courses')
       .delete()
       .eq('id', id);
       
-    if (error) alert('Erro ao deletar: ' + error.message);
+    if (error) brandAlert('Erro ao deletar: ' + error.message);
     else fetchCourses();
   };
 

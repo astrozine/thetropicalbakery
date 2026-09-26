@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { brandConfirm } from '@/lib/brandDialog';
 
 interface AdminRow {
   email: string;
@@ -57,7 +58,7 @@ export default function AdministradoresPage() {
   };
 
   const remove = async (email: string) => {
-    if (!window.confirm(`Remover o acesso de administrador de ${email}?`)) return;
+    if (!(await brandConfirm(`Remover o acesso de administrador de ${email}?`, { danger: true, confirmLabel: 'Sim, remover' }))) return;
     const { error } = await supabase.from('admins').delete().eq('email', email);
     if (error) {
       setError(error.message.includes('último') ? 'Não é possível remover o último administrador.' : 'Não foi possível remover.');

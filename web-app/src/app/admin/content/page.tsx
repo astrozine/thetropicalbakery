@@ -3,6 +3,7 @@
 import ImagePicker from '@/components/ImagePicker';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { brandAlert } from '@/lib/brandDialog';
 
 interface SiteContent {
   id: string;
@@ -60,7 +61,7 @@ export default function SiteContentAdmin() {
       setFormData({ ...formData, image_url: publicUrl });
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Erro ao fazer upload da imagem.');
+      brandAlert('Erro ao fazer upload da imagem.');
     } finally {
       setUploading(false);
     }
@@ -75,13 +76,13 @@ export default function SiteContentAdmin() {
         .update(formData)
         .eq('id', editingId);
         
-      if (error) alert('Erro ao atualizar conteúdo: ' + error.message);
+      if (error) brandAlert('Erro ao atualizar conteúdo: ' + error.message);
     } else {
       const { error } = await supabase
         .from('site_content')
         .insert([formData]);
         
-      if (error) alert('Erro ao criar conteúdo: ' + error.message);
+      if (error) brandAlert('Erro ao criar conteúdo: ' + error.message);
     }
 
     setEditingId(null);

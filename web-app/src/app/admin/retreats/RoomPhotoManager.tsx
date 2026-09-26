@@ -4,6 +4,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { RETREAT_ROOMS } from '@/lib/retreatRooms';
+import { brandConfirm } from '@/lib/brandDialog';
 
 export interface RoomPhotoRow {
   id: string;
@@ -82,8 +83,8 @@ export default function RoomPhotoManager({ room, onSaved, notify }: Props) {
     return [picked, ...list.filter((_, n) => n !== i)];
   });
 
-  const remove = (i: number) => {
-    if (!window.confirm('Tirar esta foto da lista? (Para só esconder do site, use "Esconder".)')) return;
+  const remove = async (i: number) => {
+    if (!(await brandConfirm('Tirar esta foto da lista? (Para só esconder do site, use "Esconder".)', { danger: true, confirmLabel: 'Sim, remover' }))) return;
     setPhotos(list => list.filter((_, n) => n !== i));
   };
 
@@ -113,7 +114,7 @@ export default function RoomPhotoManager({ room, onSaved, notify }: Props) {
   };
 
   const resetToDefaults = async () => {
-    if (!window.confirm('Voltar para as fotos originais do site? As fotos que você enviou saem desta lista.')) return;
+    if (!(await brandConfirm('Voltar para as fotos originais do site? As fotos que você enviou saem desta lista.'))) return;
     setSaving(true);
     const update = { gallery: [] as string[], gallery_library: [] as string[], updated_at: new Date().toISOString() };
     let { error } = await supabase.from('retreat_rooms').update(update).eq('id', room.id);

@@ -10,6 +10,7 @@ import { BoxItem } from '@/lib/allergens';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { pushTreatDetails } from '@/lib/treatSync';
 import { BoxWindowFields, SaleState, deliveryWindowLabel, lastOrderDay, longDay, saleState } from '@/lib/boxWindow';
+import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 
 interface TastingBox extends BoxWindowFields {
   id: string;
@@ -86,7 +87,7 @@ export default function AdminCaixas() {
       if (!e.target.files || e.target.files.length === 0) return;
       setImageUrl(await uploadPublicImage(e.target.files[0], 'boxes'));
     } catch (error) {
-      alert('Error uploading image!');
+      brandAlert('Error uploading image!');
       console.error(error);
     } finally {
       setUploading(false);
@@ -139,7 +140,7 @@ export default function AdminCaixas() {
       : ordersOpen && ordersClose && ordersClose < ordersOpen ? 'O fim dos pedidos vem antes do início.'
       : ordersClose && deliveryUntil && ordersClose > deliveryUntil ? 'Os pedidos fecham depois do último dia de entrega.'
       : '';
-    if (windowProblem) { alert(windowProblem); return; }
+    if (windowProblem) { brandAlert(windowProblem); return; }
     setSaving(true);
 
     // 1. Treats ticked "also add to the Menu de Eventos" are created there first, so the box can point at them.
@@ -148,7 +149,7 @@ export default function AdminCaixas() {
       let treatId = it.treat_id || null;
       if (it.add_to_menu && !treatId) {
         if (!it.menu_price || it.menu_price <= 0) {
-          alert(`Informe o preço unitário de "${it.name}" para adicioná-lo ao Menu de Eventos.`);
+          brandAlert(`Informe o preço unitário de "${it.name}" para adicioná-lo ao Menu de Eventos.`);
           setSaving(false);
           return;
         }
@@ -159,7 +160,7 @@ export default function AdminCaixas() {
           is_available: true,
         }]).select('id').single();
         if (error || !data) {
-          alert(`Erro ao adicionar "${it.name}" ao Menu de Eventos: ${error?.message ?? ''}${hint(error?.message ?? '')}`);
+          brandAlert(`Erro ao adicionar "${it.name}" ao Menu de Eventos: ${error?.message ?? ''}${hint(error?.message ?? '')}`);
           setSaving(false);
           return;
         }
@@ -202,10 +203,10 @@ export default function AdminCaixas() {
       const rest: Record<string, unknown> = { ...payload };
       WINDOW_KEYS.forEach(k => delete rest[k]);
       ({ error } = await save(rest));
-      if (!error) alert('Caixa salva, mas sem as janelas de entrega e de pedidos. Rode a migration_21_box_windows.sql no Supabase e salve de novo.');
+      if (!error) brandAlert('Caixa salva, mas sem as janelas de entrega e de pedidos. Rode a migration_21_box_windows.sql no Supabase e salve de novo.');
     }
     if (error) {
-      alert(`Erro ao salvar: ${error.message}${hint(error.message)}`);
+      brandAlert(`Erro ao salvar: ${error.message}${hint(error.message)}`);
       setSaving(false);
       return;
     }
@@ -226,9 +227,9 @@ export default function AdminCaixas() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja deletar este lote?')) return;
+    if (!(await brandConfirm('Tem certeza que deseja deletar este lote?', { danger: true, confirmLabel: 'Sim, remover' }))) return;
     const { error } = await supabase.from('tasting_boxes').delete().eq('id', id);
-    if (error) alert('Erro ao deletar: ' + error.message);
+    if (error) brandAlert('Erro ao deletar: ' + error.message);
     else fetchBoxes();
   };
 

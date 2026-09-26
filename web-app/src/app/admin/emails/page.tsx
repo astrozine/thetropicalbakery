@@ -7,6 +7,7 @@ import { SITE_URL, renderEmail } from '@/lib/email/layout';
 import { EMAIL_TOPICS, MARKETING_TOPICS, TAG_LABELS, ContactTag, canReceive, topicById } from '@/lib/emailTopics';
 import DietTargeting, { DietTargetingValue, EMPTY_TARGETING } from './DietTargeting';
 import { matchDiet } from '@/lib/dietary';
+import { brandConfirm } from '@/lib/brandDialog';
 
 interface SendRow {
   message_key: string;
@@ -154,7 +155,7 @@ export default function AdminEmailsPage() {
       setResult({ ok: false, text: 'Ninguém novo para receber isso agora.' });
       return;
     }
-    if (!window.confirm(`Enviar "${info.subject}" para ${info.willSend} pessoa(s)?\n\nQuem já recebeu esta mesma mensagem não recebe de novo.`)) return;
+    if (!(await brandConfirm(`Enviar "${info.subject}" para ${info.willSend} pessoa(s)?\n\nQuem já recebeu esta mesma mensagem não recebe de novo.`))) return;
 
     setBusy('send'); setResult(null);
     try {

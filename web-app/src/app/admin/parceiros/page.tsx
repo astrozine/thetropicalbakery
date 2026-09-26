@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { PARTNER_KINDS, PARTNER_STATUS, Partner, RESTOCK_STATUS, RestockRequest, partnerKind } from '@/lib/portals';
+import { brandConfirm } from '@/lib/brandDialog';
 
 const card: React.CSSProperties = { background: 'white', borderRadius: '12px', padding: 'clamp(1.25rem, 3vw, 1.75rem)', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' };
 const field: React.CSSProperties = { width: '100%', padding: '0.7rem', borderRadius: '8px', border: '1px solid #dfe4ea', fontSize: '0.95rem' };
@@ -77,7 +78,7 @@ export default function AdminPartnersPage() {
   };
 
   const remove = async (p: Partner) => {
-    if (!confirm(`Remover ${p.business_name} dos parceiros? Os pedidos de reposição dele também saem.`)) return;
+    if (!(await brandConfirm(`Remover ${p.business_name} dos parceiros? Os pedidos de reposição dele também saem.`, { danger: true, confirmLabel: 'Sim, remover' }))) return;
     await supabase.from('partners').delete().eq('id', p.id);
     load();
   };

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 
 const SECTION_ID = 'announcement';
 
@@ -43,7 +44,7 @@ export default function AnnouncementAdmin() {
     setSaving(false);
     if (error) {
       console.error('Error saving announcement:', error);
-      alert('Não foi possível salvar o anúncio.');
+      brandAlert('Não foi possível salvar o anúncio.');
       return;
     }
     setSaved(true);
@@ -51,7 +52,7 @@ export default function AnnouncementAdmin() {
   };
 
   const handleClear = async () => {
-    if (!confirm('Remover o anúncio da página inicial?')) return;
+    if (!(await brandConfirm('Remover o anúncio da página inicial?', { danger: true, confirmLabel: 'Sim, remover' }))) return;
     setMessage('');
     setLink('');
     setSaving(true);

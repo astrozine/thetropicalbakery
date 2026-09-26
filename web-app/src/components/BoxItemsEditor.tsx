@@ -6,6 +6,7 @@ import { uploadPublicImage } from '@/lib/imageUpload';
 import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
 import { AllergenFields, EmojiField, IngredientsField, fieldStyle, labelStyle } from '@/components/TreatDetailsFields';
+import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 
 interface Props {
   items: BoxItem[];
@@ -65,7 +66,7 @@ function ItemEditor({ item, onChange }: { item: BoxItem; onChange: (i: BoxItem) 
       onChange({ ...item, image_url: await uploadPublicImage(file, 'boxes/items') });
     } catch (err) {
       console.error(err);
-      alert('Não foi possível enviar a foto. Tente novamente.');
+      brandAlert('Não foi possível enviar a foto. Tente novamente.');
     }
     setUploading(false);
   };
@@ -151,8 +152,8 @@ export default function BoxItemsEditor({ items, onChange }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const update = (id: string, next: BoxItem) => onChange(items.map(i => (i.id === id ? next : i)));
-  const remove = (id: string, name: string) => {
-    if (!confirm(`Remover "${name || 'este doce'}" da caixa?`)) return;
+  const remove = async (id: string, name: string) => {
+    if (!(await brandConfirm(`Remover "${name || 'este doce'}" da caixa?`, { danger: true, confirmLabel: 'Sim, remover' }))) return;
     onChange(items.filter(i => i.id !== id));
   };
   const move = (idx: number, dir: -1 | 1) => {

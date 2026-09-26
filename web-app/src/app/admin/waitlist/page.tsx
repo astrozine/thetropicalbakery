@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 
 interface WaitlistEntry {
   id: string;
@@ -38,14 +39,14 @@ export default function AdminWaitlist() {
       .update({ notified: !currentStatus })
       .eq('id', id);
       
-    if (error) alert('Erro ao atualizar: ' + error.message);
+    if (error) brandAlert('Erro ao atualizar: ' + error.message);
     else fetchWaitlist();
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja deletar este contato?')) return;
+    if (!(await brandConfirm('Tem certeza que deseja deletar este contato?', { danger: true, confirmLabel: 'Sim, remover' }))) return;
     const { error } = await supabase.from('waitlist').delete().eq('id', id);
-    if (error) alert('Erro ao deletar: ' + error.message);
+    if (error) brandAlert('Erro ao deletar: ' + error.message);
     else fetchWaitlist();
   };
 

@@ -10,6 +10,7 @@ import TreatInfo from '@/components/TreatInfo';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { syncTreatIntoBoxes } from '@/lib/treatSync';
+import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 
 interface Treat {
   id: string;
@@ -66,7 +67,7 @@ export default function TreatsAdmin() {
       setFormData(f => ({ ...f, image_url: publicUrl }));
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Erro ao fazer upload da imagem.');
+      brandAlert('Erro ao fazer upload da imagem.');
     } finally {
       setUploading(false);
     }
@@ -92,7 +93,7 @@ export default function TreatsAdmin() {
     if (editingId) {
       const { error } = await supabase.from('treats').update({ ...formData, ...details }).eq('id', editingId);
       if (error) {
-        alert('Erro ao atualizar doce: ' + error.message + hint(error.message));
+        brandAlert('Erro ao atualizar doce: ' + error.message + hint(error.message));
         setSaving(false);
         return;
       }
@@ -107,7 +108,7 @@ export default function TreatsAdmin() {
         batch_multiplier: formData.batch_multiplier || 1,
       }]);
       if (error) {
-        alert('Erro ao criar doce: ' + error.message + hint(error.message));
+        brandAlert('Erro ao criar doce: ' + error.message + hint(error.message));
         setSaving(false);
         return;
       }
@@ -126,10 +127,10 @@ export default function TreatsAdmin() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este item?')) return;
+    if (!(await brandConfirm('Tem certeza que deseja excluir este item?', { danger: true, confirmLabel: 'Sim, remover' }))) return;
 
     const { error } = await supabase.from('treats').delete().eq('id', id);
-    if (error) alert('Erro ao deletar: ' + error.message);
+    if (error) brandAlert('Erro ao deletar: ' + error.message);
     else fetchTreats();
   };
 
