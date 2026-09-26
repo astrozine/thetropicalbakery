@@ -4,7 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 
-export default function WaitlistCapture({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
+export default function WaitlistCapture({ theme = 'dark', heading, subheading, plain = false }: {
+  theme?: 'light' | 'dark';
+  /** Overrides the default "Quero ser avisado do próximo lote!" headline. */
+  heading?: string;
+  /** Overrides the small line under the headline. */
+  subheading?: string;
+  /** Drops the form's own box and shadow, for when it already sits inside a card. */
+  plain?: boolean;
+}) {
   const [formData, setFormData] = useState({ name: '', whatsapp: '', email: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -100,12 +108,12 @@ export default function WaitlistCapture({ theme = 'dark' }: { theme?: 'light' | 
   }
 
   return (
-    <div style={{ background: containerBg, padding: '2rem', borderRadius: '16px', backdropFilter: isLight ? 'none' : 'blur(10px)', border: containerBorder, boxShadow: containerShadow, maxWidth: '500px', margin: '0 auto', textAlign: 'left' }}>
+    <div style={{ background: plain ? 'transparent' : containerBg, padding: plain ? '0' : '2rem', borderRadius: '16px', backdropFilter: isLight || plain ? 'none' : 'blur(10px)', border: plain ? 'none' : containerBorder, boxShadow: plain ? 'none' : containerShadow, maxWidth: '500px', margin: '0 auto', textAlign: 'left' }}>
       <h3 style={{ color: '#d4af37', fontSize: '1.3rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>
-        Quero ser avisado do próximo lote!
+        {heading ?? 'Quero ser avisado do próximo lote!'}
       </h3>
       <p style={{ fontSize: '0.9rem', color: subtextColor, marginBottom: '1.5rem', textAlign: 'center' }}>
-        Deixe seu contato para ter acesso prioritário ao menu surpresa antes que esgote novamente.
+        {subheading ?? 'Deixe seu contato para ter acesso prioritário ao menu surpresa antes que esgote novamente.'}
       </p>
 
       {!user && (

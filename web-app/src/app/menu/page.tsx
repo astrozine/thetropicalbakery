@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import ScrollReveal from '@/components/ScrollReveal';
 import MenuCard from '@/components/MenuCard';
+import TreatPicker from '@/components/TreatPicker';
 import SquiggleArrows from '@/components/SquiggleArrows';
 import EventLeadCapture from '@/components/EventLeadCapture';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
@@ -57,7 +58,7 @@ export default function MenuPage() {
         maxWidth: '1400px',
         margin: '0 auto'
       }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '3rem' }}>
+        <div className="menu-hero" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '3rem' }}>
           
           {/* Image Column */}
           <div style={{ flex: '1 1 400px', position: 'relative' }}>
@@ -77,6 +78,25 @@ export default function MenuPage() {
               Menu para Eventos
             </h1>
             
+            {/* PHONE HERO: tapping photos beats reading a paragraph. By the time
+                someone has picked four treats they have already decided they want
+                something — the button only has to catch that. Desktop keeps its
+                own hero, which works well there. */}
+            <div className="mobile-only" style={{ margin: '0 0 2rem' }}>
+              <TreatPicker
+                hero
+                title="Monte o seu evento"
+                subtitle="Toque nos doces que você quer servir. A gente monta o orçamento a partir da sua escolha."
+                initial={8}
+                ctaLabel="Pedir orçamento"
+                onAction={chosen => {
+                  const list = chosen.map(t => `• ${t.name}`).join('\n');
+                  const text = `Olá Tropical Bakery! 🌴 Estou montando um evento e escolhi estes doces no site:\n\n${list}\n\nPodem me passar um orçamento?`;
+                  window.open(`https://wa.me/5511932119196?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+                }}
+              />
+            </div>
+
             <details style={{ marginBottom: '2.5rem', cursor: 'pointer' }}>
               <summary style={{ fontSize: '1.15rem', color: '#594a42', fontWeight: 600, padding: '0.5rem 0', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
                 Ler sobre nossa proposta para eventos...

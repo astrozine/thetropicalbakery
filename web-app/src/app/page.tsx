@@ -6,6 +6,9 @@ import PhilosophyShowcase from '@/components/PhilosophyShowcase';
 import PhotoShowcase from '@/components/PhotoShowcase';
 import FeaturedBoxCard from '@/components/FeaturedBoxCard';
 import { formatBatchDate } from '@/lib/batchDate';
+import { fetchSchedule, selectableDates } from '@/lib/deliverySchedule';
+import { inDeliveryWindow, noUpcomingEdition, saleState } from '@/lib/boxWindow';
+import NoBoxNotice from '@/components/NoBoxNotice';
 import ModalCard from '@/components/ModalCard';
 import WaitlistCapture from '@/components/WaitlistCapture';
 import Link from 'next/link';
@@ -32,6 +35,15 @@ export default async function Home() {
     .eq('is_active', true)
     .single();
   
+  // A box only counts as "on sale" if a customer could really order it: a delivery day is left
+  // to pick and its ordering window is open. Otherwise say there is no box yet and offer the waiting list.
+  let boxOnSale = !!activeBox;
+  if (activeBox) {
+    const schedule = await fetchSchedule();
+    const choosable = inDeliveryWindow(selectableDates(schedule), activeBox);
+    boxOnSale = !noUpcomingEdition(saleState(activeBox, schedule.leadDays, choosable).state, choosable);
+  }
+
   const getContent = (sectionId: string, fallbackUrl: string) => {
     const item = contentData?.find(c => c.section_id === sectionId);
     return item?.image_url || fallbackUrl;
@@ -96,7 +108,7 @@ export default async function Home() {
       <section id="order" style={{ padding: '6rem 2rem', background: '#fdfaf3' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '1100px' }}>
           <ScrollReveal className="text-center">
-            {activeBox ? (
+            {activeBox && boxOnSale ? (
               <FeaturedBoxCard
                 title={activeBox.title}
                 description={activeBox.description}
@@ -104,9 +116,7 @@ export default async function Home() {
                 dateLabel={formatBatchDate(activeBox.batch_date_label)}
               />
             ) : (
-              <div style={{ padding: '3rem 1rem', background: 'white', borderRadius: '24px', boxShadow: '0 10px 30px rgba(60, 42, 33, 0.05)' }}>
-                <WaitlistCapture theme="light" />
-              </div>
+              <NoBoxNotice variant="card" />
             )}
           </ScrollReveal>
         </div>

@@ -1067,3 +1067,10 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .mobile-header-nav .glass-pill { transition: none; }
 }
+
+/* /menu on a phone: the words and the treat picker come before the big photo,
+   so the first thing you can do is tap a doce rather than read about one. */
+@media (max-width: 767px) {
+  .menu-hero { flex-direction: column-reverse; gap: 1.5rem !important; }
+  .menu-hero > div:first-child img { max-height: 42vh; object-fit: cover; }
+}

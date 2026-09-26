@@ -54,6 +54,14 @@ export function saleState(b: BoxWindowFields, leadDays: number, choosable: strin
   return { state: 'open', opensOn, closesOn };
 }
 
+/**
+ * True when there is nothing a customer could order: the ordering window is over, or no delivery
+ * day is left to pick. (Sold out and "opens soon" are different situations with their own message.)
+ * `choosable` is null while the calendar is still loading.
+ */
+export const noUpcomingEdition = (state: SaleState, choosable: string[] | null) =>
+  choosable !== null && state !== 'soldout' && state !== 'soon' && (state === 'closed' || choosable.length === 0);
+
 /** "sábado, 26 de setembro" */
 export const longDay = (iso: string) =>
   parseISODate(iso).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });

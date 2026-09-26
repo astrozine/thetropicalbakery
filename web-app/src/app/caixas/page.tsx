@@ -6,12 +6,13 @@ import { supabase } from '@/lib/supabase';
 import StripedBackground from '@/components/StripedBackground';
 import BoxOrder from '@/components/BoxOrder';
 import ScrollReveal from '@/components/ScrollReveal';
-import WaitlistCapture from '@/components/WaitlistCapture';
 import Marquee from '@/components/Marquee';
 import BoxContents from '@/components/BoxContents';
 import { BoxItem } from '@/lib/allergens';
 import { formatBatchDate } from '@/lib/batchDate';
-import { BoxWindowFields, deliveryWindowLabel, hasDeliveryWindow, longDay } from '@/lib/boxWindow';
+import BoxItemList from '@/components/BoxItemList';
+import { BoxWindowFields, deliveryWindowLabel, hasDeliveryWindow, longDay, noUpcomingEdition } from '@/lib/boxWindow';
+import NoBoxNotice from '@/components/NoBoxNotice';
 import { useBoxSale } from '@/lib/useBoxSale';
 import HeroBoxCard, { HeroBoxStrip, type HeroBoxPhoto } from '@/components/HeroBoxCard';
 import MobileBuyBar from '@/components/MobileBuyBar';
@@ -70,98 +71,14 @@ export default function CaixasPage() {
     return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Carregando a surpresa da semana...</div>;
   }
 
-  if (!activeBox) {
-    return (
-      <main style={{ minHeight: '100vh', background: 'var(--color-background)', display: 'flex', flexDirection: 'column' }}>
-        
-        {/* Mobile Marquee */}
-        <div className="mobile-only">
-          <Marquee text="Nossas Caixas de Degustação são edições limitadas lançadas semanalmente. O lote atual já esgotou ou estamos preparando o próximo menu surpresa com nossos melhores doces veganos, sem glúten e sem açúcar. 🌿✨ " speed={250} />
-        </div>
+  // Wait for the delivery calendar too, so a box with no days left never flashes on screen first.
+  if (activeBox && sale && !sale.loaded) {
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Carregando a surpresa da semana...</div>;
+  }
 
-        <section style={{ 
-          flex: 1,
-          position: 'relative',
-          padding: 'clamp(2.25rem, 8vw, 6rem) 1rem', 
-          textAlign: 'center',
-          color: '#fdfaf3',
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          overflow: 'hidden'
-        }}>
-          <div
-            style={{
-              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0,
-              backgroundSize: 'cover', backgroundPosition: 'center',
-              backgroundImage: 'url(/iphone_cacao_pod.jpg), linear-gradient(rgba(60, 42, 33, 0.8), rgba(60, 42, 33, 0.95))',
-              backgroundBlendMode: 'overlay',
-            }}
-          />
-          
-          <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
-            
-            <h1 style={{ fontSize: 'clamp(1.85rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem', color: '#d4af37' }}>
-              Preparando o Próximo Lote...
-            </h1>
-            
-            <p className="desktop-only" style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.9)', maxWidth: '800px', margin: '0 auto 2rem auto', lineHeight: '1.8' }}>
-              Cada Caixa de Degustação é uma edição única, feita à mão e lançada uma vez por semana.
-              O lote desta semana já encontrou suas casas — o próximo já está sendo desenhado.
-            </p>
-
-            {/* Someone who arrived at a sold-out lot is the single most likely
-                person on the site to subscribe. Offer it before the waitlist. */}
-            <div style={{
-              maxWidth: '620px', margin: '0 auto 3rem', padding: '1.5rem',
-              background: 'rgba(212,175,55,0.14)', border: '1px solid rgba(212,175,55,0.5)',
-              borderRadius: '16px', backdropFilter: 'blur(6px)',
-            }}>
-              <p style={{ color: '#d4af37', fontWeight: 700, fontSize: '1.05rem', marginBottom: '0.6rem' }}>
-                Cansado de perder o lote?
-              </p>
-              <p style={{ color: 'rgba(253,250,243,0.88)', fontSize: '0.95rem', lineHeight: 1.75, marginBottom: '1.25rem' }}>
-                Assinantes recebem uma caixa toda semana, com prioridade nas edições limitadas
-                e a partir de R$ 79 por caixa.
-              </p>
-              <Link href="/assinatura" style={{
-                display: 'inline-block', background: '#d4af37', color: '#3c2a21',
-                padding: '0.9rem 2rem', borderRadius: '8px', textDecoration: 'none',
-                fontWeight: 700, fontSize: '0.98rem',
-              }}>
-                Ver a assinatura semanal
-              </Link>
-            </div>
-
-            {/* Mobile Carousel */}
-            <div className="mobile-only hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: '1rem', padding: '0.5rem', marginBottom: '2rem', scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
-              <img src="/box1.jpg" alt="Tasting Box 1" style={{ flex: '0 0 85%', height: '350px', objectFit: 'cover', borderRadius: '16px', scrollSnapAlign: 'center', boxShadow: '0 10px 20px rgba(0,0,0,0.3)' }} />
-              <img src="/box2.jpg" alt="Tasting Box 2" style={{ flex: '0 0 85%', height: '350px', objectFit: 'cover', borderRadius: '16px', scrollSnapAlign: 'center', boxShadow: '0 10px 20px rgba(0,0,0,0.3)' }} />
-            </div>
-
-            {/* Desktop 3-Column Layout */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-              
-              <div className="desktop-only" style={{ flex: '1', maxWidth: '400px', minWidth: '300px' }}>
-                <img src="/box1.jpg" alt="Tasting Box" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }} />
-              </div>
-
-              <div style={{ flex: '1', maxWidth: '500px', width: '100%', minWidth: '300px' }}>
-                <ScrollReveal>
-                  <WaitlistCapture />
-                </ScrollReveal>
-              </div>
-
-              <div className="desktop-only" style={{ flex: '1', maxWidth: '400px', minWidth: '300px' }}>
-                <img src="/box2.jpg" alt="Tasting Box" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }} />
-              </div>
-
-            </div>
-
-          </div>
-        </section>
-      </main>
-    );
+  // Nothing to order: no box set up, or the one that is has no delivery day left / is past its ordering window.
+  if (!activeBox || (sale && noUpcomingEdition(sale.state, sale.choosable))) {
+    return <NoBoxNotice variant="page" photos={[...pastPhotos.map(p => p.src), ...FALLBACK_BOX_PHOTOS.map(p => p.src)]} />;
   }
 
   const remainingQuantity = Math.max(0, activeBox.total_quantity - activeBox.sold_quantity);
@@ -212,9 +129,9 @@ export default function CaixasPage() {
                 return <>{activeBox.title.slice(0, i + 1)} <span style={gold}>{activeBox.title.slice(i + 1).trim()}</span></>;
               })()}
             </h1>
-            <p style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.9)', marginBottom: '2.5rem', lineHeight: '1.8' }}>
-              {activeBox.description}
-            </p>
+            <div style={{ maxWidth: '680px', margin: '0 auto 2.5rem' }}>
+              <BoxItemList description={activeBox.description} tone="dark" />
+            </div>
 
             {/* Scarcity Counter */}
             <div style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.2)' }}>
