@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { BUCKETS, BUCKET_ORDER, bucketOf, urgencyOf, urgencyRank, type Bucket, type Urgency } from './inboxStatus';
 
 type ItemType = 'job_application' | 'order' | 'retreat_inquiry' | 'course_inquiry' | 'waitlist' | 'contact_lead';
 
@@ -19,8 +18,6 @@ interface InboxItem {
   created_at: string;
   /** A box the customer will collect themselves. */
   pickup?: boolean;
-  /** The day an order is due out ('YYYY-MM-DD'), for the red "delivery is tomorrow" flag. */
-  dueDate?: string | null;
 }
 
 interface StatusStep {
@@ -143,8 +140,6 @@ function useInbox() {
           : `${money(o.total_price)}${o.requested_date ? ` · ${o.fulfillment === 'pickup' ? '🛍️ Retirada' : 'Entrega'} ${new Date(o.requested_date + 'T00:00:00').toLocaleDateString('pt-BR')}` : ''}`,
         whatsapp: o.customer_whatsapp, email: o.customer_email, created_at: o.created_at,
         pickup: o.fulfillment === 'pickup',
-        // A quote request's date is the event day, not a delivery we are late on.
-        dueDate: o.items?.kind === 'orcamento_evento' || o.status === 'ORCAMENTO' ? null : (o.requested_date || null),
       })),
       ...(coursesRes.data || []).map((c: any) => ({
         key: `course_registrations:${c.id}`, source_table: 'course_registrations', source_id: c.id,
