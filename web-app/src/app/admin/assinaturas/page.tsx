@@ -163,7 +163,7 @@ export default function SubscriptionsAdmin() {
 
   return (
     <div>
-      <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Assinaturas</h1>
+      <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Assinaturas 📦🧁</h1>
       <p style={{ color: '#7f8c8d', marginBottom: '2rem', lineHeight: 1.7 }}>
         A Caixa de Degustação Semanal. Assinantes novos entram como{' '}
         <strong>aguardando pagamento</strong> — confirme o Pix pelo WhatsApp e marque como ativa.

@@ -41,7 +41,7 @@ export const buildGroups = (): NavGroup[] => [
     id: 'pedidos', name: 'Pedidos & Entregas', emoji: '🚚', accent: '#e2792a', shade: '#2a3d52',
     items: [
       { name: 'Calendário de Entregas', path: '/admin/calendario', word: 'Datas', emoji: '📅', hint: 'Em quais dias as caixas saem (toda sexta, dias soltos…)' },
-      { name: 'Assinaturas', path: '/admin/assinaturas', word: 'Assinantes', emoji: '🔁', hint: 'Quem assina a caixa semanal' },
+      { name: 'Assinaturas 📦🧁', path: '/admin/assinaturas', word: 'Assinantes', emoji: '🔁', hint: 'Quem assina a Caixa de Degustação semanal' },
       { name: 'Fila de Espera', path: '/admin/waitlist', word: 'Fila', emoji: '⏳', hint: 'Gente esperando o próximo lote' },
     ],
   },
