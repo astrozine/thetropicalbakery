@@ -11,6 +11,7 @@ import {
 } from '@/lib/portals';
 import { exactEmail, isAdmin, previewIdFromUrl } from '@/lib/portalPreview';
 import PreviewBanner from '@/components/PreviewBanner';
+import { DEMO_AFFILIATE, DEMO_PARTNERS, DEMO_RESTOCKS, isDemoId } from '@/lib/demoPortals';
 
 const STORE_WHATSAPP = '5511932119196';
 
@@ -61,6 +62,16 @@ export default function PartnerPortalPage() {
       const previewId = previewIdFromUrl();
       const asAdmin = !!previewId && await isAdmin();
       setPreview(asAdmin);
+
+      // A made-up partner from "Ver como": no database involved.
+      if (asAdmin && isDemoId(previewId)) {
+        const demo = DEMO_PARTNERS.find(d => d.id === previewId) || null;
+        setPartner(demo);
+        setRequests(demo ? DEMO_RESTOCKS.filter(r => r.partner_id === demo.id) : []);
+        if (demo && (demo.kind === 'afiliado' || demo.affiliate_code)) setAffiliate(DEMO_AFFILIATE);
+        setLoading(false);
+        return;
+      }
 
       // Always the signed-in person's own row, matched by e-mail. (Admins can read every row, so
       // without this filter an admin would have seen whichever partner happened to come first.)

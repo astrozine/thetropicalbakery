@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import LoginPanel from '@/components/LoginPanel';
+import { DEMO_PARTNERS, DEMO_WORKERS } from '@/lib/demoPortals';
 import { PARTNER_STATUS, partnerKind, workerRole, type Partner, type Worker } from '@/lib/portals';
 
 /**
@@ -41,7 +42,12 @@ export default function VerComoPage() {
     : tab === 'equipe' && selected ? `/equipe?preview=${selected}`
     : null;
 
-  const pick = (t: Tab) => { setTab(t); setSelected(null); };
+  // Partner and staff tabs open on the first example, so there is always something to look at.
+  const pick = (t: Tab) => {
+    setTab(t);
+    setSelected(t === 'parceiro' ? DEMO_PARTNERS[0].id : t === 'equipe' ? DEMO_WORKERS[0].id : null);
+    setFrameKey(k => k + 1);
+  };
 
   const tabBtn = (t: Tab, label: string) => (
     <button key={t} type="button" onClick={() => pick(t)} aria-pressed={tab === t}
@@ -100,14 +106,24 @@ export default function VerComoPage() {
               Esta é <strong>a sua própria</strong> Minha Conta, que é exatamente a tela que qualquer cliente vê com os dados dele. Para ver a versão de quem ainda não entrou, use a aba Tela de login.
             </p>
           )}
-          {tab === 'parceiro' && (partners.length === 0
-            ? <p style={{ color: '#7f8c8d' }}>Nenhum parceiro cadastrado ainda. Cadastre em Parceiros B2B.</p>
-            : partners.map(p => personBtn(p.id, `${partnerKind(p.kind).emoji} ${p.business_name}`, p.email, PARTNER_STATUS[p.status])))}
-          {tab === 'equipe' && (workers.length === 0
-            ? <p style={{ color: '#7f8c8d' }}>Ninguém na equipe ainda. Cadastre em Escala da Equipe.</p>
-            : workers.map(w => personBtn(w.id, w.full_name, `${workerRole(w.role).label} · ${w.email}`,
-                w.status === 'ativo' ? undefined : { label: 'Inativo: não consegue entrar', color: '#c0392b', bg: '#fdecea' })))}
-          {(tab === 'parceiro' || tab === 'equipe') && !selected && (partners.length > 0 || workers.length > 0) && (
+          {tab === 'parceiro' && (<>
+            <p style={{ color: '#7f8c8d', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Exemplos inventados</p>
+            {DEMO_PARTNERS.map(p => personBtn(p.id, `${partnerKind(p.kind).emoji} ${p.business_name}`, `${p.contact_name} · exemplo`, PARTNER_STATUS[p.status]))}
+            <p style={{ color: '#7f8c8d', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0.6rem 0 0' }}>Parceiros de verdade</p>
+            {partners.length === 0
+              ? <p style={{ color: '#7f8c8d', fontSize: '0.88rem', margin: 0 }}>Nenhum parceiro cadastrado ainda. Cadastre em Parceiros B2B.</p>
+              : partners.map(p => personBtn(p.id, `${partnerKind(p.kind).emoji} ${p.business_name}`, p.email, PARTNER_STATUS[p.status]))}
+          </>)}
+          {tab === 'equipe' && (<>
+            <p style={{ color: '#7f8c8d', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Exemplos inventados</p>
+            {DEMO_WORKERS.map(w => personBtn(w.id, w.full_name, `${workerRole(w.role).label} · ${w.notes}`))}
+            <p style={{ color: '#7f8c8d', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0.6rem 0 0' }}>Equipe de verdade</p>
+            {workers.length === 0
+              ? <p style={{ color: '#7f8c8d', fontSize: '0.88rem', margin: 0 }}>Ninguém na equipe ainda. Cadastre em Escala da Equipe.</p>
+              : workers.map(w => personBtn(w.id, w.full_name, `${workerRole(w.role).label} · ${w.email}`,
+                  w.status === 'ativo' ? undefined : { label: 'Inativo: não consegue entrar', color: '#c0392b', bg: '#fdecea' }))}
+          </>)}
+          {(tab === 'parceiro' || tab === 'equipe') && !selected && (
             <p style={{ color: '#7f8c8d', fontSize: '0.85rem' }}>Escolha alguém para ver a área dessa pessoa.</p>
           )}
         </aside>

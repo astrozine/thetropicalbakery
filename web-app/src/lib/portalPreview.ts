@@ -10,7 +10,7 @@ import { supabase } from '@/lib/supabase';
 export function previewIdFromUrl(): string | null {
   if (typeof window === 'undefined') return null;
   const id = new URLSearchParams(window.location.search).get('preview');
-  return id && /^[0-9a-f-]{36}$/i.test(id) ? id : null;
+  return id && (/^[0-9a-f-]{36}$/i.test(id) || /^demo-[a-z]+$/.test(id)) ? id : null;
 }
 
 export async function isAdmin(): Promise<boolean> {

@@ -8,6 +8,7 @@ import LoginPanel from '@/components/LoginPanel';
 import { formatBRL } from '@/lib/deliveryZones';
 import { exactEmail, isAdmin, previewIdFromUrl } from '@/lib/portalPreview';
 import PreviewBanner from '@/components/PreviewBanner';
+import { DEMO_SHIFTS, DEMO_WORKERS, isDemoId } from '@/lib/demoPortals';
 import { MONTH_NAMES, SHIFT_STATUS, Worker, WorkShift, monthPay, shiftHours, workerRole } from '@/lib/portals';
 
 const STORE_WHATSAPP = '5511932119196';
@@ -42,6 +43,14 @@ export default function WorkerPortalPage() {
       const previewId = previewIdFromUrl();
       const asAdmin = !!previewId && await isAdmin();
       setPreview(asAdmin);
+      // A made-up worker from "Ver como": no database involved.
+      if (asAdmin && isDemoId(previewId)) {
+        const demo = DEMO_WORKERS.find(d => d.id === previewId) || null;
+        setWorker(demo);
+        setShifts(demo ? DEMO_SHIFTS.filter(s => s.worker_id === demo.id) : []);
+        setLoading(false);
+        return;
+      }
       // The signed-in person's own row by e-mail (an admin can read every row, so filter explicitly).
       const query = asAdmin
         ? supabase.from('workers').select('*').eq('id', previewId!)
