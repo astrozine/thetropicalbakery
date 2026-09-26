@@ -239,8 +239,12 @@ export function CourseCTA({ title, text, cta, onCta }: { title: string; text: st
 export function CourseGallery({ images }: { images: string[] }) {
   return (
     <section className="crs-section" style={{ paddingTop: 0 }}>
-      <div className="crs-wrap crs-gallery">
-        {images.map(src => <ZoomableImage key={src} src={src} alt="Criação da The Tropical Bakery" thumbWidth={384} />)}
+      {/* The rail (.crs-gallery) pulls itself 1rem past its container on phones, so it must sit INSIDE
+          the padded wrap. When it was the wrap itself it ended up 32px wider than the screen. */}
+      <div className="crs-wrap">
+        <div className="crs-gallery">
+          {images.map(src => <ZoomableImage key={src} src={src} alt="Criação da The Tropical Bakery" thumbWidth={384} />)}
+        </div>
       </div>
     </section>
   );
