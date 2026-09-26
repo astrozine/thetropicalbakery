@@ -42,7 +42,7 @@ const SALE_LABEL: Record<SaleState, { text: string; color: string; bg: string }>
 
 const input: React.CSSProperties = { width: '100%', padding: '0.8rem', border: '1px solid #ccc', borderRadius: '6px' };
 const label: React.CSSProperties = { display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' };
-const card: React.CSSProperties = { background: 'white', padding: 'clamp(1.25rem, 3vw, 2rem)', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' };
+const card: React.CSSProperties = { minWidth: 0, background: 'white', padding: 'clamp(1.25rem, 3vw, 2rem)', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' };
 
 export default function AdminCaixas() {
   const [boxes, setBoxes] = useState<TastingBox[]>([]);
@@ -351,8 +351,8 @@ export default function AdminCaixas() {
         <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))', alignItems: 'start' }}>
 
           {/* LEFT: the box itself + its picture */}
-          <div style={{ display: 'grid', gap: '1.5rem', alignContent: 'start' }}>
-            <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
+          <div style={{ display: 'grid', gap: '1.5rem', alignContent: 'start', gridTemplateColumns: 'minmax(0, 1fr)', minWidth: 0 }}>
+            <div style={{ ...card, display: 'grid', gap: '1.25rem', gridTemplateColumns: 'minmax(0, 1fr)' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>📦 Dados da caixa</h3>
 
             <div>
@@ -365,7 +365,7 @@ export default function AdminCaixas() {
               <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder="Uma frase sobre o tema desta edição. Se ficar vazio, usamos a lista dos doces." style={input} />
             </div>
 
-            <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
+            <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))' }}>
               <div>
                 <label style={label}>Data do Lote</label>
                 <input type="date" required min="2020-01-01" max="2100-12-31" value={batchDateLabel} onChange={e => setBatchDateLabel(e.target.value)} style={input} />
@@ -386,7 +386,7 @@ export default function AdminCaixas() {
             </p>
             </div>
 
-            <div style={{ ...card, display: 'grid', gap: '1rem', background: '#fffdf6', border: '1px solid #f0e2bf' }}>
+            <div style={{ ...card, display: 'grid', gap: '1rem', gridTemplateColumns: 'minmax(0, 1fr)', background: '#fffdf6', border: '1px solid #f0e2bf' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>🎁 Tamanhos e preços</h3>
               <p style={{ fontSize: '0.85rem', color: '#7f8c8d', lineHeight: 1.6, margin: 0 }}>
                 O cliente escolhe uma caixa de 2, 4 ou 6 doces. Estes preços valem para <strong>todas as caixas</strong> e para a
@@ -412,7 +412,7 @@ export default function AdminCaixas() {
               )}
             </div>
 
-            <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
+            <div style={{ ...card, display: 'grid', gap: '1.25rem', gridTemplateColumns: 'minmax(0, 1fr)' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>🖼️ Imagem e visibilidade</h3>
             <ImagePicker label="Imagem da Caixa" imageUrl={imageUrl} uploading={uploading} onChange={handleImageUpload} />
 
@@ -449,13 +449,13 @@ export default function AdminCaixas() {
           </div>
 
           {/* RIGHT: when it goes out, then the treats inside */}
-          <div style={{ display: 'grid', gap: '1.5rem', alignContent: 'start' }}>
-            <div style={{ ...card, background: '#fdf7ee', border: '1px solid #e8e1d7', display: 'grid', gap: '1.1rem' }}>
+          <div style={{ display: 'grid', gap: '1.5rem', alignContent: 'start', gridTemplateColumns: 'minmax(0, 1fr)', minWidth: 0 }}>
+            <div style={{ ...card, background: '#fdf7ee', border: '1px solid #e8e1d7', display: 'grid', gap: '1.1rem', gridTemplateColumns: 'minmax(0, 1fr)' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>📅 Datas de entrega e pedidos</h3>
               <div>
                 <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🚚 Janela de entrega prevista</p>
                 <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os dias em que esta leva está planejada para sair. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas. <strong>Se a janela passar e ainda houver caixas, a venda continua</strong>: as entregas passam a valer a partir do primeiro dia livre do calendário.</p>
-                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))' }}>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Primeiro dia
                     <input type="date" value={deliveryFrom} onChange={e => setDeliveryFrom(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
                   </label>
@@ -467,7 +467,7 @@ export default function AdminCaixas() {
               <div>
                 <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🔔 Abertura dos pedidos</p>
                 <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os pedidos ficam abertos até a caixa <strong>esgotar</strong> ou você <strong>desativá-la</strong> no botão abaixo. Só a data de abertura é opcional, para deixar uma caixa pronta para uma data futura.</p>
-                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))' }}>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Abre em <span style={{ fontWeight: 400, color: '#95a5a6' }}>(vazio = já)</span>
                     <input type="date" value={ordersOpen} onChange={e => setOrdersOpen(e.target.value)} style={{ ...input, marginTop: '0.3rem' }} />
                   </label>
