@@ -78,7 +78,7 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
         <img
           src={optimizedSrc(box.image_url, 1080)}
           alt={box.title}
-          style={{ width: '100%', height: 'auto', maxHeight: '640px', objectFit: 'contain', background: '#f5efe2', borderRadius: '24px', boxShadow: '0 15px 30px rgba(0,0,0,0.15)', display: 'block' }}
+          style={{ width: '100%', height: '100%', maxHeight: '640px', objectFit: 'cover', background: '#f5efe2', borderRadius: '24px', boxShadow: '0 15px 30px rgba(0,0,0,0.15)', display: 'block' }}
         />
         {/* On phones the badge sits INSIDE the photo: hanging 10px past its edge made the whole page 2px wider than the screen. */}
         <style dangerouslySetInnerHTML={{ __html: '.box-price-badge{top:-10px;right:-10px}@media (max-width:767px){.box-price-badge{top:8px;right:8px}}' }} />

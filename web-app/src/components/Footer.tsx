@@ -2,10 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import AdminFooter from '@/components/AdminFooter';
 import { STORE_WHATSAPP, STORE_WHATSAPP_DISPLAY, SUBSTACK_URL } from '@/lib/siteContact';
 import { OriginSeal } from '@/components/BelgiumBrazil';
 
 export default function Footer() {
+  // The back-office has its own slim footer: the public one (photo, columns, newsletter) is far too big there.
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin')) return <AdminFooter />;
+
   const handleScrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

@@ -2,8 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { CAMPAIGNS, CampaignValues, campaignById } from '@/lib/email/campaigns';
-import { SITE_URL, renderEmail } from '@/lib/email/layout';
+import { CAMPAIGNS, CampaignValues, campaignById, previewValues } from '@/lib/email/campaigns';
+import { SITE_URL, greeting, renderEmail } from '@/lib/email/layout';
 import { EMAIL_TOPICS, MARKETING_TOPICS, TAG_LABELS, ContactTag, canReceive, topicById } from '@/lib/emailTopics';
 import DietTargeting, { DietTargetingValue, EMPTY_TARGETING } from './DietTargeting';
 import { matchDiet } from '@/lib/dietary';
@@ -123,10 +123,13 @@ export default function AdminEmailsPage() {
   }, [audience, diet]);
 
   const previewHtml = useMemo(() => {
-    const content = campaign.build(values);
+    const content = campaign.build(previewValues(campaign, values));
     return renderEmail({
       ...content,
-      body: `<p style="color:#3c2a21;font-size:16px;font-weight:bold;margin:0 0 14px;">Oi, Dolly!</p>${content.body}`,
+      theme: campaign.theme,
+      // Images from this server, so a photo added to public/email/ shows here before it is deployed.
+      assetBase: typeof window !== 'undefined' ? window.location.origin : SITE_URL,
+      body: greeting('Dolly') + content.body,
       prefsUrl: `${SITE_URL}/preferencias?token=exemplo`,
       unsubscribeUrl: `${SITE_URL}/preferencias?token=exemplo&sair=1`,
       reason: campaign.reason,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { campaignById } from '@/lib/email/campaigns';
-import { FROM_ADDRESS, SITE_URL, plainTextFallback, renderEmail } from '@/lib/email/layout';
+import { FROM_ADDRESS, SITE_URL, greeting, plainTextFallback, renderEmail } from '@/lib/email/layout';
 import { canReceive, topicById } from '@/lib/emailTopics';
 import { dietLine, matchDiet } from '@/lib/dietary';
 
@@ -41,7 +41,7 @@ const CONTACT_COLUMNS_LEGACY = 'email, full_name, token, tags, opted_out, unsubs
 
 /** The personal line, wrapped so it stands out in the message. */
 const dietBlock = (line: string, warning: boolean) => line
-  ? `<div style="margin:0 0 18px;padding:12px 14px;border-radius:10px;background:${warning ? '#fdf0e8' : '#eef6ef'};border:1px solid ${warning ? '#f0c9ae' : '#cde3d1'};color:#3c2a21;font-size:15px;line-height:1.55;">${line}</div>`
+  ? `<div style="margin:0 0 18px;padding:12px 14px;border-radius:10px;background:${warning ? '#fdf0e8' : '#eef6ef'};border:1px solid ${warning ? '#f0c9ae' : '#cde3d1'};color:#3c2a21;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;">${line}</div>`
   : '';
 
 /**
@@ -174,8 +174,9 @@ export async function POST(req: NextRequest) {
 
     const layout = {
       ...content,
+      theme: campaign.theme,
       body: (firstName
-        ? `<p style="color:#3c2a21;font-size:16px;font-weight:bold;margin:0 0 14px;">Oi, ${firstName}!</p>`
+        ? greeting(firstName)
         : '') + personal + content.body,
       ...(topic.transactional ? {} : { prefsUrl, unsubscribeUrl, reason: campaign.reason }),
     };

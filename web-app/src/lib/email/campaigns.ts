@@ -5,7 +5,8 @@
  * Pure string building, so the admin can preview exactly what will land.
  */
 
-import { SITE_URL, bulletList, esc, paragraphs } from './layout';
+import { SITE_URL, bulletList, esc, kicker, paragraphs } from './layout';
+import type { EmailFact, EmailTheme } from './layout';
 import type { ContactTag } from '@/lib/emailTopics';
 
 export type FieldType = 'text' | 'textarea' | 'date' | 'number';
@@ -27,6 +28,8 @@ export interface CampaignContent {
   body: string;
   cta?: { label: string; href: string };
   note?: string;
+  /** Up to three big-number tiles, e.g. "100 m · da casa até a areia". */
+  facts?: EmailFact[];
 }
 
 export interface Campaign {
@@ -35,6 +38,8 @@ export interface Campaign {
   emoji: string;
   /** Topic id from emailTopics.ts — decides who may receive it. */
   topic: string;
+  /** Which photo, kicker and photo strip the e-mail wears (see THEMES in layout.ts). */
+  theme: EmailTheme;
   /** Extra tag filter on top of the topic, when the audience is narrower. */
   tags?: ContactTag[];
   description: string;
@@ -65,6 +70,21 @@ export const prettyDateList = (raw: string) => {
   return `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}`;
 };
 
+const WEEKDAYS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+const MONTHS_SHORT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+
+/** "2026-09-26" -> "26 set" (for the big-number tiles); anything else comes back as typed. */
+const shortDate = (iso: string) => {
+  const m = /^(d{4})-(d{2})-(d{2})$/.exec((iso || '').trim());
+  return m ? `${Number(m[3])} ${MONTHS_SHORT[Number(m[2]) - 1]}` : (iso || '').trim();
+};
+
+/** "2026-09-26" -> "sábado" */
+const weekday = (iso: string) => {
+  const m = /^(d{4})-(d{2})-(d{2})$/.exec((iso || '').trim());
+  return m ? WEEKDAYS[new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).getUTCDay()] : '';
+};
+
 const listFrom = (raw: string) => (raw || '').split(/[,\n]/).map(s => s.trim()).filter(Boolean);
 
 const slug = (s: string) =>
@@ -83,6 +103,7 @@ const url = (path: string) => `${SITE_URL}${path}`;
 export const CAMPAIGNS: Campaign[] = [
   {
     id: 'delivery-dates',
+    theme: 'caixa',
     name: 'Novas datas de entrega',
     emoji: '📅',
     topic: 'caixa',
@@ -100,7 +121,8 @@ export const CAMPAIGNS: Campaign[] = [
         paragraphs(
           `A Caixa de Degustação já pode ser entregue em ${prettyDateList(v.dates)}. ` +
           `Cada edição é feita à mão, em quantidade limitada — quando acaba, acaba.`,
-        ) + bulletList(listFrom(v.dates).map(d => `Entrega em ${prettyDate(d)}`)),
+        ) + (listFrom(v.dates).length > 3 ? bulletList(listFrom(v.dates).map(d => `Entrega em ${prettyDate(d)}`)) : ''),
+      facts: listFrom(v.dates).length <= 3 ? listFrom(v.dates).map(d => ({ num: shortDate(d), label: weekday(d) || 'entrega' })) : undefined,
       cta: { label: 'Garantir minha caixa', href: url('/caixas') },
       note: 'Entregas em Itamambuca, praias vizinhas e Ubatuba.',
     }),
@@ -108,6 +130,7 @@ export const CAMPAIGNS: Campaign[] = [
 
   {
     id: 'box-live',
+    theme: 'caixa',
     name: 'A caixa da semana entrou no ar',
     emoji: '📦',
     topic: 'caixa',
@@ -126,8 +149,12 @@ export const CAMPAIGNS: Campaign[] = [
       heading: v.title,
       body:
         paragraphs(v.intro || 'A edição desta semana já está pronta para reserva.') +
-        (listFrom(v.treats).length ? `<p style="color:#a6832b;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;margin:0 0 10px;">O que vem dentro</p>${bulletList(listFrom(v.treats))}` : '') +
-        (v.quantity ? paragraphs(`São apenas ${esc(v.quantity)} caixas desta edição.`) : ''),
+        (listFrom(v.treats).length ? kicker('O que vem dentro') + bulletList(listFrom(v.treats)) : ''),
+      facts: [
+        ...(v.quantity ? [{ num: v.quantity, label: 'caixas nesta edição' }] : []),
+        { num: '100%', label: 'vegano' },
+        { num: '0%', label: 'glúten e açúcar refinado' },
+      ],
       cta: { label: 'Ver a caixa desta semana', href: url('/caixas') },
       note: 'Cada caixa é vegana, sem glúten e sem açúcar refinado.',
     }),
@@ -135,6 +162,7 @@ export const CAMPAIGNS: Campaign[] = [
 
   {
     id: 'box-last-chance',
+    theme: 'caixa',
     name: 'Últimas caixas da edição',
     emoji: '⏳',
     topic: 'caixa',
@@ -153,12 +181,14 @@ export const CAMPAIGNS: Campaign[] = [
         `A edição ${v.title} está quase no fim: restam ${v.remaining} caixas. ` +
         `Como tudo é feito em uma cozinha só, não dá para repor no meio da semana.`,
       ),
+      facts: [{ num: String(v.remaining || ''), label: 'caixas restantes' }, { num: '1', label: 'cozinha, feita à mão' }],
       cta: { label: 'Pegar a minha', href: url('/caixas') },
     }),
   },
 
   {
     id: 'waitlist-turn',
+    theme: 'caixa',
     name: 'Chegou a sua vez (fila de espera)',
     emoji: '🎟️',
     topic: 'caixa',
@@ -183,6 +213,7 @@ export const CAMPAIGNS: Campaign[] = [
 
   {
     id: 'subscriber-delivery',
+    theme: 'assinatura',
     name: 'Sua caixa chega em breve (assinantes)',
     emoji: '🔁',
     topic: 'assinatura',
@@ -202,6 +233,7 @@ export const CAMPAIGNS: Campaign[] = [
         paragraphs(
           `A Dolly já está preparando a sua caixa da semana. Ela sai fresquinha e chega em ${prettyDate(v.date)}.`,
         ) + (v.preview ? paragraphs(v.preview) : ''),
+      facts: [{ num: shortDate(v.date), label: weekday(v.date) || 'dia da entrega' }, { num: 'Fresca', label: 'do forno direto para a sua porta' }],
       cta: { label: 'Ver minha assinatura', href: url('/minha-conta') },
       note: 'Precisa pular esta semana ou mudar o endereço? É só responder no WhatsApp.',
     }),
@@ -209,6 +241,7 @@ export const CAMPAIGNS: Campaign[] = [
 
   {
     id: 'events-menu',
+    theme: 'eventos',
     name: 'Menu de Eventos atualizado',
     emoji: '🎉',
     topic: 'eventos',
@@ -237,6 +270,7 @@ export const CAMPAIGNS: Campaign[] = [
 
   {
     id: 'course-open',
+    theme: 'cursos',
     name: 'Curso com vagas abertas',
     emoji: '🎓',
     topic: 'cursos',
@@ -255,14 +289,19 @@ export const CAMPAIGNS: Campaign[] = [
       preheader: `${v.course} em ${prettyDate(v.date)}.`,
       heading: `${v.course}`,
       body:
-        paragraphs(v.intro || `Abrimos uma nova turma para ${prettyDate(v.date)}.`) +
-        bulletList([`Data: ${prettyDate(v.date)}`, ...(v.spots ? [`Vagas: ${v.spots}`] : []), 'Itamambuca, Ubatuba']),
+        paragraphs(v.intro || `Abrimos uma nova turma para ${prettyDate(v.date)}.`),
+      facts: [
+        { num: shortDate(v.date), label: weekday(v.date) || 'data da turma' },
+        ...(v.spots ? [{ num: v.spots, label: 'vagas na turma' }] : []),
+        { num: 'Itamambuca', label: 'Ubatuba · SP' },
+      ],
       cta: { label: 'Quero minha vaga', href: url('/cursos') },
     }),
   },
 
   {
     id: 'retreat-dates',
+    theme: 'retiros',
     name: 'Retiro com datas abertas',
     emoji: '🏝️',
     topic: 'cursos',
@@ -280,14 +319,20 @@ export const CAMPAIGNS: Campaign[] = [
       preheader: `Retiro de ${v.period} em Itamambuca.`,
       heading: `Retiro em Itamambuca — ${v.period}`,
       body:
-        paragraphs(v.intro || 'Abrimos novas datas na nossa casa a 100 metros da praia.') +
-        bulletList([`Quando: ${v.period}`, ...(v.focus ? [`Foco: ${v.focus}`] : []), 'Comida vegana, sem glúten e sem açúcar refinado', 'Trilhas, cachoeiras e praia']),
+        paragraphs(v.intro || 'Abrimos novas datas na nossa casa a 100 metros da praia de Itamambuca.') +
+        bulletList([`Quando: ${v.period}`, ...(v.focus ? [`Foco: ${v.focus}`] : []), 'Comida vegana, sem glúten e sem açúcar refinado', 'Aulas de surfe podem ser somadas ao pacote']),
+      facts: [
+        { num: '100 m', label: 'da casa até a areia' },
+        { num: '15–20 min', label: 'até a Ilha do Prumirim' },
+        { num: '15–20 min', label: 'até a Cachoeira do Prumirim' },
+      ],
       cta: { label: 'Ver os retiros', href: url('/retreats') },
     }),
   },
 
   {
     id: 'partner-news',
+    theme: 'parcerias',
     name: 'Novidades para parceiros',
     emoji: '🤝',
     topic: 'parcerias',
@@ -296,7 +341,7 @@ export const CAMPAIGNS: Campaign[] = [
     reason: 'Você recebe este e-mail porque é (ou pediu para ser) parceiro da Tropical Bakery.',
     fields: [
       { name: 'title', label: 'Assunto da novidade', type: 'text', required: true, placeholder: 'Nova linha para o café da manhã' },
-      { name: 'body', label: 'Mensagem', type: 'textarea', required: true },
+      { name: 'body', label: 'Mensagem', type: 'textarea', required: true, placeholder: 'Criamos uma linha pensada para o café da manhã dos hóspedes: porções individuais, embaladas para durar três dias e prontas para servir.' },
       { name: 'ctaLabel', label: 'Texto do botão', type: 'text', placeholder: 'Ver as parcerias' },
       { name: 'ctaPath', label: 'Página do botão', type: 'text', placeholder: '/b2b/hotels' },
     ],
@@ -313,6 +358,7 @@ export const CAMPAIGNS: Campaign[] = [
 
   {
     id: 'job-opening',
+    theme: 'equipe',
     name: 'Vaga aberta',
     emoji: '🧑‍🍳',
     topic: 'equipe',
@@ -335,14 +381,15 @@ export const CAMPAIGNS: Campaign[] = [
 
   {
     id: 'newsletter',
+    theme: 'novidades',
     name: 'Carta da padaria (texto livre)',
     emoji: '🌴',
     topic: 'novidades',
     description: 'Uma carta aberta para toda a lista: receitas, estação, bastidores.',
     reason: 'Você recebe este e-mail porque pediu para acompanhar as novidades da Tropical Bakery.',
     fields: [
-      { name: 'title', label: 'Título', type: 'text', required: true },
-      { name: 'body', label: 'Texto (linhas em branco separam parágrafos)', type: 'textarea', required: true },
+      { name: 'title', label: 'Título', type: 'text', required: true, placeholder: 'Cartas de Itamambuca: a estação da manga' },
+      { name: 'body', label: 'Texto (linhas em branco separam parágrafos)', type: 'textarea', required: true, placeholder: 'A manga chegou no ponto e a cozinha inteira cheira a verão. Esta semana a gente conta o que muda no forno quando a estação vira.' },
       { name: 'ctaLabel', label: 'Texto do botão (opcional)', type: 'text' },
       { name: 'ctaPath', label: 'Página do botão', type: 'text', placeholder: '/caixas' },
     ],
@@ -358,3 +405,15 @@ export const CAMPAIGNS: Campaign[] = [
 ];
 
 export const campaignById = (id: string) => CAMPAIGNS.find(c => c.id === id);
+
+/**
+ * For the admin preview only: every field the admin hasn't filled yet shows its example text, so the
+ * preview reads like a real e-mail instead of "Retiro em Itamambuca — undefined".
+ */
+export const previewValues = (campaign: Campaign, values: CampaignValues): CampaignValues => {
+  const out: CampaignValues = { ...values };
+  for (const f of campaign.fields) {
+    if (!String(out[f.name] ?? '').trim()) out[f.name] = f.placeholder || (f.type === 'date' ? new Date().toISOString().slice(0, 10) : '');
+  }
+  return out;
+};
