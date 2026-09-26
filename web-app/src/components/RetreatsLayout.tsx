@@ -212,10 +212,10 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           maxWidth: '1200px',
           margin: '0 auto 3rem',
         }}>
-          <ZoomableImage src="/menu-items/Screenshot_20260412_123155_Edits.jpg" alt="Treats" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
-          <ZoomableImage src="/menu-items/20260724_154636.jpg" alt="Treats" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
-          <ZoomableImage src="/menu-items/Screenshot_20260623_080155_Gallery.jpg" alt="Treats" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
-          <ZoomableImage src="/menu-items/Screenshot_20260818_075043_Gallery.jpg" alt="Treats" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
+          <ZoomableImage src="/menu-items/Screenshot_20260415_110305_Gallery.jpg" alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
+          <ZoomableImage src="/menu-items/Screenshot_20260401_193246_Edits.jpg"   alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
+          <ZoomableImage src="/menu-items/Screenshot_20260518_122444_Gallery.jpg" alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
+          <ZoomableImage src="/menu-items/20260209_172647.jpg"                    alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
         </div>
         <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', marginBottom: '1rem' }}>
           {texts.foodHero.title}
