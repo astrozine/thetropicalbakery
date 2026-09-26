@@ -762,6 +762,14 @@ body {
 .crs-story { max-width: 800px; margin: 0 auto 3rem; }
 .crs-story p { font-size: clamp(1.05rem, 2.3vw, 1.25rem); line-height: 1.9; color: #594a42; margin-bottom: 1.2rem; }
 .crs-story p:first-child::first-letter { font-family: var(--font-heading); font-size: 3.4em; float: left; line-height: .9; margin: .08em .1em 0 0; color: #d4af37; }
+/* clear photo beside the story: stacked on phones, side by side from tablet width up */
+.crs-intro { display: grid; gap: 1.75rem; align-items: center; margin-bottom: 3rem; }
+.crs-intro .crs-story { margin: 0; }
+.crs-intro-photo { width: 100%; aspect-ratio: 4 / 3; max-height: 60vh; background-size: cover; background-position: center; border-radius: 12px; border: 1px solid #d4af37; box-shadow: 0 14px 34px rgba(60,42,33,.16); }
+@media (min-width: 900px) {
+  .crs-intro { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 3.5rem; }
+  .crs-intro-photo { aspect-ratio: 4 / 5; max-height: none; }
+}
 .crs-two { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
 .crs-card { background: #fff; border: 1px solid #eadfcb; border-radius: 22px; padding: clamp(1.4rem, 3vw, 2rem); box-shadow: 0 10px 30px rgba(60,42,33,.06); }
 .crs-card-gold { background: linear-gradient(135deg, #fffaf0, #fdf1d6); border-color: rgba(212,175,55,.5); }

@@ -43,7 +43,7 @@ export default function CoursePage({ slug }: { slug: string }) {
         secondary={{ label: 'Descobrir a mágica ↓', href: '#magia' }}
       />
 
-      <WhoAndWhat story={c.story} whoFor={c.whoFor} youLeaveWith={c.youLeaveWith} />
+      <WhoAndWhat story={c.story} whoFor={c.whoFor} youLeaveWith={c.youLeaveWith} image={c.heroImage} imageAlt={c.title} />
 
       <div id="magia">
         <MagicFlavors intro={c.magicIntro} tricks={c.magic} />

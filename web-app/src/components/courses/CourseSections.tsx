@@ -84,11 +84,17 @@ export function MagicFlavors({ intro, tricks, title = 'As combinações mágicas
 }
 
 /* ------------------------------------------------------------------ who it's for / what you leave with */
-export function WhoAndWhat({ story, whoFor, youLeaveWith }: { story: string[]; whoFor: string[]; youLeaveWith: string[] }) {
+export function WhoAndWhat({ story, whoFor, youLeaveWith, image, imageAlt }: { story: string[]; whoFor: string[]; youLeaveWith: string[]; image?: string; imageAlt?: string }) {
   return (
     <section className="crs-section">
       <div className="crs-wrap">
-        <div className="crs-story">{story.map(p => <p key={p.slice(0, 20)}>{p}</p>)}</div>
+        {/* The hero photo is dimmed under the title, so it also sits here, clear, beside the story. */}
+        <div className={image ? 'crs-intro' : undefined}>
+          {image && (
+            <div className="crs-intro-photo" role="img" aria-label={imageAlt || ''} style={{ backgroundImage: bg(image, 1080) }} />
+          )}
+          <div className="crs-story">{story.map(p => <p key={p.slice(0, 20)}>{p}</p>)}</div>
+        </div>
         <div className="crs-two">
           <div className="crs-card">
             <h3 className="crs-h3">Para quem é</h3>
