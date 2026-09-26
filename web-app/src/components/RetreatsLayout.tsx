@@ -143,11 +143,11 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           /* Phones: photos first, in a collage of their own; then the words. Nothing overlaps. */
           @media (max-width: 767px) {
             .rh { display: block; min-height: 0; padding: 1.25rem 0 3rem; }
-            .rh__photos { position: relative; inset: auto; width: min(94%, 520px); aspect-ratio: 1 / 0.92; margin: 0 auto 1.25rem; }
-            .rh__ph--bundt  { top: 0; right: 3%; bottom: auto; left: auto; width: 30%; transform: rotate(9deg); z-index: 3; }
-            .rh__ph--cake   { bottom: 0; left: 6%; top: auto; right: auto; width: 30%; transform: rotate(-9deg); z-index: 3; }
-            .rh__ph--coast  { top: 3%; left: 4%; width: 64%; opacity: 1; transform: rotate(-4deg); }
-            .rh__ph--island { bottom: 4%; right: 2%; top: auto; left: auto; width: 56%; opacity: 1; transform: rotate(4deg); z-index: 2; }
+            .rh__photos { position: relative; inset: auto; width: min(92%, 480px); aspect-ratio: 1 / 0.84; margin: 0 auto 1rem; }
+            .rh__ph--bundt  { top: 0; right: 3%; bottom: auto; left: auto; width: 28%; transform: rotate(9deg); z-index: 3; }
+            .rh__ph--cake   { bottom: 0; left: 6%; top: auto; right: auto; width: 28%; transform: rotate(-9deg); z-index: 3; }
+            .rh__ph--coast  { top: 3%; left: 4%; width: 60%; opacity: 1; transform: rotate(-4deg); }
+            .rh__ph--island { bottom: 4%; right: 2%; top: auto; left: auto; width: 52%; opacity: 1; transform: rotate(4deg); z-index: 2; }
             .rh__ph--coast img, .rh__ph--island img { border-radius: 16px; box-shadow: 0 16px 32px rgba(0,0,0,0.5); }
             .rh__ph--bundt, .rh__ph--cake { border-radius: 10px; box-shadow: 0 12px 26px rgba(0,0,0,0.5); }
             .rh__content { padding: 0 1.25rem; }
