@@ -226,7 +226,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
       </section>
 
       {/* Suites Section */}
-      <section style={{ background: 'var(--color-background)', padding: 'clamp(2.25rem, 8vw, 8rem) clamp(1rem, 4vw, 2rem)' }}>
+      <section id="quartos" style={{ background: 'var(--color-background)', padding: 'clamp(2.25rem, 8vw, 8rem) clamp(1rem, 4vw, 2rem)', scrollMarginTop: '4.5rem' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <ScrollReveal>
             <div style={{ textAlign: 'center', marginBottom: '3rem' }}>

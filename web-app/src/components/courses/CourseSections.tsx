@@ -171,7 +171,7 @@ export function BeachRetreat({ text, onEnquire, interest }: { text: string; onEn
         </ul>
         <div className="crs-hero-actions">
           <button type="button" onClick={() => onEnquire(`Curso + Retiro: ${interest}`, 'retiro')} className="crs-btn crs-btn-gold">Quero o pacote com praia</button>
-          <Link href="/retreats" className="crs-btn crs-btn-ghost">Ver a casa e os quartos</Link>
+          <Link href="/retreats#quartos" className="crs-btn crs-btn-ghost">Ver a casa e os quartos</Link>
         </div>
       </div>
     </section>
