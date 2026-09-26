@@ -68,24 +68,15 @@ export default function VerComoPage() {
   );
 
   return (
-    <div style={{ maxWidth: '1400px' }}>
+    <div style={{ maxWidth: '1700px' }}>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>👀 Ver como</h1>
       <p style={{ color: '#7f8c8d', marginBottom: '1.75rem', maxWidth: '760px', lineHeight: 1.7 }}>
         O que clientes, parceiros e a equipe veem quando entram no site. As pré-visualizações são só para olhar: nada é enviado em nome de ninguém.
       </p>
 
-      {/* The audit: where each person signs in */}
-      <div style={{ display: 'grid', gap: '0.9rem', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', marginBottom: '2rem' }}>
-        {AREAS.map(a => (
-          <div key={a.who} style={{ background: '#fff', borderRadius: '12px', padding: '1.1rem 1.2rem', boxShadow: '0 3px 6px rgba(0,0,0,0.05)' }}>
-            <p style={{ fontWeight: 800, color: '#2c3e50', marginBottom: '0.35rem' }}>{a.emoji} {a.who}</p>
-            <a href={a.where} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#a6832b', fontWeight: 700 }}>{a.where} ↗</a>
-            <p style={{ fontSize: '0.84rem', color: '#594a42', lineHeight: 1.6, margin: '0.5rem 0 0.35rem' }}><strong>Como entra:</strong> {a.how}</p>
-            <p style={{ fontSize: '0.84rem', color: '#594a42', lineHeight: 1.6, margin: 0 }}><strong>O que vê:</strong> {a.sees}</p>
-          </div>
-        ))}
-      </div>
-
+      {/* The preview is the main thing, so it comes first; the audit of where each person signs in flanks it on the right. */}
+      <div className="ver-como-split">
+      <div style={{ minWidth: 0 }}>
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
         {tabBtn('login', '🔐 Tela de login')}
         {tabBtn('cliente', '🛍️ Cliente')}
@@ -158,7 +149,29 @@ export default function VerComoPage() {
         </section>
       </div>
 
+      </div>
+
+      {/* Right: where each person signs in, compact */}
+      <aside className="ver-como-audit" aria-label="Onde cada pessoa entra">
+        <p style={{ fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7f8c8d', margin: 0 }}>Onde cada pessoa entra</p>
+        {AREAS.map(a => (
+          <div key={a.who} style={{ background: '#fff', borderRadius: '12px', padding: '0.8rem 0.95rem', boxShadow: '0 3px 6px rgba(0,0,0,0.05)' }}>
+            <p style={{ fontWeight: 800, color: '#2c3e50', fontSize: '0.9rem', margin: '0 0 0.15rem' }}>{a.emoji} {a.who}</p>
+            <a href={a.where} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#a6832b', fontWeight: 700 }}>{a.where} ↗</a>
+            <p style={{ fontSize: '0.78rem', color: '#594a42', lineHeight: 1.5, margin: '0.4rem 0 0.25rem' }}><strong>Como entra:</strong> {a.how}</p>
+            <p style={{ fontSize: '0.78rem', color: '#594a42', lineHeight: 1.5, margin: 0 }}><strong>O que vê:</strong> {a.sees}</p>
+          </div>
+        ))}
+      </aside>
+      </div>
+
       <style dangerouslySetInnerHTML={{ __html: `
+        .ver-como-split { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
+        .ver-como-audit { display: grid; gap: 0.6rem; align-content: start; }
+        @media (min-width: 1500px) {
+          .ver-como-split { grid-template-columns: minmax(0, 1fr) 320px; }
+          .ver-como-audit { position: sticky; top: 1.5rem; }
+        }
         .ver-como-grid { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
         @media (min-width: 1000px) { .ver-como-grid { grid-template-columns: 300px minmax(0, 1fr); } }
       ` }} />
