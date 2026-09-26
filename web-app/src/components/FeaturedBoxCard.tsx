@@ -15,9 +15,9 @@ interface FeaturedBoxCardProps {
 }
 
 /**
- * Homepage "this week's box". The photo is shown at its own proportions, never
- * cropped to a strip: side by side with the text on a wide screen, stacked on a
- * phone. Tap the photo to see it full size.
+ * Homepage "this week's box". The photo fills its half of the rounded card edge to
+ * edge (cover, no bars): side by side with the text on a wide screen, stacked at its
+ * own proportions on a phone. Tap the photo to see it full size.
  */
 export default function FeaturedBoxCard({ title, description, imageUrl, dateLabel }: FeaturedBoxCardProps) {
   // "Chegada da Primavera: Sensações Amarelas" -> the part after the colon is the theme; give it its own colour and size.
@@ -30,20 +30,22 @@ export default function FeaturedBoxCard({ title, description, imageUrl, dateLabe
       <style>{`
         .fbc { background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(60,42,33,0.1); text-align: left; }
         .fbc-grid { display: grid; grid-template-columns: 1fr; }
-        .fbc-photo { display: flex; align-items: center; justify-content: center; background: #f5efe2; }
-        .fbc-photo img { display: block; width: 100%; height: auto; max-height: 640px; object-fit: contain; }
+        .fbc-photo { position: relative; background: #f5efe2; }
+        .fbc-photo img { display: block; width: 100%; height: auto; object-fit: cover; }
         .fbc-theme { display: block; margin-top: 0.1em; font-size: 1.22em; line-height: 1.05; color: #e39a14; }
         .fbc-cta .btn.fbc-btn, .fbc-cta .btn.fbc-btn:hover { color: #3c2a21; font-weight: 800; letter-spacing: 0.14em; }
         .fbc-text { padding: clamp(1.75rem, 4vw, 3rem); display: flex; flex-direction: column; justify-content: center; }
         .fbc-cta { padding: 3.75rem clamp(1.25rem, 4vw, 2rem) 2.25rem; background: linear-gradient(180deg, #fff 0%, #fdf7ee 100%); }
         @media (min-width: 860px) {
           .fbc-grid { grid-template-columns: 1.15fr 1fr; }
+          .fbc-photo { min-height: 420px; }
+          .fbc-photo img { position: absolute; inset: 0; height: 100%; }
         }
       `}</style>
 
       <div className="fbc-grid">
         <div className="fbc-photo">
-          <ZoomableImage src={imageUrl} alt={title} />
+          <ZoomableImage src={imageUrl} alt={title} thumbWidth={1080} />
         </div>
 
         <div className="fbc-text">
