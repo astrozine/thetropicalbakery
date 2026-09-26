@@ -47,7 +47,7 @@ export default function ExplodingTreats() {
           <motion.img
             src="/hero-logo-transparent.png"
             alt="The Tropical Bakery Logo"
-            style={{ width: '60vw', maxWidth: '250px', filter: 'drop-shadow(0 0 25px rgba(253,250,243,1))' }}
+            style={{ height: '170px', width: 'auto', maxWidth: '90vw', filter: 'drop-shadow(0 0 25px rgba(253,250,243,1))' }}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1 }}
@@ -90,8 +90,8 @@ export default function ExplodingTreats() {
           ))}
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', color: '#d4af37', opacity: 0.8 }}>
-          <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Deslize para ver mais</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', color: '#5a3d10' }}>
+          <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700 }}>Deslize para ver mais</span>
           <span style={{ fontSize: '1.2rem' }}>→</span>
         </div>
 
