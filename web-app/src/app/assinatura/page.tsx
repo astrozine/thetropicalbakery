@@ -251,8 +251,8 @@ export default function SubscriptionPage() {
       </StripedBackground>
 
       {/* ---------------------------------------------------------------- PLANS */}
-      <section id="planos" style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 1.5rem' }}>
-        <div style={{ maxWidth: '1150px', margin: '0 auto' }}>
+      <section id="planos" style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 0' }}>
+        <div style={{ maxWidth: '1150px', margin: '0 auto', padding: '0 1.5rem' }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
             color: 'var(--color-primary)', textAlign: 'center', marginBottom: '0.75rem',
@@ -262,16 +262,41 @@ export default function SubscriptionPage() {
           <p style={{ textAlign: 'center', color: '#7a6a61', marginBottom: '3.5rem', fontSize: '1rem' }}>
             Todos os planos entregam uma caixa por semana. Quanto maior o compromisso, menor o valor por caixa.
           </p>
+        </div>
 
-          {loading ? (
-            <p style={{ textAlign: 'center', color: '#7a6a61' }}>Carregando planos...</p>
-          ) : plans.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#7a6a61' }}>
-              Os planos estarão disponíveis em instantes. Fale com a gente no{' '}
-              <a href="https://wa.me/5511932119196" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>WhatsApp</a>.
-            </p>
-          ) : (
-            <div className="tb-rail" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.75rem', alignItems: 'start' }}>
+        {loading ? (
+          <p style={{ textAlign: 'center', color: '#7a6a61' }}>Carregando planos...</p>
+        ) : plans.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#7a6a61', padding: '0 1.5rem' }}>
+            Os planos estarão disponíveis em instantes. Fale com a gente no{' '}
+            <a href="https://wa.me/5511932119196" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>WhatsApp</a>.
+          </p>
+        ) : (
+          <div className="tb-plan-rail-wrap" style={{ position: 'relative' }}>
+            {/* Right-edge fade gradient — the most friction-free swipe cue.
+                On wide screens the cards sit in a normal row; this overlay is
+                invisible when no overflow exists. */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute', right: 0, top: 0, bottom: 0, width: '5rem',
+                background: 'linear-gradient(to left, var(--color-background) 10%, transparent)',
+                zIndex: 2, pointerEvents: 'none',
+              }}
+            />
+            <div
+              className="tb-plan-rail"
+              style={{
+                display: 'flex',
+                gap: '1.75rem',
+                overflowX: 'auto',
+                scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                padding: '1rem 1.5rem 2rem',
+                paddingRight: 'calc(1.5rem + 2rem)',
+              }}
+            >
               {plans.map(plan => {
                 const featured = Boolean(plan.badge);
                 const savings = monthlySavings(plan, BASE_BOX_PRICE, 1);
@@ -293,6 +318,10 @@ export default function SubscriptionPage() {
                       transform: featured ? 'scale(1.02)' : 'none',
                       boxShadow: isSelected ? '0 18px 40px rgba(212,175,55,0.28)' : '0 8px 24px rgba(60,42,33,0.07)',
                       transition: 'box-shadow 0.25s, border-color 0.25s',
+                      /* Each card snaps to left edge and has a fixed min-width
+                         so mobile users see a partial next card (peek) */
+                      scrollSnapAlign: 'start',
+                      flex: '0 0 min(290px, 82vw)',
                     }}
                   >
                     {plan.badge && (
@@ -369,8 +398,8 @@ export default function SubscriptionPage() {
                 );
               })}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </section>
 
       {/* ------------------------------------------------------ WHY SUBSCRIBE */}

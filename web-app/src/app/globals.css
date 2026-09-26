@@ -1146,7 +1146,60 @@ body {
 .menu-detailed > p { color: rgba(253,250,243,0.66) !important; }
 .menu-detailed .menu-main > div[style*="text-align: center"] { color: #fdfaf3 !important; }
 
+
+
 @media (max-width: 767px) {
   .menu-detailed { padding-left: 1rem !important; padding-right: 1rem !important; }
   .menu-detailed-head { margin-bottom: 1.5rem; }
 }
+
+/* ── Plan card scroll rail ──────────────────────────────────────────────────
+   On mobile: horizontal scroll with scroll-snap. Cards sized to show a peek
+   of the next one so the swipe affordance is obvious.
+   On desktop (≥900px): flex wraps naturally, no scroll, centered.           */
+
+.tb-plan-rail::-webkit-scrollbar { display: none; }
+
+@media (min-width: 900px) {
+  .tb-plan-rail {
+    flex-wrap: wrap !important;
+    justify-content: center;
+    overflow-x: visible !important;
+    scroll-snap-type: none !important;
+    padding-right: 1.5rem !important;
+  }
+  /* On desktop the rail's parent wrapper doesn't need the fade overlay */
+  .tb-plan-rail-wrap > [aria-hidden="true"] { display: none; }
+}
+
+/* ── B2B treat gallery strip ────────────────────────────────────────────────
+   On mobile: horizontal scroll row with compact square thumbnails so it
+   doesn't feel like a wall of redundant images.
+   On desktop: centred wrap as before.                                        */
+
+.tb-gallery-rail {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .tb-gallery-rail {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    justify-content: flex-start;
+    padding-bottom: 0.5rem;
+  }
+  .tb-gallery-rail::-webkit-scrollbar { display: none; }
+  .tb-gallery-rail-img {
+    width: 130px !important;
+    height: 130px !important;
+    flex: 0 0 130px;
+    scroll-snap-align: start;
+  }
+}
+

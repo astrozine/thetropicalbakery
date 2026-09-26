@@ -110,12 +110,19 @@ export default function B2BPageLayout({
 
       {/* Treat Gallery Strip */}
       <StripedBackground tone="dark" bandHeight={64}>
-        <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap', padding: '3rem 2rem' }}>
+        <div className="tb-gallery-rail" style={{ padding: '2.5rem 1.5rem' }}>
           {galleryImages.map((src, i) => (
-            <ZoomableImage key={i} src={src} alt="Criação Tropical" style={{ width: '200px', height: '200px', objectFit: 'cover', borderRadius: '12px', border: '2px solid rgba(212,175,55,0.3)' }} />
+            <ZoomableImage
+              key={i}
+              src={src}
+              alt="Criação Tropical"
+              className="tb-gallery-rail-img"
+              style={{ width: '160px', height: '160px', objectFit: 'cover', borderRadius: '12px', border: '2px solid rgba(212,175,55,0.3)', flexShrink: 0, scrollSnapAlign: 'start' }}
+            />
           ))}
         </div>
       </StripedBackground>
+
     </main>
   );
 }
