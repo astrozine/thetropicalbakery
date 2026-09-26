@@ -1071,8 +1071,12 @@ body {
 /* /menu on a phone: the words and the treat picker come before the big photo,
    so the first thing you can do is tap a doce rather than read about one. */
 @media (max-width: 767px) {
-  .menu-hero { flex-direction: column-reverse; gap: 1.5rem !important; }
-  .menu-hero > div:first-child img { max-height: 42vh; object-fit: cover; }
+  .menu-hero { flex-direction: column-reverse; gap: 1rem !important; }
+  /* line-height:0 kills the few pixels an inline <img> leaves under itself,
+     which was showing as a band of empty cream before the dark half. */
+  .menu-hero > div:first-child { line-height: 0; }
+  .menu-hero > div:first-child img { max-height: 30vh; object-fit: cover; }
+  .menu-detailed { padding-top: 2rem !important; }
 }
 
 /* Home hero on a phone: the logo plaque and the photo strip together ran to
@@ -1111,4 +1115,38 @@ body {
 
   /* The big section paddings on the course pages, halved again for a phone. */
   .crs-section, .crs-magic, .crs-beach { padding-top: 2.25rem !important; padding-bottom: 2.25rem !important; }
+}
+
+/* ── /menu: two ways to choose, told apart at a glance ──────────────────────
+   The page had two picking areas that looked identical, so it felt like being
+   asked the same question twice. Now:
+     · "Escolha rápida" up top, on cream — tap photos, done.
+     · "Busca detalhada" here, on dark — the whole catalogue with allergen and
+       ingredient filters, for people who arrive with a restriction in mind.
+   The change of background is what tells you it is a different room. */
+.menu-detailed {
+  background: linear-gradient(180deg, #3c2a21 0%, #33241c 100%);
+  max-width: none;
+  margin: 0;
+}
+.menu-detailed-head { text-align: center; max-width: 720px; margin: 0 auto 2.5rem; }
+.menu-detailed-kicker {
+  display: inline-block; margin-bottom: 0.7rem; padding: 0.3rem 1rem; border-radius: 999px;
+  background: rgba(212,175,55,0.18); border: 1px solid rgba(212,175,55,0.55);
+  color: #f4c542; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.menu-detailed-head h2 {
+  font-family: var(--font-heading); color: #fdfaf3; line-height: 1.12;
+  font-size: clamp(1.5rem, 4vw, 2.6rem); margin-bottom: 0.75rem;
+}
+.menu-detailed-head p { color: rgba(253,250,243,0.78); font-size: 1rem; line-height: 1.7; }
+.menu-detailed-head strong { color: #f4c542; }
+/* The treat cards and the closing note sit on dark now. */
+.menu-detailed .menu-main > p,
+.menu-detailed > p { color: rgba(253,250,243,0.66) !important; }
+.menu-detailed .menu-main > div[style*="text-align: center"] { color: #fdfaf3 !important; }
+
+@media (max-width: 767px) {
+  .menu-detailed { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .menu-detailed-head { margin-bottom: 1.5rem; }
 }

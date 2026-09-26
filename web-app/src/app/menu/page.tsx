@@ -85,8 +85,8 @@ export default function MenuPage() {
             <div className="mobile-only" style={{ margin: '0 0 2rem' }}>
               <TreatPicker
                 hero
-                title="Monte o seu evento"
-                subtitle="Toque nos doces que você quer servir. A gente monta o orçamento a partir da sua escolha."
+                title="Escolha rápida"
+                subtitle="Toque nos doces que você quer servir e peça o orçamento. Sem formulário."
                 initial={8}
                 ctaLabel="Pedir orçamento"
                 onAction={chosen => {
@@ -108,24 +108,18 @@ export default function MenuPage() {
               </div>
             </details>
             
-            <div style={{ position: 'relative', width: '100%', maxWidth: '600px' }}>
-              <SquiggleArrows />
-              <div style={{ position: 'relative', zIndex: 11 }}>
-                <EventLeadCapture />
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
       {/* Gallery / Events Menu Section */}
-      <section id="portfolio" style={{ padding: 'clamp(2rem, 6vw, 5rem) 2rem', maxWidth: '1400px', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 style={{ fontSize: 'clamp(1.6rem, 4vw, 3rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
-            Nosso Portfólio
-          </h2>
-          <p style={{ fontSize: '1.1rem', color: '#594a42', maxWidth: '600px', margin: '0 auto' }}>
-            Navegue pelas nossas criações para montar a mesa perfeita para seus convidados.
+      <section id="portfolio" className="menu-detailed" style={{ padding: 'clamp(2rem, 6vw, 5rem) 2rem' }}>
+        <div className="menu-detailed-head">
+          <span className="menu-detailed-kicker">Busca detalhada</span>
+          <h2>Todos os doces, com filtros</h2>
+          <p>
+            Precisa evitar um alérgeno ou procurar por ingrediente? Aqui está o catálogo inteiro,
+            com os filtros. Se você só quer escolher pelas fotos, a <strong>Escolha rápida</strong> lá em cima resolve.
           </p>
         </div>
 
@@ -187,6 +181,16 @@ export default function MenuPage() {
           Alérgenos e ingredientes são informados por doce. Tudo é feito na mesma cozinha, então traços de outros ingredientes podem existir
           mesmo quando não estão na receita. Se algum convidado tem alergia grave, fale com a gente no WhatsApp antes de fechar o pedido.
         </p>
+      </section>
+
+      {/* The two-step form comes last now: you browse, then you ask. */}
+      <section id="orcamento" style={{ padding: 'clamp(2.25rem, 6vw, 5rem) 1rem', background: '#fdfaf3' }}>
+        <div style={{ position: 'relative', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+          <SquiggleArrows />
+          <div style={{ position: 'relative', zIndex: 11 }}>
+            <EventLeadCapture />
+          </div>
+        </div>
       </section>
 
     </main>
