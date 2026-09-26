@@ -11,6 +11,10 @@ this file describes how not to break each other's work. If a rule here changes, 
    that you did not edit belong to another agent's unfinished work. Leave them alone.
 2. **Stage by name, never by sweep.** `git add path/one path/two`. Never `git add -A`, `git add .`
    or `git commit -a`. A sweep commit has already published one agent's half-finished work under another's name.
+   **Naming the file is not enough when two agents are in the same file:** `git add` takes the whole file as it is on
+   disk, including the other agent's half-written lines (this once published an import of a file that was not in
+   the repo, so HEAD would not build). Run `git diff <file>` right before staging; if any hunk is not yours, do not
+   commit that file: wait, or commit only your hunks with `git add -p`.
 3. **Never `git stash`, `git reset --hard`, `git checkout -- file`, `git clean`, or force-push.**
    Stash briefly removes every other agent's uncommitted files from disk. If you need to compare with the last
    commit, use `git diff` or `git show HEAD:path`, or make a scratch worktree (`git worktree add <dir> HEAD`).
@@ -92,7 +96,15 @@ Verified live, 2026-09-26:
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the
   "no box yet" notice however much stock is left. Check it before assuming the box pages are broken.
 - **Stock is reserved when the order is created and only given back if saving fails.** Pix is confirmed by hand, so an abandoned
-  Pix checkout keeps its boxes for good. Batches are small; fix the count by hand in `/admin/caixas`.
+  Pix checkout keeps its boxes until someone gives them back. `/admin/caixas` lists Pix orders still unconfirmed after 24 h
+  (`HeldBoxes.tsx`) with a "Liberar N caixas" button per order. It marks the order `cancelled` in `inbox_status` first, then
+  lowers `sold_quantity` only if the counter has not moved meanwhile. It never offers card/PayPal orders (they can still be paid).
+  `cancelled` is set only there; the inbox must not offer a way to reopen it (that would bring back an order whose boxes were
+  already returned).
+- The admin overview warns when a box is on sale but fewer than 3 delivery days are open (`deliveryDaysLeft` in `adminStats.ts`).
+  A recurring weekly rule in `/admin/calendario` is the real fix.
+- **Type is never under 12px (0.75rem) on the public site**, and tap targets are 44px. The phone audit reports anything smaller.
+  `npm run lint` has 0 errors; React's compiler-style rules and `any` are warnings on purpose (see `eslint.config.mjs`).
 - Box sale rules live in `src/lib/boxWindow.ts` (a box is on sale until it sells out or is switched off; an ended window rolls over
   to the next deliverable days). When nothing can be ordered the site shows the "no box yet + waiting list" notice
   (`NoBoxNotice.tsx`) on `/caixas` and the home page.
