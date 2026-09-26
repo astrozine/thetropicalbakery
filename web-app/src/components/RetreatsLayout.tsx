@@ -49,7 +49,27 @@ export interface RetreatsLayoutProps {
   }
 }
 
+/** The little "how far is it" cards that hang off the bottom of the photos. */
+const NEARBY = {
+  pt: {
+    beach: { num: '100 m', label: 'da casa até a areia de Itamambuca', extra: 'Aulas de surfe à parte' },
+    island: { num: '15–20 min', label: 'de carro da casa · Ilha do Prumirim' },
+    waterfall: { num: '15–20 min', label: 'de carro da casa · Cachoeira do Prumirim' },
+  },
+  en: {
+    beach: { num: '100 m', label: 'from the house to the sand at Itamambuca', extra: 'Surf classes as an add-on' },
+    island: { num: '15–20 min', label: 'by car from the house · Prumirim Island' },
+    waterfall: { num: '15–20 min', label: 'by car from the house · Prumirim Waterfall' },
+  },
+  es: {
+    beach: { num: '100 m', label: 'de la casa a la arena de Itamambuca', extra: 'Clases de surf aparte' },
+    island: { num: '15–20 min', label: 'en auto desde la casa · Isla de Prumirim' },
+    waterfall: { num: '15–20 min', label: 'en auto desde la casa · Cascada de Prumirim' },
+  },
+} as const;
+
 export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutProps) {
+  const nearby = NEARBY[locale];
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInterest, setSelectedInterest] = useState('');
   const [roomImages, setRoomImages] = useState<{ [key: string]: string }>({
@@ -93,9 +113,18 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           <ZoomableImage className="rh__ph rh__ph--cake" src="/menu-items/Screenshot_20260513_114809_Edits.jpg" alt="Tropical Treats" />
           <div className="rh__ph rh__ph--coast">
             <img src="/retreats/real-itamambuca-coast.jpg" alt="Praia de Itamambuca vista do alto" />
+            <div className="rh__card">
+              <b className="rh__num">{nearby.beach.num}</b>
+              <span className="rh__lbl">{nearby.beach.label}</span>
+              <span className="rh__extra"><span aria-hidden>✦</span> {nearby.beach.extra}</span>
+            </div>
           </div>
           <div className="rh__ph rh__ph--island">
             <img src="/retreats/real-prumirim-island.jpg" alt="Ilha do Prumirim" />
+            <div className="rh__card rh__card--right">
+              <b className="rh__num">{nearby.island.num}</b>
+              <span className="rh__lbl">{nearby.island.label}</span>
+            </div>
           </div>
         </div>
 
@@ -128,11 +157,18 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           .rh__bg { position: absolute; inset: 0; background-image: url("/retreats/real-itamambuca-aerial.jpg"); background-size: cover; background-position: center; filter: brightness(0.45); transform: scale(1.05); }
           .rh__photos { position: absolute; inset: 0; pointer-events: none; }
           .rh__ph { position: absolute; pointer-events: auto; }
-          .rh__ph--bundt { top: 15%; right: 12%; width: clamp(90px, 16vw, 220px); border-radius: 12px; transform: rotate(12deg); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 2; }
+          .rh__ph--bundt { top: 15%; right: 12%; width: clamp(90px, 16vw, 220px); border-radius: 12px; transform: rotate(12deg); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 4; }
           .rh__ph--cake  { bottom: 20%; left: 15%; width: clamp(90px, 15vw, 210px); border-radius: 12px; transform: rotate(-10deg); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 2; }
-          .rh__ph--coast { top: 15%; left: 8%; width: clamp(250px, 40vw, 550px); z-index: 1; opacity: 0.9; transform: rotate(-4deg); }
-          .rh__ph--island { bottom: 15%; right: 8%; width: clamp(250px, 40vw, 550px); z-index: 1; opacity: 0.9; transform: rotate(4deg); }
-          .rh__ph--coast img, .rh__ph--island img { display: block; width: 100%; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); object-fit: cover; }
+          .rh__ph--coast { top: 15%; left: 8%; width: clamp(250px, 40vw, 550px); z-index: 3; transform: rotate(-4deg); }
+          .rh__ph--island { bottom: 21%; right: 8%; width: clamp(250px, 40vw, 550px); z-index: 3; transform: rotate(4deg); }
+          .rh__ph--coast img, .rh__ph--island img { display: block; width: 100%; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); object-fit: cover; opacity: 0.9; }
+          /* The "how far" cards: cream, gold-edged, hanging off the bottom of the photo like a name tag. */
+          .rh__card { position: absolute; left: 1.25rem; bottom: -1.3rem; z-index: 3; display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 0.85rem; max-width: min(88%, 340px); padding: 0.7rem 1.05rem 0.7rem 0.95rem; background: rgba(253,250,243,0.97); color: #3c2a21; border: 1px solid rgba(212,175,55,0.6); border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,0.4); }
+          .rh__card--right { left: auto; right: 1.25rem; }
+          .rh__num { font-family: var(--font-heading); font-size: clamp(1.3rem, 2.1vw, 1.85rem); line-height: 1; color: #b8921f; white-space: nowrap; }
+          .rh__lbl { font-size: 0.82rem; line-height: 1.3; color: #594a42; }
+          .rh__extra { grid-column: 1 / -1; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(212,175,55,0.7); font-size: 0.68rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: #3c2a21; }
+          .rh__extra span { color: #d4af37; }
           .rh__content { position: relative; z-index: 10; text-align: center; padding: 0 2rem; max-width: 800px; }
           .rh__ribbon { width: clamp(140px, 20vw, 220px); margin: 0 auto 1rem; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.4)); }
           .rh__location { display: inline-block; color: #d4af37; letter-spacing: 4px; text-transform: uppercase; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(212,175,55,0.4); padding-bottom: 0.5rem; }
@@ -146,8 +182,15 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             .rh__photos { position: relative; inset: auto; width: min(92%, 480px); aspect-ratio: 1 / 0.84; margin: 0 auto 1rem; }
             .rh__ph--bundt  { top: 0; right: 3%; bottom: auto; left: auto; width: 28%; transform: rotate(9deg); z-index: 3; }
             .rh__ph--cake   { bottom: 0; left: 6%; top: auto; right: auto; width: 28%; transform: rotate(-9deg); z-index: 3; }
-            .rh__ph--coast  { top: 3%; left: 4%; width: 60%; opacity: 1; transform: rotate(-4deg); }
-            .rh__ph--island { bottom: 4%; right: 2%; top: auto; left: auto; width: 52%; opacity: 1; transform: rotate(4deg); z-index: 2; }
+            .rh__ph--coast  { top: 3%; left: 4%; width: 60%; transform: rotate(-4deg); }
+            .rh__ph--island { bottom: 4%; right: 2%; top: auto; left: auto; width: 52%; transform: rotate(4deg); z-index: 2; }
+            .rh__ph--coast img, .rh__ph--island img { opacity: 1; }
+            /* On a phone the photos are small, so the cards are compact and only just overhang the bottom edge. */
+            .rh__card { left: 0.4rem; bottom: -0.55rem; max-width: 94%; padding: 0.35rem 0.55rem; column-gap: 0.5rem; border-radius: 10px; box-shadow: 0 8px 18px rgba(0,0,0,0.35); }
+            .rh__card--right { left: auto; right: 0.4rem; grid-template-columns: 1fr; row-gap: 0.15rem; }
+            .rh__num { font-size: 1rem; }
+            .rh__lbl { font-size: 0.72rem; line-height: 1.25; }
+            .rh__extra { margin-top: 0.3rem; padding-top: 0.3rem; font-size: 0.72rem; letter-spacing: 0.6px; }
             .rh__ph--coast img, .rh__ph--island img { border-radius: 16px; box-shadow: 0 16px 32px rgba(0,0,0,0.5); }
             .rh__ph--bundt, .rh__ph--cake { border-radius: 10px; box-shadow: 0 12px 26px rgba(0,0,0,0.5); }
             .rh__content { padding: 0 1.25rem; }
@@ -177,7 +220,10 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
               <div className="rx__wide">
                 <img src="/retreats/real-cachoeira.jpg" alt="Cachoeira do Prumirim, Ubatuba" loading="lazy" />
               </div>
-              <span className="rx__tag"><span aria-hidden>✦</span> Cachoeira do Prumirim · Ubatuba</span>
+              <div className="rx__card">
+                <b className="rx__num">{nearby.waterfall.num}</b>
+                <span className="rx__lbl">{nearby.waterfall.label}</span>
+              </div>
             </div>
             <style dangerouslySetInnerHTML={{ __html: `
               .rx { flex: 1 1 50%; min-width: 300px; display: flex; align-items: center; justify-content: center; padding: clamp(1.5rem, 4vw, 4rem); background: linear-gradient(160deg, #f7eedb 0%, #ecdcbc 100%); overflow: hidden; }
@@ -188,8 +234,11 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
               .rx__arch img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
               .rx__wide { position: absolute; right: 0; bottom: 4%; width: 62%; aspect-ratio: 4 / 3; border: 8px solid #fdfaf3; border-radius: 22px; overflow: hidden; box-shadow: 0 24px 50px rgba(60,42,33,0.35); transform: rotate(3deg); z-index: 2; }
               .rx__wide img { display: block; width: 100%; height: 100%; object-fit: cover; }
-              .rx__tag { position: absolute; left: 2%; bottom: 3%; z-index: 3; background: #3c2a21; color: #d4af37; padding: 0.55rem 1.1rem; border-radius: 999px; font-size: clamp(0.62rem, 1.6vw, 0.78rem); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; box-shadow: 0 10px 24px rgba(60,42,33,0.35); }
-              @media (max-width: 480px) { .rx__wide { border-width: 5px; border-radius: 16px; } .rx__tag { letter-spacing: 1.2px; padding: 0.45rem 0.8rem; } }
+              /* Same "how far" card as the hero, in brown so it sits on the cream panel. */
+              .rx__card { position: absolute; left: 2%; bottom: -1%; z-index: 3; display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 0.8rem; max-width: 62%; padding: 0.7rem 1.05rem 0.7rem 0.95rem; background: #3c2a21; color: #fdfaf3; border: 1px solid rgba(212,175,55,0.55); border-radius: 14px; box-shadow: 0 16px 34px rgba(60,42,33,0.4); }
+              .rx__num { font-family: var(--font-heading); font-size: clamp(1.15rem, 2.4vw, 1.7rem); line-height: 1; color: #d4af37; white-space: nowrap; }
+              .rx__lbl { font-size: clamp(0.72rem, 1.5vw, 0.8rem); line-height: 1.3; color: rgba(253,250,243,0.85); }
+              @media (max-width: 480px) { .rx__wide { border-width: 5px; border-radius: 16px; } .rx__card { padding: 0.5rem 0.7rem; column-gap: 0.55rem; } }
             ` }} />
           </div>
           {/* Text side */}
