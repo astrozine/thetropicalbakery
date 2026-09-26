@@ -293,7 +293,7 @@ export default function SubscriptionPage() {
                 scrollSnapType: 'x mandatory',
                 WebkitOverflowScrolling: 'touch',
                 scrollbarWidth: 'none',
-                padding: '1rem 1.5rem 2rem',
+                padding: '1.5rem 1.5rem 2rem',
                 paddingRight: 'calc(1.5rem + 2rem)',
               }}
             >
@@ -312,16 +312,17 @@ export default function SubscriptionPage() {
                       border: '2px solid',
                       borderColor: isSelected ? '#d4af37' : featured ? 'var(--color-primary)' : '#e8e1d7',
                       borderRadius: '20px',
-                      padding: '2rem 1.75rem',
+                      padding: '2rem 1.5rem',
+                      paddingTop: plan.badge ? '2.25rem' : '2rem',
                       cursor: 'pointer',
                       position: 'relative',
+                      overflow: 'hidden',
+                      minWidth: 0,
                       transform: featured ? 'scale(1.02)' : 'none',
                       boxShadow: isSelected ? '0 18px 40px rgba(212,175,55,0.28)' : '0 8px 24px rgba(60,42,33,0.07)',
                       transition: 'box-shadow 0.25s, border-color 0.25s',
-                      /* Each card snaps to left edge and has a fixed min-width
-                         so mobile users see a partial next card (peek) */
                       scrollSnapAlign: 'start',
-                      flex: '0 0 min(290px, 82vw)',
+                      flex: '0 0 min(275px, 80vw)',
                     }}
                   >
                     {plan.badge && (
@@ -336,8 +337,12 @@ export default function SubscriptionPage() {
                     )}
 
                     <h3 style={{
-                      fontFamily: 'var(--font-heading)', fontSize: '1.9rem',
-                      color: featured ? '#d4af37' : 'var(--color-primary)', marginBottom: '0.4rem',
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 'clamp(1.4rem, 5vw, 1.9rem)',
+                      color: featured ? '#d4af37' : 'var(--color-primary)',
+                      marginBottom: '0.4rem',
+                      wordBreak: 'break-word',
+                      overflowWrap: 'anywhere',
                     }}>
                       {plan.name}
                     </h3>
@@ -348,8 +353,14 @@ export default function SubscriptionPage() {
                       {plan.tagline}
                     </p>
 
-                    <div style={{ marginBottom: '0.35rem' }}>
-                      <span style={{ fontFamily: 'var(--font-heading)', fontSize: '2.8rem', lineHeight: 1 }}>
+                    <div style={{ marginBottom: '0.35rem', overflow: 'hidden' }}>
+                      <span style={{
+                        fontFamily: 'var(--font-heading)',
+                        fontSize: 'clamp(1.8rem, 6vw, 2.8rem)',
+                        lineHeight: 1,
+                        display: 'inline-block',
+                        maxWidth: '100%',
+                      }}>
                         {formatBRL(plan.monthly_price)}
                       </span>
                       <span style={{ fontSize: '0.95rem', opacity: 0.7 }}> /mês</span>

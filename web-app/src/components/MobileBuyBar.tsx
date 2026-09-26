@@ -24,27 +24,39 @@ interface Props {
  *
  * It hides itself while the real order form is on screen — two identical buttons
  * fighting for the same tap is worse than none.
+ *
+ * After ~2 screens of scrolling it collapses to a compact pill (kicker/note
+ * fade out) so it stops fighting for attention mid-content. It re-expands near
+ * the bottom where a final CTA makes sense again.
  */
 export default function MobileBuyBar({ kicker, price, note, label, targetId }: Props) {
   const [hidden, setHidden] = useState(true);
+  const [compact, setCompact] = useState(false);
   const raf = useRef(0);
 
   useEffect(() => {
     document.body.classList.add('has-buybar');
 
     const target = document.querySelector(targetId);
-    // Show it once the reader has moved past the hero, and hide it again when
-    // the real form is in front of them.
     const onScroll = () => {
       cancelAnimationFrame(raf.current);
       raf.current = requestAnimationFrame(() => {
-        const pastHero = window.scrollY > window.innerHeight * 0.55;
+        const scrollY = window.scrollY;
+        const vh = window.innerHeight;
+        const docH = document.documentElement.scrollHeight;
+
+        const pastHero = scrollY > vh * 0.55;
+        // Compact after 2 screen-heights, expand again in the last 30% of the page
+        const nearEnd = scrollY + vh > docH * 0.72;
+        const shouldCompact = pastHero && scrollY > vh * 2 && !nearEnd;
+
         let formVisible = false;
         if (target) {
           const r = target.getBoundingClientRect();
-          formVisible = r.top < window.innerHeight * 0.85 && r.bottom > 0;
+          formVisible = r.top < vh * 0.85 && r.bottom > 0;
         }
         setHidden(!pastHero || formVisible);
+        setCompact(shouldCompact);
       });
     };
 
@@ -65,7 +77,7 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
   };
 
   return (
-    <div className="tb-buybar" data-hidden={hidden ? 'true' : 'false'}>
+    <div className={`tb-buybar${compact ? ' tb-buybar--compact' : ''}`} data-hidden={hidden ? 'true' : 'false'}>
       <div className="tb-buybar__price">
         {kicker && <span className="tb-buybar__kicker">{kicker}</span>}
         <strong>{price}</strong>
@@ -78,7 +90,6 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
         @media (max-width: 767px) {
           .tb-buybar {
             position: fixed;
-            /* sits directly on top of the bottom tab bar */
             bottom: calc(72px + env(safe-area-inset-bottom, 0px));
             left: 0; right: 0;
             z-index: 999;
@@ -91,7 +102,7 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
             -webkit-backdrop-filter: blur(12px);
             border-top: 1px solid rgba(212,175,55,0.35);
             box-shadow: 0 -8px 24px rgba(60,42,33,0.13);
-            transition: transform .28s cubic-bezier(.16,1,.3,1), opacity .28s;
+            transition: transform .28s cubic-bezier(.16,1,.3,1), opacity .28s, padding .28s;
           }
           .tb-buybar[data-hidden="true"] {
             transform: translateY(130%);
@@ -99,9 +110,19 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
             pointer-events: none;
           }
           .tb-buybar__price { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
-          .tb-buybar__kicker { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: #a6832b; font-weight: 800; }
-          .tb-buybar__price strong { font-family: var(--font-heading); font-size: 1.3rem; color: #3c2a21; }
-          .tb-buybar__note { font-size: 0.72rem; color: #7a6a61; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .tb-buybar__kicker {
+            font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+            color: #a6832b; font-weight: 800;
+            max-height: 2em; overflow: hidden;
+            transition: max-height .28s, opacity .28s, margin .28s;
+          }
+          .tb-buybar__price strong { font-family: var(--font-heading); font-size: 1.3rem; color: #3c2a21; white-space: nowrap; }
+          .tb-buybar__note {
+            font-size: 0.72rem; color: #7a6a61; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+            max-height: 2em;
+            transition: max-height .28s, opacity .28s, margin .28s;
+          }
           .tb-buybar__cta {
             margin-left: auto;
             flex: 0 0 auto;
@@ -117,8 +138,29 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
             letter-spacing: 0.02em;
             cursor: pointer;
             box-shadow: 0 6px 16px rgba(212,175,55,0.45);
+            white-space: nowrap;
+            transition: min-height .28s, padding .28s, font-size .28s;
           }
           .tb-buybar__cta:active { transform: scale(0.97); }
+
+          /* ── Compact mode: kicker + note collapse, button shrinks ── */
+          .tb-buybar--compact {
+            padding: 0.3rem 0.75rem;
+          }
+          .tb-buybar--compact .tb-buybar__kicker,
+          .tb-buybar--compact .tb-buybar__note {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+          }
+          .tb-buybar--compact .tb-buybar__price strong {
+            font-size: 1.05rem;
+          }
+          .tb-buybar--compact .tb-buybar__cta {
+            min-height: 36px;
+            padding: 0 1rem;
+            font-size: 0.88rem;
+          }
         }
         @media (prefers-reduced-motion: reduce) {
           .tb-buybar { transition: none; }

@@ -58,6 +58,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
+  const [showOptional, setShowOptional] = useState(false);
 
   // Nobody who already has an account should retype what we know.
   useEffect(() => {
@@ -234,7 +235,25 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
         Sem pagamento agora. Você confirma tudo por WhatsApp com a Dolly.
       </p>
 
-      {!user && (
+      {/* Logged-in welcome banner — replaces the LoginPanel only when we already
+          know who they are, because typing your name twice is demoralising. */}
+      {user ? (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '0.75rem',
+          padding: '0.85rem 1rem', borderRadius: '12px', marginBottom: '1.75rem',
+          background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.4)',
+        }}>
+          <span style={{ fontSize: '1.5rem' }}>✓</span>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-primary)', fontSize: '0.9rem' }}>
+              {profile?.full_name ? `Olá, ${profile.full_name.split(' ')[0]}!` : 'Você está conectado'}
+            </p>
+            <p style={{ margin: 0, fontSize: '0.78rem', color: '#7a6a61' }}>
+              {profile?.full_name ? 'Seus dados já estão preenchidos.' : 'Entre para preencher tudo em 10 segundos.'}
+            </p>
+          </div>
+        </div>
+      ) : (
         <div style={{ marginBottom: '2rem' }}>
           <LoginPanel
             message="Entre para reservar em 10 segundos"
@@ -299,67 +318,96 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
 
         <AddressFields value={address} onChange={setAddress} required />
 
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ flex: '0 1 200px' }}>
-            <label style={labelStyle}>Caixas por semana</label>
-            <select value={boxesPerWeek} onChange={e => setBoxesPerWeek(Number(e.target.value))} style={{ ...inputStyle, cursor: 'pointer' }}>
-              {[1, 2, 3, 4].map(n => <option key={n} value={n}>{n} {n === 1 ? 'caixa' : 'caixas'}</option>)}
-            </select>
-          </div>
-          <div style={{ flex: '1 1 220px' }}>
-            <label style={labelStyle}>Quem te indicou? <span style={{ textTransform: 'none', fontWeight: 400, color: '#a89a90' }}>(opcional)</span></label>
-            <input type="text" value={referredBy} onChange={e => setReferredBy(e.target.value)} placeholder="Nome de quem indicou" style={inputStyle} />
-          </div>
-        </div>
+        {/* ── Optional fields: collapsed by default ── */}
+        <div style={{
+          borderRadius: '12px',
+          border: '1px solid #e8e1d7',
+          overflow: 'hidden',
+        }}>
+          <button
+            type="button"
+            onClick={() => setShowOptional(v => !v)}
+            style={{
+              width: '100%', textAlign: 'left', background: 'rgba(212,175,55,0.06)',
+              border: 'none', padding: '0.85rem 1rem',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              cursor: 'pointer', fontFamily: 'var(--font-body)',
+            }}
+          >
+            <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: '0.9rem' }}>
+              🌿 Personalizar minha caixa
+            </span>
+            <span style={{ color: '#d4af37', fontSize: '1.1rem', flexShrink: 0 }}>
+              {showOptional ? '−' : '+'}
+            </span>
+          </button>
 
-        <div>
-          <label style={labelStyle}>Restrições alimentares</label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-            {DIETARY_FIELDS.map(({ key, label }) => {
-              const on = dietary[key];
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setDietary({ ...dietary, [key]: !on })}
-                  style={{
-                    padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid',
-                    borderColor: on ? '#d4af37' : '#e8e1d7',
-                    background: on ? 'rgba(212,175,55,0.15)' : 'transparent',
-                    color: on ? '#3c2a21' : '#7a6a61', fontWeight: on ? 700 : 500,
-                    fontSize: '0.85rem', cursor: 'pointer',
-                  }}
-                >
-                  {on ? '✓ ' : ''}{label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+          {showOptional && (
+            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+              <div>
+                <label style={labelStyle}>Restrições alimentares</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                  {DIETARY_FIELDS.map(({ key, label }) => {
+                    const on = dietary[key];
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setDietary({ ...dietary, [key]: !on })}
+                        style={{
+                          padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid',
+                          borderColor: on ? '#d4af37' : '#e8e1d7',
+                          background: on ? 'rgba(212,175,55,0.15)' : 'transparent',
+                          color: on ? '#3c2a21' : '#7a6a61', fontWeight: on ? 700 : 500,
+                          fontSize: '0.85rem', cursor: 'pointer',
+                        }}
+                      >
+                        {on ? '✓ ' : ''}{label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-        <div>
-          <label style={labelStyle}>Alergias — o que nunca pode entrar na sua caixa</label>
-          <input
-            type="text"
-            value={allergies}
-            onChange={e => setAllergies(e.target.value)}
-            placeholder="Ex: castanha de caju, amendoim, soja"
-            style={inputStyle}
-          />
-          <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.4rem' }}>
-            Isso aparece destacado na cozinha toda semana. Se for grave, conte pra gente no WhatsApp também.
-          </p>
-        </div>
+              <div>
+                <label style={labelStyle}>Alergias — o que nunca pode entrar na sua caixa</label>
+                <input
+                  type="text"
+                  value={allergies}
+                  onChange={e => setAllergies(e.target.value)}
+                  placeholder="Ex: castanha de caju, amendoim, soja"
+                  style={inputStyle}
+                />
+                <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.4rem' }}>
+                  Isso aparece destacado na cozinha toda semana.
+                </p>
+              </div>
 
-        <div>
-          <label style={labelStyle}>Algo que a Dolly deveria saber? <span style={{ textTransform: 'none', fontWeight: 400, color: '#a89a90' }}>(opcional)</span></label>
-          <textarea
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            rows={3}
-            placeholder="Sabores favoritos, quantas pessoas em casa, melhor horário para entrega..."
-            style={{ ...inputStyle, resize: 'vertical' }}
-          />
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 180px' }}>
+                  <label style={labelStyle}>Quem te indicou? <span style={{ textTransform: 'none', fontWeight: 400, color: '#a89a90' }}>(opcional)</span></label>
+                  <input type="text" value={referredBy} onChange={e => setReferredBy(e.target.value)} placeholder="Nome de quem indicou" style={inputStyle} />
+                </div>
+                <div style={{ flex: '1 1 180px' }}>
+                  <label style={labelStyle}>Caixas por semana</label>
+                  <select value={boxesPerWeek} onChange={e => setBoxesPerWeek(Number(e.target.value))} style={{ ...inputStyle, cursor: 'pointer' }}>
+                    {[1, 2, 3, 4].map(n => <option key={n} value={n}>{n} {n === 1 ? 'caixa' : 'caixas'}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={labelStyle}>Algo que a Dolly deveria saber? <span style={{ textTransform: 'none', fontWeight: 400, color: '#a89a90' }}>(opcional)</span></label>
+                <textarea
+                  value={message}
+                  onChange={e => setMessage(e.target.value)}
+                  rows={3}
+                  placeholder="Sabores favoritos, quantas pessoas em casa, melhor horário para entrega..."
+                  style={{ ...inputStyle, resize: 'vertical' }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -369,7 +417,10 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
           marginTop: '2rem', padding: '1.25rem', borderRadius: '14px',
           background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.3)',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#594a42', marginBottom: '0.4rem' }}>
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#594a42', marginBottom: '0.4rem',
+            flexWrap: 'wrap', gap: '0.25rem',
+          }}>
             <span>{boxesPerWeek} {boxesPerWeek === 1 ? 'caixa' : 'caixas'} por semana — plano {plan.name}</span>
             <span>{formatBRL(plan.monthly_price * boxesPerWeek)}</span>
           </div>
@@ -379,10 +430,16 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
           </div>
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+            flexWrap: 'wrap', gap: '0.25rem',
             marginTop: '0.9rem', paddingTop: '0.9rem', borderTop: '1px solid rgba(212,175,55,0.35)',
           }}>
             <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>Total por mês</span>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.7rem', color: 'var(--color-primary)' }}>
+            <span style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'clamp(1.3rem, 5vw, 1.7rem)',
+              color: 'var(--color-primary)',
+              whiteSpace: 'nowrap',
+            }}>
               {formatBRL(total)}
             </span>
           </div>
@@ -401,7 +458,10 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
         type="submit"
         disabled={submitting}
         className="btn btn-primary"
-        style={{ width: '100%', padding: '1.2rem', marginTop: '1.5rem', borderRadius: '10px', fontSize: '1.05rem' }}
+        style={{
+          width: '100%', padding: '1.2rem', marginTop: '1.5rem', borderRadius: '10px', fontSize: '1.05rem',
+          marginBottom: 'calc(72px + env(safe-area-inset-bottom, 0px) + 64px)',
+        }}
       >
         {submitting ? 'Reservando...' : 'Reservar minha vaga'}
       </button>
