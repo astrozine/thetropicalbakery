@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -352,31 +352,31 @@ export default function CRMAdmin() {
                   </div>
                 </div>
 
-                <div style={{ flex: '1 1 220px' }}>
-                  <h4 style={{ fontSize: '0.8rem', color: '#95a5a6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Restrições Alimentares</h4>
+                <div style={{ flex: '1 1 220px', background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '10px', padding: '1rem 1.1rem' }}>
+                  <h4 style={{ fontSize: '0.75rem', color: '#b9870e', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.6rem', marginTop: 0 }}>Restrições Alimentares</h4>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     {c.dietary.length > 0 ? c.dietary.map(tag => (
-                      <span key={tag} style={{ background: '#fdf7ee', color: '#8a6d1f', border: '1px solid #e8e1d7', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                      <span key={tag} style={{ background: 'white', color: '#8a6d1f', border: '1px solid #e8e1d7', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
                         {tag}
                       </span>
                     )) : (
-                      <span style={{ color: '#bdc3c7', fontSize: '0.9rem' }}>Nenhuma registrada.</span>
+                      <span style={{ color: '#c8a96b', fontSize: '0.88rem' }}>Nenhuma registrada.</span>
                     )}
                   </div>
                   {c.allergies.length > 0 && (
-                    <>
-                      <h4 style={{ fontSize: '0.8rem', color: '#c0392b', textTransform: 'uppercase', letterSpacing: '1px', margin: '0.85rem 0 0.5rem' }}>⚠️ Evita</h4>
+                    <div style={{ background: '#fdecea', border: '1px solid #f5c6cb', borderRadius: '8px', padding: '0.6rem 0.8rem', marginTop: '0.75rem' }}>
+                      <p style={{ fontSize: '0.75rem', color: '#c0392b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.4rem' }}>⚠️ Evita</p>
                       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                         {c.allergies.map(a => (
-                          <span key={a} style={{ background: '#fdecea', color: '#a03027', border: '1px solid #f5c6cb', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                          <span key={a} style={{ background: 'white', color: '#a03027', border: '1px solid #f5c6cb', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
                             {a}
                           </span>
                         ))}
                       </div>
-                    </>
+                    </div>
                   )}
                   {c.dietNotes && (
-                    <p style={{ fontSize: '0.83rem', color: '#7f8c8d', lineHeight: 1.6, marginTop: '0.6rem', fontStyle: 'italic' }}>“{c.dietNotes}”</p>
+                    <p style={{ fontSize: '0.83rem', color: '#7f8c8d', lineHeight: 1.6, marginTop: '0.6rem', fontStyle: 'italic' }}>“{c.dietNotes}”</p>
                   )}
                 </div>
 
