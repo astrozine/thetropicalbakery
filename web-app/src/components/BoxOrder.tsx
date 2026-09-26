@@ -5,6 +5,7 @@ import { OriginSeal } from '@/components/BelgiumBrazil';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import DeliveryCalendar from '@/components/DeliveryCalendar';
+import TreatFlank from '@/components/TreatFlank';
 import { formatBRL } from '@/lib/deliveryZones';
 import { optimizedSrc } from '@/lib/thumbs';
 import Link from 'next/link';
@@ -117,7 +118,9 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
           </div>
         ) : (
           <>
+        <TreatFlank contentWidth={1100} sides="right">
         <DeliveryCalendar value={date} onChange={pickDate} title="Escolha o dia da sua caixa" window={{ from: box.delivery_from, until: box.delivery_until }} />
+        </TreatFlank>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#3c2a21', background: '#fdf7ee', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7', flexWrap: 'wrap' }}>
           <label style={{ fontSize: '1.1rem', fontWeight: 600, flex: 1, minWidth: '120px' }}>Quantidade:</label>

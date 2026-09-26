@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import StripedBackground from '@/components/StripedBackground';
 import HighlightsHero from '@/components/HighlightsHero';
 import DeliveryCalendar from '@/components/DeliveryCalendar';
+import TreatFlank from '@/components/TreatFlank';
 import SubscriptionSignup from '@/components/SubscriptionSignup';
 import MobileBuyBar from '@/components/MobileBuyBar';
 import ScrollReveal from '@/components/ScrollReveal';
@@ -205,6 +206,7 @@ export default function SubscriptionPage() {
       {/* ---------------------------------------------------- DELIVERY CALENDAR */}
       <section style={{ padding: '0 1.5rem clamp(2.25rem, 9vw, 7rem)' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+          <TreatFlank contentWidth={640}>
           <ScrollReveal>
             <h2 style={{
               fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.7rem, 4.5vw, 2.4rem)',
@@ -217,6 +219,7 @@ export default function SubscriptionPage() {
             </p>
             <DeliveryCalendar title="Calendário de entregas" />
           </ScrollReveal>
+          </TreatFlank>
         </div>
       </section>
 
