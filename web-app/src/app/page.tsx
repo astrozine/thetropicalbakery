@@ -10,7 +10,6 @@ import { fetchSchedule, selectableDates } from '@/lib/deliverySchedule';
 import { inDeliveryWindow, noUpcomingEdition, saleState } from '@/lib/boxWindow';
 import NoBoxNotice from '@/components/NoBoxNotice';
 import ModalCard from '@/components/ModalCard';
-import WaitlistCapture from '@/components/WaitlistCapture';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 

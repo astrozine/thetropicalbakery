@@ -7,6 +7,7 @@ import DeliveryCalendar from '@/components/DeliveryCalendar';
 import { formatBRL } from '@/lib/deliveryZones';
 import { optimizedSrc } from '@/lib/thumbs';
 import Link from 'next/link';
+import WaitlistCapture from '@/components/WaitlistCapture';
 import { BoxWindowFields, SaleState, longDay } from '@/lib/boxWindow';
 
 interface BoxOrderProps {
@@ -104,6 +105,11 @@ export default function BoxOrder({ box, maxQuantity, sale }: BoxOrderProps) {
                 : 'A próxima caixa já está sendo preparada. Assinantes recebem toda semana, sem correr atrás do lote.'}
             </p>
             <Link href="/assinatura" className="btn btn-primary" style={{ padding: '0.9rem 1.6rem', display: 'inline-block' }}>Conhecer a assinatura</Link>
+            {sale.state === 'soldout' && (
+              <div style={{ marginTop: '1.5rem' }}>
+                <WaitlistCapture theme="light" plain heading="Entre na fila de espera" subheading="Esgotou, mas você pode ser a primeira pessoa a saber quando a próxima edição abrir." />
+              </div>
+            )}
           </div>
         ) : (
           <>
