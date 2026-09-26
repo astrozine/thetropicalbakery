@@ -83,9 +83,16 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 
 Verified live, 2026-09-26:
 - Card payments via Mercado Pago are on (`/api/pay/methods` says `card: true`). PayPal is off (no keys yet).
-- Orders are created on the server. **Migration 22 (lock down orders, content tables, uploads, safe stock) must be run by Andrew
-  after this code is deployed.** Until it runs, the public can still read `orders`.
-- Migration 21 (box delivery / ordering windows) is not confirmed run. The admin box form warns when it is missing.
+- Orders are created on the server. **Migration 22 is RUN** (checked with the public key, 2026-09-26): `orders` gives the public
+  nothing back, `reserve_box_stock` / `release_box_stock` exist and answer "permission denied" to anyone but the server, and the
+  content tables read publicly but refuse an anonymous write. `orders.status` and `orders.total_price` both default to NULL, so a
+  lead that sets neither is accepted — a lead that sets either one is rejected outright.
+- **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
+- **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
+  last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the
+  "no box yet" notice however much stock is left. Check it before assuming the box pages are broken.
+- **Stock is reserved when the order is created and only given back if saving fails.** Pix is confirmed by hand, so an abandoned
+  Pix checkout keeps its boxes for good. Batches are small; fix the count by hand in `/admin/caixas`.
 - Box sale rules live in `src/lib/boxWindow.ts` (a box is on sale until it sells out or is switched off; an ended window rolls over
   to the next deliverable days). When nothing can be ordered the site shows the "no box yet + waiting list" notice
   (`NoBoxNotice.tsx`) on `/caixas` and the home page.
