@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
 
         <section style={sectionStyle}>
           <p style={pStyle}>
-            A The Tropical Bakery ("nós") respeita a privacidade de quem visita e faz pedidos no nosso site.
+            A The Tropical Bakery (&ldquo;nós&rdquo;) respeita a privacidade de quem visita e faz pedidos no nosso site.
             Esta página explica quais dados coletamos, por que coletamos, como eles são armazenados e quais
             direitos você tem sobre eles, em conformidade com a Lei Geral de Proteção de Dados (LGPD).
           </p>

@@ -68,8 +68,8 @@ export default function AnnouncementAdmin() {
     <div style={{ maxWidth: '640px' }}>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Anúncio Especial</h1>
       <p style={{ color: '#7f8c8d', marginBottom: '2rem', lineHeight: 1.7 }}>
-        Uma faixinha discreta no canto da página inicial para avisos rápidos — "Fechado no feriado",
-        "Vagas abertas para o retiro de outubro", uma promoção do mês. Deixe a mensagem em branco
+        Uma faixinha discreta no canto da página inicial para avisos rápidos — &ldquo;Fechado no feriado&rdquo;,
+        &ldquo;Vagas abertas para o retiro de outubro&rdquo;, uma promoção do mês. Deixe a mensagem em branco
         para esconder o anúncio do site.
       </p>
 

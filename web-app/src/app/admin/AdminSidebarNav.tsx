@@ -15,7 +15,7 @@ const STORAGE_KEY = 'admin_nav_open_groups';
 export default function AdminSidebarNav({ pathname, unreadCount, partnerCount = 0, onNavigate }: {
   pathname: string; unreadCount: number; partnerCount?: number; onNavigate?: () => void;
 }) {
-  const groups = useMemo(buildGroups, []);
+  const groups = useMemo(() => buildGroups(), []);
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState('');
 
