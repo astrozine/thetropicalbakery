@@ -111,18 +111,25 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
           }}
           onClick={() => setIsOpen(false)}
         >
+          {/* Wide screens: photo flanks the order form. Narrow: photo on top. */}
+          <style>{`
+            .order-modal { display: flex; flex-direction: row; max-width: 980px; }
+            .order-modal-photo { position: relative; flex: 0 0 42%; min-height: 100%; }
+            @media (max-width: 760px) {
+              .order-modal { flex-direction: column; max-width: 500px; }
+              .order-modal-photo { flex: none; height: 30vh; min-height: 200px; }
+            }
+          `}</style>
           <div 
+            className="order-modal"
             style={{
               backgroundColor: '#fdfaf3',
               borderRadius: '24px',
               overflow: 'hidden',
-              maxWidth: '500px',
               width: '100%',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
               position: 'relative',
-              maxHeight: '90vh',
-              display: 'flex',
-              flexDirection: 'column'
+              maxHeight: '90vh'
             }}
             onClick={(e) => e.stopPropagation()} 
           >
@@ -148,15 +155,15 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
             >
               ×
             </button>
-            <div style={{ position: 'relative', width: '100%', height: '30vh', minHeight: '200px' }}>
-              <Image src={imageSrc} alt={title} fill style={{ objectFit: 'cover' }} />
+            <div className="order-modal-photo">
+              <Image src={imageSrc} alt={title} fill sizes="(max-width: 760px) 100vw, 410px" style={{ objectFit: 'cover' }} />
             </div>
             
-            <div style={{ padding: '2rem', textAlign: 'center', overflowY: 'auto' }}>
+            <div style={{ flex: 1, minWidth: 0, padding: '1.75rem 2rem', textAlign: 'center', overflowY: 'auto' }}>
               <h3 style={{ fontSize: '1.8rem', color: '#3c2a21', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>{title}</h3>
-              <p style={{ color: '#594a42', fontSize: '1rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>{description}</p>
+              <p style={{ color: '#594a42', fontSize: '1rem', marginBottom: '1.1rem', lineHeight: 1.6 }}>{description}</p>
               
-              <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '1rem', textAlign: 'left' }}>
+              <div style={{ background: 'white', padding: '1.1rem 1.25rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '0.9rem', textAlign: 'left' }}>
                 <h4 style={{ marginBottom: '0.75rem', color: '#3c2a21', fontSize: '1.1rem', textAlign: 'center' }}>Quantas caixas você quer?</h4>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                   {BOX_SIZES.map(option => {
@@ -190,9 +197,9 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                 )}
               </div>
 
-              <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
-                <h4 style={{ marginBottom: '1rem', color: '#3c2a21', fontSize: '1.1rem' }}>Preencha seus dados para continuar</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ background: 'white', padding: '1.1rem 1.25rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '1.1rem' }}>
+                <h4 style={{ marginBottom: '0.75rem', color: '#3c2a21', fontSize: '1.1rem' }}>Preencha seus dados para continuar</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
                   <input 
                     type="text" 
                     placeholder="Seu Nome Completo" 
@@ -210,15 +217,15 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem' }}>
                 <button 
                   onClick={() => handleOrder('CAIXA_DEGUSTACAO')}
                   disabled={loading}
                   className="btn btn-primary"
                   style={{
-                    width: '100%',
-                    fontSize: '1rem',
-                    padding: '1rem',
+                    flex: '1 1 200px',
+                    fontSize: '0.95rem',
+                    padding: '1rem 0.75rem',
                     background: '#d4af37',
                     color: 'white',
                     border: 'none',
@@ -233,9 +240,9 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                   onClick={() => handleOrder('EVENTO')}
                   disabled={loading}
                   style={{
-                    width: '100%',
-                    fontSize: '1rem',
-                    padding: '1rem',
+                    flex: '1 1 200px',
+                    fontSize: '0.95rem',
+                    padding: '1rem 0.75rem',
                     background: 'transparent',
                     color: '#2c3e50',
                     border: '2px solid #2c3e50',
