@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Marquee from '@/components/Marquee';
 import ScrollReveal from '@/components/ScrollReveal';
 import ExplodingTreats from '@/components/ExplodingTreats';
+import HomeTreatPicker from '@/components/HomeTreatPicker';
 import PhilosophyShowcase from '@/components/PhilosophyShowcase';
 import PhotoShowcase from '@/components/PhotoShowcase';
 import FeaturedBoxCard from '@/components/FeaturedBoxCard';
@@ -87,6 +88,9 @@ export default async function Home() {
           <ExplodingTreats />
         </div>
       </section>
+
+      {/* Phones open with something to tap, not something to read. Desktop is unchanged. */}
+      <HomeTreatPicker />
 
       {/* Scrolling Text Banner */}
       <Marquee text="THE TROPICAL BAKERY ✦ ITAMAMBUCA ✦ VEGAN ✦ " speed={300} />

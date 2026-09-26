@@ -1074,3 +1074,11 @@ body {
   .menu-hero { flex-direction: column-reverse; gap: 1.5rem !important; }
   .menu-hero > div:first-child img { max-height: 42vh; object-fit: cover; }
 }
+
+/* Home hero on a phone: the logo plaque and the photo strip together ran to
+   1.4 screens, which pushed the first thing you can actually do below the fold.
+   Trimmed so the treat picker lands within the first screen and a bit. */
+@media (max-width: 767px) {
+  .hero-section img[src*="hero-logo"] { max-height: 190px; width: auto; }
+  .hero-section .hide-scrollbars img { max-height: 250px; width: auto; }
+}
