@@ -148,13 +148,18 @@ export default function TodasAsParcerias() {
 
       {/* ── Alternating partnership cards ── */}
       <section style={{ padding: 'clamp(3rem, 7vw, 5rem) 1.5rem' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'clamp(3.5rem, 8vw, 5.5rem)' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'clamp(1.75rem, 4vw, 2.75rem)' }}>
           {PARTNERSHIPS.map((p, i) => {
             const reversed = i % 2 !== 0;
             return (
               <article
                 key={p.slug}
                 style={{
+                  background: '#fff',
+                  border: '1px solid #efe4c8',
+                  borderRadius: '28px',
+                  boxShadow: '0 10px 30px rgba(60,42,33,0.09)',
+                  padding: 'clamp(1.25rem, 3.5vw, 2.5rem)',
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))',
                   gap: 'clamp(2rem, 5vw, 4rem)',
@@ -168,7 +173,7 @@ export default function TodasAsParcerias() {
                     aspectRatio: '4/3',
                     borderRadius: '24px',
                     overflow: 'hidden',
-                    boxShadow: '0 20px 60px rgba(60,42,33,0.18)',
+                    boxShadow: '0 8px 24px rgba(60,42,33,0.14)',
                   }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -180,8 +185,8 @@ export default function TodasAsParcerias() {
                   {/* Floating treat photo */}
                   <div style={{
                     position: 'absolute',
-                    bottom: '-20px',
-                    [reversed ? 'left' : 'right']: '-20px',
+                    bottom: '-16px',
+                    [reversed ? 'left' : 'right']: '-12px',
                     width: '130px',
                     aspectRatio: '1',
                     borderRadius: '20px',
