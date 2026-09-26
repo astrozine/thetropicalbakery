@@ -32,6 +32,33 @@ const field: React.CSSProperties = { width: '100%', padding: '0.7rem', borderRad
 const lbl: React.CSSProperties = { display: 'block', fontSize: '0.82rem', fontWeight: 'bold', color: '#2c3e50', marginBottom: '0.35rem' };
 const dark: React.CSSProperties = { background: '#2c3e50', color: 'white', border: 'none', padding: '0.8rem 1.4rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' };
 
+// The e-mail is laid out for a ~640px inbox. On a phone the card is narrower than that, so the
+// e-mail is drawn at its real width and shrunk to fit: an overview glance instead of a cut-off page.
+const EMAIL_WIDTH = 640;
+function ScaledPreview({ html }: { html: string }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const measure = () => setScale(Math.min(1, el.clientWidth / EMAIL_WIDTH));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Shrunk, more of the e-mail fits in the same space, so let the frame be taller.
+  const realHeight = scale < 1 ? 1300 : 640;
+  return (
+    <div ref={box} style={{ width: '100%', height: realHeight * scale, overflow: 'hidden', borderRadius: '10px', border: '1px solid #e8e1d7', background: '#fdfaf3' }}>
+      <iframe title="Prévia do e-mail" srcDoc={html} scrolling={scale < 1 ? 'no' : 'auto'}
+        style={{ width: scale < 1 ? EMAIL_WIDTH : '100%', height: realHeight, border: 0, display: 'block', transform: `scale(${scale})`, transformOrigin: 'top left' }} />
+    </div>
+  );
+}
+
 interface DryRun { subject: string; messageKey: string; audience: number; alreadySent: number; willSend: number; remainingAfter: number }
 
 export default function AdminEmailsPage() {
@@ -341,10 +368,7 @@ export default function AdminEmailsPage() {
               {showPreview ? 'Esconder' : 'Mostrar'}
             </button>
           </div>
-          {showPreview && (
-            <iframe title="Prévia do e-mail" srcDoc={previewHtml}
-              style={{ width: '100%', height: '640px', border: '1px solid #e8e1d7', borderRadius: '10px', background: '#fdfaf3' }} />
-          )}
+          {showPreview && <ScaledPreview html={previewHtml} />}
           <p style={{ fontSize: '0.78rem', color: '#95a5a6', marginTop: '0.75rem', lineHeight: 1.6 }}>
             O nome (“Oi, Dolly!”) e o link de descadastro são trocados pelos de cada pessoa no envio real.
           </p>
