@@ -36,7 +36,7 @@ export default function BoxesLeftBadge({ remaining }: { remaining: number }) {
       <style dangerouslySetInnerHTML={{ __html: `
         .boxes-left {
           display: none; position: absolute; z-index: 2; pointer-events: none;
-          top: 9%; left: calc(1.5vw + clamp(210px, 19vw, 440px) - 2.2rem);
+          top: 9%; left: calc(max(1.5%, calc(50% - 860px)) + clamp(210px, 19vw, 340px) - 2.2rem);
           width: clamp(128px, 9.5vw, 200px);
           animation: boxes-left-float 6s ease-in-out infinite;
         }

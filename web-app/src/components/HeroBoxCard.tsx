@@ -53,13 +53,13 @@ export default function HeroBoxCard({ photos, side, delayMs = 0 }: { photos: Her
       <style dangerouslySetInnerHTML={{ __html: `
         .hero-box-card {
           display: none; margin: 0; position: absolute; top: 50%; z-index: 1;
-          width: clamp(210px, 19vw, 440px);
+          width: clamp(210px, 19vw, 340px);
           background: #fdfaf3; padding: clamp(8px, 0.8vw, 14px) clamp(8px, 0.8vw, 14px) 0; border-radius: 18px;
           box-shadow: 0 30px 60px rgba(0,0,0,0.55), 0 8px 18px rgba(0,0,0,0.35);
           transition: transform .4s ease;
         }
-        .hero-box-card--left  { left: 1.5vw;  transform: translateY(-50%) rotate(-5deg); }
-        .hero-box-card--right { right: 1.5vw; transform: translateY(-46%) rotate(4deg); }
+        .hero-box-card--left  { left: max(1.5%, calc(50% - 860px));  transform: translateY(-50%) rotate(-5deg); }
+        .hero-box-card--right { right: max(1.5%, calc(50% - 860px)); transform: translateY(-46%) rotate(4deg); }
         .hero-box-card--left:hover  { transform: translateY(-50%) rotate(-2deg) scale(1.02); }
         .hero-box-card--right:hover { transform: translateY(-46%) rotate(2deg) scale(1.02); }
         .hero-box-card__frame { position: relative; aspect-ratio: 3 / 4; border-radius: 10px; overflow: hidden; background: #3c2a21; }
