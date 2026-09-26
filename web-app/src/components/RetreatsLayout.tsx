@@ -5,6 +5,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 import RetreatPricingCalculator from '@/components/RetreatPricingCalculator';
+import MobileBuyBar from '@/components/MobileBuyBar';
 import RoomsAccordion from '@/components/RoomsAccordion';
 import RetreatTracks from '@/components/RetreatTracks';
 import { InspirationSection } from '@/components/InspirationSection';
@@ -80,103 +81,83 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
       {/* ══════════════════════════════════════════════════════════════
           HERO — Full-screen cinematic with overlapping images
       ══════════════════════════════════════════════════════════════ */}
-      <section style={{
-        position: 'relative',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        background: '#1a1a1a'
-      }}>
+      <section className="rh">
         {/* Background — drone shot */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'url("/retreats/real-itamambuca-aerial.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'brightness(0.45)',
-          transform: 'scale(1.05)',
-        }} />
+        <div className="rh__bg" />
 
-        {/* Floating scattered images */}
-        {/* Original Treat Images Restored */}
-        <ZoomableImage
-          src="/menu-items/1000215018.jpg"
-          alt="Tropical Treats"
-          style={{ position: 'absolute', top: '15%', right: '12%', width: 'clamp(90px, 16vw, 220px)', borderRadius: '12px', transform: 'rotate(12deg)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 2 }}
-        />
-        <ZoomableImage
-          src="/menu-items/Screenshot_20260513_114809_Edits.jpg"
-          alt="Tropical Treats"
-          style={{ position: 'absolute', bottom: '20%', left: '15%', width: 'clamp(90px, 15vw, 210px)', borderRadius: '12px', transform: 'rotate(-10deg)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 2 }}
-        />
-
-        {/* Large Side Images - Brought more inward and made bigger */}
-        <div style={{ position: 'absolute', top: '15%', left: '8%', width: 'clamp(250px, 40vw, 550px)', zIndex: 1, opacity: 0.9, transform: 'rotate(-4deg)' }}>
-          <img
-            src="/retreats/real-itamambuca-coast.jpg"
-            alt="Praia de Itamambuca vista do alto"
-            style={{ width: '100%', borderRadius: '24px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)', objectFit: 'cover' }}
-          />
-        </div>
-        <div style={{ position: 'absolute', bottom: '15%', right: '8%', width: 'clamp(250px, 40vw, 550px)', zIndex: 1, opacity: 0.9, transform: 'rotate(4deg)' }}>
-          <img
-            src="/retreats/real-prumirim-island.jpg"
-            alt="Ilha do Prumirim"
-            style={{ width: '100%', borderRadius: '24px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)', objectFit: 'cover' }}
-          />
+        {/* The photos. Wide screens: scattered over the whole hero. Phones: their own collage above
+            the text, so a photo can never land on top of the words (a phone is tall and narrow, and
+            the text fills most of it). */}
+        <div className="rh__photos">
+          <ZoomableImage className="rh__ph rh__ph--bundt" src="/menu-items/1000215018.jpg" alt="Tropical Treats" />
+          <ZoomableImage className="rh__ph rh__ph--cake" src="/menu-items/Screenshot_20260513_114809_Edits.jpg" alt="Tropical Treats" />
+          <div className="rh__ph rh__ph--coast">
+            <img src="/retreats/real-itamambuca-coast.jpg" alt="Praia de Itamambuca vista do alto" />
+          </div>
+          <div className="rh__ph rh__ph--island">
+            <img src="/retreats/real-prumirim-island.jpg" alt="Ilha do Prumirim" />
+          </div>
         </div>
 
         {/* Center Content */}
-        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '0 2rem', maxWidth: '800px' }}>
+        <div className="rh__content">
           <img
+            className="rh__ribbon"
             src="/itamambuca-ribbon.png"
             alt="Itamambuca"
-            style={{ width: 'clamp(140px, 20vw, 220px)', marginBottom: '1rem', filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.4))' }}
           />
-          <span style={{
-            display: 'inline-block',
-            color: '#d4af37',
-            letterSpacing: '4px',
-            textTransform: 'uppercase',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            marginBottom: '1.5rem',
-            borderBottom: '1px solid rgba(212,175,55,0.4)',
-            paddingBottom: '0.5rem'
-          }}>
+          <span className="rh__location">
             {texts.hero.location}
           </span>
-          <h1 style={{
-            fontSize: 'clamp(1.95rem, 7vw, 5.5rem)',
-            color: '#fff',
-            fontFamily: 'var(--font-heading)',
-            lineHeight: '1.1',
-            marginBottom: '1.5rem',
-            textShadow: '0 4px 30px rgba(0,0,0,0.5)'
-          }}>
+          <h1 className="rh__title">
             {texts.hero.title}
           </h1>
-          <p style={{
-            fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
-            color: 'rgba(255,255,255,0.85)',
-            lineHeight: '1.9',
-            maxWidth: '600px',
-            margin: '0 auto 2.5rem',
-            fontWeight: 300
-          }}>
+          <p className="rh__text">
             {texts.hero.description}
           </p>
-          <button 
+          <button
             onClick={() => { setSelectedInterest(typeof texts.hero.title === 'string' ? texts.hero.title : 'Retiro Tropical'); setIsModalOpen(true); }}
-            className="btn btn-secondary" 
-            style={{ padding: '1rem 3rem', fontSize: '1.1rem', letterSpacing: '2px' }}
+            className="btn btn-secondary rh__cta"
           >
             {texts.hero.cta}
           </button>
         </div>
+
+        <style dangerouslySetInnerHTML={{ __html: `
+          .rh { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #1a1a1a; }
+          .rh__bg { position: absolute; inset: 0; background-image: url("/retreats/real-itamambuca-aerial.jpg"); background-size: cover; background-position: center; filter: brightness(0.45); transform: scale(1.05); }
+          .rh__photos { position: absolute; inset: 0; pointer-events: none; }
+          .rh__ph { position: absolute; pointer-events: auto; }
+          .rh__ph--bundt { top: 15%; right: 12%; width: clamp(90px, 16vw, 220px); border-radius: 12px; transform: rotate(12deg); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 2; }
+          .rh__ph--cake  { bottom: 20%; left: 15%; width: clamp(90px, 15vw, 210px); border-radius: 12px; transform: rotate(-10deg); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 2; }
+          .rh__ph--coast { top: 15%; left: 8%; width: clamp(250px, 40vw, 550px); z-index: 1; opacity: 0.9; transform: rotate(-4deg); }
+          .rh__ph--island { bottom: 15%; right: 8%; width: clamp(250px, 40vw, 550px); z-index: 1; opacity: 0.9; transform: rotate(4deg); }
+          .rh__ph--coast img, .rh__ph--island img { display: block; width: 100%; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); object-fit: cover; }
+          .rh__content { position: relative; z-index: 10; text-align: center; padding: 0 2rem; max-width: 800px; }
+          .rh__ribbon { width: clamp(140px, 20vw, 220px); margin: 0 auto 1rem; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.4)); }
+          .rh__location { display: inline-block; color: #d4af37; letter-spacing: 4px; text-transform: uppercase; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(212,175,55,0.4); padding-bottom: 0.5rem; }
+          .rh__title { font-size: clamp(1.95rem, 7vw, 5.5rem); color: #fff; font-family: var(--font-heading); line-height: 1.1; margin-bottom: 1.5rem; text-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+          .rh__text { font-size: clamp(1rem, 2.5vw, 1.3rem); color: rgba(255,255,255,0.85); line-height: 1.9; max-width: 600px; margin: 0 auto 2.5rem; font-weight: 300; }
+          .rh__cta { padding: 1rem 3rem; font-size: 1.1rem; letter-spacing: 2px; }
+
+          /* Phones: photos first, in a collage of their own; then the words. Nothing overlaps. */
+          @media (max-width: 767px) {
+            .rh { display: block; min-height: 0; padding: 1.25rem 0 3rem; }
+            .rh__photos { position: relative; inset: auto; width: min(94%, 520px); aspect-ratio: 1 / 0.92; margin: 0 auto 1.25rem; }
+            .rh__ph--bundt  { top: 0; right: 3%; bottom: auto; left: auto; width: 30%; transform: rotate(9deg); z-index: 3; }
+            .rh__ph--cake   { bottom: 0; left: 6%; top: auto; right: auto; width: 30%; transform: rotate(-9deg); z-index: 3; }
+            .rh__ph--coast  { top: 3%; left: 4%; width: 64%; opacity: 1; transform: rotate(-4deg); }
+            .rh__ph--island { bottom: 4%; right: 2%; top: auto; left: auto; width: 56%; opacity: 1; transform: rotate(4deg); z-index: 2; }
+            .rh__ph--coast img, .rh__ph--island img { border-radius: 16px; box-shadow: 0 16px 32px rgba(0,0,0,0.5); }
+            .rh__ph--bundt, .rh__ph--cake { border-radius: 10px; box-shadow: 0 12px 26px rgba(0,0,0,0.5); }
+            .rh__content { padding: 0 1.25rem; }
+            .rh__ribbon { width: 130px; margin-bottom: 0.75rem; }
+            .rh__location { letter-spacing: 3px; font-size: 0.8rem; margin-bottom: 1.1rem; }
+            .rh__title { margin-bottom: 1.1rem; }
+            .rh__text { line-height: 1.75; margin-bottom: 1.75rem; }
+            .rh__cta { padding: 0.95rem 2.25rem; font-size: 1.05rem; letter-spacing: 1.5px; }
+          }
+        ` }} />
       </section>
 
       {/* ══════════════════════════════════════════════════════════════
@@ -224,9 +205,9 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
 
       {/* Food Hero — full-bleed with treats mosaic */}
       <section style={{ position: 'relative', padding: '6rem 2rem', background: '#3c2a21', textAlign: 'center', overflow: 'hidden' }}>
-        <div style={{
+        <div className="tb-rail" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',   // .tb-rail turns this into a swipe on phones
           gap: '1rem',
           maxWidth: '1200px',
           margin: '0 auto 3rem',
@@ -279,7 +260,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             O Pacote Completo, Não Só a Estadia
           </h2>
         </div>
-        <RetreatPricingCalculator whatsappNumber={WHATSAPP_NUMBER} locale={locale} />
+        <div id="pacote"><RetreatPricingCalculator whatsappNumber={WHATSAPP_NUMBER} locale={locale} /></div>
       </section>
 
       {/* Photo Gallery — cinematic grid */}
@@ -330,6 +311,16 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
         interestType="retiro"
         specificInterest={selectedInterest}
       />
+      {/* Phones only: the package builder sat fourteen screens down, so the way
+          in rides along instead. */}
+      <MobileBuyBar
+        kicker="Itamambuca"
+        price="Monte seu pacote"
+        note="estadia + cursos + comida"
+        label="Ver preços"
+        targetId="#pacote"
+      />
+
     </main>
   );
 }

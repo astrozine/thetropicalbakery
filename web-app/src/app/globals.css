@@ -1082,3 +1082,33 @@ body {
   .hero-section img[src*="hero-logo"] { max-height: 190px; width: auto; }
   .hero-section .hide-scrollbars img { max-height: 250px; width: auto; }
 }
+
+/* ── Phone: the remaining card towers become rails ──────────────────────────
+   /cursos ran to 15.3 screens because each card grid collapsed to one column.
+   These four are all "here are several comparable things" — exactly what a
+   sideways rail is for. The step-by-step list (.crs-journey) stays vertical,
+   because a sequence should be read in order. */
+@media (max-width: 767px) {
+  .crs-courses, .crs-paths, .crs-tricks, .crs-gallery {
+    display: flex !important;
+    grid-template-columns: none !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.8rem !important;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding: 0.25rem 1rem 1rem;
+    scroll-padding-left: 1rem;
+    scrollbar-width: none;
+  }
+  .crs-courses::-webkit-scrollbar,
+  .crs-paths::-webkit-scrollbar,
+  .crs-tricks::-webkit-scrollbar,
+  .crs-gallery::-webkit-scrollbar { display: none; }
+  .crs-courses > *, .crs-paths > *, .crs-tricks > * { flex: 0 0 80%; scroll-snap-align: start; min-width: 0; }
+  .crs-gallery > * { flex: 0 0 62%; scroll-snap-align: start; min-width: 0; }
+
+  /* The big section paddings on the course pages, halved again for a phone. */
+  .crs-section, .crs-magic, .crs-beach { padding-top: 2.25rem !important; padding-bottom: 2.25rem !important; }
+}

@@ -271,7 +271,7 @@ export default function SubscriptionPage() {
               <a href="https://wa.me/5511932119196" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>WhatsApp</a>.
             </p>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.75rem', alignItems: 'start' }}>
+            <div className="tb-rail" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.75rem', alignItems: 'start' }}>
               {plans.map(plan => {
                 const featured = Boolean(plan.badge);
                 const savings = monthlySavings(plan, BASE_BOX_PRICE, 1);
