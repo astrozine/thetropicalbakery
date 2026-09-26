@@ -10,11 +10,33 @@ export default function MobileBottomNav() {
   const pathname = usePathname();
   const { totalItems, setIsCartOpen } = useCart();
 
+  // The bar tucks away while the page is moving and slides back once scrolling stops.
+  const [scrolling, setScrolling] = useState(false);
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      const y = window.scrollY;
+      // Ignore sub-pixel jitter and layout shifts that don't come from a finger.
+      if (Math.abs(y - lastY) < 3) return;
+      lastY = y;
+      setScrolling(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setScrolling(false), 300);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(timer);
+    };
   }, []);
 
   if (!isMobile) return null;
@@ -44,7 +66,10 @@ export default function MobileBottomNav() {
       paddingBottom: 'env(safe-area-inset-bottom, 1rem)',
       zIndex: 1000,
       borderTopLeftRadius: '24px',
-      borderTopRightRadius: '24px'
+      borderTopRightRadius: '24px',
+      transform: scrolling ? 'translateY(110%)' : 'translateY(0)',
+      transition: 'transform 0.25s ease-out',
+      pointerEvents: scrolling ? 'none' : 'auto'
     }}>
       {navItems.map((item) => {
         const isActive = pathname === item.path;
