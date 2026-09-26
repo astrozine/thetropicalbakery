@@ -137,8 +137,14 @@ export default function AdminPartnersPage() {
         </div>
       )}
 
+      {/* Wide screens: the form on the left, the partner list beside it, so a new partner shows up without scrolling */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .partners-split { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); }
+        @media (min-width: 1280px) { .partners-split { grid-template-columns: minmax(440px, 5fr) minmax(0, 6fr); align-items: start; } }
+      ` }} />
+      <div className="partners-split">
       {/* Add / edit */}
-      <form onSubmit={save} style={{ ...card, marginBottom: '1.5rem' }}>
+      <form onSubmit={save} style={{ ...card, minWidth: 0 }}>
         <h2 style={{ fontSize: '1.15rem', color: '#2c3e50', marginBottom: '1.25rem' }}>
           {editingId ? 'Editar parceiro' : 'Novo parceiro'}
         </h2>
@@ -200,6 +206,7 @@ export default function AdminPartnersPage() {
       </form>
 
       {/* List */}
+      <div style={{ minWidth: 0 }}>
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
         {(['todos', 'pendente', 'ativo', 'pausado'] as const).map(f => (
           <button key={f} type="button" onClick={() => setFilter(f)}
@@ -249,6 +256,8 @@ export default function AdminPartnersPage() {
           })}
         </div>
       )}
+      </div>
+      </div>
 
       {/* Affiliate note */}
       <div style={{ ...card, marginTop: '1.5rem' }}>

@@ -162,6 +162,8 @@ export default function AdminTeamPage() {
           </div>
         </form>
 
+        {/* Right column: mark a shift, and the month's schedule right under it, so nothing sits far below the forms */}
+        <div style={{ display: 'grid', gap: '1.5rem', minWidth: 0 }}>
         {/* Shift form */}
         <form onSubmit={addShift} style={{ ...card, display: 'grid', gap: '1rem' }}>
           <h2 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>📅 Marcar um turno</h2>
@@ -193,10 +195,9 @@ export default function AdminTeamPage() {
             </>
           )}
         </form>
-      </div>
 
       {/* Month */}
-      <div style={{ ...card, marginTop: '1.5rem' }}>
+      <div style={card}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
           <h2 style={{ fontSize: '1.15rem', color: '#2c3e50', flex: 1, textTransform: 'capitalize' }}>
             Escala de {MONTH_NAMES[view.getMonth()]} de {view.getFullYear()}
@@ -275,6 +276,8 @@ export default function AdminTeamPage() {
           Os valores aqui são o combinado bruto (hora × horas, ou o salário fixo). Encargos de CLT e descontos não entram nesta conta —
           para estimar o custo total de uma contratação, use a calculadora em <code>/trabalhe-conosco</code>.
         </p>
+      </div>
+        </div>
       </div>
     </div>
   );
