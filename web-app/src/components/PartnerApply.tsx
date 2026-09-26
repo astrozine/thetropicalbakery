@@ -24,6 +24,26 @@ interface Props {
   whatsappHref: string;
 }
 
+/** The other partnership pages, shown as a quiet rail beside the form on wide screens. */
+const OTHER_PARTNERSHIPS: { kind: PartnerKind; href: string; emoji: string; label: string }[] = [
+  { kind: 'hotel', href: '/b2b/hotels', emoji: '🏨', label: 'Hotéis' },
+  { kind: 'pousada', href: '/b2b/pousadas', emoji: '🌺', label: 'Pousadas' },
+  { kind: 'airbnb', href: '/b2b/airbnbs', emoji: '🏡', label: 'Airbnbs' },
+  { kind: 'restaurante', href: '/b2b/restaurants', emoji: '🍽️', label: 'Restaurantes' },
+  { kind: 'padaria', href: '/b2b/bakeries', emoji: '🥐', label: 'Padarias e cafés' },
+  { kind: 'afiliado', href: '/b2b/affiliates', emoji: '🤝', label: 'Afiliados' },
+  { kind: 'outro', href: '/b2b/travel-managers', emoji: '✈️', label: 'Agências e grupos' },
+];
+
+/** Where each scattered photo sits in the right-hand gutter: [top %, side offset px, rotation deg, width px]. */
+const PHOTO_SPOTS: [number, number, number, number][] = [
+  [3, 6, 4, 176],
+  [21, 46, -5, 158],
+  [40, 4, 3, 182],
+  [60, 40, -4, 160],
+  [79, 8, 5, 172],
+];
+
 const on0 = (chosen: string[]) => (chosen.length === 0 ? '#a89a90' : '#8a6d1f');
 
 const input: React.CSSProperties = {
@@ -126,9 +146,71 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
     );
   }
 
+  // A few treat photos for the gutter: spread through the menu so they are not all the same kind of sweet.
+  const withPhoto = treats.filter(t => t.image_url);
+  const step = Math.max(1, Math.floor(withPhoto.length / PHOTO_SPOTS.length));
+  const gutterPhotos = PHOTO_SPOTS.map((_, i) => withPhoto[(i * step + 2) % Math.max(1, withPhoto.length)]).filter(Boolean);
+
   return (
     <section id="ser-parceiro" style={{ padding: 'clamp(2rem, 7vw, 5rem) 1.5rem', background: '#fdf7ee' }}>
-      <div style={{ maxWidth: '680px', margin: '0 auto' }}>
+      <style>{`
+        .pa-wrap { position: relative; max-width: 680px; margin: 0 auto; }
+        .pa-rail, .pa-photos { display: none; }
+        @media (min-width: 1320px) {
+          .pa-rail, .pa-photos { display: block; position: absolute; top: 0; bottom: 0; width: 236px; }
+          .pa-rail { right: calc(100% + 30px); }
+          .pa-photos { left: calc(100% + 30px); pointer-events: none; }
+          .pa-rail-inner { position: sticky; top: 7rem; }
+        }
+        .pa-card { background: rgba(255,255,255,0.7); border: 1px solid #efe4c8; border-radius: 16px; padding: 1rem 1.1rem; }
+        .pa-card h3 { margin: 0 0 0.6rem; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a6832b; font-weight: 700; }
+        .pa-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
+        .pa-steps li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.86rem; line-height: 1.4; color: #594a42; }
+        .pa-steps b { flex-shrink: 0; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: #d4af37; color: #3c2a21; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; }
+        .pa-links { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .pa-links a { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.7rem; border-radius: 999px; background: #fff; border: 1px solid #efe4c8; font-size: 0.82rem; color: #6b5a4e; text-decoration: none; transition: border-color 0.2s, color 0.2s; }
+        .pa-links a:hover { border-color: #d4af37; color: #3c2a21; }
+        .pa-photo { position: absolute; margin: 0; background: #fff; padding: 7px 7px 0; border-radius: 12px; box-shadow: 0 12px 28px rgba(60,42,33,0.16); }
+        .pa-photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+        .pa-photo figcaption { padding: 0.35rem 0.2rem 0.5rem; font-size: 0.74rem; line-height: 1.25; text-align: center; color: #6b5a4e; }
+      `}</style>
+      <div className="pa-wrap">
+        <aside className="pa-rail" aria-label="Como funciona e outras parcerias">
+          <div className="pa-rail-inner" style={{ display: 'grid', gap: '0.9rem' }}>
+            <div className="pa-card">
+              <h3>Como funciona</h3>
+              <ol className="pa-steps">
+                <li><b>1</b><span>Você preenche em 2 minutos</span></li>
+                <li><b>2</b><span>A Dolly te chama no WhatsApp</span></li>
+                <li><b>3</b><span>Portal liberado para pedir reposição</span></li>
+              </ol>
+            </div>
+            <div className="pa-card">
+              <h3>Outras parcerias</h3>
+              <div className="pa-links">
+                {OTHER_PARTNERSHIPS.filter(o => o.kind !== defaultKind).map(o => (
+                  <Link key={o.kind} href={o.href}><span aria-hidden>{o.emoji}</span>{o.label}</Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {gutterPhotos.length > 0 && (
+          <div className="pa-photos" aria-hidden>
+            {gutterPhotos.map((t, i) => {
+              const [top, side, rot, w] = PHOTO_SPOTS[i];
+              return (
+                <figure key={t.id} className="pa-photo" style={{ top: `${top}%`, left: `${side}px`, width: `${w}px`, transform: `rotate(${rot}deg)` }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={optimizedSrc(t.image_url as string, 384)} alt="" loading="lazy" decoding="async" />
+                  <figcaption>{t.name}</figcaption>
+                </figure>
+              );
+            })}
+          </div>
+        )}
+
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <span style={{ ...label, display: 'block' }}>Quero ser parceiro</span>
           <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.7rem, 4.5vw, 2.6rem)', color: 'var(--color-primary)', lineHeight: 1.2, marginBottom: '1rem' }}>
