@@ -163,7 +163,10 @@ export default function AdminLayout({
 
   return (
     <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', background: '#f5f6fa' }}>
-      
+      {/* The sidebar is fixed, so on desktop the whole page (announcement bar, header, content,
+          footer) gets the sidebar's width as a left margin and flows in the column beside it. */}
+      {!isMobile && <style>{'body { padding-left: 280px; }'}</style>}
+
       {/* Mobile Header */}
       {isMobile && (
         <header style={{ background: '#2c3e50', color: 'white', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -184,14 +187,15 @@ export default function AdminLayout({
         color: 'white', 
         display: 'flex', 
         flexDirection: 'column',
-        // Desktop: pinned to the window and exactly as tall as it, so the menu scrolls inside
-        // and the account chip below is always where you can see it (not at the foot of a long page).
-        position: isMobile ? 'fixed' : 'sticky',
+        // Locked to the window on every screen, top to bottom: the page (site header, content and
+        // footer) scrolls past it, the menu scrolls inside it, and the account chip stays put at the
+        // bottom. On desktop the page is nudged right by the <style> below to make room for it.
+        position: 'fixed',
         top: 0,
         left: 0,
-        bottom: isMobile ? 0 : undefined,
-        height: isMobile ? undefined : '100vh',
-        alignSelf: isMobile ? undefined : 'flex-start',
+        bottom: 0,
+        height: '100dvh',
+        overflow: 'hidden',
         flexShrink: 0,
         zIndex: 99999,
         transform: isMobile ? (isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)') : 'none',

@@ -78,7 +78,7 @@ export default function AdminSidebarNav({ pathname, unreadCount, partnerCount = 
   const pinned = PINNED.map(p => ({ ...p, badge: badgeFor(p.path) }));
 
   return (
-    <nav aria-label="Menu do painel" style={{ flex: 1, overflowY: 'auto', paddingBottom: '1rem' }}>
+    <nav aria-label="Menu do painel" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', paddingBottom: '1rem' }}>
       {/* Quick find */}
       <div style={{ padding: '1rem 1rem 0.5rem' }}>
         <input
