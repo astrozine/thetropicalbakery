@@ -18,5 +18,5 @@ export async function isAdmin(): Promise<boolean> {
   return !error && data === true;
 }
 
-/** An e-mail as an exact, case-insensitive match (escapes the LIKE wildcards `_` and `%`). */
-export const exactEmail = (email: string) => email.trim().replace(/[\%_]/g, m => `\${m}`);
+/** An e-mail as an exact, case-insensitive match (escapes the LIKE wildcards `_` and `%`, and the backslash itself). */
+export const exactEmail = (email: string) => email.trim().replace(/[\\%_]/g, m => '\\' + m);
