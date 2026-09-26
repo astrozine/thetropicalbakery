@@ -167,15 +167,31 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
       {/* Experience Block */}
       <section style={{ background: 'var(--color-background)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'stretch', minHeight: '70vh' }}>
-          {/* Image side */}
-          <div style={{
-            flex: '1 1 50%',
-            minWidth: '300px',
-            minHeight: '450px',
-            backgroundImage: 'url("/retreats/real-cachoeira.jpg")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }} />
+          {/* Image side: an arched portrait with the wide waterfall overlapping it, gold outline behind */}
+          <div className="rx">
+            <div className="rx__stage">
+              <div className="rx__ring" aria-hidden />
+              <div className="rx__arch">
+                <img src="/retreats/prumirim-woman.jpg" alt="Mulher relaxando na piscina natural da Cachoeira do Prumirim" loading="lazy" />
+              </div>
+              <div className="rx__wide">
+                <img src="/retreats/real-cachoeira.jpg" alt="Cachoeira do Prumirim, Ubatuba" loading="lazy" />
+              </div>
+              <span className="rx__tag"><span aria-hidden>✦</span> Cachoeira do Prumirim · Ubatuba</span>
+            </div>
+            <style dangerouslySetInnerHTML={{ __html: `
+              .rx { flex: 1 1 50%; min-width: 300px; display: flex; align-items: center; justify-content: center; padding: clamp(1.5rem, 4vw, 4rem); background: linear-gradient(160deg, #f7eedb 0%, #ecdcbc 100%); overflow: hidden; }
+              .rx__stage { position: relative; width: min(100%, 640px); aspect-ratio: 1 / 1.1; }
+              .rx__arch, .rx__ring { position: absolute; left: 6%; top: 0; width: 58%; aspect-ratio: 3 / 4.1; border-radius: 999px 999px 28px 28px; }
+              .rx__ring { left: 0; top: -3%; border: 1.5px solid #d4af37; }
+              .rx__arch { overflow: hidden; box-shadow: 0 30px 60px rgba(60,42,33,0.3); z-index: 1; }
+              .rx__arch img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+              .rx__wide { position: absolute; right: 0; bottom: 4%; width: 62%; aspect-ratio: 4 / 3; border: 8px solid #fdfaf3; border-radius: 22px; overflow: hidden; box-shadow: 0 24px 50px rgba(60,42,33,0.35); transform: rotate(3deg); z-index: 2; }
+              .rx__wide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+              .rx__tag { position: absolute; left: 2%; bottom: 3%; z-index: 3; background: #3c2a21; color: #d4af37; padding: 0.55rem 1.1rem; border-radius: 999px; font-size: clamp(0.62rem, 1.6vw, 0.78rem); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; box-shadow: 0 10px 24px rgba(60,42,33,0.35); }
+              @media (max-width: 480px) { .rx__wide { border-width: 5px; border-radius: 16px; } .rx__tag { letter-spacing: 1.2px; padding: 0.45rem 0.8rem; } }
+            ` }} />
+          </div>
           {/* Text side */}
           <div style={{ flex: '1 1 50%', minWidth: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(2rem, 6vw, 6rem)' }}>
             <ScrollReveal>
