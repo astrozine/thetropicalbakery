@@ -299,6 +299,8 @@ export default function SubscriptionPage() {
                 gap: '1.75rem',
                 overflowX: 'auto',
                 scrollSnapType: 'x mandatory',
+                // Without this, snapping puts each card flush against the screen edge and ignores the padding.
+                scrollPaddingLeft: '1.5rem',
                 WebkitOverflowScrolling: 'touch',
                 scrollbarWidth: 'none',
                 padding: '1.5rem 1.5rem 2rem',
