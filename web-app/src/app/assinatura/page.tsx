@@ -11,6 +11,7 @@ import MobileBuyBar from '@/components/MobileBuyBar';
 import ScrollReveal from '@/components/ScrollReveal';
 import { SubscriptionPlan, monthlySavings } from '@/lib/subscriptions';
 import { formatBRL } from '@/lib/deliveryZones';
+import WhatsAppGate from '@/components/WhatsAppGate';
 
 /** The single-box price we compare plans against. */
 const BASE_BOX_PRICE = 99;
@@ -269,7 +270,7 @@ export default function SubscriptionPage() {
         ) : plans.length === 0 ? (
           <p style={{ textAlign: 'center', color: '#7a6a61', padding: '0 1.5rem' }}>
             Os planos estarão disponíveis em instantes. Fale com a gente no{' '}
-            <a href="https://wa.me/5511932119196" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>WhatsApp</a>.
+            <WhatsAppGate href="https://wa.me/5511932119196" topic="Assinatura: planos" tags={['assinatura']} style={{ color: 'var(--color-secondary)', fontWeight: 600, textDecoration: 'underline' }}>WhatsApp</WhatsAppGate>.
           </p>
         ) : (
           <div className="tb-plan-rail-wrap" style={{ position: 'relative' }}>
@@ -518,9 +519,9 @@ export default function SubscriptionPage() {
           </button>
           <p style={{ fontSize: '0.8rem', color: 'rgba(253,250,243,0.6)', marginTop: '1.5rem' }}>
             Ou fale direto com a gente no{' '}
-            <a href="https://wa.me/5511932119196" target="_blank" rel="noopener noreferrer" style={{ color: '#d4af37', fontWeight: 600 }}>
+            <WhatsAppGate href="https://wa.me/5511932119196" topic="Assinatura: dúvidas" tags={['assinatura']} style={{ color: '#d4af37', fontWeight: 600, textDecoration: 'underline' }}>
               WhatsApp
-            </a>
+            </WhatsAppGate>
           </p>
         </div>
       </StripedBackground>

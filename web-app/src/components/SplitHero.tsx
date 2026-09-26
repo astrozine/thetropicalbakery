@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import HeroPhoto from './HeroPhoto';
+import WhatsAppGate from './WhatsAppGate';
 
 interface SplitHeroProps {
   eyebrow: string;
@@ -15,6 +16,8 @@ interface SplitHeroProps {
   itamambucaBadge?: boolean;
   ctaHref: string;
   ctaLabel: string;
+  /** Saved with the lead when the CTA is a WhatsApp link (see WhatsAppGate). */
+  ctaTopic?: string;
   /** Optional second, smaller photo layered onto the main one. */
   accentImage?: string;
   /** Portrait treat photos layered as tilted prints over the main photo. */
@@ -27,7 +30,7 @@ interface SplitHeroProps {
  * thing seen. The photo is never overlaid or dimmed — that's the whole point.
  */
 export default function SplitHero({
-  eyebrow, title, intro, image, images, imageAlt, regionNote, itamambucaBadge, ctaHref, ctaLabel, accentImage, treats,
+  eyebrow, title, intro, image, images, imageAlt, regionNote, itamambucaBadge, ctaHref, ctaLabel, ctaTopic, accentImage, treats,
 }: SplitHeroProps) {
   // "Parcerias para Hotéis" -> small kicker + a huge "HOTÉIS", so a visitor knows at a glance which program this is.
   const m = eyebrow.match(/^(Parcerias para)\s+(.+)$/i);
@@ -61,15 +64,15 @@ export default function SplitHero({
             📍 {regionNote}
           </p>
         )}
-        <a
+        <WhatsAppGate
           href={ctaHref}
-          target="_blank"
-          rel="noopener noreferrer"
+          topic={ctaTopic || eyebrow}
+          tags={['parceiro']}
           className="btn btn-secondary"
           style={{ alignSelf: 'flex-start', padding: '1rem 2.25rem', fontSize: '1rem', letterSpacing: '1px' }}
         >
           {ctaLabel}
-        </a>
+        </WhatsAppGate>
       </div>
 
       {/* Photo */}

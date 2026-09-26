@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
-type ItemType = 'job_application' | 'order' | 'retreat_inquiry' | 'course_inquiry' | 'waitlist';
+type ItemType = 'job_application' | 'order' | 'retreat_inquiry' | 'course_inquiry' | 'waitlist' | 'contact_lead';
 
 interface InboxItem {
   key: string;
@@ -57,6 +57,12 @@ const FLOWS: Record<ItemType, StatusStep[]> = {
     { status: 'new', icon: '❓', label: 'Novo', color: '#c0392b', bg: '#fdecea' },
     { status: 'resolved', icon: '✅', label: 'Resolvido', color: '#0b6b3a', bg: '#e6f4ec' },
   ],
+  // Someone who tapped a "Falar no WhatsApp" button and left their details first (migration 23).
+  contact_lead: [
+    { status: 'new', icon: '❓', label: 'Novo', color: '#c0392b', bg: '#fdecea' },
+    { status: 'contacted', icon: '📞', label: 'Contato Feito', color: '#8a6d1f', bg: '#fdf7ee' },
+    { status: 'resolved', icon: '✅', label: 'Resolvido', color: '#0b6b3a', bg: '#e6f4ec' },
+  ],
 };
 
 /** Same steps as a delivery, worded for someone collecting their box. Customers' Minha Conta reads these steps too. */
@@ -79,10 +85,11 @@ const TYPE_INFO: Record<ItemType, { label: string; icon: string; section: string
   waitlist: { label: 'Fila de Espera', icon: '⏳', section: 'Pedidos & Entregas', color: '#b5560f', bg: '#fdebd9', href: '/admin/waitlist', hrefLabel: 'Fila de Espera' },
   course_inquiry: { label: 'Interesse em Curso', icon: '🍰', section: 'Cursos & Retiros', color: '#b0322a', bg: '#fbe3e0', href: '/admin/inscricoes', hrefLabel: 'Inscrições em Cursos' },
   retreat_inquiry: { label: 'Interesse em Retiro', icon: '🏡', section: 'Cursos & Retiros', color: '#b0322a', bg: '#fbe3e0', href: '/admin/inscricoes', hrefLabel: 'Inscrições em Cursos' },
+  contact_lead: { label: 'Contato pelo site', icon: '💬', section: 'Parcerias & Contatos', color: '#0b6b3a', bg: '#e6f4ec' },
   job_application: { label: 'Candidatura', icon: '👷', section: 'Equipe & Casa', color: '#2f6f9f', bg: '#e1eefa', href: '/admin/vagas', hrefLabel: 'Candidaturas de Emprego' },
 };
 
-const TYPE_ORDER: ItemType[] = ['order', 'course_inquiry', 'retreat_inquiry', 'waitlist', 'job_application'];
+const TYPE_ORDER: ItemType[] = ['order', 'contact_lead', 'course_inquiry', 'retreat_inquiry', 'waitlist', 'job_application'];
 
 const digitsOnly = (v: string | null | undefined) => (v || '').replace(/\D/g, '');
 const waLink = (v: string | null) => {
@@ -102,12 +109,14 @@ function useInbox() {
   const load = useCallback(async () => {
     setLoading(true);
 
-    const [jobsRes, ordersRes, coursesRes, waitlistRes, statusRes] = await Promise.all([
+    const [jobsRes, ordersRes, coursesRes, waitlistRes, statusRes, leadsRes] = await Promise.all([
       supabase.from('job_applications').select('*').order('created_at', { ascending: false }),
       supabase.from('orders').select('*').order('created_at', { ascending: false }),
       supabase.from('course_registrations').select('*').order('created_at', { ascending: false }),
       supabase.from('waitlist').select('*').order('created_at', { ascending: false }),
       supabase.from('inbox_status').select('*'),
+      // Absent until migration 23 runs: the error just leaves this list empty.
+      supabase.from('contact_leads').select('*').order('created_at', { ascending: false }),
     ]);
 
     const merged: InboxItem[] = [
@@ -133,6 +142,12 @@ function useInbox() {
         type: (c.interest_type === 'retiro' ? 'retreat_inquiry' : 'course_inquiry') as ItemType,
         title: c.customer_name, subtitle: c.specific_interest || (c.interest_type === 'retiro' ? 'Retiro' : 'Curso'),
         whatsapp: c.customer_whatsapp, email: c.email, created_at: c.created_at,
+      })),
+      ...(leadsRes.data || []).map((l: any) => ({
+        key: `contact_leads:${l.id}`, source_table: 'contact_leads', source_id: l.id,
+        type: 'contact_lead' as const,
+        title: l.name, subtitle: `${l.topic || 'Contato'}${l.signed_in ? ' · entrou com conta' : ''}`,
+        whatsapp: l.whatsapp, email: l.email, created_at: l.created_at,
       })),
       ...(waitlistRes.data || []).map((w: any) => ({
         key: `waitlist:${w.id}`, source_table: 'waitlist', source_id: w.id,

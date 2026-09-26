@@ -3,6 +3,7 @@ import SplitHero from '@/components/SplitHero';
 import ZoomableImage from '@/components/ZoomableImage';
 import StripedBackground from '@/components/StripedBackground';
 import PartnerApply from '@/components/PartnerApply';
+import WhatsAppGate from '@/components/WhatsAppGate';
 import { PartnerKind } from '@/lib/portals';
 
 export interface PartnershipOption {
@@ -95,15 +96,15 @@ export default function B2BPageLayout({
             <li key={i}>✦ {line}</li>
           ))}
         </ul>
-        <a
+        <WhatsAppGate
           href={whatsappHref}
-          target="_blank"
-          rel="noopener noreferrer"
+          topic={eyebrow}
+          tags={['parceiro']}
           className="btn btn-primary"
           style={{ padding: '1.1rem 2.5rem', fontSize: '1.15rem', borderRadius: '4px', letterSpacing: '1px', display: 'inline-block' }}
         >
           {whatsappLabel}
-        </a>
+        </WhatsAppGate>
       </section>
 
       <PartnerApply defaultKind={partnerKind} whatsappHref={whatsappHref} />

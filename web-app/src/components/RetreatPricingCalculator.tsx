@@ -6,6 +6,7 @@ import { formatBRL } from '@/lib/deliveryZones';
 import { RetreatRoom, quoteRetreatPackage, IMMERSION_FEE_PER_GUEST_PER_NIGHT } from '@/lib/retreatPricing';
 import { getSiteSetting } from '@/lib/siteSettings';
 import { useExchangeRates, formatForeign } from '@/lib/currency';
+import WhatsAppGate from '@/components/WhatsAppGate';
 
 const DEFAULT_ROOMS: RetreatRoom[] = [
   { id: 'penthouse', name: 'Cobertura (Penthouse)', airbnb_nightly_rate: 0, max_guests: 6 },
@@ -140,15 +141,16 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
         )}
       </div>
 
-      <a
+      <WhatsAppGate
         href={`https://wa.me/${whatsappNumber}?text=${message}`}
-        target="_blank"
-        rel="noopener noreferrer"
+        topic={`Retiro: pacote ${room.name}`}
+        tags={['retiros']}
+        locale={locale}
         className="btn btn-secondary"
         style={{ width: '100%', textAlign: 'center', display: 'block', padding: '1rem', fontSize: '1.05rem' }}
       >
         Confirmar Pelo WhatsApp
-      </a>
+      </WhatsAppGate>
 
       {room.airbnb_nightly_rate === 0 && (
         <p style={{ fontSize: '0.75rem', color: 'rgba(253,250,243,0.5)', marginTop: '1rem', textAlign: 'center' }}>

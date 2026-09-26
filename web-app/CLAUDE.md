@@ -115,3 +115,16 @@ that only add columns or policies to existing tables need nothing extra.
   "conferimos" when it doesn't. Default is to warn, not to exclude; excluding is an explicit tick.
 - Every read of the new columns must survive migration 19 being absent (fall back to the old
   columns/booleans) — the same rule the rest of the admin follows.
+
+
+# WhatsApp buttons never go straight to the chat
+
+- Any "Falar no WhatsApp / com o Comercial" button that starts a conversation with a visitor must use
+  `src/components/WhatsAppGate.tsx`, never a bare `<a href="https://wa.me/...">`. The gate first asks for a
+  one-tap Google / Facebook sign-in (which also gives them an account for future orders) or a name +
+  WhatsApp, saves the lead in `contact_leads` (`migration_23_contact_leads.sql`; shows in Admin > Caixa de
+  Entrada as "Contato pelo site"), then opens WhatsApp with the original message.
+- Pass `topic` (what they are asking about), `tags` (e-mail list, see `emailTopics.ts`) and `locale` on pages
+  that speak English/Spanish. Signed-in people with a phone on their account go straight through.
+- Left as plain links on purpose: footer, privacy page, admin, logged-in areas (partner, team, my account,
+  my subscription), the order-return page and e-mail templates.

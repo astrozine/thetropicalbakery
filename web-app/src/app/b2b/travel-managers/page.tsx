@@ -3,6 +3,7 @@ import SplitHero from '@/components/SplitHero';
 import PartnerApply from '@/components/PartnerApply';
 import Link from 'next/link';
 import ZoomableImage from '@/components/ZoomableImage';
+import WhatsAppGate from '@/components/WhatsAppGate';
 import StripedBackground from '@/components/StripedBackground';
 
 const OFFERINGS = [
@@ -95,15 +96,15 @@ export default function TravelManagersPage() {
                 <li><strong>Comissionamento:</strong> receba uma porcentagem atrativa sobre o valor total do grupo que você organizar.</li>
                 <li><strong>Fácil de vender:</strong> uma experiência transformadora em Itamambuca (Ubatuba), muito procurada por grupos.</li>
               </ul>
-              <a
+              <WhatsAppGate
                 href="https://wa.me/5511932119196?text=Ol%C3%A1%21%20Tenho%20interesse%20em%20organizar%20um%20grupo%20para%20os%20Retiros%20da%20Tropical%20Bakery."
-                target="_blank"
-                rel="noopener noreferrer"
+                topic="Parceria: organizadores de grupos (retiros)"
+                tags={['parceiro', 'retiros']}
                 className="btn btn-primary"
                 style={{ fontSize: '1.1rem', letterSpacing: '1px', textAlign: 'center' as const, display: 'inline-block' }}
               >
                 Falar com o Comercial
-              </a>
+              </WhatsAppGate>
             </div>
           </div>
 

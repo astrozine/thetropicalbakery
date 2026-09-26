@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import WhatsAppGate from '@/components/WhatsAppGate';
 
 export const metadata: Metadata = {
   title: 'Todas as Parcerias | The Tropical Bakery',
@@ -310,10 +311,10 @@ export default function TodasAsParcerias() {
           Se você tem uma ideia de parceria que não está aqui — um hotel boutique fora da região,
           uma marca de lifestyle, um espaço de bem-estar — a Dolly adoraria ouvir.
         </p>
-        <a
+        <WhatsAppGate
           href="https://wa.me/5511932119196?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20uma%20parceria%20com%20a%20The%20Tropical%20Bakery!"
-          target="_blank"
-          rel="noopener noreferrer"
+          topic="Parceria: fale com a gente"
+          tags={['parceiro']}
           style={{
             display: 'inline-block',
             background: '#3c2a21',
@@ -328,7 +329,7 @@ export default function TodasAsParcerias() {
           }}
         >
           Falar com o Comercial no WhatsApp
-        </a>
+        </WhatsAppGate>
       </section>
 
     </main>
