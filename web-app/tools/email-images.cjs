@@ -61,7 +61,7 @@ const FLAGS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="132" height="7
 
 (async () => {
   for (const [name, src] of Object.entries(HEROES)) {
-    await sharp(path.join(PUB, src)).rotate().resize(1200, 600, { fit: 'cover', position: 'attention' })
+    await sharp(path.join(PUB, src)).rotate().resize(1200, 800, { fit: 'cover' })
       .jpeg({ quality: 70, mozjpeg: true, progressive: true }).toFile(path.join(OUT, `${name}.jpg`));
   }
   for (const [name, src] of Object.entries(TILES)) {

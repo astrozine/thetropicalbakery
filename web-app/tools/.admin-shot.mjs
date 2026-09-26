@@ -54,6 +54,7 @@ try {
     await new Promise(r => setTimeout(r, 300));
   }
 
+  if (process.env.SCROLL) { await page.evaluate(() => window.scrollTo(0, 1e6)); await new Promise(r => setTimeout(r, 400)); }
   const m = await page.evaluate(() => {
     const de = document.documentElement;
     const foot = document.querySelector('footer');

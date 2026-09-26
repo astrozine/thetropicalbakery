@@ -166,11 +166,19 @@ export default function AdminLayout({
     <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', background: '#f5f6fa' }}>
       {/* Fill exactly the space between the site header and the slim footer, so a short page needs no scrolling and
           the footer rests at the bottom of the window; a long page just grows and the footer follows it. The root
-          layout's <main> is a flex item of the body, and its bottom padding (for the phone tab bar) is only kept on phones. */}
-      <style>{`body > main { flex: 1 0 auto; display: flex; flex-direction: column; ${isMobile ? '' : 'padding-bottom: 0 !important;'} } body > main > * { flex: 1 0 auto; }`}</style>
+          layout's <main> is a flex item of the body, and its bottom padding (for the public phone tab bar) is dropped here: on phones the footer clears the admin bar itself. */}
+      <style>{`body > main { flex: 1 0 auto; display: flex; flex-direction: column; padding-bottom: 0 !important; } body > main > * { flex: 1 0 auto; }
+        ${isMobile ? 'body > footer { padding-bottom: calc(4.75rem + env(safe-area-inset-bottom)) !important; }' : ''}`}</style>
       {/* The sidebar is fixed, so on desktop the whole page (announcement bar, header, content,
           footer) gets the sidebar's width as a left margin and flows in the column beside it. */}
-      {!isMobile && <style>{'body { padding-left: 280px; }'}</style>}
+      {!isMobile && <style>{`body { padding-left: 280px; }
+        /* The sidebar leaves a laptop screen (1280-1535px) too little room for the site header's eight items, which pushed
+           the cart and account menu off the right edge and made the page scroll sideways. Tighter spacing, admin only. */
+        @media (max-width: 1535px) {
+          body > nav .nav-inner { padding-left: 0.75rem; padding-right: 0.75rem; }
+          body > nav .nav-inner > div.hidden > * { margin-left: 0.55rem !important; }
+          body > nav .nav-inner > div.hidden, body > nav .nav-inner > div.hidden * { letter-spacing: 0 !important; }
+        }`}</style>}
 
       {/* Mobile Header */}
       {isMobile && (

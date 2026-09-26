@@ -311,7 +311,7 @@ export function renderEmail(o: LayoutOptions): string {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff"
             style="background:#ffffff;border:1px solid ${LINE};border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 18px 40px rgba(60,42,33,0.10);">
             <tr><td bgcolor="${SAND}" style="background:${SAND};line-height:0;font-size:0;border-radius:22px 22px 0 0;overflow:hidden;">
-              <img src="${img(base, `hero-${themeName}`)}" width="580" height="290" alt="${esc(theme.heroAlt)}"
+              <img src="${img(base, `hero-${themeName}`)}" width="580" height="387" alt="${esc(theme.heroAlt)}"
                 style="display:block;width:100%;max-width:580px;height:auto;border:0;border-radius:22px 22px 0 0;">
             </td></tr>
             <tr><td height="4" bgcolor="${GOLD}" style="background:${GOLD};line-height:4px;font-size:0;">&nbsp;</td></tr>
