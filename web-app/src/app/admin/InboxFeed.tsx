@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { BUCKETS, BUCKET_ORDER, bucketOf, urgencyOf, urgencyRank, type Bucket, type Urgency } from './inboxStatus';
 
 type ItemType = 'job_application' | 'order' | 'retreat_inquiry' | 'course_inquiry' | 'waitlist' | 'contact_lead';
 
@@ -18,6 +19,8 @@ interface InboxItem {
   created_at: string;
   /** A box the customer will collect themselves. */
   pickup?: boolean;
+  /** The day an order is due out ('YYYY-MM-DD'), for the red "delivery is tomorrow" flag. */
+  dueDate?: string | null;
 }
 
 interface StatusStep {
@@ -40,6 +43,7 @@ const FLOWS: Record<ItemType, StatusStep[]> = {
     { status: 'preparing', icon: '👩‍🍳', label: 'Em Preparo', color: '#a6832b', bg: '#fdf7ee' },
     { status: 'shipped', icon: '🛵', label: 'Saiu para Entrega', color: '#1a5276', bg: '#eaf2f8' },
     { status: 'delivered', icon: '✅', label: 'Entregue', color: '#0b6b3a', bg: '#e6f4ec' },
+    { status: 'cancelled', icon: '🚫', label: 'Cancelado (caixas liberadas)', color: '#6c757d', bg: '#f1f2f6' },
   ],
   retreat_inquiry: [
     { status: 'new', icon: '❓', label: 'Novo', color: '#c0392b', bg: '#fdecea' },
@@ -72,6 +76,7 @@ const PICKUP_ORDER_FLOW: StatusStep[] = [
   { status: 'preparing', icon: '👩‍🍳', label: 'Em Preparo', color: '#a6832b', bg: '#fdf7ee' },
   { status: 'shipped', icon: '🛍️', label: 'Pronta para retirada', color: '#1a5276', bg: '#eaf2f8' },
   { status: 'delivered', icon: '✅', label: 'Retirado', color: '#0b6b3a', bg: '#e6f4ec' },
+  { status: 'cancelled', icon: '🚫', label: 'Cancelado (caixas liberadas)', color: '#6c757d', bg: '#f1f2f6' },
 ];
 
 const flowFor = (item: InboxItem) => (item.pickup ? PICKUP_ORDER_FLOW : FLOWS[item.type]);
@@ -138,6 +143,8 @@ function useInbox() {
           : `${money(o.total_price)}${o.requested_date ? ` · ${o.fulfillment === 'pickup' ? '🛍️ Retirada' : 'Entrega'} ${new Date(o.requested_date + 'T00:00:00').toLocaleDateString('pt-BR')}` : ''}`,
         whatsapp: o.customer_whatsapp, email: o.customer_email, created_at: o.created_at,
         pickup: o.fulfillment === 'pickup',
+        // A quote request's date is the event day, not a delivery we are late on.
+        dueDate: o.items?.kind === 'orcamento_evento' || o.status === 'ORCAMENTO' ? null : (o.requested_date || null),
       })),
       ...(coursesRes.data || []).map((c: any) => ({
         key: `course_registrations:${c.id}`, source_table: 'course_registrations', source_id: c.id,
@@ -172,8 +179,11 @@ function useInbox() {
   useEffect(() => { load(); }, [load]);
 
   const advanceStatus = async (item: InboxItem) => {
-    const flow = flowFor(item);
+    // 'cancelled' is set only by "Liberar caixas" on /admin/caixas (it gives the boxes back), never by tapping
+    // through the steps, and a cancelled order is not reopened by a stray tap.
+    const flow = flowFor(item).filter(f => f.status !== 'cancelled');
     const current = statusMap[item.key] || 'new';
+    if (current === 'cancelled') return;
     const idx = flow.findIndex(f => f.status === current);
     const next = flow[(idx + 1) % flow.length].status;
 

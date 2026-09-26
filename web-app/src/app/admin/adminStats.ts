@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { fetchSchedule, selectableDates } from '@/lib/deliverySchedule';
 
 export interface ActiveBox {
   id: string;
@@ -23,10 +24,14 @@ export interface AdminStats {
   partnersPending: number;
   restockOpen: number;
   customers: number;
+  /** Delivery days a customer can still pick (null = could not be read). At 0 every box page turns into the "no box yet" notice. */
+  deliveryDaysLeft: number | null;
+  deliveryLastDay: string | null;
 }
 
 const EMPTY: AdminStats = {
   loading: true, box: null, newOrders: 0, weekOrders: 0, weekRevenue: 0, partnersPending: 0, restockOpen: 0, customers: 0,
+  deliveryDaysLeft: null, deliveryLastDay: null,
 };
 
 /**
@@ -38,14 +43,16 @@ export function useAdminStats(): AdminStats & { reload: () => void } {
 
   const load = useCallback(async () => {
     const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
-    const [box, orders, status, partners, restock, customers] = await Promise.all([
+    const [box, orders, status, partners, restock, customers, schedule] = await Promise.all([
       supabase.from('tasting_boxes').select('id, title, batch_date_label, total_quantity, sold_quantity').eq('is_active', true).limit(1),
       supabase.from('orders').select('id, total_price, created_at').order('created_at', { ascending: false }).limit(1000),
       supabase.from('inbox_status').select('source_id, status').eq('source_table', 'orders'),
       supabase.from('partners').select('id', { count: 'exact', head: true }).eq('status', 'pendente'),
       supabase.from('partner_restock_requests').select('id', { count: 'exact', head: true }).eq('status', 'novo'),
       supabase.from('users').select('id', { count: 'exact', head: true }),
+      fetchSchedule().catch(() => null),   // a calendar that will not load must not blank the overview
     ]);
+    const days = schedule ? selectableDates(schedule) : null;
 
     const orderRows = (orders.data || []) as { id: string; total_price: number | string | null; created_at: string }[];
     const handled = new Set(((status.data || []) as { source_id: string; status: string }[])
@@ -61,6 +68,8 @@ export function useAdminStats(): AdminStats & { reload: () => void } {
       partnersPending: partners.count || 0,
       restockOpen: restock.count || 0,
       customers: customers.count || 0,
+      deliveryDaysLeft: days ? days.length : null,
+      deliveryLastDay: days && days.length ? days[days.length - 1] : null,
     });
   }, []);
 

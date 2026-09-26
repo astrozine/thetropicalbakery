@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import HeldBoxes from './HeldBoxes';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
@@ -392,6 +393,8 @@ export default function AdminCaixas() {
             </div>
         </div>
       </form>
+
+      <HeldBoxes box={boxes.find(b => b.is_active) ?? null} onReleased={fetchBoxes} />
 
       <h2 style={{ fontSize: '1.5rem', color: '#2c3e50', marginBottom: '1.5rem' }}>Lotes Anteriores</h2>
 
