@@ -68,6 +68,24 @@ export default function AdminLayout({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // The phone tab bar tucks away while the page is moving and slides back the moment scrolling stops
+  // (same behaviour as the public tab bar), so it never covers what you are reading.
+  const [scrolling, setScrolling] = useState(false);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) < 3) return;
+      lastY = y;
+      setScrolling(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setScrolling(false), 300);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { window.removeEventListener('scroll', onScroll); clearTimeout(timer); };
+  }, []);
+
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -283,6 +301,9 @@ export default function AdminLayout({
           position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'grid', gridTemplateColumns: '1fr 1fr 72px 1fr 1fr', alignItems: 'end',
           background: '#22323f', borderTop: '1px solid rgba(255,255,255,0.12)', padding: '0.4rem 0.25rem calc(0.4rem + env(safe-area-inset-bottom))',
           boxShadow: '0 -6px 20px rgba(0,0,0,0.25)',
+          // Slides fully out of sight (the extra 2.5rem also clears the + that sticks up above the bar).
+          transform: scrolling ? 'translateY(calc(100% + 2.5rem))' : 'translateY(0)',
+          transition: 'transform 0.25s ease-out', pointerEvents: scrolling ? 'none' : 'auto',
         }}>
           {([
             { href: '/admin', emoji: '🏠', label: 'Início', badge: 0 },
@@ -295,27 +316,38 @@ export default function AdminLayout({
             fontSize: '2.4rem', fontWeight: 300, lineHeight: 1, paddingBottom: '0.3rem', border: '4px solid #22323f', boxShadow: '0 6px 14px rgba(0,0,0,0.4)',
           }}>+</Link>
 
-          {([
-            { href: '/admin/crm', emoji: '💌', label: 'Clientes', badge: 0 },
-            { href: '/admin/parceiros', emoji: '🤝', label: 'Parceiros', badge: partnerCount },
-          ] as const).map(t => <TabLink key={t.href} {...t} active={pathname === t.href} />)}
+          <TabLink href="/admin/crm" emoji="💌" label="Clientes" badge={0} active={pathname === '/admin/crm'} />
+
+          {/* The panel's own menu ("Painel", not "Menu": the site's hamburger up top is the public menu). Always in
+              thumb reach, never hidden behind the site header. Parceiros lives in it, so its red badge shows here. */}
+          <button type="button" onClick={() => setIsSidebarOpen(true)} aria-haspopup="dialog" aria-expanded={isSidebarOpen} aria-label="Abrir o menu do painel" style={tabStyle(isSidebarOpen)}>
+            <span aria-hidden style={{ fontSize: '1.4rem', lineHeight: 1.1 }}>☰</span>
+            Painel
+            <TabBadge n={partnerCount} />
+          </button>
         </nav>
       )}
     </div>
   );
 }
 
+const tabStyle = (active: boolean): React.CSSProperties => ({
+  position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.1rem', padding: '0.3rem 0.2rem', textDecoration: 'none',
+  color: active ? '#f4c542' : '#c9d5df', fontSize: '0.68rem', fontWeight: active ? 800 : 600,
+  background: 'transparent', border: 'none', fontFamily: 'inherit', cursor: 'pointer',
+});
+
+function TabBadge({ n }: { n: number }) {
+  if (n <= 0) return null;
+  return <span style={{ position: 'absolute', top: '0.05rem', right: 'calc(50% - 1.5rem)', background: '#e74c3c', color: '#fff', fontSize: '0.62rem', fontWeight: 800, minWidth: '17px', textAlign: 'center', padding: '0.05rem 0.3rem', borderRadius: '999px' }}>{n}</span>;
+}
+
 function TabLink({ href, emoji, label, badge, active }: { href: string; emoji: string; label: string; badge: number; active: boolean }) {
   return (
-    <Link href={href} aria-current={active ? 'page' : undefined} style={{
-      position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.1rem', padding: '0.3rem 0.2rem', textDecoration: 'none',
-      color: active ? '#f4c542' : '#c9d5df', fontSize: '0.68rem', fontWeight: active ? 800 : 600,
-    }}>
+    <Link href={href} aria-current={active ? 'page' : undefined} style={tabStyle(active)}>
       <span aria-hidden style={{ fontSize: '1.4rem', lineHeight: 1.1 }}>{emoji}</span>
       {label}
-      {badge > 0 && (
-        <span style={{ position: 'absolute', top: '0.05rem', right: 'calc(50% - 1.5rem)', background: '#e74c3c', color: '#fff', fontSize: '0.62rem', fontWeight: 800, minWidth: '17px', textAlign: 'center', padding: '0.05rem 0.3rem', borderRadius: '999px' }}>{badge}</span>
-      )}
+      <TabBadge n={badge} />
     </Link>
   );
 }
