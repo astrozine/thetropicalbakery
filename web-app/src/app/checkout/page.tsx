@@ -109,7 +109,9 @@ export default function CheckoutPage() {
       email: user?.email || prev.email,
     }));
     if (profile) {
-      if (profile.delivery_zone) setZoneId(profile.delivery_zone);
+      // Only a zone that still exists: an old profile can hold a zone id that was since renamed, and
+      // an unknown id used to show no delivery fee at all (the server now refuses it outright).
+      if (profile.delivery_zone && getZone(profile.delivery_zone)) setZoneId(profile.delivery_zone);
       // An account from before migration 19 only has the five booleans.
       setDiet({
         tags: profile.diet_tags?.length ? profile.diet_tags : tagsFromLegacy(profile),

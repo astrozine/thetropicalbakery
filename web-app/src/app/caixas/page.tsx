@@ -82,14 +82,18 @@ export default function CaixasPage() {
     return <NoBoxNotice variant="page" photos={[...pastPhotos.map(p => p.src), ...FALLBACK_BOX_PHOTOS.map(p => p.src)]} />;
   }
 
-  const remainingQuantity = Math.max(0, activeBox.total_quantity - activeBox.sold_quantity);
+  // total_quantity 0 means "no fixed batch" — what saleState() and the server's reserve_box_stock both
+  // read it as. Treating it as a batch of zero showed "Restam apenas 0 caixas!" and "NaN% Vendido", and
+  // left the order form capped at zero, so a box that was on sale could not be bought.
+  const limited = activeBox.total_quantity > 0;
+  const remainingQuantity = limited ? Math.max(0, activeBox.total_quantity - activeBox.sold_quantity) : 999;
   // Earlier boxes first, then the stock photos, never the box that is on sale now. Alternate them left/right.
   const seen = new Set<string>([activeBox.image_url]);
   const heroPhotos = [...pastPhotos, ...FALLBACK_BOX_PHOTOS].filter(p => !seen.has(p.src) && seen.add(p.src));
   const leftPhotos = heroPhotos.filter((_, i) => i % 2 === 0).slice(0, 4);
   const rightPhotos = heroPhotos.filter((_, i) => i % 2 === 1).slice(0, 4);
 
-  const percentageSold = Math.min(100, (activeBox.sold_quantity / activeBox.total_quantity) * 100);
+  const percentageSold = limited ? Math.min(100, (activeBox.sold_quantity / activeBox.total_quantity) * 100) : 0;
 
   return (
     <main style={{ minHeight: '100vh', background: 'var(--color-background)', paddingBottom: '6rem' }}>
@@ -114,7 +118,7 @@ export default function CaixasPage() {
         
         <HeroBoxCard side="left" photos={leftPhotos} />
         <HeroBoxCard side="right" photos={rightPhotos} delayMs={2750} />
-        {sale?.state === 'open' && <BoxesLeftBadge remaining={remainingQuantity} />}
+        {limited && sale?.state === 'open' && <BoxesLeftBadge remaining={remainingQuantity} />}
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
           <HeroBoxStrip photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} />
@@ -135,17 +139,22 @@ export default function CaixasPage() {
               <BoxItemList description={activeBox.description} tone="dark" />
             </div>
 
-            {/* Scarcity Counter */}
+            {/* Scarcity Counter. The count and the bar only mean something for a limited batch; the
+                delivery/ordering chips below them are shown either way. */}
             <div style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.2)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '1.1rem', fontWeight: 'bold', color: 'white' }}>
-                <span>Restam apenas {remainingQuantity} caixas!</span>
-                <span>{percentageSold.toFixed(0)}% Vendido</span>
-              </div>
-              <div style={{ width: '100%', height: '12px', background: 'rgba(255,255,255,0.2)', borderRadius: '6px', overflow: 'hidden' }}>
-                <div style={{ width: `${percentageSold}%`, height: '100%', background: remainingQuantity <= 5 ? '#ff7675' : '#d4af37', transition: 'width 1s ease-in-out' }} />
-              </div>
-              {remainingQuantity <= 5 && remainingQuantity > 0 && sale?.state === 'open' && (
-                <p style={{ color: '#ff7675', marginTop: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold', animation: 'pulse 2s infinite', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>Corra! O lote está quase no fim.</p>
+              {limited && (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '1.1rem', fontWeight: 'bold', color: 'white' }}>
+                    <span>Restam apenas {remainingQuantity} caixas!</span>
+                    <span>{percentageSold.toFixed(0)}% Vendido</span>
+                  </div>
+                  <div style={{ width: '100%', height: '12px', background: 'rgba(255,255,255,0.2)', borderRadius: '6px', overflow: 'hidden' }}>
+                    <div style={{ width: `${percentageSold}%`, height: '100%', background: remainingQuantity <= 5 ? '#ff7675' : '#d4af37', transition: 'width 1s ease-in-out' }} />
+                  </div>
+                  {remainingQuantity <= 5 && remainingQuantity > 0 && sale?.state === 'open' && (
+                    <p style={{ color: '#ff7675', marginTop: '0.5rem', fontSize: '0.9rem', fontWeight: 'bold', animation: 'pulse 2s infinite', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>Corra! O lote está quase no fim.</p>
+                  )}
+                </>
               )}
 
               {/* The two windows: when it arrives, and until when you can order */}
@@ -223,7 +232,7 @@ export default function CaixasPage() {
 
       {/* Phones only: keeps the price and one tap to order under the thumb the whole way down. */}
       <MobileBuyBar
-        kicker={remainingQuantity > 0 ? `Restam ${remainingQuantity}` : 'Caixa da semana'}
+        kicker={limited && remainingQuantity > 0 ? `Restam ${remainingQuantity}` : 'Caixa da semana'}
         price={`R$ ${Math.round(activeBox.price)}`}
         note={sale?.rolledOver ? `entregas ${sale.windowLabel}` : activeBox.batch_date_label ? formatBatchDate(activeBox.batch_date_label) : undefined}
         label="Pedir"

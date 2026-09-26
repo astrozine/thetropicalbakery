@@ -34,9 +34,13 @@ async function saveLead(v: { name: string; whatsapp: string; date: string; guest
   const guests = v.guests ? Number(v.guests) : null;
   const items = { kind: 'orcamento_evento', picks: v.picks, guests, note: v.note || null };
   const summary = `Orçamento de evento${v.picks.length ? `: ${v.picks.join(', ')}` : ''}${guests ? ` · ${guests} convidados` : ''}${v.note ? ` · ${v.note}` : ''}`;
+  // This is a LEAD, not an order. Migration 22 only lets the public insert a row with no status and no
+  // price (real orders are priced and saved by the server), so sending status/total_price made every
+  // attempt bounce off row-level security and the quote fell through to a stripped-down row that lost
+  // the requested date and the summary. Leave both unset and the date and summary survive.
   const base = {
     customer_name: v.name.trim(), customer_whatsapp: digits, order_type: 'EVENTO', items,
-    requested_date: v.date || null, status: 'ORCAMENTO', total_price: 0,
+    requested_date: v.date || null,
   };
   let res = await supabase.from('orders').insert([{ ...base, order_kind: 'quote', items_summary: summary }]);
   if (res.error) res = await supabase.from('orders').insert([base]);

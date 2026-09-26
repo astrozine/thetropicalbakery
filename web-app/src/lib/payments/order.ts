@@ -164,7 +164,11 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
   }
 
   // ---- delivery fee
-  const zone = getZone(input.zoneId) ?? DELIVERY_ZONES[0];
+  // An unknown zone must never quietly become the first one: DELIVERY_ZONES[0] is Itamambuca, which is
+  // free and has no minimum, so falling back to it handed free delivery (and no minimum) to anyone whose
+  // zone did not match — a stale delivery_zone saved on an old profile was enough to do it by accident.
+  const zone = hasBox && !isPickup ? getZone(input.zoneId) : (getZone(input.zoneId) ?? DELIVERY_ZONES[0]);
+  if (!zone) throw new OrderError(400, 'Escolha a sua região de entrega.');
   const boxCount = [...boxWanted.values()].reduce((a, b) => a + b, 0);
   if (hasBox && !isPickup && boxCount < zone.minBoxes) {
     throw new OrderError(400, `O pedido mínimo para esta região é de ${zone.minBoxes} caixas.`);

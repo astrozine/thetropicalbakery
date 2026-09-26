@@ -131,7 +131,9 @@ function useInbox() {
         type: 'order' as const,
         title: o.customer_name,
         // A quote request from /menu has no price yet: show what they asked for instead of R$ 0.
-        subtitle: o.status === 'ORCAMENTO'
+        // The public may not set a status on a lead (migration 22), so recognise it by what it carries;
+        // 'ORCAMENTO' still matches the rows saved before that rule existed.
+        subtitle: o.items?.kind === 'orcamento_evento' || o.status === 'ORCAMENTO'
           ? `📝 Orçamento de evento${o.items?.picks?.length ? ` · ${o.items.picks.slice(0, 3).join(', ')}${o.items.picks.length > 3 ? ` +${o.items.picks.length - 3}` : ''}` : ''}${o.items?.guests ? ` · ${o.items.guests} convidados` : ''}${o.requested_date ? ` · ${new Date(o.requested_date + 'T00:00:00').toLocaleDateString('pt-BR')}` : ''}`
           : `${money(o.total_price)}${o.requested_date ? ` · ${o.fulfillment === 'pickup' ? '🛍️ Retirada' : 'Entrega'} ${new Date(o.requested_date + 'T00:00:00').toLocaleDateString('pt-BR')}` : ''}`,
         whatsapp: o.customer_whatsapp, email: o.customer_email, created_at: o.created_at,
