@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import BoxesLeftBadge from '@/components/BoxesLeftBadge';
 
-export default function ExplodingTreats() {
+export default function ExplodingTreats({ boxesLeft = null }: { boxesLeft?: number | null }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -198,8 +199,10 @@ export default function ExplodingTreats() {
             textAlign: 'center',
             boxShadow: '0 25px 50px -12px rgba(60,42,33,0.3)',
             pointerEvents: 'auto',
+            position: 'relative',
           }}
         >
+          {boxesLeft !== null && boxesLeft > 0 && <BoxesLeftBadge remaining={boxesLeft} variant="sticker" />}
           <span style={{ display: 'inline-block', color: '#a6832b', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
             🌴 Itamambuca · Ubatuba
           </span>

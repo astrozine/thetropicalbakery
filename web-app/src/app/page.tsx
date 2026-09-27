@@ -40,12 +40,18 @@ export default async function Home() {
   // A box only counts as "on sale" if a customer could really order it: a delivery day is left
   // to pick and its ordering window is open. Otherwise say there is no box yet and offer the waiting list.
   let boxOnSale = !!activeBox;
+  let boxesLeft: number | null = null;
   let boxDateLabel = activeBox ? formatBatchDate(activeBox.batch_date_label) : '';
   if (activeBox) {
     const schedule = await fetchSchedule();
     const all = selectableDates(schedule);
     const choosable = inDeliveryWindow(all, activeBox);
-    boxOnSale = !noUpcomingEdition(saleState(activeBox, choosable).state, choosable);
+    const sale = saleState(activeBox, choosable);
+    boxOnSale = !noUpcomingEdition(sale.state, choosable);
+    // The "how many left" sticker only for a limited batch that can be ordered right now.
+    if (sale.state === 'open' && boxOnSale && activeBox.total_quantity > 0) {
+      boxesLeft = Math.max(0, activeBox.total_quantity - activeBox.sold_quantity);
+    }
     // The planned batch date is over but there are boxes left: say when they arrive now.
     if (choosable.length && isRolledOver(all, { from: activeBox.delivery_from, until: activeBox.delivery_until })) {
       boxDateLabel = `entregas a partir de ${shortDay(choosable[0])}`;
@@ -93,7 +99,7 @@ export default async function Home() {
           <img src="/box1.jpg" alt="Caixa de Degustação The Tropical Bakery" />
         </div>
         <div className="container hero-content fade-in" style={{ padding: '0' }}>
-          <ExplodingTreats />
+          <ExplodingTreats boxesLeft={boxesLeft} />
         </div>
       </section>
 

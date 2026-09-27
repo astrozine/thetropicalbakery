@@ -7,7 +7,7 @@ import React, { useId } from 'react';
  * Phones already show the count in the counter and the buy bar, so this only appears on wide
  * screens, next to the side photo cards (same breakpoint as HeroBoxCard).
  */
-export default function BoxesLeftBadge({ remaining }: { remaining: number }) {
+export default function BoxesLeftBadge({ remaining, variant = 'hero' }: { remaining: number; variant?: 'hero' | 'sticker' }) {
   const maskId = useId();
   if (remaining <= 0) return null;
 
@@ -15,7 +15,7 @@ export default function BoxesLeftBadge({ remaining }: { remaining: number }) {
   const fontSize = digits === 1 ? 128 : digits === 2 ? 98 : 70;
 
   return (
-    <div className="boxes-left" role="img" aria-label={`${remaining} ${remaining === 1 ? 'caixa disponível' : 'caixas disponíveis'}`}>
+    <div className={variant === 'sticker' ? 'boxes-left boxes-left--sticker' : 'boxes-left'} role="img" aria-label={`${remaining} ${remaining === 1 ? 'caixa disponível' : 'caixas disponíveis'}`}>
       <svg className="boxes-left__disc" viewBox="0 0 200 200" aria-hidden="true">
         <defs>
           <mask id={maskId}>
@@ -49,6 +49,11 @@ export default function BoxesLeftBadge({ remaining }: { remaining: number }) {
         }
         @keyframes boxes-left-float { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-8px) rotate(-4deg); } }
         @media (min-width: 1360px) { .boxes-left { display: block; } }
+        /* Home page: stuck on the corner of the light "Veganos chegando" card, so it is placed against that
+           card (the caller makes it position: relative) and softened for a cream background. */
+        .boxes-left--sticker { display: block; top: auto; left: auto; bottom: 0.5rem; right: -4.4rem; width: clamp(112px, 9vw, 148px); z-index: 12; }
+        .boxes-left--sticker .boxes-left__disc { filter: drop-shadow(0 0 8px rgba(255,118,117,0.45)) drop-shadow(0 5px 12px rgba(60,42,33,0.28)); }
+        .boxes-left--sticker .boxes-left__label { color: #ff5a59; text-shadow: 0 0 4px #fdfaf3, 0 0 10px #fdfaf3, 0 0 16px #fdfaf3; }
         @media (prefers-reduced-motion: reduce) { .boxes-left { animation: none; transform: rotate(-4deg); } }
       ` }} />
     </div>
