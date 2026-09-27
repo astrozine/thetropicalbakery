@@ -227,7 +227,7 @@ export default function CoursesAdmin() {
         <h2 style={{ fontSize: '1.05rem', color: '#3c2a21', margin: '0 0 1rem' }}>
           Cursos cadastrados <span style={{ color: '#95a5a6', fontWeight: 500 }}>({courses.length})</span>
         </h2>
-        <div style={{ display: 'grid', gap: '0.75rem' }}>
+        <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}>
           {courses.map(course => (
             <div key={course.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.06)', padding: '0.75rem', outline: editingId === course.id ? '2px solid #d4af37' : 'none' }}>
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
@@ -267,7 +267,7 @@ export default function CoursesAdmin() {
       <style dangerouslySetInnerHTML={{ __html: `
         .courses-layout { display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
         @media (min-width: 1100px) {
-          .courses-layout { grid-template-columns: minmax(0, 1fr) 340px; }
+          .courses-layout { grid-template-columns: minmax(0, 1fr) clamp(340px, 30vw, 580px); }
           .courses-column { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; padding-right: 4px; }
         }
       ` }} />
