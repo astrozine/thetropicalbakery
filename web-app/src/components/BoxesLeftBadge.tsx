@@ -42,9 +42,9 @@ export default function BoxesLeftBadge({ remaining, variant = 'hero' }: { remain
         }
         .boxes-left__disc { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 10px rgba(255,118,117,0.55)) drop-shadow(0 6px 18px rgba(0,0,0,0.4)); }
         .boxes-left__label {
-          position: absolute; right: 12%; top: 100%; margin-top: 0.3rem; transform-origin: right top; transform: rotate(-13deg);
+          position: absolute; left: 50%; top: 100%; margin-top: 0.5rem; transform-origin: center top; transform: translateX(-50%) rotate(-6deg);
           font-family: 'Yellowtail', 'Brush Script MT', cursive; font-weight: 400;
-          font-size: clamp(1.7rem, 2.1vw, 2.9rem); line-height: 0.95; white-space: nowrap; text-align: right;
+          font-size: clamp(1.6rem, 2vw, 2.6rem); line-height: 1.05; white-space: nowrap; text-align: center;
           color: #ff7675; text-shadow: 0 0 14px rgba(255,118,117,0.5), 0 2px 10px rgba(0,0,0,0.55);
         }
         @keyframes boxes-left-float { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-8px) rotate(-4deg); } }
