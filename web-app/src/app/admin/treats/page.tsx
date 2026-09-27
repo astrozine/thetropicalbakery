@@ -221,21 +221,22 @@ export default function TreatsAdmin() {
             </div>
           </div>
 
-          {/* 2: what's in it */}
-          <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
-            <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>🌿 Ingredientes</h3>
-            <EmojiField emoji={formData.emoji || '🍫'} onChange={emoji => setFormData({ ...formData, emoji })} />
-            <IngredientsField ingredients={formData.ingredients || []} onChange={ingredients => setFormData({ ...formData, ingredients })} />
-          </div>
+          {/* 2: what's in it, and allergens stacked underneath so this column fills the height of the first */}
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
+              <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>🌿 Ingredientes</h3>
+              <EmojiField emoji={formData.emoji || '🍫'} onChange={emoji => setFormData({ ...formData, emoji })} />
+              <IngredientsField ingredients={formData.ingredients || []} onChange={ingredients => setFormData({ ...formData, ingredients })} />
+            </div>
 
-          {/* 3: allergens, "contém" and "pode conter" side by side */}
-          <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
-            <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>⚠️ Alérgenos</h3>
-            <AllergenFields
-              contains={formData.contains || []}
-              mayContain={formData.may_contain || []}
-              onChange={a => setFormData({ ...formData, ...a })}
-            />
+            <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
+              <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>⚠️ Alérgenos</h3>
+              <AllergenFields
+                contains={formData.contains || []}
+                mayContain={formData.may_contain || []}
+                onChange={a => setFormData({ ...formData, ...a })}
+              />
+            </div>
           </div>
         </div>
       </form>
