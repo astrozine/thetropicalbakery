@@ -142,7 +142,7 @@ export default function CoursesAdmin() {
       <div className="courses-layout">
 
       {/* Editor Form */}
-      <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+      <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', maxWidth: '820px' }}>
         <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#3c2a21' }}>
           {editingId ? 'Editar Curso' : 'Adicionar Novo Curso'}
         </h2>
