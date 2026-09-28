@@ -1,6 +1,7 @@
 import 'server-only';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { SITE_URL } from '@/lib/email/layout';
+import { sendOrderPaid } from '@/lib/email/receipts';
 
 /**
  * Server-only helpers shared by the card (Mercado Pago) and PayPal routes.
@@ -85,6 +86,39 @@ export async function markOrderPaid(order: PayableOrder, provider: 'mercadopago'
       { onConflict: 'source_table,source_id' },
     );
   }
+
+  // Tell the customer. Never throws: the money has arrived and the order is
+  // marked paid, so an e-mail problem must not make the webhook look failed
+  // (a failed webhook is retried, and the payment company may give up on us).
+  try {
+    await sendPaidReceipt(order.id);
+  } catch (e) {
+    console.error('markOrderPaid: confirmation e-mail failed (order IS paid):', e);
+  }
+}
+
+/**
+ * Reads back what the saved order remembers and sends the "pagamento confirmado"
+ * e-mail. Reading it fresh (rather than trusting the caller) keeps the receipt
+ * honest about the delivery day and the address, which the webhook never sees.
+ */
+async function sendPaidReceipt(orderId: string) {
+  const db = supabaseAdmin();
+  const { data } = await db.from('orders').select('*').eq('id', orderId).maybeSingle();
+  if (!data) return;
+
+  const address = String(data.delivery_address ?? '');
+  await sendOrderPaid(db, {
+    reference: String(data.pix_transaction_id ?? ''),
+    customerName: data.customer_name ?? '',
+    customerEmail: data.customer_email ?? null,
+    summary: data.items_summary ?? null,
+    fee: Number(data.delivery_fee ?? 0),
+    total: Number(data.total_price ?? 0),
+    method: String(data.payment_provider ?? ''),
+    date: data.requested_date ?? null,
+    isPickup: /^RETIRADA/i.test(address),
+  });
 }
 
 /** A cent-safe comparison: providers round to 2 decimals. */

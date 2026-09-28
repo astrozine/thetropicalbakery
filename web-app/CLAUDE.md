@@ -36,18 +36,41 @@ that only add columns or policies to existing tables need nothing extra.
 - **Templates** are in `src/lib/email/campaigns.ts` (one `Campaign` each: audience, fields, subject,
   `messageKey`, body) and the shell is `src/lib/email/layout.ts`. Both are pure string builders so
   the admin can preview them; no server-only imports there.
-- **Sending** goes through `POST /api/email/send` (admin token, `dryRun` for counts, `testEmail` for
-  a single test). It writes an `email_sends` row *before* calling Resend: the unique index on
+- **Sending** happens in exactly one place: `sendCampaign()` in `src/lib/email/send.ts` (server-only).
+  It writes an `email_sends` row *before* calling Resend: the unique index on
   `(lower(email), message_key)` is what makes a second send skip people who already have it. On a
   provider failure the row is deleted so the address can be retried. Add `List-Unsubscribe` and
-  `List-Unsubscribe-Post` headers to every marketing send.
+  `List-Unsubscribe-Post` headers to every marketing send. The caller passes the Supabase client,
+  which decides what the send may touch — the admin's own session, or the service-role client for the
+  scheduler. **Never add a second way to send**; route it through `sendCampaign` or opt-outs stop meaning anything.
+- Two doors into it: `POST /api/email/send` (the admin's button — admin token, `dryRun` for counts,
+  `testEmail` for one test) and `GET|POST /api/email/cron` (the scheduler).
+- **The scheduler** (`migration_26_email_scheduler.sql`, guide in `SETUP_email_scheduler.md`):
+  - `email_schedule` — one row per planned send ("this campaign, at this moment"). There is no
+    "repeat": the same campaign with the same values makes the same `message_key`, so a repeat would
+    reach nobody and look like it worked. Anything genuinely recurring is an automation.
+  - `email_automations` — always-on rules (`box-live`, `box-last-chance`, `delivery-dates`,
+    `subscriber-delivery`), defined in `src/lib/email/automationDefs.ts` (pure, shared with the admin
+    UI) and evaluated in `src/lib/email/automations.ts` (server-only). A rule never sends: `planFor()`
+    returns the `SendRequest`s it *wants* plus an `after()` for bookkeeping, and the cron route runs
+    them through `sendCampaign`. Each rule fires at most once per Brasília day, inside its `send_hour`.
+    **All seeded off** — turning one on is a decision to mail real customers.
+  - `email_cron_runs` — proof of life, so the admin can show "conferiu há 4 minutos" instead of
+    anybody reading a deploy log.
+  - Guarded by `EMAIL_CRON_SECRET`. `?dry=1` reports what it would do and sends nothing.
+  - Admin UI: `src/app/admin/emails/Agenda.tsx`, which degrades to a "run migration 26" hint.
+- **Receipts** (`src/lib/email/receipts.ts`, topic `pedido`) go out with nothing to switch on:
+  `sendOrderReceived` from `createOrder` (carries the Pix copia-e-cola, so closing the checkout tab no
+  longer loses the payment) and `sendOrderPaid` from `markOrderPaid`. Both are wrapped in try/catch at
+  the call site on purpose: **an e-mail failure must never fail a saved or paid order.** They are
+  deliberately not in `CAMPAIGNS` — the admin never hand-sends a receipt.
 - **Preferences page** `/preferencias?token=…` uses the SECURITY DEFINER functions
   `email_prefs_get` / `email_prefs_set` / `email_unsubscribe_all`, so a logged-out person can manage
   their own row without the table being readable. `?sair=1` unsubscribes immediately (one click).
 - **Collecting contacts**: call the `email_contact_upsert` RPC after any form that captures an
   e-mail, with the right tags (checkout, waitlist, subscription, course sign-up, job application all
   do this). It merges tags and never resurrects an unsubscribe.
-- Schema: `migration_15_email_preferences.sql`.
+- Schema: `migration_15_email_preferences.sql` and `migration_26_email_scheduler.sql`.
 
 # Private areas: partner portal and team area
 

@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **25**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **27**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -115,7 +115,17 @@ Verified live, 2026-09-26:
 - Admin **Ver como** (`/admin/ver-como`) previews customer, partner and staff areas read-only (`?preview=<id>`, admins only).
 - The events strip (`GlobalMenuTeaser`) shows only on home, retreats, courses and partnership pages.
 
-Not built yet (ask Andrew before starting): an automatic message to the waiting list when a new box opens; the cookie
+- **E-mail can now send itself (written 2026-09-28, migration 26 NOT run yet).** Sending was extracted into
+  `src/lib/email/send.ts`; `/api/email/send` (the admin button) and `/api/email/cron` (the scheduler) both go through it, so
+  scheduled mail obeys the same opt-outs and the same "nobody twice". Until Andrew runs
+  `migration_26_email_scheduler.sql`, adds `EMAIL_CRON_SECRET` to Vercel and schedules pg_cron
+  (`web-app/SETUP_email_scheduler.md`), **nothing sends by itself** and Admin › E-mails shows a "run migration 26" hint
+  instead of the scheduler. The four automations are seeded **off**; do not enable one for him.
+  Order receipts (`src/lib/email/receipts.ts`) need none of that setup and go out as soon as the code deploys — the first
+  transactional mail the site has ever sent. If you touch `createOrder` or `markOrderPaid`, keep the receipt call inside its
+  try/catch: an e-mail failure must never fail a saved or paid order.
+
+Not built yet (ask Andrew before starting): the cookie
 consent banner and privacy-policy update that must come **before** installing any ad pixel (LGPD); the Google / Meta pixel itself.
 
 ## 7. When you stop

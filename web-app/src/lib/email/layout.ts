@@ -185,6 +185,41 @@ export const greeting = (firstName: string) =>
 export const kicker = (text: string) =>
   `<p style="color:${GOLD_DEEP};font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;margin:8px 0 10px;">${esc(text)}</p>`;
 
+export interface OrderLine {
+  label: string;
+  /** Already formatted, e.g. "R$ 99,00". Blank for a line with no price. */
+  amount: string;
+  /** Sets it apart as the amount that matters. */
+  strong?: boolean;
+}
+
+/**
+ * The "what you ordered" table on a receipt. Right-aligned amounts, a rule above
+ * the total, and no colspan tricks — Outlook renders this one the same as Gmail.
+ */
+export const orderTable = (lines: OrderLine[]) =>
+  lines.length
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:4px 0 22px;border-collapse:collapse;">${lines
+        .map(l => {
+          const weight = l.strong ? 'bold' : 'normal';
+          const size = l.strong ? '17px' : '15px';
+          const colour = l.strong ? COCOA : TEXT;
+          const top = l.strong ? `border-top:1px solid ${LINE};padding-top:10px;` : '';
+          return `<tr>` +
+            `<td style="color:${colour};font-family:${BODY_FONT};font-size:${size};font-weight:${weight};line-height:1.6;padding:0 8px 8px 0;${top}">${esc(l.label)}</td>` +
+            `<td align="right" style="color:${colour};font-family:${BODY_FONT};font-size:${size};font-weight:${weight};line-height:1.6;padding:0 0 8px;white-space:nowrap;${top}">${esc(l.amount)}</td>` +
+            `</tr>`;
+        })
+        .join('')}</table>`
+    : '';
+
+/**
+ * A code the reader has to copy by hand — a Pix "copia e cola" string. Monospace,
+ * breaks anywhere, and on a background so it reads as a field rather than prose.
+ */
+export const copyBox = (label: string, code: string) =>
+  `${kicker(label)}<div style="margin:0 0 20px;padding:12px 14px;border-radius:10px;background:${SAND};border:1px solid ${LINE};color:${COCOA};font-family:'Courier New',Courier,monospace;font-size:13px;line-height:1.6;word-break:break-all;">${esc(code)}</div>`;
+
 const FOOTER_LINKS: { label: string; path: string }[] = [
   { label: 'Caixa de Degustação', path: '/caixas' },
   { label: 'Assinatura', path: '/assinatura' },

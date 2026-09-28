@@ -6,6 +6,7 @@ import { CAMPAIGNS, CampaignValues, campaignById, previewValues } from '@/lib/em
 import { SITE_URL, greeting, renderEmail } from '@/lib/email/layout';
 import { EMAIL_TOPICS, MARKETING_TOPICS, TAG_LABELS, ContactTag, canReceive, topicById } from '@/lib/emailTopics';
 import DietTargeting, { DietTargetingValue, EMPTY_TARGETING } from './DietTargeting';
+import Agenda from './Agenda';
 import { matchDiet } from '@/lib/dietary';
 import { normalizeAllergens } from '@/lib/allergens';
 import { brandConfirm } from '@/lib/brandDialog';
@@ -375,6 +376,9 @@ export default function AdminEmailsPage() {
           </p>
         </div>
       </div>
+
+      {/* Scheduling and the always-on rules */}
+      <Agenda campaignId={campaignId} values={values} diet={diet} />
 
       {/* History */}
       <div style={{ ...card, marginTop: '1.5rem' }}>

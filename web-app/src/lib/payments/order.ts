@@ -5,6 +5,8 @@ import { fetchSchedule, openDatesBetween, toISODate, parseISODate } from '@/lib/
 import { BoxWindowFields, inDeliveryWindow, saleState } from '@/lib/boxWindow';
 import { dietSummary, normalizeDiet } from '@/lib/dietary';
 import { fetchBoxSizePrices, isTreatCount, sizeText, toTreatCount, type TreatCount } from '@/lib/boxSizes';
+import { sendOrderReceived } from '@/lib/email/receipts';
+import { generatePixData } from '@/utils/pix';
 
 /**
  * Creates an order on the SERVER, pricing it from the database.
@@ -262,6 +264,22 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
       }
     }
     throw e;
+  }
+
+  // ---- the receipt
+  // Never let e-mail break a saved order: it is already paid for or already
+  // reserved, so a Resend outage must not turn into a failed checkout.
+  try {
+    const pixPayload = payment_provider === 'pix'
+      ? (await generatePixData({ value: total, transactionId: reference })).payload
+      : null;
+    await sendOrderReceived(db, {
+      reference, customerName: name, customerEmail: email || null,
+      lines, fee, total, summary: itemsSummary,
+      method: payment_provider, date, isPickup, pixPayload,
+    });
+  } catch (e) {
+    console.error('createOrder: receipt e-mail failed (order is saved):', e);
   }
 
   return { reference, subtotal, fee, total, lines };
