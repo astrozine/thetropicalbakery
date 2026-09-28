@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import TreatInfo, { hasTreatInfo } from '@/components/TreatInfo';
 import { allergenById, normalizeAllergens } from '@/lib/allergens';
+import { treatTypeById } from '@/lib/treatTypes';
 import Image from 'next/image';
 import { canOptimize } from '@/lib/thumbs';
 
@@ -20,6 +21,8 @@ interface MenuCardProps {
     ingredients?: string[] | null;
     contains?: string[] | null;
     may_contain?: string[] | null;
+    /** Cookie, cake, chocolate… shown as a small tag over the photo. Absent treats simply get none. */
+    treat_type?: string | null;
   };
   /** On a page with a quick pick: this treat is one of the ones already chosen there. */
   picked?: boolean;
@@ -33,6 +36,7 @@ export default function MenuCard({ item, picked = false, onTogglePick }: MenuCar
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const hasInfo = hasTreatInfo(item);
+  const kind = treatTypeById(item.treat_type);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -84,6 +88,13 @@ export default function MenuCard({ item, picked = false, onTogglePick }: MenuCar
           />
           {picked && (
             <span aria-label="Na sua escolha" style={{ position: 'absolute', top: '8px', left: '8px', width: '30px', height: '30px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(0,0,0,0.28)' }}>✓</span>
+          )}
+          {/* A tag only when the treat has one — untyped treats simply show none. Bottom-left, so it
+              never fights the "picked" mark (top-left) or the mobile zoom icon (top-right). */}
+          {kind && (
+            <span style={{ position: 'absolute', left: '8px', bottom: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.02em', backdropFilter: 'blur(2px)' }}>
+              <span aria-hidden>{kind.emoji}</span>{kind.label}
+            </span>
           )}
           {isMobile && (
             <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255,255,255,0.8)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>
@@ -186,8 +197,15 @@ export default function MenuCard({ item, picked = false, onTogglePick }: MenuCar
             {/* Handle */}
             <div style={{ width: '40px', height: '5px', background: '#e0e0e0', borderRadius: '3px', margin: '0 auto 1.5rem' }} />
 
-            <img src={item.image} alt={item.name} style={{ width: '100%', height: '35vh', minHeight: '250px', objectFit: 'cover', borderRadius: '12px', marginBottom: '1.5rem' }} />
-            
+            <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+              <img src={item.image} alt={item.name} style={{ width: '100%', height: '35vh', minHeight: '250px', objectFit: 'cover', borderRadius: '12px', display: 'block' }} />
+              {kind && (
+                <span style={{ position: 'absolute', left: '10px', bottom: '10px', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.02em' }}>
+                  <span aria-hidden>{kind.emoji}</span>{kind.label}
+                </span>
+              )}
+            </div>
+
             <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
               {item.emoji ? `${item.emoji} ` : ''}{item.name}
             </h3>

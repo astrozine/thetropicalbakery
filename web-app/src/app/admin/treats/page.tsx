@@ -5,12 +5,13 @@ import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
 import ToggleSwitch from '@/components/ToggleSwitch';
-import { AllergenFields, EmojiField, IngredientsField } from '@/components/TreatDetailsFields';
+import { AllergenFields, EmojiField, IngredientsField, TreatTypeField } from '@/components/TreatDetailsFields';
 import TreatInfo from '@/components/TreatInfo';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { syncTreatIntoBoxes } from '@/lib/treatSync';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
+import { anyTyped, groupByType, treatTypeById } from '@/lib/treatTypes';
 
 interface Treat {
   id: string;
@@ -25,6 +26,7 @@ interface Treat {
   ingredients?: string[] | null;
   contains?: string[] | null;
   may_contain?: string[] | null;
+  treat_type?: string | null;
 }
 
 const field: React.CSSProperties = { width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #ccc' };
@@ -143,6 +145,66 @@ export default function TreatsAdmin() {
 
   const visibleTreats = treats.filter(t => matchesRefine(t, refine));
 
+  // One card, reused whether the list is grouped by type or shown flat.
+  const renderTreatCard = (treat: Treat) => {
+    const kind = treatTypeById(treat.treat_type);
+    return (
+      <div key={treat.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ position: 'relative', height: '200px', background: '#f5f6fa' }}>
+          {treat.image_url ? (
+            <Image src={treat.image_url} alt={treat.name} fill style={{ objectFit: 'cover' }} />
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#bdc3c7' }}>Sem Foto</div>
+          )}
+          {!treat.is_available && (
+            <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#e74c3c', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+              Fora do menu
+            </div>
+          )}
+          {kind && (
+            <div style={{ position: 'absolute', left: '10px', bottom: '10px', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700 }}>
+              {kind.emoji} {kind.label}
+            </div>
+          )}
+        </div>
+
+        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <h3 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem', color: '#2c3e50' }}>{treat.emoji || '🍫'} {treat.name}</h3>
+          <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '1.2rem', margin: '0 0 0.75rem' }}>R$ {treat.price.toFixed(2).replace('.', ',')}</p>
+
+          <p style={{ fontSize: '0.8rem', color: '#7f8c8d', marginBottom: '0.75rem' }}>
+            {(treat.ingredients || []).length} ingredientes · {(treat.contains || []).length} alérgenos
+            {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length === 0 && (
+              <span style={{ color: '#e67e22', fontWeight: 'bold' }}> — falta preencher</span>
+            )}
+          </p>
+
+          {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length > 0 && (
+            <div style={{ marginBottom: '1rem' }}>
+              <TreatInfo ingredients={treat.ingredients} contains={treat.contains} may_contain={treat.may_contain} showEmptyNote={false} />
+            </div>
+          )}
+
+          <div style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: '1.5rem', background: '#f8f9fa', padding: '0.5rem', borderRadius: '4px' }}>
+            <div><strong>Min:</strong> {treat.min_batch_size} un.</div>
+            <div><strong>Aumenta de:</strong> {treat.batch_multiplier} em {treat.batch_multiplier}</div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
+            <button onClick={() => handleEdit(treat)} style={{ flex: 1, padding: '0.5rem', background: '#f1c40f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+              Editar
+            </button>
+            <button onClick={() => handleDelete(treat.id)} style={{ flex: 1, padding: '0.5rem', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+              Excluir
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  const typeGroups = anyTyped(visibleTreats) ? groupByType(visibleTreats) : null;
+  const cardGrid: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '1.5rem' };
+
   return (
     <div style={{ maxWidth: '2200px' }}>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Catálogo de Doces (Menu de Eventos)</h1>
@@ -173,6 +235,8 @@ export default function TreatsAdmin() {
               <label style={label}>Descrição</label>
               <textarea value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} style={{ ...field, minHeight: '100px' }} />
             </div>
+
+            <TreatTypeField value={formData.treat_type} onChange={treat_type => setFormData({ ...formData, treat_type })} />
 
             <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
               <div>
@@ -267,57 +331,19 @@ export default function TreatsAdmin() {
         </div>
       )}
 
-      {/* Treats List */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '1.5rem' }}>
-        {visibleTreats.map(treat => (
-          <div key={treat.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ position: 'relative', height: '200px', background: '#f5f6fa' }}>
-              {treat.image_url ? (
-                <Image src={treat.image_url} alt={treat.name} fill style={{ objectFit: 'cover' }} />
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#bdc3c7' }}>Sem Foto</div>
-              )}
-              {!treat.is_available && (
-                <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#e74c3c', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  Fora do menu
-                </div>
-              )}
-            </div>
-
-            <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <h3 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem', color: '#2c3e50' }}>{treat.emoji || '🍫'} {treat.name}</h3>
-              <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '1.2rem', margin: '0 0 0.75rem' }}>R$ {treat.price.toFixed(2).replace('.', ',')}</p>
-
-              <p style={{ fontSize: '0.8rem', color: '#7f8c8d', marginBottom: '0.75rem' }}>
-                {(treat.ingredients || []).length} ingredientes · {(treat.contains || []).length} alérgenos
-                {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length === 0 && (
-                  <span style={{ color: '#e67e22', fontWeight: 'bold' }}> — falta preencher</span>
-                )}
-              </p>
-
-              {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length > 0 && (
-                <div style={{ marginBottom: '1rem' }}>
-                  <TreatInfo ingredients={treat.ingredients} contains={treat.contains} may_contain={treat.may_contain} showEmptyNote={false} />
-                </div>
-              )}
-
-              <div style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: '1.5rem', background: '#f8f9fa', padding: '0.5rem', borderRadius: '4px' }}>
-                <div><strong>Min:</strong> {treat.min_batch_size} un.</div>
-                <div><strong>Aumenta de:</strong> {treat.batch_multiplier} em {treat.batch_multiplier}</div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-                <button onClick={() => handleEdit(treat)} style={{ flex: 1, padding: '0.5rem', background: '#f1c40f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                  Editar
-                </button>
-                <button onClick={() => handleDelete(treat.id)} style={{ flex: 1, padding: '0.5rem', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                  Excluir
-                </button>
-              </div>
-            </div>
+      {/* Treats List: grouped into sections once at least one treat has a type, otherwise one flat grid */}
+      {typeGroups ? (
+        typeGroups.map(group => (
+          <div key={group.type?.id || 'outros'} style={{ marginBottom: '2.5rem' }}>
+            <h3 style={{ fontSize: '1.05rem', color: '#3c2a21', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #eef1f4' }}>
+              {group.emoji} {group.label} <span style={{ color: '#7f8c8d', fontWeight: 400 }}>({group.items.length})</span>
+            </h3>
+            <div style={cardGrid}>{group.items.map(renderTreatCard)}</div>
           </div>
-        ))}
-      </div>
+        ))
+      ) : (
+        <div style={cardGrid}>{visibleTreats.map(renderTreatCard)}</div>
+      )}
       </div>
       </div>
     </div>

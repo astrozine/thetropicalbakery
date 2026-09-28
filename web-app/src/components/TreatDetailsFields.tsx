@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ALLERGENS, TREAT_EMOJIS, normalizeAllergens } from '@/lib/allergens';
+import { TREAT_TYPES } from '@/lib/treatTypes';
 
 /** Shared admin styles for the treat-detail editors (box treats and Menu de Eventos treats). */
 export const fieldStyle: React.CSSProperties = { width: '100%', padding: '0.7rem', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.95rem' };
@@ -129,6 +130,38 @@ export function IngredientsField({ ingredients, onChange }: { ingredients: strin
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Single-select: is it a cookie, a cake, a chocolate… Optional — tap the active one again to clear it. */
+export function TreatTypeField({ value, onChange }: { value: string | null | undefined; onChange: (id: string | null) => void }) {
+  return (
+    <div>
+      <label style={labelStyle}>Tipo de doce</label>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+        {TREAT_TYPES.map(t => {
+          const active = value === t.id;
+          return (
+            <button
+              key={t.id}
+              type="button"
+              title={t.hint}
+              onClick={() => onChange(active ? null : t.id)}
+              style={{
+                padding: '0.35rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', cursor: 'pointer',
+                border: `1px solid ${active ? '#d4af37' : '#dfe4ea'}`, background: active ? '#fdf6dd' : '#fff',
+                color: active ? '#8a6d1f' : '#7f8c8d', fontWeight: active ? 700 : 500,
+              }}
+            >
+              {t.emoji} {t.label}
+            </button>
+          );
+        })}
+      </div>
+      <p style={{ fontSize: '0.78rem', color: '#7f8c8d', marginTop: '0.5rem', lineHeight: 1.5 }}>
+        Agrupa os doces em seções no Menu de Eventos e mostra uma etiqueta pequena no card. Opcional — deixe em branco se não tiver certeza.
+      </p>
     </div>
   );
 }

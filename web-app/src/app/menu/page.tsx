@@ -11,6 +11,7 @@ import EventOrderSheet, { EventQuoteForm } from '@/components/EventOrder';
 import { useCart } from '@/context/CartContext';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 import { ALLERGEN_LIST_NEM } from '@/lib/allergens';
+import { anyTyped, groupByType } from '@/lib/treatTypes';
 
 interface Treat {
   id: string;
@@ -25,6 +26,7 @@ interface Treat {
   ingredients?: string[] | null;
   contains?: string[] | null;
   may_contain?: string[] | null;
+  treat_type?: string | null;
 }
 
 export default function MenuPage() {
@@ -163,25 +165,64 @@ export default function MenuPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            {visibleItems.map(item => (
-              <ScrollReveal key={item.id}>
-                <MenuCard picked={picked.includes(item.id)} onTogglePick={() => togglePick(item.id)} item={{
-                  id: item.id,
-                  name: item.name,
-                  description: item.description,
-                  price: item.price.toFixed(2).replace('.', ','),
-                  image: item.image_url,
-                  min_batch_size: item.min_batch_size,
-                  batch_multiplier: item.batch_multiplier,
-                  emoji: item.emoji,
-                  ingredients: item.ingredients,
-                  contains: item.contains,
-                  may_contain: item.may_contain,
-                }} />
-              </ScrollReveal>
-            ))}
-          </div>
+          {/* Grouped into sections (Cookies, Bolos & Tarteletes…) once Dolly has typed at least one treat;
+              until then one flat grid, exactly as before, so the feature stays invisible until it's used. */}
+          {anyTyped(visibleItems) ? (
+            groupByType(visibleItems).map(group => (
+              <div key={group.type?.id || 'outros'} style={{ marginBottom: '3rem' }}>
+                <h3 className="menu-type-heading">
+                  <span aria-hidden>{group.emoji}</span> {group.label}
+                  <span className="menu-type-count">{group.items.length}</span>
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                  {group.items.map(item => (
+                    <ScrollReveal key={item.id}>
+                      <MenuCard picked={picked.includes(item.id)} onTogglePick={() => togglePick(item.id)} item={{
+                        id: item.id,
+                        name: item.name,
+                        description: item.description,
+                        price: item.price.toFixed(2).replace('.', ','),
+                        image: item.image_url,
+                        min_batch_size: item.min_batch_size,
+                        batch_multiplier: item.batch_multiplier,
+                        emoji: item.emoji,
+                        ingredients: item.ingredients,
+                        contains: item.contains,
+                        may_contain: item.may_contain,
+                        treat_type: item.treat_type,
+                      }} />
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              {visibleItems.map(item => (
+                <ScrollReveal key={item.id}>
+                  <MenuCard picked={picked.includes(item.id)} onTogglePick={() => togglePick(item.id)} item={{
+                    id: item.id,
+                    name: item.name,
+                    description: item.description,
+                    price: item.price.toFixed(2).replace('.', ','),
+                    image: item.image_url,
+                    min_batch_size: item.min_batch_size,
+                    batch_multiplier: item.batch_multiplier,
+                    emoji: item.emoji,
+                    ingredients: item.ingredients,
+                    contains: item.contains,
+                    may_contain: item.may_contain,
+                    treat_type: item.treat_type,
+                  }} />
+                </ScrollReveal>
+              ))}
+            </div>
+          )}
+
+          <style>{`
+            .menu-type-heading { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-heading); font-size: clamp(1.1rem, 2.6vw, 1.4rem); color: #3c2a21; margin: 0 0 1.25rem; padding-bottom: 0.6rem; border-bottom: 1px solid rgba(212,175,55,0.35); }
+            .menu-type-count { margin-left: 0.2rem; font-family: var(--font-body); font-size: 0.8rem; font-weight: 600; color: #7a6a61; }
+          `}</style>
           </div>
           </div>
           </>
