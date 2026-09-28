@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ALLERGENS, ALLERGEN_GROUPS } from '@/lib/allergens';
-import { DIET_GROUPS, DIET_TAGS, QUICK_TAGS } from '@/lib/dietary';
+import { ALLERGENS } from '@/lib/allergens';
+import { DIET_GROUPS, DIET_TAGS, QUICK_TAGS, normalizeDiet } from '@/lib/dietary';
+import { KitchenFacts } from '@/components/TreatInfo';
 
 export interface DietaryValue {
   tags: string[];
@@ -57,14 +58,16 @@ const countPill = (n: number): React.CSSProperties => ({
  * the allergy ids are the same ones each treat declares.
  */
 export default function DietaryPicker({ value, onChange, compact = true, showNotes = true, audience = 'me' }: Props) {
-  const { tags, allergens, notes } = value;
+  // Older saved diets may still carry ids from the long allergen list; show and save them in today's words.
+  const current = normalizeDiet(value);
+  const { tags, allergens, notes } = current;
   const biz = audience === 'business';
   const groupLabel = (id: string, fallback: string) =>
     biz ? (id === 'jeito' ? 'Estilo de alimentação dos clientes' : id === 'saude' ? 'Restrições de saúde dos clientes' : fallback) : fallback;
   const [openMore, setOpenMore] = useState(!compact);
   const [openAllergens, setOpenAllergens] = useState(!compact);
 
-  const set = (patch: Partial<DietaryValue>) => onChange({ ...value, ...patch });
+  const set = (patch: Partial<DietaryValue>) => onChange({ ...current, ...patch });
   const toggleTag = (id: string) => set({ tags: tags.includes(id) ? tags.filter(t => t !== id) : [...tags, id] });
   const toggleAllergen = (id: string) => set({ allergens: allergens.includes(id) ? allergens.filter(a => a !== id) : [...allergens, id] });
 
@@ -125,33 +128,25 @@ export default function DietaryPicker({ value, onChange, compact = true, showNot
         </button>
         {openAllergens && (
           <div style={{ display: 'grid', gap: '1rem', padding: '1rem 0.25rem 0' }}>
+            <KitchenFacts />
             <p style={{ fontSize: '0.85rem', color: '#7a6a61', lineHeight: 1.65, margin: 0 }}>
               {biz ? (
-                <>Marque o que o seu negócio precisa evitar. A gente confere <strong>cada doce</strong> contra a lista e avisa com honestidade, inclusive quando é só risco de contato na mesma cozinha. 💛</>
+                <>Fora isso, é isto que passa pela nossa cozinha. Marque o que o seu negócio precisa evitar: a gente confere <strong>cada doce</strong> e avisa com honestidade, inclusive quando é só risco de contato. 💛</>
               ) : (
-                <>Marque o que você precisa evitar. A gente confere <strong>cada doce</strong> da caixa contra a sua lista
-                e te avisa antes — inclusive quando é só risco de contato na mesma cozinha. 💛</>
+                <>Fora isso, é isto que passa pela nossa cozinha. Marque o que você precisa evitar: a gente confere <strong>cada doce</strong> da caixa
+                e te avisa antes, inclusive quando é só risco de contato. 💛</>
               )}
             </p>
-            {ALLERGEN_GROUPS.map(group => {
-              const items = ALLERGENS.filter(a => a.group === group.id);
-              if (!items.length) return null;
-              return (
-                <div key={group.id}>
-                  <p style={groupTitle}>{group.label}</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-                    {items.map(a => {
-                      const on = allergens.includes(a.id);
-                      return (
-                        <button key={a.id} type="button" aria-pressed={on} onClick={() => toggleAllergen(a.id)} title={a.hint} style={chip(on)}>
-                          {on ? '✓ ' : ''}{a.emoji} {a.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+              {ALLERGENS.map(a => {
+                const on = allergens.includes(a.id);
+                return (
+                  <button key={a.id} type="button" aria-pressed={on} onClick={() => toggleAllergen(a.id)} title={a.hint} style={chip(on)}>
+                    {on ? '✓ ' : ''}{a.emoji} {a.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
@@ -162,7 +157,7 @@ export default function DietaryPicker({ value, onChange, compact = true, showNot
             rows={2}
             value={notes}
             onChange={e => set({ notes: e.target.value })}
-            placeholder="Mais alguma coisa que a gente deva saber? (ex: evito frutas muito doces, meu filho é alérgico a…)"
+            placeholder="Alguma outra alergia ou algo que a gente deva saber? (ex: alérgico a banana, evito frutas muito doces…)"
             style={{
               width: '100%', padding: '0.85rem 1rem', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px',
               background: 'rgba(255,255,255,0.7)', fontFamily: 'inherit', fontSize: '0.95rem', resize: 'vertical', outline: 'none',

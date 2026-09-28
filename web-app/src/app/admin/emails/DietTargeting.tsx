@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ALLERGENS, ALLERGEN_GROUPS, BoxItem, summarizeAllergens } from '@/lib/allergens';
+import { ALLERGENS, BoxItem, normalizeAllergens, summarizeAllergens } from '@/lib/allergens';
 import { DIET_TAGS, matchDiet } from '@/lib/dietary';
 
 export interface DietTargetingValue {
@@ -80,7 +80,7 @@ export default function DietTargeting({ value, onChange, audience }: Props) {
 
   const avoidCounts = useMemo(() => {
     const c: Record<string, number> = {};
-    audience.forEach(p => (p.allergens_avoid || []).forEach(a => { c[a] = (c[a] || 0) + 1; }));
+    audience.forEach(p => normalizeAllergens(p.allergens_avoid).forEach(a => { c[a] = (c[a] || 0) + 1; }));
     return c;
   }, [audience]);
 
@@ -91,7 +91,7 @@ export default function DietTargeting({ value, onChange, audience }: Props) {
     if (!described) return { conflicts: 0, traces: 0, reassured: 0 };
     let conflicts = 0, traces = 0, reassured = 0;
     audience.forEach(p => {
-      const n = (p.allergens_avoid || []).length;
+      const n = normalizeAllergens(p.allergens_avoid).length;
       if (!n) return;
       const m = matchDiet(p.allergens_avoid, value.contains, value.mayContain);
       if (m.status === 'unsafe') conflicts += 1;
@@ -128,24 +128,14 @@ export default function DietTargeting({ value, onChange, audience }: Props) {
   };
 
   const allergenChips = (key: 'avoiding' | 'contains' | 'mayContain', counts?: Record<string, number>) => (
-    <div style={{ display: 'grid', gap: '0.75rem' }}>
-      {ALLERGEN_GROUPS.map(g => {
-        const items = ALLERGENS.filter(a => a.group === g.id);
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+      {ALLERGENS.map(a => {
+        const n = counts ? (counts[a.id] || 0) : 0;
         return (
-          <div key={g.id}>
-            <p style={sub}>{g.label}</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-              {items.map(a => {
-                const n = counts ? (counts[a.id] || 0) : 0;
-                return (
-                  <button key={a.id} type="button" onClick={() => toggle(key, a.id)}
-                    style={chip(value[key].includes(a.id), counts ? n : 1, key === 'avoiding' ? '#2980b9' : '#c0392b')}>
-                    {a.emoji} {a.label}{counts ? ` (${n})` : ''}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <button key={a.id} type="button" onClick={() => toggle(key, a.id)}
+            style={chip(value[key].includes(a.id), counts ? n : 1, key === 'avoiding' ? '#2980b9' : '#c0392b')}>
+            {a.emoji} {a.label}{counts ? ` (${n})` : ''}
+          </button>
         );
       })}
     </div>

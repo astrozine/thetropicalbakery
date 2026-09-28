@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { allergenById } from '@/lib/allergens';
+import { ALLERGEN_LIST_NEM, KITCHEN_FACTS, allergenById, normalizeAllergens } from '@/lib/allergens';
 
 export const allergenChipStyle = (tone: 'contains' | 'may'): React.CSSProperties => ({
   display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.28rem 0.7rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600,
@@ -13,11 +13,26 @@ export const allergenChipStyle = (tone: 'contains' | 'may'): React.CSSProperties
 export function AllergenChips({ ids, tone }: { ids: string[]; tone: 'contains' | 'may' }) {
   return (
     <>
-      {ids.map(id => {
+      {normalizeAllergens(ids).map(id => {
         const a = allergenById(id);
         return a ? <span key={id} style={allergenChipStyle(tone)}>{a.emoji} {a.label}</span> : null;
       })}
     </>
+  );
+}
+
+/** What is true of every treat (vegan, made without gluten, no refined sugar), said once instead of ticked per treat. */
+export function KitchenFacts({ tone = 'light', style }: { tone?: 'light' | 'dark'; style?: React.CSSProperties }) {
+  const color = tone === 'dark' ? 'rgba(255,255,255,0.82)' : '#594a42';
+  return (
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '0.45rem', ...style }}>
+      {KITCHEN_FACTS.map(f => (
+        <li key={f.text} style={{ display: 'flex', gap: '0.55rem', alignItems: 'baseline', color, fontSize: '0.85rem', lineHeight: 1.6 }}>
+          <span aria-hidden style={{ flexShrink: 0 }}>{f.emoji}</span>
+          <span>{f.text}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -32,8 +47,8 @@ interface TreatInfoProps {
 /** Ingredients + allergens for one treat. Used by the box accordion and the Menu de Eventos cards. */
 export default function TreatInfo({ ingredients, contains, may_contain, showEmptyNote = true }: TreatInfoProps) {
   const ing = ingredients || [];
-  const con = contains || [];
-  const may = may_contain || [];
+  const con = normalizeAllergens(contains);
+  const may = normalizeAllergens(may_contain);
 
   return (
     <div>
@@ -66,7 +81,7 @@ export default function TreatInfo({ ingredients, contains, may_contain, showEmpt
           )}
         </div>
       ) : (
-        showEmptyNote && <p style={{ color: '#7a6a61', fontSize: '0.85rem' }}>🌱 Nenhum dos principais alérgenos declarados neste doce.</p>
+        showEmptyNote && <p style={{ color: '#7a6a61', fontSize: '0.85rem' }}>🌱 Não leva {ALLERGEN_LIST_NEM}.</p>
       )}
     </div>
   );

@@ -7,6 +7,7 @@ import { SITE_URL, greeting, renderEmail } from '@/lib/email/layout';
 import { EMAIL_TOPICS, MARKETING_TOPICS, TAG_LABELS, ContactTag, canReceive, topicById } from '@/lib/emailTopics';
 import DietTargeting, { DietTargetingValue, EMPTY_TARGETING } from './DietTargeting';
 import { matchDiet } from '@/lib/dietary';
+import { normalizeAllergens } from '@/lib/allergens';
 import { brandConfirm } from '@/lib/brandDialog';
 
 interface SendRow {
@@ -142,7 +143,7 @@ export default function AdminEmailsPage() {
   const targeted = useMemo(() => {
     let list = audience;
     if (diet.tags.length) list = list.filter(c => diet.tags.some(t => (c.diet_tags || []).includes(t)));
-    if (diet.avoiding.length) list = list.filter(c => diet.avoiding.some(a => (c.allergens_avoid || []).includes(a)));
+    if (diet.avoiding.length) list = list.filter(c => diet.avoiding.some(a => normalizeAllergens(c.allergens_avoid).includes(a)));
     if (diet.skipConflicts && diet.contains.length) {
       list = list.filter(c => !matchDiet(c.allergens_avoid, diet.contains, diet.mayContain).conflicts.length);
     }

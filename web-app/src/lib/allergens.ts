@@ -1,70 +1,63 @@
 /**
- * Allergens a treat can declare. Built from:
- *  - ANVISA RDC 26/2015 (Brazil): wheat/rye/barley/oats and hybrids, crustaceans,
- *    eggs, fish, peanut, soy, milk, and the tree nuts (almond, hazelnut, cashew,
- *    Brazil nut, macadamia, walnut, pecan, pistachio, pine nut), plus natural latex.
- *    Cross-contact is declared as "Alérgicos: pode conter …".
- *  - Lei 10.674/2003: gluten must always be declared ("contém" / "não contém").
- *  - EU Regulation 1169/2011, Annex II — the extra items it names that RDC 26 does
- *    not: sesame, celery, mustard, lupin, molluscs, sulphites (> 10 mg/kg).
- *    Sesame matters here: our treats often use sesame seeds.
+ * The allergens a treat can declare, scoped to OUR kitchen.
  *
- * Coconut is not a legally required allergen, but plenty of people ask about it.
+ * Everything we make is plant-based and made without gluten, so the long legal
+ * lists (ANVISA RDC 26/2015, EU 1169/2011) are mostly things we never touch:
+ * milk, eggs, fish, crustaceans, molluscs, mustard, celery, lupin, sulphites…
+ * Those aren't ticked per treat; they are covered once, for the whole kitchen,
+ * by KITCHEN_FACTS below. What's left is what a plant-based whole-food kitchen
+ * really handles.
+ *
+ * Tree nuts are ONE chip on purpose: which nut it is shows in the ingredients,
+ * and in a kitchen that works with nuts every day, anyone allergic to one
+ * should be warned about all of them.
+ *
+ * Old ids (the nine separate nuts, gluten, milk…) may still be stored on older
+ * rows; normalizeAllergens() translates them, and migration 25 rewrites them.
  */
-
-export type AllergenGroup = 'gluten' | 'nuts' | 'common' | 'other';
 
 export interface Allergen {
   id: string;
   label: string;
   emoji: string;
-  group: AllergenGroup;
   hint?: string;
 }
 
-export const ALLERGEN_GROUPS: { id: AllergenGroup; label: string }[] = [
-  { id: 'gluten', label: 'Glúten e cereais' },
-  { id: 'nuts', label: 'Castanhas e oleaginosas' },
-  { id: 'common', label: 'Mais comuns' },
-  { id: 'other', label: 'Menos comuns' },
-];
-
 export const ALLERGENS: Allergen[] = [
-  // Gluten and cereals
-  { id: 'gluten', label: 'Glúten', emoji: '🌾', group: 'gluten', hint: 'trigo, centeio, cevada e híbridos — inclui contaminação cruzada' },
-  { id: 'aveia', label: 'Aveia', emoji: '🥣', group: 'gluten', hint: 'costuma ter traços de glúten' },
-
-  // Tree nuts and seeds
-  { id: 'amendoim', label: 'Amendoim', emoji: '🥜', group: 'nuts', hint: 'leguminosa, mas declarado junto das castanhas' },
-  { id: 'castanha-caju', label: 'Castanha-de-caju', emoji: '🌰', group: 'nuts' },
-  { id: 'castanha-brasil', label: 'Castanha-do-Brasil (Pará)', emoji: '🌰', group: 'nuts' },
-  { id: 'amendoa', label: 'Amêndoa', emoji: '🌰', group: 'nuts' },
-  { id: 'avela', label: 'Avelã', emoji: '🌰', group: 'nuts' },
-  { id: 'noz', label: 'Nozes', emoji: '🌰', group: 'nuts' },
-  { id: 'noz-peca', label: 'Noz-pecã', emoji: '🌰', group: 'nuts' },
-  { id: 'pistache', label: 'Pistache', emoji: '🌰', group: 'nuts' },
-  { id: 'macadamia', label: 'Macadâmia', emoji: '🌰', group: 'nuts' },
-  { id: 'pinoli', label: 'Pinoli (pine nuts)', emoji: '🌰', group: 'nuts', hint: 'não é o pinhão' },
-  { id: 'gergelim', label: 'Gergelim', emoji: '⚪', group: 'nuts', hint: 'sementes e tahine' },
-
-  // Most common
-  { id: 'soja', label: 'Soja', emoji: '🫘', group: 'common', hint: 'inclui lecitina de soja' },
-  { id: 'leite', label: 'Leite e derivados', emoji: '🥛', group: 'common', hint: 'inclui lactose' },
-  { id: 'ovos', label: 'Ovos', emoji: '🥚', group: 'common' },
-
-  // Less common
-  { id: 'coco', label: 'Coco', emoji: '🥥', group: 'other', hint: 'não é obrigatório por lei, mas muita gente pergunta' },
-  { id: 'sulfitos', label: 'Sulfitos', emoji: '🍷', group: 'other', hint: 'frutas secas, vinagres' },
-  { id: 'aipo', label: 'Aipo', emoji: '🥬', group: 'other' },
-  { id: 'mostarda', label: 'Mostarda', emoji: '🟡', group: 'other' },
-  { id: 'tremoço', label: 'Tremoço', emoji: '🌼', group: 'other' },
-  { id: 'peixes', label: 'Peixes', emoji: '🐟', group: 'other' },
-  { id: 'crustaceos', label: 'Crustáceos', emoji: '🦐', group: 'other' },
-  { id: 'moluscos', label: 'Moluscos', emoji: '🐚', group: 'other' },
-  { id: 'latex', label: 'Látex natural', emoji: '🧤', group: 'other', hint: 'frutas como banana e abacate têm proteínas parecidas' },
+  { id: 'castanhas', label: 'Castanhas', emoji: '🌰', hint: 'caju, pará, amêndoa, nozes, macadâmia, avelã, pistache… qual delas está nos ingredientes' },
+  { id: 'amendoim', label: 'Amendoim', emoji: '🥜' },
+  { id: 'coco', label: 'Coco', emoji: '🥥', hint: 'polpa, leite, óleo ou açúcar de coco' },
+  { id: 'gergelim', label: 'Gergelim', emoji: '⚪', hint: 'sementes e tahine' },
+  { id: 'soja', label: 'Soja', emoji: '🫘', hint: 'inclui lecitina de soja, comum em chocolate vegano' },
+  { id: 'aveia', label: 'Aveia', emoji: '🥣', hint: 'muitos celíacos evitam também' },
 ];
 
-export const allergenById = (id: string) => ALLERGENS.find(a => a.id === id);
+/** "castanhas, amendoim, coco, gergelim, soja nem aveia": the whole list in one phrase, for "não leva …". */
+export const ALLERGEN_LIST_NEM = ALLERGENS.map(a => a.label.toLowerCase()).join(', ').replace(/, ([^,]+)$/, ' nem $1');
+
+/** The ids we used before the list was trimmed that still mean something now. Anything else old is dropped. */
+const LEGACY_IDS: Record<string, string> = {
+  'castanha-caju': 'castanhas', 'castanha-brasil': 'castanhas', amendoa: 'castanhas', avela: 'castanhas',
+  noz: 'castanhas', 'noz-peca': 'castanhas', pistache: 'castanhas', macadamia: 'castanhas', pinoli: 'castanhas',
+};
+
+/** Stored ids -> current ids: old nut ids become 'castanhas', ids we no longer use are dropped, no repeats. */
+export function normalizeAllergens(ids: string[] | null | undefined): string[] {
+  const known = new Set(ALLERGENS.map(a => a.id));
+  return [...new Set((ids || []).map(id => LEGACY_IDS[id] || id))].filter(id => known.has(id));
+}
+
+/**
+ * True of every treat, so said once instead of ticked on each one. Keep these
+ * in step with the claims on the site (PhilosophyShowcase, /menu, /caixas).
+ */
+export const KITCHEN_FACTS = [
+  { emoji: '🌱', text: '100% vegetal: nenhum doce leva leite, ovos, mel ou qualquer ingrediente de origem animal.' },
+  { emoji: '🌾', text: 'Nenhuma receita leva glúten, mas a cozinha não é certificada sem glúten: pode haver traços. Se você é celíaco, fale com a gente antes.' },
+  { emoji: '🍯', text: 'Sem açúcar refinado: adoçamos com frutas e, em algumas criações, açúcar de coco ou chocolate vegano adoçado com açúcar de coco.' },
+];
+
+export const allergenById = (id: string) => ALLERGENS.find(a => a.id === (LEGACY_IDS[id] || id));
 
 /** One treat in a box. */
 export interface BoxItem {
@@ -120,8 +113,8 @@ export const treatToBoxItem = (t: TreatRow): BoxItem => ({
   description: t.description || '',
   image_url: t.image_url || '',
   ingredients: t.ingredients || [],
-  contains: t.contains || [],
-  may_contain: t.may_contain || [],
+  contains: normalizeAllergens(t.contains),
+  may_contain: normalizeAllergens(t.may_contain),
   treat_id: t.id,
 });
 
@@ -143,8 +136,8 @@ export function summarizeAllergens(items: BoxItem[]) {
   const contains = new Set<string>();
   const may = new Set<string>();
   items.forEach(i => {
-    (i.contains || []).forEach(a => contains.add(a));
-    (i.may_contain || []).forEach(a => may.add(a));
+    normalizeAllergens(i.contains).forEach(a => contains.add(a));
+    normalizeAllergens(i.may_contain).forEach(a => may.add(a));
   });
   contains.forEach(a => may.delete(a));
   const order = (ids: Set<string>) => ALLERGENS.filter(a => ids.has(a.id));

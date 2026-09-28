@@ -10,7 +10,7 @@ import { generatePixData } from '@/utils/pix';
 import { supabase } from '@/lib/supabase';
 import { DELIVERY_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
-import { legacyFlags, tagsFromLegacy } from '@/lib/dietary';
+import { legacyFlags, normalizeDiet, tagsFromLegacy } from '@/lib/dietary';
 import { fetchSchedule, selectableDates, toISODate } from '@/lib/deliverySchedule';
 import { BoxWindowFields, inDeliveryWindow, longDay, saleState } from '@/lib/boxWindow';
 
@@ -113,11 +113,11 @@ export default function CheckoutPage() {
       // an unknown id used to show no delivery fee at all (the server now refuses it outright).
       if (profile.delivery_zone && getZone(profile.delivery_zone)) setZoneId(profile.delivery_zone);
       // An account from before migration 19 only has the five booleans.
-      setDiet({
+      setDiet(normalizeDiet({
         tags: profile.diet_tags?.length ? profile.diet_tags : tagsFromLegacy(profile),
         allergens: profile.allergens_avoid || [],
         notes: profile.diet_notes || '',
-      });
+      }));
     }
   }, [profile, user]);
 

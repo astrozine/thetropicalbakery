@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ALLERGENS, ALLERGEN_GROUPS } from '@/lib/allergens';
+import { ALLERGENS, normalizeAllergens } from '@/lib/allergens';
+import { KitchenFacts } from '@/components/TreatInfo';
 
 /** The bits of a treat the refine menu looks at. */
 export interface RefinableTreat {
@@ -53,8 +54,8 @@ export function matchesRefine(t: RefinableTreat, r: RefineState, opts: { hideUnk
   }
 
   const ing = (t.ingredients || []).map(norm);
-  const con = t.contains || [];
-  const may = t.may_contain || [];
+  const con = normalizeAllergens(t.contains);
+  const may = normalizeAllergens(t.may_contain);
 
   if (r.mode === 'free') {
     // A treat with nothing filled in is "unknown", not "free". Customers must never see it as safe.
@@ -150,7 +151,7 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
     const allergen = new Map<string, number>();
     const ingredient = new Map<string, { label: string; n: number }>();
     treats.forEach(t => {
-      new Set([...(t.contains || []), ...(t.may_contain || [])]).forEach(a => allergen.set(a, (allergen.get(a) || 0) + 1));
+      new Set(normalizeAllergens([...(t.contains || []), ...(t.may_contain || [])])).forEach(a => allergen.set(a, (allergen.get(a) || 0) + 1));
       const seen = new Set<string>();
       (t.ingredients || []).forEach(i => {
         const k = norm(i);
@@ -260,18 +261,18 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
               </div>,
             )}
 
-            {[...ALLERGEN_GROUPS].sort((a, b) => collator.compare(a.label, b.label)).map(g => {
-              const items = ALLERGENS.filter(a => a.group === g.id).sort((a, b) => collator.compare(a.label, b.label));
-              return folder(g.id, g.label, items.filter(a => value.allergens.includes(a.id)).length,
+            {folder('allergens', isPublic ? 'Alergias' : 'Alérgenos', value.allergens.filter(id => ALLERGENS.some(a => a.id === id)).length,
+              <div style={{ display: 'grid', gap: '0.85rem' }}>
                 <div style={chipRow}>
-                  {items.map(a => (
+                  {ALLERGENS.map(a => (
                     <button key={a.id} type="button" title={a.hint} onClick={() => toggle('allergens', a.id)} style={chip(value.allergens.includes(a.id), 'allergen')}>
                       {a.emoji} {a.label} <span style={countBadge}>{counts.allergen.get(a.id) || 0}</span>
                     </button>
                   ))}
-                </div>,
-              );
-            })}
+                </div>
+                {isPublic && <KitchenFacts style={{ paddingTop: '0.75rem', borderTop: '1px dashed #e8e1d7' }} />}
+              </div>,
+            )}
 
             {folder('ingredients', 'Ingredientes', value.ingredients.length,
               ingredientList.length === 0 ? (

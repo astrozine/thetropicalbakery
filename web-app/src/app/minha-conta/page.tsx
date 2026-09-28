@@ -12,7 +12,7 @@ import SunbakedLetters from '@/components/SunbakedLetters';
 import { SUBSCRIPTION_ZONES, formatBRL, isItamambuca } from '@/lib/deliveryZones';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
 import AccountSection from '@/components/AccountSection';
-import { allergensFrom, dietTagsFrom, legacyFlags, tagsFromLegacy } from '@/lib/dietary';
+import { allergensFrom, dietTagsFrom, legacyFlags, normalizeDiet, tagsFromLegacy } from '@/lib/dietary';
 import { supabase } from '@/lib/supabase';
 
 const labelStyle: React.CSSProperties = {
@@ -106,11 +106,11 @@ export default function MyAccountPage() {
         : {}),
     };
     // An account from before migration 19 only has the five booleans.
-    const d: DietaryValue = {
+    const d: DietaryValue = normalizeDiet({
       tags: profile.diet_tags?.length ? profile.diet_tags : tagsFromLegacy(profile),
       allergens: profile.allergens_avoid || [],
       notes: profile.diet_notes || '',
-    };
+    });
     const t = {
       allergies: profile.allergies || '',
       favorite_flavors: profile.favorite_flavors || '',

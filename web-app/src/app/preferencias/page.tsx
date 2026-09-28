@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { MARKETING_TOPICS, TAG_LABELS, ContactTag } from '@/lib/emailTopics';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
+import { normalizeDiet } from '@/lib/dietary';
 
 interface Prefs {
   email: string;
@@ -78,11 +79,11 @@ function EmailPreferences() {
       } else {
         setPrefs(row);
       }
-      setDiet({
+      setDiet(normalizeDiet({
         tags: row.diet_tags || [],
         allergens: row.allergens_avoid || [],
         notes: row.diet_notes || '',
-      });
+      }));
       setLoading(false);
     };
     load();

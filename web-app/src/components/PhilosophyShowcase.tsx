@@ -8,8 +8,8 @@ import { DELIVERY_ZONES, formatBRL } from '@/lib/deliveryZones';
 import { BOX_SIZES, SINGLE_PIECE_FROM } from '@/lib/boxSizes';
 
 const FOOTNOTES = [
-  '* Algumas criações podem conter açúcar de coco ou pequenos toques de chocolate que contêm pequenas quantidades de açúcar refinado.',
-  '** Não são livres de possíveis contaminações cruzadas com glúten.',
+  '* O mais perto de açúcar que usamos é o açúcar de coco, às vezes num chocolate vegano (inclusive o branco) adoçado com ele. Nada de açúcar refinado.',
+  '** Nenhuma receita leva glúten, mas a cozinha não é certificada: pode haver traços. Celíacos, falem com a gente antes.',
 ];
 
 /** The bird's-eye strip: four things to know before opening anything. */

@@ -97,6 +97,13 @@ that only add columns or policies to existing tables need nothing extra.
 
 - Three layers, defined in `src/lib/dietary.ts` (`DIET_TAGS`) and `src/lib/allergens.ts` (`ALLERGENS`):
   how someone eats ('jeito'), what they avoid for their health ('saude'), and what makes them ill.
+- **The allergen list is scoped to our kitchen: 6 ids** (castanhas, amendoim, coco, gergelim, soja, aveia).
+  Vegan, no gluten in any recipe (traces possible) and no refined sugar are true of every treat, so they
+  live once in `KITCHEN_FACTS` (shown by `<KitchenFacts />`), never as per-treat checkboxes. All tree nuts
+  are one id on purpose; which nut it is goes in the ingredients. Don't grow the list back toward the
+  legal 14/23: an unusual allergy goes in the free-text notes. Old ids are translated by
+  `normalizeAllergens()` / `normalizeDiet()` (a customer's old 'gluten' allergy becomes the 'sem-gluten'
+  tag); read stored ids through them. Data rewritten by `migration_25_trim_allergens.sql`.
 - **The allergy layer reuses the treat ids.** A customer's `allergens_avoid` holds the same ids each
   treat declares in `contains` / `may_contain`, so `matchDiet()` compares them directly. Never invent a
   second list of allergen names — add to `ALLERGENS` and both sides move together.

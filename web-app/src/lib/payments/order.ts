@@ -3,7 +3,7 @@ import { supabaseAdmin } from './server';
 import { DELIVERY_ZONES, getZone } from '@/lib/deliveryZones';
 import { fetchSchedule, openDatesBetween, toISODate, parseISODate } from '@/lib/deliverySchedule';
 import { BoxWindowFields, inDeliveryWindow, saleState } from '@/lib/boxWindow';
-import { dietSummary } from '@/lib/dietary';
+import { dietSummary, normalizeDiet } from '@/lib/dietary';
 import { fetchBoxSizePrices, isTreatCount, sizeText, toTreatCount, type TreatCount } from '@/lib/boxSizes';
 
 /**
@@ -190,8 +190,8 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
   const total = round2(subtotal + fee);
 
   // ---- diet and partner code
-  const dietTags = list(input.diet?.tags, 20);
-  const dietAllergens = list(input.diet?.allergens, 30);
+  // In today's vocabulary, whatever an older page or saved profile sent.
+  const { tags: dietTags, allergens: dietAllergens } = normalizeDiet({ tags: list(input.diet?.tags, 20), allergens: list(input.diet?.allergens, 30) });
   const dietNotes = text(input.diet?.notes, 500);
   const dietaryNotes = dietSummary(dietTags, dietAllergens, dietNotes) || null;
   const code = text(input.affiliateCode, 30).toUpperCase();

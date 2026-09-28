@@ -7,7 +7,8 @@
  *                                 (diabetes, pressão alta…). The "why" matters:
  *                                 it's what lets an e-mail speak to the person
  *                                 instead of to a list.
- *   3. ALLERGENS (src/lib/allergens.ts) — what actually makes them ill.
+ *   3. ALLERGENS (src/lib/allergens.ts) — what actually makes them ill, limited
+ *      to what our plant-based kitchen really handles.
  *
  * Layer 3 deliberately reuses the SAME ids the treats declare in `contains` /
  * `may_contain`. That is what makes the matching automatic: we can tell someone
@@ -18,7 +19,7 @@
  * so nothing that already reads them breaks.
  */
 
-import { ALLERGENS, Allergen, allergenById } from './allergens';
+import { ALLERGENS, Allergen, allergenById, normalizeAllergens } from './allergens';
 import type { DietaryKey } from './subscriptions';
 
 export type DietGroupId = 'jeito' | 'saude';
@@ -42,25 +43,19 @@ export const DIET_GROUPS: { id: DietGroupId; label: string; hint: string }[] = [
 ];
 
 export const DIET_TAGS: DietTag[] = [
-  // ---- how they eat
+  // ---- how they eat (everything we make is already vegan and plant-based; these tell us who THEY are)
   { id: 'vegano', label: 'Vegano', emoji: '🌱', group: 'jeito', legacy: 'is_vegan', quick: true, hint: 'nada de origem animal' },
-  { id: 'vegetariano', label: 'Vegetariano', emoji: '🥗', group: 'jeito' },
   { id: 'plant-based', label: 'Plant-based integral', emoji: '🌿', group: 'jeito', hint: 'comida de verdade, sem ultraprocessados' },
-  { id: 'sos-free', label: 'SOS-free', emoji: '✨', group: 'jeito', hint: 'sem sal, óleo nem açúcar — o nosso jeito de fazer tudo' },
-  { id: 'crudivoro', label: 'Crudívoro / raw', emoji: '🥥', group: 'jeito', hint: 'nada assado acima de 42°C' },
-  { id: 'low-carb', label: 'Low carb / keto', emoji: '🥑', group: 'jeito' },
+  { id: 'sos-free', label: 'SOS-free', emoji: '✨', group: 'jeito', hint: 'sem sal, óleo nem açúcar refinado, o nosso jeito de fazer tudo' },
 
-  // ---- health
+  // ---- health: the four we cook for, and the three reasons people most often give for them
   { id: 'sem-gluten', label: 'Sem Glúten', emoji: '🌾', group: 'saude', legacy: 'is_gluten_free', quick: true },
   { id: 'sem-acucar', label: 'Sem Açúcar', emoji: '🍬', group: 'saude', legacy: 'is_sugar_free', quick: true },
   { id: 'sem-sal', label: 'Sem Sal', emoji: '🧂', group: 'saude', legacy: 'is_salt_free', quick: true },
   { id: 'sem-oleo', label: 'Sem Óleo', emoji: '💧', group: 'saude', legacy: 'is_oil_free', quick: true },
-  { id: 'sem-lactose', label: 'Sem lactose', emoji: '🥛', group: 'saude', hint: 'tudo aqui já é sem leite, mas é bom a gente saber' },
-  { id: 'diabetes', label: 'Diabetes', emoji: '🩸', group: 'saude', hint: 'controle de glicemia — evitamos até as frutas mais doces' },
+  { id: 'diabetes', label: 'Diabetes', emoji: '🩸', group: 'saude', hint: 'controle de glicemia' },
   { id: 'pressao-alta', label: 'Pressão alta', emoji: '💓', group: 'saude', hint: 'pouco ou nenhum sódio' },
   { id: 'colesterol', label: 'Colesterol / coração', emoji: '🫀', group: 'saude', hint: 'sem óleo e sem gordura adicionada' },
-  { id: 'fodmap', label: 'Intestino sensível (FODMAP)', emoji: '🌀', group: 'saude' },
-  { id: 'gestante', label: 'Gestante ou amamentando', emoji: '🤰', group: 'saude' },
 ];
 
 export const dietTagById = (id: string) => DIET_TAGS.find(t => t.id === id);
@@ -70,8 +65,21 @@ export const QUICK_TAGS = DIET_TAGS.filter(t => t.quick);
 export const dietTagsFrom = (ids: string[] | null | undefined) =>
   DIET_TAGS.filter(t => (ids || []).includes(t.id));
 
-export const allergensFrom = (ids: string[] | null | undefined) =>
-  ALLERGENS.filter(a => (ids || []).includes(a.id));
+export const allergensFrom = (ids: string[] | null | undefined) => {
+  const current = normalizeAllergens(ids);
+  return ALLERGENS.filter(a => current.includes(a.id));
+};
+
+/**
+ * Brings a stored diet up to today's vocabulary. Someone who once marked gluten
+ * as an allergy keeps that as the 'Sem Glúten' tag (gluten is now a kitchen-wide
+ * fact, not a per-treat allergen); old nut ids become 'castanhas'.
+ */
+export function normalizeDiet<T extends { tags: string[]; allergens: string[] }>(value: T): T {
+  const hadGluten = (value.allergens || []).includes('gluten');
+  const tags = hadGluten && !value.tags.includes('sem-gluten') ? [...value.tags, 'sem-gluten'] : value.tags;
+  return { ...value, tags, allergens: normalizeAllergens(value.allergens) };
+}
 
 /** The five old booleans, derived from the tag list — so both stay true at once. */
 export function legacyFlags(tagIds: string[]): Record<DietaryKey, boolean> {
@@ -123,9 +131,10 @@ export function matchDiet(
   contains: string[] | null | undefined,
   mayContain: string[] | null | undefined,
 ): DietMatch {
-  const avoidSet = new Set(avoid || []);
-  const conflicts = (contains || []).filter(id => avoidSet.has(id)).map(allergenById).filter(Boolean) as Allergen[];
-  const traces = (mayContain || []).filter(id => avoidSet.has(id) && !(contains || []).includes(id))
+  const avoidSet = new Set(normalizeAllergens(avoid));
+  const has = normalizeAllergens(contains);
+  const conflicts = has.filter(id => avoidSet.has(id)).map(allergenById).filter(Boolean) as Allergen[];
+  const traces = normalizeAllergens(mayContain).filter(id => avoidSet.has(id) && !has.includes(id))
     .map(allergenById).filter(Boolean) as Allergen[];
   return {
     status: conflicts.length ? 'unsafe' : traces.length ? 'may' : 'safe',

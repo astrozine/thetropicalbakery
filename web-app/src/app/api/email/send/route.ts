@@ -4,6 +4,7 @@ import { campaignById } from '@/lib/email/campaigns';
 import { FROM_ADDRESS, SITE_URL, greeting, plainTextFallback, renderEmail } from '@/lib/email/layout';
 import { canReceive, topicById } from '@/lib/emailTopics';
 import { dietLine, matchDiet } from '@/lib/dietary';
+import { normalizeAllergens } from '@/lib/allergens';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -120,7 +121,7 @@ export async function POST(req: NextRequest) {
     eligible = eligible.filter(c => diet.tags!.some(t => (c.diet_tags || []).includes(t)));
   }
   if (diet?.avoiding?.length) {
-    eligible = eligible.filter(c => diet.avoiding!.some(a => (c.allergens_avoid || []).includes(a)));
+    eligible = eligible.filter(c => diet.avoiding!.some(a => normalizeAllergens(c.allergens_avoid).includes(a)));
   }
   if (diet?.skipConflicts && boxContains.length) {
     eligible = eligible.filter(c => !matchDiet(c.allergens_avoid, boxContains, boxMayContain).conflicts.length);
@@ -169,7 +170,7 @@ export async function POST(req: NextRequest) {
     // contains. Everyone else sees exactly the message as previewed.
     const match = matchDiet(person.allergens_avoid, boxContains, boxMayContain);
     const personal = (boxContains.length || boxMayContain.length)
-      ? dietBlock(dietLine(match, (person.allergens_avoid || []).length), match.status !== 'safe')
+      ? dietBlock(dietLine(match, normalizeAllergens(person.allergens_avoid).length), match.status !== 'safe')
       : '';
 
     const layout = {

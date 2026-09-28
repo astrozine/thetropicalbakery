@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import TreatInfo, { hasTreatInfo } from '@/components/TreatInfo';
-import { allergenById } from '@/lib/allergens';
+import { allergenById, normalizeAllergens } from '@/lib/allergens';
 import Image from 'next/image';
 import { canOptimize } from '@/lib/thumbs';
 
@@ -106,9 +106,9 @@ export default function MenuCard({ item, picked = false, onTogglePick }: MenuCar
             </p>
           )}
 
-          {!isMobile && (item.contains?.length || 0) > 0 && (
+          {!isMobile && normalizeAllergens(item.contains).length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.6rem' }} aria-label="Alérgenos">
-              {item.contains!.map(id => {
+              {normalizeAllergens(item.contains).map(id => {
                 const a = allergenById(id);
                 return a ? <span key={id} title={`Contém ${a.label}`} style={{ background: '#fdecea', color: '#b03a2e', border: '1px solid #f5b7b1', borderRadius: '20px', padding: '0.1rem 0.5rem', fontSize: '0.75rem', fontWeight: 600 }}>{a.emoji} {a.label}</span> : null;
               })}

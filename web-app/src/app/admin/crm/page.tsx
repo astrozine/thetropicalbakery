@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { DIET_TAGS, allergensFrom, dietTagsFrom, tagsFromLegacy } from '@/lib/dietary';
-import { ALLERGENS } from '@/lib/allergens';
+import { ALLERGENS, normalizeAllergens } from '@/lib/allergens';
 
 interface CrmRow {
   id: string;
@@ -89,7 +89,7 @@ const dietOf = (r: {
   diet_tags?: string[] | null; allergens_avoid?: string[] | null; diet_notes?: string | null;
 }) => {
   const ids = r.diet_tags?.length ? r.diet_tags : tagsFromLegacy(r);
-  const allergenIds = r.allergens_avoid || [];
+  const allergenIds = normalizeAllergens(r.allergens_avoid);
   return {
     dietIds: ids,
     allergenIds,
@@ -353,7 +353,8 @@ export default function CRMAdmin() {
                 </div>
 
                 <div style={{ flex: '1 1 220px', background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '10px', padding: '1rem 1.1rem' }}>
-                  <h4 style={{ fontSize: '0.75rem', color: '#b9870e', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.6rem', marginTop: 0 }}>Restrições Alimentares</h4>
+                  <h4 style={{ fontSize: '0.75rem', color: '#b9870e', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.6rem', marginTop: 0 }}>Restrições Alimentares</h4>
+
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     {c.dietary.length > 0 ? c.dietary.map(tag => (
                       <span key={tag} style={{ background: 'white', color: '#8a6d1f', border: '1px solid #e8e1d7', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
@@ -365,7 +366,8 @@ export default function CRMAdmin() {
                   </div>
                   {c.allergies.length > 0 && (
                     <div style={{ background: '#fdecea', border: '1px solid #f5c6cb', borderRadius: '8px', padding: '0.6rem 0.8rem', marginTop: '0.75rem' }}>
-                      <p style={{ fontSize: '0.75rem', color: '#c0392b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.4rem' }}>⚠️ Evita</p>
+                      <p style={{ fontSize: '0.75rem', color: '#c0392b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', margin: '0 0 0.4rem' }}>⚠️ Evita</p>
+
                       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                         {c.allergies.map(a => (
                           <span key={a} style={{ background: 'white', color: '#a03027', border: '1px solid #f5c6cb', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
@@ -376,7 +378,8 @@ export default function CRMAdmin() {
                     </div>
                   )}
                   {c.dietNotes && (
-                    <p style={{ fontSize: '0.83rem', color: '#7f8c8d', lineHeight: 1.6, marginTop: '0.6rem', fontStyle: 'italic' }}>“{c.dietNotes}”</p>
+                    <p style={{ fontSize: '0.83rem', color: '#7f8c8d', lineHeight: 1.6, marginTop: '0.6rem', fontStyle: 'italic' }}>“{c.dietNotes}”</p>
+
                   )}
                 </div>
 

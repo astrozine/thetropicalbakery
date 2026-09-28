@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BoxItem, summarizeAllergens } from '@/lib/allergens';
-import TreatInfo, { AllergenChips } from '@/components/TreatInfo';
+import { ALLERGEN_LIST_NEM, BoxItem, normalizeAllergens, summarizeAllergens } from '@/lib/allergens';
+import TreatInfo, { AllergenChips, KitchenFacts } from '@/components/TreatInfo';
 import { optimizedSrc } from '@/lib/thumbs';
 
 const chip = (tone: 'contains' | 'may'): React.CSSProperties => ({
@@ -58,8 +58,8 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
                     <span style={{ display: 'block', fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700 }}>Doce {idx + 1}</span>
                     <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.05rem, 2.8vw, 1.5rem)', color: '#3c2a21', lineHeight: 1.2 }}>{item.name}</span>
                   </span>
-                  {item.contains?.length > 0 && !isOpen && (
-                    <span style={{ ...chip('contains'), flexShrink: 0 }} className="box-allergen-badge">⚠️ {item.contains.length}</span>
+                  {normalizeAllergens(item.contains).length > 0 && !isOpen && (
+                    <span style={{ ...chip('contains'), flexShrink: 0 }} className="box-allergen-badge">⚠️ {normalizeAllergens(item.contains).length}</span>
                   )}
                   <span aria-hidden style={{ flexShrink: 0, width: '36px', height: '36px', borderRadius: '50%', background: isOpen ? '#d4af37' : '#f5efe2', color: isOpen ? '#fff' : '#3c2a21', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', transform: isOpen ? 'rotate(45deg)' : 'none', transition: 'transform 0.25s' }}>+</span>
                 </button>
@@ -92,7 +92,7 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
               <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#b03a2e', fontWeight: 700, marginBottom: '0.5rem' }}>⚠️ Contém</p>
               {summary.contains.length > 0
                 ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}><AllergenChips ids={summary.contains.map(a => a.id)} tone="contains" /></div>
-                : <p style={{ color: '#7a6a61', fontSize: '0.9rem' }}>Nenhum dos principais alérgenos declarados.</p>}
+                : <p style={{ color: '#7a6a61', fontSize: '0.9rem' }}>Nenhum doce leva {ALLERGEN_LIST_NEM}.</p>}
             </div>
             {summary.mayContain.length > 0 && (
               <div>
@@ -101,7 +101,8 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
               </div>
             )}
           </div>
-          <p style={{ color: '#7a6a61', fontSize: '0.8rem', lineHeight: 1.7, marginTop: '1.1rem' }}>
+          <KitchenFacts style={{ marginTop: '1.25rem', paddingTop: '1.1rem', borderTop: '1px dashed #e0d6c8' }} />
+          <p style={{ color: '#7a6a61', fontSize: '0.8rem', lineHeight: 1.7, marginTop: '0.9rem' }}>
             Tudo é feito na mesma cozinha, então traços de outros ingredientes podem existir mesmo quando não estão na receita.
             Se você tem alergia grave, fale com a gente no WhatsApp antes de pedir.
           </p>

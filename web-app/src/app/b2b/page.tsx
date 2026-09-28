@@ -63,7 +63,7 @@ const PARTNERSHIPS = [
     image: '/assets/realistic_bakery.jpg',
     treat: '/b2b-hero/treat-4.jpg',
     emoji: '🥐',
-    tags: ['Criação Personalizada', 'Pronto para Vender', 'Zero Contaminação'],
+    tags: ['Criação Personalizada', 'Pronto para Vender', 'Nada Entra na Sua Cozinha'],
   },
   {
     slug: '/b2b/travel-managers',

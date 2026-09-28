@@ -10,6 +10,7 @@ import SquiggleArrows from '@/components/SquiggleArrows';
 import EventOrderSheet, { EventQuoteForm } from '@/components/EventOrder';
 import { useCart } from '@/context/CartContext';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
+import { ALLERGEN_LIST_NEM } from '@/lib/allergens';
 
 interface Treat {
   id: string;
@@ -187,8 +188,9 @@ export default function MenuPage() {
         )}
 
         <p style={{ maxWidth: '760px', margin: '3rem auto 0', textAlign: 'center', color: '#7a6a61', fontSize: '0.85rem', lineHeight: 1.75 }}>
-          Alérgenos e ingredientes são informados por doce. Tudo é feito na mesma cozinha, então traços de outros ingredientes podem existir
-          mesmo quando não estão na receita. Se algum convidado tem alergia grave, fale com a gente no WhatsApp antes de fechar o pedido.
+          Todos os doces são 100% vegetais, feitos sem glúten e sem açúcar refinado. O que muda de um doce para outro ({ALLERGEN_LIST_NEM.replace(' nem ', ' e ')})
+          está em cada um. Tudo é feito na mesma cozinha, então pode haver traços, inclusive de glúten. Se algum convidado tem alergia grave ou é celíaco,
+          fale com a gente no WhatsApp antes de fechar o pedido.
         </p>
       </section>
 

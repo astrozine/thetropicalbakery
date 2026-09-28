@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ALLERGENS, ALLERGEN_GROUPS, TREAT_EMOJIS } from '@/lib/allergens';
+import { ALLERGENS, TREAT_EMOJIS, normalizeAllergens } from '@/lib/allergens';
 
 /** Shared admin styles for the treat-detail editors (box treats and Menu de Eventos treats). */
 export const fieldStyle: React.CSSProperties = { width: '100%', padding: '0.7rem', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.95rem' };
@@ -34,7 +34,7 @@ export function Fold({ title, summary, chips, defaultOpen = false, children }: {
   );
 }
 
-/** Chip picker for one list of allergens ("contém" or "pode conter"). Each group folds shut and shows what is picked. */
+/** Chip picker for one list of allergens ("contém" or "pode conter"). The list is short enough to show in full. */
 export function AllergenPicker({ title, hint, tone, selected, onToggle }: {
   title: string; hint: string; tone: 'contains' | 'may'; selected: string[]; onToggle: (id: string) => void;
 }) {
@@ -45,44 +45,23 @@ export function AllergenPicker({ title, hint, tone, selected, onToggle }: {
     <div>
       <p style={{ ...labelStyle, marginBottom: '0.15rem' }}>{title}</p>
       <p style={{ fontSize: '0.78rem', color: '#7f8c8d', marginBottom: '0.6rem', lineHeight: 1.5 }}>{hint}</p>
-      <div style={{ display: 'grid', gap: '0.45rem' }}>
-        {ALLERGEN_GROUPS.map(g => {
-          const inGroup = ALLERGENS.filter(a => a.group === g.id);
-          const picked = inGroup.filter(a => selected.includes(a.id));
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+        {ALLERGENS.map(a => {
+          const active = selected.includes(a.id);
           return (
-            <Fold
-              key={g.id}
-              title={g.label}
-              summary={picked.length === 0 ? <span style={{ fontSize: '0.75rem', color: '#b2bec3' }}>nenhum</span> : undefined}
-              chips={picked.length > 0
-                ? picked.map(a => (
-                    <span key={a.id} style={{ padding: '0.1rem 0.55rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, background: on.bg, border: `1px solid ${on.border}`, color: on.color, whiteSpace: 'nowrap' }}>
-                      {a.emoji} {a.label}
-                    </span>
-                  ))
-                : undefined}
+            <button
+              key={a.id}
+              type="button"
+              title={a.hint}
+              onClick={() => onToggle(a.id)}
+              style={{
+                padding: '0.35rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', cursor: 'pointer',
+                border: `1px solid ${active ? on.border : '#dfe4ea'}`, background: active ? on.bg : '#fff',
+                color: active ? on.color : '#7f8c8d', fontWeight: active ? 700 : 500,
+              }}
             >
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                {inGroup.map(a => {
-                  const active = selected.includes(a.id);
-                  return (
-                    <button
-                      key={a.id}
-                      type="button"
-                      title={a.hint}
-                      onClick={() => onToggle(a.id)}
-                      style={{
-                        padding: '0.35rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', cursor: 'pointer',
-                        border: `1px solid ${active ? on.border : '#dfe4ea'}`, background: active ? on.bg : '#fff',
-                        color: active ? on.color : '#7f8c8d', fontWeight: active ? 700 : 500,
-                      }}
-                    >
-                      {a.emoji} {a.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </Fold>
+              {active ? '✓ ' : ''}{a.emoji} {a.label}
+            </button>
           );
         })}
       </div>
@@ -91,9 +70,12 @@ export function AllergenPicker({ title, hint, tone, selected, onToggle }: {
 }
 
 /** Both allergen lists together, with the exact wording used everywhere. */
-export function AllergenFields({ contains, mayContain, onChange }: {
+export function AllergenFields({ contains: storedContains, mayContain: storedMay, onChange }: {
   contains: string[]; mayContain: string[]; onChange: (next: { contains: string[]; may_contain: string[] }) => void;
 }) {
+  // A treat saved with the old long list shows (and saves) in today's ids.
+  const contains = normalizeAllergens(storedContains);
+  const mayContain = normalizeAllergens(storedMay);
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter(x => x !== id) : [...list, id]);
   return (
     <div style={{ background: '#fafbfc', border: '1px solid #eef1f4', borderRadius: '10px', padding: '1rem', display: 'grid', gap: '1.25rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 270px), 1fr))', alignItems: 'start' }}>
@@ -105,8 +87,12 @@ export function AllergenFields({ contains, mayContain, onChange }: {
       <AllergenPicker
         title="🔸 Pode conter (contaminação cruzada)" tone="may" selected={mayContain}
         onToggle={id => onChange({ contains, may_contain: toggle(mayContain, id) })}
-        hint="Não vai na receita, mas é manipulado na mesma cozinha ou nos mesmos utensílios (ex.: traços de glúten, castanhas, gergelim)."
+        hint="Não vai na receita, mas é manipulado na mesma cozinha ou nos mesmos utensílios (ex.: traços de castanhas ou gergelim)."
       />
+      <p style={{ gridColumn: '1 / -1', fontSize: '0.78rem', color: '#7f8c8d', lineHeight: 1.6, margin: 0 }}>
+        Vegano, sem glúten na receita (com possíveis traços) e sem açúcar refinado já vale para todos os doces e aparece para o cliente
+        automaticamente. Aqui só o que muda de um doce para outro. Qual castanha é, fica nos ingredientes.
+      </p>
     </div>
   );
 }
