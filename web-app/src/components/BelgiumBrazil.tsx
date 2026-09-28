@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 /*
  * "Belgian skill, Brazilian nature": the luxury story, told in small doses around the site.
@@ -94,6 +95,7 @@ export function OriginStory() {
             </div>
           ))}
         </div>
+        <Link href="/dolly" className="bb-story__more">Conheça a Dolly &rarr;</Link>
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
@@ -112,6 +114,7 @@ export function OriginStory() {
         .bb-story__pillar strong { display: block; font-family: var(--font-heading); font-size: 1.05rem; color: #f4d675; margin: 0.8rem 0 0.45rem; }
         .bb-story__pillar p { color: rgba(253,250,243,0.78); font-size: 0.93rem; line-height: 1.7; margin: 0; }
         .bb-story__icon { display: inline-flex; height: 24px; align-items: center; }
+        .bb-story__more { display: inline-block; margin-top: 2.25rem; min-height: 44px; padding: 0.85rem 1.75rem; border: 1px solid rgba(212,175,55,0.6); border-radius: 999px; color: #f4d675; text-decoration: none; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
       ` }} />
     </section>
   );

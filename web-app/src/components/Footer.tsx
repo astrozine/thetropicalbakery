@@ -56,7 +56,7 @@ export default function Footer() {
             <li><Link href="/assinatura" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>Assinatura Semanal</Link></li>
             <li><Link href="/" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Fazer Pedido</Link></li>
             <li><Link href="/cursos" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Cursos com Dolly</Link></li>
-            <li><Link href="/#about" style={{ color: '#e8e1d7', textDecoration: 'none' }}>Nossa História</Link></li>
+            <li><Link href="/dolly" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Sobre a Dolly</Link></li>
             <li><Link href="/trabalhe-conosco" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Trabalhe Conosco</Link></li>
           </ul>
         </div>
