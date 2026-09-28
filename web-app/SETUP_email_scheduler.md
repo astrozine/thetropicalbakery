@@ -42,6 +42,13 @@ decision, on a day you are watching, not something a migration did quietly.
 
 ## Step 2 — Make up a password for the robot
 
+> **Already done for Andrew on 2026-09-28.** `EMAIL_CRON_SECRET` is set in Vercel
+> Production and the site has been redeployed, so the address answers "Não
+> autorizado" to anyone without it. The password itself is in
+> `SUPABASE_passo3_cron.local.sql` in the project root (gitignored), already
+> pasted into the step-3 SQL. The rest of this section is only for doing it again
+> or rotating the password.
+
 The scheduler has its own web address (`/api/email/cron`). Anything that can reach
 that address can e-mail the whole list, so it needs a password.
 
@@ -90,12 +97,19 @@ select cron.schedule(
   '*/5 * * * *',                       -- every 5 minutes
   $$
   select net.http_post(
-    url     := 'https://thetropicalbakery.com/api/email/cron',
-    headers := '{"Content-Type":"application/json","Authorization":"Bearer SEU_SEGREDO"}'::jsonb
+    url                  := 'https://thetropicalbakery.com/api/email/cron',
+    headers              := '{"Content-Type":"application/json","Authorization":"Bearer SEU_SEGREDO"}'::jsonb,
+    timeout_milliseconds := 55000
   );
   $$
 );
 ```
+
+`timeout_milliseconds` matters: pg_net gives up after **5 seconds** by default and
+cuts the call off, which would chop a big send in half every time. (It would
+recover on the next tick — the scheduler is built to resume — but it would crawl.)
+If your pg_net is old enough not to know that argument, delete the line and the
+comma above it.
 
 Check it is there:
 

@@ -14,3 +14,10 @@
 /Sweet Escape E-Book/
 /Tests and Resized Images/
 /supabase/.temp/
+
+# Secrets and private documents that live in this folder but must never reach GitHub.
+# *.local.sql holds the cron password; the recovery phrase speaks for itself.
+*.local.sql
+proton-recovery-phrase.pdf
+*recovery-phrase*
+*.key
