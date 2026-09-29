@@ -18,12 +18,19 @@ import { OUTROS_ACCENT, OUTROS_KEY, TREAT_TYPES, textOn, typeKeyOf, type Typeabl
  * Several pills can be on at once (they're OR'd — a treat has only one type), and
  * "Todos" is simply the state where none is chosen.
  */
-export default function TreatTypeBar({ treats, value, onChange, label = 'Ver só' }: {
+export default function TreatTypeBar({ treats, value, onChange, label = 'Ver só', tone = 'dark', bleed = false }: {
   /** The WHOLE catalogue, not the filtered view: the counts must not jump around as you pick. */
   treats: TypeableTreat[];
   value: string[];
   onChange: (next: string[]) => void;
   label?: string;
+  /** The surface behind the row: 'dark' for the cocoa /menu section, 'light' for the admin's grey. */
+  tone?: 'dark' | 'light';
+  /**
+   * Let the strip run past the page gutter to the screen edge on phones, so it reads as
+   * swipeable. Only safe where an ancestor clips horizontally, as /menu's <main> does.
+   */
+  bleed?: boolean;
 }) {
   const options = useMemo(() => {
     const counts = new Map<string, number>();
@@ -47,7 +54,7 @@ export default function TreatTypeBar({ treats, value, onChange, label = 'Ver só
     onChange(value.includes(key) ? value.filter(k => k !== key) : [...value, key]);
 
   return (
-    <div className="ttb" role="group" aria-label="Filtrar por tipo de doce">
+    <div className="ttb" data-tone={tone} data-bleed={bleed ? 'true' : 'false'} role="group" aria-label="Filtrar por tipo de doce">
       <span className="ttb__label">{label}</span>
       <div className="ttb__scroll">
         {/* "Todos" is gold rather than the cocoa the rest of the site uses for a pressed button:
@@ -83,8 +90,12 @@ export default function TreatTypeBar({ treats, value, onChange, label = 'Ver só
       </div>
 
       <style>{`
-        .ttb { display: flex; align-items: center; gap: 0.7rem; min-width: 0; }
+        /* min-width/max-width matter: without them this flex item sizes to its content, the inner
+           strip never gets to scroll, and the pills push the whole page sideways. */
+        .ttb { display: flex; align-items: center; gap: 0.7rem; min-width: 0; max-width: 100%; }
         .ttb__label { flex: none; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #d4af37; }
+        /* On a light surface the gold label washes out and the cream ring below disappears. */
+        .ttb[data-tone="light"] .ttb__label { color: #8a6d1f; }
         /* Phones: one swipeable strip rather than a block of chips that pushes the treats down the page. */
         .ttb__scroll { display: flex; gap: 0.4rem; min-width: 0; overflow-x: auto; padding: 0.15rem 0.1rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .ttb__scroll::-webkit-scrollbar { display: none; }
@@ -101,14 +112,14 @@ export default function TreatTypeBar({ treats, value, onChange, label = 'Ver só
         /* A cream ring around whatever is switched on, so even the darkest accent (Chocolates)
            still separates from the dark cocoa section behind it. */
         .ttb__pill[data-on="true"] { box-shadow: 0 0 0 2px rgba(253,250,243,0.85), 0 4px 12px rgba(0,0,0,0.25); }
+        .ttb[data-tone="light"] .ttb__pill[data-on="true"] { box-shadow: 0 2px 8px rgba(44,62,80,0.22); }
         .ttb__n { font-size: 0.72rem; font-weight: 700; opacity: 0.65; }
         .ttb__pill[data-on="true"] .ttb__n { opacity: 0.85; }
 
         @media (max-width: 1023px) {
           .ttb { gap: 0.5rem; }
           .ttb__label { display: none; }
-          /* Let the strip run to the screen edge so it's obviously swipeable. */
-          .ttb__scroll { margin-inline: -1rem; padding-inline: 1rem; }
+          .ttb[data-bleed="true"] .ttb__scroll { margin-inline: -1rem; padding-inline: 1rem; }
         }
         @media (prefers-reduced-motion: reduce) {
           .ttb__pill { transition: none; }

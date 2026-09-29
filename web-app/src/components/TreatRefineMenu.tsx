@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALLERGENS, allergenById, normalizeAllergens } from '@/lib/allergens';
 import { KitchenFacts } from '@/components/TreatInfo';
-import { OUTROS_KEY, TREAT_TYPES, typeChipFor, typeKeyOf } from '@/lib/treatTypes';
+import { typeChipFor, typeKeyOf } from '@/lib/treatTypes';
 
 /** The bits of a treat the refine menu looks at. */
 export interface RefinableTreat {
@@ -153,15 +153,12 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
   const toggle = (key: 'allergens' | 'ingredients' | 'status' | 'types', id: string) =>
     onChange({ ...value, [key]: value[key].includes(id) ? value[key].filter(x => x !== id) : [...value[key], id] });
 
-  // How many treats declare each allergen, use each ingredient, and belong to each type.
+  // How many treats declare each allergen and use each ingredient.
   const counts = useMemo(() => {
     const allergen = new Map<string, number>();
     const ingredient = new Map<string, { label: string; n: number }>();
-    const type = new Map<string, number>();
     treats.forEach(t => {
       new Set(normalizeAllergens([...(t.contains || []), ...(t.may_contain || [])])).forEach(a => allergen.set(a, (allergen.get(a) || 0) + 1));
-      const k = typeKeyOf(t);
-      type.set(k, (type.get(k) || 0) + 1);
       const seen = new Set<string>();
       (t.ingredients || []).forEach(i => {
         const key = norm(i);
@@ -171,7 +168,7 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
         ingredient.set(key, { label: cur?.label || i.trim(), n: (cur?.n || 0) + 1 });
       });
     });
-    return { allergen, ingredient, type };
+    return { allergen, ingredient };
   }, [treats]);
 
   const ingredientList = useMemo(
@@ -312,22 +309,6 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
                 {s.label} <span style={countBadge}>{statusCount(s.id)}</span>
               </button>
             ))}
-          </div>,
-        )}
-
-        {/* Type lives here only for the admin. On the public menu it has a row of its own above the grid. */}
-        {!isPublic && folder('types', '🍪', 'Tipo de doce', value.types.length,
-          <div style={chipRow}>
-            {TREAT_TYPES.filter(t => counts.type.get(t.id)).map(t => (
-              <button key={t.id} type="button" title={t.hint} onClick={() => toggle('types', t.id)} style={chip(value.types.includes(t.id), 'type')}>
-                {t.emoji} {t.label} <span style={countBadge}>{counts.type.get(t.id) || 0}</span>
-              </button>
-            ))}
-            {!!counts.type.get(OUTROS_KEY) && (
-              <button type="button" onClick={() => toggle('types', OUTROS_KEY)} style={chip(value.types.includes(OUTROS_KEY), 'type')}>
-                ✨ Outros <span style={countBadge}>{counts.type.get(OUTROS_KEY)}</span>
-              </button>
-            )}
           </div>,
         )}
 

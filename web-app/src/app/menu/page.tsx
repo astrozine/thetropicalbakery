@@ -159,7 +159,7 @@ export default function MenuPage() {
 
           <div className="menu-main">
           <div className="menu-typebar">
-            <TreatTypeBar treats={menuItems} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
+            <TreatTypeBar bleed treats={menuItems} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
           </div>
 
           {visibleItems.length === 0 && (

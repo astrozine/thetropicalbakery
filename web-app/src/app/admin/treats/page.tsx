@@ -8,6 +8,7 @@ import ToggleSwitch from '@/components/ToggleSwitch';
 import { AllergenFields, EmojiField, IngredientsField, TreatTypeField } from '@/components/TreatDetailsFields';
 import TreatInfo from '@/components/TreatInfo';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
+import TreatTypeBar from '@/components/TreatTypeBar';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { syncTreatIntoBoxes } from '@/lib/treatSync';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
@@ -308,9 +309,13 @@ export default function TreatsAdmin() {
       {/* Refine the list: folders of allergens and ingredients. A sticky left column on wide screens, above the list otherwise. */}
       <style>{`
         .treats-aside { margin-bottom: 1.5rem; }
+        /* Same place as on /menu: the type picker sits at the top of the catalogue column,
+           pushed to the right once there's room for it beside the heading. */
+        .treats-typebar { display: flex; justify-content: flex-start; margin-bottom: 1.25rem; }
         @media (min-width: 1280px) {
           .treats-layout { display: grid; grid-template-columns: minmax(320px, 380px) minmax(0, 1fr); gap: 1.75rem; align-items: start; }
           .treats-aside { position: sticky; top: 7.5rem; max-height: calc(100vh - 9rem); overflow-y: auto; margin-bottom: 0; padding: 2px 6px 10px 2px; }
+          .treats-typebar { justify-content: flex-end; }
         }
       `}</style>
       <div className="treats-layout">
@@ -319,6 +324,10 @@ export default function TreatsAdmin() {
       </aside>
 
       <div className="treats-main">
+      <div className="treats-typebar">
+        <TreatTypeBar tone="light" treats={treats} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
+      </div>
+
       {visibleTreats.length === 0 && (
         <div style={{ ...card, textAlign: 'center', color: '#7f8c8d' }}>
           <p style={{ marginBottom: '1rem' }}>Nenhum doce combina com esses filtros.</p>
