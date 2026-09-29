@@ -33,6 +33,13 @@ const field: React.CSSProperties = { width: '100%', padding: '0.8rem', borderRad
 const label: React.CSSProperties = { display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem' };
 const card: React.CSSProperties = { background: 'white', padding: 'clamp(1.25rem, 3vw, 2rem)', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' };
 
+/** White text on dark accents, dark text on light ones — same rule as the overview's own Atalhos grid. */
+const textOn = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16);
+  const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return lum > 0.62 ? '#2c3e50' : '#ffffff';
+};
+
 export default function TreatsAdmin() {
   const [treats, setTreats] = useState<Treat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -331,16 +338,29 @@ export default function TreatsAdmin() {
         </div>
       )}
 
-      {/* Treats List: grouped into sections once at least one treat has a type, otherwise one flat grid */}
+      {/* Treats List: grouped once at least one treat has a type, same idea as the overview's own
+          Atalhos grid — one continuous grid, the next category just slides in after the last card,
+          and only the first card of each group carries the little coloured tab with its name.
+          Otherwise (nothing typed yet) it's the same flat grid it always was. */}
       {typeGroups ? (
-        typeGroups.map(group => (
-          <div key={group.type?.id || 'outros'} style={{ marginBottom: '2.5rem' }}>
-            <h3 style={{ fontSize: '1.05rem', color: '#3c2a21', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #eef1f4' }}>
-              {group.emoji} {group.label} <span style={{ color: '#7f8c8d', fontWeight: 400 }}>({group.items.length})</span>
-            </h3>
-            <div style={cardGrid}>{group.items.map(renderTreatCard)}</div>
-          </div>
-        ))
+        <div style={cardGrid}>
+          {typeGroups.flatMap(group => group.items.map((treat, i) => (
+            <div key={treat.id} style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+              <div style={{ height: '1.7rem', display: 'flex', alignItems: 'flex-end', marginBottom: '0.5rem' }}>
+                {i === 0 && (
+                  <span style={{
+                    display: 'inline-block', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    fontSize: '0.76rem', fontWeight: 800, lineHeight: 1, padding: '0.38rem 0.7rem', borderRadius: '8px 8px 0 0',
+                    background: group.accent, color: textOn(group.accent),
+                  }}>
+                    {group.emoji} {group.label}
+                  </span>
+                )}
+              </div>
+              {renderTreatCard(treat)}
+            </div>
+          )))}
+        </div>
       ) : (
         <div style={cardGrid}>{visibleTreats.map(renderTreatCard)}</div>
       )}

@@ -29,6 +29,13 @@ interface Treat {
   treat_type?: string | null;
 }
 
+/** White text on dark accents, dark text on light ones — same rule as the admin's own Atalhos grid. */
+const textOn = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16);
+  const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return lum > 0.62 ? '#2c3e50' : '#ffffff';
+};
+
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<Treat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -165,37 +172,41 @@ export default function MenuPage() {
             </div>
           )}
 
-          {/* Grouped into sections (Cookies, Bolos & Tarteletes…) once Dolly has typed at least one treat;
-              until then one flat grid, exactly as before, so the feature stays invisible until it's used. */}
+          {/* Grouped once Dolly has typed at least one treat, in the same style as the admin's own
+              Atalhos grid: one continuous grid (rows never break for a group change — the next
+              category just slides in after the last card), and only the first card of each group
+              carries the little coloured tab with its name. Until anything is typed, this is exactly
+              the flat grid it always was, so the feature stays invisible until it's used. */}
           {anyTyped(visibleItems) ? (
-            groupByType(visibleItems).map(group => (
-              <div key={group.type?.id || 'outros'} style={{ marginBottom: '3rem' }}>
-                <h3 className="menu-type-heading">
-                  <span aria-hidden>{group.emoji}</span> {group.label}
-                  <span className="menu-type-count">{group.items.length}</span>
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                  {group.items.map(item => (
-                    <ScrollReveal key={item.id}>
-                      <MenuCard picked={picked.includes(item.id)} onTogglePick={() => togglePick(item.id)} item={{
-                        id: item.id,
-                        name: item.name,
-                        description: item.description,
-                        price: item.price.toFixed(2).replace('.', ','),
-                        image: item.image_url,
-                        min_batch_size: item.min_batch_size,
-                        batch_multiplier: item.batch_multiplier,
-                        emoji: item.emoji,
-                        ingredients: item.ingredients,
-                        contains: item.contains,
-                        may_contain: item.may_contain,
-                        treat_type: item.treat_type,
-                      }} />
-                    </ScrollReveal>
-                  ))}
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              {groupByType(visibleItems).flatMap(group => group.items.map((item, i) => (
+                <div key={item.id} className="menu-type-cell">
+                  <div className="menu-type-head">
+                    {i === 0 && (
+                      <span style={{ background: group.accent, color: textOn(group.accent) }}>
+                        {group.emoji} {group.label}
+                      </span>
+                    )}
+                  </div>
+                  <ScrollReveal>
+                    <MenuCard picked={picked.includes(item.id)} onTogglePick={() => togglePick(item.id)} item={{
+                      id: item.id,
+                      name: item.name,
+                      description: item.description,
+                      price: item.price.toFixed(2).replace('.', ','),
+                      image: item.image_url,
+                      min_batch_size: item.min_batch_size,
+                      batch_multiplier: item.batch_multiplier,
+                      emoji: item.emoji,
+                      ingredients: item.ingredients,
+                      contains: item.contains,
+                      may_contain: item.may_contain,
+                      treat_type: item.treat_type,
+                    }} />
+                  </ScrollReveal>
                 </div>
-              </div>
-            ))
+              )))}
+            </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {visibleItems.map(item => (
@@ -220,8 +231,9 @@ export default function MenuPage() {
           )}
 
           <style>{`
-            .menu-type-heading { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-heading); font-size: clamp(1.1rem, 2.6vw, 1.4rem); color: #3c2a21; margin: 0 0 1.25rem; padding-bottom: 0.6rem; border-bottom: 1px solid rgba(212,175,55,0.35); }
-            .menu-type-count { margin-left: 0.2rem; font-family: var(--font-body); font-size: 0.8rem; font-weight: 600; color: #7a6a61; }
+            .menu-type-cell { display: flex; flex-direction: column; min-width: 0; }
+            .menu-type-head { height: 1.7rem; display: flex; align-items: flex-end; margin-bottom: 0.5rem; }
+            .menu-type-head span { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.76rem; font-weight: 800; line-height: 1; letter-spacing: 0.01em; padding: 0.38rem 0.7rem; border-radius: 8px 8px 0 0; }
           `}</style>
           </div>
           </div>
