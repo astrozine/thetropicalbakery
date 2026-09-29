@@ -7,6 +7,8 @@ import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
 import { AllergenFields, EmojiField, IngredientsField, fieldStyle, labelStyle } from '@/components/TreatDetailsFields';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
+import { boxPlan, planCaption } from '@/lib/boxPicks';
+import { TREAT_COUNTS } from '@/lib/boxSizes';
 
 interface Props {
   items: BoxItem[];
@@ -183,6 +185,13 @@ export default function BoxItemsEditor({ items, onChange }: Props) {
 
   return (
     <div>
+      {items.length > 0 && (
+        // What the customer sees at the order form with this many treats (src/lib/boxPicks.ts).
+        <p style={{ fontSize: '0.85rem', color: '#5d6d7e', background: '#fff8e6', border: '1px solid #f0dca0', borderRadius: '10px', padding: '0.6rem 0.9rem', marginBottom: '0.75rem', lineHeight: 1.5 }}>
+          Com {items.length} {items.length === 1 ? 'doce' : 'doces'}: {TREAT_COUNTS.map(n => `caixa de ${n} = ${planCaption(boxPlan(items.length, n))}`).join(' · ')}.
+          {boxPlan(items.length, 4).picks > 0 && ' Para a caixa de 4 ser a completa, coloque 4 doces.'}
+        </p>
+      )}
       <div style={{ display: 'grid', gap: '0.75rem' }}>
         {items.map((item, idx) => {
           const isOpen = open === item.id;

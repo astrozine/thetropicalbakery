@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { OriginSeal } from '@/components/BelgiumBrazil';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -14,9 +14,12 @@ import { BoxWindowFields, SaleState, longDay } from '@/lib/boxWindow';
 import BoxSizePicker from '@/components/BoxSizePicker';
 import FulfillmentPicker, { Fulfillment, readFulfillment } from '@/components/FulfillmentPicker';
 import { BoxSizePrices, DEFAULT_TREAT_COUNT, TreatCount, sizeText } from '@/lib/boxSizes';
+import BoxTreatPicker from '@/components/BoxTreatPicker';
+import { boxPlan, planCaption, picksSuffix } from '@/lib/boxPicks';
+import type { BoxItem } from '@/lib/allergens';
 
 interface BoxOrderProps {
-  box: { id: string; title: string; image_url: string; price: number } & Partial<BoxWindowFields>;
+  box: { id: string; title: string; image_url: string; price: number; items?: BoxItem[] | null } & Partial<BoxWindowFields>;
   maxQuantity: number;
   /** Whether the box can be ordered today (ordering window + stock). Null while loading. */
   sale?: { state: SaleState; opensOn: string | null } | null;
@@ -42,6 +45,20 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
   useEffect(() => { const saved = readFulfillment(); if (saved) setFulfillment(saved); }, []);
   const pickup = fulfillment === 'pickup';
   const [error, setError] = useState('');
+  // The treats the customer chose for the 2-box, or the extras on the 6-box (see boxPicks.ts).
+  const treats = (Array.isArray(box.items) ? box.items : []).filter(i => i && i.id && i.name);
+  const plan = boxPlan(treats.length, size);
+  const [picks, setPicks] = useState<string[]>([]);
+  const [pickNudge, setPickNudge] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const shownPicks = picks.slice(0, plan.picks);
+
+  const changeSize = (s: TreatCount) => {
+    setSize(s);
+    setPickNudge(false);
+    // Going 2 -> 6 keeps the favourites already chosen (both sizes have two picks).
+    setPicks(p => p.slice(0, boxPlan(treats.length, s).picks));
+  };
 
   const changeQuantity = (delta: number) => {
     const next = quantity + delta;
@@ -66,18 +83,27 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
       setError(pickup ? 'Escolha no calendário o dia em que você vem retirar sua caixa.' : 'Escolha o dia em que você quer receber sua caixa no calendário.');
       return;
     }
+    const missing = plan.picks - shownPicks.length;
+    if (missing > 0) {
+      setPickNudge(true);
+      setError(`Escolha mais ${missing === 1 ? '1 doce' : `${missing} doces`} para a sua caixa.`);
+      pickerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    const pickedNames = shownPicks.map(id => treats.find(t => t.id === id)?.name || '');
     const id = `box-${box.id}-${size}`;
     removeFromCart(id); // re-adding sets the exact quantity instead of stacking on an older order
     removeFromCart(`box-${box.id}`); // a cart from before the sizes existed
     addToCart({
       id,
-      name: `${box.title} (${sizeText(size)})`,
+      name: `${box.title} (${sizeText(size)}${picksSuffix(plan, pickedNames)})`,
       price: unit.toFixed(2).replace('.', ','),
       image: box.image_url,
       kind: 'box',
       tasting_box_id: box.id,
       max_quantity: maxQuantity,
       box_size: size,
+      box_picks: plan.picks > 0 ? shownPicks : undefined,
     }, { open: false, quantity });
     router.push('/checkout');
   };
@@ -141,7 +167,20 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
           window={{ from: box.delivery_from, until: box.delivery_until }} />
         </TreatFlank>
 
-        <BoxSizePicker value={size} onChange={setSize} priceOf={s => prices[s]} />
+        <BoxSizePicker
+          value={size} onChange={changeSize} priceOf={s => prices[s]} title="3 · Quantos doces na caixa?"
+          picksOf={treats.length ? s => boxPlan(treats.length, s).picks : undefined}
+          captionOf={treats.length ? s => planCaption(boxPlan(treats.length, s)) : undefined}
+        />
+
+        {treats.length > 0 && (
+          <div ref={pickerRef} style={{ scrollMarginTop: '6rem' }}>
+            <BoxTreatPicker
+              items={treats} plan={plan} picks={shownPicks} attention={pickNudge}
+              onChange={p => { setPicks(p); if (p.length >= plan.picks) setError(''); }}
+            />
+          </div>
+        )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#3c2a21', background: '#fdf7ee', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7', flexWrap: 'wrap' }}>
           <label style={{ fontSize: '1.1rem', fontWeight: 600, flex: 1, minWidth: '120px' }}>Quantas caixas:</label>

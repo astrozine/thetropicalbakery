@@ -14,13 +14,17 @@ interface Props {
   /** Light cards (order form) or on a dark background. */
   tone?: 'light' | 'dark';
   title?: string;
+  /** How many of each size's treats the customer picks: those dots are drawn hollow (see boxPicks.ts). */
+  picksOf?: (size: TreatCount) => number;
+  /** A word or two under the size, e.g. "a completa" / "você escolhe 2". */
+  captionOf?: (size: TreatCount) => string;
 }
 
 /**
  * "Quantos doces?": three cards, 2 / 4 / 6 treats, with a row of little dots so the size reads at a glance.
  * Used on /caixas and in the subscription form, so a box is chosen the same way everywhere.
  */
-export default function BoxSizePicker({ value, onChange, priceOf, priceNote, tone = 'light', title = 'Quantos doces na caixa?' }: Props) {
+export default function BoxSizePicker({ value, onChange, priceOf, priceNote, tone = 'light', title = 'Quantos doces na caixa?', picksOf, captionOf }: Props) {
   return (
     <div className={`bsp bsp-${tone}`}>
       <style>{`
@@ -40,6 +44,9 @@ export default function BoxSizePicker({ value, onChange, priceOf, priceNote, ton
         .bsp-opt:focus-visible { outline: 3px solid #d4af37; outline-offset: 2px; }
         .bsp-dots { display: grid; grid-template-columns: repeat(var(--cols), 10px); gap: 4px; justify-content: center; min-height: 24px; align-content: center; }
         .bsp-dot { width: 10px; height: 10px; border-radius: 50%; background: #d4af37; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15); }
+        .bsp-dot-pick { background: transparent; border: 2px dashed #c9a43a; box-shadow: none; box-sizing: border-box; }
+        .bsp-cap { font-size: 0.75rem; font-weight: 700; color: #a8862a; line-height: 1.2; }
+        .bsp-dark .bsp-cap { color: #e8c766; }
         .bsp-n { font-family: var(--font-heading); font-size: 1.35rem; line-height: 1; }
         .bsp-word { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; opacity: 0.8; }
         .bsp-price { font-weight: 800; font-size: 1rem; }
@@ -56,10 +63,11 @@ export default function BoxSizePicker({ value, onChange, priceOf, priceNote, ton
             <button key={size} type="button" role="radio" aria-checked={on} className="bsp-opt" onClick={() => onChange(size)}>
               {on && <span className="bsp-tick" aria-hidden>✓</span>}
               <span className="bsp-dots" aria-hidden style={{ ['--cols' as string]: size > 4 ? 3 : 2 }}>
-                {Array.from({ length: size }).map((_, i) => <span key={i} className="bsp-dot" />)}
+                {Array.from({ length: size }).map((_, i) => <span key={i} className={`bsp-dot${i >= size - (picksOf?.(size) ?? 0) ? ' bsp-dot-pick' : ''}`} />)}
               </span>
               <span className="bsp-n">{size}</span>
               <span className="bsp-word">doces</span>
+              {captionOf && <span className="bsp-cap">{captionOf(size)}</span>}
               <span className="bsp-price">{formatBRL(priceOf(size))}</span>
               {priceNote && <span className="bsp-note">{priceNote}</span>}
             </button>

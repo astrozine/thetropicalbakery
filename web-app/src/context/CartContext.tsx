@@ -17,6 +17,8 @@ export interface CartItem {
   max_quantity?: number;
   /** For boxes: 2, 4 or 6 treats (the server prices it from this). Missing on older carts = 4. */
   box_size?: number;
+  /** For boxes: the treats the customer chose (BoxItem ids, repeats allowed), see src/lib/boxPicks.ts. */
+  box_picks?: string[];
 }
 
 interface CartContextType {

@@ -6,6 +6,7 @@ import { BoxWindowFields, inDeliveryWindow, saleState } from '@/lib/boxWindow';
 import { dietSummary, normalizeDiet } from '@/lib/dietary';
 import { fetchBoxSizePrices, isTreatCount, sizeText, toTreatCount, type TreatCount } from '@/lib/boxSizes';
 import { sendOrderReceived } from '@/lib/email/receipts';
+import { boxPlan, picksSuffix } from '@/lib/boxPicks';
 import { generatePixData } from '@/utils/pix';
 
 /**
@@ -23,7 +24,7 @@ export class OrderError extends Error {
 }
 
 export interface OrderInput {
-  items: { id?: string; kind?: string; quantity?: number; tasting_box_id?: string; box_size?: number }[];
+  items: { id?: string; kind?: string; quantity?: number; tasting_box_id?: string; box_size?: number; box_picks?: unknown }[];
   customer: { name?: string; email?: string; whatsapp?: string; address?: string };
   fulfillment?: string;
   zoneId?: string;
@@ -55,7 +56,7 @@ function brasiliaToday(): Date {
 
 const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 
-interface BoxRow extends BoxWindowFields { id: string; title: string; price: number; is_active: boolean }
+interface BoxRow extends BoxWindowFields { id: string; title: string; price: number; is_active: boolean; items?: { id?: string; name?: string }[] | null }
 interface TreatRow { id: string; name: string; price: number; is_available: boolean; min_batch_size: number | null; batch_multiplier: number | null }
 
 /** `userToken` is the visitor's session token, if they are signed in (needed for pickup and to link the order to them). */
@@ -82,7 +83,8 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
   if (rawItems.length === 0) throw new OrderError(400, 'O carrinho está vazio.');
 
   const boxWanted = new Map<string, number>();   // box id -> boxes of every size together (the stock counts boxes)
-  const boxBySize = new Map<string, number>();   // `${box id}|${size}` -> boxes of that size
+  // One line per box, size and choice of treats: two 2-treat boxes with different favourites are two lines.
+  const boxLines = new Map<string, { id: string; size: TreatCount; picks: string[]; qty: number }>();
   const treatWanted = new Map<string, number>();
   for (const it of rawItems) {
     const qty = Number(it.quantity);
@@ -92,8 +94,13 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
       if (!UUID.test(id)) throw new OrderError(400, 'Uma das caixas do carrinho não é válida.');
       if (it.box_size != null && !isTreatCount(it.box_size)) throw new OrderError(400, 'Escolha uma caixa de 2, 4 ou 6 doces.');
       const size = toTreatCount(it.box_size);
+      // Which treats they chose (checked against the box further down). Ids only, never names or prices.
+      const picks = Array.isArray(it.box_picks) ? it.box_picks.slice(0, 6).map(p => String(p).slice(0, 80)) : [];
       boxWanted.set(id, (boxWanted.get(id) ?? 0) + qty);
-      boxBySize.set(`${id}|${size}`, (boxBySize.get(`${id}|${size}`) ?? 0) + qty);
+      const key = `${id}|${size}|${picks.join(',')}`;
+      const line = boxLines.get(key) ?? { id, size, picks, qty: 0 };
+      line.qty += qty;
+      boxLines.set(key, line);
     } else {
       const id = String(it.id ?? '');
       if (!UUID.test(id)) throw new OrderError(400, 'Um dos itens do carrinho não é válido.');
@@ -150,14 +157,27 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
     }
     // Every box is priced by its size (2, 4 or 6 treats) from the settings Dolly edits in /admin/caixas.
     const { prices } = await fetchBoxSizePrices(db);
-    for (const [key, qty] of boxBySize) {
-      const [id, sizeStr] = key.split('|');
+    for (const { id, size, picks, qty } of boxLines.values()) {
       const row = boxRows.find(b => b.id === id)!;
-      const size = Number(sizeStr) as TreatCount;
       const unit = Number(prices[size]);
       if (!(unit > 0)) throw new OrderError(500, 'Preço da caixa inválido.');
+      // The 2-box is the customer's favourites, the 6-box the complete one plus two more (src/lib/boxPicks.ts).
+      // Their choice goes into the line's name, which is what the inbox, the receipt and the kitchen read.
+      const treats = (Array.isArray(row.items) ? row.items : []).filter(t => t && t.id && t.name);
+      const plan = boxPlan(treats.length, size);
+      let suffix = '';
+      if (plan.picks > 0) {
+        const names = picks.map(p => treats.find(t => t.id === p)?.name);
+        if (picks.length === 0) {
+          suffix = ': doces à escolha da casa'; // a cart saved before the picker existed
+        } else if (picks.length !== plan.picks || names.some(n => !n)) {
+          throw new OrderError(409, `Os doces de "${row.title}" mudaram. Volte à página da caixa e escolha de novo.`);
+        } else {
+          suffix = picksSuffix(plan, names as string[]);
+        }
+      }
       subtotal += unit * qty;
-      lines.push({ name: `${row.title} (${sizeText(size)})`, quantity: qty, unit });
+      lines.push({ name: `${row.title} (${sizeText(size)}${suffix})`, quantity: qty, unit });
     }
   } else if (parseISODate(date) < addDays(today, 3)) {
     throw new OrderError(400, 'Encomendas do Menu de Eventos precisam de pelo menos 3 dias de antecedência.');
