@@ -6,6 +6,7 @@ import {
   toISODate, parseISODate, describeRule,
 } from '@/lib/deliverySchedule';
 import { windowedDates } from '@/lib/boxWindow';
+import { PICKUP_EXTRA_DAYS, pickupDays, pickupLastDay, shortDay } from '@/lib/pickupWindow';
 
 const WEEKDAY = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const MONTH_NAME = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -21,7 +22,8 @@ interface Props {
   window?: { from?: string | null; until?: string | null };
   /** Several boxes at once (checkout): a day must suit every one of them. Each window rolls over on its own. */
   windows?: { from?: string | null; until?: string | null }[];
-  /** Box orders: whether the customer comes to get it. Changes the words, not the days (both happen on the same box days). */
+  /** Box orders: whether the customer comes to get it. They still pick the box day (when it is ready); for a
+   *  pickup the calendar then also lights up the days after it that the box waits in the fridge (pickupWindow.ts). */
   fulfillment?: 'delivery' | 'pickup';
 }
 
@@ -35,6 +37,12 @@ const countdown = (iso: string) => {
   if (n <= 0) return 'É hoje!';
   if (n === 1) return 'É amanhã!';
   return `Faltam ${n} dias`;
+};
+
+/** "hoje" / "amanhã" / "em 5 dias", for "Fica pronta …". */
+const readyIn = (iso: string) => {
+  const n = daysUntil(iso);
+  return n <= 0 ? 'hoje' : n === 1 ? 'amanhã' : `em ${n} dias`;
 };
 
 /**
@@ -80,6 +88,8 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
   const interactive = !!onChange;
   const pickup = fulfillment === 'pickup';
   const dayWord = pickup ? 'retirada' : 'entrega';
+  // The days after the chosen one when a pickup box is still waiting in the fridge.
+  const fridgeDays = useMemo(() => new Set(pickup && value ? pickupDays(value).slice(1) : []), [pickup, value]);
 
   const view = new Date();
   view.setDate(1);
@@ -155,6 +165,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
           const isOpenButTooSoon = st === 'open' && !isSelectable && iso >= today;
           const isSelected = value === iso;
           const isMine = mine.has(iso);
+          const isFridge = fridgeDays.has(iso);
           const day = Number(iso.slice(-2));
 
           let background = 'transparent';
@@ -168,6 +179,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
           }
           if (isMine) { background = 'linear-gradient(135deg, #2a9d8f 0%, #1b7a6e 100%)'; color = '#fff'; }
           if (isSelected) { background = 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)'; color = '#ffd166'; border = '2px solid #ffd166'; anim = undefined; }
+          if (isFridge) { background = 'rgba(255,209,102,0.45)'; color = '#3c2a21'; border = '2px dashed #d4af37'; anim = undefined; }
           if (isOpenButTooSoon) { border = '1px dashed #d8c7a8'; color = '#b3a08a'; }
           if (iso === today && !isSelectable) border = '1px solid #3c2a21';
 
@@ -178,7 +190,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
               className="dc-day"
               disabled={!interactive || !isSelectable}
               onClick={() => onChange?.(iso)}
-              title={isSelectable ? `Dia de ${dayWord} das caixas` : isOpenButTooSoon ? 'Prazo de pedido encerrado para este dia' : undefined}
+              title={isFridge ? 'Sua caixa ainda está te esperando na geladeira' : isSelectable ? `Dia de ${dayWord} das caixas` : isOpenButTooSoon ? 'Prazo de pedido encerrado para este dia' : undefined}
               style={{
                 aspectRatio: '1', borderRadius: '50%', border, background, color, animation: anim,
                 cursor: interactive && isSelectable ? 'pointer' : 'default',
@@ -189,13 +201,17 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
               {(isSelectable || isMine) && (
                 <span aria-hidden style={{ position: 'absolute', bottom: '-2px', right: '-1px', fontSize: 'clamp(0.55rem, 1.6vw, 0.75rem)' }}>{isMine ? '⭐' : '📦'}</span>
               )}
+              {isFridge && !isSelectable && (
+                <span aria-hidden style={{ position: 'absolute', bottom: '-2px', right: '-1px', fontSize: 'clamp(0.55rem, 1.6vw, 0.75rem)' }}>🛍️</span>
+              )}
             </button>
           );
         })}
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.9rem', fontSize: '0.75rem', color: '#7a6a61' }}>
-        <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#fb8500', marginRight: 6 }} />dia de {dayWord}</span>
+        <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#fb8500', marginRight: 6 }} />{pickup ? 'dia em que a caixa fica pronta' : `dia de ${dayWord}`}</span>
+        {fridgeDays.size > 0 && <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: 'rgba(255,209,102,0.6)', border: '1px dashed #d4af37', marginRight: 6 }} />ainda dá para retirar</span>}
         {highlight.length > 0 && <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#2a9d8f', marginRight: 6 }} />sua caixa</span>}
       </div>
 
@@ -211,18 +227,28 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
           <span style={{ fontSize: '2.2rem' }} aria-hidden>{value ? '🎉' : '🌴'}</span>
           <div>
             <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700 }}>
-              {value ? (pickup ? 'Sua caixa fica pronta para retirar' : 'Sua caixa chega') : 'Próximo dia de caixa'}
+              {value ? (pickup ? 'Retire sua caixa' : 'Sua caixa chega') : 'Próximo dia de caixa'}
             </p>
             <p style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.05rem, 3vw, 1.35rem)', lineHeight: 1.25 }}>
-              {focusDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+              {value && pickup
+                ? <>de {shortDay(value)}<br />até {shortDay(pickupLastDay(value))}</>
+                : focusDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
             </p>
             <p style={{ fontSize: '0.85rem', color: 'rgba(253,250,243,0.8)' }}>
-              {countdown(focus!)} — {value
-                ? (pickup ? 'feita à mão, fresquinha, esperando por você no home bakery.' : 'feita à mão, fresquinha, na sua porta.')
-                : (pickup ? 'reserve a sua e venha buscar fresquinha.' : 'reserve a sua e receba fresquinha.')}
+              {value && pickup
+                ? `Fica pronta ${readyIn(focus!)}. Guardamos na geladeira por até ${PICKUP_EXTRA_DAYS} dias. Venha no dia que for melhor para você.`
+                : `${countdown(focus!)} — ${value
+                  ? 'feita à mão, fresquinha, na sua porta.'
+                  : (pickup ? 'reserve a sua e venha buscar fresquinha.' : 'reserve a sua e receba fresquinha.')}`}
             </p>
           </div>
         </div>
+      )}
+
+      {pickup && !value && (
+        <p style={{ fontSize: '0.82rem', color: '#7a6a61', marginTop: '0.8rem', lineHeight: 1.6 }}>
+          🛍️ Escolha o dia em que a caixa fica pronta. Depois ela te espera na geladeira por até {PICKUP_EXTRA_DAYS} dias: é só vir quando for melhor para você.
+        </p>
       )}
 
       {schedule.rules.length > 0 && (

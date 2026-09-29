@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { parseISODate } from '@/lib/deliverySchedule';
+import { PICKUP_EXTRA_DAYS, pickupLastDay, shortDay } from '@/lib/pickupWindow';
 
 interface PickupOrder {
   order_id: string;
@@ -26,11 +27,11 @@ const MONTHS = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', '
 const icsEscape = (v: string) => v.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
 const compact = (iso: string) => iso.replace(/-/g, '');
 
-/** A one-day calendar entry the customer can drop into their phone's calendar. */
+/** A calendar entry covering every day they can come, from the ready day to the last fridge day. */
 function downloadIcs(order: PickupOrder) {
   if (!order.requested_date) return;
-  const start = parseISODate(order.requested_date);
-  const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1);
+  const last = parseISODate(pickupLastDay(order.requested_date));
+  const end = new Date(last.getFullYear(), last.getMonth(), last.getDate() + 1);   // DTEND is exclusive
   const endIso = `${end.getFullYear()}${String(end.getMonth() + 1).padStart(2, '0')}${String(end.getDate()).padStart(2, '0')}`;
   const lines = [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//The Tropical Bakery//Retirada//PT', 'BEGIN:VEVENT',
@@ -100,8 +101,13 @@ export default function MyPickups() {
                 )}
                 <div style={{ flex: '1 1 220px', minWidth: 0 }}>
                   <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700 }}>
-                    {date ? `Retirada ${date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}` : 'Retirada — data a combinar'}
+                    {date ? `Pronta ${date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}` : 'Retirada — data a combinar'}
                   </p>
+                  {o.requested_date && o.stage !== 'picked_up' && (
+                    <p style={{ fontSize: '0.85rem', color: '#594a42', marginBottom: '0.2rem' }}>
+                      Retire até <strong>{shortDay(pickupLastDay(o.requested_date))}</strong>
+                    </p>
+                  )}
                   <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.05rem', color: '#3c2a21', lineHeight: 1.3 }}>
                     {o.items_summary || 'Caixa de Degustação'}
                   </p>
@@ -144,6 +150,11 @@ export default function MyPickups() {
                       </button>
                     )}
                   </div>
+                  {o.requested_date && o.stage !== 'picked_up' && (
+                    <p style={{ fontSize: '0.85rem', color: 'rgba(253,250,243,0.85)', marginTop: '0.8rem' }}>
+                      🧊 Sua caixa fica na geladeira te esperando de {shortDay(o.requested_date)} até {shortDay(pickupLastDay(o.requested_date))} ({PICKUP_EXTRA_DAYS} dias depois de pronta).
+                    </p>
+                  )}
                   <p style={{ fontSize: '0.75rem', color: 'rgba(253,250,243,0.6)', marginTop: '0.8rem' }}>
                     Este endereço é só para você. Por favor, não compartilhe.
                   </p>

@@ -1,5 +1,6 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { PICKUP_EXTRA_DAYS, pickupWindowText } from '@/lib/pickupWindow';
 import { SITE_URL, STORE_WHATSAPP, copyBox, greeting, kicker, orderTable, paragraphs, type LayoutOptions } from './layout';
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
@@ -71,7 +72,11 @@ function amounts(order: ReceiptOrder) {
 
 /** "Entrega em 3 de outubro" / "Retirada no home bakery" — whichever applies. */
 function fulfilment(order: ReceiptOrder): string {
-  if (order.isPickup) return 'Retirada no nosso home bakery em Itamambuca.';
+  if (order.isPickup) {
+    return order.date
+      ? `Retirada no nosso home bakery em Itamambuca: ${pickupWindowText(order.date)}. Guardamos a caixa na geladeira por até ${PICKUP_EXTRA_DAYS} dias; o endereço aparece em Minha Conta assim que o pagamento for confirmado.`
+      : 'Retirada no nosso home bakery em Itamambuca.';
+  }
   if (order.date) return `Entrega prevista para ${prettyDate(order.date)}.`;
   return '';
 }
