@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { Subscription, SubscriptionPlan, SubscriptionStatus, STATUS_LABELS, DIETARY_FIELDS } from '@/lib/subscriptions';
 import { TREAT_COUNTS, TreatCount, planBoxPrice, toTreatCount } from '@/lib/boxSizes';
 import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
+import { boxPlan, namesText, surpriseText } from '@/lib/boxPicks';
 import { getZone, formatBRL } from '@/lib/deliveryZones';
 
 interface DeliveryRow {
@@ -60,6 +61,42 @@ export default function SubscriptionsAdmin() {
   const [roster, setRoster] = useState<DeliveryRow[]>([]);
   const [rosterLoading, setRosterLoading] = useState(false);
   const [rosterMsg, setRosterMsg] = useState('');
+
+  // What each subscriber chose for the box that is on sale now (migration 28). Empty before it runs.
+  const [weekBox, setWeekBox] = useState<{ id: string; title: string; items: { id?: string; name?: string }[] | null } | null>(null);
+  const [weekPicks, setWeekPicks] = useState<Record<string, { picks: string[]; surprise: boolean }>>({});
+  useEffect(() => {
+    (async () => {
+      const { data: box } = await supabase.from('tasting_boxes').select('id, title, items').eq('is_active', true).maybeSingle();
+      if (!box) return;
+      const { data, error } = await supabase.from('subscription_picks').select('subscription_id, picks, surprise').eq('tasting_box_id', box.id);
+      if (error) return; // migration 28 not run yet: show nothing rather than "ainda não escolheu" for everyone
+      setWeekBox(box);
+      setWeekPicks(Object.fromEntries((data || []).map(r => [r.subscription_id, { picks: (r.picks || []).map(String), surprise: !!r.surprise }])));
+    })();
+  }, []);
+
+  /** "completa + 2× Sol de Abacaxi", "2 à escolha da Dolly 🎲", or null when this week's box has no treat list. */
+  const choiceOf = (s: Subscription): { text: string; waiting: boolean } | null => {
+    const treats = (weekBox?.items || []).filter(t => t && t.id && t.name);
+    const plan = boxPlan(treats.length, toTreatCount(s.box_size));
+    if (!weekBox || treats.length === 0) return null;
+    if (plan.picks === 0) return { text: 'completa (um de cada)', waiting: false };
+    const row = weekPicks[s.id];
+    if (!row) return { text: `ainda não escolheu · ${surpriseText(plan)}`, waiting: true };
+    if (row.surprise || row.picks.length === 0) return { text: surpriseText(plan), waiting: false };
+    const names = row.picks.map(id => treats.find(t => t.id === id)?.name || '?');
+    return { text: `${plan.fixed > 0 ? 'completa + ' : ''}${namesText(names)}`, waiting: false };
+  };
+  const choiceLine = (s: Subscription) => {
+    const c = choiceOf(s);
+    if (!c) return null;
+    return (
+      <div style={{ marginTop: '0.4rem', fontSize: '0.85rem', color: c.waiting ? '#b9770e' : '#2c3e50' }}>
+        🍫 <strong>{toTreatCount(s.box_size)} doces:</strong> {c.text}
+      </div>
+    );
+  };
 
   const loadSubs = useCallback(async () => {
     setLoading(true);
@@ -282,6 +319,7 @@ export default function SubscriptionsAdmin() {
                       <div style={{ color: '#7f8c8d' }}>Próxima: {formatDate(s.next_delivery_on)}</div>
                       {s.committed_until && <div style={{ color: '#7f8c8d', fontSize: '0.82rem' }}>Compromisso até {formatDate(s.committed_until)}</div>}
                       {s.paused_until && <div style={{ color: '#b9770e', fontSize: '0.82rem' }}>Pausada até {formatDate(s.paused_until)}</div>}
+                      {s.status !== 'cancelled' && choiceLine(s)}
                     </div>
 
                     {(restrictions.length > 0 || s.allergies) && (
@@ -424,6 +462,7 @@ export default function SubscriptionsAdmin() {
                               {s.address_oneline}
                               {s.address_reference && <div style={{ fontStyle: 'italic' }}>🧭 {s.address_reference}</div>}
                             </div>
+                            {choiceLine(s)}
                             {(restrictions.length > 0 || s.allergies) && (
                               <div style={{ marginTop: '0.4rem', fontSize: '0.8rem' }}>
                                 {restrictions.length > 0 && <span style={{ color: '#b9870e', fontWeight: 600 }}>{restrictions.join(' · ')}</span>}

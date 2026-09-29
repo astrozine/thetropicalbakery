@@ -50,6 +50,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
   const plan = boxPlan(treats.length, size);
   const [picks, setPicks] = useState<string[]>([]);
   const [pickNudge, setPickNudge] = useState(false);
+  const [surprise, setSurprise] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
   const shownPicks = picks.slice(0, plan.picks);
 
@@ -83,14 +84,15 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
       setError(pickup ? 'Escolha no calendário o dia em que você vem retirar sua caixa.' : 'Escolha o dia em que você quer receber sua caixa no calendário.');
       return;
     }
-    const missing = plan.picks - shownPicks.length;
+    const missing = surprise ? 0 : plan.picks - shownPicks.length;
     if (missing > 0) {
       setPickNudge(true);
       setError(`Escolha mais ${missing === 1 ? '1 doce' : `${missing} doces`} para a sua caixa.`);
       pickerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
-    const pickedNames = shownPicks.map(id => treats.find(t => t.id === id)?.name || '');
+    const chosen = surprise ? [] : shownPicks;
+    const pickedNames = chosen.map(id => treats.find(t => t.id === id)?.name || '');
     const id = `box-${box.id}-${size}`;
     removeFromCart(id); // re-adding sets the exact quantity instead of stacking on an older order
     removeFromCart(`box-${box.id}`); // a cart from before the sizes existed
@@ -103,7 +105,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
       tasting_box_id: box.id,
       max_quantity: maxQuantity,
       box_size: size,
-      box_picks: plan.picks > 0 ? shownPicks : undefined,
+      box_picks: plan.picks > 0 ? chosen : undefined,
     }, { open: false, quantity });
     router.push('/checkout');
   };
@@ -176,8 +178,10 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         {treats.length > 0 && (
           <div ref={pickerRef} style={{ scrollMarginTop: '6rem' }}>
             <BoxTreatPicker
-              items={treats} plan={plan} picks={shownPicks} attention={pickNudge}
-              onChange={p => { setPicks(p); if (p.length >= plan.picks) setError(''); }}
+              items={treats} plan={plan} picks={surprise ? [] : shownPicks} attention={pickNudge}
+              kicker="4 · O que vai na sua caixa"
+              surprise={surprise} onSurprise={on => { setSurprise(on); if (on) setError(''); }}
+              onChange={p => { setSurprise(false); setPicks(p); if (p.length >= plan.picks) setError(''); }}
             />
           </div>
         )}

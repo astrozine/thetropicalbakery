@@ -231,10 +231,11 @@ export const CAMPAIGNS: Campaign[] = [
       heading: `Sua caixa chega ${prettyDate(v.date)}`,
       body:
         paragraphs(
-          `A Dolly já está preparando a sua caixa da semana. Ela sai fresquinha e chega em ${prettyDate(v.date)}.`,
+          `A Dolly já está preparando a sua caixa da semana. Ela sai fresquinha e chega em ${prettyDate(v.date)}.\n\n` +
+          'Na caixa de 2 você escolhe os seus favoritos, e na de 6 escolhe os 2 extras: é só entrar em Minha Conta. Se preferir, toque no dado e a Dolly escolhe por você.',
         ) + (v.preview ? paragraphs(v.preview) : ''),
       facts: [{ num: shortDate(v.date), label: weekday(v.date) || 'dia da entrega' }, { num: 'Fresca', label: 'do forno direto para a sua porta' }],
-      cta: { label: 'Ver minha assinatura', href: url('/minha-conta') },
+      cta: { label: 'Escolher meus doces', href: url('/minha-conta') },
       note: 'Precisa pular esta semana ou mudar o endereço? É só responder no WhatsApp.',
     }),
   },

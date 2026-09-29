@@ -40,8 +40,17 @@ export function namesText(names: string[]): string {
   return parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}`;
 }
 
-/** What follows the size in an order line: ": Brownie e Tartelete" or ": completa + 2× Brownie". Empty for the complete box. */
+/** The dice: "completa + 2 à escolha da Dolly". */
+export function surpriseText(plan: BoxPlan): string {
+  return `${plan.fixed > 0 ? 'completa + ' : ''}${plan.picks} à escolha da Dolly 🎲`;
+}
+
+/**
+ * What follows the size in an order line: ": Brownie e Tartelete" or ": completa + 2× Brownie".
+ * Nothing picked means the dice (or a cart from before the picker): ": 2 à escolha da Dolly 🎲". Empty for the complete box.
+ */
 export function picksSuffix(plan: BoxPlan, pickedNames: string[]): string {
-  if (plan.picks === 0 || pickedNames.length === 0) return '';
+  if (plan.picks === 0) return '';
+  if (pickedNames.length === 0) return `: ${surpriseText(plan)}`;
   return `: ${plan.fixed > 0 ? 'completa + ' : ''}${namesText(pickedNames)}`;
 }

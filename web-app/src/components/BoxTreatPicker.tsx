@@ -14,20 +14,27 @@ interface Props {
   onChange: (picks: string[]) => void;
   /** Outline the picker when the customer tried to continue with picks missing. */
   attention?: boolean;
+  /** "Deixa a Dolly escolher": shows the dice button. While on, the pick slots show dice and nothing needs choosing. */
+  surprise?: boolean;
+  onSurprise?: (on: boolean) => void;
+  /** The small line above the title. */
+  kicker?: string;
 }
 
 /**
  * "O que vai na sua caixa": the box drawn as a tray of slots (2 = 2×1, 4 = 2×2, 6 = 3×2, the same
  * layout as the dots on the size cards). The week's treats sit in solid gold slots; the ones the
  * customer chooses go in dashed slots. Tap a treat card to put it in, tap a slot to take it out.
+ * Or roll the dice and Dolly chooses (the parent keeps that flag; picking a treat turns it off).
  */
-export default function BoxTreatPicker({ items, plan, picks, onChange, attention }: Props) {
+export default function BoxTreatPicker({ items, plan, picks, onChange, attention, surprise = false, onSurprise, kicker = 'O que vai na sua caixa' }: Props) {
   const [full, setFull] = useState(false);
   const size = plan.fixed + plan.picks;
   const byId = new Map(items.map(i => [i.id, i]));
-  const left = plan.picks - picks.length;
+  const left = surprise ? 0 : plan.picks - picks.length;
 
   const add = (id: string) => {
+    if (surprise) { setFull(false); onChange([id]); return; } // changed their mind: start choosing
     if (left > 0) { setFull(false); onChange([...picks, id]); return; }
     if (plan.picks === 1) { onChange([id]); return; } // one choice: just swap it
     setFull(true);
@@ -86,12 +93,20 @@ export default function BoxTreatPicker({ items, plan, picks, onChange, attention
         .btp-card-add { position: absolute; top: 6px; right: 6px; min-width: 28px; height: 28px; padding: 0 6px; border-radius: 999px; background: #fff;
           color: #3c2a21; font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
         .btp-card[data-on="true"] .btp-card-add { background: #d4af37; color: #fff; }
+.btp-slot-dice { font-size: 1.7rem; background: #fff8e6; }
+        .btp-dice { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; min-height: 44px; margin-top: 0.7rem;
+          padding: 0.6rem 1rem; border-radius: 999px; border: 2px dashed #c9a43a; background: #fff; color: #3c2a21; font: inherit;
+          font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+        .btp-dice:hover .btp-dice-icon { transform: rotate(-20deg) scale(1.15); }
+        .btp-dice-icon { font-size: 1.3rem; display: inline-block; transition: transform 0.2s; }
+        .btp-dice[aria-pressed="true"] { background: #d4af37; border-style: solid; border-color: #d4af37; color: #fff; }
+        .btp-dice:focus-visible { outline: 3px solid #3c2a21; outline-offset: 2px; }
         @keyframes btp-pop { 0% { transform: scale(0.6); } 70% { transform: scale(1.06); } 100% { transform: scale(1); } }
         @keyframes btp-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
         @media (prefers-reduced-motion: reduce) { .btp-slot-pick, .btp-tray.btp-shake { animation: none; } .btp-card { transition: none; } .btp-card:hover { transform: none; } }
       `}</style>
 
-      <p className="btp-kicker">4 · O que vai na sua caixa</p>
+      <p className="btp-kicker">{kicker}</p>
       <p className="btp-title">{title}</p>
       <p className="btp-sub">{sub}</p>
 
@@ -103,6 +118,7 @@ export default function BoxTreatPicker({ items, plan, picks, onChange, attention
           </div>
         ))}
         {Array.from({ length: plan.picks }).map((_, i) => {
+          if (surprise) return <div key={`d-${i}`} className="btp-slot btp-slot-empty btp-slot-dice" aria-hidden>🎲</div>;
           const item = picks[i] ? byId.get(picks[i]) : undefined;
           if (!item) return <div key={`e-${i}`} className="btp-slot btp-slot-empty" aria-hidden>+</div>;
           return (
@@ -124,11 +140,18 @@ export default function BoxTreatPicker({ items, plan, picks, onChange, attention
       {plan.picks > 0 && (
         <>
           <p className={`btp-status${left === 0 ? ' btp-done' : ''}`} aria-live="polite">
-            {full ? 'Caixa cheia! Toque num doce da caixa para trocar.'
+            {surprise ? `A Dolly escolhe ${plan.picks === 1 ? 'o seu' : `os seus ${plan.picks}`} 🎲 Mudou de ideia? Toque num doce.`
+              : full ? 'Caixa cheia! Toque num doce da caixa para trocar.'
               : left === 0 ? 'Pronto, sua caixa está montada ✓'
               : picks.length === 0 ? `Toque em ${plan.picks === 1 ? 'um doce' : `${plan.picks} doces`} 👇`
               : `Falta${left > 1 ? 'm' : ''} ${left}`}
           </p>
+          {onSurprise && (
+            <button type="button" className="btp-dice" aria-pressed={surprise} onClick={() => { setFull(false); onSurprise(!surprise); }}>
+              <span aria-hidden className="btp-dice-icon">🎲</span>
+              {surprise ? 'A Dolly escolhe ✓' : 'Não sabe? Deixa a Dolly escolher'}
+            </button>
+          )}
           <div className="btp-grid">
             {items.map(item => {
               const n = picks.filter(p => p === item.id).length;

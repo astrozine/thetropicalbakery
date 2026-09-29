@@ -169,7 +169,7 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
       if (plan.picks > 0) {
         const names = picks.map(p => treats.find(t => t.id === p)?.name);
         if (picks.length === 0) {
-          suffix = ': doces à escolha da casa'; // a cart saved before the picker existed
+          suffix = picksSuffix(plan, []); // the dice, or a cart saved before the picker existed: Dolly chooses
         } else if (picks.length !== plan.picks || names.some(n => !n)) {
           throw new OrderError(409, `Os doces de "${row.title}" mudaram. Volte à página da caixa e escolha de novo.`);
         } else {

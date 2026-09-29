@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **27**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **29**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -91,6 +91,11 @@ Verified live, 2026-09-26:
   nothing back, `reserve_box_stock` / `release_box_stock` exist and answer "permission denied" to anyone but the server, and the
   content tables read publicly but refuse an anonymous write. `orders.status` and `orders.total_price` both default to NULL, so a
   lead that sets neither is accepted — a lead that sets either one is rejected outright.
+- **Treat picks (written 2026-09-28).** The 4-box is the complete one, the 2-box is two favourites, the 6-box is complete + 2
+  (`src/lib/boxPicks.ts`, one rule for page, server and SQL). One-off orders carry the picks as BoxItem ids and the server writes
+  the names into the order line; the dice ("a Dolly escolhe") sends none. Subscribers choose weekly in Minha Conta
+  (`SubscriberPicks.tsx`) through `set_subscription_picks`: **migration 28 is NOT run yet**; until then that card and the admin's
+  per-subscriber choice line stay hidden. The picker only appears when the active box has a treat list in /admin/caixas.
 - **Migration 24 (box sizes, box gallery, subscription size) is NOT run yet** (written 2026-09-26). Until it runs the site uses the
   built-in prices 59 / 99 / 129 from `src/lib/boxSizes.ts`, the admin cannot change them, box gallery photos are not saved, and a new
   subscription's size goes into its customer message. Boxes come in 2, 4 or 6 treats everywhere; the server prices every box line

@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { Subscription, SubscriptionPlan, STATUS_LABELS, DIETARY_FIELDS } from '@/lib/subscriptions';
 import { formatBRL } from '@/lib/deliveryZones';
 import DeliveryCalendar from '@/components/DeliveryCalendar';
+import SubscriberPicks from '@/components/SubscriberPicks';
 
 interface Delivery {
   id: string;
@@ -119,6 +120,9 @@ export default function MySubscription() {
             </div>
           </div>
         )}
+
+        {/* This week's treats: their favourites, or the dice */}
+        {sub.status !== 'cancelled' && <SubscriberPicks subscriptionId={sub.id} boxSize={sub.box_size} />}
 
         {/* Calendar strip */}
         {visible.length > 0 && (
