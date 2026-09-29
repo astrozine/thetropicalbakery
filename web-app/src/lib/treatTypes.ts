@@ -31,6 +31,9 @@ export const TREAT_TYPES: TreatType[] = [
 /** The catch-all "Outros" bucket's colour — a neutral that doesn't compete with any real type. */
 export const OUTROS_ACCENT = '#8a7a6b';
 
+/** The key the "Outros" bucket answers to, in grouping and in the type filter. Never a real type id. */
+export const OUTROS_KEY = 'outros';
+
 export const treatTypeById = (id: string | null | undefined) => TREAT_TYPES.find(t => t.id === id);
 
 /** The bit of a treat that groupByType looks at. */
@@ -66,3 +69,25 @@ export function groupByType<T extends TypeableTreat>(treats: T[]): TreatTypeGrou
 
 /** True once at least one treat has a real type — the signal to start showing grouped sections. */
 export const anyTyped = (treats: TypeableTreat[]) => treats.some(t => !!t.treat_type && TREAT_TYPES.some(ty => ty.id === t.treat_type));
+
+/**
+ * Which bucket a treat belongs to — its own type, or OUTROS_KEY when it has none
+ * (or one we no longer use). The grouping and the type filter both go through
+ * this, so "Outros" always means the same set of treats in both.
+ */
+export function typeKeyOf(t: TypeableTreat): string {
+  return t.treat_type && TREAT_TYPES.some(ty => ty.id === t.treat_type) ? t.treat_type : OUTROS_KEY;
+}
+
+/** Label + colour for any bucket key, including OUTROS_KEY. */
+export function typeChipFor(key: string) {
+  const t = treatTypeById(key);
+  return t ? { emoji: t.emoji, label: t.label, accent: t.accent } : { emoji: '✨', label: 'Outros', accent: OUTROS_ACCENT };
+}
+
+/** White text on dark accents, dark text on light ones — the rule the admin's Atalhos grid uses. */
+export function textOn(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return lum > 0.62 ? '#2c3e50' : '#ffffff';
+}

@@ -11,7 +11,7 @@ import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineSt
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { syncTreatIntoBoxes } from '@/lib/treatSync';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
-import { anyTyped, groupByType, treatTypeById } from '@/lib/treatTypes';
+import { anyTyped, groupByType, textOn, treatTypeById } from '@/lib/treatTypes';
 
 interface Treat {
   id: string;
@@ -32,13 +32,6 @@ interface Treat {
 const field: React.CSSProperties = { width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #ccc' };
 const label: React.CSSProperties = { display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem' };
 const card: React.CSSProperties = { background: 'white', padding: 'clamp(1.25rem, 3vw, 2rem)', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' };
-
-/** White text on dark accents, dark text on light ones — same rule as the overview's own Atalhos grid. */
-const textOn = (hex: string) => {
-  const n = parseInt(hex.slice(1), 16);
-  const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
-  return lum > 0.62 ? '#2c3e50' : '#ffffff';
-};
 
 export default function TreatsAdmin() {
   const [treats, setTreats] = useState<Treat[]>([]);

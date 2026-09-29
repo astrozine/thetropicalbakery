@@ -10,8 +10,9 @@ import SquiggleArrows from '@/components/SquiggleArrows';
 import EventOrderSheet, { EventQuoteForm } from '@/components/EventOrder';
 import { useCart } from '@/context/CartContext';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
+import TreatTypeBar from '@/components/TreatTypeBar';
 import { ALLERGEN_LIST_NEM } from '@/lib/allergens';
-import { anyTyped, groupByType } from '@/lib/treatTypes';
+import { anyTyped, groupByType, textOn } from '@/lib/treatTypes';
 
 interface Treat {
   id: string;
@@ -28,13 +29,6 @@ interface Treat {
   may_contain?: string[] | null;
   treat_type?: string | null;
 }
-
-/** White text on dark accents, dark text on light ones — same rule as the admin's own Atalhos grid. */
-const textOn = (hex: string) => {
-  const n = parseInt(hex.slice(1), 16);
-  const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
-  return lum > 0.62 ? '#2c3e50' : '#ffffff';
-};
 
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<Treat[]>([]);
@@ -149,9 +143,13 @@ export default function MenuPage() {
           {/* Allergy/preference finder: a sticky left column on desktop, above the treats on phones. */}
           <style>{`
             .menu-aside { margin-bottom: 2.5rem; }
+            /* The type picker sits at the top of the treats column — top-right on a wide screen,
+               a swipeable strip above the grid on a phone. */
+            .menu-typebar { display: flex; justify-content: flex-start; margin-bottom: 1.5rem; }
             @media (min-width: 1024px) {
               .menu-layout { display: grid; grid-template-columns: minmax(320px, 380px) minmax(0, 1fr); gap: 2rem; align-items: start; }
               .menu-aside { position: sticky; top: 7.5rem; max-height: calc(100vh - 9rem); overflow-y: auto; margin-bottom: 0; padding: 2px 6px 10px 2px; }
+              .menu-typebar { justify-content: flex-end; margin-bottom: 1.25rem; }
             }
           `}</style>
           <div className="menu-layout">
@@ -160,6 +158,10 @@ export default function MenuPage() {
           </aside>
 
           <div className="menu-main">
+          <div className="menu-typebar">
+            <TreatTypeBar treats={menuItems} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
+          </div>
+
           {visibleItems.length === 0 && (
             <div style={{ textAlign: 'center', color: '#594a42', padding: '2rem 1rem' }}>
               <p style={{ marginBottom: '1rem' }}>Nenhum doce combina com essa busca. Tente tirar algum filtro, ou fale com a gente no WhatsApp: podemos adaptar um doce para você.</p>
