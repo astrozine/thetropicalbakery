@@ -6,6 +6,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
 import { DELIVERY_ZONES, formatBRL } from '@/lib/deliveryZones';
 import { BOX_SIZES, SINGLE_PIECE_FROM } from '@/lib/boxSizes';
+import { usualCaption } from '@/lib/boxPicks';
 
 const FOOTNOTES = [
   '* O mais perto de açúcar que usamos é o açúcar de coco, às vezes num chocolate vegano (inclusive o branco) adoçado com ele. Nada de açúcar refinado.',
@@ -92,7 +93,7 @@ const panels: Panel[] = [
         <div>
           {BOX_SIZES.map(size => (
             <div key={size.pieces} style={rowStyle}>
-              <span>Caixa com <strong>{size.pieces} peças</strong></span>
+              <span>Caixa com <strong>{size.pieces} peças</strong> <span style={{ opacity: 0.7, fontSize: '0.85em' }}>· {usualCaption(size.pieces)}</span></span>
               <strong style={{ fontFamily: 'var(--font-heading)', fontSize: '1.05rem' }}>R$ {size.price}</strong>
             </div>
           ))}

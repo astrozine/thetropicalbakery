@@ -22,6 +22,8 @@ interface InboxItem {
   pickup?: boolean;
   /** The day an order is due out ('YYYY-MM-DD'), for the red "delivery is tomorrow" flag. */
   dueDate?: string | null;
+  /** Orders: what to pack (items_summary, which carries the treats they chose), where it goes, and diet notes. */
+  details?: { what: string | null; where: string | null; diet: string | null };
 }
 
 interface StatusStep {
@@ -146,6 +148,11 @@ function useInbox() {
         pickup: o.fulfillment === 'pickup',
         // A quote request's date is the event day, not a delivery we are late on.
         dueDate: o.items?.kind === 'orcamento_evento' || o.status === 'ORCAMENTO' ? null : (o.requested_date || null),
+        details: {
+          what: o.items_summary || null,
+          where: o.fulfillment === 'pickup' ? null : (o.delivery_address || null),
+          diet: o.dietary_notes || null,
+        },
       })),
       ...(coursesRes.data || []).map((c: any) => ({
         key: `course_registrations:${c.id}`, source_table: 'course_registrations', source_id: c.id,
@@ -349,6 +356,13 @@ function ItemCard({ row, onSet, compact }: {
         </div>
         <h3 style={{ fontSize: compact ? '1rem' : '1.15rem', margin: '0 0 0.2rem', color: '#2c3e50', fontWeight: isUnread ? 800 : 600 }}>{item.title}</h3>
         <p style={{ color: '#7f8c8d', fontSize: '0.88rem', margin: 0 }}>{item.subtitle}</p>
+        {item.details && (item.details.what || item.details.where || item.details.diet) && !compact && (
+          <div style={{ marginTop: '0.45rem', fontSize: '0.86rem', color: '#2c3e50', lineHeight: 1.55, overflowWrap: 'anywhere' }}>
+            {item.details.what && <div>📦 {item.details.what}</div>}
+            {item.details.where && <div style={{ color: '#7f8c8d' }}>📍 {item.details.where}</div>}
+            {item.details.diet && <div style={{ color: '#a03027', fontWeight: 600 }}>⚠ {item.details.diet}</div>}
+          </div>
+        )}
         <p style={{ color: '#95a5a6', fontSize: '0.78rem', marginTop: '0.3rem' }}>
           {stamp(item.created_at)}
           {t.href && !compact && (

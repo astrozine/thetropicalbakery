@@ -9,6 +9,7 @@ import FormSideRails, { RailCard, RailSteps } from '@/components/FormSideRails';
 import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
 import { SUBSCRIPTION_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
 import { SubscriptionPlan, DIETARY_FIELDS, DietaryKey } from '@/lib/subscriptions';
+import { usualCaption, usualPicks } from '@/lib/boxPicks';
 import BoxSizePicker from '@/components/BoxSizePicker';
 import { DEFAULT_TREAT_COUNT, TreatCount, planBoxPrice, sizeText } from '@/lib/boxSizes';
 import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
@@ -346,7 +347,12 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
             priceOf={size => perBoxFor(plan, size)}
             priceNote="por caixa"
             title="Quantos doces em cada caixa?"
+            picksOf={usualPicks} captionOf={usualCaption}
           />
+          <p style={{ fontSize: '0.85rem', color: '#594a42', marginTop: '0.6rem', lineHeight: 1.55 }}>
+            A de 4 é a caixa completa da semana. Na de 2 você escolhe os seus favoritos, e na de 6 leva a completa + 2 favoritos.
+            Toda semana você escolhe em Minha Conta, ou deixa a Dolly escolher 🎲.
+          </p>
           <p style={{ fontSize: '0.8rem', color: '#7a6a61', marginTop: '0.6rem' }}>
             Quer mudar depois? Dá para aumentar ou diminuir a caixa a qualquer momento, é só avisar a Dolly.
           </p>

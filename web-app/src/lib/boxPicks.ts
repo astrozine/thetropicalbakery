@@ -25,6 +25,13 @@ export function boxPlan(itemCount: number, size: number): BoxPlan {
   return { fixed, picks: size - fixed };
 }
 
+/** How many treats a weekly box usually lists. Only for places that talk about sizes before a box exists (signup, homepage). */
+export const USUAL_TREATS = 4;
+
+/** "você escolhe 2" / "a completa" / "completa + 2" for a usual week. */
+export const usualCaption = (size: number) => planCaption(boxPlan(USUAL_TREATS, size));
+export const usualPicks = (size: number) => boxPlan(USUAL_TREATS, size).picks;
+
 /** The short caption under each size card: "você escolhe 2", "a completa", "completa + 2". */
 export function planCaption(plan: BoxPlan): string {
   if (plan.picks === 0) return 'a completa';
@@ -32,12 +39,20 @@ export function planCaption(plan: BoxPlan): string {
   return `completa + ${plan.picks}`;
 }
 
-/** "Brownie", "Brownie e Tartelete", "2× Brownie, Tartelete e Cookie". Keeps the order they were picked in. */
+/**
+ * "Brownie", "Brownie + Tartelete", "2× Brownie + Cookie". Keeps the order they were picked in.
+ * Never a comma: an order's items_summary is split on commas into lines (the paid receipt does it).
+ */
 export function namesText(names: string[]): string {
   const counts = new Map<string, number>();
-  for (const n of names) counts.set(n, (counts.get(n) ?? 0) + 1);
-  const parts = [...counts].map(([n, c]) => (c > 1 ? `${c}× ${n}` : n));
-  return parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}`;
+  for (const n of names) counts.set(n.replace(/,/g, ''), (counts.get(n.replace(/,/g, '')) ?? 0) + 1);
+  return [...counts].map(([n, c]) => (c > 1 ? `${c}× ${n}` : n)).join(' + ');
+}
+
+/** What an order stores in orders.items for its boxes, so the kitchen can count treats (see admin ProductionTally). */
+export interface BoxOrderItems {
+  kind: 'caixa';
+  boxes: { box_id: string; size: number; picks: string[]; qty: number }[];
 }
 
 /** The dice: "completa + 2 à escolha da Dolly". */

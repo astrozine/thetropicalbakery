@@ -50,7 +50,8 @@ export default function HeldBoxes({ box, onReleased }: Props) {
 
     const inbox = new Map<string, string>(
       ((statusRes.data || []) as { source_id: string; status: string }[]).map(s => [String(s.source_id), s.status]));
-    const line = new RegExp(`(\\d+)\\s*x\\s+${escapeRegExp(box.title)}`, 'i');
+    // One order can hold several lines of this box (different sizes or treat choices): add them all up.
+    const line = new RegExp(`(\\d+)\\s*x\\s+${escapeRegExp(box.title)}`, 'gi');
 
     const rows: Held[] = [];
     for (const o of (ordersRes.data || []) as {
@@ -62,13 +63,13 @@ export default function HeldBoxes({ box, onReleased }: Props) {
       if (o.payment_provider && o.payment_provider !== 'pix') continue;      // card / PayPal: not ours to release
       const summary = o.items_summary || '';
       if (!summary.toLowerCase().includes(box.title.toLowerCase())) continue; // an order for another edition
-      const m = summary.match(line);
+      const counts = [...summary.matchAll(line)].map(m => Number(m[1]));
       rows.push({
         id: String(o.id),
         name: o.customer_name || 'Sem nome',
         hoursAgo: Math.floor((Date.now() - new Date(o.created_at).getTime()) / 3600000),
         summary,
-        qty: m ? Number(m[1]) : null,
+        qty: counts.length ? counts.reduce((a, b) => a + b, 0) : null,
       });
     }
     setHeld(rows);

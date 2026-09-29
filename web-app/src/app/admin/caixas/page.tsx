@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import HeldBoxes from './HeldBoxes';
+import ProductionTally from './ProductionTally';
 import BoxStock from '../BoxStock';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -369,6 +370,8 @@ export default function AdminCaixas() {
 
       {/* The number that changes every day, before the long form that almost never does. */}
       <BoxStock box={boxes.find(b => b.is_active) ?? null} onChanged={applyStock} />
+      {/* Customers choose their treats now, so "N boxes" no longer says how many of each to bake. */}
+      <div style={{ marginBottom: '2rem' }}><ProductionTally box={boxes.find(b => b.is_active) ?? null} /></div>
 
       <div style={{ background: '#f8f9fa', padding: '1rem 1.5rem', borderRadius: '8px', borderLeft: '4px solid #d4af37', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>

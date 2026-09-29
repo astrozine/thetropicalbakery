@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BOX_SIZES, BoxSize } from '@/lib/boxSizes';
+import { usualCaption } from '@/lib/boxPicks';
 import { formatBRL } from '@/lib/deliveryZones';
 import { STORE_WHATSAPP } from '@/lib/siteContact';
 
@@ -61,7 +62,7 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
       const boxes = `${quantity} ${quantity === 1 ? 'caixa' : 'caixas'} de degustação`;
       const text =
         `Olá! Meu nome é ${name}. Vi "${title}" no site e gostaria de pedir *${boxes}*` +
-        (size ? ` de ${size.pieces} peças (R$ ${size.price} cada)` : '') + `.
+        (size ? ` de ${size.pieces} peças, ${usualCaption(size.pieces)} (R$ ${size.price} cada)` : '') + `.
 ` +
         (size ? `Total estimado: ${formatBRL(quantity * size.price)}
 ` : '') +
@@ -178,6 +179,7 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                       >
                         <strong style={{ display: 'block' }}>{option.pieces} peças</strong>
                         <span style={{ fontSize: '0.85rem' }}>R$ {option.price}</span>
+                        <span style={{ display: 'block', fontSize: '0.75rem', opacity: 0.85 }}>{usualCaption(option.pieces)}</span>
                       </button>
                     );
                   })}

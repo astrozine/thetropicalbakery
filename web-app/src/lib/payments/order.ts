@@ -6,7 +6,7 @@ import { BoxWindowFields, inDeliveryWindow, saleState } from '@/lib/boxWindow';
 import { dietSummary, normalizeDiet } from '@/lib/dietary';
 import { fetchBoxSizePrices, isTreatCount, sizeText, toTreatCount, type TreatCount } from '@/lib/boxSizes';
 import { sendOrderReceived } from '@/lib/email/receipts';
-import { boxPlan, picksSuffix } from '@/lib/boxPicks';
+import { boxPlan, picksSuffix, type BoxOrderItems } from '@/lib/boxPicks';
 import { generatePixData } from '@/utils/pix';
 
 /**
@@ -222,6 +222,10 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
   const reference = `ORD${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
   const payment_provider = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : 'pix';
   const itemsSummary = lines.map(l => `${l.quantity}x ${l.name}`).join(', ');
+  // The same boxes as data: which treats, how many, so the kitchen tally never has to read the summary text.
+  const boxItems: BoxOrderItems | null = hasBox
+    ? { kind: 'caixa', boxes: [...boxLines.values()].map(l => ({ box_id: l.id, size: l.size, picks: l.picks, qty: l.qty })) }
+    : null;
 
   // ---- keep the box counter honest: reserve first, in one safe step per box
   try {
@@ -264,6 +268,7 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
       delivery_fee: fee,
       dietary_notes: dietaryNotes,
       items_summary: itemsSummary,
+      ...(boxItems ? { items: boxItems } : {}),
     };
     let saved = !(await db.from('orders').insert([{ ...rich, diet_tags: dietTags, allergens_avoid: dietAllergens }])).error;
     if (!saved) saved = !(await db.from('orders').insert([rich])).error;
