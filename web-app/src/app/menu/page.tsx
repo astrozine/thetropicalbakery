@@ -176,22 +176,28 @@ export default function MenuPage() {
 
           {/* Grouped once Dolly has typed at least one treat, in the same style as the admin's own
               Atalhos grid: one continuous grid (rows never break for a group change — the next
-              category just slides in after the last card), and only the first card of each group
-              carries the little coloured tab with its name. Until anything is typed, this is exactly
-              the flat grid it always was, so the feature stays invisible until it's used. */}
+              category just slides in after the last card), and the group's colour runs across the
+              top of every one of its cards with the name sitting on that line. Until anything is
+              typed, this is exactly the flat grid it always was. */}
           {anyTyped(visibleItems) ? (
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {groupByType(visibleItems).flatMap(group => group.items.map((item, i) => (
-                <div key={item.id} className="menu-type-cell">
+                <div
+                  key={item.id}
+                  className="menu-type-cell"
+                  data-first={i === 0 ? 'true' : 'false'}
+                  style={{ ['--cell-accent' as string]: group.accent } as React.CSSProperties}
+                >
+                  {/* The name is rendered on every card but only revealed on the group's first one
+                      and at the start of each row (see the CSS) — so however long a group runs,
+                      the left-hand card of the row you're looking at always says where you are. */}
                   <div className="menu-type-head">
-                    {i === 0 && (
-                      <span style={{ background: group.accent, color: textOn(group.accent) }}>
-                        {group.emoji} {group.label}
-                      </span>
-                    )}
+                    <span style={{ background: group.accent, color: textOn(group.accent) }}>
+                      {group.emoji} {group.label}
+                    </span>
                   </div>
                   <ScrollReveal>
-                    <MenuCard picked={picked.includes(item.id)} onTogglePick={() => togglePick(item.id)} item={{
+                    <MenuCard flatTop picked={picked.includes(item.id)} onTogglePick={() => togglePick(item.id)} item={{
                       id: item.id,
                       name: item.name,
                       description: item.description,
@@ -234,8 +240,29 @@ export default function MenuPage() {
 
           <style>{`
             .menu-type-cell { display: flex; flex-direction: column; min-width: 0; }
-            .menu-type-head { height: 1.7rem; display: flex; align-items: flex-end; margin-bottom: 0.5rem; }
-            .menu-type-head span { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.76rem; font-weight: 800; line-height: 1; letter-spacing: 0.01em; padding: 0.38rem 0.7rem; border-radius: 8px 8px 0 0; }
+            /* The group's colour, drawn across the full width of every card it owns, with the
+               name tab sitting on that line — the card below is squared off so the two meet. */
+            .menu-type-head { height: 1.7rem; display: flex; align-items: flex-end; border-bottom: 4px solid var(--cell-accent, #d4af37); }
+            .menu-type-head span { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.76rem; font-weight: 800; line-height: 1; letter-spacing: 0.01em; padding: 0.38rem 0.7rem; border-radius: 8px 8px 0 0; visibility: hidden; }
+
+            /* The name shows on the group's first card, and again on whichever card starts a row,
+               so a long group keeps telling you what you're looking at however far it runs.
+               The counts below mirror the grid classes above (2 / md:3 / xl:4), in Tailwind's own
+               rem breakpoints (md 48rem, xl 80rem) so the two can't drift apart. Within each
+               block the [data-first] rule has to come last: it has the same specificity as the
+               nth-child ones and must win. */
+            .menu-type-cell:nth-child(2n+1) .menu-type-head span { visibility: visible; }
+            .menu-type-cell[data-first="true"] .menu-type-head span { visibility: visible; }
+            @media (min-width: 48rem) {
+              .menu-type-cell:nth-child(2n+1) .menu-type-head span { visibility: hidden; }
+              .menu-type-cell:nth-child(3n+1) .menu-type-head span { visibility: visible; }
+              .menu-type-cell[data-first="true"] .menu-type-head span { visibility: visible; }
+            }
+            @media (min-width: 80rem) {
+              .menu-type-cell:nth-child(3n+1) .menu-type-head span { visibility: hidden; }
+              .menu-type-cell:nth-child(4n+1) .menu-type-head span { visibility: visible; }
+              .menu-type-cell[data-first="true"] .menu-type-head span { visibility: visible; }
+            }
           `}</style>
           </div>
           </div>

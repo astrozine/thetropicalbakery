@@ -146,10 +146,10 @@ export default function TreatsAdmin() {
   const visibleTreats = treats.filter(t => matchesRefine(t, refine));
 
   // One card, reused whether the list is grouped by type or shown flat.
-  const renderTreatCard = (treat: Treat) => {
+  const renderTreatCard = (treat: Treat, grouped = false) => {
     const kind = treatTypeById(treat.treat_type);
     return (
-      <div key={treat.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+      <div key={treat.id} style={{ background: 'white', borderRadius: grouped ? '0 0 12px 12px' : '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{ position: 'relative', height: '200px', background: '#f5f6fa' }}>
           {treat.image_url ? (
             <Image src={treat.image_url} alt={treat.name} fill style={{ objectFit: 'cover' }} />
@@ -339,7 +339,7 @@ export default function TreatsAdmin() {
         <div style={cardGrid}>
           {typeGroups.flatMap(group => group.items.map((treat, i) => (
             <div key={treat.id} style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              <div style={{ height: '1.7rem', display: 'flex', alignItems: 'flex-end', marginBottom: '0.5rem' }}>
+              <div style={{ height: '1.7rem', display: 'flex', alignItems: 'flex-end', borderBottom: `4px solid ${group.accent}` }}>
                 {i === 0 && (
                   <span style={{
                     display: 'inline-block', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -350,12 +350,12 @@ export default function TreatsAdmin() {
                   </span>
                 )}
               </div>
-              {renderTreatCard(treat)}
+              {renderTreatCard(treat, true)}
             </div>
           )))}
         </div>
       ) : (
-        <div style={cardGrid}>{visibleTreats.map(renderTreatCard)}</div>
+        <div style={cardGrid}>{visibleTreats.map(t => renderTreatCard(t))}</div>
       )}
       </div>
       </div>

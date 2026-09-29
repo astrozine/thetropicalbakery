@@ -28,9 +28,14 @@ interface MenuCardProps {
   picked?: boolean;
   /** Present when the page has a quick pick; adds a choose/unchoose button to the phone drawer. */
   onTogglePick?: () => void;
+  /**
+   * Square off the top corners so the card can sit flush under its group's colour bar
+   * (see the grouped grid on /menu). Rounded on every other page.
+   */
+  flatTop?: boolean;
 }
 
-export default function MenuCard({ item, picked = false, onTogglePick }: MenuCardProps) {
+export default function MenuCard({ item, picked = false, onTogglePick, flatTop = false }: MenuCardProps) {
   const { addToCart } = useCart();
   const [isMobile, setIsMobile] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -66,7 +71,7 @@ export default function MenuCard({ item, picked = false, onTogglePick }: MenuCar
         onClick={handleCardClick}
         style={{
           background: '#fff',
-          borderRadius: '16px',
+          borderRadius: flatTop ? '0 0 16px 16px' : '16px',
           overflow: 'hidden',
           boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
           border: picked ? '2px solid #d4af37' : '1px solid rgba(212,175,55,0.1)',
