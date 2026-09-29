@@ -12,7 +12,7 @@ export const metadata: Metadata = {
       'Raízes belgas, natureza brasileira, pâtisserie francesa. A história da chef por trás da The Tropical Bakery.',
     url: '/dolly',
     type: 'profile',
-    images: [{ url: '/dolly/dolly-spatula.jpg', width: 1200, height: 1600, alt: 'Dolly Van Dam' }],
+    images: [{ url: '/dolly/dolly-spatula.jpg', width: 1650, height: 2200, alt: 'Dolly Van Dam' }],
   },
 };
 

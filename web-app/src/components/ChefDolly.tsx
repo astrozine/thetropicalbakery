@@ -86,7 +86,7 @@ export default function ChefDolly() {
               <ZoomableImage
                 src="/dolly/dolly-spatula.jpg"
                 alt="Dolly Van Dam segurando uma espátula atrás de uma tábua de doces, na mata de Itamambuca"
-                thumbWidth={828}
+                thumbWidth={1080}
               />
               <span className="cd-hero__plate">
                 <b>Elisabeth “Dolly” Van Dam</b>
@@ -407,17 +407,18 @@ export default function ChefDolly() {
         /* ── HERO ─────────────────────────────────────────────────── */
         /* Two columns: the poster lives in the left one, the billing in the right. Nothing the
            photos do can reach the words, because they are in a column of their own. */
-        .cd-hero { position: relative; overflow: hidden; background: #17100c; min-height: 100vh; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: center; gap: clamp(1rem, 3vw, 2.5rem); padding: 4.5rem clamp(1.25rem, 4vw, 3.5rem); }
-        .cd-hero__bg { position: absolute; inset: 0; background: url("/retreats/Palmtrees frog view.webp") center/cover; filter: brightness(0.3) saturate(0.75); transform: scale(1.06); }
+        .cd-hero { position: relative; overflow: hidden; background: #17100c; min-height: calc(100svh - 9rem); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); align-items: center; gap: clamp(1rem, 3vw, 2.5rem); padding: clamp(2.5rem, 6vh, 4.5rem) clamp(1.25rem, 4vw, 3.5rem); }
+        .cd-hero__bg { position: absolute; inset: 0; background: url("/dolly/hero-mata.webp") center 35%/cover; filter: brightness(0.36) saturate(0.85); transform: scale(1.06); }
         .cd-hero__veil { position: absolute; inset: 0; background: radial-gradient(70% 55% at 50% 45%, rgba(23,16,12,0.35), rgba(23,16,12,0.9) 75%), radial-gradient(45% 40% at 12% 10%, rgba(212,175,55,0.22), transparent 70%); }
         .cd-hero__photos { position: relative; z-index: 4; display: flex; justify-content: center; }
-        .cd-hero__stage { position: relative; width: clamp(190px, 27vw, 330px); }
+        /* As big as the column allows, but never taller than the screen under the site header: the whole poster, name plate included, is in view on a laptop. */
+        .cd-hero__stage { position: relative; width: min(clamp(280px, 31vw, 500px), calc((100svh - 18rem) * 0.72)); }
         .cd-hero__poster { position: relative; z-index: 3; transform: rotate(-3.5deg); padding: 10px 10px 0; background: var(--cream); border: 1px solid rgba(212,175,55,0.65); border-radius: 14px; box-shadow: 0 34px 70px rgba(0,0,0,0.6); }
         .cd-hero__poster img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 8px; }
         .cd-hero__plate { display: block; padding: 0.7rem 0.3rem 0.85rem; text-align: center; }
         .cd-hero__plate b { display: block; font-family: var(--font-heading); font-size: 0.86rem; color: var(--cocoa); line-height: 1.3; text-wrap: balance; }
         .cd-hero__plate i { display: block; margin-top: 0.3rem; font-style: normal; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #9a7a1f; }
-        .cd-hero__chip { position: absolute; width: 46%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 44px rgba(0,0,0,0.6); z-index: 4; }
+        .cd-hero__chip { position: absolute; width: 40%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 44px rgba(0,0,0,0.6); z-index: 4; }
         .cd-hero__chip--a { top: -7%; right: -20%; transform: rotate(9deg); }
         .cd-hero__chip--b { bottom: 20%; left: -22%; transform: rotate(-8deg); }
         .cd-hero__bill { position: relative; z-index: 6; text-align: center; max-width: 620px; margin: 0 auto; }
@@ -522,6 +523,7 @@ export default function ChefDolly() {
         /* ── Phone: the playbill photos come first, then the words ─── */
         @media (max-width: 767px) {
           .cd-hero { display: block; min-height: 0; padding: 1.5rem 0 3.25rem; }
+          .cd-hero__bg { background-image: url("/dolly/hero-mata-sm.webp"); }
           .cd-hero__photos { margin-bottom: 1.75rem; }
           .cd-hero__stage { width: min(58%, 250px); }
           .cd-hero__poster { transform: rotate(-3deg); }
