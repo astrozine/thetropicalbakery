@@ -21,6 +21,8 @@ interface Props {
   window?: { from?: string | null; until?: string | null };
   /** Several boxes at once (checkout): a day must suit every one of them. Each window rolls over on its own. */
   windows?: { from?: string | null; until?: string | null }[];
+  /** Box orders: whether the customer comes to get it. Changes the words, not the days (both happen on the same box days). */
+  fulfillment?: 'delivery' | 'pickup';
 }
 
 const daysUntil = (iso: string) => {
@@ -40,7 +42,7 @@ const countdown = (iso: string) => {
  * everything else recedes. Picking one turns it into a small celebration,
  * because the day the box arrives is the best day of the week.
  */
-export default function DeliveryCalendar({ value, onChange, highlight = [], title = 'Dia da Caixa', window: range, windows }: Props) {
+export default function DeliveryCalendar({ value, onChange, highlight = [], title = 'Dia da Caixa', window: range, windows, fulfillment }: Props) {
   const [schedule, setSchedule] = useState<DeliverySchedule | null>(null);
   const [monthOffset, setMonthOffset] = useState(0);
 
@@ -76,6 +78,8 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
   }
   const mine = useMemo(() => new Set(highlight), [highlight]);
   const interactive = !!onChange;
+  const pickup = fulfillment === 'pickup';
+  const dayWord = pickup ? 'retirada' : 'entrega';
 
   const view = new Date();
   view.setDate(1);
@@ -174,7 +178,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
               className="dc-day"
               disabled={!interactive || !isSelectable}
               onClick={() => onChange?.(iso)}
-              title={isSelectable ? 'Dia de entrega das caixas' : isOpenButTooSoon ? 'Prazo de pedido encerrado para este dia' : undefined}
+              title={isSelectable ? `Dia de ${dayWord} das caixas` : isOpenButTooSoon ? 'Prazo de pedido encerrado para este dia' : undefined}
               style={{
                 aspectRatio: '1', borderRadius: '50%', border, background, color, animation: anim,
                 cursor: interactive && isSelectable ? 'pointer' : 'default',
@@ -191,7 +195,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.9rem', fontSize: '0.75rem', color: '#7a6a61' }}>
-        <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#fb8500', marginRight: 6 }} />dia de entrega</span>
+        <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#fb8500', marginRight: 6 }} />dia de {dayWord}</span>
         {highlight.length > 0 && <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#2a9d8f', marginRight: 6 }} />sua caixa</span>}
       </div>
 
@@ -207,13 +211,15 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
           <span style={{ fontSize: '2.2rem' }} aria-hidden>{value ? '🎉' : '🌴'}</span>
           <div>
             <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700 }}>
-              {value ? 'Sua caixa chega' : 'Próximo dia de caixa'}
+              {value ? (pickup ? 'Sua caixa fica pronta para retirar' : 'Sua caixa chega') : 'Próximo dia de caixa'}
             </p>
             <p style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.05rem, 3vw, 1.35rem)', lineHeight: 1.25 }}>
               {focusDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
             </p>
             <p style={{ fontSize: '0.85rem', color: 'rgba(253,250,243,0.8)' }}>
-              {countdown(focus!)} — {value ? 'feita à mão, fresquinha, na sua porta.' : 'reserve a sua e receba fresquinha.'}
+              {countdown(focus!)} — {value
+                ? (pickup ? 'feita à mão, fresquinha, esperando por você no home bakery.' : 'feita à mão, fresquinha, na sua porta.')
+                : (pickup ? 'reserve a sua e venha buscar fresquinha.' : 'reserve a sua e receba fresquinha.')}
             </p>
           </div>
         </div>

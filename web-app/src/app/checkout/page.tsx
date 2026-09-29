@@ -6,6 +6,7 @@ import { useCart, CartItem } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import DeliveryCalendar from '@/components/DeliveryCalendar';
+import FulfillmentPicker, { readFulfillment } from '@/components/FulfillmentPicker';
 import { generatePixData } from '@/utils/pix';
 import { supabase } from '@/lib/supabase';
 import { DELIVERY_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
@@ -90,6 +91,8 @@ export default function CheckoutPage() {
     const savedPhone = localStorage.getItem('checkout_phone');
     const savedAddress = localStorage.getItem('checkout_address');
     const savedDate = localStorage.getItem(DATE_KEY);
+    const savedFulfillment = readFulfillment();   // chosen on the box page
+    if (savedFulfillment) setFulfillment(savedFulfillment);
     setFormData(prev => ({
       ...prev,
       name: prev.name || savedName || '',
@@ -434,27 +437,7 @@ export default function CheckoutPage() {
                   {hasBox && (
                     <div>
                       <label style={labelStyle}>Como você quer receber?</label>
-                      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                        {([
-                          ['delivery', '🛵', 'Receber em casa', 'Entregamos no seu endereço'],
-                          ['pickup', '🛍️', 'Retirar no home bakery', 'Grátis · endereço liberado na sua conta'],
-                        ] as const).map(([value, emoji, title, hint]) => {
-                          const on = fulfillment === value;
-                          return (
-                            <button
-                              key={value}
-                              type="button"
-                              aria-pressed={on}
-                              onClick={() => { setFulfillment(value); setError(''); }}
-                              style={{ flex: '1 1 220px', textAlign: 'left', padding: '0.9rem 1rem', borderRadius: '12px', cursor: 'pointer', border: `2px solid ${on ? '#d4af37' : '#e8e1d7'}`, background: on ? 'rgba(212,175,55,0.14)' : 'rgba(255,255,255,0.7)', color: '#3c2a21' }}
-                            >
-                              <span style={{ fontSize: '1.4rem' }} aria-hidden>{emoji}</span>{' '}
-                              <strong>{title}</strong>
-                              <span style={{ display: 'block', fontSize: '0.8rem', color: '#7a6a61', marginTop: '0.2rem' }}>{hint}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <FulfillmentPicker value={fulfillment} onChange={v => { setFulfillment(v); setError(''); }} />
                       {isPickup && (
                         <p style={{ fontSize: '0.82rem', color: '#7a6a61', marginTop: '0.6rem', lineHeight: 1.6 }}>
                           Por segurança, o endereço não fica público: depois que confirmarmos o seu Pix, ele aparece em <strong>Minha Conta</strong>, junto com o dia da retirada. Por isso a retirada pede que você esteja com a conta ativa (acima).
@@ -504,7 +487,8 @@ export default function CheckoutPage() {
                     {hasBox ? (
                       <>
                         <label style={labelStyle}>{isPickup ? 'Quando você quer retirar sua caixa?' : 'Quando você quer receber sua caixa?'}</label>
-                        <DeliveryCalendar value={formData.date} onChange={setDate} windows={boxWindows} />
+                        <DeliveryCalendar value={formData.date} onChange={setDate} windows={boxWindows} fulfillment={fulfillment}
+                          title={isPickup ? 'Dia da retirada' : 'Dia da entrega'} />
                       </>
                     ) : (
                       <>

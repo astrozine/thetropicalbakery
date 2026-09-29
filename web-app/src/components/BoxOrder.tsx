@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { OriginSeal } from '@/components/BelgiumBrazil';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -12,6 +12,7 @@ import Link from 'next/link';
 import WaitlistCapture from '@/components/WaitlistCapture';
 import { BoxWindowFields, SaleState, longDay } from '@/lib/boxWindow';
 import BoxSizePicker from '@/components/BoxSizePicker';
+import FulfillmentPicker, { Fulfillment, readFulfillment } from '@/components/FulfillmentPicker';
 import { BoxSizePrices, DEFAULT_TREAT_COUNT, TreatCount, sizeText } from '@/lib/boxSizes';
 
 interface BoxOrderProps {
@@ -37,6 +38,9 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
   const [size, setSize] = useState<TreatCount>(DEFAULT_TREAT_COUNT);
   const unit = prices[size];
   const [date, setDate] = useState('');
+  const [fulfillment, setFulfillment] = useState<Fulfillment>('delivery');
+  useEffect(() => { const saved = readFulfillment(); if (saved) setFulfillment(saved); }, []);
+  const pickup = fulfillment === 'pickup';
   const [error, setError] = useState('');
 
   const changeQuantity = (delta: number) => {
@@ -59,7 +63,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
   const goToCheckout = () => {
     if (sale && sale.state !== 'open') return;
     if (!date) {
-      setError('Escolha o dia em que você quer receber sua caixa no calendário.');
+      setError(pickup ? 'Escolha no calendário o dia em que você vem retirar sua caixa.' : 'Escolha o dia em que você quer receber sua caixa no calendário.');
       return;
     }
     const id = `box-${box.id}-${size}`;
@@ -100,7 +104,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         <div>
           <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '0.75rem' }}>Peça Sua Caixa</h2>
           <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: 1.6 }}>
-            Escolha o dia e pague por Pix em seguida. Receba em casa (Itamambuca, praias vizinhas e eventos em Paraty) ou retire no nosso home bakery: você escolhe no próximo passo.
+            Receba em casa (Itamambuca, praias vizinhas e eventos em Paraty) ou retire no nosso home bakery. Escolha o dia e pague por Pix em seguida.
           </p>
           <OriginSeal text="Técnica belga · Ingredientes brasileiros" style={{ marginTop: '0.9rem' }} />
         </div>
@@ -126,8 +130,15 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
           </div>
         ) : (
           <>
+        <div>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700, marginBottom: '0.6rem' }}>1 · Como você quer pegar sua caixa?</p>
+          <FulfillmentPicker value={fulfillment} onChange={setFulfillment} />
+        </div>
+
         <TreatFlank contentWidth={1100} sides="right">
-        <DeliveryCalendar value={date} onChange={pickDate} title="Escolha o dia da sua caixa" window={{ from: box.delivery_from, until: box.delivery_until }} />
+        <DeliveryCalendar value={date} onChange={pickDate} fulfillment={fulfillment}
+          title={pickup ? '2 · Escolha o dia da retirada' : '2 · Escolha o dia da entrega'}
+          window={{ from: box.delivery_from, until: box.delivery_until }} />
         </TreatFlank>
 
         <BoxSizePicker value={size} onChange={setSize} priceOf={s => prices[s]} />
@@ -146,7 +157,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
           <strong>{formatBRL(quantity * unit)}</strong>
         </div>
         <p style={{ fontSize: '0.8rem', color: '#7a6a61', marginTop: '-0.75rem', padding: '0 0.5rem' }}>
-          + taxa de entrega conforme a região (Itamambuca é grátis), calculada no próximo passo.
+          {pickup ? 'Retirada grátis. O endereço aparece em Minha Conta assim que confirmarmos o seu Pix.' : '+ taxa de entrega conforme a região (Itamambuca é grátis), calculada no próximo passo.'}
         </p>
 
         {error && <p style={{ color: '#c0392b', fontSize: '0.92rem' }}>{error}</p>}
