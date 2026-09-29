@@ -51,7 +51,7 @@ const WORLDS = [
   { n: '02', t: 'Natureza brasileira', d: 'Cacau, castanhas, coco e fruta da Mata Atlântica.' },
   { n: '03', t: 'Pâtisserie francesa', d: 'A gramática clássica das massas, cremes e camadas.' },
   { n: '04', t: 'Artesanato plant-based', d: 'Tudo à mão, em pequenos lotes, sem nada de origem animal.' },
-  { n: '05', t: 'Uma profunda paixão por saúde', d: 'Sem glúten em nenhuma receita, sem açúcar refinado.' },
+  { n: '05', t: 'Uma profunda paixão por saúde', d: 'Totalmente vegetal, sem processados, sem glúten, com alimentos integrais, sem sal e sem óleo.' },
 ];
 
 /**
@@ -203,6 +203,11 @@ export default function ChefDolly() {
               cercada de natureza, arte, movimento e família. Hoje, Andrew e eu criamos Gigi e nossa pequena
               Zimi aqui — e a vida que um dia imaginei acabou se tornando algo completamente diferente.
               E muito mais bonito.
+            </p>
+            <p className="cd-body">
+              Aqui, a saúde virou princípio da família: comemos de forma <em>nutritariana</em> — alimentos
+              vegetais, integrais e o mais próximos possível da natureza. É essa mesma mesa que chega
+              à The Tropical Bakery.
             </p>
             <span className="cd-passport">
               <Flags size={16} />
