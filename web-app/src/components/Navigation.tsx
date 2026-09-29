@@ -57,8 +57,7 @@ export default function Navigation() {
     { name: 'Caixa de Degustação', path: '/caixas' },
     { name: 'Menu de Eventos', path: '/menu' },
     { name: 'Retiros', path: '/retreats' },
-    // Short on purpose: the desktop bar is already full, and "Dolly" is how customers name her.
-    { name: 'Dolly', path: '/dolly' },
+    { name: 'Chef Dolly', path: '/dolly' },
   ];
 
   const cursosLinks = [
