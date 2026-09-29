@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ALLERGENS, TREAT_EMOJIS, normalizeAllergens } from '@/lib/allergens';
-import { TREAT_TYPES } from '@/lib/treatTypes';
+import { TREAT_TYPES, normalizeTreatType } from '@/lib/treatTypes';
 
 /** Shared admin styles for the treat-detail editors (box treats and Menu de Eventos treats). */
 export const fieldStyle: React.CSSProperties = { width: '100%', padding: '0.7rem', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.95rem' };
@@ -141,7 +141,7 @@ export function TreatTypeField({ value, onChange }: { value: string | null | und
       <label style={labelStyle}>Tipo de doce</label>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
         {TREAT_TYPES.map(t => {
-          const active = value === t.id;
+          const active = normalizeTreatType(value) === t.id;
           return (
             <button
               key={t.id}

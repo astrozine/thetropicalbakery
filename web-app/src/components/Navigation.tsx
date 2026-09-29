@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import AccountMenu from '@/components/AccountMenu';
+import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,12 +61,14 @@ export default function Navigation() {
     { name: 'Chef Dolly', path: '/dolly' },
   ];
 
+  // A course Dolly has hidden in the admin ("em preparo") leaves this menu too.
+  const shownCourses = useShownCourses();
   const cursosLinks = [
     { name: 'Todos os Cursos', path: '/cursos', highlight: true },
     { name: 'Turismo Gastronômico', path: '/cursos/turismo-gastronomico' },
     { name: 'Capacitação Profissional', path: '/cursos/capacitacao-profissional' },
     { name: 'Saúde e Bem-Estar', path: '/cursos/saude-bem-estar' },
-  ];
+  ].filter(l => l.path === '/cursos' || courseIsShown(shownCourses, l.path.slice('/cursos/'.length)));
 
   const b2bLinks = [
     { name: 'Todas as Parcerias', path: '/b2b', highlight: true },

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
 import ToggleSwitch from '@/components/ToggleSwitch';
+import ShowOnSiteSwitch from '@/components/ShowOnSiteSwitch';
 import { AllergenFields, EmojiField, IngredientsField, TreatTypeField } from '@/components/TreatDetailsFields';
 import TreatInfo from '@/components/TreatInfo';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
@@ -137,6 +138,14 @@ export default function TreatsAdmin() {
     else fetchTreats();
   };
 
+  // The card's one-tap switch: only the visibility flag, nothing else on the row.
+  const setShown = async (treat: Treat, shown: boolean) => {
+    const { error } = await supabase.from('treats').update({ is_available: shown }).eq('id', treat.id);
+    if (error) { brandAlert('Não foi possível mudar: ' + error.message); return; }
+    setTreats(ts => ts.map(t => (t.id === treat.id ? { ...t, is_available: shown } : t)));
+    if (editingId === treat.id) setFormData(f => ({ ...f, is_available: shown }));
+  };
+
   const cancelEdit = () => {
     setEditingId(null);
     setFormData({});
@@ -151,15 +160,15 @@ export default function TreatsAdmin() {
     const kind = treatTypeById(treat.treat_type);
     return (
       <div key={treat.id} style={{ background: 'white', borderRadius: grouped ? '0 0 12px 12px' : '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ position: 'relative', height: '200px', background: '#f5f6fa' }}>
+        <div style={{ position: 'relative', height: '200px', background: '#f5f6fa', opacity: treat.is_available ? 1 : 0.55, filter: treat.is_available ? undefined : 'grayscale(0.6)' }}>
           {treat.image_url ? (
             <Image src={treat.image_url} alt={treat.name} fill style={{ objectFit: 'cover' }} />
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#bdc3c7' }}>Sem Foto</div>
           )}
           {!treat.is_available && (
-            <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#e74c3c', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-              Fora do menu
+            <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#9a5b00', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+              🙈 Escondido
             </div>
           )}
           {kind && (
@@ -170,6 +179,9 @@ export default function TreatsAdmin() {
         </div>
 
         <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ marginBottom: '0.9rem' }}>
+            <ShowOnSiteSwitch what="doce" shown={treat.is_available} onChange={v => setShown(treat, v)} />
+          </div>
           <h3 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem', color: '#2c3e50' }}>{treat.emoji || '🍫'} {treat.name}</h3>
           <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '1.2rem', margin: '0 0 0.75rem' }}>R$ {treat.price.toFixed(2).replace('.', ',')}</p>
 
@@ -211,7 +223,8 @@ export default function TreatsAdmin() {
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Catálogo de Doces (Menu de Eventos)</h1>
       <p style={{ color: '#7f8c8d', marginBottom: '2rem', lineHeight: 1.7, maxWidth: '760px' }}>
         Os mesmos doces podem estar aqui e dentro das Caixas de Degustação. Ingredientes e alérgenos que você mudar aqui são atualizados
-        também nas caixas que incluem o doce.
+        também nas caixas que incluem o doce. Ainda testando uma receita? Use o botão <strong>Aparecendo no site</strong> em cada doce para
+        escondê-lo até ficar pronto: ele continua guardado aqui.
       </p>
 
       <h2 style={{ fontSize: '1.3rem', marginBottom: '1.25rem', color: '#3c2a21' }}>
@@ -271,7 +284,7 @@ export default function TreatsAdmin() {
               onChange={v => setFormData({ ...formData, is_available: v })}
               label="Mostrar este doce no Menu"
               onText="Ativado — aparecendo no menu"
-              offText="Desativado — escondido do menu (fica guardado para repetir em caixas)"
+              offText="Escondido — ainda em preparo ou fora do menu (fica guardado aqui e pode ir em caixas)"
             />
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>

@@ -1,6 +1,9 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 
 // Each card uses the same photo as that course's own page (or, where that page's photo isn't a
 // real one, a real treat from its gallery), so the card previews what you'll find inside.
@@ -26,7 +29,9 @@ const coursesData = [
 ];
 
 export default function OtherCourses({ currentSlug }: { currentSlug: string }) {
-  const otherCourses = coursesData.filter(c => c.slug !== currentSlug);
+  const shown = useShownCourses();
+  const otherCourses = coursesData.filter(c => c.slug !== currentSlug && courseIsShown(shown, c.slug));
+  if (otherCourses.length === 0) return null;
 
   return (
     <section style={{ padding: '4rem 1.5rem', background: '#fdfaf3' }}>

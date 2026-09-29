@@ -34,18 +34,20 @@ const FAQ = [
 
 export default function CursosPage() {
   const [courses, setCourses] = useState<Course[] | null>(null);
+  const [dbDown, setDbDown] = useState(false);
   const [enquiry, setEnquiry] = useState<{ interest: string; type: 'curso' | 'retiro' } | null>(null);
   const book = (interest: string, type: 'curso' | 'retiro' = 'curso') => setEnquiry({ interest, type });
 
   useEffect(() => {
     supabase.from('courses').select('*').eq('is_active', true).order('created_at', { ascending: true })
-      .then(({ data, error }) => setCourses(!error && data ? data : []));
+      .then(({ data, error }) => { setCourses(!error && data ? data : []); setDbDown(!!error || !data); });
   }, []);
 
   // Courses switched on in the admin, told with the richer copy; if the database can't be reached, show the three we know.
+  // An empty list is NOT a reason to fall back: it means Dolly has hidden every course while she works on them.
   const list = courses === null
     ? []
-    : courses.length > 0
+    : !dbDown
       ? courses.map(c => ({ slug: c.slug, title: c.title, image: c.image_url, price: c.price as number | null, fallback: c.description }))
       : COURSE_CONTENT.map(c => ({ slug: c.slug, title: c.title, image: c.heroImage, price: null as number | null, fallback: c.tagline }));
 
@@ -93,6 +95,8 @@ export default function CursosPage() {
           <h2 className="crs-h2">Os cursos</h2>
           {courses === null ? (
             <p style={{ color: '#7a6a61' }}>Carregando cursos…</p>
+          ) : list.length === 0 ? (
+            <p style={{ color: '#7a6a61' }}>Novas turmas em preparo. Fale com a gente para saber das próximas datas.</p>
           ) : (
             <div className="crs-courses">
               {list.map(item => {

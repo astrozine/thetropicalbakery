@@ -2,6 +2,7 @@
 
 import ImagePicker from '@/components/ImagePicker';
 import ToggleSwitch from '@/components/ToggleSwitch';
+import ShowOnSiteSwitch from '@/components/ShowOnSiteSwitch';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
@@ -128,6 +129,14 @@ export default function CoursesAdmin() {
     else fetchCourses();
   };
 
+  // The card's one-tap switch: only the visibility flag, nothing else on the row.
+  const setShown = async (course: Course, shown: boolean) => {
+    const { error } = await supabase.from('courses').update({ is_active: shown }).eq('id', course.id);
+    if (error) { brandAlert('Não foi possível mudar: ' + error.message); return; }
+    setCourses(cs => cs.map(c => (c.id === course.id ? { ...c, is_active: shown } : c)));
+    if (editingId === course.id) setFormData(f => ({ ...f, is_active: shown }));
+  };
+
   const cancelEdit = () => {
     setEditingId(null);
     setFormData({});
@@ -194,7 +203,7 @@ export default function CoursesAdmin() {
               onChange={v => setFormData({ ...formData, is_active: v })}
               label="Mostrar este curso no site"
               onText="Ativado — aparecendo no site"
-              offText="Desativado — escondido do site"
+              offText="Escondido — ainda em preparo (some da lista de cursos e do menu do site)"
             />
           </div>
 
@@ -231,7 +240,7 @@ export default function CoursesAdmin() {
           {courses.map(course => (
             <div key={course.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.06)', padding: '0.75rem', outline: editingId === course.id ? '2px solid #d4af37' : 'none' }}>
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                <div style={{ position: 'relative', width: '76px', height: '76px', flexShrink: 0, borderRadius: '8px', overflow: 'hidden', background: '#f5f6fa' }}>
+                <div style={{ position: 'relative', width: '76px', height: '76px', flexShrink: 0, borderRadius: '8px', overflow: 'hidden', background: '#f5f6fa', opacity: course.is_active ? 1 : 0.55, filter: course.is_active ? undefined : 'grayscale(0.6)' }}>
                   {course.image_url ? (
                     <img src={course.image_url} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
@@ -243,12 +252,15 @@ export default function CoursesAdmin() {
                   <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '1rem', margin: 0 }}>
                     R$ {course.price.toFixed(2).replace('.', ',')}
                     {!course.is_active && (
-                      <span style={{ marginLeft: '0.5rem', background: '#e74c3c', color: 'white', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold', verticalAlign: 'middle' }}>Inativo</span>
+                      <span style={{ marginLeft: '0.5rem', background: '#9a5b00', color: 'white', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold', verticalAlign: 'middle' }}>🙈 Escondido</span>
                     )}
                   </p>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.65rem' }}>
+              <div style={{ marginTop: '0.65rem' }}>
+                <ShowOnSiteSwitch what="curso" shown={course.is_active} onChange={v => setShown(course, v)} />
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
                 <button onClick={() => handleEdit(course)} style={{ flex: 1, padding: '0.4rem', background: '#f1c40f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem' }}>
                   Editar
                 </button>

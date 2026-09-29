@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **29**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **30**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -100,6 +100,11 @@ Verified live, 2026-09-26:
   built-in prices 59 / 99 / 129 from `src/lib/boxSizes.ts`, the admin cannot change them, box gallery photos are not saved, and a new
   subscription's size goes into its customer message. Boxes come in 2, 4 or 6 treats everywhere; the server prices every box line
   by `box_size` from `site_settings` (box_price_2/4/6), never from `tasting_boxes.price` any more.
+- **Hide what isn't ready (2026-09-29).** Every card in /admin/treats and /admin/courses has a one-tap "Aparecendo no site /
+  Escondido · em preparo" switch (`ShowOnSiteSwitch.tsx`), flipping the flags the public pages already read (`treats.is_available`,
+  `courses.is_active`). Hidden courses also leave the nav dropdown and "Outros Cursos" (`useShownCourses.ts`). Treat types: Bolos,
+  Tarteletes and Cupcakes are separate now; old `bolos-tarteletes` reads as `bolos` (`normalizeTreatType`) and
+  `migration_29_split_cakes_tartelettes.sql` (NOT run yet, safe either way) rewrites it. "Entremets" stays French, with the Portuguese in brackets.
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the

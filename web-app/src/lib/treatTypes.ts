@@ -20,13 +20,28 @@ export interface TreatType {
 }
 
 export const TREAT_TYPES: TreatType[] = [
-  { id: 'entremets', label: 'Entremets', emoji: '🍮', accent: '#c2504a', hint: 'sobremesa em camadas, moldada, ao estilo da pâtisserie francesa' },
+  // "Entremets" is French and stays French (it is the pâtisserie name); the Portuguese in brackets is
+  // there so a Brazilian visitor knows what it means. Keep both halves in the label: it is what every
+  // pill, heading and card tag shows.
+  { id: 'entremets', label: 'Entremets (sobremesa em camadas)', emoji: '🍮', accent: '#c2504a', hint: 'sobremesa em camadas, moldada, ao estilo da pâtisserie francesa' },
   { id: 'raw', label: 'Raw', emoji: '🌿', accent: '#7a9b57', hint: 'sem forno, à base de castanhas, frutas secas e cacau cru' },
-  { id: 'bolos-tarteletes', label: 'Bolos & Tarteletes', emoji: '🎂', accent: '#e8a33d', hint: 'bolos, mini bundt cakes, tortas e tarteletes' },
+  { id: 'bolos', label: 'Bolos', emoji: '🎂', accent: '#e8a33d', hint: 'bolos, mini bundt cakes, cheesecakes, rocamboles' },
+  { id: 'tarteletes', label: 'Tarteletes', emoji: '🥧', accent: '#b8743a', hint: 'tarteletes e tortas com base crocante' },
+  { id: 'cupcakes', label: 'Cupcakes', emoji: '🧁', accent: '#d77a9a', hint: 'bolinhos individuais com cobertura' },
   { id: 'assados', label: 'Assados', emoji: '🥐', accent: '#c98a4b', hint: 'vai ao forno: barrinhas, folhados, pães doces' },
   { id: 'cookies', label: 'Cookies', emoji: '🍪', accent: '#8a5a3b' },
   { id: 'chocolates', label: 'Chocolates', emoji: '🍫', accent: '#4a332a', hint: 'bombons, trufas e docinhos de chocolate' },
 ];
+
+/**
+ * Ids we used to have, and what they mean now. 'bolos-tarteletes' was one group until cakes and
+ * tartelettes were split (migration_29 rewrites the stored rows); a row still carrying it reads as a cake
+ * until Dolly re-files it.
+ */
+const LEGACY_TYPES: Record<string, string> = { 'bolos-tarteletes': 'bolos' };
+
+/** The current id for whatever is stored in treats.treat_type. Read stored ids through this. */
+export const normalizeTreatType = (id: string | null | undefined) => (id ? LEGACY_TYPES[id] ?? id : id);
 
 /** The catch-all "Outros" bucket's colour — a neutral that doesn't compete with any real type. */
 export const OUTROS_ACCENT = '#8a7a6b';
@@ -34,7 +49,10 @@ export const OUTROS_ACCENT = '#8a7a6b';
 /** The key the "Outros" bucket answers to, in grouping and in the type filter. Never a real type id. */
 export const OUTROS_KEY = 'outros';
 
-export const treatTypeById = (id: string | null | undefined) => TREAT_TYPES.find(t => t.id === id);
+export const treatTypeById = (id: string | null | undefined) => {
+  const key = normalizeTreatType(id);
+  return TREAT_TYPES.find(t => t.id === key);
+};
 
 /** The bit of a treat that groupByType looks at. */
 export interface TypeableTreat {
@@ -59,16 +77,16 @@ export interface TreatTypeGroup<T> {
  */
 export function groupByType<T extends TypeableTreat>(treats: T[]): TreatTypeGroup<T>[] {
   const groups: TreatTypeGroup<T>[] = TREAT_TYPES
-    .map(t => ({ type: t, label: t.label, emoji: t.emoji, accent: t.accent, items: treats.filter(x => x.treat_type === t.id) }))
+    .map(t => ({ type: t, label: t.label, emoji: t.emoji, accent: t.accent, items: treats.filter(x => normalizeTreatType(x.treat_type) === t.id) }))
     .filter(g => g.items.length > 0);
   const known = new Set(TREAT_TYPES.map(t => t.id));
-  const rest = treats.filter(x => !x.treat_type || !known.has(x.treat_type));
+  const rest = treats.filter(x => !known.has(normalizeTreatType(x.treat_type) || ''));
   if (rest.length > 0) groups.push({ type: null, label: 'Outros', emoji: '✨', accent: OUTROS_ACCENT, items: rest });
   return groups;
 }
 
 /** True once at least one treat has a real type — the signal to start showing grouped sections. */
-export const anyTyped = (treats: TypeableTreat[]) => treats.some(t => !!t.treat_type && TREAT_TYPES.some(ty => ty.id === t.treat_type));
+export const anyTyped = (treats: TypeableTreat[]) => treats.some(t => !!treatTypeById(t.treat_type));
 
 /**
  * Which bucket a treat belongs to — its own type, or OUTROS_KEY when it has none
@@ -76,7 +94,7 @@ export const anyTyped = (treats: TypeableTreat[]) => treats.some(t => !!t.treat_
  * this, so "Outros" always means the same set of treats in both.
  */
 export function typeKeyOf(t: TypeableTreat): string {
-  return t.treat_type && TREAT_TYPES.some(ty => ty.id === t.treat_type) ? t.treat_type : OUTROS_KEY;
+  return treatTypeById(t.treat_type)?.id ?? OUTROS_KEY;
 }
 
 /** Label + colour for any bucket key, including OUTROS_KEY. */

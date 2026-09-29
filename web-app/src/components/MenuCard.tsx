@@ -97,7 +97,7 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
           {/* A tag only when the treat has one — untyped treats simply show none. Bottom-left, so it
               never fights the "picked" mark (top-left) or the mobile zoom icon (top-right). */}
           {kind && (
-            <span style={{ position: 'absolute', left: '8px', bottom: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.02em', backdropFilter: 'blur(2px)' }}>
+            <span style={{ position: 'absolute', left: '8px', bottom: '8px', maxWidth: 'calc(100% - 16px)', lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.02em', backdropFilter: 'blur(2px)' }}>
               <span aria-hidden>{kind.emoji}</span>{kind.label}
             </span>
           )}
