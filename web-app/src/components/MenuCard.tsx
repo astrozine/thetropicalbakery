@@ -24,7 +24,7 @@ interface MenuCardProps {
     /** Made without an oven. Its own green leaf tag, next to the type one. */
     is_raw?: boolean | null;
     /** SugarLevel / CaffeineLevel (sugarCaffeine.ts). */
-    sugar?: string | null;
+    sugars?: string[] | null;
     caffeine?: string | null;
   };
   /** On a page with a quick pick: this treat is one of the ones already chosen there. */
@@ -144,7 +144,7 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
                   </div>
                 )}
                 <div style={{ marginTop: '0.5rem' }}>
-                  <SugarCaffeineChips compact ingredients={item.ingredients} sugar={item.sugar} caffeine={item.caffeine} />
+                  <SugarCaffeineChips compact ingredients={item.ingredients} sugars={item.sugars} caffeine={item.caffeine} />
                 </div>
               </div>
               <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '1.6rem', pointerEvents: 'none', background: 'linear-gradient(rgba(255,255,255,0), #fff)', opacity: moreBelow ? 1 : 0, transition: 'opacity 0.2s' }} />

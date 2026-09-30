@@ -75,7 +75,7 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
                         <p style={{ color: '#594a42', lineHeight: 1.85, marginBottom: '1.25rem' }}>{item.description}</p>
                       )}
 
-                      <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} sugar={item.sugar} caffeine={item.caffeine} />
+                      <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} sugars={item.sugars} caffeine={item.caffeine} />
                     </div>
                   </div>
                 )}

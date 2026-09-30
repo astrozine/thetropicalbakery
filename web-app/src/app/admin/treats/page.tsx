@@ -10,12 +10,12 @@ import { AllergenFields, EmojiField, IngredientsField, RawField, SugarCaffeineFi
 import TreatInfo from '@/components/TreatInfo';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 import TreatTypeBar from '@/components/TreatTypeBar';
-import RawSwitch from '@/components/RawSwitch';
 import { uploadPublicImage } from '@/lib/imageUpload';
-import { isMissingSugarColumns, syncTreatIntoBoxes } from '@/lib/treatSync';
-import { caffeineOf, sugarOf } from '@/lib/sugarCaffeine';
+import { syncTreatIntoBoxes, withoutMissingColumn } from '@/lib/treatSync';
+import { WHOLE_FOOD, caffeineOf, isWholeFood, sugarsOf } from '@/lib/sugarCaffeine';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
-import { RAW, anyTyped, groupByType, isRaw, matchesRaw, textOn, treatTypeById } from '@/lib/treatTypes';
+import { RAW, anyTyped, groupByType, isRaw, textOn, treatTypeById } from '@/lib/treatTypes';
+import { styleToggles } from '@/components/TreatTypeBar';
 
 interface Treat {
   id: string;
@@ -32,7 +32,7 @@ interface Treat {
   may_contain?: string[] | null;
   treat_type?: string | null;
   is_raw?: boolean | null;
-  sugar?: string | null;
+  sugars?: string[] | null;
   caffeine?: string | null;
 }
 
@@ -97,7 +97,7 @@ export default function TreatsAdmin() {
       ingredients: formData.ingredients || [],
       contains: formData.contains || [],
       may_contain: formData.may_contain || [],
-      sugar: formData.sugar ?? null,
+      sugars: formData.sugars?.length ? formData.sugars : null,
       caffeine: formData.caffeine ?? null,
     };
 
@@ -115,22 +115,17 @@ export default function TreatsAdmin() {
       if (raw && kind) brandAlert(`Salvei o tipo, mas a marca ${RAW.emoji} Raw só fica guardada junto com ele depois de rodar a migration_31_raw_flag.sql no Supabase.`);
     };
     const missingRawColumn = (msg: string) => /is_raw/.test(msg);
-    // Before migration_32: save everything else, and say that sugar/caffeine need it.
-    const withoutSugarColumns = () => {
-      const rest = { ...row };
-      delete rest.sugar;
-      delete rest.caffeine;
-      row = rest;
-      brandAlert('Salvei o doce, mas açúcar e cafeína só ficam guardados depois de rodar a migration_32_sugar_caffeine.sql no Supabase.');
-    };
-
     // Supabase names one missing column per try, in any order, so drop whichever it names and try again.
+    // Sugars need migration_33: save everything else, and say so.
     const saveWithFallbacks = async (write: () => PromiseLike<{ error: { message: string } | null }>) => {
       let { error } = await write();
-      for (let tries = 0; error && tries < 2; tries++) {
+      for (let tries = 0; error && tries < 3; tries++) {
+        const without = withoutMissingColumn(row, error.message, ['sugars', 'caffeine']);
         if (missingRawColumn(error.message) && 'is_raw' in row) withoutRawColumn();
-        else if (isMissingSugarColumns(error.message) && 'sugar' in row) withoutSugarColumns();
-        else break;
+        else if (without) {
+          row = without;
+          brandAlert('Salvei o doce, mas os açúcares só ficam guardados depois de rodar a migration_33_sugar_sources.sql no Supabase.');
+        } else break;
         ({ error } = await write());
       }
       return error;
@@ -220,6 +215,11 @@ export default function TreatsAdmin() {
                 {RAW.emoji} {RAW.label}
               </span>
             )}
+            {isWholeFood(treat) === false && (
+              <span style={{ background: WHOLE_FOOD.no.accent, color: '#fff', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
+                {WHOLE_FOOD.no.emoji} {WHOLE_FOOD.no.label}
+              </span>
+            )}
             {kind && (
               <span style={{ background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
                 {kind.emoji} {kind.label}
@@ -240,16 +240,16 @@ export default function TreatsAdmin() {
             {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length === 0 && (
               <span style={{ color: '#e67e22', fontWeight: 'bold' }}> — falta preencher</span>
             )}
-            {(!sugarOf(treat) || !caffeineOf(treat)) && (
+            {(!sugarsOf(treat) || !caffeineOf(treat)) && (
               <span style={{ display: 'block', color: '#e67e22', fontWeight: 'bold', marginTop: '0.2rem' }}>
-                Falta: {[!sugarOf(treat) && 'açúcar', !caffeineOf(treat) && 'cafeína'].filter(Boolean).join(' e ')}
+                Falta: {[!sugarsOf(treat) && 'açúcar', !caffeineOf(treat) && 'cafeína'].filter(Boolean).join(' e ')}
               </span>
             )}
           </p>
 
           {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length > 0 && (
             <div style={{ marginBottom: '1rem' }}>
-              <TreatInfo ingredients={treat.ingredients} contains={treat.contains} may_contain={treat.may_contain} sugar={treat.sugar} caffeine={treat.caffeine} showEmptyNote={false} />
+              <TreatInfo ingredients={treat.ingredients} contains={treat.contains} may_contain={treat.may_contain} sugars={treat.sugars} caffeine={treat.caffeine} showEmptyNote={false} />
             </div>
           )}
 
@@ -375,7 +375,7 @@ export default function TreatsAdmin() {
                 onChange={a => setFormData({ ...formData, ...a })}
               />
               <SugarCaffeineFields
-                sugar={formData.sugar}
+                sugars={formData.sugars}
                 caffeine={formData.caffeine}
                 ingredients={formData.ingredients || []}
                 onChange={v => setFormData({ ...formData, ...v })}
@@ -404,8 +404,8 @@ export default function TreatsAdmin() {
 
       <div className="treats-main">
       <div className="treats-typebar">
-        <RawSwitch tone="light" treats={treats} value={refine.raw || 'all'} onChange={raw => setRefine({ ...refine, raw })} />
-        <TreatTypeBar tone="light" treats={treats.filter(t => matchesRaw(t, refine.raw || 'all'))} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
+        <TreatTypeBar tone="light" treats={treats} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })}
+          toggles={styleToggles(treats, refine, setRefine)} />
       </div>
 
       {visibleTreats.length === 0 && (

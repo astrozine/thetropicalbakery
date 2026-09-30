@@ -13,21 +13,31 @@ export async function pushTreatDetails(treatId: string, d: TreatDetails): Promis
     name: d.name, description: d.description, image_url: d.image_url,
     emoji: d.emoji, ingredients: d.ingredients, contains: d.contains, may_contain: d.may_contain,
   };
-  let { error: treatError } = await supabase
-    .from('treats')
-    .update({ ...base, sugar: d.sugar ?? null, caffeine: d.caffeine ?? null })
-    .eq('id', treatId);
-  // Before migration_32 there are no sugar/caffeine columns: save the rest (the boxes keep them in their JSON).
-  if (treatError && isMissingSugarColumns(treatError.message)) {
-    ({ error: treatError } = await supabase.from('treats').update(base).eq('id', treatId));
+  let row: Record<string, unknown> = { ...base, sugars: d.sugars ?? null, caffeine: d.caffeine ?? null };
+  let { error: treatError } = await supabase.from('treats').update(row).eq('id', treatId);
+  // A column a migration hasn't added yet (sugars: 33): save the rest (the boxes keep it in their JSON).
+  for (let tries = 0; treatError && tries < 2; tries++) {
+    const next = withoutMissingColumn(row, treatError.message, ['sugars', 'caffeine']);
+    if (!next) break;
+    row = next;
+    ({ error: treatError } = await supabase.from('treats').update(row).eq('id', treatId));
   }
   if (treatError) return { error: treatError.message };
 
   return syncTreatIntoBoxes(treatId, d);
 }
 
-/** True for the error Supabase gives when migration_32 (treats.sugar / treats.caffeine) hasn't run. */
-export const isMissingSugarColumns = (msg: string) => /\b(sugar|caffeine)\b/.test(msg);
+/**
+ * When Supabase says one of `optional` isn't a column yet (a migration not run), the same row without it;
+ * otherwise null. It names one missing column per error, so callers try again until it stops.
+ */
+export function withoutMissingColumn(row: Record<string, unknown>, msg: string, optional: string[]) {
+  const col = optional.find(c => c in row && new RegExp(`\\b${c}\\b`).test(msg));
+  if (!col) return null;
+  const rest = { ...row };
+  delete rest[col];
+  return rest;
+}
 
 /** Rewrites the copy of this treat inside every box that includes it. */
 export async function syncTreatIntoBoxes(treatId: string, d: TreatDetails): Promise<{ error?: string }> {

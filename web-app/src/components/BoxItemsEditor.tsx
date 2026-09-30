@@ -94,7 +94,7 @@ function ItemEditor({ item, onChange }: { item: BoxItem; onChange: (i: BoxItem) 
       <ImagePicker label="Foto deste doce" imageUrl={item.image_url} uploading={uploading} onChange={upload} />
       <IngredientsField ingredients={item.ingredients} onChange={ingredients => onChange({ ...item, ingredients })} />
       <AllergenFields contains={item.contains} mayContain={item.may_contain} onChange={a => onChange({ ...item, ...a })} />
-      <SugarCaffeineFields sugar={item.sugar} caffeine={item.caffeine} ingredients={item.ingredients} onChange={v => onChange({ ...item, ...v })} />
+      <SugarCaffeineFields sugars={item.sugars} caffeine={item.caffeine} ingredients={item.ingredients} onChange={v => onChange({ ...item, ...v })} />
       <MenuLink item={item} onChange={onChange} />
     </div>
   );

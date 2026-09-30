@@ -323,7 +323,7 @@ export default function AdminCaixas() {
       const res = await pushTreatDetails(it.treat_id, {
         name: it.name, description: it.description, image_url: it.image_url, emoji: it.emoji,
         ingredients: it.ingredients, contains: it.contains, may_contain: it.may_contain,
-        sugar: it.sugar ?? null, caffeine: it.caffeine ?? null,
+        sugars: it.sugars ?? null, caffeine: it.caffeine ?? null,
       });
       if (res.error) console.error('Sync to menu failed:', res.error);
     }

@@ -11,10 +11,9 @@ import EventQuoteDecor from '@/components/EventQuoteDecor';
 import EventOrderSheet, { EventQuoteForm } from '@/components/EventOrder';
 import { useCart } from '@/context/CartContext';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
-import TreatTypeBar from '@/components/TreatTypeBar';
-import RawSwitch from '@/components/RawSwitch';
+import TreatTypeBar, { styleToggles } from '@/components/TreatTypeBar';
 import { ALLERGEN_LIST_NEM } from '@/lib/allergens';
-import { anyTyped, groupByType, matchesRaw, textOn, type RawFilter } from '@/lib/treatTypes';
+import { anyTyped, groupByType, textOn } from '@/lib/treatTypes';
 
 interface Treat {
   id: string;
@@ -31,7 +30,7 @@ interface Treat {
   may_contain?: string[] | null;
   treat_type?: string | null;
   is_raw?: boolean | null;
-  sugar?: string | null;
+  sugars?: string[] | null;
   caffeine?: string | null;
 }
 
@@ -65,16 +64,17 @@ export default function MenuPage() {
     fetchMenu();
   }, []);
 
-  // /menu?raw=1 opens on the raw treats (and ?raw=0 on the baked ones), so a post or a message can
-  // link straight to them; the address follows the switch, so what you're looking at can be shared.
+  // /menu?raw=1 opens on the raw treats and /menu?integral=1 on the whole-food ones, so a post or a
+  // message can link straight to them; the address follows the pills, so what you see can be shared.
   useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get('raw');
-    if (q === '1' || q === '0') setRefine(r => ({ ...r, raw: q === '1' ? 'raw' : 'cooked' }));
+    const q = new URLSearchParams(window.location.search);
+    setRefine(r => ({ ...r, raw: q.get('raw') === '1' ? 'raw' : 'all', wholeFood: q.get('integral') === '1' }));
   }, []);
-  const setRaw = (raw: RawFilter) => {
-    setRefine(r => ({ ...r, raw }));
+  const setStyle = (next: RefineState) => {
+    setRefine(next);
     const url = new URL(window.location.href);
-    if (raw === 'all') url.searchParams.delete('raw'); else url.searchParams.set('raw', raw === 'raw' ? '1' : '0');
+    if (next.raw === 'raw') url.searchParams.set('raw', '1'); else url.searchParams.delete('raw');
+    if (next.wholeFood) url.searchParams.set('integral', '1'); else url.searchParams.delete('integral');
     window.history.replaceState(window.history.state, '', url);
   };
 
@@ -172,14 +172,14 @@ export default function MenuPage() {
           `}</style>
           <div className="menu-layout">
           <aside className="menu-aside" aria-label="Filtro de alergias e preferências">
-            <TreatRefineMenu variant="public" treats={menuItems} value={refine} onChange={setRefine} shown={visibleItems.length} sheetBelow={1024} fabBottom={picked.length > 0 ? '9.5rem' : '5.5rem'} />
+            <TreatRefineMenu variant="public" treats={menuItems} value={refine} onChange={setStyle} shown={visibleItems.length} sheetBelow={1024} fabBottom={picked.length > 0 ? '9.5rem' : '5.5rem'} />
           </aside>
 
           <div className="menu-main">
           <div className="menu-typebar">
-            <RawSwitch treats={menuItems} value={refine.raw || 'all'} onChange={setRaw} />
-            {/* The type pills count within the raw switch, so "Raw" only offers the kinds that have a raw treat. */}
-            <TreatTypeBar bleed treats={menuItems.filter(t => matchesRaw(t, refine.raw || 'all'))} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
+            {/* One row: 🌿 Raw and 🌾 Integral (on/off), then the kinds of treat. */}
+            <TreatTypeBar bleed treats={menuItems} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })}
+              toggles={styleToggles(menuItems, refine, setStyle)} />
           </div>
 
           {visibleItems.length === 0 && (
@@ -231,7 +231,7 @@ export default function MenuPage() {
                       may_contain: item.may_contain,
                       treat_type: item.treat_type,
                       is_raw: item.is_raw,
-                      sugar: item.sugar,
+                      sugars: item.sugars,
                       caffeine: item.caffeine,
                     }} />
                   </ScrollReveal>
@@ -256,7 +256,7 @@ export default function MenuPage() {
                     may_contain: item.may_contain,
                     treat_type: item.treat_type,
                     is_raw: item.is_raw,
-                    sugar: item.sugar,
+                    sugars: item.sugars,
                     caffeine: item.caffeine,
                   }} />
                 </ScrollReveal>

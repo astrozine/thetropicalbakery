@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALLERGENS, allergenById, normalizeAllergens } from '@/lib/allergens';
 import { KitchenFacts } from '@/components/TreatInfo';
 import { RAW, matchesRaw, typeChipFor, typeKeyOf, type RawFilter } from '@/lib/treatTypes';
-import { AVOID_FILTERS, avoidFilterById, passesAvoid, undeclaredFor } from '@/lib/sugarCaffeine';
+import { AVOID_FILTERS, WHOLE_FOOD, avoidFilterById, isWholeFood, passesAvoid, undeclaredFor } from '@/lib/sugarCaffeine';
 
 /** The bits of a treat the refine menu looks at. */
 export interface RefinableTreat {
@@ -15,7 +15,7 @@ export interface RefinableTreat {
   may_contain?: string[] | null;
   treat_type?: string | null;
   is_raw?: boolean | null;
-  sugar?: string | null;
+  sugars?: string[] | null;
   caffeine?: string | null;
 }
 
@@ -31,6 +31,8 @@ export interface RefineState {
   types: string[];
   /** Raw or not, a separate yes/no that crosses with the type (see RAW in treatTypes.ts). Absent means 'all'. */
   raw?: RawFilter;
+  /** 🌾 Integral: only treats known to have nothing refined (no crystal sugar from industrial chocolate). */
+  wholeFood?: boolean;
   /** "Sem açúcar de cana", "Sem cafeína"… (AVOID_FILTERS in sugarCaffeine.ts). Always "avoid", whatever the mode. */
   avoid?: string[];
 }
@@ -48,7 +50,7 @@ export const unknownHidden = (treats: RefinableTreat[], r: RefineState) =>
 
 export const refineCount = (r: RefineState) =>
   r.allergens.length + r.ingredients.length + r.status.length + r.types.length + (r.search.trim() ? 1 : 0)
-  + (r.raw && r.raw !== 'all' ? 1 : 0) + (r.avoid?.length || 0);
+  + (r.raw === 'raw' ? 1 : 0) + (r.wholeFood ? 1 : 0) + (r.avoid?.length || 0);
 
 const STATUSES = [
   { id: 'menu', label: '✅ No menu' },
@@ -63,6 +65,8 @@ export function matchesRefine(t: RefinableTreat, r: RefineState, opts: { hideUnk
   // Type is its own axis, OR'd within itself: "cookies or chocolates", then AND'd with everything else.
   if (r.types.length > 0 && !r.types.includes(typeKeyOf(t))) return false;
   if (!matchesRaw(t, r.raw || 'all')) return false;
+  // Integral: unknown is not integral, so an undeclared treat is left out.
+  if (r.wholeFood && isWholeFood(t) !== true) return false;
   // Sugar/caffeine: an undeclared treat never passes, so "sem cafeína" can't show something unknown.
   if (!passesAvoid(t, r.avoid)) return false;
 
@@ -218,10 +222,11 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
     ...(value.search.trim() ? [{
       key: 'search', label: `“${value.search.trim()}”`, onRemove: () => onChange({ ...value, search: '' }),
     }] : []),
-    ...(value.raw && value.raw !== 'all' ? [{
-      key: 'raw',
-      label: value.raw === 'raw' ? `${RAW.emoji} Só ${RAW.label}` : '🔥 Só do forno',
-      onRemove: () => onChange({ ...value, raw: 'all' }),
+    ...(value.raw === 'raw' ? [{
+      key: 'raw', label: `${RAW.emoji} Só ${RAW.label}`, onRemove: () => onChange({ ...value, raw: 'all' }),
+    }] : []),
+    ...(value.wholeFood ? [{
+      key: 'wholeFood', label: `${WHOLE_FOOD.yes.emoji} Só ${WHOLE_FOOD.yes.label.toLowerCase()}`, onRemove: () => onChange({ ...value, wholeFood: false }),
     }] : []),
     ...value.types.map(id => {
       const c = typeChipFor(id);

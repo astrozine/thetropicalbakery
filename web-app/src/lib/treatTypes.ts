@@ -52,7 +52,7 @@ export const normalizeTreatType = (id: string | null | undefined) =>
 /**
  * Raw is not a kind of treat, it is a way of making one: a raw cheesecake is still a cake, a raw truffle
  * still a chocolate. So it is a yes/no on every treat (`treats.is_raw`, migration_31), with its own leaf
- * tag and its own "Todos / Raw / Do forno" switch, and it crosses with the type instead of replacing it.
+ * tag and a 🌿 Raw pill at the start of the type row (styleToggles in TreatTypeBar), crossing with the type.
  */
 export const RAW = {
   label: 'Raw',
@@ -69,10 +69,10 @@ export interface RawableTreat {
 /** The one test for "is this treat raw". The old 'raw' type still counts until migration_31 moves it. */
 export const isRaw = (t: RawableTreat) => t.is_raw === true || t.treat_type === 'raw';
 
-/** 'all' shows everything, 'raw' only the raw treats, 'cooked' only the ones that go in the oven. */
-export type RawFilter = 'all' | 'raw' | 'cooked';
+/** 'all' shows everything, 'raw' only the raw treats. (A "baked only" choice was dropped: nobody asks for it.) */
+export type RawFilter = 'all' | 'raw';
 
-export const matchesRaw = (t: RawableTreat, f: RawFilter) => f === 'all' || (f === 'raw') === isRaw(t);
+export const matchesRaw = (t: RawableTreat, f: RawFilter) => f !== 'raw' || isRaw(t);
 
 /** The catch-all "Outros" bucket's colour — a neutral that doesn't compete with any real type. */
 export const OUTROS_ACCENT = '#8a7a6b';

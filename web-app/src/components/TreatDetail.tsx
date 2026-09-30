@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import TreatInfo, { hasTreatInfo } from '@/components/TreatInfo';
 import { RAW, isRaw, treatTypeById } from '@/lib/treatTypes';
+import { WHOLE_FOOD, isWholeFood } from '@/lib/sugarCaffeine';
 import { optimizedSrc, type OptimizedWidth } from '@/lib/thumbs';
 
 export interface TreatDetailItem {
@@ -20,7 +21,7 @@ export interface TreatDetailItem {
   may_contain?: string[] | null;
   treat_type?: string | null;
   is_raw?: boolean | null;
-  sugar?: string | null;
+  sugars?: string[] | null;
   caffeine?: string | null;
 }
 
@@ -67,7 +68,9 @@ export function WholePhoto({ src, alt, width = 750, frame, maxCrop = 0.2, childr
 export function TreatTags({ item, size = 'sm' }: { item: TreatDetailItem; size?: 'sm' | 'md' }) {
   const kind = treatTypeById(item.treat_type);
   const raw = isRaw(item);
-  if (!kind && !raw) return null;
+  // Said on the photo, where nobody can miss it: vegan, but with an industrial chocolate's crystal sugar.
+  const notWhole = isWholeFood(item) === false;
+  if (!kind && !raw && !notWhole) return null;
   const pad = size === 'md' ? '0.3rem 0.75rem' : '0.25rem 0.65rem';
   const fs = size === 'md' ? '0.78rem' : '0.75rem';
   return (
@@ -76,6 +79,11 @@ export function TreatTags({ item, size = 'sm' }: { item: TreatDetailItem; size?:
       {raw && (
         <span title={`${RAW.label}: ${RAW.hint}`} style={{ lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: RAW.accent, color: '#ffffff', padding: pad, borderRadius: '20px', fontSize: fs, fontWeight: 800, letterSpacing: '0.02em', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>
           <span aria-hidden>{RAW.emoji}</span>{RAW.label}
+        </span>
+      )}
+      {notWhole && (
+        <span title={`${WHOLE_FOOD.no.label}: ${WHOLE_FOOD.no.hint}`} style={{ lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: WHOLE_FOOD.no.accent, color: '#ffffff', padding: pad, borderRadius: '20px', fontSize: fs, fontWeight: 800, letterSpacing: '0.02em', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>
+          <span aria-hidden>{WHOLE_FOOD.no.emoji}</span>Não integral
         </span>
       )}
       {kind && (
@@ -140,7 +148,7 @@ export default function TreatDetail({ item, picked = false, onTogglePick, onAdd,
 
           {hasTreatInfo(item) && (
             <div style={{ marginBottom: '1.5rem' }}>
-              <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} sugar={item.sugar} caffeine={item.caffeine} showEmptyNote={false} />
+              <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} sugars={item.sugars} caffeine={item.caffeine} showEmptyNote={false} />
             </div>
           )}
 

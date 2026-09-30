@@ -106,16 +106,18 @@ Verified live, 2026-09-26:
   Tarteletes and Cupcakes are separate now; old `bolos-tarteletes` reads as `bolos` (`normalizeTreatType`) and
   `migration_29_split_cakes_tartelettes.sql` (NOT run yet, safe either way) rewrites it. "Entremets" stays French, with the Portuguese in brackets.
 - **Raw is a checkbox, not a type (2026-09-30, Dolly's call).** Any treat can be raw: `treats.is_raw`, read only through
-  `isRaw()` in `treatTypes.ts` (an old `treat_type = 'raw'` still counts). /menu and /admin/treats have a "Todos / Raw / Do forno"
-  switch (`RawSwitch.tsx`, `RefineState.raw`) that crosses with the type pills; `/menu?raw=1` opens on the raw treats. New type
-  `cake-pops`. Migration 31 looks run (the public API shows Esmeraldas as Raw + Bolos, 2026-09-30).
-- **Sugar and caffeine per treat (2026-09-30).** Scales, not allergens: `sugar` = fruta | nao-refinado | cana, `caffeine` = sem | pouca | com,
-  all in `src/lib/sugarCaffeine.ts` (with `AVOID_FILTERS`, the "Sem açúcar de cana / Sem açúcar adicionado / Sem cafeína / Sem café" chips in
-  `TreatRefineMenu`, `RefineState.avoid`). NULL = not declared and never passes a "sem" filter; caffeine found in the ingredients (cacau…)
-  counts even undeclared. Edited with `SugarCaffeineFields` (admin treats + box editor, with a "Usar" suggestion read from the ingredients),
-  shown by `TreatInfo` / `SugarCaffeineChips`, copied into box items by `treatSync.ts`. Customers can tick "Sem Cafeína" in their diet.
-  **Migration 32 is RUN** (columns answer on the public API, 2026-09-30). KITCHEN_FACTS no longer promises
-  "sem açúcar refinado"; ~20 marketing lines elsewhere still do (grep "açúcar refinado") — waiting on Andrew to say what sugar the chocolate has.
+  `isRaw()` in `treatTypes.ts` (an old `treat_type = 'raw'` still counts). New type `cake-pops`. Migration 31 is run.
+- **One control row on /menu and /admin/treats:** 🌿 Raw and 🌾 Integral are on/off pills at the start of `TreatTypeBar`
+  (`styleToggles`, `RefineState.raw` / `.wholeFood`), then the kinds. `/menu?raw=1`, `/menu?integral=1`. The old
+  "Todos / Raw / Do forno" switch (`RawSwitch.tsx`) is gone: please don't add another row of controls to that page.
+- **Sugar and caffeine per treat (2026-09-30).** Not allergens. `treats.sugars` is a LIST (migration_33): nenhum | fruta | coco | rapadura |
+  cristal. **Integral (whole food) is derived, never stored:** no 'cristal' = integral. 'cristal' comes with the industrial vegan chocolates
+  (milk, white, caramel, most dark), and those treats say "Vegano, não integral" (tag on the photo, `TreatTags`; explanation in `TreatInfo`).
+  `caffeine` = sem | pouca | com (migration 32, run). All in `src/lib/sugarCaffeine.ts`; the "Açúcar e cafeína" folder keeps only
+  Sem açúcar adicionado / Sem cafeína / Sem café. Unknown never counts as integral or "sem". Edited with `SugarCaffeineFields` (suggests
+  from ingredients, asks about unlabelled chocolate). **`migration_33_sugar_sources.sql` is NOT run yet** (the old `treats.sugar`
+  column stays, unused). Andrew confirmed (2026-09-30) the vegan chocolates carry crystal sugar, so ~20 "sem açúcar refinado" lines
+  across the site (grep it) are no longer true for every treat; they need rewording.
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the
