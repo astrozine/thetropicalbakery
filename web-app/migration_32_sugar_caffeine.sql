@@ -35,6 +35,7 @@ ALTER TABLE public.treats ADD CONSTRAINT treats_caffeine_check
 
 COMMIT;
 
-SELECT name, sugar, caffeine, array_to_string(ingredients, ', ') AS ingredients
+-- ingredients is jsonb (a JSON array), so it is shown as-is rather than joined.
+SELECT name, sugar, caffeine, ingredients
 FROM public.treats
 ORDER BY name;

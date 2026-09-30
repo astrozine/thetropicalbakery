@@ -114,7 +114,7 @@ Verified live, 2026-09-26:
   `TreatRefineMenu`, `RefineState.avoid`). NULL = not declared and never passes a "sem" filter; caffeine found in the ingredients (cacau…)
   counts even undeclared. Edited with `SugarCaffeineFields` (admin treats + box editor, with a "Usar" suggestion read from the ingredients),
   shown by `TreatInfo` / `SugarCaffeineChips`, copied into box items by `treatSync.ts`. Customers can tick "Sem Cafeína" in their diet.
-  **`migration_32_sugar_caffeine.sql` is NOT run yet**; the admin saves without the columns and says so. KITCHEN_FACTS no longer promises
+  **Migration 32 is RUN** (columns answer on the public API, 2026-09-30). KITCHEN_FACTS no longer promises
   "sem açúcar refinado"; ~20 marketing lines elsewhere still do (grep "açúcar refinado") — waiting on Andrew to say what sugar the chocolate has.
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
