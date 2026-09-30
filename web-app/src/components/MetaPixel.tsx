@@ -112,8 +112,9 @@ export default function MetaPixel() {
       }}
     >
       <p style={{ margin: 0 }}>
-        🌴 Ajude a cozinha da Dolly a chegar em quem vai amar! Com os cookies da Meta, mostramos nossos doces
-        no Instagram e no Facebook para quem tem a ver com eles, e você vê menos anúncios que não têm nada a ver.
+        🌴 Sejamos sinceros: o algoritmo não está fazendo favor a ninguém. Pra uma cozinha pequena como a da Chef
+        Dolly, chegar até a comunidade vegana nas redes está cada vez mais difícil. Aceitar os cookies da Meta é um
+        empurrãozinho contra o algoritmo: a gente aparece pra quem vai amar, e você vê menos anúncio aleatório.
         Só ativamos se você aceitar.{' '}
         <Link href="/privacidade" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>
           Política de Privacidade
