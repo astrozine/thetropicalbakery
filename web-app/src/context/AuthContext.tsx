@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
+import { trackMeta } from '@/lib/metaPixel';
 import { User } from '@supabase/supabase-js';
 
 export interface UserProfile {
@@ -122,8 +123,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user || null);
+      // Meta pixel: an account created in the last 15 minutes signing in = a new registration (once per account).
+      const u = session?.user;
+      if (event === 'SIGNED_IN' && u?.created_at && Date.now() - new Date(u.created_at).getTime() < 15 * 60_000) {
+        const key = `tb-registered-${u.id}`;
+        try {
+          if (!localStorage.getItem(key)) {
+            localStorage.setItem(key, '1');
+            trackMeta('CompleteRegistration', { content_name: String(u.app_metadata?.provider ?? 'email') });
+          }
+        } catch { /* private mode: skip rather than risk double counting */ }
+      }
       if (session?.user) {
         await fetchProfile(session.user.id);
       } else {

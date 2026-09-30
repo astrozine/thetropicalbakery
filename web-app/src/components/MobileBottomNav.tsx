@@ -1,14 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
+import { ClubeModal } from '@/components/ClubeInvite';
 
 export default function MobileBottomNav() {
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
   const { totalItems, setIsCartOpen } = useCart();
+  const { user } = useAuth();
+  const [clubeOpen, setClubeOpen] = useState(false);
+  const closeClube = useCallback(() => setClubeOpen(false), []);
 
   // The bar tucks away while the page is moving and slides back once scrolling stops.
   const [scrolling, setScrolling] = useState(false);
@@ -104,6 +109,24 @@ export default function MobileBottomNav() {
         );
       })}
 
+      {/* Signed out: the Clube Tropical invitation. Signed in: their account. */}
+      {user ? (
+        <Link href="/minha-conta" style={{ ...tabStyle, color: pathname === '/minha-conta' ? '#d4af37' : '#887d77' }}>
+          <span style={{ fontSize: '1.5rem' }}>🎟️</span>
+          <span style={tabLabel}>Conta</span>
+        </Link>
+      ) : (
+        <button type="button" onClick={() => setClubeOpen(true)} style={{ ...tabStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#8a6d1f' }}>
+          <span style={{ fontSize: '1.5rem' }}>🎟️</span>
+          <span style={{ ...tabLabel, fontWeight: 700 }}>Clube</span>
+        </button>
+      )}
+      <ClubeModal open={clubeOpen} onClose={closeClube} />
     </div>
   );
 }
+
+const tabStyle: React.CSSProperties = {
+  display: 'flex', flexDirection: 'column', alignItems: 'center', textDecoration: 'none', gap: '4px', position: 'relative', width: '20%',
+};
+const tabLabel: React.CSSProperties = { fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' };

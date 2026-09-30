@@ -4,14 +4,14 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
+import ClubeInvite from '@/components/ClubeInvite';
 
 /**
- * Deliberately renders nothing for signed-out visitors: signing in is offered at
- * the purchase points, not pushed in the navigation. Signed-in customers get a
+ * Signed-out visitors get the "Entrar no Clube" invitation (ClubeInvite). Signed-in customers get a
  * quiet confirmation of who they are, plus a way out.
  */
 export default function AccountMenu({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [portals, setPortals] = useState<{ is_partner: boolean; is_worker: boolean }>({ is_partner: false, is_worker: false });
@@ -33,7 +33,7 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
     return () => { cancelled = true; };
   }, [userId]);
 
-  if (!user) return null;
+  if (!user) return loading ? null : <ClubeInvite variant={variant} />;
 
   const displayName = (profile?.full_name || user.email || '').split(' ')[0];
   const avatarUrl = user.user_metadata?.avatar_url as string | undefined;
