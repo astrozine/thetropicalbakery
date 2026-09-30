@@ -20,6 +20,8 @@ export interface TreatDetailItem {
   may_contain?: string[] | null;
   treat_type?: string | null;
   is_raw?: boolean | null;
+  sugar?: string | null;
+  caffeine?: string | null;
 }
 
 /**
@@ -116,7 +118,7 @@ export default function TreatDetail({ item, picked = false, onTogglePick, onAdd,
 
           {hasTreatInfo(item) && (
             <div style={{ marginBottom: '1.5rem' }}>
-              <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} showEmptyNote={false} />
+              <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} sugar={item.sugar} caffeine={item.caffeine} showEmptyNote={false} />
             </div>
           )}
 
