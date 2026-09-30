@@ -4,54 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-// Meta dataset (pixel) "The Tropical Bakery Website". The ID is public by design.
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1953002309021163';
-const STORAGE_KEY = 'tb-cookie-consent';
-
-type Consent = 'accepted' | 'declined' | null;
-
-type Fbq = ((...args: unknown[]) => void) & {
-  callMethod?: (...args: unknown[]) => void;
-  queue: unknown[][];
-  loaded: boolean;
-  version: string;
-  push: unknown;
-};
-
-declare global {
-  interface Window {
-    fbq?: Fbq;
-    _fbq?: Fbq;
-  }
-}
-
-function readConsent(): Consent {
-  try {
-    const v = window.localStorage.getItem(STORAGE_KEY);
-    return v === 'accepted' || v === 'declined' ? v : null;
-  } catch {
-    return null;
-  }
-}
-
-function loadPixel() {
-  if (window.fbq) return;
-  const fbq = function (...args: unknown[]) {
-    if (fbq.callMethod) fbq.callMethod(...args);
-    else fbq.queue.push(args);
-  } as Fbq;
-  fbq.push = fbq;
-  fbq.loaded = true;
-  fbq.version = '2.0';
-  fbq.queue = [];
-  window.fbq = fbq;
-  window._fbq = fbq;
-  const s = document.createElement('script');
-  s.async = true;
-  s.src = 'https://connect.facebook.net/en_US/fbevents.js';
-  document.head.appendChild(s);
-  fbq('init', PIXEL_ID);
-}
+import { Consent, CONSENT_KEY as STORAGE_KEY, isTrackedPath, loadPixel, readConsent } from '@/lib/metaPixel';
 
 /**
  * LGPD: the Meta pixel is only loaded after the visitor taps "Aceitar".
@@ -70,7 +23,7 @@ export default function MetaPixel() {
   }, []);
 
   // Admin, partner and team areas are staff-only: never track them.
-  const tracked = !!pathname && !/^\/(admin|parceiro|equipe)(\/|$)/.test(pathname);
+  const tracked = isTrackedPath(pathname);
 
   useEffect(() => {
     if (consent !== 'accepted' || !tracked) return;
