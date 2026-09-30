@@ -141,7 +141,7 @@ export default function Navigation() {
   return (
     <>
       {/* Announcement Banner */}
-      <div style={{ 
+      <div className="announce-bar" style={{ 
         background: '#3c2a21', 
         color: '#d4af37', 
         textAlign: 'center', 

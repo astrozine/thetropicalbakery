@@ -1159,7 +1159,9 @@ body {
    1.4 screens, which pushed the first thing you can actually do below the fold.
    Trimmed so the treat picker lands within the first screen and a bit. */
 @media (max-width: 767px) {
-  .hero-section img[src*="hero-logo"] { max-height: 190px; width: auto; }
+  /* !important: before the page hydrates the desktop logo (inline width: 90%) is what
+     renders, and the height cap alone squashed it until the phone layout took over. */
+  .hero-section img[src*="hero-logo"] { max-height: 190px; width: auto !important; height: auto; }
   .hero-section .hide-scrollbars img { max-height: 250px; width: auto; }
 }
 
@@ -1279,3 +1281,30 @@ body {
   }
 }
 
+
+
+/* Delivery-area notice: a bar on desktop, a quick toast on phones that fades
+   away on its own so it never pushes the page down. */
+@keyframes announce-toast {
+  0%   { opacity: 0; transform: translate(-50%, -12px); }
+  8%   { opacity: 1; transform: translate(-50%, 0); }
+  85%  { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -12px); visibility: hidden; }
+}
+@media (max-width: 767px) {
+  .announce-bar {
+    position: fixed !important;
+    top: 0.75rem;
+    left: 50%;
+    width: min(92vw, 380px) !important;
+    z-index: 2000 !important;
+    border-radius: 16px;
+    box-shadow: 0 10px 28px rgba(60, 42, 33, 0.35);
+    pointer-events: none;
+    opacity: 0;
+    animation: announce-toast 6s ease-in-out 0.8s forwards;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .announce-bar { animation-duration: 6s; }
+}
