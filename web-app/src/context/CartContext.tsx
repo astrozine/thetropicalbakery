@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { priceNumber, trackMeta } from '@/lib/metaPixel';
 
 export interface CartItem {
   id: string;
@@ -69,6 +70,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...current, { ...newItem, quantity: options?.quantity ?? minBatch }];
     });
     if (options?.open !== false) setIsCartOpen(true); // Auto-open cart when adding
+    const qty = options?.quantity ?? newItem.batch_multiplier ?? newItem.min_batch_size ?? 1;
+    trackMeta('AddToCart', {
+      content_ids: [newItem.id], content_name: newItem.name, content_type: 'product',
+      value: priceNumber(newItem.price) * qty, num_items: qty,
+    });
   };
 
   const removeFromCart = (id: string) => {

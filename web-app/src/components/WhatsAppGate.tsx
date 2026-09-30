@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { trackMeta } from '@/lib/metaPixel';
 import { useAuth, OAuthProvider } from '@/context/AuthContext';
 
 const PENDING_KEY = 'tb_wa_gate_pending';
@@ -228,6 +229,7 @@ export default function WhatsAppGate({ href, topic, tags = [], locale = 'pt', ch
     })();
     if (p.name.trim()) write('checkout_fullName', p.name.trim());
     if (p.whatsapp.trim()) write('checkout_phone', p.whatsapp.trim());
+    trackMeta('Contact', { content_name: topic });
     window.open(href, '_blank');
     setPhase('done');
   };

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
+import { trackMeta } from '@/lib/metaPixel';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import { SunbakedLettersNote } from '@/components/SunbakedLetters';
@@ -214,6 +215,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
         p_source: 'inscricao_curso',
       });
 
+      trackMeta('Lead', { content_name: /retiro/i.test(interestType || '') ? 'retiro' : 'curso' });
       setStatus('success');
 
       // Auto-close modal after 3 seconds

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { trackMeta } from '@/lib/metaPixel';
 import { User } from '@supabase/supabase-js';
 
 export default function WaitlistCapture({ theme = 'dark', heading, subheading, plain = false }: {
@@ -92,6 +93,7 @@ export default function WaitlistCapture({ theme = 'dark', heading, subheading, p
       });
       if (formData.name) localStorage.setItem('checkout_fullName', formData.name);
       if (formData.whatsapp) localStorage.setItem('checkout_phone', formData.whatsapp);
+      trackMeta('Lead', { content_name: 'fila_de_espera' });
       setSuccess(true);
     }
   };

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { trackMeta } from '@/lib/metaPixel';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import { SunbakedLettersNote } from '@/components/SunbakedLetters';
@@ -181,6 +182,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
       });
     }
 
+    trackMeta('Subscribe', { content_name: 'assinatura' });
     setSubmitting(false);
     setDone(true);
   };

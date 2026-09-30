@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { trackMeta } from '@/lib/metaPixel';
 import { useAuth } from '@/context/AuthContext';
 import { PARTNER_KINDS, PartnerKind } from '@/lib/portals';
 import { optimizedSrc } from '@/lib/thumbs';
@@ -118,6 +119,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
         : 'Não conseguimos enviar. Confira o e-mail e tente de novo, ou fale com a gente no WhatsApp.');
       return;
     }
+    trackMeta('Lead', { content_name: `parceiro:${form.kind}` });
     setDone(true);
   };
 

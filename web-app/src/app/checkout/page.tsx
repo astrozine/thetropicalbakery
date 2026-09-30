@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { trackMeta } from '@/lib/metaPixel';
 import Link from 'next/link';
 import { useCart, CartItem } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -58,6 +59,17 @@ export default function CheckoutPage() {
       .then(j => setAvailable({ card: !!j.card, paypal: !!j.paypal }))
       .catch(() => { /* Pix only */ });
   }, []);
+
+  // Meta pixel: once per visit to the checkout, as soon as the cart (read from localStorage) is there.
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (checkoutTracked.current || !items.length) return;
+    checkoutTracked.current = true;
+    trackMeta('InitiateCheckout', {
+      content_ids: items.map(i => i.id), content_type: 'product',
+      num_items: items.reduce((n, i) => n + i.quantity, 0), value: totalPrice,
+    });
+  }, [items, totalPrice]);
 
   const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', address: '', date: '' });
   const [affiliateCode, setAffiliateCode] = useState('');
@@ -213,6 +225,13 @@ export default function CheckoutPage() {
       return;
     }
     const transactionId = order.reference;
+    // Meta pixel: the order is saved with its server-side total. Sent here, before a card/PayPal redirect,
+    // because the visitor may never come back to this site. eventID = the order reference, so any later
+    // server-side send (Conversions API) of the same order counts once.
+    trackMeta('Purchase', {
+      content_ids: items.map(i => i.id), content_type: 'product',
+      num_items: items.reduce((n, i) => n + i.quantity, 0), value: order.total,
+    }, transactionId);
     const { payload, base64 } = method === 'pix' ? await generatePixData({ value: order.total, transactionId }) : { payload: '', base64: '' };
 
     const flags = legacyFlags(diet.tags);
