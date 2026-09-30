@@ -139,6 +139,10 @@ totals) and `/equipe` (staff: shifts, hours, pay). Both are gated by an e-mail m
 `partners` / `workers`, managed in `/admin/parceiros` and `/admin/equipe`. Partners apply through
 `PartnerApply` on the B2B pages. Schema: `migration_16_portals.sql`. Types/labels: `src/lib/portals.ts`.
 
+**Minha Conta (`/minha-conta`)**: the "Clube Tropical" customer home: hero with level and one next-step
+button, tabs Início / Pedidos / Perfil, stamp card, value-ladder trail, order history with "Pedir de novo".
+Rules and data in `src/lib/loyalty.ts` + `migration_30_my_journey.sql`; see `web-app/CLAUDE.md` "Minha Conta".
+
 **Public pages**: `/` home, `/assinatura`, `/caixas`, `/menu`, `/retreats` (+ `/en/retreats`,
 `/es/retiros`, but the newest retreat sections are Portuguese only), `/cursos`, `/b2b/*`,
 `/trabalhe-conosco`, `/minha-conta`, `/checkout`. Language switcher uses the Google Translate
@@ -161,6 +165,9 @@ widget cookie (`googtrans`); choosing Português clears it and reloads.
 - Admin forms should not be full-width walls: use two columns that stack on small screens.
 - Highlight cards on the `/assinatura` hero only (Andrew was explicit that `/caixas` must not have them).
 - Check phones: much of his audience is mobile.
+- **Minha Conta's Clube Tropical layout was praised ("great job", 2026-09-29).** For customer dashboards: one
+  primary action that changes with the customer's situation, tabs instead of long stacks, and progress people can
+  see (levels, stamps, a trail of what to try next) instead of walls of forms.
 
 ## 7. Known gotchas (each cost real time)
 
@@ -186,6 +193,10 @@ widget cookie (`googtrans`); choosing Português clears it and reloads.
 - English/Spanish versions of the new retreat sections; more video placements for the inspiration section.
 - A full mobile audit needs Andrew's phone screenshots (you can't test mobile).
 - Physical QR display card for hotel mini-fridges and a gold-foil paint-swash graphic.
+
+- Run `web-app/migration_30_my_journey.sql` in Supabase, or Minha Conta hides the stamps, levels and order history.
+- Andrew to confirm the loyalty reward in `src/lib/loyalty.ts` (currently a surprise treat every 6 boxes), and
+  decide how the kitchen learns who has earned it.
 
 ## 9. How to work well here
 

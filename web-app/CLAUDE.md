@@ -158,3 +158,38 @@ that only add columns or policies to existing tables need nothing extra.
   that speak English/Spanish. Signed-in people with a phone on their account go straight through.
 - Left as plain links on purpose: footer, privacy page, admin, logged-in areas (partner, team, my account,
   my subscription), the order-return page and e-mail templates.
+
+# Minha Conta: the Clube Tropical home (a design that worked)
+
+Andrew asked for an account page that "keeps people buying and gets them up the value ladder" and called the
+result a **great job** (2026-09-29). Treat it as the reference for customer-facing dashboards. What made it work:
+
+- **One next step, not a menu.** The hero (`src/components/account/AccountHero.tsx`) has exactly one gold button,
+  and it changes with the customer's situation: box ready → see it; Pix waiting → see the order; subscriber →
+  pick this week's treats; everyone else → the next rung of the ladder. A second, quieter button nudges an
+  incomplete profile. Keep it to one primary action.
+- **Tabs instead of a long stack.** Início / Pedidos / Perfil (`#pedidos`, `#perfil` open a tab directly). The
+  old page showed every form fold, the subscription and three promo cards at once, which is what felt cluttered.
+- **Live things always come first.** Pickup and subscription e-mails link here, so `MyPickups` and
+  `MySubscription` sit at the top of Início. Never move them behind a tab.
+- **Status and progress, not forms.** Club level (Semente → Broto → Palmeira → Sol Tropical), a kraft-paper
+  stamp card, a "Sua trilha tropical" path (caixa → assinatura → eventos → curso → retiro, with the next step
+  spotlighted by a photo and a button), and a profile checklist that jumps to the right fold.
+- **Floating-photo hero** in the /retreats style, with a gold progress ring around the customer's own photo.
+
+Where things live:
+- Every promise (stamps per reward, the reward text, level thresholds, the trail steps and their pitches) is in
+  **`src/lib/loyalty.ts`**. Change a reward there and nowhere else. The current reward, "6 stamps = um mimo
+  surpresa da Dolly na próxima caixa", was proposed by Claude; confirm with Andrew before making it bigger, and
+  note that nothing yet tells the kitchen who has earned it.
+- Data comes from one SECURITY DEFINER function, `my_journey()` (`migration_30_my_journey.sql`), which returns
+  only the caller's own orders, stamp count, event quotes and course/retreat enquiries. Customers still cannot
+  read `orders` directly; do not add a SELECT policy for them. "Paid" means `status = 'PAID'` or moved past
+  `new` in `inbox_status` (how a Pix payment is confirmed by hand). Stamps = paid box orders + delivered
+  subscription boxes.
+- If the function is missing, the page must keep working: `journey` stays `null` and the stamps, level and order
+  history hide themselves. Keep that fallback.
+- Styles are in `src/app/minha-conta/accountStyles.ts` (phone first, desktop at 1024px). On phones the two home
+  columns use `display: contents` and `order` so the stamp card comes right after the live boxes.
+- Gotcha found on the way: a grid of `AccountSection`s needs `grid-template-columns: minmax(0, 1fr)`, or the
+  one-line summaries (`white-space: nowrap`) stretch the grid past a 412px screen and the page clip hides it.
