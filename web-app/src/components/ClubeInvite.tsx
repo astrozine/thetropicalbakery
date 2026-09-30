@@ -18,6 +18,11 @@ const PERKS: { icon: string; title: string; text: string }[] = [
   { icon: '📦', title: 'Tudo num só lugar', text: 'Seus pedidos e sua assinatura sempre à mão.' },
 ];
 
+/** Small second line under a gold pill, saying what it is. Also used by Navigation (Assinatura). */
+export const SUB_STYLE: React.CSSProperties = {
+  fontSize: '0.62rem', fontWeight: 500, textTransform: 'none', letterSpacing: '0.2px', opacity: 0.85, whiteSpace: 'nowrap',
+};
+
 export function ClubeModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { user } = useAuth();
 
@@ -114,13 +119,15 @@ export default function ClubeInvite({ variant = 'desktop' }: { variant?: 'deskto
       <button
         type="button"
         onClick={() => setOpen(true)}
+        title="Sua conta grátis: pedidos, fidelidade e dados salvos"
         style={{
-          marginLeft: '1.5rem', padding: '0.5rem 1rem', border: 'none', borderRadius: '999px', background: '#d4af37',
-          color: '#3c2a21', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '1px', textTransform: 'uppercase',
-          cursor: 'pointer', whiteSpace: 'nowrap',
+          marginLeft: 'clamp(0.7rem, 1.1vw, 1.5rem)', padding: '0.35rem 1rem', border: 'none', borderRadius: '999px', background: '#d4af37',
+          color: '#3c2a21', fontWeight: 700, fontSize: 'clamp(0.72rem, 0.75vw, 0.8rem)', letterSpacing: '0.5px', textTransform: 'uppercase',
+          cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.15,
         }}
       >
         🌴 Entrar no Clube
+        <span style={SUB_STYLE}>pedidos sem redigitar</span>
       </button>
     );
 

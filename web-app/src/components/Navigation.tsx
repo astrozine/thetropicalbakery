@@ -5,7 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import AccountMenu from '@/components/AccountMenu';
+import { SUB_STYLE } from '@/components/ClubeInvite';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
+
+// Desktop menu (xl and up): one line at 1280px, roomier on bigger screens.
+const GAP = 'clamp(0.7rem, 1.1vw, 1.5rem)';
+const TOP_SIZE = 'clamp(0.74rem, 0.78vw, 0.9rem)';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,11 +55,11 @@ export default function Navigation() {
     }
   };
 
-  const links: { name: string; path: string; highlight?: boolean }[] = [
+  const links: { name: string; path: string; highlight?: boolean; sub?: string }[] = [
     { name: 'Início', path: '/' },
     // The weekly subscription is the core of the business, so it leads and is
     // the only item given the foil treatment.
-    { name: 'Assinatura', path: '/assinatura', highlight: true },
+    { name: 'Assinatura', path: '/assinatura', highlight: true, sub: 'caixa toda semana' },
     { name: 'Caixa de Degustação', path: '/caixas' },
     { name: 'Menu de Eventos', path: '/menu' },
     { name: 'Retiros', path: '/retreats' },
@@ -181,37 +186,41 @@ export default function Navigation() {
         </Link>
         
         {/* Desktop Menu & Cart */}
-        <div className="hidden md:flex items-center" style={{ alignItems: 'center' }}>
+        <div className="hidden xl:flex items-center" style={{ alignItems: 'center' }}>
           {links.map((link) => (
             <Link key={link.path} href={link.path} style={{
-              marginLeft: '1.5rem',
+              marginLeft: GAP,
               textDecoration: 'none',
               color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#3c2a21',
               fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
               textTransform: 'uppercase',
-              letterSpacing: '1px',
-              fontSize: '0.9rem',
+              letterSpacing: '0.5px',
+              fontSize: TOP_SIZE,
+              whiteSpace: 'nowrap',
               ...(link.highlight ? {
                 background: '#d4af37',
-                padding: '0.5rem 1rem',
+                padding: '0.35rem 0.9rem',
                 borderRadius: '6px',
+                display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.15,
               } : {}),
             }}>
               {link.name}
+              {link.sub && <span style={SUB_STYLE}>{link.sub}</span>}
             </Link>
           ))}
 
           {/* Cursos Dropdown */}
           <div 
-            style={{ position: 'relative', marginLeft: '1.5rem', cursor: 'pointer' }}
+            style={{ position: 'relative', marginLeft: GAP, cursor: 'pointer' }}
             onMouseEnter={() => setIsCursosDropdownOpen(true)}
             onMouseLeave={() => setIsCursosDropdownOpen(false)}
           >
             <span style={{
               color: '#3c2a21',
               textTransform: 'uppercase',
-              letterSpacing: '1px',
-              fontSize: '0.9rem',
+              letterSpacing: '0.5px',
+              fontSize: TOP_SIZE,
+              whiteSpace: 'nowrap',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem'
@@ -262,12 +271,12 @@ export default function Navigation() {
           <div
             className="notranslate"
             translate="no"
-            style={{ position: 'relative', marginLeft: '1.5rem', cursor: 'pointer' }}
+            style={{ position: 'relative', marginLeft: GAP, cursor: 'pointer' }}
             onMouseEnter={() => setIsRetreatsDropdownOpen(true)}
             onMouseLeave={() => setIsRetreatsDropdownOpen(false)}
           >
-            <span style={{ color: '#3c2a21', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              🌐 {langLabel} ▾
+            <span title={langLabel} aria-label={langLabel} style={{ color: '#3c2a21', textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: TOP_SIZE, whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              🌐 ▾
             </span>
             {isRetreatsDropdownOpen && (
               <div style={{ position: 'absolute', top: '100%', left: 0, background: 'rgba(253,250,243,0.95)', backdropFilter: 'blur(10px)', minWidth: '200px', padding: '1rem 0', borderRadius: '8px', boxShadow: '0 10px 30px rgba(60,42,33,0.1)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -295,15 +304,16 @@ export default function Navigation() {
 
           {/* B2B Dropdown */}
           <div 
-            style={{ position: 'relative', marginLeft: '1.5rem', cursor: 'pointer' }}
+            style={{ position: 'relative', marginLeft: GAP, cursor: 'pointer' }}
             onMouseEnter={() => setIsDropdownOpen(true)}
             onMouseLeave={() => setIsDropdownOpen(false)}
           >
             <span style={{
               color: '#3c2a21',
               textTransform: 'uppercase',
-              letterSpacing: '1px',
-              fontSize: '0.9rem',
+              letterSpacing: '0.5px',
+              fontSize: TOP_SIZE,
+              whiteSpace: 'nowrap',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem'
@@ -351,7 +361,7 @@ export default function Navigation() {
 
           <button
             onClick={() => setIsCartOpen(true)}
-            style={{ marginLeft: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center' }}
+            style={{ marginLeft: GAP, background: 'none', border: 'none', cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center' }}
           >
             <span style={{ fontSize: '1.5rem' }}>🛒</span>
             {totalItems > 0 && (
@@ -363,7 +373,7 @@ export default function Navigation() {
         </div>
 
         {/* Mobile Menu Toggle & Cart */}
-        <div className="md:hidden glass-pill actions-pill flex items-center gap-4">
+        <div className="xl:hidden glass-pill actions-pill flex items-center gap-4">
           {/* 44x44 is the smallest a thumb hits reliably (Apple HIG); the glyph stays 1.5rem. */}
           <button
             onClick={() => setIsCartOpen(true)}
@@ -488,9 +498,10 @@ export default function Navigation() {
                 }}
               >
                 {link.name}
+                {link.sub && <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, opacity: 0.85 }}>{link.sub}</span>}
               </Link>
             ))}
-            
+
             {/* Cursos Section Header */}
             <button 
               onClick={() => setMobileCursosOpen(!mobileCursosOpen)}
