@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import TreatInfo, { hasTreatInfo } from '@/components/TreatInfo';
 import { allergenById, normalizeAllergens } from '@/lib/allergens';
-import { treatTypeById } from '@/lib/treatTypes';
+import { RAW, isRaw, treatTypeById } from '@/lib/treatTypes';
 import Image from 'next/image';
 import { canOptimize } from '@/lib/thumbs';
 
@@ -23,6 +23,8 @@ interface MenuCardProps {
     may_contain?: string[] | null;
     /** Cookie, cake, chocolate… shown as a small tag over the photo. Absent treats simply get none. */
     treat_type?: string | null;
+    /** Made without an oven. Its own green leaf tag, next to the type one. */
+    is_raw?: boolean | null;
   };
   /** On a page with a quick pick: this treat is one of the ones already chosen there. */
   picked?: boolean;
@@ -42,6 +44,7 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
   const [showInfo, setShowInfo] = useState(false);
   const hasInfo = hasTreatInfo(item);
   const kind = treatTypeById(item.treat_type);
+  const raw = isRaw(item);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -96,10 +99,20 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
           )}
           {/* A tag only when the treat has one — untyped treats simply show none. Bottom-left, so it
               never fights the "picked" mark (top-left) or the mobile zoom icon (top-right). */}
-          {kind && (
-            <span style={{ position: 'absolute', left: '8px', bottom: '8px', maxWidth: 'calc(100% - 16px)', lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.02em', backdropFilter: 'blur(2px)' }}>
-              <span aria-hidden>{kind.emoji}</span>{kind.label}
-            </span>
+          {(kind || raw) && (
+            <div style={{ position: 'absolute', left: '8px', bottom: '8px', right: '8px', display: 'flex', flexWrap: 'wrap-reverse', gap: '0.3rem', pointerEvents: 'none' }}>
+              {/* Raw first and in leaf green: it's the one guests scan the page for. */}
+              {raw && (
+                <span title={`${RAW.label}: ${RAW.hint}`} style={{ lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: RAW.accent, color: '#ffffff', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.02em', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>
+                  <span aria-hidden>{RAW.emoji}</span>{RAW.label}
+                </span>
+              )}
+              {kind && (
+                <span style={{ maxWidth: '100%', lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.02em', backdropFilter: 'blur(2px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span aria-hidden>{kind.emoji}</span>{kind.label}
+                </span>
+              )}
+            </div>
           )}
           {isMobile && (
             <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255,255,255,0.8)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>
@@ -204,16 +217,31 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
 
             <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
               <img src={item.image} alt={item.name} style={{ width: '100%', height: '35vh', minHeight: '250px', objectFit: 'cover', borderRadius: '12px', display: 'block' }} />
-              {kind && (
-                <span style={{ position: 'absolute', left: '10px', bottom: '10px', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.02em' }}>
-                  <span aria-hidden>{kind.emoji}</span>{kind.label}
-                </span>
+              {(kind || raw) && (
+                <div style={{ position: 'absolute', left: '10px', bottom: '10px', right: '10px', display: 'flex', flexWrap: 'wrap-reverse', gap: '0.35rem' }}>
+                  {raw && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: RAW.accent, color: '#ffffff', padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.02em' }}>
+                      <span aria-hidden>{RAW.emoji}</span>{RAW.label}
+                    </span>
+                  )}
+                  {kind && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.02em' }}>
+                      <span aria-hidden>{kind.emoji}</span>{kind.label}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
 
             <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
               {item.emoji ? `${item.emoji} ` : ''}{item.name}
             </h3>
+
+            {raw && (
+              <p style={{ background: '#eef5e8', color: '#3f5e2c', borderRadius: '10px', padding: '0.6rem 0.85rem', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '1rem' }}>
+                <strong>{RAW.emoji} {RAW.label}:</strong> {RAW.hint}.
+              </p>
+            )}
             
             <p style={{ color: '#594a42', fontSize: '1rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
               {item.description}

@@ -12,8 +12,9 @@ import EventOrderSheet, { EventQuoteForm } from '@/components/EventOrder';
 import { useCart } from '@/context/CartContext';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 import TreatTypeBar from '@/components/TreatTypeBar';
+import RawSwitch from '@/components/RawSwitch';
 import { ALLERGEN_LIST_NEM } from '@/lib/allergens';
-import { anyTyped, groupByType, textOn } from '@/lib/treatTypes';
+import { anyTyped, groupByType, matchesRaw, textOn, type RawFilter } from '@/lib/treatTypes';
 
 interface Treat {
   id: string;
@@ -29,6 +30,7 @@ interface Treat {
   contains?: string[] | null;
   may_contain?: string[] | null;
   treat_type?: string | null;
+  is_raw?: boolean | null;
 }
 
 export default function MenuPage() {
@@ -60,6 +62,19 @@ export default function MenuPage() {
     };
     fetchMenu();
   }, []);
+
+  // /menu?raw=1 opens on the raw treats (and ?raw=0 on the baked ones), so a post or a message can
+  // link straight to them; the address follows the switch, so what you're looking at can be shared.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('raw');
+    if (q === '1' || q === '0') setRefine(r => ({ ...r, raw: q === '1' ? 'raw' : 'cooked' }));
+  }, []);
+  const setRaw = (raw: RawFilter) => {
+    setRefine(r => ({ ...r, raw }));
+    const url = new URL(window.location.href);
+    if (raw === 'all') url.searchParams.delete('raw'); else url.searchParams.set('raw', raw === 'raw' ? '1' : '0');
+    window.history.replaceState(window.history.state, '', url);
+  };
 
   const visibleItems = menuItems.filter(t => matchesRefine(t, refine, { hideUnknownWhenFree: true }));
 
@@ -146,11 +161,11 @@ export default function MenuPage() {
             .menu-aside { margin-bottom: 2.5rem; }
             /* The type picker sits at the top of the treats column — top-right on a wide screen,
                a swipeable strip above the grid on a phone. */
-            .menu-typebar { display: flex; justify-content: flex-start; margin-bottom: 1.5rem; }
+            .menu-typebar { display: flex; flex-direction: column; align-items: stretch; gap: 0.8rem; margin-bottom: 1.5rem; }
             @media (min-width: 1024px) {
               .menu-layout { display: grid; grid-template-columns: minmax(320px, 380px) minmax(0, 1fr); gap: 2rem; align-items: start; }
               .menu-aside { position: sticky; top: 7.5rem; max-height: calc(100vh - 9rem); overflow-y: auto; margin-bottom: 0; padding: 2px 6px 10px 2px; }
-              .menu-typebar { justify-content: flex-end; margin-bottom: 1.25rem; }
+              .menu-typebar { align-items: flex-end; margin-bottom: 1.25rem; }
             }
           `}</style>
           <div className="menu-layout">
@@ -160,7 +175,9 @@ export default function MenuPage() {
 
           <div className="menu-main">
           <div className="menu-typebar">
-            <TreatTypeBar bleed treats={menuItems} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
+            <RawSwitch treats={menuItems} value={refine.raw || 'all'} onChange={setRaw} />
+            {/* The type pills count within the raw switch, so "Raw" only offers the kinds that have a raw treat. */}
+            <TreatTypeBar bleed treats={menuItems.filter(t => matchesRaw(t, refine.raw || 'all'))} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
           </div>
 
           {visibleItems.length === 0 && (
@@ -211,6 +228,7 @@ export default function MenuPage() {
                       contains: item.contains,
                       may_contain: item.may_contain,
                       treat_type: item.treat_type,
+                      is_raw: item.is_raw,
                     }} />
                   </ScrollReveal>
                 </div>
@@ -233,6 +251,7 @@ export default function MenuPage() {
                     contains: item.contains,
                     may_contain: item.may_contain,
                     treat_type: item.treat_type,
+                    is_raw: item.is_raw,
                   }} />
                 </ScrollReveal>
               ))}

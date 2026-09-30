@@ -24,10 +24,12 @@ export const TREAT_TYPES: TreatType[] = [
   // there so a Brazilian visitor knows what it means. Keep both halves in the label: it is what every
   // pill, heading and card tag shows.
   { id: 'entremets', label: 'Entremets (sobremesa em camadas)', emoji: '🍮', accent: '#c2504a', hint: 'sobremesa em camadas, moldada, ao estilo da pâtisserie francesa' },
-  { id: 'raw', label: 'Raw', emoji: '🌿', accent: '#7a9b57', hint: 'sem forno, à base de castanhas, frutas secas e cacau cru' },
+  // No 'raw' here: raw is how a treat is made, not what it is. See RAW / isRaw below.
   { id: 'bolos', label: 'Bolos', emoji: '🎂', accent: '#e8a33d', hint: 'bolos, mini bundt cakes, cheesecakes, rocamboles' },
   { id: 'tarteletes', label: 'Tarteletes', emoji: '🥧', accent: '#b8743a', hint: 'tarteletes e tortas com base crocante' },
   { id: 'cupcakes', label: 'Cupcakes', emoji: '🧁', accent: '#d77a9a', hint: 'bolinhos individuais com cobertura' },
+  // "Cake pop" is also what Brazilian bakeries call it (two words, no hyphen); the brackets say what it is.
+  { id: 'cake-pops', label: 'Cake pops (bolo no palito)', emoji: '🍭', accent: '#b0579a', hint: 'bolinha de bolo no palito, banhada na cobertura' },
   { id: 'assados', label: 'Assados', emoji: '🥐', accent: '#c98a4b', hint: 'vai ao forno: barrinhas, folhados, pães doces' },
   { id: 'cookies', label: 'Cookies', emoji: '🍪', accent: '#8a5a3b' },
   { id: 'chocolates', label: 'Chocolates', emoji: '🍫', accent: '#4a332a', hint: 'bombons, trufas e docinhos de chocolate' },
@@ -36,12 +38,41 @@ export const TREAT_TYPES: TreatType[] = [
 /**
  * Ids we used to have, and what they mean now. 'bolos-tarteletes' was one group until cakes and
  * tartelettes were split (migration_29 rewrites the stored rows); a row still carrying it reads as a cake
- * until Dolly re-files it.
+ * until Dolly re-files it. 'raw' was a type until it became a yes/no of its own (any treat can be raw, see
+ * isRaw): a row still carrying it has no type yet ("Outros") and still counts as raw.
  */
-const LEGACY_TYPES: Record<string, string> = { 'bolos-tarteletes': 'bolos' };
+const LEGACY_TYPES: Record<string, string | null> = { 'bolos-tarteletes': 'bolos', raw: null };
 
 /** The current id for whatever is stored in treats.treat_type. Read stored ids through this. */
-export const normalizeTreatType = (id: string | null | undefined) => (id ? LEGACY_TYPES[id] ?? id : id);
+export const normalizeTreatType = (id: string | null | undefined) =>
+  (id && id in LEGACY_TYPES ? LEGACY_TYPES[id] : id);
+
+// ------------------------------------------------------------------ raw
+
+/**
+ * Raw is not a kind of treat, it is a way of making one: a raw cheesecake is still a cake, a raw truffle
+ * still a chocolate. So it is a yes/no on every treat (`treats.is_raw`, migration_31), with its own leaf
+ * tag and its own "Todos / Raw / Do forno" switch, and it crosses with the type instead of replacing it.
+ */
+export const RAW = {
+  label: 'Raw',
+  emoji: '🌿',
+  accent: '#5f8a45',
+  hint: 'feito sem forno: nada passa de 42 °C, então frutas, castanhas e cacau continuam crus',
+};
+
+export interface RawableTreat {
+  is_raw?: boolean | null;
+  treat_type?: string | null;
+}
+
+/** The one test for "is this treat raw". The old 'raw' type still counts until migration_31 moves it. */
+export const isRaw = (t: RawableTreat) => t.is_raw === true || t.treat_type === 'raw';
+
+/** 'all' shows everything, 'raw' only the raw treats, 'cooked' only the ones that go in the oven. */
+export type RawFilter = 'all' | 'raw' | 'cooked';
+
+export const matchesRaw = (t: RawableTreat, f: RawFilter) => f === 'all' || (f === 'raw') === isRaw(t);
 
 /** The catch-all "Outros" bucket's colour — a neutral that doesn't compete with any real type. */
 export const OUTROS_ACCENT = '#8a7a6b';

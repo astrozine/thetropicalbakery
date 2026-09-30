@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ALLERGENS, TREAT_EMOJIS, normalizeAllergens } from '@/lib/allergens';
-import { TREAT_TYPES, normalizeTreatType } from '@/lib/treatTypes';
+import { RAW, TREAT_TYPES, normalizeTreatType } from '@/lib/treatTypes';
 
 /** Shared admin styles for the treat-detail editors (box treats and Menu de Eventos treats). */
 export const fieldStyle: React.CSSProperties = { width: '100%', padding: '0.7rem', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.95rem' };
@@ -163,6 +163,29 @@ export function TreatTypeField({ value, onChange }: { value: string | null | und
         Agrupa os doces em seções no Menu de Eventos e mostra uma etiqueta pequena no card. Opcional — deixe em branco se não tiver certeza.
       </p>
     </div>
+  );
+}
+
+/**
+ * Raw is a yes/no on any treat, not one of the types above: a raw cheesecake is still a Bolo.
+ * A real checkbox, so it reads as "this one too" rather than as a choice between kinds.
+ */
+export function RawField({ checked, onChange }: { checked: boolean; onChange: (raw: boolean) => void }) {
+  return (
+    <label style={{
+      display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', padding: '0.8rem 0.9rem', borderRadius: '10px',
+      border: `1px solid ${checked ? RAW.accent : '#dfe4ea'}`, background: checked ? '#eef5e8' : '#fff',
+    }}>
+      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)}
+        style={{ width: '22px', height: '22px', marginTop: '2px', accentColor: RAW.accent, flex: 'none', cursor: 'pointer' }} />
+      <span>
+        <strong style={{ color: checked ? '#3f5e2c' : '#2c3e50' }}>{RAW.emoji} Este doce é Raw</strong>
+        <span style={{ display: 'block', fontSize: '0.8rem', color: '#7f8c8d', lineHeight: 1.5, marginTop: '0.2rem' }}>
+          Não vai ao forno: nada passa de 42 °C. Vale para qualquer tipo de doce (um cheesecake raw continua em Bolos):
+          ganha a etiqueta verde e aparece no botão <strong>Raw</strong> do Menu de Eventos.
+        </span>
+      </span>
+    </label>
   );
 }
 

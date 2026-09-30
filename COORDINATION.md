@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **30**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **32**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -105,6 +105,10 @@ Verified live, 2026-09-26:
   `courses.is_active`). Hidden courses also leave the nav dropdown and "Outros Cursos" (`useShownCourses.ts`). Treat types: Bolos,
   Tarteletes and Cupcakes are separate now; old `bolos-tarteletes` reads as `bolos` (`normalizeTreatType`) and
   `migration_29_split_cakes_tartelettes.sql` (NOT run yet, safe either way) rewrites it. "Entremets" stays French, with the Portuguese in brackets.
+- **Raw is a checkbox, not a type (2026-09-30, Dolly's call).** Any treat can be raw: `treats.is_raw`, read only through
+  `isRaw()` in `treatTypes.ts` (an old `treat_type = 'raw'` still counts). /menu and /admin/treats have a "Todos / Raw / Do forno"
+  switch (`RawSwitch.tsx`, `RefineState.raw`) that crosses with the type pills; `/menu?raw=1` opens on the raw treats. New type
+  `cake-pops`. **`migration_31_raw_flag.sql` is NOT run yet** (safe either way): until then a raw treat can't also carry a type.
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the

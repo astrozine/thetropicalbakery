@@ -6,14 +6,15 @@ import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
 import ToggleSwitch from '@/components/ToggleSwitch';
 import ShowOnSiteSwitch from '@/components/ShowOnSiteSwitch';
-import { AllergenFields, EmojiField, IngredientsField, TreatTypeField } from '@/components/TreatDetailsFields';
+import { AllergenFields, EmojiField, IngredientsField, RawField, TreatTypeField } from '@/components/TreatDetailsFields';
 import TreatInfo from '@/components/TreatInfo';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 import TreatTypeBar from '@/components/TreatTypeBar';
+import RawSwitch from '@/components/RawSwitch';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { syncTreatIntoBoxes } from '@/lib/treatSync';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
-import { anyTyped, groupByType, textOn, treatTypeById } from '@/lib/treatTypes';
+import { RAW, anyTyped, groupByType, isRaw, matchesRaw, textOn, treatTypeById } from '@/lib/treatTypes';
 
 interface Treat {
   id: string;
@@ -29,6 +30,7 @@ interface Treat {
   contains?: string[] | null;
   may_contain?: string[] | null;
   treat_type?: string | null;
+  is_raw?: boolean | null;
 }
 
 const field: React.CSSProperties = { width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #ccc' };
@@ -94,8 +96,27 @@ export default function TreatsAdmin() {
       may_contain: formData.may_contain || [],
     };
 
+    // Raw is its own column now; a row still typed 'raw' (the old way) drops that type as it's saved.
+    const raw = isRaw(formData);
+    const kind = formData.treat_type === 'raw' ? null : formData.treat_type ?? null;
+    let row: Record<string, unknown> = { ...formData, ...details, treat_type: kind, is_raw: raw };
+
+    // Until migration_31 runs there is no is_raw column: keep raw in the old place when the treat has no
+    // other type, and say so when it has one (the two can't both be stored yet).
+    const withoutRawColumn = () => {
+      const rest = { ...row };
+      delete rest.is_raw;
+      row = { ...rest, treat_type: raw && !kind ? 'raw' : kind };
+      if (raw && kind) brandAlert(`Salvei o tipo, mas a marca ${RAW.emoji} Raw só fica guardada junto com ele depois de rodar a migration_31_raw_flag.sql no Supabase.`);
+    };
+    const missingRawColumn = (msg: string) => /is_raw/.test(msg);
+
     if (editingId) {
-      const { error } = await supabase.from('treats').update({ ...formData, ...details }).eq('id', editingId);
+      let { error } = await supabase.from('treats').update(row).eq('id', editingId);
+      if (error && missingRawColumn(error.message)) {
+        withoutRawColumn();
+        ({ error } = await supabase.from('treats').update(row).eq('id', editingId));
+      }
       if (error) {
         brandAlert('Erro ao atualizar doce: ' + error.message + hint(error.message));
         setSaving(false);
@@ -104,13 +125,17 @@ export default function TreatsAdmin() {
       // An ingredient/allergen fix must reach every box that includes this treat.
       await syncTreatIntoBoxes(editingId, details);
     } else {
-      const { error } = await supabase.from('treats').insert([{
-        ...formData,
-        ...details,
+      const insert = () => supabase.from('treats').insert([{
+        ...row,
         is_available: formData.is_available ?? true,
         min_batch_size: formData.min_batch_size ?? 1,
         batch_multiplier: formData.batch_multiplier || 1,
       }]);
+      let { error } = await insert();
+      if (error && missingRawColumn(error.message)) {
+        withoutRawColumn();
+        ({ error } = await insert());
+      }
       if (error) {
         brandAlert('Erro ao criar doce: ' + error.message + hint(error.message));
         setSaving(false);
@@ -158,6 +183,7 @@ export default function TreatsAdmin() {
   // One card, reused whether the list is grouped by type or shown flat.
   const renderTreatCard = (treat: Treat, grouped = false) => {
     const kind = treatTypeById(treat.treat_type);
+    const raw = isRaw(treat);
     return (
       <div key={treat.id} style={{ background: 'white', borderRadius: grouped ? '0 0 12px 12px' : '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{ position: 'relative', height: '200px', background: '#f5f6fa', opacity: treat.is_available ? 1 : 0.55, filter: treat.is_available ? undefined : 'grayscale(0.6)' }}>
@@ -171,11 +197,18 @@ export default function TreatsAdmin() {
               🙈 Escondido
             </div>
           )}
-          {kind && (
-            <div style={{ position: 'absolute', left: '10px', bottom: '10px', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700 }}>
-              {kind.emoji} {kind.label}
-            </div>
-          )}
+          <div style={{ position: 'absolute', left: '10px', bottom: '10px', right: '10px', display: 'flex', flexWrap: 'wrap-reverse', gap: '0.3rem' }}>
+            {raw && (
+              <span style={{ background: RAW.accent, color: '#fff', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
+                {RAW.emoji} {RAW.label}
+              </span>
+            )}
+            {kind && (
+              <span style={{ background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
+                {kind.emoji} {kind.label}
+              </span>
+            )}
+          </div>
         </div>
 
         <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -252,6 +285,11 @@ export default function TreatsAdmin() {
 
             <TreatTypeField value={formData.treat_type} onChange={treat_type => setFormData({ ...formData, treat_type })} />
 
+            <RawField
+              checked={isRaw(formData)}
+              onChange={is_raw => setFormData({ ...formData, is_raw, treat_type: formData.treat_type === 'raw' ? null : formData.treat_type })}
+            />
+
             <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
               <div>
                 <label style={label}>Preço Unitário (R$)</label>
@@ -324,11 +362,11 @@ export default function TreatsAdmin() {
         .treats-aside { margin-bottom: 1.5rem; }
         /* Same place as on /menu: the type picker sits at the top of the catalogue column,
            pushed to the right once there's room for it beside the heading. */
-        .treats-typebar { display: flex; justify-content: flex-start; margin-bottom: 1.25rem; }
+        .treats-typebar { display: flex; flex-direction: column; align-items: stretch; gap: 0.75rem; margin-bottom: 1.25rem; }
         @media (min-width: 1280px) {
           .treats-layout { display: grid; grid-template-columns: minmax(320px, 380px) minmax(0, 1fr); gap: 1.75rem; align-items: start; }
           .treats-aside { position: sticky; top: 7.5rem; max-height: calc(100vh - 9rem); overflow-y: auto; margin-bottom: 0; padding: 2px 6px 10px 2px; }
-          .treats-typebar { justify-content: flex-end; }
+          .treats-typebar { align-items: flex-end; }
         }
       `}</style>
       <div className="treats-layout">
@@ -338,7 +376,8 @@ export default function TreatsAdmin() {
 
       <div className="treats-main">
       <div className="treats-typebar">
-        <TreatTypeBar tone="light" treats={treats} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
+        <RawSwitch tone="light" treats={treats} value={refine.raw || 'all'} onChange={raw => setRefine({ ...refine, raw })} />
+        <TreatTypeBar tone="light" treats={treats.filter(t => matchesRaw(t, refine.raw || 'all'))} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })} />
       </div>
 
       {visibleTreats.length === 0 && (
