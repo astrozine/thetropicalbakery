@@ -70,7 +70,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...current, { ...newItem, quantity: options?.quantity ?? minBatch }];
     });
     if (options?.open !== false) setIsCartOpen(true); // Auto-open cart when adding
-    const qty = options?.quantity ?? newItem.batch_multiplier ?? newItem.min_batch_size ?? 1;
+    // Same amount the updater above adds: a batch on top of an existing line, else the first quantity.
+    const inCart = items.some(i => i.id === newItem.id);
+    const qty = inCart ? (newItem.batch_multiplier || 1) : (options?.quantity ?? (newItem.min_batch_size || 1));
     trackMeta('AddToCart', {
       content_ids: [newItem.id], content_name: newItem.name, content_type: 'product',
       value: priceNumber(newItem.price) * qty, num_items: qty,
