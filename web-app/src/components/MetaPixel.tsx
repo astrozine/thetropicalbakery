@@ -112,8 +112,9 @@ export default function MetaPixel() {
       }}
     >
       <p style={{ margin: 0 }}>
-        Usamos cookies da Meta (Facebook e Instagram) para entender quem visita o site e mostrar nossos doces a
-        quem pode gostar deles. Só ativamos se você aceitar.{' '}
+        🌴 Ajude a cozinha da Dolly a chegar em quem vai amar! Com os cookies da Meta, mostramos nossos doces
+        no Instagram e no Facebook para quem tem a ver com eles, e você vê menos anúncios que não têm nada a ver.
+        Só ativamos se você aceitar.{' '}
         <Link href="/privacidade" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>
           Política de Privacidade
         </Link>
