@@ -407,7 +407,7 @@ export default function ChefDolly() {
         /* ── HERO ─────────────────────────────────────────────────── */
         /* Two columns: the poster lives in the left one, the billing in the right. Nothing the
            photos do can reach the words, because they are in a column of their own. */
-        .cd-hero { position: relative; overflow: hidden; background: #17100c; min-height: calc(100svh - 9rem); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); align-items: center; gap: clamp(1rem, 3vw, 2.5rem); padding: clamp(2.5rem, 6vh, 4.5rem) clamp(1.25rem, 4vw, 3.5rem); }
+        .cd-hero { position: relative; overflow: hidden; background: #17100c; min-height: calc(100svh - 9rem); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); align-items: center; gap: clamp(1rem, 3vw, 2.5rem); padding: clamp(2.5rem, 6vh, 4.5rem) max(clamp(1.25rem, 4vw, 3.5rem), calc((100% - 1240px) / 2)); }
         .cd-hero__bg { position: absolute; inset: 0; background: url("/dolly/hero-mata.webp") center 35%/cover; filter: brightness(0.36) saturate(0.85); transform: scale(1.06); }
         .cd-hero__veil { position: absolute; inset: 0; background: radial-gradient(70% 55% at 50% 45%, rgba(23,16,12,0.35), rgba(23,16,12,0.9) 75%), radial-gradient(45% 40% at 12% 10%, rgba(212,175,55,0.22), transparent 70%); }
         .cd-hero__photos { position: relative; z-index: 4; display: flex; justify-content: center; }
