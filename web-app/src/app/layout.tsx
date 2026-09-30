@@ -9,6 +9,7 @@ import Providers from "@/app/Providers";
 import CartDrawer from "@/components/CartDrawer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import BrandDialogHost from "@/components/BrandDialogHost";
+import MetaPixel from "@/components/MetaPixel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,6 +65,7 @@ export default function RootLayout({
           <Footer />
           <MobileBottomNav />
           <BrandDialogHost />
+          <MetaPixel />
         </Providers>
         <Script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" strategy="afterInteractive" />
         <Script id="google-translate-script" strategy="afterInteractive">

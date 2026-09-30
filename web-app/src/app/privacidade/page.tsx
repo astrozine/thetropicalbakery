@@ -77,6 +77,7 @@ export default function PrivacyPolicyPage() {
           <ul style={{ paddingLeft: '1.5rem' }}>
             <li style={liStyle}><strong>Google e Facebook</strong> — apenas se você optar por entrar com essas contas</li>
             <li style={liStyle}><strong>WhatsApp/Twilio</strong> — para enviar confirmações e notificações sobre seu pedido</li>
+            <li style={liStyle}><strong>Meta (Facebook e Instagram)</strong> — somente se você aceitar os cookies no aviso do site, usamos o Pixel da Meta para medir visitas e mostrar nossos anúncios a quem pode se interessar</li>
             <li style={liStyle}><strong>Google Translate</strong> — para traduzir o conteúdo do site para visitantes de outros idiomas</li>
             <li style={liStyle}><strong>ViaCEP</strong> — quando você digita seu CEP, consultamos a base pública dos Correios para preencher rua, bairro e cidade automaticamente. Enviamos apenas o CEP, nunca seu nome ou endereço completo</li>
           </ul>
@@ -88,6 +89,13 @@ export default function PrivacyPolicyPage() {
             Usamos o armazenamento local do seu navegador (localStorage) para lembrar os itens do seu
             carrinho e os dados já preenchidos em um checkout anterior, para que você não precise digitá-los
             novamente. Essas informações ficam apenas no seu navegador e não são compartilhadas.
+          </p>
+          <p style={pStyle}>
+            Se você clicar em &ldquo;Aceitar&rdquo; no aviso de cookies, também carregamos o Pixel da Meta, que usa
+            cookies para registrar as páginas que você visita e nos ajuda a medir e melhorar nossos anúncios no
+            Facebook e no Instagram. Se clicar em &ldquo;Recusar&rdquo;, ou não responder, o Pixel não é carregado e nada
+            é enviado à Meta. Você pode mudar de ideia limpando os dados do site no seu navegador, e o aviso
+            aparecerá de novo.
           </p>
         </section>
 
