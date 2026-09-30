@@ -1,19 +1,24 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth, formatBrazilianPhone } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
 import MySubscription from '@/components/MySubscription';
 import MyPickups from '@/components/MyPickups';
-import SunbakedLetters from '@/components/SunbakedLetters';
 import { SUBSCRIPTION_ZONES, formatBRL, isItamambuca } from '@/lib/deliveryZones';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
 import AccountSection from '@/components/AccountSection';
+import AccountHero, { HeroAction } from '@/components/account/AccountHero';
+import StampCard from '@/components/account/StampCard';
+import TropicalTrail from '@/components/account/TropicalTrail';
+import MyOrders from '@/components/account/MyOrders';
 import { allergensFrom, dietTagsFrom, legacyFlags, normalizeDiet, tagsFromLegacy } from '@/lib/dietary';
+import { Journey, STAMPS_PER_REWARD, TRAIL, levelFor, trailDone } from '@/lib/loyalty';
+import { SUBSTACK_URL } from '@/lib/siteContact';
 import { supabase } from '@/lib/supabase';
+import { ACCOUNT_CSS } from './accountStyles';
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
@@ -29,7 +34,7 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.85rem 1rem',
   border: '1px solid rgba(212,175,55,0.5)',
-  borderRadius: '8px',
+  borderRadius: '12px',
   background: 'rgba(255,255,255,0.85)',
   fontFamily: 'var(--font-body)',
   fontSize: '1rem',
@@ -38,6 +43,20 @@ const inputStyle: React.CSSProperties = {
 
 const FOLD_ORDER = ['dados', 'endereco', 'dieta', 'gostos'] as const;
 type FoldId = typeof FOLD_ORDER[number];
+
+const FOLD_META: Record<FoldId, { emoji: string; todo: string; ok: string }> = {
+  dados: { emoji: '🎂', todo: 'Seu aniversário (ganha surpresa)', ok: 'Seus dados' },
+  endereco: { emoji: '🏡', todo: 'Onde entregamos', ok: 'Endereço' },
+  dieta: { emoji: '🌱', todo: 'Restrições e alergias', ok: 'Restrições' },
+  gostos: { emoji: '💛', todo: 'Sabores que você ama', ok: 'Seus gostos' },
+};
+
+type Tab = 'inicio' | 'pedidos' | 'perfil';
+const TABS: { id: Tab; label: string; emoji: string }[] = [
+  { id: 'inicio', label: 'Início', emoji: '🌴' },
+  { id: 'pedidos', label: 'Pedidos', emoji: '📦' },
+  { id: 'perfil', label: 'Perfil', emoji: '✨' },
+];
 
 /** Which folds are filled in. Pure, so it can run before the form state has caught up with the profile. */
 function completeness(
@@ -53,6 +72,10 @@ function completeness(
     gostos: !!(t.favorite_flavors.trim() || t.avoid_ingredients.trim()),
   };
 }
+
+const SHARE_TEXT = encodeURIComponent(
+  'Conheci a The Tropical Bakery: doces veganos, sem glúten e sem açúcar refinado, feitos em Itamambuca. Você vai amar 🌴 https://thetropicalbakery.com',
+);
 
 export default function MyAccountPage() {
   const { user, profile, loading, saveProfile, signOut } = useAuth();
@@ -79,7 +102,46 @@ export default function MyAccountPage() {
   const [baseline, setBaseline] = useState('');
   const openedFirst = useRef(false);
 
+  const [tab, setTabState] = useState<Tab>('inicio');
+  const tabsRef = useRef<HTMLDivElement>(null);
+  // null = not loaded yet or migration 30 not run; the page then hides what needs it.
+  const [journey, setJourney] = useState<Journey | null>(null);
+  const [subStatus, setSubStatus] = useState<string | null>(null);
+  const [loadedAt, setLoadedAt] = useState(0);
+
   const toggle = (id: string) => setOpenIds(ids => (ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]));
+
+  const setTab = useCallback((t: Tab, scroll = true) => {
+    setTabState(t);
+    try { history.replaceState(null, '', t === 'inicio' ? location.pathname : `#${t}`); } catch { /* ignore */ }
+    if (scroll && tabsRef.current) {
+      const y = tabsRef.current.getBoundingClientRect().top + window.scrollY - 90;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    }
+  }, []);
+
+  // A link to /minha-conta#perfil or #pedidos lands on that tab.
+  useEffect(() => {
+    const h = location.hash.replace('#', '');
+    if (h === 'perfil' || h === 'pedidos') setTabState(h);
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const [{ data: j, error }, { data: subs }] = await Promise.all([
+        supabase.rpc('my_journey'),
+        supabase.from('subscriptions').select('status').order('created_at', { ascending: false }).limit(5),
+      ]);
+      if (cancelled) return;
+      if (!error && j) setJourney(j as Journey);
+      setLoadedAt(Date.now());
+      const current = (subs || []).find(s => s.status !== 'cancelled');
+      setSubStatus(current?.status ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
   useEffect(() => {
     if (!profile) return;
@@ -193,6 +255,15 @@ export default function MyAccountPage() {
     setTimeout(() => setSaved(false), 3000);
   };
 
+  const openFold = (id: FoldId) => {
+    setOpenIds(ids => (ids.includes(id) ? ids : [...ids, id]));
+    setTabState('perfil');
+    try { history.replaceState(null, '', '#perfil'); } catch { /* ignore */ }
+    setTimeout(() => {
+      document.getElementById(`fold-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  };
+
   const firstName = (basics.full_name || profile?.full_name || '').trim().split(' ')[0];
   const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
   const checks = Object.values(done);
@@ -212,143 +283,198 @@ export default function MyAccountPage() {
     address_city: address.address_city,
   });
 
+  // ---------------------------------------------------------------- the ladder
+  const subscriber = subStatus === 'active' || subStatus === 'paused' || subStatus === 'pending';
+  const paidBoxes = journey?.paid_boxes ?? 0;
+  const { level, next, toNext } = levelFor(paidBoxes, subStatus === 'active');
+  const trail = trailDone(journey, subscriber);
+  const nextStep = TRAIL.find(s => !trail[s.id]);
+  const orders = journey?.orders ?? [];
+  const liveOrder = orders.find(o => o.stage === 'ready')
+    ?? orders.find(o => o.stage === 'awaiting_payment' && loadedAt - new Date(o.created_at).getTime() < 14 * 86400000);
+
+  const scrollToLive = () => {
+    setTab('inicio', false);
+    setTimeout(() => document.getElementById('acct-live')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+  };
+
+  let heroAlert: string | undefined;
+  let primary: HeroAction;
+  if (liveOrder?.stage === 'ready') {
+    heroAlert = '🎉 Sua caixa está pronta!';
+    primary = { label: 'Ver minha caixa', onClick: scrollToLive };
+  } else if (liveOrder) {
+    heroAlert = '⏳ Seu pedido está esperando o Pix. O código está no e-mail que mandamos.';
+    primary = { label: 'Ver meu pedido', onClick: () => setTab('pedidos') };
+  } else if (subStatus === 'pending') {
+    heroAlert = '⏳ Sua assinatura está aguardando o pagamento.';
+    primary = { label: 'Ver minha assinatura', onClick: scrollToLive };
+  } else if (subStatus === 'active') {
+    primary = { label: 'Escolher os doces da semana', onClick: scrollToLive };
+  } else if (nextStep) {
+    primary = { label: nextStep.cta, href: nextStep.href };
+  } else {
+    primary = { label: 'Pedir uma caixa', href: '/caixas' };
+  }
+  const secondary: HeroAction | undefined = pct < 100
+    ? { label: `Completar meu perfil · ${pct}%`, onClick: () => setTab('perfil') }
+    : orders.length ? { label: 'Meus pedidos', onClick: () => setTab('pedidos') } : undefined;
+
+  const stats: string[] = [];
+  if (journey) stats.push(`🎟️ ${paidBoxes % STAMPS_PER_REWARD}/${STAMPS_PER_REWARD} carimbos`);
+  if (journey?.first_order_at) {
+    const since = new Date(journey.first_order_at).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }).replace('.', '');
+    stats.push(`Cliente desde ${since}`);
+  }
+  if (orders.length) stats.push(`${orders.length} ${orders.length === 1 ? 'pedido' : 'pedidos'}`);
+
+  if (loading || !user) {
+    return (
+      <main style={{ minHeight: '100vh', paddingTop: '8rem', paddingBottom: '6rem', background: 'var(--color-background)' }}>
+        <div className="container" style={{ maxWidth: '720px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.75rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
+            Minha Conta
+          </h1>
+          {loading ? (
+            <p style={{ color: '#7a6a61' }}>Carregando...</p>
+          ) : (
+            <>
+              <p style={{ color: '#594a42', lineHeight: 1.8, marginBottom: '2rem' }}>
+                Entre para salvar seus dados de entrega, juntar carimbos no cartão fidelidade e fazer seus próximos pedidos em segundos.
+              </p>
+              <LoginPanel />
+            </>
+          )}
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main style={{ minHeight: '100vh', paddingTop: '8rem', paddingBottom: '6rem', background: 'var(--color-background)' }}>
-      <div className="container account-container" style={{ margin: '0 auto', padding: '0 1.5rem' }}>
+    <main className="acct-page">
+      <AccountHero
+        firstName={firstName}
+        avatarUrl={avatarUrl}
+        level={level}
+        next={next}
+        toNext={toNext}
+        ring={journey ? (paidBoxes % STAMPS_PER_REWARD) / STAMPS_PER_REWARD : pct / 100}
+        stats={stats}
+        primary={primary}
+        secondary={secondary}
+        alert={heroAlert}
+      />
 
-        <h1 style={{
-          fontSize: 'clamp(2rem, 5vw, 2.75rem)',
-          fontFamily: 'var(--font-heading)',
-          color: 'var(--color-primary)',
-          marginBottom: '0.5rem',
-        }}>
-          Minha Conta
-        </h1>
+      <div className="acct-wrap">
+        <div className="acct-tabs" role="tablist" aria-label="Minha conta" ref={tabsRef}>
+          {TABS.map(t => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              className={`acct-tab${tab === t.id ? ' is-on' : ''}`}
+              onClick={() => setTab(t.id)}
+            >
+              <span aria-hidden>{t.emoji}</span> {t.label}
+              {t.id === 'perfil' && pct < 100 && <span className="acct-tab-dot" aria-label="falta completar" />}
+              {t.id === 'pedidos' && orders.length > 0 && <span className="acct-tab-count">{orders.length}</span>}
+            </button>
+          ))}
+        </div>
 
-        {loading ? (
-          <p style={{ color: '#7a6a61' }}>Carregando...</p>
-        ) : !user ? (
-          <>
-            <p style={{ color: '#594a42', lineHeight: 1.8, marginBottom: '2rem' }}>
-              Entre para salvar seus dados de entrega e fazer seus próximos pedidos em segundos.
-            </p>
-            <LoginPanel />
-          </>
-        ) : (
-          <>
-            <p style={{ color: '#7a6a61', marginBottom: '2rem', fontSize: '0.92rem', lineHeight: 1.7 }}>
-              Tudo aqui é preenchido automaticamente nos seus pedidos e na sua assinatura.
-              Quanto mais completo, mais a Dolly acerta na sua caixa.
-            </p>
+        {/* ============================================================ INÍCIO */}
+        <div role="tabpanel" hidden={tab !== 'inicio'} className="acct-home">
+          <div className="acct-col-main">
+            <div id="acct-live" className="acct-live">
+              <MyPickups />
+              <MySubscription />
+            </div>
+            <div className="acct-o-trail">
+              <TropicalTrail done={trail} local={inItamambuca} />
+            </div>
+          </div>
 
-            <div className="account-grid">
-              {/* ------------------------------------------------------ SIDEBAR: status */}
-              <div className="account-side">
-                <MyPickups />
+          <aside className="acct-col-side">
+            <div className="acct-o-stamps">
+              <StampCard paidBoxes={journey ? paidBoxes : null} />
+            </div>
 
-                <MySubscription />
-
-                {inItamambuca && (
-                  <div className="liquid-glass-card fade-in" style={{
-                    padding: 'clamp(1.5rem, 4vw, 2rem)',
-                    marginBottom: '2rem',
-                    display: 'flex',
-                    gap: '1.5rem',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    background: 'linear-gradient(135deg, rgba(212,175,55,0.08), rgba(60,42,33,0.03))',
-                  }}>
-                    <Image
-                      src="/itamambuca-lockup.png"
-                      alt="The Tropical Bakery — Itamambuca"
-                      width={172}
-                      height={220}
-                      style={{ width: '76px', height: 'auto', flexShrink: 0 }}
-                    />
-                    <div style={{ flex: '1 1 220px' }}>
-                      <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: '#3c2a21', marginBottom: '0.5rem' }}>
-                        Você está bem no coração de Itamambuca 🌴
-                      </h2>
-                      <p style={{ color: '#594a42', lineHeight: 1.7, marginBottom: '1.1rem', fontSize: '0.9rem' }}>
-                        Sendo daqui, você está pertinho de tudo que a Tropical Bakery faz — não só a caixa semanal.
-                        Dá uma olhada no que dá pra viver de perto:
-                      </p>
-                      <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-                        <Link href="/cursos" className="btn btn-secondary" style={{ padding: '0.6rem 1.1rem', fontSize: '0.85rem' }}>
-                          Cursos de Confeitaria
-                        </Link>
-                        <Link href="/retreats" className="btn btn-secondary" style={{ padding: '0.6rem 1.1rem', fontSize: '0.85rem' }}>
-                          Retiros e Estadias
-                        </Link>
-                        <Link href="/assinatura" className="btn btn-secondary" style={{ padding: '0.6rem 1.1rem', fontSize: '0.85rem' }}>
-                          Caixa de Degustação
-                        </Link>
-                        <a
-                          href="https://wa.me/5511932119196?text=Ol%C3%A1%21%20Sou%20de%20Itamambuca%20e%20queria%20saber%20mais%20sobre%20os%20retiros%2Fcursos%20da%20Tropical%20Bakery."
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-primary"
-                          style={{ padding: '0.6rem 1.1rem', fontSize: '0.85rem' }}
-                        >
-                          Fazer uma Pergunta
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <SunbakedLetters />
-              </div>
-
-              {/* --------------------------------------------------- MAIN: edit your data */}
-              <div className="account-main">
-            <form onSubmit={handleSave}>
-
-              {/* ------------------------------------------------- profile header */}
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap',
-                padding: 'clamp(1.25rem, 3vw, 1.75rem)', marginBottom: '1.25rem', borderRadius: '24px',
-                background: 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)', color: '#fdfaf3',
-                boxShadow: '0 16px 40px rgba(60,42,33,0.18)',
-              }}>
-                {avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={avatarUrl} alt="" style={{ width: '68px', height: '68px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #d4af37' }} />
-                ) : (
-                  <span aria-hidden style={{ width: '68px', height: '68px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)' }}>
-                    {(firstName[0] || '🌴').toUpperCase()}
-                  </span>
-                )}
-                <div style={{ flex: '1 1 220px', minWidth: 0 }}>
-                  <p style={{ fontSize: '0.75rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700, margin: 0 }}>Seu perfil</p>
-                  <p className="notranslate" translate="no" style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.3rem, 3.5vw, 1.7rem)', margin: '0.15rem 0 0.6rem', lineHeight: 1.15 }}>
-                    {firstName ? `Oi, ${firstName}!` : 'Bem-vindo(a)!'}
-                  </p>
-                  <div style={{ height: '8px', borderRadius: '999px', background: 'rgba(255,255,255,0.18)', overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, #ffd166, #d4af37)', transition: 'width .5s' }} />
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'rgba(253,250,243,0.8)', margin: '0.5rem 0 0' }}>
-                    {pct === 100
-                      ? '🎉 Perfil completo — a Dolly já sabe tudo para acertar na sua caixa.'
-                      : `${pct}% completo — quanto mais a Dolly conhece, mais a caixa é a sua cara.`}
-                  </p>
+            <section className="acct-card acct-o-quest" aria-label="Seu perfil de sabor">
+              <div className="acct-quest-head">
+                <div className="acct-quest-ring" style={{ ['--p' as string]: `${pct}%` } as React.CSSProperties}>
+                  <span>{pct}%</span>
+                </div>
+                <div>
+                  <p className="acct-kicker">Seu perfil de sabor</p>
+                  <h2 className="acct-h3">
+                    {pct === 100 ? 'A Dolly já sabe tudo 🎉' : 'Quanto mais completo, mais a caixa é a sua cara'}
+                  </h2>
                 </div>
               </div>
+              <ul className="acct-quest-list">
+                {FOLD_ORDER.map(id => (
+                  <li key={id}>
+                    <button type="button" onClick={() => openFold(id)} className={done[id] ? 'is-done' : ''}>
+                      <span aria-hidden>{done[id] ? '✓' : FOLD_META[id].emoji}</span>
+                      {done[id] ? FOLD_META[id].ok : FOLD_META[id].todo}
+                      <span className="acct-quest-go" aria-hidden>{done[id] ? 'editar' : '→'}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: '0.75rem' }}>
-                <button type="button" onClick={() => setOpenIds([...FOLD_ORDER, 'conta'])}
-                  style={{ background: 'none', border: 'none', color: '#8a6d1f', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'underline' }}>
-                  Abrir tudo
-                </button>
-                <button type="button" onClick={() => setOpenIds([])}
-                  style={{ background: 'none', border: 'none', color: '#7a6a61', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'underline' }}>
-                  Fechar tudo
-                </button>
+            <section className="acct-card acct-share acct-o-share" aria-label="Indique a Tropical">
+              <p className="acct-kicker">Espalhe o sabor</p>
+              <h2 className="acct-h3">Tem alguém que merece um doce? 💛</h2>
+              <p className="acct-muted">Mande a Tropical para quem você ama, ou surpreenda com uma caixa de presente.</p>
+              <div className="acct-share-row">
+                <a href={`https://wa.me/?text=${SHARE_TEXT}`} target="_blank" rel="noopener noreferrer" className="acct-btn acct-btn-soft">
+                  Indicar no WhatsApp
+                </a>
+                <Link href="/caixas" className="acct-btn acct-btn-soft">Mandar de presente 🎁</Link>
               </div>
+            </section>
 
-              <div style={{ display: 'grid', gap: '0.9rem' }}>
+            <a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" className="acct-letters acct-o-letters">
+              <span aria-hidden>✉️</span>
+              <span><strong>Sunbaked Letters</strong> · as receitas e histórias da Dolly no Substack (em inglês) ↗</span>
+            </a>
+          </aside>
+        </div>
 
-                {/* --------------------------------------------------- WHO YOU ARE */}
+        {/* =========================================================== PEDIDOS */}
+        <div role="tabpanel" hidden={tab !== 'pedidos'} className="acct-panel-narrow">
+          {orders.length > 0 ? (
+            <MyOrders orders={orders} />
+          ) : (
+            <div className="acct-empty">
+              <p className="acct-empty-emoji" aria-hidden>📦</p>
+              <h2 className="acct-h2">{journey ? 'Nenhum pedido ainda' : 'Seus pedidos aparecem aqui'}</h2>
+              <p className="acct-muted">
+                {journey
+                  ? 'Sua primeira caixa ganha o primeiro carimbo do cartão fidelidade.'
+                  : 'Retiradas e assinatura estão na aba Início.'}
+              </p>
+              <Link href="/caixas" className="acct-btn acct-btn-gold">Escolher minha caixa</Link>
+            </div>
+          )}
+        </div>
+
+        {/* ============================================================ PERFIL */}
+        <div role="tabpanel" hidden={tab !== 'perfil'} className="acct-panel-narrow">
+          <form onSubmit={handleSave}>
+            <div className="acct-perfil-head">
+              <h2 className="acct-h2">Seu perfil de sabor</h2>
+              <p className="acct-muted">
+                Tudo aqui é preenchido sozinho nos seus pedidos e na sua assinatura, e a cozinha confere antes de montar a sua caixa.
+              </p>
+              <div className="acct-bar" aria-hidden><div style={{ width: `${pct}%` }} /></div>
+            </div>
+
+            <div className="acct-folds">
+              <div id="fold-dados">
                 <AccountSection
                   id="dados" emoji="👤" accent="#e2792a" title="Seus dados"
                   open={openIds.includes('dados')} onToggle={() => toggle('dados')}
@@ -380,8 +506,9 @@ export default function MyAccountPage() {
                     </div>
                   </div>
                 </AccountSection>
+              </div>
 
-                {/* ------------------------------------------------------ ADDRESS */}
+              <div id="fold-endereco">
                 <AccountSection
                   id="endereco" emoji="🏡" accent="#5aa9e6" title="Onde entregamos"
                   open={openIds.includes('endereco')} onToggle={() => toggle('endereco')}
@@ -400,8 +527,9 @@ export default function MyAccountPage() {
                   </div>
                   <AddressFields value={address} onChange={setAddress} />
                 </AccountSection>
+              </div>
 
-                {/* ---------------------------------------------- DIET + ALLERGIES */}
+              <div id="fold-dieta">
                 <AccountSection
                   id="dieta" emoji="🌱" accent="#9bab3c" title="Restrições e alergias"
                   open={openIds.includes('dieta')} onToggle={() => toggle('dieta')}
@@ -426,8 +554,9 @@ export default function MyAccountPage() {
                     </p>
                   </div>
                 </AccountSection>
+              </div>
 
-                {/* ---------------------------------------------------------- TASTES */}
+              <div id="fold-gostos">
                 <AccountSection
                   id="gostos" emoji="💛" accent="#d9453a" title="Seus gostos"
                   open={openIds.includes('gostos')} onToggle={() => toggle('gostos')}
@@ -448,75 +577,41 @@ export default function MyAccountPage() {
                     </div>
                   </div>
                 </AccountSection>
-
-                {/* --------------------------------------------- ACCOUNT + PRIVACY */}
-                <AccountSection
-                  id="conta" emoji="🔐" accent="#8b7d72" title="Conta e privacidade"
-                  open={openIds.includes('conta')} onToggle={() => toggle('conta')}
-                  status={{ label: 'Segura', tone: 'quiet' }}
-                  summary={<span className="notranslate" translate="no">{user.email || formatBrazilianPhone(user.phone) || '—'}</span>}
-                >
-                  <p style={{ color: '#7a6a61', fontSize: '0.88rem', lineHeight: 1.75, margin: '0 0 0.9rem' }}>
-                    <strong style={{ color: '#3c2a21' }}>Como você entrou:</strong>{' '}
-                    <span className="notranslate" translate="no">{user.email || formatBrazilianPhone(user.phone) || '—'}</span>
-                  </p>
-                  <p style={{ color: '#7a6a61', fontSize: '0.88rem', lineHeight: 1.75, margin: '0 0 1.1rem' }}>
-                    Para excluir sua conta e seus dados, fale com a gente pelo{' '}
-                    <a href="https://wa.me/5511932119196" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>WhatsApp</a>.
-                    Veja também nossa{' '}
-                    <Link href="/privacidade" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>Política de Privacidade</Link>
-                    {' '}e as suas{' '}
-                    <Link href="/preferencias" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>preferências de e-mail</Link>.
-                  </p>
-                  <button type="button" onClick={signOut}
-                    style={{ background: 'none', border: '1px solid #d9cfc2', borderRadius: '8px', padding: '0.6rem 1.2rem', color: '#594a42', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer' }}>
-                    Sair da conta
-                  </button>
-                </AccountSection>
-
-              </div>
-
-              <button
-                type="submit"
-                disabled={saving}
-                className="btn btn-primary"
-                style={{ width: '100%', padding: '1.1rem', marginTop: '1.75rem', borderRadius: '8px', fontSize: '1rem' }}
-              >
-                {saving ? 'Salvando...' : saved ? '✅ Dados salvos!' : 'Salvar meus dados'}
-              </button>
-
-              {/* Appears when something has changed, so nobody leaves without saving. */}
-              {dirty && (
-                <div role="status" style={{
-                  position: 'fixed', left: '50%', bottom: '1.25rem', transform: 'translateX(-50%)', zIndex: 60,
-                  display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.7rem 0.8rem 0.7rem 1.25rem',
-                  background: '#3c2a21', color: '#fdfaf3', borderRadius: '999px', boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
-                  maxWidth: 'calc(100vw - 2rem)',
-                }}>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>✏️ Alterações não salvas</span>
-                  <button type="submit" disabled={saving}
-                    style={{ background: '#d4af37', color: '#3c2a21', border: 'none', borderRadius: '999px', padding: '0.55rem 1.2rem', fontWeight: 800, fontSize: '0.88rem', cursor: 'pointer' }}>
-                    {saving ? 'Salvando…' : 'Salvar'}
-                  </button>
-                </div>
-              )}
-            </form>
               </div>
             </div>
 
-          </>
-        )}
+            <button type="submit" disabled={saving} className="acct-btn acct-btn-gold acct-save">
+              {saving ? 'Salvando...' : saved ? '✅ Dados salvos!' : 'Salvar meus dados'}
+            </button>
+
+            {/* Appears when something has changed, on any tab, so nobody leaves without saving. */}
+            {dirty && (
+              <div role="status" className="acct-dirty">
+                <span>✏️ Alterações não salvas</span>
+                <button type="submit" disabled={saving}>{saving ? 'Salvando…' : 'Salvar'}</button>
+              </div>
+            )}
+          </form>
+
+          <section className="acct-account" aria-label="Conta e privacidade">
+            <p>
+              🔐 Você entrou com{' '}
+              <strong className="notranslate" translate="no">{user.email || formatBrazilianPhone(user.phone) || '—'}</strong>
+            </p>
+            <p>
+              <Link href="/preferencias">Preferências de e-mail</Link>
+              {' · '}
+              <Link href="/privacidade">Privacidade</Link>
+              {' · '}
+              Para excluir sua conta, fale com a gente no{' '}
+              <a href="https://wa.me/5511932119196" target="_blank" rel="noopener noreferrer">WhatsApp</a>.
+            </p>
+            <button type="button" onClick={signOut} className="acct-signout">Sair da conta</button>
+          </section>
+        </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
-        .account-container { max-width: 720px; }
-        @media (min-width: 1024px) {
-          .account-container { max-width: 1220px; }
-          .account-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 2rem; align-items: start; }
-          .account-side { order: 2; position: sticky; top: 7rem; }
-          .account-main { order: 1; }
-        }
-      ` }} />
+      <style dangerouslySetInnerHTML={{ __html: ACCOUNT_CSS }} />
     </main>
   );
 }
