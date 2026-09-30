@@ -108,7 +108,14 @@ Verified live, 2026-09-26:
 - **Raw is a checkbox, not a type (2026-09-30, Dolly's call).** Any treat can be raw: `treats.is_raw`, read only through
   `isRaw()` in `treatTypes.ts` (an old `treat_type = 'raw'` still counts). /menu and /admin/treats have a "Todos / Raw / Do forno"
   switch (`RawSwitch.tsx`, `RefineState.raw`) that crosses with the type pills; `/menu?raw=1` opens on the raw treats. New type
-  `cake-pops`. **`migration_31_raw_flag.sql` is NOT run yet** (safe either way): until then a raw treat can't also carry a type.
+  `cake-pops`. Migration 31 looks run (the public API shows Esmeraldas as Raw + Bolos, 2026-09-30).
+- **Sugar and caffeine per treat (2026-09-30).** Scales, not allergens: `sugar` = fruta | nao-refinado | cana, `caffeine` = sem | pouca | com,
+  all in `src/lib/sugarCaffeine.ts` (with `AVOID_FILTERS`, the "Sem açúcar de cana / Sem açúcar adicionado / Sem cafeína / Sem café" chips in
+  `TreatRefineMenu`, `RefineState.avoid`). NULL = not declared and never passes a "sem" filter; caffeine found in the ingredients (cacau…)
+  counts even undeclared. Edited with `SugarCaffeineFields` (admin treats + box editor, with a "Usar" suggestion read from the ingredients),
+  shown by `TreatInfo` / `SugarCaffeineChips`, copied into box items by `treatSync.ts`. Customers can tick "Sem Cafeína" in their diet.
+  **`migration_32_sugar_caffeine.sql` is NOT run yet**; the admin saves without the columns and says so. KITCHEN_FACTS no longer promises
+  "sem açúcar refinado"; ~20 marketing lines elsewhere still do (grep "açúcar refinado") — waiting on Andrew to say what sugar the chocolate has.
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the

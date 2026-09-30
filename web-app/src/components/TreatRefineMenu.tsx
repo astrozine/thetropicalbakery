@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ALLERGENS, allergenById, normalizeAllergens } from '@/lib/allergens';
 import { KitchenFacts } from '@/components/TreatInfo';
 import { RAW, matchesRaw, typeChipFor, typeKeyOf, type RawFilter } from '@/lib/treatTypes';
+import { AVOID_FILTERS, avoidFilterById, passesAvoid, undeclaredFor } from '@/lib/sugarCaffeine';
 
 /** The bits of a treat the refine menu looks at. */
 export interface RefinableTreat {
@@ -14,6 +15,8 @@ export interface RefinableTreat {
   may_contain?: string[] | null;
   treat_type?: string | null;
   is_raw?: boolean | null;
+  sugar?: string | null;
+  caffeine?: string | null;
 }
 
 export type RefineMode = 'contains' | 'may' | 'free';
@@ -28,9 +31,11 @@ export interface RefineState {
   types: string[];
   /** Raw or not, a separate yes/no that crosses with the type (see RAW in treatTypes.ts). Absent means 'all'. */
   raw?: RawFilter;
+  /** "Sem açúcar de cana", "Sem cafeína"… (AVOID_FILTERS in sugarCaffeine.ts). Always "avoid", whatever the mode. */
+  avoid?: string[];
 }
 
-export const emptyRefine: RefineState = { search: '', mode: 'contains', allergens: [], ingredients: [], status: [], types: [], raw: 'all' };
+export const emptyRefine: RefineState = { search: '', mode: 'contains', allergens: [], ingredients: [], status: [], types: [], raw: 'all', avoid: [] };
 
 const collator = new Intl.Collator('pt-BR', { sensitivity: 'base' });
 const norm = (s: string) => s.trim().toLowerCase();
@@ -43,7 +48,7 @@ export const unknownHidden = (treats: RefinableTreat[], r: RefineState) =>
 
 export const refineCount = (r: RefineState) =>
   r.allergens.length + r.ingredients.length + r.status.length + r.types.length + (r.search.trim() ? 1 : 0)
-  + (r.raw && r.raw !== 'all' ? 1 : 0);
+  + (r.raw && r.raw !== 'all' ? 1 : 0) + (r.avoid?.length || 0);
 
 const STATUSES = [
   { id: 'menu', label: '✅ No menu' },
@@ -58,6 +63,8 @@ export function matchesRefine(t: RefinableTreat, r: RefineState, opts: { hideUnk
   // Type is its own axis, OR'd within itself: "cookies or chocolates", then AND'd with everything else.
   if (r.types.length > 0 && !r.types.includes(typeKeyOf(t))) return false;
   if (!matchesRaw(t, r.raw || 'all')) return false;
+  // Sugar/caffeine: an undeclared treat never passes, so "sem cafeína" can't show something unknown.
+  if (!passesAvoid(t, r.avoid)) return false;
 
   if (r.status.length > 0) {
     const ok = r.status.some(s =>
@@ -157,6 +164,9 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
 
   const toggle = (key: 'allergens' | 'ingredients' | 'status' | 'types', id: string) =>
     onChange({ ...value, [key]: value[key].includes(id) ? value[key].filter(x => x !== id) : [...value[key], id] });
+  const avoid = value.avoid || [];
+  const toggleAvoid = (id: string) =>
+    onChange({ ...value, avoid: avoid.includes(id) ? avoid.filter(x => x !== id) : [...avoid, id] });
 
   // How many treats declare each allergen and use each ingredient.
   const counts = useMemo(() => {
@@ -196,6 +206,7 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
     : MODES;
   const mode = modes.find(m => m.id === value.mode)!;
   const hiddenUnknown = isPublic ? unknownHidden(treats, value) : 0;
+  const avoidUnknown = undeclaredFor(treats, value.avoid);
   const clearAll = () => onChange({ ...emptyRefine, mode: value.mode });
 
   /**
@@ -216,6 +227,10 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
       const c = typeChipFor(id);
       return { key: `type-${id}`, label: `${c.emoji} ${c.label}`, onRemove: () => toggle('types', id) };
     }),
+    ...avoid.map(id => {
+      const f = avoidFilterById(id);
+      return { key: `avoid-${id}`, label: `${f?.emoji || ''} ${f?.label || id}`.trim(), onRemove: () => toggleAvoid(id) };
+    }),
     ...value.allergens.map(id => {
       const a = allergenById(id);
       return { key: `allergen-${id}`, label: `${a?.emoji || ''} ${a?.label || id}`.trim(), onRemove: () => toggle('allergens', id) };
@@ -228,8 +243,10 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
     })),
   ];
 
-  const chip = (on: boolean, tone: 'allergen' | 'ingredient' | 'status' | 'type'): React.CSSProperties => {
-    const palette = tone === 'ingredient'
+  const chip = (on: boolean, tone: 'allergen' | 'ingredient' | 'status' | 'type' | 'avoid'): React.CSSProperties => {
+    const palette = tone === 'avoid'
+      ? { bg: '#f4f0fa', border: '#8e74b8', color: '#5b4a7a' }
+      : tone === 'ingredient'
       ? { bg: '#f0faf4', border: '#27ae60', color: '#1e6b3c' }
       : tone === 'status'
         ? { bg: '#eaf2fb', border: '#3b82c4', color: '#245d94' }
@@ -332,6 +349,28 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
               ))}
             </div>
             {isPublic && <KitchenFacts style={{ paddingTop: '0.75rem', borderTop: '1px dashed #e8e1d7' }} />}
+          </div>,
+        )}
+
+        {folder('sugar', '🍬', 'Açúcar e cafeína', avoid.length,
+          <div style={{ display: 'grid', gap: '0.7rem' }}>
+            <div style={chipRow}>
+              {AVOID_FILTERS.map(f => (
+                <button key={f.id} type="button" title={f.hint} onClick={() => toggleAvoid(f.id)} aria-pressed={avoid.includes(f.id)} style={chip(avoid.includes(f.id), 'avoid')}>
+                  {f.emoji} {f.label} <span style={countBadge}>{treats.filter(f.ok).length}</span>
+                </button>
+              ))}
+            </div>
+            {/* The hint of the last filter switched on: it's the one the person is thinking about right now. */}
+            {avoid.length > 0 && (
+              <p style={{ fontSize: '0.78rem', color: '#6d5c7f', lineHeight: 1.55, margin: 0 }}>{avoidFilterById(avoid[avoid.length - 1])?.hint}</p>
+            )}
+            {avoidUnknown > 0 && (
+              <p style={{ fontSize: '0.78rem', color: '#8a5a00', lineHeight: 1.55, margin: 0 }}>
+                {avoidUnknown} {avoidUnknown === 1 ? 'doce ainda não tem' : 'doces ainda não têm'} essa informação e {avoidUnknown === 1 ? 'ficou' : 'ficaram'} de fora.
+                {isPublic ? ' Pergunte pra gente no WhatsApp.' : ''}
+              </p>
+            )}
           </div>,
         )}
 

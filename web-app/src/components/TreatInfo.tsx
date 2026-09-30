@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ALLERGEN_LIST_NEM, KITCHEN_FACTS, allergenById, normalizeAllergens } from '@/lib/allergens';
+import { caffeineById, caffeineOf, sugarById, sugarOf } from '@/lib/sugarCaffeine';
 
 export const allergenChipStyle = (tone: 'contains' | 'may'): React.CSSProperties => ({
   display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.28rem 0.7rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600,
@@ -21,7 +22,34 @@ export function AllergenChips({ ids, tone }: { ids: string[]; tone: 'contains' |
   );
 }
 
-/** What is true of every treat (vegan, made without gluten, no refined sugar), said once instead of ticked per treat. */
+/**
+ * Sugar and caffeine as two quiet chips, with the "where from" as a line under them. Only what is
+ * known: caffeine found in the ingredients (cacao…) shows even before it's declared; sugar only once declared.
+ */
+export function SugarCaffeineChips({ ingredients, sugar, caffeine, compact = false }: {
+  ingredients?: string[] | null; sugar?: string | null; caffeine?: string | null; compact?: boolean;
+}) {
+  const s = sugarById(sugarOf({ sugar }));
+  const c = caffeineById(caffeineOf({ ingredients, caffeine }));
+  if (!s && !c) return null;
+  const chip: React.CSSProperties = {
+    display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: compact ? '0.1rem 0.5rem' : '0.28rem 0.7rem', borderRadius: '20px',
+    fontSize: compact ? '0.75rem' : '0.8rem', fontWeight: 600, background: '#f4f0fa', color: '#5b4a7a', border: '1px solid #ddd3ec',
+  };
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem 0.4rem' }} aria-label="Açúcar e cafeína">
+      {s && <span style={chip} title={s.hint}>{s.emoji} {s.label}</span>}
+      {c && <span style={chip} title={c.hint}>{c.emoji} {c.label}</span>}
+      {!compact && (
+        <p style={{ flexBasis: '100%', margin: '0.2rem 0 0', fontSize: '0.8rem', color: '#7a6a61', lineHeight: 1.55 }}>
+          {[s && `${s.label}: ${s.hint}.`, c && `${c.label}: ${c.hint}.`].filter(Boolean).join(' ')}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** What is true of every treat (vegan, made without gluten), said once instead of ticked per treat. */
 export function KitchenFacts({ tone = 'light', style }: { tone?: 'light' | 'dark'; style?: React.CSSProperties }) {
   const color = tone === 'dark' ? 'rgba(255,255,255,0.82)' : '#594a42';
   return (
@@ -40,12 +68,14 @@ interface TreatInfoProps {
   ingredients?: string[] | null;
   contains?: string[] | null;
   may_contain?: string[] | null;
+  sugar?: string | null;
+  caffeine?: string | null;
   /** Show the "no allergens declared" line when nothing is set. */
   showEmptyNote?: boolean;
 }
 
 /** Ingredients + allergens for one treat. Used by the box accordion and the Menu de Eventos cards. */
-export default function TreatInfo({ ingredients, contains, may_contain, showEmptyNote = true }: TreatInfoProps) {
+export default function TreatInfo({ ingredients, contains, may_contain, sugar, caffeine, showEmptyNote = true }: TreatInfoProps) {
   const ing = ingredients || [];
   const con = normalizeAllergens(contains);
   const may = normalizeAllergens(may_contain);
@@ -83,10 +113,17 @@ export default function TreatInfo({ ingredients, contains, may_contain, showEmpt
       ) : (
         showEmptyNote && <p style={{ color: '#7a6a61', fontSize: '0.85rem' }}>🌱 Não leva {ALLERGEN_LIST_NEM}.</p>
       )}
+
+      {(sugarOf({ sugar }) || caffeineOf({ ingredients, caffeine })) && (
+        <div style={{ marginTop: '1rem' }}>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5b4a7a', fontWeight: 700, marginBottom: '0.5rem' }}>🍬 Açúcar e cafeína</p>
+          <SugarCaffeineChips ingredients={ingredients} sugar={sugar} caffeine={caffeine} />
+        </div>
+      )}
     </div>
   );
 }
 
 /** True when there's anything to show, so cards can skip the disclosure entirely for treats without data. */
-export const hasTreatInfo = (t: { ingredients?: string[] | null; contains?: string[] | null; may_contain?: string[] | null }) =>
-  (t.ingredients?.length || 0) + (t.contains?.length || 0) + (t.may_contain?.length || 0) > 0;
+export const hasTreatInfo = (t: { ingredients?: string[] | null; contains?: string[] | null; may_contain?: string[] | null; sugar?: string | null }) =>
+  (t.ingredients?.length || 0) + (t.contains?.length || 0) + (t.may_contain?.length || 0) > 0 || !!sugarOf(t);

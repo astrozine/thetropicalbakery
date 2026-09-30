@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { ALLERGENS, TREAT_EMOJIS, normalizeAllergens } from '@/lib/allergens';
 import { RAW, TREAT_TYPES, normalizeTreatType } from '@/lib/treatTypes';
+import { CAFFEINE_LEVELS, SUGAR_LEVELS, caffeineById, sugarById, suggestFromIngredients, type Level } from '@/lib/sugarCaffeine';
 
 /** Shared admin styles for the treat-detail editors (box treats and Menu de Eventos treats). */
 export const fieldStyle: React.CSSProperties = { width: '100%', padding: '0.7rem', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.95rem' };
@@ -91,8 +92,76 @@ export function AllergenFields({ contains: storedContains, mayContain: storedMay
         hint="Não vai na receita, mas é manipulado na mesma cozinha ou nos mesmos utensílios (ex.: traços de castanhas ou gergelim)."
       />
       <p style={{ gridColumn: '1 / -1', fontSize: '0.78rem', color: '#7f8c8d', lineHeight: 1.6, margin: 0 }}>
-        Vegano, sem glúten na receita (com possíveis traços) e sem açúcar refinado já vale para todos os doces e aparece para o cliente
-        automaticamente. Aqui só o que muda de um doce para outro. Qual castanha é, fica nos ingredientes.
+        Vegano e sem glúten na receita (com possíveis traços) já vale para todos os doces e aparece para o cliente
+        automaticamente. Aqui só o que muda de um doce para outro. Qual castanha é, fica nos ingredientes. Açúcar e cafeína ficam logo abaixo.
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Sugar and caffeine, one tap each (see sugarCaffeine.ts for why these are scales, not allergens).
+ * The ingredient list is read for a suggestion Dolly confirms with one tap; nothing is saved on a guess,
+ * and "chocolate" always asks, because only the bar's label knows which sugar is in it.
+ */
+export function SugarCaffeineFields({ sugar, caffeine, ingredients, onChange }: {
+  sugar?: string | null; caffeine?: string | null; ingredients: string[];
+  onChange: (next: { sugar: string | null; caffeine: string | null }) => void;
+}) {
+  const s = sugarById(sugar)?.id ?? null;
+  const c = caffeineById(caffeine)?.id ?? null;
+  const tip = suggestFromIngredients(ingredients);
+
+  const row = <Id extends string>(title: string, levels: Level<Id>[], current: Id | null, pick: (id: Id | null) => void,
+    suggestion?: { id: Id; because: string }) => {
+    const suggested = suggestion && suggestion.id !== current ? levels.find(l => l.id === suggestion.id) : undefined;
+    return (
+      <div>
+        <p style={{ ...labelStyle, marginBottom: '0.5rem' }}>{title}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.4rem' }}>
+          {levels.map(l => {
+            const on = current === l.id;
+            return (
+              <button key={l.id} type="button" onClick={() => pick(on ? null : l.id)} aria-pressed={on} title={l.hint}
+                style={{
+                  textAlign: 'left', padding: '0.55rem 0.7rem', borderRadius: '10px', cursor: 'pointer', fontFamily: 'inherit', minHeight: '44px',
+                  border: `1px solid ${on ? '#d4af37' : '#dfe4ea'}`, background: on ? '#fdf6dd' : '#fff',
+                  color: on ? '#6b5214' : '#566573', fontWeight: on ? 700 : 500, fontSize: '0.85rem', lineHeight: 1.3,
+                }}>
+                {on ? '✓ ' : ''}{l.emoji} {l.label}
+              </button>
+            );
+          })}
+        </div>
+        {current === null && (
+          <p style={{ fontSize: '0.78rem', color: '#e67e22', margin: '0.4rem 0 0' }}>Ainda não informado: quem filtra por isso não vai ver este doce.</p>
+        )}
+        {suggested && (
+          <p style={{ fontSize: '0.8rem', color: '#566573', margin: '0.45rem 0 0', lineHeight: 1.5 }}>
+            💡 Pelos ingredientes parece <strong>{suggested.emoji} {suggested.label}</strong>
+            {suggestion!.because ? <> (por causa de “{suggestion!.because}”)</> : null}.{' '}
+            <button type="button" onClick={() => pick(suggested.id)}
+              style={{ border: 'none', background: 'none', padding: 0, color: '#8a6d1f', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}>
+              Usar
+            </button>
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ background: '#fafbfc', border: '1px solid #eef1f4', borderRadius: '10px', padding: '1rem', display: 'grid', gap: '1.1rem' }}>
+      {row('🍬 Açúcar', SUGAR_LEVELS, s, id => onChange({ sugar: id, caffeine: c }), tip.sugar)}
+      {tip.chocolate && s !== 'cana' && (
+        <p style={{ fontSize: '0.8rem', color: '#8a5a00', background: '#fff4e0', borderRadius: '8px', padding: '0.5rem 0.7rem', margin: '-0.4rem 0 0', lineHeight: 1.5 }}>
+          🍫 Leva “{tip.chocolate}”: confira no rótulo da barra se tem açúcar e qual. Açúcar de cana → “Contém açúcar de cana”; açúcar de coco → “Açúcar não refinado”.
+        </p>
+      )}
+      {row('☕ Cafeína', CAFFEINE_LEVELS, c, id => onChange({ sugar: s, caffeine: id }), tip.caffeine)}
+      <p style={{ fontSize: '0.78rem', color: '#7f8c8d', lineHeight: 1.6, margin: 0 }}>
+        Aparece no doce para o cliente e nos filtros “Sem açúcar de cana”, “Sem açúcar adicionado” e “Sem cafeína” do Menu de Eventos.
+        Cacau conta como pouca cafeína; manteiga de cacau e chocolate branco, não.
       </p>
     </div>
   );

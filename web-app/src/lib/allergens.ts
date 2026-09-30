@@ -54,7 +54,9 @@ export function normalizeAllergens(ids: string[] | null | undefined): string[] {
 export const KITCHEN_FACTS = [
   { emoji: '🌱', text: '100% vegetal: nenhum doce leva leite, ovos, mel ou qualquer ingrediente de origem animal.' },
   { emoji: '🌾', text: 'Nenhuma receita leva glúten, mas a cozinha não é certificada sem glúten: pode haver traços. Se você é celíaco, fale com a gente antes.' },
-  { emoji: '🍯', text: 'Sem açúcar refinado: adoçamos com frutas e, em algumas criações, açúcar de coco ou chocolate vegano adoçado com açúcar de coco.' },
+  // Not "sem açúcar refinado" any more: some chocolates arrive already sweetened. Each treat now says
+  // which sugar it has, and whether it has caffeine (src/lib/sugarCaffeine.ts).
+  { emoji: '🍯', text: 'Adoçamos com frutas e, em algumas criações, açúcares não refinados ou chocolate que já vem adoçado. Cada doce mostra que açúcar leva e se tem cafeína.' },
 ];
 
 export const allergenById = (id: string) => ALLERGENS.find(a => a.id === (LEGACY_IDS[id] || id));
@@ -69,6 +71,9 @@ export interface BoxItem {
   ingredients: string[];
   contains: string[];
   may_contain: string[];
+  /** SugarLevel / CaffeineLevel from sugarCaffeine.ts; absent = not declared yet. */
+  sugar?: string | null;
+  caffeine?: string | null;
   /** Link to the same treat in the Menu de Eventos (public.treats). */
   treat_id?: string | null;
   /** Editor-only: create this treat in the Menu de Eventos when the box is saved. Never stored. */
@@ -87,6 +92,8 @@ export interface TreatDetails {
   ingredients: string[];
   contains: string[];
   may_contain: string[];
+  sugar?: string | null;
+  caffeine?: string | null;
 }
 
 /** A row of public.treats as the admin reads it. */
@@ -103,6 +110,8 @@ export interface TreatRow {
   ingredients?: string[] | null;
   contains?: string[] | null;
   may_contain?: string[] | null;
+  sugar?: string | null;
+  caffeine?: string | null;
 }
 
 /** Copies a Menu de Eventos treat into a box, keeping the link so both stay in step. */
@@ -115,6 +124,8 @@ export const treatToBoxItem = (t: TreatRow): BoxItem => ({
   ingredients: t.ingredients || [],
   contains: normalizeAllergens(t.contains),
   may_contain: normalizeAllergens(t.may_contain),
+  sugar: t.sugar ?? null,
+  caffeine: t.caffeine ?? null,
   treat_id: t.id,
 });
 

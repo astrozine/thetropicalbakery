@@ -53,6 +53,7 @@ export const DIET_TAGS: DietTag[] = [
   { id: 'sem-acucar', label: 'Sem Açúcar', emoji: '🍬', group: 'saude', legacy: 'is_sugar_free', quick: true },
   { id: 'sem-sal', label: 'Sem Sal', emoji: '🧂', group: 'saude', legacy: 'is_salt_free', quick: true },
   { id: 'sem-oleo', label: 'Sem Óleo', emoji: '💧', group: 'saude', legacy: 'is_oil_free', quick: true },
+  { id: 'sem-cafeina', label: 'Sem Cafeína', emoji: '🌙', group: 'saude', hint: 'gestação, sono, ansiedade, refluxo (inclui o cacau)' },
   { id: 'diabetes', label: 'Diabetes', emoji: '🩸', group: 'saude', hint: 'controle de glicemia' },
   { id: 'pressao-alta', label: 'Pressão alta', emoji: '💓', group: 'saude', hint: 'pouco ou nenhum sódio' },
   { id: 'colesterol', label: 'Colesterol / coração', emoji: '🫀', group: 'saude', hint: 'sem óleo e sem gordura adicionada' },

@@ -9,17 +9,25 @@ import { BoxItem, TreatDetails } from '@/lib/allergens';
  * Price and batch sizes are menu-only and are never touched here.
  */
 export async function pushTreatDetails(treatId: string, d: TreatDetails): Promise<{ error?: string }> {
-  const { error: treatError } = await supabase
+  const base = {
+    name: d.name, description: d.description, image_url: d.image_url,
+    emoji: d.emoji, ingredients: d.ingredients, contains: d.contains, may_contain: d.may_contain,
+  };
+  let { error: treatError } = await supabase
     .from('treats')
-    .update({
-      name: d.name, description: d.description, image_url: d.image_url,
-      emoji: d.emoji, ingredients: d.ingredients, contains: d.contains, may_contain: d.may_contain,
-    })
+    .update({ ...base, sugar: d.sugar ?? null, caffeine: d.caffeine ?? null })
     .eq('id', treatId);
+  // Before migration_32 there are no sugar/caffeine columns: save the rest (the boxes keep them in their JSON).
+  if (treatError && isMissingSugarColumns(treatError.message)) {
+    ({ error: treatError } = await supabase.from('treats').update(base).eq('id', treatId));
+  }
   if (treatError) return { error: treatError.message };
 
   return syncTreatIntoBoxes(treatId, d);
 }
+
+/** True for the error Supabase gives when migration_32 (treats.sugar / treats.caffeine) hasn't run. */
+export const isMissingSugarColumns = (msg: string) => /\b(sugar|caffeine)\b/.test(msg);
 
 /** Rewrites the copy of this treat inside every box that includes it. */
 export async function syncTreatIntoBoxes(treatId: string, d: TreatDetails): Promise<{ error?: string }> {

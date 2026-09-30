@@ -6,13 +6,14 @@ import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
 import ToggleSwitch from '@/components/ToggleSwitch';
 import ShowOnSiteSwitch from '@/components/ShowOnSiteSwitch';
-import { AllergenFields, EmojiField, IngredientsField, RawField, TreatTypeField } from '@/components/TreatDetailsFields';
+import { AllergenFields, EmojiField, IngredientsField, RawField, SugarCaffeineFields, TreatTypeField } from '@/components/TreatDetailsFields';
 import TreatInfo from '@/components/TreatInfo';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 import TreatTypeBar from '@/components/TreatTypeBar';
 import RawSwitch from '@/components/RawSwitch';
 import { uploadPublicImage } from '@/lib/imageUpload';
-import { syncTreatIntoBoxes } from '@/lib/treatSync';
+import { isMissingSugarColumns, syncTreatIntoBoxes } from '@/lib/treatSync';
+import { caffeineOf, sugarOf } from '@/lib/sugarCaffeine';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 import { RAW, anyTyped, groupByType, isRaw, matchesRaw, textOn, treatTypeById } from '@/lib/treatTypes';
 
@@ -31,6 +32,8 @@ interface Treat {
   may_contain?: string[] | null;
   treat_type?: string | null;
   is_raw?: boolean | null;
+  sugar?: string | null;
+  caffeine?: string | null;
 }
 
 const field: React.CSSProperties = { width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #ccc' };
@@ -94,6 +97,8 @@ export default function TreatsAdmin() {
       ingredients: formData.ingredients || [],
       contains: formData.contains || [],
       may_contain: formData.may_contain || [],
+      sugar: formData.sugar ?? null,
+      caffeine: formData.caffeine ?? null,
     };
 
     // Raw is its own column now; a row still typed 'raw' (the old way) drops that type as it's saved.
@@ -110,13 +115,29 @@ export default function TreatsAdmin() {
       if (raw && kind) brandAlert(`Salvei o tipo, mas a marca ${RAW.emoji} Raw só fica guardada junto com ele depois de rodar a migration_31_raw_flag.sql no Supabase.`);
     };
     const missingRawColumn = (msg: string) => /is_raw/.test(msg);
+    // Before migration_32: save everything else, and say that sugar/caffeine need it.
+    const withoutSugarColumns = () => {
+      const rest = { ...row };
+      delete rest.sugar;
+      delete rest.caffeine;
+      row = rest;
+      brandAlert('Salvei o doce, mas açúcar e cafeína só ficam guardados depois de rodar a migration_32_sugar_caffeine.sql no Supabase.');
+    };
+
+    // Supabase names one missing column per try, in any order, so drop whichever it names and try again.
+    const saveWithFallbacks = async (write: () => PromiseLike<{ error: { message: string } | null }>) => {
+      let { error } = await write();
+      for (let tries = 0; error && tries < 2; tries++) {
+        if (missingRawColumn(error.message) && 'is_raw' in row) withoutRawColumn();
+        else if (isMissingSugarColumns(error.message) && 'sugar' in row) withoutSugarColumns();
+        else break;
+        ({ error } = await write());
+      }
+      return error;
+    };
 
     if (editingId) {
-      let { error } = await supabase.from('treats').update(row).eq('id', editingId);
-      if (error && missingRawColumn(error.message)) {
-        withoutRawColumn();
-        ({ error } = await supabase.from('treats').update(row).eq('id', editingId));
-      }
+      const error = await saveWithFallbacks(() => supabase.from('treats').update(row).eq('id', editingId));
       if (error) {
         brandAlert('Erro ao atualizar doce: ' + error.message + hint(error.message));
         setSaving(false);
@@ -131,11 +152,7 @@ export default function TreatsAdmin() {
         min_batch_size: formData.min_batch_size ?? 1,
         batch_multiplier: formData.batch_multiplier || 1,
       }]);
-      let { error } = await insert();
-      if (error && missingRawColumn(error.message)) {
-        withoutRawColumn();
-        ({ error } = await insert());
-      }
+      const error = await saveWithFallbacks(insert);
       if (error) {
         brandAlert('Erro ao criar doce: ' + error.message + hint(error.message));
         setSaving(false);
@@ -223,11 +240,16 @@ export default function TreatsAdmin() {
             {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length === 0 && (
               <span style={{ color: '#e67e22', fontWeight: 'bold' }}> — falta preencher</span>
             )}
+            {(!sugarOf(treat) || !caffeineOf(treat)) && (
+              <span style={{ display: 'block', color: '#e67e22', fontWeight: 'bold', marginTop: '0.2rem' }}>
+                Falta: {[!sugarOf(treat) && 'açúcar', !caffeineOf(treat) && 'cafeína'].filter(Boolean).join(' e ')}
+              </span>
+            )}
           </p>
 
           {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length > 0 && (
             <div style={{ marginBottom: '1rem' }}>
-              <TreatInfo ingredients={treat.ingredients} contains={treat.contains} may_contain={treat.may_contain} showEmptyNote={false} />
+              <TreatInfo ingredients={treat.ingredients} contains={treat.contains} may_contain={treat.may_contain} sugar={treat.sugar} caffeine={treat.caffeine} showEmptyNote={false} />
             </div>
           )}
 
@@ -346,11 +368,17 @@ export default function TreatsAdmin() {
             </div>
 
             <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
-              <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>⚠️ Alérgenos</h3>
+              <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>⚠️ Alérgenos, açúcar e cafeína</h3>
               <AllergenFields
                 contains={formData.contains || []}
                 mayContain={formData.may_contain || []}
                 onChange={a => setFormData({ ...formData, ...a })}
+              />
+              <SugarCaffeineFields
+                sugar={formData.sugar}
+                caffeine={formData.caffeine}
+                ingredients={formData.ingredients || []}
+                onChange={v => setFormData({ ...formData, ...v })}
               />
             </div>
           </div>

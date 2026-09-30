@@ -5,7 +5,7 @@ import { BoxItem, TreatRow, newBoxItem, treatToBoxItem } from '@/lib/allergens';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { supabase } from '@/lib/supabase';
 import ImagePicker from '@/components/ImagePicker';
-import { AllergenFields, EmojiField, IngredientsField, fieldStyle, labelStyle } from '@/components/TreatDetailsFields';
+import { AllergenFields, EmojiField, IngredientsField, SugarCaffeineFields, fieldStyle, labelStyle } from '@/components/TreatDetailsFields';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 import { boxPlan, planCaption } from '@/lib/boxPicks';
 import { TREAT_COUNTS } from '@/lib/boxSizes';
@@ -94,6 +94,7 @@ function ItemEditor({ item, onChange }: { item: BoxItem; onChange: (i: BoxItem) 
       <ImagePicker label="Foto deste doce" imageUrl={item.image_url} uploading={uploading} onChange={upload} />
       <IngredientsField ingredients={item.ingredients} onChange={ingredients => onChange({ ...item, ingredients })} />
       <AllergenFields contains={item.contains} mayContain={item.may_contain} onChange={a => onChange({ ...item, ...a })} />
+      <SugarCaffeineFields sugar={item.sugar} caffeine={item.caffeine} ingredients={item.ingredients} onChange={v => onChange({ ...item, ...v })} />
       <MenuLink item={item} onChange={onChange} />
     </div>
   );
