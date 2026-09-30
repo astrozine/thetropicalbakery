@@ -198,7 +198,7 @@ export default function MenuPage() {
               top of every one of its cards with the name sitting on that line. Until anything is
               typed, this is exactly the flat grid it always was. */}
           {anyTyped(visibleItems) ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
               {groupByType(visibleItems).flatMap(group => group.items.map((item, i) => (
                 <div
                   key={item.id}
@@ -235,7 +235,7 @@ export default function MenuPage() {
               )))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
               {visibleItems.map(item => (
                 <ScrollReveal key={item.id}>
                   <MenuCard picked={picked.includes(item.id)} onTogglePick={() => togglePick(item.id)} item={{
@@ -267,10 +267,11 @@ export default function MenuPage() {
 
             /* The name shows on the group's first card, and again on whichever card starts a row,
                so a long group keeps telling you what you're looking at however far it runs.
-               The counts below mirror the grid classes above (2 / md:3 / xl:4), in Tailwind's own
-               rem breakpoints (md 48rem, xl 80rem) so the two can't drift apart. Within each
-               block the [data-first] rule has to come last: it has the same specificity as the
-               nth-child ones and must win. */
+               The counts below mirror the grid classes above (2 / md:3 / lg:2 / xl:3 / 2xl:4 — the
+               filter column takes the room from lg up), in Tailwind's own rem breakpoints (md 48rem,
+               lg 64rem, xl 80rem, 2xl 96rem) so the two can't drift apart. Within each block the
+               [data-first] rule has to come last: it has the same specificity as the nth-child
+               ones and must win. */
             .menu-type-cell:nth-child(2n+1) .menu-type-head span { visibility: visible; }
             .menu-type-cell[data-first="true"] .menu-type-head span { visibility: visible; }
             @media (min-width: 48rem) {
@@ -278,7 +279,17 @@ export default function MenuPage() {
               .menu-type-cell:nth-child(3n+1) .menu-type-head span { visibility: visible; }
               .menu-type-cell[data-first="true"] .menu-type-head span { visibility: visible; }
             }
+            @media (min-width: 64rem) {
+              .menu-type-cell:nth-child(3n+1) .menu-type-head span { visibility: hidden; }
+              .menu-type-cell:nth-child(2n+1) .menu-type-head span { visibility: visible; }
+              .menu-type-cell[data-first="true"] .menu-type-head span { visibility: visible; }
+            }
             @media (min-width: 80rem) {
+              .menu-type-cell:nth-child(2n+1) .menu-type-head span { visibility: hidden; }
+              .menu-type-cell:nth-child(3n+1) .menu-type-head span { visibility: visible; }
+              .menu-type-cell[data-first="true"] .menu-type-head span { visibility: visible; }
+            }
+            @media (min-width: 96rem) {
               .menu-type-cell:nth-child(3n+1) .menu-type-head span { visibility: hidden; }
               .menu-type-cell:nth-child(4n+1) .menu-type-head span { visibility: visible; }
               .menu-type-cell[data-first="true"] .menu-type-head span { visibility: visible; }

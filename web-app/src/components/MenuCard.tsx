@@ -1,12 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useCart } from '@/context/CartContext';
-import TreatInfo, { hasTreatInfo } from '@/components/TreatInfo';
 import { allergenById, normalizeAllergens } from '@/lib/allergens';
-import { RAW, isRaw, treatTypeById } from '@/lib/treatTypes';
-import Image from 'next/image';
-import { canOptimize } from '@/lib/thumbs';
+import TreatDetail, { TreatTags, WholePhoto } from '@/components/TreatDetail';
 
 interface MenuCardProps {
   item: {
@@ -28,7 +25,7 @@ interface MenuCardProps {
   };
   /** On a page with a quick pick: this treat is one of the ones already chosen there. */
   picked?: boolean;
-  /** Present when the page has a quick pick; adds a choose/unchoose button to the phone drawer. */
+  /** Present when the page has a quick pick; adds a choose/unchoose button to the detail overlay. */
   onTogglePick?: () => void;
   /**
    * Square off the top corners so the card can sit flush under its group's colour bar
@@ -40,11 +37,13 @@ interface MenuCardProps {
 export default function MenuCard({ item, picked = false, onTogglePick, flatTop = false }: MenuCardProps) {
   const { addToCart } = useCart();
   const [isMobile, setIsMobile] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [showInfo, setShowInfo] = useState(false);
-  const hasInfo = hasTreatInfo(item);
-  const kind = treatTypeById(item.treat_type);
-  const raw = isRaw(item);
+  const [isOpen, setIsOpen] = useState(false);
+  // The description scrolls inside a fixed-height box so every card is the same size; the fade at
+  // its foot only shows while there's more text below.
+  const textRef = useRef<HTMLDivElement>(null);
+  const [moreBelow, setMoreBelow] = useState(false);
+  const contains = normalizeAllergens(item.contains);
+  const closeDetail = useCallback(() => setIsOpen(false), []);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -53,145 +52,134 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const handleCardClick = () => {
-    if (isMobile) {
-      setIsDrawerOpen(true);
-    }
-  };
+  const measure = useCallback(() => {
+    const el = textRef.current;
+    setMoreBelow(!!el && el.scrollHeight - el.scrollTop - el.clientHeight > 4);
+  }, []);
+  useEffect(() => {
+    measure();
+    const el = textRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [measure, isMobile, item.description]);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const add = () => {
     addToCart({
       id: item.id, name: item.name, price: item.price, image: item.image,
       min_batch_size: item.min_batch_size, batch_multiplier: item.batch_multiplier, kind: 'events',
     });
-    if (isMobile) setIsDrawerOpen(false);
   };
 
   return (
     <>
-      <div 
-        onClick={handleCardClick}
+      <div
+        className="ev-card"
+        role="button"
+        tabIndex={0}
+        aria-label={`${item.name}: ver foto e detalhes`}
+        onClick={() => setIsOpen(true)}
+        onKeyDown={e => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setIsOpen(true); } }}
         style={{
           background: '#fff',
           borderRadius: flatTop ? '0 0 16px 16px' : '16px',
           overflow: 'hidden',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+          boxShadow: picked ? '0 8px 22px rgba(212,175,55,0.38)' : '0 4px 20px rgba(0,0,0,0.05)',
           border: picked ? '2px solid #d4af37' : '1px solid rgba(212,175,55,0.1)',
-          ...(picked ? { boxShadow: '0 8px 22px rgba(212,175,55,0.38)' } : null),
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          cursor: isMobile ? 'pointer' : 'default'
+          cursor: 'pointer'
         }}
       >
-        <div style={{ height: isMobile ? '160px' : '260px', overflow: 'hidden', position: 'relative' }}>
-          <Image
-            src={item.image}
-            alt={item.name}
-            fill
-            sizes="(max-width: 768px) 50vw, 340px"
-            unoptimized={!canOptimize(item.image)}
-            style={{ objectFit: 'cover', transition: 'transform 0.3s' }}
-          />
+        {/* Square frame, whole photo: nothing gets cut off, whatever shape the picture is.
+            Tap anywhere on the card for the full-size photo and every detail. */}
+        <WholePhoto src={item.image} alt={item.name} width={isMobile ? 640 : 750} style={{ aspectRatio: '1 / 1', flexShrink: 0 }}>
           {picked && (
             <span aria-label="Na sua escolha" style={{ position: 'absolute', top: '8px', left: '8px', width: '30px', height: '30px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(0,0,0,0.28)' }}>✓</span>
           )}
-          {/* A tag only when the treat has one — untyped treats simply show none. Bottom-left, so it
-              never fights the "picked" mark (top-left) or the mobile zoom icon (top-right). */}
-          {(kind || raw) && (
-            <div style={{ position: 'absolute', left: '8px', bottom: '8px', right: '8px', display: 'flex', flexWrap: 'wrap-reverse', gap: '0.3rem', pointerEvents: 'none' }}>
-              {/* Raw first and in leaf green: it's the one guests scan the page for. */}
-              {raw && (
-                <span title={`${RAW.label}: ${RAW.hint}`} style={{ lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: RAW.accent, color: '#ffffff', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.02em', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>
-                  <span aria-hidden>{RAW.emoji}</span>{RAW.label}
-                </span>
-              )}
-              {kind && (
-                <span style={{ maxWidth: '100%', lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.02em', backdropFilter: 'blur(2px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  <span aria-hidden>{kind.emoji}</span>{kind.label}
-                </span>
-              )}
-            </div>
-          )}
-          {isMobile && (
-            <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255,255,255,0.8)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3c2a21" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            </div>
-          )}
-        </div>
-        
-        <div style={{ padding: isMobile ? '1rem' : '1.5rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-          <h3 style={{ fontSize: isMobile ? '1.1rem' : '1.3rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
-            {item.emoji ? `${item.emoji} ` : ''}{item.name}
+          {/* Bottom-left, so the tags never fight the "picked" mark (top-left) or the zoom icon (top-right). */}
+          <TreatTags item={item} />
+          <div className="ev-card-zoom" aria-hidden style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255,255,255,0.85)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3c2a21" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="11" y1="8" x2="11" y2="14"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+          </div>
+        </WholePhoto>
+
+        {/* A fixed-height body: the title is held to two lines and the description (with its chips)
+            scrolls in its own box, so a long text never makes one card taller than the rest. */}
+        <div style={{ padding: isMobile ? '0.8rem 0.7rem 0.95rem' : '1.1rem 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', height: isMobile ? 'auto' : '17.5rem', flexGrow: isMobile ? 1 : 0 }}>
+          {/* Phones get three lines (and no emoji) so a long word like "Tartarugas" still fits. */}
+          <h3 title={item.name} style={{ fontSize: isMobile ? '0.84rem' : '1.15rem', lineHeight: 1.25, minHeight: isMobile ? '3.75em' : '2.5em', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: isMobile ? '0.35rem' : '0.5rem',
+            display: '-webkit-box', WebkitLineClamp: isMobile ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'break-word' }}>
+            {item.emoji && !isMobile ? `${item.emoji} ` : ''}{item.name}
           </h3>
-          
+
           {!isMobile && (
-            <p style={{ color: '#594a42', fontSize: '0.95rem', lineHeight: '1.5', flexGrow: 1 }}>
-              {item.description}
-            </p>
-          )}
-
-          {!isMobile && normalizeAllergens(item.contains).length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.6rem' }} aria-label="Alérgenos">
-              {normalizeAllergens(item.contains).map(id => {
-                const a = allergenById(id);
-                return a ? <span key={id} title={`Contém ${a.label}`} style={{ background: '#fdecea', color: '#b03a2e', border: '1px solid #f5b7b1', borderRadius: '20px', padding: '0.1rem 0.5rem', fontSize: '0.75rem', fontWeight: 600 }}>{a.emoji} {a.label}</span> : null;
-              })}
+            <div style={{ position: 'relative', flex: '1 1 0', minHeight: 0 }}>
+              {/* Clicks in here scroll the text rather than open the overlay. */}
+              <div ref={textRef} onScroll={measure} onClick={e => e.stopPropagation()} className="ev-card-text" tabIndex={0} aria-label={`Descrição de ${item.name}`}
+                style={{ height: '100%', overflowY: 'auto', paddingRight: '0.35rem', cursor: 'default' }}>
+                <p style={{ color: '#594a42', fontSize: '0.92rem', lineHeight: 1.55, margin: 0 }}>
+                  {item.description}
+                </p>
+                {contains.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.6rem' }} aria-label="Alérgenos">
+                    {contains.map(id => {
+                      const a = allergenById(id);
+                      return a ? <span key={id} title={`Contém ${a.label}`} style={{ background: '#fdecea', color: '#b03a2e', border: '1px solid #f5b7b1', borderRadius: '20px', padding: '0.1rem 0.5rem', fontSize: '0.75rem', fontWeight: 600 }}>{a.emoji} {a.label}</span> : null;
+                    })}
+                  </div>
+                )}
+              </div>
+              <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '2.2rem', pointerEvents: 'none', background: 'linear-gradient(rgba(255,255,255,0), #fff)', opacity: moreBelow ? 1 : 0, transition: 'opacity 0.2s' }} />
             </div>
           )}
 
-          {!isMobile && hasInfo && (
-            <div style={{ marginTop: '0.75rem' }}>
-              <button
-                type="button"
-                onClick={() => setShowInfo(v => !v)}
-                aria-expanded={showInfo}
-                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#8a6d1f', fontWeight: 700, fontSize: '0.85rem' }}
-              >
-                🌿 Ingredientes e alérgenos {showInfo ? '−' : '+'}
-              </button>
-              {showInfo && (
-                <div style={{ marginTop: '0.75rem' }}>
-                  <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} showEmptyNote={false} />
-                </div>
-              )}
+          {!isMobile && (
+            <button type="button" onClick={e => { e.stopPropagation(); setIsOpen(true); }}
+              style={{ alignSelf: 'flex-start', background: 'none', border: 'none', padding: 0, marginTop: '0.55rem', cursor: 'pointer', color: '#8a6d1f', fontWeight: 700, fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
+              Ver detalhes e ingredientes →
+            </button>
+          )}
+
+          {!isMobile && (
+            <div style={{ fontSize: '0.78rem', color: '#7f8c8d', marginTop: '0.4rem', minHeight: '1.2em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {(item.min_batch_size && item.min_batch_size > 1)
+                ? <><strong>Mín.</strong> {item.min_batch_size} un. · <strong>lotes de</strong> {item.batch_multiplier}</>
+                : null}
             </div>
           )}
 
-          {(!isMobile && item.min_batch_size && item.min_batch_size > 1) ? (
-            <div style={{ fontSize: '0.85rem', color: '#7f8c8d', background: '#f8f9fa', padding: '0.5rem', borderRadius: '4px', marginTop: '0.5rem' }}>
-              <div><strong>Min:</strong> {item.min_batch_size} un.</div>
-              <div><strong>Lote:</strong> múltiplos de {item.batch_multiplier}</div>
-            </div>
-          ) : null}
-
-          <div style={{ marginTop: isMobile ? '0.5rem' : '1.5rem', borderTop: isMobile ? 'none' : '1px solid rgba(0,0,0,0.05)', paddingTop: isMobile ? '0' : '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 600, color: '#3c2a21', fontSize: isMobile ? '1.1rem' : '1rem' }}>
+          <div style={{ marginTop: isMobile ? 'auto' : '0.6rem', borderTop: isMobile ? 'none' : '1px solid rgba(0,0,0,0.05)', paddingTop: isMobile ? '0' : '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ fontWeight: 600, color: '#3c2a21', fontSize: isMobile ? '1.05rem' : '1rem', whiteSpace: 'nowrap' }}>
               R$ {item.price} <span style={{ fontSize: '0.85rem', color: '#7a6a61', fontWeight: 400 }}>/ un.</span>
             </span>
-            
+
             {!isMobile && (
-              <button 
-                onClick={handleAddToCart}
-                style={{ 
-                  background: '#d4af37', 
-                  color: 'white', 
-                  border: 'none', 
-                  padding: '0.5rem 1rem', 
-                  borderRadius: '8px', 
-                  fontWeight: 600, 
-                  fontSize: '0.9rem', 
-                  textTransform: 'uppercase', 
-                  letterSpacing: '1px', 
+              <button
+                type="button"
+                className="ev-card-add"
+                onClick={e => { e.stopPropagation(); add(); }}
+                style={{
+                  background: '#d4af37',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 0.9rem',
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
                   cursor: 'pointer',
+                  whiteSpace: 'nowrap',
                   transition: 'background 0.3s'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.background = '#c9a67a'}
-                onMouseOut={(e) => e.currentTarget.style.background = '#d4af37'}
               >
                 Adicionar +
               </button>
@@ -200,114 +188,29 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
         </div>
       </div>
 
-      {/* Mobile Bottom Drawer */}
-      {isMobile && isDrawerOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99990, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-          {/* Backdrop */}
-          <div 
-            onClick={() => setIsDrawerOpen(false)}
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', opacity: 1, transition: 'opacity 0.3s' }}
-          />
-          
-          {/* Drawer Content */}
-          <div style={{ position: 'relative', background: 'white', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '2rem 1.5rem', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 -10px 40px rgba(0,0,0,0.2)', animation: 'slideUp 0.3s ease-out' }}>
-            
-            {/* Handle */}
-            <div style={{ width: '40px', height: '5px', background: '#e0e0e0', borderRadius: '3px', margin: '0 auto 1.5rem' }} />
-
-            <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-              <img src={item.image} alt={item.name} style={{ width: '100%', height: '35vh', minHeight: '250px', objectFit: 'cover', borderRadius: '12px', display: 'block' }} />
-              {(kind || raw) && (
-                <div style={{ position: 'absolute', left: '10px', bottom: '10px', right: '10px', display: 'flex', flexWrap: 'wrap-reverse', gap: '0.35rem' }}>
-                  {raw && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: RAW.accent, color: '#ffffff', padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.02em' }}>
-                      <span aria-hidden>{RAW.emoji}</span>{RAW.label}
-                    </span>
-                  )}
-                  {kind && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.02em' }}>
-                      <span aria-hidden>{kind.emoji}</span>{kind.label}
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
-              {item.emoji ? `${item.emoji} ` : ''}{item.name}
-            </h3>
-
-            {raw && (
-              <p style={{ background: '#eef5e8', color: '#3f5e2c', borderRadius: '10px', padding: '0.6rem 0.85rem', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '1rem' }}>
-                <strong>{RAW.emoji} {RAW.label}:</strong> {RAW.hint}.
-              </p>
-            )}
-            
-            <p style={{ color: '#594a42', fontSize: '1rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-              {item.description}
-            </p>
-
-            {hasInfo && (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <TreatInfo ingredients={item.ingredients} contains={item.contains} may_contain={item.may_contain} showEmptyNote={false} />
-              </div>
-            )}
-
-            {(item.min_batch_size && item.min_batch_size > 1) ? (
-              <div style={{ fontSize: '0.9rem', color: '#7f8c8d', background: '#f8f9fa', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
-                <div style={{ marginBottom: '0.5rem' }}><strong>Pedido Mínimo:</strong> {item.min_batch_size} unidades</div>
-                <div><strong>Tamanho do Lote:</strong> múltiplos de {item.batch_multiplier}</div>
-              </div>
-            ) : null}
-
-            {onTogglePick && (
-              <button
-                type="button"
-                onClick={onTogglePick}
-                aria-pressed={picked}
-                style={{ width: '100%', minHeight: '48px', marginBottom: '1rem', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, fontSize: '0.95rem', fontFamily: 'inherit',
-                  border: '2px solid #d4af37', background: picked ? '#d4af37' : 'rgba(212,175,55,0.08)', color: picked ? '#3c2a21' : '#8a6d1f' }}
-              >
-                {picked ? '✓ Na sua escolha rápida (toque para tirar)' : '+ Incluir na escolha rápida'}
-              </button>
-            )}
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '0.85rem', color: '#7a6a61' }}>Preço unitário</span>
-                <span style={{ fontWeight: 'bold', color: '#3c2a21', fontSize: '1.3rem' }}>
-                  R$ {item.price}
-                </span>
-              </div>
-              
-              <button 
-                onClick={handleAddToCart}
-                style={{ 
-                  background: '#d4af37', 
-                  color: 'white', 
-                  border: 'none', 
-                  padding: '1rem 2rem', 
-                  borderRadius: '12px', 
-                  fontWeight: 'bold', 
-                  fontSize: '1rem', 
-                  textTransform: 'uppercase', 
-                  boxShadow: '0 4px 15px rgba(212,175,55,0.4)',
-                  cursor: 'pointer'
-                }}
-              >
-                Adicionar +
-              </button>
-            </div>
-          </div>
-        </div>
+      {isOpen && (
+        <TreatDetail
+          item={item}
+          picked={picked}
+          onTogglePick={onTogglePick}
+          onAdd={() => { add(); setIsOpen(false); }}
+          onClose={closeDetail}
+        />
       )}
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
+
+      <style>{`
+        .ev-card { transition: transform 0.25s, box-shadow 0.25s; }
+        .ev-card:focus-visible { outline: 3px solid #d4af37; outline-offset: 2px; }
+        .ev-card-add:hover { background: #c9a67a !important; }
+        @media (hover: hover) {
+          .ev-card:hover { transform: translateY(-3px); }
+          .ev-card-zoom { opacity: 0.75; transition: opacity 0.2s, transform 0.2s; }
+          .ev-card:hover .ev-card-zoom { opacity: 1; transform: scale(1.08); }
         }
-      `}} />
+        .ev-card-text { scrollbar-width: thin; scrollbar-color: rgba(212,175,55,0.55) transparent; }
+        .ev-card-text::-webkit-scrollbar { width: 5px; }
+        .ev-card-text::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.55); border-radius: 4px; }
+      `}</style>
     </>
   );
 }
