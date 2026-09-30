@@ -10,6 +10,7 @@ const MONTHS = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', '
 function kindLabel(o: JourneyOrder) {
   if (o.order_kind === 'quote') return 'Orçamento de evento';
   if (o.order_kind === 'events') return 'Menu de eventos';
+  if ((o.order_kind as string) === 'ebook') return 'E-book';
   return o.fulfillment === 'pickup' ? 'Caixa · retirada' : 'Caixa · entrega';
 }
 
@@ -23,7 +24,7 @@ export default function MyOrders({ orders }: { orders: JourneyOrder[] }) {
         {orders.map(o => {
           const d = new Date(o.requested_date ? `${o.requested_date}T00:00:00` : o.created_at);
           const stage = ORDER_STAGE[o.stage] ?? ORDER_STAGE.awaiting_payment;
-          const again = o.order_kind === 'box' ? '/caixas' : '/menu';
+          const again = o.order_kind === 'box' ? '/caixas' : (o.order_kind as string) === 'ebook' ? '/sweet-escape' : '/menu';
           return (
             <li key={o.id} className="acct-order">
               <div className="acct-order-date" aria-hidden>

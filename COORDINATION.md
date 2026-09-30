@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **32**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **35**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -122,6 +122,14 @@ Verified live, 2026-09-26:
   the recipes. Short lines say only that; where sugar matters, say "adoçado com tâmaras, açúcar de coco ou rapadura; os doces com
   chocolate vegano industrializado aparecem como 'Vegano, não integral'" (see PhilosophyShowcase's footnote). Still fine: teaching
   claims (courses/retreats teach cooking without refined sugar), the SOS concept in InspirationSection, customer diet labels.
+- **Sweet Escape e-book (written 2026-09-30).** English sales page `/sweet-escape` (`src/components/ebook/`), price and
+  recipes in `src/lib/ebook.ts`. Orders go through `createEbookOrder` (`src/lib/payments/ebook.ts`): server price, saved in
+  `orders` with `order_kind = 'ebook'`, reference `EBK…`. Buyers get `/sweet-escape/thank-you?ref=…&k=…` (`k` = HMAC of the
+  reference); "paid" = status PAID or moved past `new` in the inbox (Pix by hand), and `/api/ebook/download` redirects to a
+  10-minute signed URL from the PRIVATE `ebooks` bucket. **`migration_34_ebook_storage.sql` is NOT run and the 38 MB PDF
+  (`e-books/sweet-escape.pdf`) is NOT uploaded yet** (`web-app/SETUP_ebook.md`); until then downloads fail with a friendly
+  message. `createMercadoPagoCheckout` / `createPayPalCheckout` take an optional `{ returnUrl, title }`; box orders unchanged.
+  Never commit the PDF to git (it would be free to download).
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the

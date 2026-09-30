@@ -107,6 +107,18 @@ async function sendPaidReceipt(orderId: string) {
   const { data } = await db.from('orders').select('*').eq('id', orderId).maybeSingle();
   if (!data) return;
 
+  // The e-book gets its own e-mail: the download link instead of a delivery day.
+  if (data.order_kind === 'ebook' || /^EBK/.test(String(data.pix_transaction_id ?? ''))) {
+    const [{ ebookKey }, { sendEbookPaid }] = await Promise.all([import('./ebook'), import('@/lib/email/ebookReceipts')]);
+    const reference = String(data.pix_transaction_id ?? '');
+    await sendEbookPaid(db, {
+      reference, key: ebookKey(reference),
+      customerName: data.customer_name ?? '', customerEmail: data.customer_email ?? null,
+      total: Number(data.total_price ?? 0), method: String(data.payment_provider ?? ''),
+    });
+    return;
+  }
+
   const address = String(data.delivery_address ?? '');
   await sendOrderPaid(db, {
     reference: String(data.pix_transaction_id ?? ''),

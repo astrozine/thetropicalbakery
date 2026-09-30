@@ -1,5 +1,6 @@
 import 'server-only';
 import { findOrder, markOrderPaid, sameAmount, siteUrl, PayableOrder } from './server';
+import type { CheckoutOptions } from './mercadopago';
 
 export const paypalConfigured = () => !!process.env.PAYPAL_CLIENT_ID && !!process.env.PAYPAL_CLIENT_SECRET;
 
@@ -21,10 +22,12 @@ async function accessToken(): Promise<string> {
 }
 
 /** Creates a PayPal order (in reais) and returns the address to send the customer to. */
-export async function createPayPalCheckout(order: PayableOrder): Promise<string> {
+export async function createPayPalCheckout(order: PayableOrder, opts: CheckoutOptions & { locale?: string } = {}): Promise<string> {
   const site = siteUrl();
   const token = await accessToken();
-  const back = (result: string) => `${site}/checkout/retorno?provider=paypal&ref=${order.reference}&result=${result}`;
+  const back = (result: string) => opts.returnUrl
+    ? `${opts.returnUrl}&provider=paypal&result=${result}`
+    : `${site}/checkout/retorno?provider=paypal&ref=${order.reference}&result=${result}`;
 
   const res = await fetch(`${base()}/v2/checkout/orders`, {
     method: 'POST',
@@ -35,14 +38,14 @@ export async function createPayPalCheckout(order: PayableOrder): Promise<string>
         reference_id: order.reference,
         custom_id: order.reference,
         invoice_id: order.reference,
-        description: `The Tropical Bakery — pedido ${order.reference}`.slice(0, 127),
+        description: (opts.title ?? `The Tropical Bakery — pedido ${order.reference}`).slice(0, 127),
         amount: { currency_code: 'BRL', value: order.total.toFixed(2) },
       }],
       payment_source: {
         paypal: {
           experience_context: {
             brand_name: 'The Tropical Bakery',
-            locale: 'pt-BR',
+            locale: opts.locale ?? 'pt-BR',
             user_action: 'PAY_NOW',
             shipping_preference: 'NO_SHIPPING',
             landing_page: 'GUEST_CHECKOUT',

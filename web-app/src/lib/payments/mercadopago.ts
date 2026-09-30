@@ -6,6 +6,12 @@ const API = 'https://api.mercadopago.com';
 
 export const mercadoPagoConfigured = () => !!process.env.MERCADOPAGO_ACCESS_TOKEN;
 
+/**
+ * For purchases that are not a box order (the e-book): where to send the customer back — a full URL that
+ * already has a `?` — and what the payment page calls the purchase. Omitted, everything works as before.
+ */
+export interface CheckoutOptions { returnUrl?: string; title?: string }
+
 const auth = () => ({ Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`, 'Content-Type': 'application/json' });
 
 /**
@@ -13,9 +19,11 @@ const auth = () => ({ Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TO
  * the address to send the customer to. Cards only: Pix is handled by our own
  * free Pix flow, and boleto is switched off.
  */
-export async function createMercadoPagoCheckout(order: PayableOrder): Promise<string> {
+export async function createMercadoPagoCheckout(order: PayableOrder, opts: CheckoutOptions = {}): Promise<string> {
   const site = siteUrl();
-  const back = (result: string) => `${site}/checkout/retorno?provider=mercadopago&ref=${order.reference}&result=${result}`;
+  const back = (result: string) => opts.returnUrl
+    ? `${opts.returnUrl}&provider=mercadopago&result=${result}`
+    : `${site}/checkout/retorno?provider=mercadopago&ref=${order.reference}&result=${result}`;
 
   const res = await fetch(`${API}/checkout/preferences`, {
     method: 'POST',
@@ -23,7 +31,7 @@ export async function createMercadoPagoCheckout(order: PayableOrder): Promise<st
     body: JSON.stringify({
       items: [{
         id: order.reference,
-        title: `Pedido The Tropical Bakery${order.itemsSummary ? ` — ${order.itemsSummary}` : ''}`.slice(0, 250),
+        title: (opts.title ?? `Pedido The Tropical Bakery${order.itemsSummary ? ` — ${order.itemsSummary}` : ''}`).slice(0, 250),
         quantity: 1,
         unit_price: Math.round(order.total * 100) / 100,
         currency_id: 'BRL',

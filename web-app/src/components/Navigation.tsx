@@ -64,6 +64,7 @@ export default function Navigation() {
     { name: 'Menu de Eventos', path: '/menu' },
     { name: 'Retiros', path: '/retreats' },
     { name: 'Chef Dolly', path: '/dolly' },
+    { name: 'E-book', path: '/sweet-escape' },
   ];
 
   // A course Dolly has hidden in the admin ("em preparo") leaves this menu too.
