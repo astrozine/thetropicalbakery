@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import TreatInfo, { hasTreatInfo } from '@/components/TreatInfo';
 import { RAW, isRaw, treatTypeById } from '@/lib/treatTypes';
@@ -25,18 +25,40 @@ export interface TreatDetailItem {
 }
 
 /**
- * The whole photo, never cropped: the picture sits on a blurred, zoomed copy of itself, so a
- * portrait, square or landscape photo all fill the same frame without cutting the treat off.
+ * The photo on a blurred, zoomed copy of itself, so a portrait, square or landscape picture all
+ * fill the same frame. With no `frame` the photo is shown whole (the full-size view).
+ *
+ * With a `frame` (the frame's width / height) the photo is zoomed in just enough to fill it, but
+ * never past `maxCrop` of the picture: a photo close to the frame's shape fills it edge to edge,
+ * one far from it loses at most that much off its long side and the blur covers what's left.
  */
-export function WholePhoto({ src, alt, width = 750, children, style }: {
-  src: string; alt: string; width?: OptimizedWidth; children?: React.ReactNode; style?: React.CSSProperties;
+export function WholePhoto({ src, alt, width = 750, frame, maxCrop = 0.2, children, style }: {
+  src: string; alt: string; width?: OptimizedWidth; frame?: number; maxCrop?: number; children?: React.ReactNode; style?: React.CSSProperties;
 }) {
+  // The photo's own width / height, read once it loads (a cached one may already be complete).
+  const [ratio, setRatio] = useState<number | null>(null);
+  const read = (img: HTMLImageElement | null) => {
+    if (img && img.complete && img.naturalWidth && img.naturalHeight) setRatio(img.naturalWidth / img.naturalHeight);
+  };
+
+  let size: React.CSSProperties = { width: '100%', height: '100%', objectFit: 'contain' };
+  if (frame && ratio) {
+    const tall = ratio < frame;
+    // Contain leaves the photo `fit` of the frame on its short side; zoom until that's filled
+    // or the crop on the long side reaches maxCrop, whichever comes first.
+    const fit = tall ? ratio / frame : frame / ratio;
+    const zoom = Math.min(1 / fit, 1 / (1 - maxCrop));
+    size = tall
+      ? { height: `${zoom * 100}%`, width: `${zoom * fit * 100}%`, objectFit: 'cover' }
+      : { width: `${zoom * 100}%`, height: `${zoom * fit * 100}%`, objectFit: 'cover' };
+  }
+
   return (
     <div style={{ position: 'relative', overflow: 'hidden', background: '#efe6d4', ...style }}>
       <img aria-hidden src={optimizedSrc(src, 256)} alt="" loading="lazy" decoding="async"
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(18px) saturate(1.1)', transform: 'scale(1.2)', opacity: 0.85 }} />
-      <img src={optimizedSrc(src, width)} alt={alt} loading="lazy" decoding="async"
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} />
+      <img ref={read} onLoad={e => read(e.currentTarget)} src={optimizedSrc(src, width)} alt={alt} loading="lazy" decoding="async"
+        style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', maxWidth: 'none', ...size }} />
       {children}
     </div>
   );

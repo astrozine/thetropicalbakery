@@ -97,9 +97,12 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
           cursor: 'pointer'
         }}
       >
-        {/* Square frame, whole photo: nothing gets cut off, whatever shape the picture is.
-            Tap anywhere on the card for the full-size photo and every detail. */}
-        <WholePhoto src={item.image} alt={item.name} width={isMobile ? 640 : 750} style={{ aspectRatio: '1 / 1', flexShrink: 0 }}>
+        {/* A 5:4 frame on a computer (square on a phone, where the card is only photo + name): the
+            photo fills it, cropped by at most 20% of its long side, and a blurred copy of itself
+            covers any gap left, so the treat is never cut in half and the text gets the room.
+            Tap anywhere on the card for the whole photo and every detail. */}
+        <WholePhoto src={item.image} alt={item.name} width={isMobile ? 640 : 750} frame={isMobile ? 1 : 5 / 4} maxCrop={0.2}
+          style={{ aspectRatio: isMobile ? '1 / 1' : '5 / 4', flexShrink: 0 }}>
           {picked && (
             <span aria-label="Na sua escolha" style={{ position: 'absolute', top: '8px', left: '8px', width: '30px', height: '30px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(0,0,0,0.28)' }}>✓</span>
           )}
@@ -117,9 +120,9 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
 
         {/* A fixed-height body: the title is held to two lines and the description (with its chips)
             scrolls in its own box, so a long text never makes one card taller than the rest. */}
-        <div style={{ padding: isMobile ? '0.8rem 0.7rem 0.95rem' : '1.1rem 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', height: isMobile ? 'auto' : '17.5rem', flexGrow: isMobile ? 1 : 0 }}>
+        <div style={{ padding: isMobile ? '0.8rem 0.7rem 0.95rem' : '1.1rem 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', height: isMobile ? 'auto' : '21.5rem', flexGrow: isMobile ? 1 : 0 }}>
           {/* Phones get three lines (and no emoji) so a long word like "Tartarugas" still fits. */}
-          <h3 title={item.name} style={{ fontSize: isMobile ? '0.84rem' : '1.15rem', lineHeight: 1.25, minHeight: isMobile ? '3.75em' : '2.5em', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: isMobile ? '0.35rem' : '0.5rem',
+          <h3 title={item.name} style={{ fontSize: isMobile ? '0.84rem' : '1.15rem', lineHeight: 1.25, height: isMobile ? '3.75em' : '2.5em', flexShrink: 0, fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', marginBottom: isMobile ? '0.35rem' : '0.5rem',
             display: '-webkit-box', WebkitLineClamp: isMobile ? 3 : 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'break-word' }}>
             {item.emoji && !isMobile ? `${item.emoji} ` : ''}{item.name}
           </h3>
@@ -144,7 +147,7 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
                   <SugarCaffeineChips compact ingredients={item.ingredients} sugar={item.sugar} caffeine={item.caffeine} />
                 </div>
               </div>
-              <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '2.2rem', pointerEvents: 'none', background: 'linear-gradient(rgba(255,255,255,0), #fff)', opacity: moreBelow ? 1 : 0, transition: 'opacity 0.2s' }} />
+              <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '1.6rem', pointerEvents: 'none', background: 'linear-gradient(rgba(255,255,255,0), #fff)', opacity: moreBelow ? 1 : 0, transition: 'opacity 0.2s' }} />
             </div>
           )}
 
