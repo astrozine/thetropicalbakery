@@ -115,9 +115,13 @@ Verified live, 2026-09-26:
   (milk, white, caramel, most dark), and those treats say "Vegano, não integral" (tag on the photo, `TreatTags`; explanation in `TreatInfo`).
   `caffeine` = sem | pouca | com (migration 32, run). All in `src/lib/sugarCaffeine.ts`; the "Açúcar e cafeína" folder keeps only
   Sem açúcar adicionado / Sem cafeína / Sem café. Unknown never counts as integral or "sem". Edited with `SugarCaffeineFields` (suggests
-  from ingredients, asks about unlabelled chocolate). **`migration_33_sugar_sources.sql` is NOT run yet** (the old `treats.sugar`
-  column stays, unused). Andrew confirmed (2026-09-30) the vegan chocolates carry crystal sugar, so ~20 "sem açúcar refinado" lines
-  across the site (grep it) are no longer true for every treat; they need rewording.
+  from ingredients, asks about unlabelled chocolate). **Migration 33 is RUN** (`treats.sugars` answers, 2026-09-30; the old
+  `treats.sugar` column stays, unused).
+- **Never write "sem açúcar refinado", "SOS-free" or "sem processados" about OUR treats or boxes again (Andrew, 2026-09-30).**
+  The industrial vegan chocolates carry crystal sugar, so it isn't true of every treat. What IS true of all of them: vegan, no gluten in
+  the recipes. Short lines say only that; where sugar matters, say "adoçado com tâmaras, açúcar de coco ou rapadura; os doces com
+  chocolate vegano industrializado aparecem como 'Vegano, não integral'" (see PhilosophyShowcase's footnote). Still fine: teaching
+  claims (courses/retreats teach cooking without refined sugar), the SOS concept in InspirationSection, customer diet labels.
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the

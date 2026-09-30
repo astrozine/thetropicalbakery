@@ -13,7 +13,7 @@ interface Highlight {
 
 // Same fallback the homepage's "Destaques Anteriores" uses when nothing is set up in the admin.
 const FALLBACK: Highlight[] = [
-  { id: 'f1', image_url: '/box1.jpg', title: 'O Clássico Tropical', description: 'Doces refinados com o toque inconfundível da nossa padaria.' },
+  { id: 'f1', image_url: '/box1.jpg', title: 'O Clássico Tropical', description: 'Doces sofisticados com o toque inconfundível da nossa padaria.' },
   { id: 'f2', image_url: '/box2.jpg', title: 'Seleção Premium', description: 'Texturas marcantes e ingredientes frescos.' },
   { id: 'f3', image_url: '/box3.jpg', title: 'Edição Tropical', description: 'Uma criação nova, feita à mão a cada semana.' },
   { id: 'f4', image_url: '/box4.jpg', title: 'Surpresa da Dolly', description: 'O que está no melhor momento, na sua caixa.' },

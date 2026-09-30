@@ -20,7 +20,7 @@ export default function PousadasPage() {
         {
           icon: '🥐',
           title: 'Café da Manhã',
-          description: 'Opções de alta qualidade, 100% veganas, sem glúten e SOS-Free (livre de açúcar refinado, sal e produtos processados) direto no seu buffet.',
+          description: 'Opções de alta qualidade, 100% veganas e sem glúten, com o açúcar de cada doce informado às claras, direto no seu buffet.',
         },
         {
           icon: '📱',

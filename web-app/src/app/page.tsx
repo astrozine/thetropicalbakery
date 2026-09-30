@@ -172,7 +172,7 @@ export default async function Home() {
                 ))
               ) : (
                 [
-                  { src: '/box1.jpg', title: 'O Clássico Tropical', desc: 'Uma seleção primorosa de doces refinados com o toque inconfundível da nossa padaria.' },
+                  { src: '/box1.jpg', title: 'O Clássico Tropical', desc: 'Uma seleção primorosa de doces sofisticados com o toque inconfundível da nossa padaria.' },
                   { src: '/box2.jpg', title: 'Seleção Premium', desc: 'Texturas marcantes e ingredientes frescos, pensados para surpreender os paladares mais exigentes.' },
                   { src: '/box3.jpg', title: 'Surpresa Artesanal', desc: 'Cada detalhe é cuidadosamente montado para oferecer uma experiência gastronômica única.' },
                   { src: '/box4.jpg', title: 'Requinte em Caixa', desc: 'A união perfeita entre saúde, estética e sabor inesquecível em uma única apresentação.' },

@@ -65,7 +65,7 @@ export function OriginSeal({ tone = 'light', text = 'Maestria belga · Natureza 
 const PILLARS = [
   { icon: <BelgiumFlag size={18} />, title: 'Técnica belga', body: 'A escola do país que aperfeiçoou o chocolate (e a batata frita): temperagem, massas e recheios de confeitaria clássica.' },
   { icon: <BrazilFlag size={18} />, title: 'Natureza brasileira', body: 'Só o melhor da terra: cacau, castanhas, coco e frutas da Mata Atlântica, colhidos no auge.' },
-  { icon: <span style={{ color: '#d4af37', fontSize: '1.3rem', lineHeight: 1 }}>✦</span>, title: 'Luxo que faz bem', body: 'Vegano, sem glúten, sem açúcar refinado. Feito à mão, em pequenos lotes, por uma única chef.' },
+  { icon: <span style={{ color: '#d4af37', fontSize: '1.3rem', lineHeight: 1 }}>✦</span>, title: 'Luxo que faz bem', body: 'Vegano e sem glúten, com o açúcar de cada doce dito às claras. Feito à mão, em pequenos lotes, por uma única chef.' },
 ];
 
 /**

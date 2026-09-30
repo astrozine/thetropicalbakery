@@ -31,11 +31,11 @@ const IDEAS = [
   },
   {
     title: 'SOS-free: sem sal, óleo e açúcar refinado',
-    body: 'Alan Goldhamer, do TrueNorth Health Center, fala do trio sal, óleo e açúcar (em inglês, SOS) como o que mais vicia o paladar e esconde o sabor real dos ingredientes. Quando você tira os três, fruta, castanha e cacau passam a ter gosto de fruta, castanha e cacau. É por isso que as nossas caixas são SOS-free.',
+    body: 'Alan Goldhamer, do TrueNorth Health Center, fala do trio sal, óleo e açúcar (em inglês, SOS) como o que mais vicia o paladar e esconde o sabor real dos ingredientes. Quando você tira os três, fruta, castanha e cacau passam a ter gosto de fruta, castanha e cacau. É daí que vem o nosso jeito de fazer doce: sem sal, sem óleo, e adoçado com fruta, açúcar de coco ou rapadura. Quando um doce leva chocolate vegano industrializado, que vem com açúcar cristal, a gente diz no próprio doce.',
   },
   {
     title: 'Onde a gente faz diferente',
-    body: 'Não seguimos todas as regras deles, e não pedimos que você siga. O que a gente pegou foi a lógica: comida de verdade, densa em nutrientes e sem os três vilões do paladar. Depois disso, o critério é que seja gostoso e caiba numa rotina real. Sobremesa vegana e sem glúten, feita para dar prazer.',
+    body: 'Não seguimos todas as regras deles, e não pedimos que você siga. O que a gente pegou foi a lógica: comida de verdade, densa em nutrientes e com o mínimo possível dos três vilões do paladar. Depois disso, o critério é que seja gostoso e caiba numa rotina real. Sobremesa vegana e sem glúten, feita para dar prazer.',
   },
   {
     title: 'Como isso vira aprendizado nos retiros',

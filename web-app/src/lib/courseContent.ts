@@ -64,7 +64,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     heroImage: '/assets/surfers_retreat_treats_1789884582282.jpg',
     floating: ['/menu-items/Screenshot_20260412_123155_Edits.jpg', '/menu-items/20260724_154636.jpg', '/retreats/Beach shot Itamambuca.webp'],
     story: [
-      'Você veio para Itamambuca pela praia. Leve para casa uma coisa que ninguém mais vai ter: um dia inteiro aprendendo com a Dolly, a chef belga por trás da The Tropical Bakery, a transformar frutas da Mata Atlântica em sobremesas de vitrine, 100% plant-based, sem glúten e sem açúcar refinado.',
+      'Você veio para Itamambuca pela praia. Leve para casa uma coisa que ninguém mais vai ter: um dia inteiro aprendendo com a Dolly, a chef belga por trás da The Tropical Bakery, a transformar frutas da Mata Atlântica em sobremesas de vitrine, 100% plant-based, sem glúten e adoçadas com frutas.',
       'É mão na massa do começo ao fim, em clima de férias. Você prova, erra, ri, acerta, e sai com as receitas, a técnica e aquela sensação boa de ter aprendido algo que vai usar a vida inteira.',
     ],
     whoFor: ['Turistas e moradores de Itamambuca e Ubatuba', 'Casais, amigos e famílias em busca de uma experiência diferente', 'Quem ama doce e quer comer melhor sem abrir mão do prazer', 'Iniciantes: não precisa saber nada de confeitaria'],
@@ -82,7 +82,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     familyText: 'Choveu? O Turismo Gastronômico vira programa de família: crianças e adultos na mesma bancada, cada um fazendo o seu doce, e todo mundo pode repetir.',
     faq: [
       { q: 'Preciso saber cozinhar?', a: 'Não. O dia foi pensado para iniciantes. A Dolly acompanha cada passo.' },
-      { q: 'Tem alguma restrição alimentar?', a: 'Tudo é 100% plant-based, sem glúten e sem açúcar refinado. Se você tem alergia a castanhas ou outra alergia séria, avise no formulário e a gente adapta.' },
+      { q: 'Tem alguma restrição alimentar?', a: 'Tudo é 100% plant-based e sem glúten, adoçado com tâmaras, frutas, açúcar de coco ou rapadura. Se alguma receita usar chocolate vegano industrializado (que vem com açúcar cristal), a gente avisa. Se você tem alergia a castanhas ou outra alergia séria, avise no formulário e a gente adapta.' },
       { q: 'Posso ir com crianças?', a: 'Pode, e é ótimo em dia de chuva. Conte quantas pessoas e as idades no formulário.' },
       { q: 'Dá para combinar com hospedagem?', a: 'Dá. Veja o formato Curso + Retiro abaixo, ou marque essa opção quando falar com a gente.' },
     ],

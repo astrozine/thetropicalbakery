@@ -59,7 +59,7 @@ const PARTNERSHIPS = [
     eyebrow: 'Varejo · Vitrine Inclusiva',
     title: 'Padarias',
     tagline:
-      'Expanda sua vitrine com opções SOS-Free sem sobrecarregar sua produção. Atenda quem hoje sai de mãos vazias.',
+      'Expanda sua vitrine com opções veganas e sem glúten sem sobrecarregar sua produção. Atenda quem hoje sai de mãos vazias.',
     image: '/assets/realistic_bakery.jpg',
     treat: '/b2b-hero/treat-4.jpg',
     emoji: '🥐',

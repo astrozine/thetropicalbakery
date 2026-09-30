@@ -134,7 +134,7 @@ export default function MenuPage() {
               </summary>
               <div style={{ padding: '1rem 0', color: '#7a6a61', lineHeight: '1.8' }}>
                 Planejando um aniversário, casamento, retiro ou encontro corporativo na nossa região? 
-                Abaixo você encontra nosso portfólio de doces de luxo 100% Veganos, Sem Glúten e SOS-Free (livres de açúcar refinado e óleo). 
+                Abaixo você encontra nosso portfólio de doces de luxo, 100% veganos e sem glúten. Os integrais são adoçados com tâmaras, açúcar de coco ou rapadura; os que levam chocolate vegano industrializado (que vem com açúcar cristal) aparecem marcados como “Vegano, não integral”. 
                 Todos os itens abaixo são para <strong>encomendas em grandes quantidades</strong>. Entre em contato conosco via WhatsApp para organizarmos os detalhes, quantidades e a data de entrega do seu evento!
               </div>
             </details>

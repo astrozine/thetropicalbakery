@@ -17,7 +17,7 @@ const ROLES = [
     looking: [
       'Cuidado com detalhe — nossos doces são pequenos e precisos',
       'Higiene impecável, sem exceção',
-      'Vontade de aprender confeitaria vegana, sem glúten e sem açúcar refinado',
+      'Vontade de aprender confeitaria vegana, sem glúten e com ingredientes integrais',
       'Experiência é bem-vinda, mas atitude conta mais',
     ],
     when: 'Quintas e sextas (produção), sábados (finalização)',

@@ -280,7 +280,7 @@ function originBand(base: string): string {
           <p style="font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;color:${GOLD};margin:0 0 10px;">Maestria belga &middot; Natureza brasileira</p>
           <p style="font-family:${BODY_FONT};font-size:14px;line-height:1.7;color:#d9cfc4;margin:0;">
             Receitas de Elisabeth &ldquo;Dolly&rdquo; Van Dam, com cacau, castanhas e frutas da Mata Atlântica.
-            Vegano, sem glúten, sem açúcar refinado, feito à mão em Itamambuca.
+            Vegano, sem glúten, feito à mão em Itamambuca.
           </p>
         </td></tr>
       </table>

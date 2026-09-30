@@ -84,7 +84,7 @@ export interface TrailStep {
 export const TRAIL: TrailStep[] = [
   {
     id: 'caixa', emoji: '📦', title: 'Sua primeira caixa',
-    pitch: 'Doces veganos, sem glúten e sem açúcar refinado, feitos na semana em que chegam. O jeito mais gostoso de começar.',
+    pitch: 'Doces veganos e sem glúten, feitos na semana em que chegam. O jeito mais gostoso de começar.',
     cta: 'Escolher minha caixa', href: '/caixas', image: '/box1.jpg', doneLabel: 'Provou',
   },
   {

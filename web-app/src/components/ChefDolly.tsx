@@ -51,7 +51,7 @@ const WORLDS = [
   { n: '02', t: 'Natureza brasileira', d: 'Cacau, castanhas, coco e fruta da Mata Atlântica.' },
   { n: '03', t: 'Pâtisserie francesa', d: 'A gramática clássica das massas, cremes e camadas.' },
   { n: '04', t: 'Artesanato plant-based', d: 'Tudo à mão, em pequenos lotes, sem nada de origem animal.' },
-  { n: '05', t: 'Uma profunda paixão por saúde', d: 'Totalmente vegetal, sem processados, sem glúten, com alimentos integrais e o mais perto possível do SOS-free: sem sal e sem óleo refinados, adoçado com tâmaras e frutas.' },
+  { n: '05', t: 'Uma profunda paixão por saúde', d: 'Totalmente vegetal, sem glúten, com alimentos integrais sempre que possível e o mais perto possível do SOS-free: sem sal e sem óleo, adoçado sobretudo com tâmaras e frutas.' },
 ];
 
 /**

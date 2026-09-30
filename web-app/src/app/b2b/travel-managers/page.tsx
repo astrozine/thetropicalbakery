@@ -17,7 +17,7 @@ const OFFERINGS = [
   {
     icon: '🍰',
     title: 'Cursos de Confeitaria Saudável',
-    description: 'Workshops práticos de confeitaria vegana e SOS-Free, perfeitos para incluir num retiro de bem-estar ou numa imersão gastronômica.',
+    description: 'Workshops práticos de confeitaria vegana e sem glúten, perfeitos para incluir num retiro de bem-estar ou numa imersão gastronômica.',
     href: '/cursos',
     cta: 'Ver os cursos',
   },

@@ -40,7 +40,7 @@ const HOW_IT_WORKS = [
 
 const INSIDE_THE_BOX = [
   'Caixa de 2, 4 ou 6 doces autorais (você escolhe), diferentes a cada semana',
-  'Sempre veganos, sem glúten e sem açúcar refinado',
+  'Sempre veganos e sem glúten, com o açúcar de cada doce à vista',
   'Um cartão escrito à mão contando o que é cada doce',
   'Ingredientes locais de Ubatuba quando a estação permite',
   'Embalagem pensada para presentear — ou guardar só para você',
@@ -155,7 +155,7 @@ export default function SubscriptionPage() {
             lineHeight: 1.85, maxWidth: '620px', margin: '0 auto 2.5rem',
           }}>
             Uma criação nova a cada semana, feita à mão pela Dolly em Itamambuca.
-            Vegana, sem glúten, sem açúcar refinado — e sem nunca repetir a semana anterior.
+            Vegana, sem glúten — e sem nunca repetir a semana anterior.
           </p>
 
           <OriginSeal tone="dark" style={{ marginBottom: '2.25rem' }} />

@@ -9,15 +9,15 @@ import { BOX_SIZES, SINGLE_PIECE_FROM } from '@/lib/boxSizes';
 import { usualCaption } from '@/lib/boxPicks';
 
 const FOOTNOTES = [
-  '* O mais perto de açúcar que usamos é o açúcar de coco, às vezes num chocolate vegano (inclusive o branco) adoçado com ele. Nada de açúcar refinado.',
+  '* Adoçamos com tâmaras e frutas, açúcar de coco ou rapadura. A exceção são os doces com chocolate vegano industrializado (ao leite, branco, caramelado), que já vem com açúcar cristal: esses aparecem marcados como “Vegano, não integral”.',
   '** Nenhuma receita leva glúten, mas a cozinha não é certificada: pode haver traços. Celíacos, falem com a gente antes.',
 ];
 
 /** The bird's-eye strip: four things to know before opening anything. */
 const GLANCE = [
   { emoji: '🌱', label: '100% plant-based' },
-  { emoji: '🧂', label: 'SOS-free*' },
-  { emoji: '🌾', label: 'Ingredientes integrais' },
+  { emoji: '🍯', label: 'Adoçado com frutas*' },
+  { emoji: '🌾', label: 'Ingredientes integrais*' },
   { emoji: '✨', label: 'Sem glúten**' },
 ];
 
@@ -113,14 +113,14 @@ const panels: Panel[] = [
     emoji: '🌿',
     title: 'O que tem dentro',
     badge: '100% plant-based',
-    glance: 'SOS-free, integral e sem glúten',
+    glance: 'Vegano, sem glúten e o açúcar de cada doce à vista',
     body: (
       <>
         <div>
           {[
             ['🌱', '100% plant-based', 'Nenhum ingrediente de origem animal.'],
-            ['🧂', 'SOS-free*', 'Sem sal, sem óleo e sem açúcar refinado.'],
-            ['🌾', 'Ingredientes integrais', 'Ingredientes premium, escolhidos com foco em saúde.'],
+            ['🍯', 'Adoçado com frutas*', 'Tâmaras, açúcar de coco ou rapadura. Sem sal e sem óleo.'],
+            ['🌾', 'Ingredientes integrais*', 'Ingredientes premium, escolhidos com foco em saúde.'],
             ['✨', 'Sem glúten**', 'Receitas sem ingredientes com glúten.'],
           ].map(([emoji, name, text]) => (
             <div key={name} style={{ display: 'flex', gap: '0.85rem', padding: '0.65rem 0', borderBottom: '1px dashed rgba(60,42,33,0.2)' }}>

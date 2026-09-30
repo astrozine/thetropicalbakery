@@ -46,7 +46,7 @@ export const DIET_TAGS: DietTag[] = [
   // ---- how they eat (everything we make is already vegan and plant-based; these tell us who THEY are)
   { id: 'vegano', label: 'Vegano', emoji: '🌱', group: 'jeito', legacy: 'is_vegan', quick: true, hint: 'nada de origem animal' },
   { id: 'plant-based', label: 'Plant-based integral', emoji: '🌿', group: 'jeito', hint: 'comida de verdade, sem ultraprocessados' },
-  { id: 'sos-free', label: 'SOS-free', emoji: '✨', group: 'jeito', hint: 'sem sal, óleo nem açúcar refinado, o nosso jeito de fazer tudo' },
+  { id: 'sos-free', label: 'SOS-free', emoji: '✨', group: 'jeito', hint: 'sem sal, óleo nem açúcar refinado' },
 
   // ---- health: the four we cook for, and the three reasons people most often give for them
   { id: 'sem-gluten', label: 'Sem Glúten', emoji: '🌾', group: 'saude', legacy: 'is_gluten_free', quick: true },

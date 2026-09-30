@@ -20,7 +20,7 @@ export default function PhotoShowcase() {
         <span className="photo-showcase__eyebrow">Feito à mão em Itamambuca</span>
         <h2 className="photo-showcase__title">Cada caixa chega embrulhada como um presente</h2>
         <p className="photo-showcase__text">
-          Doces veganos, sem glúten e sem açúcar refinado, no nosso papel dourado. Uma criação nova a cada semana.
+          Doces veganos e sem glúten, no nosso papel dourado. Uma criação nova a cada semana.
         </p>
         <Link href="/caixas" className="photo-showcase__cta">Ver a caixa da semana</Link>
       </div>

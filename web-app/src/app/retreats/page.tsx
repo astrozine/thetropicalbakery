@@ -23,7 +23,7 @@ export default function RetreatsPage() {
     },
     foodHero: {
       title: 'Criações Exclusivas The Tropical Bakery',
-      subtitle: '100% Vegano · Sem Glúten · SOS-Free · Feito com ingredientes tropicais frescos',
+      subtitle: '100% Vegano · Sem Glúten · Feito com ingredientes tropicais frescos',
     },
     suites: {
       subtitle: 'Salt n\' Paradise',

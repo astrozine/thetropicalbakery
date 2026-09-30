@@ -36,7 +36,8 @@ export default function ExplodingTreats({ boxesLeft = null }: { boxesLeft?: numb
     { id: '4', src: '/treats/media_1789712972031.jpg', mobile: { x: 80, y: 110, scale: 0.55 }, desktop: { x: 400, y: 160, scale: 1.0 }, rotate: 10 },
   ];
 
-  const tags = ['Sem Açúcar Refinado', 'Sem Sal', 'Sem Glúten', 'Sem Processados'];
+  // Only what is true of every treat: some carry an industrial vegan chocolate with crystal sugar.
+  const tags = ['100% Vegetal', 'Sem Sal', 'Sem Glúten', 'Feito à Mão'];
 
   if (isMobile) {
     // Mobile: Native App Home Screen Experience
