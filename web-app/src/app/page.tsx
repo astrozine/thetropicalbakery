@@ -13,6 +13,7 @@ import { inDeliveryWindow, isRolledOver, noUpcomingEdition, saleState, shortDay 
 import NoBoxNotice from '@/components/NoBoxNotice';
 import ModalCard from '@/components/ModalCard';
 import HighlightsRail from '@/components/HighlightsRail';
+import GlobalMenuTeaser from '@/components/GlobalMenuTeaser';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
@@ -105,6 +106,9 @@ export default async function Home() {
 
       {/* Phones open with something to tap, not something to read. Desktop is unchanged. */}
       <HomeTreatPicker />
+
+      {/* Events photo strip: sits right under the tasting box instead of at the foot of the page */}
+      <GlobalMenuTeaser inPage />
 
       {/* Scrolling Text Banner */}
       <Marquee text="THE TROPICAL BAKERY ✦ MAESTRIA BELGA ✦ NATUREZA BRASILEIRA ✦ ITAMAMBUCA ✦ VEGAN ✦ " speed={300} />

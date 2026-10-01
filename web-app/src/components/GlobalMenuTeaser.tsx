@@ -11,14 +11,16 @@ import { thumb } from '@/lib/thumbs';
  * thought. Everywhere else (checkout, the box and subscription pages, accounts, partner and staff
  * areas, login, privacy, admin, and the Menu de Eventos itself) the page has one job, and a big
  * tappable strip leading somewhere else pulls the visitor away from it.
+ *
+ * The home page is the exception to "at the bottom": it renders the strip itself, right under the
+ * tasting box (`inPage`), so the layout skips '/' to avoid showing it twice.
  */
 const SHOW_ON = (path: string) =>
-  path === '/' ||
   path === '/retreats' ||
   path === '/cursos' || path.startsWith('/cursos/') ||
   path === '/b2b' || path.startsWith('/b2b/');
 
-export default function GlobalMenuTeaser() {
+export default function GlobalMenuTeaser({ inPage = false }: { inPage?: boolean }) {
   const pathname = usePathname() || '';
   const isSpanish = pathname.startsWith('/es');
   // /es/retreats and /en/retreats follow the same rule as /retreats.
@@ -28,7 +30,7 @@ export default function GlobalMenuTeaser() {
   const [running, setRunning] = useState(false);
 
   // Only animate while the strip is on screen: an endless animation nobody is looking at still costs battery.
-  const visible = SHOW_ON(bare);
+  const visible = inPage || SHOW_ON(bare);
   useEffect(() => {
     const el = trackRef.current;
     if (!visible || !el || typeof IntersectionObserver === 'undefined') return;
