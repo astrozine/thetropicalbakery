@@ -30,8 +30,8 @@ const IDEAS = [
     body: 'Joel Fuhrman popularizou a sigla em inglês G-BOMBS: Greens (folhas), Beans (feijões e leguminosas), Onions (cebola, alho e afins), Mushrooms (cogumelos), Berries (frutas vermelhas) e Seeds (sementes e oleaginosas). A lógica é priorizar comida com muito nutriente para cada caloria. Na nossa cozinha isso aparece nas frutas vermelhas, nas sementes, nas oleaginosas e no cacau que a Dolly usa em quase tudo.',
   },
   {
-    title: 'SOS-free: sem sal, óleo e açúcar refinado',
-    body: 'Alan Goldhamer, do TrueNorth Health Center, fala do trio sal, óleo e açúcar (em inglês, SOS) como o que mais vicia o paladar e esconde o sabor real dos ingredientes. Quando você tira os três, fruta, castanha e cacau passam a ter gosto de fruta, castanha e cacau. É daí que vem o nosso jeito de fazer doce: sem sal, sem óleo, e adoçado com fruta, açúcar de coco ou rapadura. Quando um doce leva chocolate vegano industrializado, que vem com açúcar cristal, a gente diz no próprio doce.',
+    title: 'SOS-free: sem sal, sem óleo, sem açúcar refinado',
+    body: 'Alan Goldhamer, do TrueNorth Health Center, fala do trio sal, óleo e açúcar (em inglês, SOS) como o que mais vicia o paladar e esconde o sabor real dos ingredientes. Quando você tira os três, fruta, castanha e cacau passam a ter gosto de fruta, castanha e cacau. É daí que vem o nosso jeito de fazer doce: sem sal, sem óleo e sem açúcar refinado, com a doçura vindo de tâmaras, frutas, açúcar de coco ou rapadura (no SOS-free mais rigoroso nem esses entram: esta é a nossa versão). A única exceção é o chocolate vegano que a Dolly usa em alguns doces, que vem pronto com açúcar e óleo, e a gente marca no próprio doce. Doce, para nós, é de ocasião especial: a ideia é celebrar sem bagunçar a saúde. (Não temos ligação com o Goldhamer nem com o TrueNorth: só acreditamos na ideia.)',
   },
   {
     title: 'Onde a gente faz diferente',

@@ -54,9 +54,9 @@ export function normalizeAllergens(ids: string[] | null | undefined): string[] {
 export const KITCHEN_FACTS = [
   { emoji: '🌱', text: '100% vegetal: nenhum doce leva leite, ovos, mel ou qualquer ingrediente de origem animal.' },
   { emoji: '🌾', text: 'Nenhuma receita leva glúten, mas a cozinha não é certificada sem glúten: pode haver traços. Se você é celíaco, fale com a gente antes.' },
-  // Honest since 2026-09-30: the industrial vegan chocolates (milk, white, caramel) come with crystal
-  // sugar. Those treats are marked "Vegano, não integral" (src/lib/sugarCaffeine.ts); the rest are integral.
-  { emoji: '🍯', text: 'Adoçamos com tâmaras e frutas, açúcar de coco ou rapadura. A exceção são os doces com chocolate vegano industrializado, que vem com açúcar cristal: eles aparecem como “Vegano, não integral”.' },
+  // Andrew, 2026-09-30: the ONE refined ingredient is the industrial vegan chocolate (sugar and oil); the
+  // rest is SOS-free. Those treats are marked "Com chocolate vegano" (src/lib/sugarCaffeine.ts).
+  { emoji: '🍯', text: 'SOS-free: nossas receitas não levam sal, óleo nem açúcar refinado; a doçura vem de tâmaras e frutas, açúcar de coco ou rapadura. A única exceção é o chocolate vegano que alguns doces levam, que já vem com açúcar e óleo: esses aparecem marcados com “🍫 Com chocolate vegano”.' },
 ];
 
 export const allergenById = (id: string) => ALLERGENS.find(a => a.id === (LEGACY_IDS[id] || id));

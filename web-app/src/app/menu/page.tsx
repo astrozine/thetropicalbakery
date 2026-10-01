@@ -12,6 +12,7 @@ import EventOrderSheet, { EventQuoteForm } from '@/components/EventOrder';
 import { useCart } from '@/context/CartContext';
 import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
 import TreatTypeBar, { styleToggles } from '@/components/TreatTypeBar';
+import SosFreeExplainer from '@/components/SosFreeExplainer';
 import { ALLERGEN_LIST_NEM } from '@/lib/allergens';
 import { anyTyped, groupByType, textOn } from '@/lib/treatTypes';
 
@@ -64,17 +65,18 @@ export default function MenuPage() {
     fetchMenu();
   }, []);
 
-  // /menu?raw=1 opens on the raw treats and /menu?integral=1 on the whole-food ones, so a post or a
+  // /menu?raw=1 opens on the raw treats and /menu?sos=1 on the SOS-free ones (?integral=1, the first name, still works), so a post or a
   // message can link straight to them; the address follows the pills, so what you see can be shared.
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
-    setRefine(r => ({ ...r, raw: q.get('raw') === '1' ? 'raw' : 'all', wholeFood: q.get('integral') === '1' }));
+    setRefine(r => ({ ...r, raw: q.get('raw') === '1' ? 'raw' : 'all', wholeFood: q.get('sos') === '1' || q.get('integral') === '1' }));
   }, []);
   const setStyle = (next: RefineState) => {
     setRefine(next);
     const url = new URL(window.location.href);
     if (next.raw === 'raw') url.searchParams.set('raw', '1'); else url.searchParams.delete('raw');
-    if (next.wholeFood) url.searchParams.set('integral', '1'); else url.searchParams.delete('integral');
+    url.searchParams.delete('integral');
+    if (next.wholeFood) url.searchParams.set('sos', '1'); else url.searchParams.delete('sos');
     window.history.replaceState(window.history.state, '', url);
   };
 
@@ -134,7 +136,7 @@ export default function MenuPage() {
               </summary>
               <div style={{ padding: '1rem 0', color: '#7a6a61', lineHeight: '1.8' }}>
                 Planejando um aniversário, casamento, retiro ou encontro corporativo na nossa região? 
-                Abaixo você encontra nosso portfólio de doces de luxo, 100% veganos e sem glúten. Os integrais são adoçados com tâmaras, açúcar de coco ou rapadura; os que levam chocolate vegano industrializado (que vem com açúcar cristal) aparecem marcados como “Vegano, não integral”. 
+                Abaixo você encontra nosso portfólio de doces de luxo, 100% veganos, sem glúten e SOS-free: sem sal, sem óleo e sem açúcar refinado, com a doçura vindo de tâmaras, frutas, açúcar de coco ou rapadura. A única exceção é o chocolate vegano que alguns doces levam, que vem pronto com açúcar e óleo: esses aparecem marcados com “🍫 Com chocolate vegano”. 
                 Todos os itens abaixo são para <strong>encomendas em grandes quantidades</strong>. Entre em contato conosco via WhatsApp para organizarmos os detalhes, quantidades e a data de entrega do seu evento!
               </div>
             </details>
@@ -152,6 +154,7 @@ export default function MenuPage() {
             Precisa evitar um alérgeno ou procurar por ingrediente? Aqui está o catálogo inteiro,
             com os filtros. Se você só quer escolher pelas fotos, a <strong>Escolha rápida</strong> lá em cima resolve.
           </p>
+          <SosFreeExplainer tone="dark" style={{ margin: '0.6rem auto 0', textAlign: 'center' }} />
         </div>
 
         {loading ? (
@@ -177,7 +180,7 @@ export default function MenuPage() {
 
           <div className="menu-main">
           <div className="menu-typebar">
-            {/* One row: 🌿 Raw and 🌾 Integral (on/off), then the kinds of treat. */}
+            {/* One row: 🌿 Raw and 🌾 SOS-free (on/off), then the kinds of treat. */}
             <TreatTypeBar bleed treats={menuItems} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })}
               toggles={styleToggles(menuItems, refine, setStyle)} />
           </div>

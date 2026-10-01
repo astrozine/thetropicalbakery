@@ -3,6 +3,7 @@
 import React from 'react';
 import { ALLERGEN_LIST_NEM, KITCHEN_FACTS, allergenById, normalizeAllergens } from '@/lib/allergens';
 import { WHOLE_FOOD, caffeineById, caffeineOf, isWholeFood, sugarById, sugarsOf } from '@/lib/sugarCaffeine';
+import SosFreeExplainer from '@/components/SosFreeExplainer';
 
 export const allergenChipStyle = (tone: 'contains' | 'may'): React.CSSProperties => ({
   display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.28rem 0.7rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600,
@@ -47,7 +48,7 @@ export function SugarCaffeineChips({ ingredients, sugars, caffeine, compact = fa
   const status = whole === true ? WHOLE_FOOD.yes : whole === false ? WHOLE_FOOD.no : null;
 
   if (compact) {
-    // "Não integral" is on the photo already (TreatTags); here only the good news and the caffeine.
+    // "Com chocolate vegano" is on the photo already (TreatTags); here only the good news and the caffeine.
     return (
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }} aria-label="Açúcar e cafeína">
         {whole === true && status && <span style={chip('yes')} title={status.hint}>{status.emoji} {status.label}</span>}
@@ -59,7 +60,7 @@ export function SugarCaffeineChips({ ingredients, sugars, caffeine, compact = fa
     <div style={{ display: 'grid', gap: '0.5rem' }} aria-label="Açúcar e cafeína">
       {whole === false && (
         <p style={{ margin: 0, background: '#fbeee2', border: '1px solid #efc9a4', color: '#6e3a10', borderRadius: '10px', padding: '0.55rem 0.8rem', fontSize: '0.85rem', lineHeight: 1.5 }}>
-          <strong>{WHOLE_FOOD.no.emoji} {WHOLE_FOOD.no.label}.</strong> Continua 100% vegetal, mas leva chocolate vegano industrializado, que vem com açúcar cristal (refinado).
+          <strong>{WHOLE_FOOD.no.emoji} {WHOLE_FOOD.no.label}.</strong> Este doce leva o chocolate vegano que a Dolly compra pronto, o único ingrediente da nossa cozinha que vem com açúcar e óleo refinados. Continua 100% vegetal; só não é SOS-free.
         </p>
       )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem 0.4rem' }}>
@@ -143,6 +144,8 @@ export default function TreatInfo({ ingredients, contains, may_contain, sugars, 
         <div style={{ marginTop: '1rem' }}>
           <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5b4a7a', fontWeight: 700, marginBottom: '0.5rem' }}>🍬 Açúcar e cafeína</p>
           <SugarCaffeineChips ingredients={ingredients} sugars={sugars} caffeine={caffeine} />
+          {/* Only once the treat is known either way: then "SOS-free" (or its exception) is on screen. */}
+          {isWholeFood({ sugars, ingredients }) !== null && <SosFreeExplainer style={{ marginTop: '0.4rem' }} />}
         </div>
       )}
     </div>

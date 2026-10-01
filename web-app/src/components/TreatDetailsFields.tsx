@@ -174,14 +174,14 @@ export function SugarCaffeineFields({ sugars, caffeine, ingredients, onChange }:
       )}
 
       {whole === null ? (
-        <p style={{ ...note, color: '#e67e22' }}>Ainda não informado: quem filtra por açúcar ou por 🌾 Integral não vai ver este doce.</p>
+        <p style={{ ...note, color: '#e67e22' }}>Ainda não informado: quem filtra por açúcar ou por 🌾 SOS-free não vai ver este doce.</p>
       ) : whole ? (
         <p style={{ ...note, color: '#4b5d24', background: '#eef3e2', borderRadius: '8px', padding: '0.5rem 0.7rem' }}>
-          {WHOLE_FOOD.yes.emoji} No site: <strong>{WHOLE_FOOD.yes.label}</strong> (nada refinado).
+          {WHOLE_FOOD.yes.emoji} No site: <strong>{WHOLE_FOOD.yes.label}</strong> (sem sal, óleo nem açúcar refinado).
         </p>
       ) : (
         <p style={{ ...note, color: '#6e3a10', background: '#fbeee2', borderRadius: '8px', padding: '0.5rem 0.7rem' }}>
-          {WHOLE_FOOD.no.emoji} No site: <strong>{WHOLE_FOOD.no.label}</strong>, com a explicação de que leva chocolate vegano industrializado com açúcar cristal.
+          {WHOLE_FOOD.no.emoji} No site: <strong>{WHOLE_FOOD.no.label}</strong>, com a explicação de que é o único ingrediente com açúcar e óleo refinados.
         </p>
       )}
 

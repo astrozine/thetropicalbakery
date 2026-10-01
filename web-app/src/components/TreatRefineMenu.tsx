@@ -31,7 +31,7 @@ export interface RefineState {
   types: string[];
   /** Raw or not, a separate yes/no that crosses with the type (see RAW in treatTypes.ts). Absent means 'all'. */
   raw?: RawFilter;
-  /** 🌾 Integral: only treats known to have nothing refined (no crystal sugar from industrial chocolate). */
+  /** 🌾 SOS-free: only treats known to have nothing refined (no industrial vegan chocolate). */
   wholeFood?: boolean;
   /** "Sem açúcar de cana", "Sem cafeína"… (AVOID_FILTERS in sugarCaffeine.ts). Always "avoid", whatever the mode. */
   avoid?: string[];
@@ -226,7 +226,7 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
       key: 'raw', label: `${RAW.emoji} Só ${RAW.label}`, onRemove: () => onChange({ ...value, raw: 'all' }),
     }] : []),
     ...(value.wholeFood ? [{
-      key: 'wholeFood', label: `${WHOLE_FOOD.yes.emoji} Só ${WHOLE_FOOD.yes.label.toLowerCase()}`, onRemove: () => onChange({ ...value, wholeFood: false }),
+      key: 'wholeFood', label: `${WHOLE_FOOD.yes.emoji} Só ${WHOLE_FOOD.yes.label}`, onRemove: () => onChange({ ...value, wholeFood: false }),
     }] : []),
     ...value.types.map(id => {
       const c = typeChipFor(id);

@@ -83,7 +83,7 @@ export function TreatTags({ item, size = 'sm' }: { item: TreatDetailItem; size?:
       )}
       {notWhole && (
         <span title={`${WHOLE_FOOD.no.label}: ${WHOLE_FOOD.no.hint}`} style={{ lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: WHOLE_FOOD.no.accent, color: '#ffffff', padding: pad, borderRadius: '20px', fontSize: fs, fontWeight: 800, letterSpacing: '0.02em', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>
-          <span aria-hidden>{WHOLE_FOOD.no.emoji}</span>Não integral
+          <span aria-hidden>{WHOLE_FOOD.no.emoji}</span>{WHOLE_FOOD.no.label}
         </span>
       )}
       {kind && (

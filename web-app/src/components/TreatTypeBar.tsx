@@ -41,13 +41,13 @@ export function styleToggles<T extends StyleTreat>(treats: T[], refine: RefineSt
     onToggle: () => onChange({ ...refine, raw: rawOn ? 'all' : 'raw' }),
     note: `${RAW.emoji} Raw = ${RAW.hint}.`,
   } as StyleToggle);
-  // Both sides must exist: before Dolly declares anything, "Integral 0" would only look broken.
+  // Both sides must exist: before Dolly declares anything, "SOS-free 0" would only look broken.
   if (notWhole > 0 && whole > 0) out.push({
     key: 'integral', emoji: WHOLE_FOOD.yes.emoji, label: WHOLE_FOOD.yes.label, accent: WHOLE_FOOD.yes.accent, hint: WHOLE_FOOD.yes.hint,
     on: !!refine.wholeFood, n: whole,
     match: (t: StyleTreat) => isWholeFood(t) === true,
     onToggle: () => onChange({ ...refine, wholeFood: !refine.wholeFood }),
-    note: `${WHOLE_FOOD.yes.emoji} Integral = ${WHOLE_FOOD.yes.hint}. Ficam de fora os doces com chocolate vegano industrializado (açúcar cristal)`
+    note: `${WHOLE_FOOD.yes.emoji} SOS-free = ${WHOLE_FOOD.yes.hint}. Ficam de fora os doces com chocolate vegano, o único ingrediente nosso que vem com açúcar e óleo`
       + (unknown ? ` e ${unknown} ${unknown === 1 ? 'doce' : 'doces'} que ainda não informamos.` : '.'),
   } as StyleToggle);
   return out;

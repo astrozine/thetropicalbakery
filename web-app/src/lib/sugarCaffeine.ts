@@ -5,10 +5,13 @@
  * is meaningless here: nobody is harmed by a trace of sugar. What people need is:
  *   - WHICH sugars a treat has. One treat can have dates and a chocolate that comes with crystal
  *     sugar, so this is a list (`treats.sugars`, migration_33), ticked by Dolly.
- *   - Whether it is INTEGRAL (whole food). That follows from the list: crystal sugar, which arrives
- *     inside industrial vegan chocolate (milk, white, caramel, most dark), is the one refined thing
- *     in the kitchen. Such a treat is still vegan, and the site says so plainly: "Vegano, mas não
- *     integral". Never ticked separately, so the two can't disagree.
+ *   - Whether it is SOS-FREE. That follows from the list. The kitchen uses no salt, no oil and no
+ *     refined sugar; the ONE refined ingredient is the industrial vegan chocolate Dolly buys ready
+ *     (milk, white, caramel, most dark), which comes with crystal sugar and oil. A treat with it is
+ *     still vegan, and the site says so plainly: "Com chocolate vegano". Never ticked separately, so
+ *     the two can't disagree. (In code the yes/no is still called "whole food" / isWholeFood.)
+ *     SOS-free is Alan Goldhamer's idea (TrueNorth Health Center); SOS_EXPLAINER is how we credit it
+ *     and how far our version goes. We have no link to him: never imply one.
  *   - Caffeine as a scale: none / a little from cacao (a tenth of a coffee, plus theobromine) / real
  *     caffeine (coffee, matcha, tea, guaraná, mate). Cocoa butter and white chocolate have practically none.
  *
@@ -23,7 +26,7 @@ export interface SugarSource {
   emoji: string;
   /** Plain words for the customer: what it is. */
   hint: string;
-  /** Refined: a treat with this is vegan but not integral. */
+  /** Refined: a treat with this is vegan but not SOS-free. */
   refined?: boolean;
 }
 
@@ -33,15 +36,29 @@ export const SUGARS: SugarSource[] = [
   { id: 'fruta', label: 'Tâmaras e frutas', emoji: '🌴', hint: 'adoçado com tâmara, uva-passa ou outra fruta: o açúcar da própria fruta, com a fibra junto' },
   { id: 'coco', label: 'Açúcar de coco', emoji: '🥥', hint: 'da seiva da flor do coqueiro, não refinado' },
   { id: 'rapadura', label: 'Rapadura', emoji: '🟫', hint: 'caldo de cana só fervido e seco, não refinado (vale também para melado e mascavo)' },
-  { id: 'cristal', label: 'Açúcar cristal', emoji: '🍫', refined: true, hint: 'açúcar refinado, que vem dentro do chocolate vegano industrializado (ao leite, branco, caramelado)' },
+  { id: 'cristal', label: 'Açúcar cristal (do chocolate vegano)', emoji: '🍫', refined: true, hint: 'açúcar refinado, que só entra pelo chocolate vegano industrializado (ao leite, branco, caramelado), junto com o óleo dele' },
 ];
 
 export const sugarById = (id: string) => SUGARS.find(s => s.id === id);
 
-/** How the site names the two sides of "integral". */
+/** How the site names the two sides: SOS-free, or the one exception (the chocolate). */
 export const WHOLE_FOOD = {
-  yes: { label: 'Integral', emoji: '🌾', accent: '#6b7f3a', hint: 'whole food: nada refinado, adoçado só com frutas, açúcar de coco ou rapadura' },
-  no: { label: 'Vegano, não integral', emoji: '🍫', accent: '#a0612b', hint: 'continua 100% vegetal, mas leva chocolate vegano industrializado, que vem com açúcar cristal (refinado)' },
+  yes: { label: 'SOS-free', emoji: '🌾', accent: '#6b7f3a', hint: 'sem sal, sem óleo e sem açúcar refinado: a doçura vem de tâmaras e frutas, açúcar de coco ou rapadura' },
+  no: { label: 'Com chocolate vegano', emoji: '🍫', accent: '#a0612b', hint: 'leva o chocolate vegano que a Dolly compra pronto, o único ingrediente da nossa cozinha que vem com açúcar e óleo refinados. Continua 100% vegetal, só não é SOS-free' },
+};
+
+/**
+ * "O que é SOS-free?", in the words the whole site uses (SosFreeExplainer shows it). Credits Alan
+ * Goldhamer for the idea, says how far our version goes (coconut sugar and rapadura are in; the strict
+ * version has no added sugar at all), names the one exception, and says what a treat is for.
+ */
+export const SOS_EXPLAINER = {
+  question: 'O que é SOS-free?',
+  what: 'SOS vem do inglês salt, oil, sugar: sal, óleo e açúcar. A ideia é de Alan Goldhamer, do TrueNorth Health Center, na Califórnia: sem esses três, que viciam o paladar, a comida volta a ter o gosto de verdade.',
+  ours: 'Nas nossas receitas não entra sal, nem óleo, nem açúcar refinado. A doçura vem de tâmaras e frutas e, em algumas, de açúcar de coco ou rapadura, que não são refinados. (No SOS-free mais rigoroso nem esses entram: esta é a nossa versão.)',
+  exception: 'A única exceção é o chocolate vegano que a Dolly usa em alguns doces: ele vem pronto, com açúcar e óleo. Esses doces aparecem marcados com “🍫 Com chocolate vegano”.',
+  occasion: 'E o mais importante: doce é para ocasião especial. A ideia não é comer isso todo dia, é poder celebrar sem bagunçar a saúde.',
+  credit: 'A The Tropical Bakery não tem ligação com Alan Goldhamer nem com o TrueNorth: só acreditamos na ideia.',
 };
 
 export type CaffeineLevel = 'sem' | 'pouca' | 'com';

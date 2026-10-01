@@ -3,21 +3,22 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import ScrollReveal from '@/components/ScrollReveal';
+import SosFreeExplainer from '@/components/SosFreeExplainer';
 import ZoomableImage from '@/components/ZoomableImage';
 import { DELIVERY_ZONES, formatBRL } from '@/lib/deliveryZones';
 import { BOX_SIZES, SINGLE_PIECE_FROM } from '@/lib/boxSizes';
 import { usualCaption } from '@/lib/boxPicks';
 
 const FOOTNOTES = [
-  '* Adoçamos com tâmaras e frutas, açúcar de coco ou rapadura. A exceção são os doces com chocolate vegano industrializado (ao leite, branco, caramelado), que já vem com açúcar cristal: esses aparecem marcados como “Vegano, não integral”.',
+  '* Sem sal, sem óleo e sem açúcar refinado: a doçura vem de tâmaras e frutas, açúcar de coco ou rapadura. A única exceção é o chocolate vegano que alguns doces levam, que já vem pronto com açúcar e óleo: esses aparecem marcados.',
   '** Nenhuma receita leva glúten, mas a cozinha não é certificada: pode haver traços. Celíacos, falem com a gente antes.',
 ];
 
 /** The bird's-eye strip: four things to know before opening anything. */
 const GLANCE = [
   { emoji: '🌱', label: '100% plant-based' },
-  { emoji: '🍯', label: 'Adoçado com frutas*' },
-  { emoji: '🌾', label: 'Ingredientes integrais*' },
+  { emoji: '🌾', label: 'SOS-free*' },
+  { emoji: '🍯', label: 'Adoçado com frutas' },
   { emoji: '✨', label: 'Sem glúten**' },
 ];
 
@@ -42,6 +43,8 @@ function Footnotes({ tone }: { tone: 'dark' | 'light' }) {
   return (
     <div style={{ fontSize: '0.78rem', lineHeight: 1.65, color: tone === 'dark' ? 'rgba(253,250,243,0.62)' : '#7a6a61' }}>
       {FOOTNOTES.map(f => <p key={f} style={{ marginBottom: '0.25rem' }}>{f}</p>)}
+      {/* Nobody knows what SOS-free means: the answer is one tap from every place the word is used. */}
+      <SosFreeExplainer tone={tone} style={{ margin: '0.35rem auto 0', textAlign: 'inherit' }} />
     </div>
   );
 }
@@ -113,14 +116,14 @@ const panels: Panel[] = [
     emoji: '🌿',
     title: 'O que tem dentro',
     badge: '100% plant-based',
-    glance: 'Vegano, sem glúten e o açúcar de cada doce à vista',
+    glance: 'Vegano, SOS-free e sem glúten',
     body: (
       <>
         <div>
           {[
             ['🌱', '100% plant-based', 'Nenhum ingrediente de origem animal.'],
-            ['🍯', 'Adoçado com frutas*', 'Tâmaras, açúcar de coco ou rapadura. Sem sal e sem óleo.'],
-            ['🌾', 'Ingredientes integrais*', 'Ingredientes premium, escolhidos com foco em saúde.'],
+            ['🌾', 'SOS-free*', 'Sem sal, sem óleo e sem açúcar refinado. A doçura vem de tâmaras, frutas, açúcar de coco ou rapadura.'],
+            ['🍯', 'Para ocasiões especiais', 'Doce não é para todo dia. É para celebrar sem bagunçar a saúde.'],
             ['✨', 'Sem glúten**', 'Receitas sem ingredientes com glúten.'],
           ].map(([emoji, name, text]) => (
             <div key={name} style={{ display: 'flex', gap: '0.85rem', padding: '0.65rem 0', borderBottom: '1px dashed rgba(60,42,33,0.2)' }}>

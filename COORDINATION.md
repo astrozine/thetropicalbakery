@@ -111,17 +111,23 @@ Verified live, 2026-09-26:
   (`styleToggles`, `RefineState.raw` / `.wholeFood`), then the kinds. `/menu?raw=1`, `/menu?integral=1`. The old
   "Todos / Raw / Do forno" switch (`RawSwitch.tsx`) is gone: please don't add another row of controls to that page.
 - **Sugar and caffeine per treat (2026-09-30).** Not allergens. `treats.sugars` is a LIST (migration_33): nenhum | fruta | coco | rapadura |
-  cristal. **Integral (whole food) is derived, never stored:** no 'cristal' = integral. 'cristal' comes with the industrial vegan chocolates
-  (milk, white, caramel, most dark), and those treats say "Vegano, não integral" (tag on the photo, `TreatTags`; explanation in `TreatInfo`).
+  cristal. **SOS-free is derived, never stored** (code still calls it `isWholeFood` / `wholeFood`): no 'cristal' = SOS-free. 'cristal'
+  comes with the industrial vegan chocolate (milk, white, caramel, most dark), and those treats say "🍫 Com chocolate vegano" (tag on the
+  photo, `TreatTags`; explanation in `TreatInfo`). The menu pill is "🌾 SOS-free", `/menu?sos=1` (`?integral=1` still works).
   `caffeine` = sem | pouca | com (migration 32, run). All in `src/lib/sugarCaffeine.ts`; the "Açúcar e cafeína" folder keeps only
   Sem açúcar adicionado / Sem cafeína / Sem café. Unknown never counts as integral or "sem". Edited with `SugarCaffeineFields` (suggests
   from ingredients, asks about unlabelled chocolate). **Migration 33 is RUN** (`treats.sugars` answers, 2026-09-30; the old
   `treats.sugar` column stays, unused).
-- **Never write "sem açúcar refinado", "SOS-free" or "sem processados" about OUR treats or boxes again (Andrew, 2026-09-30).**
-  The industrial vegan chocolates carry crystal sugar, so it isn't true of every treat. What IS true of all of them: vegan, no gluten in
-  the recipes. Short lines say only that; where sugar matters, say "adoçado com tâmaras, açúcar de coco ou rapadura; os doces com
-  chocolate vegano industrializado aparecem como 'Vegano, não integral'" (see PhilosophyShowcase's footnote). Still fine: teaching
-  claims (courses/retreats teach cooking without refined sugar), the SOS concept in InspirationSection, customer diet labels.
+- **How we talk about sugar and SOS-free (Andrew, 2026-09-30).** The ONE refined ingredient is the industrial vegan chocolate Dolly buys
+  ready (it has sugar and oil); every other recipe is SOS-free: no salt, no oil, no refined sugar, sweetened with dates/fruit, coconut sugar
+  or rapadura. So:
+  - Never "SOS-free", "sem açúcar refinado" or "sem processados" about ALL treats or a whole box without naming the chocolate exception.
+    Short lines (taglines, e-mails, share texts) say only what's true of everything: vegan, gluten-free recipes, handmade.
+  - Never use "SOS-free" without `<SosFreeExplainer />` nearby: most people don't know the term. Its words live in `SOS_EXPLAINER`
+    (sugarCaffeine.ts): credit Alan Goldhamer (TrueNorth Health Center), say ours is a softer version (coconut sugar and rapadura are in),
+    name the chocolate exception, and the stance: treats are for special occasions, celebrating without wrecking your health.
+  - Never imply any link with Goldhamer or TrueNorth.
+  - Still fine: teaching claims (courses/retreats teach cooking without refined sugar), customer diet labels.
 - **Sweet Escape e-book (written 2026-09-30).** English sales page `/sweet-escape` (`src/components/ebook/`), price and
   recipes in `src/lib/ebook.ts`. Orders go through `createEbookOrder` (`src/lib/payments/ebook.ts`): server price, saved in
   `orders` with `order_kind = 'ebook'`, reference `EBK…`. Buyers get `/sweet-escape/thank-you?ref=…&k=…` (`k` = HMAC of the
