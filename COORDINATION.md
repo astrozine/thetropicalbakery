@@ -139,6 +139,8 @@ Verified live, 2026-09-26:
   **Stripe (written 2026-10-01, e-book only):** `src/lib/payments/stripe.ts` (hosted Checkout in USD, no SDK), `POST /api/pay/stripe/confirm`,
   signed `/api/webhooks/stripe`. Needs `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` (`web-app/SETUP_stripe.md`); until set, `/api/pay/methods` says
   `stripe: false` and nothing changes. When on, the en/es/nl pages offer it and show US$ 9 (the pt page stays on Mercado Pago/Pix in R$).
+  Two accounts supported: A = `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` (Dolly), B = `…_B` (Andrew), `STRIPE_ACTIVE_ACCOUNT=A|B` picks who takes new
+  payments; payments/webhooks are recognised on either.
   The order's `total_price` stays the BRL list price (47); the dollars are verified against Stripe (`EBOOK.priceUSD`) and noted in `items_summary`.
   **Languages:** the BOOK exists in four languages (PDFs `sweet-escape-en|pt-br|es|nl.pdf` in the `ebooks` bucket, `BOOK_FILES` in
   `src/lib/ebook.ts`; missing file = English). The sales page is hand-written in the same four: English (`/sweet-escape`),

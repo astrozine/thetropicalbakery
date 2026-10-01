@@ -12,15 +12,37 @@ import { EBOOK } from '@/lib/ebook';
  *    right amount, right currency;
  *  - the webhook is signed, and even then we re-read the session from Stripe before marking anything paid.
  *
- * Env (Vercel only, never NEXT_PUBLIC_): STRIPE_SECRET_KEY (sk_live_… / sk_test_…), STRIPE_WEBHOOK_SECRET (whsec_…).
+ * Env (Vercel only, never NEXT_PUBLIC_): two optional accounts, so the money can go to either and we can switch
+ * without re-pasting secrets:
+ *   account A: STRIPE_SECRET_KEY,   STRIPE_WEBHOOK_SECRET     (sk_live_… / whsec_…)
+ *   account B: STRIPE_SECRET_KEY_B, STRIPE_WEBHOOK_SECRET_B
+ *   STRIPE_ACTIVE_ACCOUNT = A | B   which one takes NEW payments (default A).
+ * Payments are always recognised on EITHER account (the session is looked up with each key in turn and the webhook
+ * is accepted from either), so a buyer who started paying just before a switch is never left locked out.
  */
 
 const API = 'https://api.stripe.com/v1';
 
-export const stripeConfigured = () => !!process.env.STRIPE_SECRET_KEY;
+interface StripeAccount { id: 'A' | 'B'; secret: string; webhook: string }
 
-const headers = () => ({
-  Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+/** The accounts that have a secret key, the active one first. */
+function accounts(): StripeAccount[] {
+  const all = ([
+    { id: 'A', secret: process.env.STRIPE_SECRET_KEY || '', webhook: process.env.STRIPE_WEBHOOK_SECRET || '' },
+    { id: 'B', secret: process.env.STRIPE_SECRET_KEY_B || '', webhook: process.env.STRIPE_WEBHOOK_SECRET_B || '' },
+  ] as StripeAccount[]).filter(a => a.secret);
+  const active = (process.env.STRIPE_ACTIVE_ACCOUNT || 'A').trim().toUpperCase();
+  return all.sort((x, y) => (x.id === active ? -1 : 0) - (y.id === active ? -1 : 0));
+}
+
+/** True only if the account chosen as active has its key (a typo in STRIPE_ACTIVE_ACCOUNT must not switch money elsewhere). */
+export const stripeConfigured = () => {
+  const active = (process.env.STRIPE_ACTIVE_ACCOUNT || 'A').trim().toUpperCase();
+  return accounts().some(a => a.id === active);
+};
+
+const headers = (secret: string) => ({
+  Authorization: `Bearer ${secret}`,
   'Content-Type': 'application/x-www-form-urlencoded',
 });
 
@@ -40,9 +62,11 @@ export interface StripeCheckoutInput {
 
 /** Creates the Stripe payment page for an e-book order and returns the address to send the buyer to. */
 export async function createStripeCheckout(o: StripeCheckoutInput): Promise<string> {
+  const account = accounts()[0];
+  if (!account || !stripeConfigured()) throw new Error('Stripe is not configured.');
   const res = await fetch(`${API}/checkout/sessions`, {
     method: 'POST',
-    headers: { ...headers(), 'Idempotency-Key': `tb-${o.reference}` },
+    headers: { ...headers(account.secret), 'Idempotency-Key': `tb-${o.reference}` },
     body: form({
       mode: 'payment',
       'line_items[0][quantity]': '1',
@@ -74,9 +98,13 @@ export async function createStripeCheckout(o: StripeCheckoutInput): Promise<stri
 export async function confirmStripeSession(sessionId: string): Promise<{ ok: boolean; status: string; reference?: string }> {
   if (!/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sessionId)) return { ok: false, status: 'invalid' };
 
-  const res = await fetch(`${API}/checkout/sessions/${sessionId}`, { headers: headers() });
-  if (!res.ok) return { ok: false, status: 'not_found' };
-  const session = await res.json();
+  // The session belongs to whichever account created it: try each configured account's key in turn.
+  let session: Record<string, unknown> | null = null;
+  for (const account of accounts()) {
+    const res = await fetch(`${API}/checkout/sessions/${sessionId}`, { headers: headers(account.secret) });
+    if (res.ok) { session = await res.json(); break; }
+  }
+  if (!session) return { ok: false, status: 'not_found' };
 
   const reference = String(session.client_reference_id || '');
   const status = String(session.payment_status || '');
@@ -102,13 +130,16 @@ export async function confirmStripeSession(sessionId: string): Promise<{ ok: boo
  * everything (unlike Mercado Pago's, this one has no safe "unsigned" mode: the return page works without it).
  */
 export function verifyStripeSignature(rawBody: string, header: string | null): boolean {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!secret || !header) return false;
+  // Either account's signing secret is accepted (they sign with their own).
+  const secrets = accounts().map(a => a.webhook).filter(Boolean);
+  if (secrets.length === 0 || !header) return false;
   const parts = header.split(',').map(p => p.trim().split('=') as [string, string]);
   const t = parts.find(([k]) => k === 't')?.[1];
   const sigs = parts.filter(([k]) => k === 'v1').map(([, v]) => v);
   if (!t || sigs.length === 0) return false;
   if (Math.abs(Date.now() / 1000 - Number(t)) > 300) return false;
-  const expected = crypto.createHmac('sha256', secret).update(`${t}.${rawBody}`).digest('hex');
-  return sigs.some(s => s.length === expected.length && crypto.timingSafeEqual(Buffer.from(s), Buffer.from(expected)));
+  return secrets.some(secret => {
+    const expected = crypto.createHmac('sha256', secret).update(`${t}.${rawBody}`).digest('hex');
+    return sigs.some(s => s.length === expected.length && crypto.timingSafeEqual(Buffer.from(s), Buffer.from(expected)));
+  });
 }

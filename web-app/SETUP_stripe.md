@@ -47,6 +47,20 @@ Then **Deployments → latest → ⋯ → Redeploy** (Vercel only reads new vari
 2. In Vercel replace both values with the live ones. Redeploy.
 3. Buy it once with a real card, then refund yourself in Stripe (Payments → the payment → Refund).
 
+## Two Stripe accounts, and switching between them
+The site can hold **two** Stripe accounts at once and send new payments to whichever one is *active*:
+
+| Vercel variable | Value |
+|---|---|
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | **account A** (Dolly's) |
+| `STRIPE_SECRET_KEY_B` / `STRIPE_WEBHOOK_SECRET_B` | **account B** (Andrew's) |
+| `STRIPE_ACTIVE_ACCOUNT` | `A` or `B`: who takes **new** payments (blank = A) |
+
+To switch: change `STRIPE_ACTIVE_ACCOUNT` and **redeploy**. Nothing else moves. Each account needs its own secret key and its
+own webhook destination (same URL, same two events), and its own `whsec_…`. A payment is always recognised on either account,
+so a buyer who started paying just before a switch is still unlocked. If `STRIPE_ACTIVE_ACCOUNT` names an account whose key is
+missing, Stripe simply turns itself off (it never falls back to the other account's money).
+
 ## Good to know
 - **Fees:** Stripe takes a percentage plus a small fixed fee per sale (more for international cards and currency conversion). See the current rates in the dashboard; it's roughly 6% of a US$ 9 sale.
 - **Refunds** (the 7-day promise) are done in Stripe. The site doesn't lock the download afterwards.
