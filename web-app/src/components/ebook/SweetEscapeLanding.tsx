@@ -6,13 +6,12 @@ import MobileBuyBar from '@/components/MobileBuyBar';
 import RainbowJourney from './RainbowJourney';
 import EbookBuyBox from './EbookBuyBox';
 import { EnglishNotice, LangBar, rich, useGoogleTranslated } from './EbookLang';
-import { BAKERY_TREAT_PRICE_BRL, EBOOK, RECIPES, TOTAL_TREATS } from '@/lib/ebook';
+import { BAKERY_TREAT_PRICE_BRL, BRL_PER_USD, EBOOK, RECIPES, TOTAL_TREATS } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import './sweetEscape.css';
 
 const IMG = '/ebook/sweet-escape';
-const price = `R$ ${EBOOK.priceBRL}`;
 const brl = (n: number) => `R$ ${n.toLocaleString('pt-BR')}`;
 
 const BLOCK_ICONS = ['🥥', '🌴', '🌾', '✨', '🍓', '🌈'];
@@ -35,7 +34,14 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
   const translated = useGoogleTranslated();
   // Anyone not reading our English original is told, in their language, that the book is English.
   const foreign = lang !== 'en' || translated;
-  const v = { price, pages: EBOOK.pages, n: TOTAL_TREATS, each: brl(BAKERY_TREAT_PRICE_BRL), usd: EBOOK.priceUSDApprox };
+  // English readers see dollars (we still charge R$ 47; the form says so). Everyone else sees reais.
+  const dollars = lang === 'en';
+  const reais = `R$ ${EBOOK.priceBRL}`;
+  const price = dollars ? `US$ ${EBOOK.priceUSD}` : reais;
+  const eachUsd = Math.round(BAKERY_TREAT_PRICE_BRL / BRL_PER_USD);
+  const each = dollars ? `US$ ${eachUsd}` : brl(BAKERY_TREAT_PRICE_BRL);
+  const bakeryValue = dollars ? `US$ ${(TOTAL_TREATS * eachUsd).toLocaleString('en-US')}` : brl(TOTAL_TREATS * BAKERY_TREAT_PRICE_BRL);
+  const v = { price, reais, pages: EBOOK.pages, n: TOTAL_TREATS, each, usd: EBOOK.priceUSD };
 
   useEffect(() => {
     trackMeta('ViewContent', { value: EBOOK.priceBRL, content_name: EBOOK.id, content_type: 'product' });
@@ -170,7 +176,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
           <h2 className="se-h2">{fill(c.math.title, v)}</h2>
           <div className="se-math">
             <div><b>{TOTAL_TREATS}</b><span>{c.math.treats}</span></div>
-            <div><b>{brl(TOTAL_TREATS * BAKERY_TREAT_PRICE_BRL)}</b><span>{fill(c.math.bakery, v)}</span></div>
+            <div><b>{bakeryValue}</b><span>{fill(c.math.bakery, v)}</span></div>
             <div className="is-hot"><b>{price}</b><span>{c.math.book}</span></div>
           </div>
           <p className="se-small">{c.math.small}</p>

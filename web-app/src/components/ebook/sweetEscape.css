@@ -332,3 +332,4 @@
 }
 .se-langbar__suggest { position: relative; padding-right: 52px; }
 .se-langbar__suggest .se-langbar__x { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); }
+.se-currency { margin: 0; font-size: 0.82rem; line-height: 1.5; color: #6b564a; }

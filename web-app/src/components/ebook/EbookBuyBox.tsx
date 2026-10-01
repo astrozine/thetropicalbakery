@@ -19,7 +19,9 @@ interface PixResult { reference: string; key: string; payload: string; base64: s
 export default function EbookBuyBox({ lang = 'en', needsEnglishTick = false }: { lang?: EbookLang; needsEnglishTick?: boolean }) {
   const c = EBOOK_COPY[lang];
   const f = c.form;
-  const price = `R$ ${EBOOK.priceBRL}`;
+  // English readers see dollars; we charge reais either way (the Pix screen always shows reais).
+  const reais = `R$ ${EBOOK.priceBRL}`;
+  const price = lang === 'en' ? `US$ ${EBOOK.priceUSD}` : reais;
 
   const [methods, setMethods] = useState<{ card: boolean; paypal: boolean }>({ card: false, paypal: false });
   const [method, setMethod] = useState<Method>('pix');
@@ -86,7 +88,7 @@ export default function EbookBuyBox({ lang = 'en', needsEnglishTick = false }: {
     const thanks = `${EBOOK.thanksPath}?ref=${pix.reference}&k=${pix.key}&provider=pix&lang=${lang}`;
     return (
       <div className="se-pix">
-        <p className="se-pix__title">{fill(f.pixTitle, { price })}</p>
+        <p className="se-pix__title">{fill(f.pixTitle, { price: reais })}</p>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="se-pix__qr" src={pix.base64} alt="Pix QR code" width={220} height={220} />
         <p className="se-pix__label">{f.pixLabel}</p>
@@ -129,6 +131,8 @@ export default function EbookBuyBox({ lang = 'en', needsEnglishTick = false }: {
           </label>
         ))}
       </fieldset>
+
+      {f.currencyNote && <p className="se-currency">{fill(f.currencyNote, { reais })}</p>}
 
       {needsEnglishTick && (
         <label className={`se-tick${english ? ' is-on' : ''}`}>

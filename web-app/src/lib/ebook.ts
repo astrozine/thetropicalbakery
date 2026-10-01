@@ -12,8 +12,8 @@ export const EBOOK = {
   lineName: 'E-book Sweet Escape (PDF)',
   author: 'Dolly',
   priceBRL: 47,
-  /** Rough, for visitors who think in dollars. Card and PayPal charge in reais and convert for them. */
-  priceUSDApprox: 9,
+  /** What English readers see. We still CHARGE priceBRL (card and PayPal convert for them), so keep this near priceBRL / BRL_PER_USD. */
+  priceUSD: 9,
   pages: 72,
   language: 'English',
   /** Private Supabase Storage bucket and file (migration_34). Uploaded by hand, see SETUP_ebook.md. */
@@ -23,6 +23,9 @@ export const EBOOK = {
   pagePath: '/sweet-escape',
   thanksPath: '/sweet-escape/thank-you',
 } as const;
+
+/** Rough exchange rate, only for showing dollar amounts to English readers (never used to charge anything). */
+export const BRL_PER_USD = 5.2;
 
 /** One store price for a treat, used only to show what a batch would cost if bought ready-made. */
 export const BAKERY_TREAT_PRICE_BRL = 25;

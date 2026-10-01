@@ -49,7 +49,7 @@ export interface EbookCopy {
   form: {
     name: string; email: string; emailNote: string; whatsapp: string; optional: string; payLegend: string;
     card: string; cardNote: string; pix: string; pixMethodNote: string; paypal: string; paypalNote: string;
-    submit: string; busy: string; fine: string; errName: string; errEmail: string; errGeneric: string;
+    submit: string; busy: string; fine: string; currencyNote: string; errName: string; errEmail: string; errGeneric: string;
     pixTitle: string; pixLabel: string; pixCopy: string; pixCopied: string; pixNote: string; pixPaid: string;
   };
   thanks: {
@@ -161,7 +161,7 @@ const EN: EbookCopy = {
     ],
     promiseDays: 'days', promiseTitle: 'The sweet promise',
     promiseText: 'Make one recipe. If it doesn’t win you over, write to us within 7 days and get every centavo back.',
-    coverAlt: 'Sweet Escape e-book cover', usd: '≈ US$ {usd} · one payment · PDF',
+    coverAlt: 'Sweet Escape e-book cover', usd: 'one payment · PDF · charged as {reais}',
   },
   faq: {
     kicker: 'Questions', title: 'Good to know',
@@ -188,6 +188,7 @@ const EN: EbookCopy = {
     card: 'Card', cardNote: 'instant download', pix: 'Pix', pixMethodNote: 'Brazil · confirmed by hand', paypal: 'PayPal', paypalNote: 'from anywhere',
     submit: 'Yes! Send me Sweet Escape · {price}', busy: 'One moment…',
     fine: '🔒 Secure payment · PDF by e-mail · 7-day money-back promise',
+    currencyNote: 'Prices in US$ are approximate. We charge {reais} (Brazilian reais) and your card or PayPal converts it at their own rate.',
     errName: 'Please tell us your name.', errEmail: 'Please check your e-mail: that is where your book goes.', errGeneric: 'Something went wrong. Please try again.',
     pixTitle: 'Almost yours! Pay {price} with Pix', pixLabel: 'Or Pix copia e cola:', pixCopy: 'Copy the Pix code', pixCopied: 'Copied ✓',
     pixNote: 'We also e-mailed this code and your personal download link to **{email}**. Dolly confirms Pix payments by hand, usually within a few hours, and your link unlocks itself.',
@@ -351,6 +352,7 @@ const PT: EbookCopy = {
     card: 'Cartão', cardNote: 'download na hora', pix: 'Pix', pixMethodNote: 'confirmado à mão', paypal: 'PayPal', paypalNote: 'de qualquer país',
     submit: 'Sim! Quero o Sweet Escape · {price}', busy: 'Um momento…',
     fine: '🔒 Pagamento seguro · PDF por e-mail · garantia de 7 dias',
+    currencyNote: '',
     errName: 'Conta pra gente o seu nome.', errEmail: 'Confira o seu e-mail: é para lá que o livro vai.', errGeneric: 'Algo deu errado. Tente de novo.',
     pixTitle: 'Quase seu! Pague {price} no Pix', pixLabel: 'Ou Pix copia e cola:', pixCopy: 'Copiar o código Pix', pixCopied: 'Copiado ✓',
     pixNote: 'Também mandamos este código e o seu link de download para **{email}**. A Dolly confirma o Pix à mão, normalmente em poucas horas, e o seu link se libera sozinho.',
@@ -514,6 +516,7 @@ const ES: EbookCopy = {
     card: 'Tarjeta', cardNote: 'descarga al instante', pix: 'Pix', pixMethodNote: 'Brasil · confirmado a mano', paypal: 'PayPal', paypalNote: 'desde cualquier país',
     submit: '¡Sí! Quiero Sweet Escape · {price}', busy: 'Un momento…',
     fine: '🔒 Pago seguro · PDF por e-mail · garantía de 7 días',
+    currencyNote: '',
     errName: 'Dinos tu nombre, por favor.', errEmail: 'Revisa tu e-mail: ahí es donde llega tu libro.', errGeneric: 'Algo salió mal. Inténtalo de nuevo.',
     pixTitle: '¡Casi tuyo! Paga {price} con Pix', pixLabel: 'O Pix copia e cola:', pixCopy: 'Copiar el código Pix', pixCopied: 'Copiado ✓',
     pixNote: 'También enviamos este código y tu enlace de descarga a **{email}**. Dolly confirma los pagos Pix a mano, normalmente en pocas horas, y tu enlace se desbloquea solo.',
