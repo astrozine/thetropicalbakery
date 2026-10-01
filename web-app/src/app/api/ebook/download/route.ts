@@ -11,7 +11,8 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const ref = req.nextUrl.searchParams.get('ref') || '';
   const k = req.nextUrl.searchParams.get('k') || '';
-  const back = new URL(`${EBOOK.thanksPath}?ref=${encodeURIComponent(ref)}&k=${encodeURIComponent(k)}`, req.nextUrl.origin);
+  const lang = (req.nextUrl.searchParams.get('lang') || 'en').replace(/[^a-z]/g, '').slice(0, 2);
+  const back = new URL(`${EBOOK.thanksPath}?ref=${encodeURIComponent(ref)}&k=${encodeURIComponent(k)}&lang=${lang}`, req.nextUrl.origin);
 
   try {
     if (!validKey(ref, k)) return NextResponse.redirect(new URL(EBOOK.pagePath, req.nextUrl.origin));

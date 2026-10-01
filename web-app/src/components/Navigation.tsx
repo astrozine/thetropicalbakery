@@ -7,6 +7,8 @@ import { useCart } from '@/context/CartContext';
 import AccountMenu from '@/components/AccountMenu';
 import { SUB_STYLE } from '@/components/ClubeInvite';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
+import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
+import { clearGoogleTranslate as clearEbookTranslation } from '@/components/ebook/EbookLang';
 
 // Desktop menu (xl and up): one line at 1280px, roomier on bigger screens.
 const GAP = 'clamp(0.7rem, 1.1vw, 1.5rem)';
@@ -35,6 +37,13 @@ export default function Navigation() {
   const closeMenu = () => setIsOpen(false);
 
   const changeLanguage = (langCode: string) => {
+    // The e-book page is written in English with hand-made Portuguese and Spanish versions; Google Translate
+    // can't produce Portuguese from it (it thinks every page already is). Send people to the real version.
+    if (pathname?.startsWith('/sweet-escape') && !pathname.includes('/thank-you')) {
+      clearEbookTranslation();
+      window.location.href = isEbookLang(langCode) ? LANG_PATH[langCode] : `${LANG_PATH.en}?tl=${langCode}`;
+      return;
+    }
     if (langCode === 'pt') {
       // The site's own language: asking Google Translate to translate
       // Portuguese into Portuguese doesn't no-op, it actually runs the
@@ -64,7 +73,7 @@ export default function Navigation() {
     { name: 'Menu de Eventos', path: '/menu' },
     { name: 'Retiros', path: '/retreats' },
     { name: 'Chef Dolly', path: '/dolly' },
-    { name: 'E-book', path: '/sweet-escape' },
+    { name: 'E-book', path: '/sweet-escape/pt' },
   ];
 
   // A course Dolly has hidden in the admin ("em preparo") leaves this menu too.

@@ -5,6 +5,7 @@ import { OrderError } from './order';
 import { EBOOK } from '@/lib/ebook';
 import { generatePixData } from '@/utils/pix';
 import { sendEbookOrderReceived } from '@/lib/email/ebookReceipts';
+import { isEbookLang, type EbookLang } from '@/lib/ebookCopy';
 
 /**
  * Selling the e-book. Same rules as a box order (lib/payments/order.ts): the browser says who is buying and
@@ -22,6 +23,8 @@ export interface EbookOrderInput {
   email?: string;
   whatsapp?: string;
   payMethod?: string;
+  /** Which version of the page they bought from: the e-mails and download page follow it. */
+  lang?: string;
 }
 
 const text = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max);
@@ -44,15 +47,27 @@ export function validKey(reference: string, key: string): boolean {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
-export function thanksUrl(site: string, reference: string): string {
-  return `${site}${EBOOK.thanksPath}?ref=${reference}&k=${ebookKey(reference)}`;
+export function thanksUrl(site: string, reference: string, lang: EbookLang = 'en'): string {
+  return `${site}${EBOOK.thanksPath}?ref=${reference}&k=${ebookKey(reference)}&lang=${lang}`;
 }
+
+/**
+ * The buyer's language rides on the order's delivery_address (a free-text field that for an e-book only ever says
+ * "digital delivery"), so the payment webhook, hours later, still knows which language to write the e-mail in.
+ */
+const ADDRESS = 'E-BOOK · entrega digital por e-mail';
+export const ebookAddress = (lang: EbookLang) => `${ADDRESS} · ${lang}`;
+export const langFromAddress = (address: unknown): EbookLang => {
+  const m = /·\s*(en|pt|es)\s*$/.exec(String(address ?? ''));
+  return m && isEbookLang(m[1]) ? m[1] : 'en';
+};
 
 export interface CreatedEbookOrder {
   reference: string;
   key: string;
   total: number;
   method: 'pix' | 'mercadopago' | 'paypal';
+  lang: EbookLang;
   pix?: { payload: string; base64: string };
 }
 
@@ -72,6 +87,7 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
     userId = data.user?.id ?? null;
   }
 
+  const lang: EbookLang = isEbookLang(input.lang) ? input.lang : 'en';
   const method = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : 'pix';
   const total = EBOOK.priceBRL;
   const reference = `EBK${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
@@ -81,7 +97,7 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
     customer_name: name,
     customer_email: email,
     customer_whatsapp: whatsapp,
-    delivery_address: 'E-BOOK · entrega digital por e-mail',
+    delivery_address: ebookAddress(lang),
     requested_date: today,
     total_price: total,
     pix_transaction_id: reference,
@@ -117,12 +133,12 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
   const pix = method === 'pix' ? await generatePixData({ value: total, transactionId: reference }) : undefined;
 
   try {
-    await sendEbookOrderReceived(db, { reference, customerName: name, customerEmail: email, total, method, pixPayload: pix?.payload ?? null, key: ebookKey(reference) });
+    await sendEbookOrderReceived(db, { reference, customerName: name, customerEmail: email, total, method, pixPayload: pix?.payload ?? null, key: ebookKey(reference), lang });
   } catch (e) {
     console.error('createEbookOrder: receipt e-mail failed (order is saved):', e);
   }
 
-  return { reference, key: ebookKey(reference), total, method, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
+  return { reference, key: ebookKey(reference), total, method, lang, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
 }
 
 export interface EbookAccess {

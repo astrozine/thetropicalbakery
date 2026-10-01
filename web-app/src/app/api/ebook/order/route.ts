@@ -29,10 +29,10 @@ export async function POST(req: NextRequest) {
 
     const saved = await findOrder(order.reference);
     if (!saved) throw new Error('order vanished after saving');
-    const opts = { returnUrl: thanksUrl(siteUrl(), order.reference), title: `${EBOOK.title} e-book (PDF) · The Tropical Bakery` };
+    const opts = { returnUrl: thanksUrl(siteUrl(), order.reference, order.lang), title: `${EBOOK.title} e-book (PDF, English) · The Tropical Bakery` };
     const url = order.method === 'mercadopago'
       ? await createMercadoPagoCheckout(saved, opts)
-      : await createPayPalCheckout(saved, { ...opts, locale: 'en-US' });
+      : await createPayPalCheckout(saved, { ...opts, locale: order.lang === 'pt' ? 'pt-BR' : order.lang === 'es' ? 'es-ES' : 'en-US' });
     return NextResponse.json({ ok: true, ...order, url });
   } catch (e) {
     if (e instanceof OrderError) return NextResponse.json({ error: e.message }, { status: e.status });

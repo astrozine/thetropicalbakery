@@ -4,36 +4,47 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { EBOOK } from '@/lib/ebook';
+import { EBOOK_COPY, fill, isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
+import { rich } from './EbookLang';
 import './sweetEscape.css';
 
 type Phase = 'checking' | 'paid' | 'waiting' | 'failed' | 'unknown';
+
+const NEXT = [
+  { href: '/caixas', img: '/box1.jpg' },
+  { href: '/cursos', img: '/dolly-course1.jpg' },
+  { href: '/retreats', img: '/retreats/real-itamambuca-coast.jpg' },
+];
 
 /**
  * Where every buyer lands: back from Mercado Pago / PayPal, after "I've paid" on Pix, and from the link in
  * the e-mails. Confirms card / PayPal with the provider (never trusting the URL), then waits for the payment
  * and shows the download button. Pix is confirmed by hand, so while waiting it checks again every 20 s.
+ * Speaks the language the buyer read the sales page in (?lang=).
  */
 export default function EbookThanks() {
   const q = useSearchParams();
   const ref = q.get('ref') || '';
   const k = q.get('k') || '';
+  const langParam = q.get('lang');
+  const lang = isEbookLang(langParam) ? langParam : 'en';
+  const c = EBOOK_COPY[lang].thanks;
   const provider = q.get('provider') || '';
   const result = q.get('result') || '';
   const paypalToken = q.get('token') || '';
   const mpPaymentId = q.get('payment_id') || q.get('collection_id') || '';
   const fileError = q.get('erro') === '1';
 
-  const [phase, setPhase] = useState<Phase>('checking');
+  const [phase, setPhase] = useState<Phase>(ref && k ? 'checking' : 'unknown');
   const [firstName, setFirstName] = useState('');
   const [method, setMethod] = useState('');
   const ran = useRef(false);
   const tracked = useRef(false);
 
   useEffect(() => {
-    if (ran.current) return;
+    if (ran.current || !ref || !k) return;
     ran.current = true;
-    if (!ref || !k) { setPhase('unknown'); return; }
     let stop = false;
 
     const check = async (): Promise<Phase> => {
@@ -69,31 +80,28 @@ export default function EbookThanks() {
     return () => { stop = true; };
   }, [ref, k, provider, result, paypalToken, mpPaymentId]);
 
-  const download = `/api/ebook/download?ref=${encodeURIComponent(ref)}&k=${encodeURIComponent(k)}`;
-  const hi = firstName ? `, ${firstName}` : '';
+  const download = `/api/ebook/download?ref=${encodeURIComponent(ref)}&k=${encodeURIComponent(k)}&lang=${lang}`;
+  const name = firstName ? `, ${firstName}` : '';
+  const page = LANG_PATH[lang];
 
   return (
-    <div className="se se-thanks">
+    <div className="se se-thanks" lang={lang}>
       <div className="se-wrap">
         <div className="se-thanks__card">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="se-thanks__cover" src="/ebook/sweet-escape/cover.webp" alt="Sweet Escape e-book cover" />
+          <img className="se-thanks__cover" src="/ebook/sweet-escape/cover.webp" alt="Sweet Escape" />
 
-          {phase === 'checking' && (<><div className="se-spinner" aria-hidden /><h1>Checking your order…</h1><p>This takes a few seconds.</p></>)}
+          {phase === 'checking' && (<><div className="se-spinner" aria-hidden /><h1>{c.checking}</h1><p>{c.checkingSub}</p></>)}
 
           {phase === 'paid' && (
             <>
-              <h1>Welcome to the jungle kitchen{hi}! 🌈</h1>
-              <p>Your copy of <b>Sweet Escape</b> is ready. Save it to your phone or tablet and cook straight from it. This page and the link in your e-mail work whenever you need them.</p>
-              {fileError && <p className="se-error" role="alert">The download didn’t start. Please try once more; if it still fails, message us on WhatsApp and we’ll send it straight away.</p>}
-              <a className="se-btn se-btn--primary se-btn--big" href={download}>Download Sweet Escape (PDF)</a>
+              <h1>{fill(c.paidTitle, { name })}</h1>
+              <p>{rich(c.paidText)}</p>
+              {fileError && <p className="se-error" role="alert">{c.fileError}</p>}
+              <a className="se-btn se-btn--primary se-btn--big" href={download}>{c.download}</a>
               <div className="se-thanks__tips">
-                <b>Where to start</b>
-                <ul>
-                  <li>Read the six rules first: they make every recipe easier.</li>
-                  <li>Day 3, the Red Berry Bliss Balls, needs no oven: perfect with kids.</li>
-                  <li>Soak cashews the night before Days 1, 2 and 6.</li>
-                </ul>
+                <b>{c.startTitle}</b>
+                <ul>{c.start.map(t => <li key={t}>{t}</li>)}</ul>
               </div>
             </>
           )}
@@ -101,51 +109,39 @@ export default function EbookThanks() {
           {phase === 'waiting' && (
             <>
               <div className="se-spinner" aria-hidden />
-              <h1>Thank you{hi}! Almost there</h1>
-              {method === 'pix' || provider === 'pix' ? (
-                <p>Dolly confirms Pix payments by hand, usually within a few hours. Keep this page open or come back from the link in your e-mail: your download unlocks here by itself.</p>
-              ) : (
-                <p>We’re waiting for the payment confirmation. Some banks take a minute or two; this page updates by itself.</p>
-              )}
+              <h1>{fill(c.waitTitle, { name })}</h1>
+              <p>{method === 'pix' || provider === 'pix' ? c.waitPix : c.waitCard}</p>
             </>
           )}
 
           {phase === 'failed' && (
             <>
-              <h1>The payment didn’t go through</h1>
-              <p>Nothing was charged. You can try again with another card, or pay with Pix.</p>
-              <Link className="se-btn se-btn--primary se-btn--big" href={`${EBOOK.pagePath}#buy`}>Try again</Link>
+              <h1>{c.failedTitle}</h1>
+              <p>{c.failedText}</p>
+              <Link className="se-btn se-btn--primary se-btn--big" href={`${page}#buy`}>{c.retry}</Link>
             </>
           )}
 
           {phase === 'unknown' && (
             <>
-              <h1>We couldn’t find this order</h1>
-              <p>Please open the link from your e-mail again. If you paid and it still doesn’t work, message us on WhatsApp with your e-mail address and we’ll sort it out.</p>
-              <Link className="se-btn se-btn--primary" href={EBOOK.pagePath}>Back to Sweet Escape</Link>
+              <h1>{c.unknownTitle}</h1>
+              <p>{c.unknownText}</p>
+              <Link className="se-btn se-btn--primary" href={page}>{c.back}</Link>
             </>
           )}
         </div>
 
         {phase === 'paid' && (
           <div className="se-next">
-            <h2>Want someone else to do the baking?</h2>
+            <h2>{c.nextTitle}</h2>
             <div className="se-next__grid">
-              <Link href="/caixas">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/box1.jpg" alt="" loading="lazy" />
-                <div><b>The Tasting Box</b><span>Dolly’s treats, fresh from our kitchen in Itamambuca.</span></div>
-              </Link>
-              <Link href="/cursos">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/dolly-course1.jpg" alt="" loading="lazy" />
-                <div><b>Cook with Dolly</b><span>Hands-on courses to go further than the book.</span></div>
-              </Link>
-              <Link href="/retreats">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/retreats/real-itamambuca-coast.jpg" alt="" loading="lazy" />
-                <div><b>The retreat</b><span>Cook in the jungle kitchen itself, steps from the beach.</span></div>
-              </Link>
+              {NEXT.map((n, i) => (
+                <Link key={n.href} href={n.href}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={n.img} alt="" loading="lazy" />
+                  <div><b>{c.next[i].title}</b><span>{c.next[i].text}</span></div>
+                </Link>
+              ))}
             </div>
           </div>
         )}
