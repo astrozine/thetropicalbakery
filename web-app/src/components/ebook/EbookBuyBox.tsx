@@ -7,7 +7,7 @@ import { EBOOK_COPY, EBOOK_LANGS, LANG_LABEL, fill, type EbookLang } from '@/lib
 import { trackMeta } from '@/lib/metaPixel';
 import { EnglishNotice, rich } from './EbookLang';
 
-type Method = 'card' | 'pix' | 'paypal';
+type Method = 'card' | 'pix' | 'paypal' | 'stripe';
 
 interface PixResult { reference: string; key: string; payload: string; base64: string }
 
@@ -20,11 +20,11 @@ interface PixResult { reference: string; key: string; payload: string; base64: s
 export default function EbookBuyBox({ lang = 'en', translated = false }: { lang?: EbookLang; translated?: boolean }) {
   const c = EBOOK_COPY[lang];
   const f = c.form;
-  // English readers see dollars; we charge reais either way (the Pix screen always shows reais).
+  // Stripe charges US dollars; Pix, Mercado Pago and PayPal charge reais. The button always shows what the chosen way charges.
   const reais = `R$ ${EBOOK.priceBRL}`;
-  const price = lang === 'en' ? `US$ ${EBOOK.priceUSD}` : reais;
+  const dollars = `US$ ${EBOOK.priceUSD}`;
 
-  const [methods, setMethods] = useState<{ card: boolean; paypal: boolean }>({ card: false, paypal: false });
+  const [methods, setMethods] = useState<{ card: boolean; paypal: boolean; stripe: boolean }>({ card: false, paypal: false, stripe: false });
   const [method, setMethod] = useState<Method>('pix');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -37,13 +37,16 @@ export default function EbookBuyBox({ lang = 'en', translated = false }: { lang?
   const [error, setError] = useState('');
   const [pix, setPix] = useState<PixResult | null>(null);
   const [copied, setCopied] = useState(false);
+  const price = method === 'stripe' ? dollars : reais;
 
   useEffect(() => {
     fetch('/api/pay/methods', { cache: 'no-store' })
       .then(r => r.json())
       .then(m => {
-        setMethods({ card: !!m.card, paypal: !!m.paypal });
-        if (m.card) setMethod('card');
+        setMethods({ card: !!m.card, paypal: !!m.paypal, stripe: !!m.stripe });
+        // Outside Brazil, a card goes through Stripe (any card, in dollars); in Portuguese, through Mercado Pago.
+        if (m.stripe && lang !== 'pt') setMethod('stripe');
+        else if (m.card) setMethod('card');
       })
       .catch(() => {});
     // Signed in? Fill in what we know and link the order to their account.
@@ -104,7 +107,8 @@ export default function EbookBuyBox({ lang = 'en', translated = false }: { lang?
   }
 
   const options: { id: Method; label: string; note: string; show: boolean }[] = [
-    { id: 'card', label: f.card, note: f.cardNote, show: methods.card },
+    { id: 'stripe', label: f.card, note: 'Visa · Mastercard · Apple Pay · Google Pay', show: methods.stripe && lang !== 'pt' },
+    { id: 'card', label: f.card, note: f.cardNote, show: methods.card && (lang === 'pt' || !methods.stripe) },
     { id: 'pix', label: f.pix, note: f.pixMethodNote, show: true },
     { id: 'paypal', label: f.paypal, note: f.paypalNote, show: methods.paypal },
   ];
@@ -145,7 +149,7 @@ export default function EbookBuyBox({ lang = 'en', translated = false }: { lang?
         ))}
       </fieldset>
 
-      {f.currencyNote && <p className="se-currency">{fill(f.currencyNote, { reais })}</p>}
+      {f.currencyNote && method !== 'stripe' && <p className="se-currency">{fill(f.currencyNote, { reais, usd: EBOOK.priceUSD })}</p>}
 
       {needsEnglishTick && <EnglishNotice lang={lang} />}
       {needsEnglishTick && (

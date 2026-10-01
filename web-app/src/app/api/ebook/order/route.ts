@@ -4,12 +4,13 @@ import { createEbookOrder, thanksUrl, type EbookOrderInput } from '@/lib/payment
 import { findOrder, siteUrl } from '@/lib/payments/server';
 import { createMercadoPagoCheckout, mercadoPagoConfigured } from '@/lib/payments/mercadopago';
 import { createPayPalCheckout, paypalConfigured } from '@/lib/payments/paypal';
+import { createStripeCheckout, stripeConfigured } from '@/lib/payments/stripe';
 import { EBOOK } from '@/lib/ebook';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Buys the e-book. Body: { name, email, whatsapp?, payMethod: 'pix' | 'card' | 'paypal' }.
+ * Buys the e-book. Body: { name, email, whatsapp?, payMethod: 'pix' | 'card' | 'paypal' | 'stripe' }.
  * The price comes from the server (lib/ebook.ts). Answers with the reference, the download key and either
  * the Pix code or the card / PayPal page to send the buyer to.
  */
@@ -18,6 +19,7 @@ export async function POST(req: NextRequest) {
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'Invalid order.' }, { status: 400 }); }
 
   if (body.payMethod === 'card' && !mercadoPagoConfigured()) return NextResponse.json({ error: 'Card payments are not switched on yet. Please use Pix.' }, { status: 503 });
+  if (body.payMethod === 'stripe' && !stripeConfigured()) return NextResponse.json({ error: 'Card payments are not switched on yet. Please use Pix.' }, { status: 503 });
   if (body.payMethod === 'paypal' && !paypalConfigured()) return NextResponse.json({ error: 'PayPal is not switched on yet. Please use Pix or card.' }, { status: 503 });
 
   const auth = req.headers.get('authorization') || '';
@@ -30,7 +32,9 @@ export async function POST(req: NextRequest) {
     const saved = await findOrder(order.reference);
     if (!saved) throw new Error('order vanished after saving');
     const opts = { returnUrl: thanksUrl(siteUrl(), order.reference, order.lang), title: `${EBOOK.title} e-book (PDF) · The Tropical Bakery` };
-    const url = order.method === 'mercadopago'
+    const url = order.method === 'stripe'
+      ? await createStripeCheckout({ reference: order.reference, email: String(body.email || '').trim(), lang: order.lang, returnUrl: opts.returnUrl })
+      : order.method === 'mercadopago'
       ? await createMercadoPagoCheckout(saved, opts)
       : await createPayPalCheckout(saved, { ...opts, locale: order.lang === 'pt' ? 'pt-BR' : order.lang === 'es' ? 'es-ES' : order.lang === 'nl' ? 'nl-NL' : 'en-US' });
     return NextResponse.json({ ok: true, ...order, url });

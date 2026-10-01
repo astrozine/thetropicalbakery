@@ -34,6 +34,7 @@ export default function EbookThanks() {
   const result = q.get('result') || '';
   const paypalToken = q.get('token') || '';
   const mpPaymentId = q.get('payment_id') || q.get('collection_id') || '';
+  const stripeSession = q.get('session_id') || '';
   const fileError = q.get('erro') === '1';
 
   const [phase, setPhase] = useState<Phase>(ref && k ? 'checking' : 'unknown');
@@ -67,6 +68,8 @@ export default function EbookThanks() {
     (async () => {
       if (provider === 'paypal' && result !== 'cancel' && paypalToken) {
         await fetch('/api/pay/paypal/capture', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: paypalToken, reference: ref }) }).catch(() => null);
+      } else if (provider === 'stripe' && result !== 'cancel' && stripeSession) {
+        await fetch('/api/pay/stripe/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: stripeSession }) }).catch(() => null);
       } else if (provider === 'mercadopago' && mpPaymentId) {
         await fetch('/api/pay/mercadopago/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payment_id: mpPaymentId }) }).catch(() => null);
       }
@@ -80,7 +83,7 @@ export default function EbookThanks() {
       }
     })();
     return () => { stop = true; };
-  }, [ref, k, provider, result, paypalToken, mpPaymentId]);
+  }, [ref, k, provider, result, paypalToken, mpPaymentId, stripeSession]);
 
   const download = `/api/ebook/download?ref=${encodeURIComponent(ref)}&k=${encodeURIComponent(k)}&lang=${lang}`;
   const name = firstName ? `, ${firstName}` : '';

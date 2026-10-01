@@ -64,7 +64,7 @@ export const isPaid = (status: string) => status.toUpperCase() === 'PAID';
  * (which is also what unlocks the pickup address for pickup orders).
  * Safe to call twice: the second call changes nothing.
  */
-export async function markOrderPaid(order: PayableOrder, provider: 'mercadopago' | 'paypal', paymentId: string) {
+export async function markOrderPaid(order: PayableOrder, provider: 'mercadopago' | 'paypal' | 'stripe', paymentId: string) {
   const db = supabaseAdmin();
   if (isPaid(order.status)) return;
 

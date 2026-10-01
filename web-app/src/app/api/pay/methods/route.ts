@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { mercadoPagoConfigured } from '@/lib/payments/mercadopago';
 import { paypalConfigured } from '@/lib/payments/paypal';
+import { stripeConfigured } from '@/lib/payments/stripe';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,5 +14,6 @@ export async function GET() {
   return NextResponse.json({
     card: serviceKey && mercadoPagoConfigured(),
     paypal: serviceKey && paypalConfigured(),
+    stripe: serviceKey && stripeConfigured(),
   });
 }

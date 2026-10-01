@@ -35,8 +35,8 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
   // On the English page, a visitor whose browser translated it (French, German, Italian...) gets the English edition:
   // tell them so in their language. Everyone else is told which editions exist.
   const foreign = translated;
-  // English readers see dollars (we still charge R$ 47; the form says so). Everyone else sees reais.
-  const dollars = lang === 'en';
+  // Everyone but the Portuguese page sees dollars (Stripe charges them; other ways charge R$ 47 and the form says so).
+  const dollars = lang !== 'pt';
   const reais = `R$ ${EBOOK.priceBRL}`;
   const price = dollars ? `US$ ${EBOOK.priceUSD}` : reais;
   const eachUsd = Math.round(BAKERY_TREAT_PRICE_BRL / BRL_PER_USD);

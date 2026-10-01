@@ -75,7 +75,7 @@ export interface CreatedEbookOrder {
   reference: string;
   key: string;
   total: number;
-  method: 'pix' | 'mercadopago' | 'paypal';
+  method: 'pix' | 'mercadopago' | 'paypal' | 'stripe';
   lang: EbookLang;
   book: BookLang;
   pix?: { payload: string; base64: string };
@@ -99,7 +99,10 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
 
   const lang: EbookLang = isEbookLang(input.lang) ? input.lang : 'en';
   const book: BookLang = isBookLang(input.book) ? input.book : 'en';
-  const method = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : 'pix';
+  // 'stripe' charges US dollars (EBOOK.priceUSD); everything else charges reais (EBOOK.priceBRL). The order's
+  // total_price is always the BRL list price so the admin's numbers stay in one currency; the dollars are noted
+  // in items_summary and verified against Stripe itself (lib/payments/stripe.ts).
+  const method = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : input.payMethod === 'stripe' ? 'stripe' : 'pix';
   const total = EBOOK.priceBRL;
   const reference = `EBK${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
   const today = new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
@@ -122,7 +125,7 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
     fulfillment: 'digital',
     user_id: userId,
     delivery_fee: 0,
-    items_summary: `1x ${EBOOK.lineName}`,
+    items_summary: method === 'stripe' ? `1x ${EBOOK.lineName} · US$ ${EBOOK.priceUSD} (Stripe)` : `1x ${EBOOK.lineName}`,
   };
 
   // Newest columns first, then fall back, so a missing migration never loses a sale. `order_type` has only
