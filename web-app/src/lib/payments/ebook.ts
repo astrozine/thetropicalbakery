@@ -4,7 +4,7 @@ import { supabaseAdmin, isPaid } from './server';
 import { OrderError } from './order';
 import { BOOK_FILES, EBOOK, downloadName, isBookLang, type BookLang } from '@/lib/ebook';
 import { generatePixData } from '@/utils/pix';
-import { sendEbookOrderReceived } from '@/lib/email/ebookReceipts';
+import { sendEbookOrderReceived, sendEbookPaid } from '@/lib/email/ebookReceipts';
 import { isEbookLang, type EbookLang } from '@/lib/ebookCopy';
 
 /**
@@ -203,4 +203,19 @@ export async function signedEbookUrl(book: BookLang = 'en'): Promise<string> {
     console.error(`signedEbookUrl: ${BOOK_FILES[lang]} not available:`, error?.message);
   }
   throw new Error('E-book file not available');
+}
+
+/**
+ * The "your book is ready" e-mail for a saved e-book order row. The one place that builds it, used when a card or
+ * PayPal payment is confirmed (markOrderPaid) and when Dolly confirms a Pix by hand in the inbox. Safe to call twice:
+ * email_sends has one row per order and address, so nobody gets it twice.
+ */
+export async function sendPaidEmailForOrder(row: Record<string, unknown>) {
+  const reference = String(row.pix_transaction_id ?? '');
+  await sendEbookPaid(supabaseAdmin(), {
+    reference, key: ebookKey(reference),
+    lang: langFromAddress(row.delivery_address), book: bookFromAddress(row.delivery_address),
+    customerName: String(row.customer_name ?? ''), customerEmail: (row.customer_email as string | null) ?? null,
+    total: Number(row.total_price ?? 0), method: String(row.payment_provider ?? ''),
+  });
 }

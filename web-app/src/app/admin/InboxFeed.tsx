@@ -192,6 +192,18 @@ function useInbox() {
       { source_table: item.source_table, source_id: item.source_id, status: next, updated_at: new Date().toISOString() },
       { onConflict: 'source_table,source_id' },
     );
+    // An e-book paid by Pix: tell the buyer their book is ready. The server ignores every other kind of order,
+    // and never sends it twice, so this is safe to call for any order that moves forward.
+    if (item.source_table === 'orders' && next !== 'new' && next !== 'cancelled') {
+      supabase.auth.getSession().then(({ data }) => {
+        if (!data.session) return;
+        fetch('/api/admin/ebook-paid', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${data.session.access_token}` },
+          body: JSON.stringify({ orderId: item.source_id }),
+        }).catch(() => {});
+      }).catch(() => {});
+    }
   };
 
   /**
