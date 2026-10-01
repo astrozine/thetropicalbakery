@@ -41,8 +41,15 @@ export const stripeConfigured = () => {
   return accounts().some(a => a.id === active);
 };
 
+/**
+ * We pin Stripe's API version instead of using each account's default: an account opened in 2014 would otherwise talk
+ * to us in a 2014 dialect. Both accounts then behave identically.
+ */
+const STRIPE_VERSION = '2025-11-17.clover';
+
 const headers = (secret: string) => ({
   Authorization: `Bearer ${secret}`,
+  'Stripe-Version': STRIPE_VERSION,
   'Content-Type': 'application/x-www-form-urlencoded',
 });
 
