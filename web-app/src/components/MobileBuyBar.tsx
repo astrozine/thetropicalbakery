@@ -28,11 +28,34 @@ interface Props {
  * After ~2 screens of scrolling it collapses to a compact pill (kicker/note
  * fade out) so it stops fighting for attention mid-content. It re-expands near
  * the bottom where a final CTA makes sense again.
+ *
+ * It rides on top of MobileBottomNav, so it tucks away with it while the page is
+ * moving and comes back with it once scrolling stops (same 300 ms settle).
  */
 export default function MobileBuyBar({ kicker, price, note, label, targetId }: Props) {
   const [hidden, setHidden] = useState(true);
   const [compact, setCompact] = useState(false);
+  const [scrolling, setScrolling] = useState(false);
   const raf = useRef(0);
+
+  // Mirrors MobileBottomNav: hide while the finger is moving, return once it stops.
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) < 3) return;
+      lastY = y;
+      setScrolling(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setScrolling(false), 300);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(timer);
+    };
+  }, []);
 
   useEffect(() => {
     document.body.classList.add('has-buybar');
@@ -77,7 +100,7 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
   };
 
   return (
-    <div className={`tb-buybar${compact ? ' tb-buybar--compact' : ''}`} data-hidden={hidden ? 'true' : 'false'}>
+    <div className={`tb-buybar${compact ? ' tb-buybar--compact' : ''}`} data-hidden={hidden ? 'true' : 'false'} data-scrolling={scrolling ? 'true' : 'false'}>
       <div className="tb-buybar__price">
         {kicker && <span className="tb-buybar__kicker">{kicker}</span>}
         <strong>{price}</strong>
@@ -102,11 +125,16 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
             -webkit-backdrop-filter: blur(12px);
             border-top: 1px solid rgba(212,175,55,0.35);
             box-shadow: 0 -8px 24px rgba(60,42,33,0.13);
-            transition: transform .28s cubic-bezier(.16,1,.3,1), opacity .28s, padding .28s;
+            transition: transform .25s ease-out, opacity .28s, padding .28s;
           }
           .tb-buybar[data-hidden="true"] {
             transform: translateY(130%);
             opacity: 0;
+            pointer-events: none;
+          }
+          /* Slides below the screen edge together with the bottom nav it sits on. */
+          .tb-buybar[data-scrolling="true"] {
+            transform: translateY(calc(100% + 72px + env(safe-area-inset-bottom, 0px)));
             pointer-events: none;
           }
           /* The price gives way to the button, never the other way round: a long price wraps or is clipped
