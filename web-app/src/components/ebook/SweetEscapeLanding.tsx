@@ -5,7 +5,7 @@ import ZoomableImage from '@/components/ZoomableImage';
 import MobileBuyBar from '@/components/MobileBuyBar';
 import RainbowJourney from './RainbowJourney';
 import EbookBuyBox from './EbookBuyBox';
-import { EnglishNotice, LangBar, rich, useGoogleTranslated } from './EbookLang';
+import { EditionNotice, EnglishNotice, LangBar, rich, useGoogleTranslated } from './EbookLang';
 import { BAKERY_TREAT_PRICE_BRL, BRL_PER_USD, EBOOK, RECIPES, TOTAL_TREATS } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
@@ -32,8 +32,9 @@ function BuyButton({ children }: { children: React.ReactNode }) {
 export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }) {
   const c = EBOOK_COPY[lang];
   const translated = useGoogleTranslated();
-  // Anyone not reading our English original is told, in their language, that the book is English.
-  const foreign = lang !== 'en' || translated;
+  // On the English page, a visitor whose browser translated it (French, German, Italian...) gets the English edition:
+  // tell them so in their language. Everyone else is told which editions exist.
+  const foreign = translated;
   // English readers see dollars (we still charge R$ 47; the form says so). Everyone else sees reais.
   const dollars = lang === 'en';
   const reais = `R$ ${EBOOK.priceBRL}`;
@@ -65,12 +66,12 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
           </div>
           <div className="se-hero__body">
             <p className="se-hero__lead">{rich(c.hero.lead)}</p>
-            {foreign && <EnglishNotice lang={lang} compact />}
+            {foreign ? <EnglishNotice lang={lang} compact /> : <EditionNotice lang={lang} compact />}
             <div className="se-hero__cta">
               <BuyButton>{cta}</BuyButton>
               <ul className="se-hero__ticks">
                 {c.hero.ticks.map(t => <li key={t}>{fill(t, v)}</li>)}
-                <li className="se-hero__en">📖 {c.english.badge}</li>
+                <li className="se-hero__en">📖 {foreign ? c.english.badge : c.edition.badge}</li>
               </ul>
             </div>
           </div>
@@ -78,7 +79,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
           <div className="se-hero__stage" aria-hidden>
             <div className="se-book">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${IMG}/cover.webp`} alt="" />
+              <img src={`${IMG}/${lang}/cover.webp`} alt="" />
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="se-float se-float--a" src={`${IMG}/red.webp`} alt="" />
@@ -142,7 +143,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
           <div className="se-pages">
             {PAGES.map((p, n) => (
               <div key={p} className="se-page" style={{ '--r': `${(n % 2 ? 1 : -1) * (1.5 + (n % 3))}deg` } as React.CSSProperties}>
-                <ZoomableImage src={`${IMG}/${p}.webp`} alt={c.peek.alts[n]} thumbWidth={640} loading="lazy" />
+                <ZoomableImage src={`${IMG}/${lang}/${p}.webp`} alt={c.peek.alts[n]} thumbWidth={640} loading="lazy" />
               </div>
             ))}
           </div>
@@ -226,16 +227,15 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
           <div className="se-card">
             <div className="se-card__head">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${IMG}/cover.webp`} alt={c.offer.coverAlt} />
+              <img src={`${IMG}/${lang}/cover.webp`} alt={c.offer.coverAlt} />
               <div>
                 <p className="se-card__title"><Brand /></p>
                 <p className="se-card__price">{price}</p>
                 <p className="se-card__usd">{fill(c.offer.usd, v)}</p>
-                <p className="se-card__en">📖 {c.english.badge}</p>
+                <p className="se-card__en">📖 {foreign ? c.english.badge : c.edition.badge}</p>
               </div>
             </div>
-            {foreign && <EnglishNotice lang={lang} />}
-            <EbookBuyBox lang={lang} needsEnglishTick={foreign} />
+            <EbookBuyBox lang={lang} translated={translated} />
           </div>
         </div>
       </section>

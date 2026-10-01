@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { EBOOK } from '@/lib/ebook';
-import { EBOOK_COPY, fill, isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
+import { EBOOK_COPY, fill, isEbookLang, LANG_LABEL, LANG_PATH } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import { rich } from './EbookLang';
 import './sweetEscape.css';
@@ -39,6 +39,7 @@ export default function EbookThanks() {
   const [phase, setPhase] = useState<Phase>(ref && k ? 'checking' : 'unknown');
   const [firstName, setFirstName] = useState('');
   const [method, setMethod] = useState('');
+  const [book, setBook] = useState<string>('');
   const ran = useRef(false);
   const tracked = useRef(false);
 
@@ -54,6 +55,7 @@ export default function EbookThanks() {
         if (!j.found) return 'unknown';
         setFirstName(j.firstName || '');
         setMethod(j.method || '');
+        setBook(j.book || '');
         if (j.paid && !tracked.current) {
           tracked.current = true;
           trackMeta('Purchase', { value: Number(j.total) || EBOOK.priceBRL, content_name: EBOOK.id, content_type: 'product', num_items: 1 }, ref);
@@ -89,13 +91,14 @@ export default function EbookThanks() {
       <div className="se-wrap">
         <div className="se-thanks__card">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="se-thanks__cover" src="/ebook/sweet-escape/cover.webp" alt="Sweet Escape" />
+          <img className="se-thanks__cover" src={`/ebook/sweet-escape/${isEbookLang(book) ? book : lang}/cover.webp`} alt="Sweet Escape" />
 
           {phase === 'checking' && (<><div className="se-spinner" aria-hidden /><h1>{c.checking}</h1><p>{c.checkingSub}</p></>)}
 
           {phase === 'paid' && (
             <>
               <h1>{fill(c.paidTitle, { name })}</h1>
+              {isEbookLang(book) && <p className="se-thanks__edition">📖 {LANG_LABEL[book]}</p>}
               <p>{rich(c.paidText)}</p>
               {fileError && <p className="se-error" role="alert">{c.fileError}</p>}
               <a className="se-btn se-btn--primary se-btn--big" href={download}>{c.download}</a>

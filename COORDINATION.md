@@ -136,12 +136,13 @@ Verified live, 2026-09-26:
   (`e-books/sweet-escape.pdf`) is NOT uploaded yet** (`web-app/SETUP_ebook.md`); until then downloads fail with a friendly
   message. `createMercadoPagoCheckout` / `createPayPalCheckout` take an optional `{ returnUrl, title }`; box orders unchanged.
   Never commit the PDF to git (it would be free to download).
-  **Languages:** the BOOK is English only. The sales page is hand-written in English (`/sweet-escape`), Portuguese
-  (`/sweet-escape/pt`, what the site menu links to) and Spanish (`/sweet-escape/es`); every word is in
-  `src/lib/ebookCopy.ts`. Google Translate CANNOT make Portuguese from these pages (the site declares itself Portuguese),
-  so the nav's 🌐 picker sends people to the hand-written page on `/sweet-escape*`, and FR/DE/IT/NL go to
-  `/sweet-escape?tl=fr` (Google). Any non-English reading shows "the e-book is in English" and requires a tick
-  before paying. The buyer's language rides on `orders.delivery_address` (`… · pt`) for the e-mails.
+  **Languages:** the BOOK exists in four languages (PDFs `sweet-escape-en|pt-br|es|nl.pdf` in the `ebooks` bucket, `BOOK_FILES` in
+  `src/lib/ebook.ts`; missing file = English). The sales page is hand-written in the same four: English (`/sweet-escape`),
+  Portuguese (`/sweet-escape/pt`, what the site menu links to), Spanish (`/sweet-escape/es`) and Dutch (`/sweet-escape/nl`); every word is in
+  `src/lib/ebookCopy.ts`. The buyer's page language and book language ride on `orders.delivery_address` (`… · pt · nl`). Google Translate CANNOT make Portuguese from these pages (the site declares itself Portuguese),
+  so the nav's 🌐 picker sends people to the hand-written page on `/sweet-escape*`, and FR/DE/IT go to
+  `/sweet-escape?tl=fr` (Google; FR/DE/IT get the English edition). Choosing the English edition while reading in another
+  language (or through Google) shows "this edition is in English" and requires a tick before paying. The buyer's language rides on `orders.delivery_address` (`… · pt`) for the e-mails.
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the

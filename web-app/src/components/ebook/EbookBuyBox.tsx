@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { EBOOK } from '@/lib/ebook';
-import { EBOOK_COPY, fill, LANG_PATH, type EbookLang } from '@/lib/ebookCopy';
+import { EBOOK_COPY, EBOOK_LANGS, LANG_LABEL, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
-import { rich } from './EbookLang';
+import { EnglishNotice, rich } from './EbookLang';
 
 type Method = 'card' | 'pix' | 'paypal';
 
@@ -14,9 +14,10 @@ interface PixResult { reference: string; key: string; payload: string; base64: s
 /**
  * The order form inside the price card. Name + e-mail (where the book goes), WhatsApp optional, and how to
  * pay. The server prices it; card and PayPal leave for their own page, Pix shows its QR right here.
- * Anyone reading the page in another language must tick that they know the book is in English.
+ * The book comes in four languages: the buyer's own is pre-selected. Anyone about to get the English edition while
+ * reading in another language (the page, or the browser's translation of it) must confirm they know it is English.
  */
-export default function EbookBuyBox({ lang = 'en', needsEnglishTick = false }: { lang?: EbookLang; needsEnglishTick?: boolean }) {
+export default function EbookBuyBox({ lang = 'en', translated = false }: { lang?: EbookLang; translated?: boolean }) {
   const c = EBOOK_COPY[lang];
   const f = c.form;
   // English readers see dollars; we charge reais either way (the Pix screen always shows reais).
@@ -28,7 +29,9 @@ export default function EbookBuyBox({ lang = 'en', needsEnglishTick = false }: {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
+  const [book, setBook] = useState<EbookLang>(lang);
   const [english, setEnglish] = useState(false);
+  const needsEnglishTick = book === 'en' && (lang !== 'en' || translated);
   const [token, setToken] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -66,7 +69,7 @@ export default function EbookBuyBox({ lang = 'en', needsEnglishTick = false }: {
       const r = await fetch('/api/ebook/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ name, email, whatsapp, payMethod: method, lang }),
+        body: JSON.stringify({ name, email, whatsapp, payMethod: method, lang, book }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || f.errGeneric);
@@ -121,6 +124,16 @@ export default function EbookBuyBox({ lang = 'en', needsEnglishTick = false }: {
         <input type="tel" inputMode="tel" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} autoComplete="tel" placeholder="+55 12 99999-9999" />
       </label>
 
+      <fieldset className="se-booklang">
+        <legend>{f.bookLang}</legend>
+        {EBOOK_LANGS.map(l => (
+          <label key={l} className={book === l ? 'is-on' : ''}>
+            <input type="radio" name="se-book" value={l} checked={book === l} onChange={() => { setBook(l); setEnglish(false); }} />
+            <span lang={l}>{LANG_LABEL[l]}</span>
+          </label>
+        ))}
+      </fieldset>
+
       <fieldset className="se-methods">
         <legend>{f.payLegend}</legend>
         {options.filter(o => o.show).map(o => (
@@ -134,6 +147,7 @@ export default function EbookBuyBox({ lang = 'en', needsEnglishTick = false }: {
 
       {f.currencyNote && <p className="se-currency">{fill(f.currencyNote, { reais })}</p>}
 
+      {needsEnglishTick && <EnglishNotice lang={lang} />}
       {needsEnglishTick && (
         <label className={`se-tick${english ? ' is-on' : ''}`}>
           <input type="checkbox" checked={english} onChange={e => setEnglish(e.target.checked)} />
@@ -147,7 +161,6 @@ export default function EbookBuyBox({ lang = 'en', needsEnglishTick = false }: {
         {busy ? f.busy : fill(f.submit, { price })}
       </button>
       <p className="se-form__fine">{f.fine}</p>
-      {lang !== 'en' && <p className="se-form__fine"><a href={LANG_PATH.en} hrefLang="en">Read this page in English</a></p>}
     </form>
   );
 }

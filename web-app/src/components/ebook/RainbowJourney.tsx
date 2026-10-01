@@ -72,8 +72,8 @@ export default function RainbowJourney({ lang = 'en' }: { lang?: EbookLang }) {
             <span className="se-feature__badge">{c.journey.day} {r.day} · {t.color}</span>
           </div>
           <div className="se-feature__text">
-            {/* Recipe names stay in English: that is what the reader will find in the book. */}
-            <h3 className="notranslate" translate="no" lang="en">{r.name}</h3>
+            {/* The recipe's title exactly as that language's book prints it: never machine-translated. */}
+            <h3 className="notranslate" translate="no">{t.name}</h3>
             <p className="se-feature__sub">{t.subtitle}</p>
             <p>{t.hook}</p>
             <p className="se-feature__kid"><span aria-hidden>👧</span> {t.kidAngle}</p>

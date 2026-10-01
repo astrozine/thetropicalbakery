@@ -86,7 +86,7 @@ export function LangBar({ lang }: { lang: EbookLang }) {
     if (lang !== 'en') return;
     try { if (sessionStorage.getItem('se-lang-dismissed')) return; } catch { /* private mode */ }
     const nav = (navigator.language || '').slice(0, 2);
-    if (nav === 'pt' || nav === 'es') setSuggest(nav);
+    if (nav === 'pt' || nav === 'es' || nav === 'nl') setSuggest(nav);
   }, [lang]);
 
   const dismiss = () => {
@@ -138,11 +138,25 @@ export function LangBar({ lang }: { lang: EbookLang }) {
   );
 }
 
-/** The plain statement that the book is in English. Shown on translated pages, always in the reader's language. */
+/** The plain statement that this edition is in English, always in the reader's own language. */
 export function EnglishNotice({ lang, compact = false }: { lang: EbookLang; compact?: boolean }) {
   const c = EBOOK_COPY[lang].english;
   return (
     <div className={`se-english${compact ? ' se-english--compact' : ''}`} role="note">
+      <span className="se-english__flag" aria-hidden>📖</span>
+      <div>
+        <b>{c.title}</b>
+        {!compact && <p>{c.text}</p>}
+      </div>
+    </div>
+  );
+}
+
+/** The good news: the book exists in their language, and in which others. */
+export function EditionNotice({ lang, compact = false }: { lang: EbookLang; compact?: boolean }) {
+  const c = EBOOK_COPY[lang].edition;
+  return (
+    <div className={`se-english se-english--good${compact ? ' se-english--compact' : ''}`} role="note">
       <span className="se-english__flag" aria-hidden>📖</span>
       <div>
         <b>{c.title}</b>

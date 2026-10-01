@@ -7,14 +7,19 @@ book once you've done steps 1 and 2 (10 minutes, once).
 Supabase → **SQL Editor** → paste all of `web-app/migration_34_ebook_storage.sql` → **Run**.
 The result shows a bucket called `ebooks` with `public = false`.
 
-## 2. Upload the book (3 min)
-Supabase → **Storage** → `ebooks` → **Upload file** → pick
-`The Tropical Bakery/e-books/sweet-escape.pdf` (the **38 MB** copy, not the 151 MB original).
-The name must be exactly `sweet-escape.pdf`.
+## 2. Upload the four books (5 min)
+Supabase → **Storage** → `ebooks` → **Upload file** → pick all four from `The Tropical Bakery/e-books/`:
 
-The small copy looks the same on screen (photos saved at print-for-screen quality). It was made because
-Supabase refuses files over 50 MB and a 151 MB download fails on phones. If Dolly changes the book in Canva,
-send me the new PDF and I'll make a new small copy, then upload it with the same name (tick "overwrite").
+| File | Language | Who gets it |
+|---|---|---|
+| `sweet-escape-en.pdf` | English | English readers, and everyone whose language has no edition |
+| `sweet-escape-pt-br.pdf` | Português (Brasil) | buyers who pick Português |
+| `sweet-escape-es.pdf` | Español | buyers who pick Español |
+| `sweet-escape-nl.pdf` | Nederlands | buyers who pick Nederlands |
+
+The names must match exactly. Each is about 38 MB (Supabase refuses files over 50 MB). If a language's file is
+missing, its buyers get the English book instead of an error. To change a book later, upload the new PDF with the
+same name (tick "overwrite"). Don't use `EBOOK SWEET ESCAPE.pdf` (151 MB) or the old `sweet-escape.pdf`.
 
 ## 3. Test it (5 min)
 Buy it yourself with Pix, then in **Admin → Caixa de Entrada** move the order to "Pagamento Confirmado".
@@ -22,6 +27,7 @@ Open the link in the e-mail: the **Download** button should give you the PDF. (W
 itself as soon as Mercado Pago approves.)
 
 ## How it works
+- Languages: the sales page and the book exist in English, Português, Español and Nederlands (`src/lib/ebookCopy.ts`, `BOOK_FILES` in `src/lib/ebook.ts`). The buyer picks the book language on the form (their own is pre-selected); the order remembers it, and the download and e-mails use it.
 - Price: **R$ 47**, set in `web-app/src/lib/ebook.ts` (`priceBRL`). The server reads it from there.
 - Card (Mercado Pago) and PayPal unlock the download by themselves. **Pix is confirmed by hand**, like boxes:
   when Dolly moves the order past "Novo" in the inbox, the buyer's link starts working. The buyer already has

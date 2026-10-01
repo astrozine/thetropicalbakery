@@ -9,7 +9,7 @@ export function ebookMetadata(lang: EbookLang): Metadata {
     description: c.description,
     alternates: {
       canonical: LANG_PATH[lang],
-      languages: { en: LANG_PATH.en, pt: LANG_PATH.pt, es: LANG_PATH.es, 'x-default': LANG_PATH.en },
+      languages: { en: LANG_PATH.en, pt: LANG_PATH.pt, es: LANG_PATH.es, nl: LANG_PATH.nl, 'x-default': LANG_PATH.en },
     },
     openGraph: {
       title: c.ogTitle,
@@ -17,7 +17,7 @@ export function ebookMetadata(lang: EbookLang): Metadata {
       url: LANG_PATH[lang],
       type: 'website',
       locale: c.ogLocale,
-      images: [{ url: '/ebook/sweet-escape/cover.webp', width: 1000, height: 1595, alt: 'Sweet Escape' }],
+      images: [{ url: `/ebook/sweet-escape/${lang}/cover.webp`, width: 1000, height: 1595, alt: 'Sweet Escape' }],
     },
   };
 }

@@ -2,7 +2,7 @@ import 'server-only';
 import crypto from 'node:crypto';
 import { supabaseAdmin, isPaid } from './server';
 import { OrderError } from './order';
-import { EBOOK } from '@/lib/ebook';
+import { BOOK_FILES, EBOOK, downloadName, isBookLang, type BookLang } from '@/lib/ebook';
 import { generatePixData } from '@/utils/pix';
 import { sendEbookOrderReceived } from '@/lib/email/ebookReceipts';
 import { isEbookLang, type EbookLang } from '@/lib/ebookCopy';
@@ -25,6 +25,8 @@ export interface EbookOrderInput {
   payMethod?: string;
   /** Which version of the page they bought from: the e-mails and download page follow it. */
   lang?: string;
+  /** Which language of the book they want: en, pt, es or nl (anything else is the English edition). */
+  book?: string;
 }
 
 const text = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max);
@@ -56,10 +58,17 @@ export function thanksUrl(site: string, reference: string, lang: EbookLang = 'en
  * "digital delivery"), so the payment webhook, hours later, still knows which language to write the e-mail in.
  */
 const ADDRESS = 'E-BOOK · entrega digital por e-mail';
-export const ebookAddress = (lang: EbookLang) => `${ADDRESS} · ${lang}`;
+export const ebookAddress = (lang: EbookLang, book: BookLang) => `${ADDRESS} · ${lang} · ${book}`;
+const TAIL = /·\s*(en|pt|es|nl)\s*(?:·\s*(en|pt|es|nl)\s*)?$/;
 export const langFromAddress = (address: unknown): EbookLang => {
-  const m = /·\s*(en|pt|es)\s*$/.exec(String(address ?? ''));
+  const m = TAIL.exec(String(address ?? ''));
   return m && isEbookLang(m[1]) ? m[1] : 'en';
+};
+/** The book language they bought: the second tag, or (older orders) the page language. */
+export const bookFromAddress = (address: unknown): BookLang => {
+  const m = TAIL.exec(String(address ?? ''));
+  const b = m?.[2] ?? m?.[1];
+  return isBookLang(b) ? b : 'en';
 };
 
 export interface CreatedEbookOrder {
@@ -68,6 +77,7 @@ export interface CreatedEbookOrder {
   total: number;
   method: 'pix' | 'mercadopago' | 'paypal';
   lang: EbookLang;
+  book: BookLang;
   pix?: { payload: string; base64: string };
 }
 
@@ -88,6 +98,7 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
   }
 
   const lang: EbookLang = isEbookLang(input.lang) ? input.lang : 'en';
+  const book: BookLang = isBookLang(input.book) ? input.book : 'en';
   const method = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : 'pix';
   const total = EBOOK.priceBRL;
   const reference = `EBK${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
@@ -97,7 +108,7 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
     customer_name: name,
     customer_email: email,
     customer_whatsapp: whatsapp,
-    delivery_address: ebookAddress(lang),
+    delivery_address: ebookAddress(lang, book),
     requested_date: today,
     total_price: total,
     pix_transaction_id: reference,
@@ -133,18 +144,20 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
   const pix = method === 'pix' ? await generatePixData({ value: total, transactionId: reference }) : undefined;
 
   try {
-    await sendEbookOrderReceived(db, { reference, customerName: name, customerEmail: email, total, method, pixPayload: pix?.payload ?? null, key: ebookKey(reference), lang });
+    await sendEbookOrderReceived(db, { reference, customerName: name, customerEmail: email, total, method, pixPayload: pix?.payload ?? null, key: ebookKey(reference), lang, book });
   } catch (e) {
     console.error('createEbookOrder: receipt e-mail failed (order is saved):', e);
   }
 
-  return { reference, key: ebookKey(reference), total, method, lang, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
+  return { reference, key: ebookKey(reference), total, method, lang, book, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
 }
 
 export interface EbookAccess {
   found: boolean;
   paid: boolean;
   method?: string;
+  /** The language of the book they bought. */
+  book?: BookLang;
   firstName?: string;
   total?: number;
 }
@@ -169,16 +182,22 @@ export async function ebookAccess(reference: string): Promise<EbookAccess> {
     found: true,
     paid,
     method: String(data.payment_provider ?? ''),
+    book: bookFromAddress(data.delivery_address),
     firstName: String(data.customer_name ?? '').trim().split(' ')[0],
     total: Number(data.total_price ?? 0),
   };
 }
 
-/** A download link to the private PDF that stops working after a few minutes. */
-export async function signedEbookUrl(): Promise<string> {
-  const { data, error } = await supabaseAdmin().storage
-    .from(EBOOK.bucket)
-    .createSignedUrl(EBOOK.file, 60 * 10, { download: EBOOK.downloadName });
-  if (error || !data?.signedUrl) throw new Error(`E-book file not available: ${error?.message ?? 'no url'}`);
-  return data.signedUrl;
+/**
+ * A download link to the private PDF of that language, good for a few minutes. If that language's file has not been
+ * uploaded (yet), the buyer gets the English one rather than nothing.
+ */
+export async function signedEbookUrl(book: BookLang = 'en'): Promise<string> {
+  const storage = supabaseAdmin().storage.from(EBOOK.bucket);
+  for (const lang of book === 'en' ? (['en'] as const) : ([book, 'en'] as const)) {
+    const { data, error } = await storage.createSignedUrl(BOOK_FILES[lang], 60 * 10, { download: downloadName(lang) });
+    if (!error && data?.signedUrl) return data.signedUrl;
+    console.error(`signedEbookUrl: ${BOOK_FILES[lang]} not available:`, error?.message);
+  }
+  throw new Error('E-book file not available');
 }

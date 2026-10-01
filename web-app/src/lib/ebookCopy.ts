@@ -12,27 +12,30 @@
  * Pure data, no imports beyond types: the server e-mails read it too.
  */
 
-export type EbookLang = 'en' | 'pt' | 'es';
-export const EBOOK_LANGS: EbookLang[] = ['en', 'pt', 'es'];
-export const isEbookLang = (v: unknown): v is EbookLang => v === 'en' || v === 'pt' || v === 'es';
+/** The page languages AND the book languages are the same four: each has its own hand-written page and its own PDF. */
+export type EbookLang = 'en' | 'pt' | 'es' | 'nl';
+export const EBOOK_LANGS: EbookLang[] = ['en', 'pt', 'es', 'nl'];
+export const isEbookLang = (v: unknown): v is EbookLang => v === 'en' || v === 'pt' || v === 'es' || v === 'nl';
 
 /** Languages offered through Google Translate from the English page. */
 export const GOOGLE_LANGS = [
   { code: 'fr', label: 'Français' },
   { code: 'de', label: 'Deutsch' },
   { code: 'it', label: 'Italiano' },
-  { code: 'nl', label: 'Nederlands' },
 ] as const;
 
-export const LANG_LABEL: Record<EbookLang, string> = { en: 'English', pt: 'Português', es: 'Español' };
-export const LANG_PATH: Record<EbookLang, string> = { en: '/sweet-escape', pt: '/sweet-escape/pt', es: '/sweet-escape/es' };
+export const LANG_LABEL: Record<EbookLang, string> = { en: 'English', pt: 'Português', es: 'Español', nl: 'Nederlands' };
+export const LANG_PATH: Record<EbookLang, string> = { en: '/sweet-escape', pt: '/sweet-escape/pt', es: '/sweet-escape/es', nl: '/sweet-escape/nl' };
 
-export interface RecipeCopy { color: string; subtitle: string; hook: string; makes: string; kidAngle: string; alt: string }
+export interface RecipeCopy { name: string; color: string; subtitle: string; hook: string; makes: string; kidAngle: string; alt: string }
 
 export interface EbookCopy {
   meta: { title: string; description: string; ogTitle: string; ogLocale: string };
   langBar: { label: string; auto: string; suggest: string; suggestGo: string };
+  /** Shown when the book they will get is the English edition and they do not read English. */
   english: { badge: string; title: string; text: string; tick: string; tickError: string };
+  /** Shown when the book is in their own language: which editions exist. */
+  edition: { badge: string; title: string; text: string };
   hero: { eyebrow: string; script: string; title: string; em: string; lead: string; cta: string; ticks: string[]; card: string; card2: string };
   problem: { kicker: string; title1: string; title2: string; pains: string[]; bigIdea: string };
   journey: { kicker: string; title: string; lead: string; day: string; tabs: string };
@@ -47,7 +50,7 @@ export interface EbookCopy {
   final: { line: string; title1: string; script: string; title2: string; ps: string };
   buyBar: { kicker: string; note: string; label: string };
   form: {
-    name: string; email: string; emailNote: string; whatsapp: string; optional: string; payLegend: string;
+    name: string; email: string; emailNote: string; whatsapp: string; optional: string; bookLang: string; payLegend: string;
     card: string; cardNote: string; pix: string; pixMethodNote: string; paypal: string; paypalNote: string;
     submit: string; busy: string; fine: string; currencyNote: string; errName: string; errEmail: string; errGeneric: string;
     pixTitle: string; pixLabel: string; pixCopy: string; pixCopied: string; pixNote: string; pixPaid: string;
@@ -59,7 +62,7 @@ export interface EbookCopy {
     nextTitle: string; next: { title: string; text: string }[];
   };
   mail: {
-    hi: string; receivedPix: string; receivedCard: string; yourOrder: string; receivedSubject: string;
+    edition: string; hi: string; receivedPix: string; receivedCard: string; yourOrder: string; receivedSubject: string;
     receivedPreheaderPix: string; receivedPreheaderCard: string; receivedHeading: string; myPage: string; receivedNote: string;
     paidText: string; whereToStart: string; tips: string[]; paidLink: string; paidSubject: string; paidPreheader: string;
     paidHeading: string; paidCta: string; paidNote: string;
@@ -76,10 +79,15 @@ const EN: EbookCopy = {
   langBar: { label: 'Read this page in', auto: 'automatic translation', suggest: 'Prefer another language?', suggestGo: 'Read in' },
   english: {
     badge: 'English edition',
-    title: 'The e-book is written in English',
-    text: 'Sweet Escape is written in simple, friendly English for readers all over the world. Every recipe has photos, and measurements come in cups and spoons with oven temperatures in °C and °F. If you are reading a translation of this page: the page can be translated, the book cannot.',
-    tick: 'I understand the e-book is written in English.',
-    tickError: 'Please confirm you know the e-book is in English.',
+    title: 'This edition is written in English',
+    text: 'Sweet Escape comes in English, Português, Español and Nederlands. Readers of any other language get the English edition: simple, friendly English, a photo for every recipe, and measurements in cups and spoons with oven temperatures in °C and °F. This page can be translated, the book can’t.',
+    tick: 'I understand I’m getting the English edition.',
+    tickError: 'Please confirm you know you’re getting the English edition.',
+  },
+  edition: {
+    badge: 'Available in 4 languages',
+    title: 'Available in 4 languages',
+    text: 'English, Português, Español and Nederlands. Pick yours when you order; any other language gets the English edition.',
   },
   hero: {
     eyebrow: 'New · the e-book from Dolly’s jungle kitchen',
@@ -100,13 +108,13 @@ const EN: EbookCopy = {
   },
   journey: { kicker: 'The journey', title: '7 days. 7 colors. 7 treats.', lead: 'One recipe a day, each one a color of nature. Tap a day.', day: 'Day', tabs: 'Choose a day' },
   recipes: [
-    { color: 'Yellow', subtitle: 'with turmeric-spiced coconut topping', hook: 'A silky pineapple-cashew cream on a date-almond base. Tastes like a beach holiday, sets in the freezer while you do something else.', makes: 'Serves 8', kidAngle: 'Looks like a slice of sunshine. Nobody asks where the vegetables are.', alt: 'Layered pineapple coconut squares on a wooden stump' },
-    { color: 'Orange', subtitle: 'with blood orange & carrot cashew cream whip', hook: 'Oat and almond muffins sweetened only with a date caramel, studded with ripe mango and topped with a whipped cream that hides a carrot.', makes: 'Makes 8–10', kidAngle: 'A cupcake with a swirl on top. The carrot is our secret.', alt: 'Mango muffins with orange cashew cream and tropical flowers' },
-    { color: 'Red', subtitle: 'jewel-like treats with cherry, strawberry, cranberry & beet', hook: 'No oven, no mixer. Blend, roll, and coat in crunchy freeze-dried raspberry. The quickest recipe in the book and the one kids help make.', makes: 'Makes 12–14', kidAngle: 'Small hands can roll them. Beetroot never looked this much like candy.', alt: 'Pink berry bliss balls with fresh cherries and strawberries' },
-    { color: 'Purple', subtitle: 'with forest dark berries & Blue Zones inspiration', hook: 'A walnut-cacao crust, a creamy purple layer made from sweet potato, and a pourable berry topping. The one that gets photographed.', makes: 'Serves 8–10', kidAngle: 'It’s purple. That’s the whole argument, and it works.', alt: 'Purple sweet potato cheesecake slice with a violet flower' },
-    { color: 'Green', subtitle: 'a joyful, melting, spirulina-powered treat', hook: 'Crunchy pistachio taco cookies filled with soft-serve made from frozen bananas. Ice cream, but it’s fruit.', makes: 'Makes 6–8', kidAngle: 'Green ice cream in a taco. It disappears before it can melt.', alt: 'Green pistachio taco cookies filled with spirulina banana nicecream' },
-    { color: 'Caramel', subtitle: 'a raw three-layer treat bridging Brazil and Britain', hook: 'A paçoca-style peanut base, a banana-cashew cream, and a runny caramel made from nothing but dates. The cover star.', makes: 'Makes 8–10', kidAngle: 'Peanut butter and caramel. You won’t have to ask twice.', alt: 'Banoffee bars with date caramel drizzle on a green plate' },
-    { color: 'Chocolate', subtitle: 'a velvet-dark ode to chocolate, with a surprising pear', hook: 'A pecan-cocoa base, a mousse whipped from a ripe pear, and a glossy chocolate shell. Pecan halves become little heads and feet.', makes: 'Makes 6–8', kidAngle: 'They’re turtles. Made of chocolate. With a pear hiding inside.', alt: 'Chocolate mousse turtles with pecan heads and feet' },
+    { name: 'Sun-Kissed Coco-Pineapple Paradise Squares', color: 'Yellow', subtitle: 'with turmeric-spiced coconut topping', hook: 'A silky pineapple-cashew cream on a date-almond base. Tastes like a beach holiday, sets in the freezer while you do something else.', makes: 'Serves 8', kidAngle: 'Looks like a slice of sunshine. Nobody asks where the vegetables are.', alt: 'Layered pineapple coconut squares on a wooden stump' },
+    { name: 'Chai-Spiced Mango Muffins', color: 'Orange', subtitle: 'with blood orange & carrot cashew cream whip', hook: 'Oat and almond muffins sweetened only with a date caramel, studded with ripe mango and topped with a whipped cream that hides a carrot.', makes: 'Makes 8–10', kidAngle: 'A cupcake with a swirl on top. The carrot is our secret.', alt: 'Mango muffins with orange cashew cream and tropical flowers' },
+    { name: 'Tangy Red Berry Bliss Balls', color: 'Red', subtitle: 'jewel-like treats with cherry, strawberry, cranberry & beet', hook: 'No oven, no mixer. Blend, roll, and coat in crunchy freeze-dried raspberry. The quickest recipe in the book and the one kids help make.', makes: 'Makes 12–14', kidAngle: 'Small hands can roll them. Beetroot never looked this much like candy.', alt: 'Pink berry bliss balls with fresh cherries and strawberries' },
+    { name: 'Purple Sweet Potato Longevity Cheesecake', color: 'Purple', subtitle: 'with forest dark berries & Blue Zones inspiration', hook: 'A walnut-cacao crust, a creamy purple layer made from sweet potato, and a pourable berry topping. The one that gets photographed.', makes: 'Serves 8–10', kidAngle: 'It’s purple. That’s the whole argument, and it works.', alt: 'Purple sweet potato cheesecake slice with a violet flower' },
+    { name: 'Supergreen Laguna Nicecream Pistachio Tacos', color: 'Green', subtitle: 'a joyful, melting, spirulina-powered treat', hook: 'Crunchy pistachio taco cookies filled with soft-serve made from frozen bananas. Ice cream, but it’s fruit.', makes: 'Makes 6–8', kidAngle: 'Green ice cream in a taco. It disappears before it can melt.', alt: 'Green pistachio taco cookies filled with spirulina banana nicecream' },
+    { name: 'Peanutty Banoffee Bars', color: 'Caramel', subtitle: 'a raw three-layer treat bridging Brazil and Britain', hook: 'A paçoca-style peanut base, a banana-cashew cream, and a runny caramel made from nothing but dates. The cover star.', makes: 'Makes 8–10', kidAngle: 'Peanut butter and caramel. You won’t have to ask twice.', alt: 'Banoffee bars with date caramel drizzle on a green plate' },
+    { name: 'Dark Cocoa Mousse Turtles', color: 'Chocolate', subtitle: 'a velvet-dark ode to chocolate, with a surprising pear', hook: 'A pecan-cocoa base, a mousse whipped from a ripe pear, and a glossy chocolate shell. Pecan halves become little heads and feet.', makes: 'Makes 6–8', kidAngle: 'They’re turtles. Made of chocolate. With a pear hiding inside.', alt: 'Chocolate mousse turtles with pecan heads and feet' },
   ],
   learn: {
     kicker: 'Not just recipes', title: 'Learn the magic behind them',
@@ -151,7 +159,7 @@ const EN: EbookCopy = {
   offer: {
     kicker: 'Everything you get', title: 'Your sweet escape, today',
     stack: [
-      { what: 'The Sweet Escape e-book (in English)', detail: '{pages} full-color pages, 7 complete recipes with every layer, step and photo' },
+      { what: 'The Sweet Escape e-book', detail: '{pages} full-color pages, 7 complete recipes with every layer, step and photo' },
       { what: 'The 6 building blocks', detail: 'the framework that lets you invent your own treats after the seventh day' },
       { what: '“Why this ingredient?” stories', detail: 'the history and magic of pineapple, mango, berries, sweet potato, spirulina, peanut and cacao' },
       { what: 'Health benefits for every recipe', detail: 'what each ingredient does for you and your family, in plain words' },
@@ -166,7 +174,7 @@ const EN: EbookCopy = {
   faq: {
     kicker: 'Questions', title: 'Good to know',
     items: [
-      { q: 'What language is the book in?', a: 'English, in simple and friendly language, written for readers all over the world. Measurements are in cups and spoons, oven temperatures in °C and °F. This page is also available in Portuguese and Spanish so more people can see what’s inside, but the book itself is in English.' },
+      { q: 'Which languages is the book in?', a: 'English, Português (Brazil), Español and Nederlands, fully translated with every recipe and photo. Choose your language when you order. Readers of any other language get the English edition: simple, friendly English, with measurements in cups and spoons and oven temperatures in °C and °F. This page is also available in Portuguese, Spanish and Dutch.' },
       { q: 'How do I get it?', a: 'It’s a PDF. After paying by card or PayPal your download opens straight away, and a personal link arrives by e-mail. With Pix (Brazil), Dolly confirms the payment by hand, usually within a few hours, and the same link unlocks itself.' },
       { q: 'Do I need special equipment?', a: 'No. A blender or food processor, a few silicone molds or a tray, and a freezer. Most treats are raw: you blend, press, and let the freezer do the work. Only the muffins and the taco cookies need an oven.' },
       { q: 'Is it really without refined sugar?', a: 'Every recipe is sweetened with dates, raisins and fruit. The one exception is the chocolate shell on Day 7: the book shows you how to choose a dark chocolate without refined sugar, because most shop-bought ones contain some.' },
@@ -183,6 +191,7 @@ const EN: EbookCopy = {
   },
   buyBar: { kicker: 'Sweet Escape e-book', note: 'Instant PDF · 7 recipes', label: 'Get it' },
   form: {
+    bookLang: 'Book language',
     name: 'Your name', email: 'E-mail', emailNote: '(your book goes here)', whatsapp: 'WhatsApp', optional: '(optional)',
     payLegend: 'How would you like to pay?',
     card: 'Card', cardNote: 'instant download', pix: 'Pix', pixMethodNote: 'Brazil · confirmed by hand', paypal: 'PayPal', paypalNote: 'from anywhere',
@@ -218,7 +227,7 @@ const EN: EbookCopy = {
     hi: 'Hi {name}!',
     receivedPix: 'Thank you for ordering Sweet Escape! Your book is reserved. As soon as your Pix of {price} arrives and Dolly confirms it, the button below unlocks your download. Keep this e-mail: the link is yours for good.',
     receivedCard: 'Thank you for ordering Sweet Escape! We are just waiting for the payment confirmation, which usually takes a minute. The button below is your personal download link, and it is yours for good.',
-    yourOrder: 'Your order', receivedSubject: 'Your Sweet Escape order ({ref})',
+    edition: 'Your edition', yourOrder: 'Your order', receivedSubject: 'Your Sweet Escape order ({ref})',
     receivedPreheaderPix: 'One Pix of {price} and the book is yours.', receivedPreheaderCard: 'Your plant-based treat book is on its way.',
     receivedHeading: 'Your sweet escape is waiting', myPage: 'My download page', receivedNote: 'Order {ref}. Questions? Just reply on WhatsApp: +55 11 93211-9196.',
     paidText: 'Payment confirmed. Welcome to the jungle kitchen! Your copy of Sweet Escape is ready to download: 72 pages, seven colors, seven treats.',
@@ -233,17 +242,22 @@ const EN: EbookCopy = {
 const PT: EbookCopy = {
   meta: {
     title: 'Sweet Escape · 7 doces de plantas que a família vai amar | The Tropical Bakery',
-    description: 'O e-book da Dolly: 7 cores, 7 sobremesas feitas de frutas, castanhas e plantas inteiras. Cremes sedosos, caramelo, mousse de chocolate, cheesecake. PDF na hora. E-book em inglês.',
+    description: 'O e-book da Dolly: 7 cores, 7 sobremesas feitas de frutas, castanhas e plantas inteiras. Cremes sedosos, caramelo, mousse de chocolate, cheesecake. PDF na hora. Em português, English, Español e Nederlands.',
     ogTitle: 'Sweet Escape · o livro de doces de plantas da cozinha da Dolly na mata',
     ogLocale: 'pt_BR',
   },
   langBar: { label: 'Leia esta página em', auto: 'tradução automática', suggest: 'Prefere ler em português?', suggestGo: 'Ler em' },
   english: {
     badge: 'E-book em inglês',
-    title: 'Atenção: o e-book é em inglês',
-    text: 'Esta página está em português para você conhecer o livro, mas o Sweet Escape foi escrito em inglês, para leitores do mundo todo. É um inglês simples e amigável, toda receita tem fotos, as medidas vêm em xícaras (cups) e colheres e o forno em °C. Se você se vira com uma receita em inglês, ou com o tradutor do celular, vai se sentir em casa.',
-    tick: 'Entendo que o e-book é em inglês.',
-    tickError: 'Confirme, por favor, que você sabe que o e-book é em inglês.',
+    title: 'Atenção: esta edição é em inglês',
+    text: 'Você escolheu a edição em inglês: um inglês simples e amigável, com foto em toda receita, medidas em xícaras (cups) e colheres e forno em °C e °F. A edição em português também está à venda: é só escolher o idioma no pedido.',
+    tick: 'Entendo que vou receber a edição em inglês.',
+    tickError: 'Confirme, por favor, que você sabe que vai receber a edição em inglês.',
+  },
+  edition: {
+    badge: 'E-book em português',
+    title: 'Disponível em português (e em outros 3 idiomas)',
+    text: 'O livro inteiro, receitas e fotos, foi traduzido para o português. Também há English, Español e Nederlands: você escolhe no pedido. Quem lê outro idioma recebe a edição em inglês.',
   },
   hero: {
     eyebrow: 'Novo · o e-book da cozinha da Dolly na mata',
@@ -264,13 +278,13 @@ const PT: EbookCopy = {
   },
   journey: { kicker: 'A jornada', title: '7 dias. 7 cores. 7 doces.', lead: 'Uma receita por dia, cada uma com uma cor da natureza. Toque em um dia.', day: 'Dia', tabs: 'Escolha um dia' },
   recipes: [
-    { color: 'Amarelo', subtitle: 'com cobertura de coco e cúrcuma', hook: 'Um creme sedoso de abacaxi e castanha de caju sobre uma base de tâmara e amêndoa. Gosto de férias na praia, e firma no freezer enquanto você faz outra coisa.', makes: 'Rende 8', kidAngle: 'Parece uma fatia de sol. Ninguém pergunta onde estão os legumes.', alt: 'Quadradinhos de abacaxi e coco em camadas sobre um toco de madeira' },
-    { color: 'Laranja', subtitle: 'com chantilly de caju, laranja-sanguínea e cenoura', hook: 'Muffins de aveia e amêndoa adoçados só com um caramelo de tâmaras, cheios de manga madura e cobertos com um chantilly que esconde uma cenoura.', makes: 'Rende 8–10', kidAngle: 'Um cupcake com redemoinho em cima. A cenoura é segredo nosso.', alt: 'Muffins de manga com creme laranja de caju e flores tropicais' },
-    { color: 'Vermelho', subtitle: 'joias de cereja, morango, cranberry e beterraba', hook: 'Sem forno, sem batedeira. Bata, enrole e passe na framboesa liofilizada crocante. A receita mais rápida do livro, e a que as crianças ajudam a fazer.', makes: 'Rende 12–14', kidAngle: 'Mãos pequenas conseguem enrolar. Beterraba nunca pareceu tanto com bala.', alt: 'Bolinhas rosadas de frutas vermelhas com cerejas e morangos' },
-    { color: 'Roxo', subtitle: 'com frutas silvestres e inspiração nas Zonas Azuis', hook: 'Base de nozes e cacau, uma camada cremosa roxa feita de batata-doce e uma calda de frutas silvestres. A que todo mundo fotografa.', makes: 'Rende 8–10', kidAngle: 'É roxo. Esse é o argumento inteiro, e funciona.', alt: 'Fatia de cheesecake de batata-doce roxa com uma flor violeta' },
-    { color: 'Verde', subtitle: 'um doce alegre e geladinho, com spirulina', hook: 'Biscoitos crocantes de pistache em formato de taco, recheados com sorvete cremoso feito de banana congelada. É sorvete, mas é fruta.', makes: 'Rende 6–8', kidAngle: 'Sorvete verde dentro de um taco. Some antes de derreter.', alt: 'Tacos de pistache verdes recheados com sorvete de banana e spirulina' },
-    { color: 'Caramelo', subtitle: 'um doce cru de três camadas entre o Brasil e a Inglaterra', hook: 'Base de amendoim estilo paçoca, creme de banana com caju e um caramelo escorrendo feito só de tâmaras. A estrela da capa.', makes: 'Rende 8–10', kidAngle: 'Pasta de amendoim e caramelo. Você não vai precisar oferecer duas vezes.', alt: 'Barrinhas banoffee com calda de caramelo de tâmaras num prato verde' },
-    { color: 'Chocolate', subtitle: 'uma ode ao chocolate escuro, com uma pera surpresa', hook: 'Base de pecã e cacau, uma mousse batida com pera madura e uma casquinha brilhante de chocolate. Metades de pecã viram cabecinhas e patinhas.', makes: 'Rende 6–8', kidAngle: 'São tartarugas. De chocolate. Com uma pera escondida dentro.', alt: 'Tartarugas de mousse de chocolate com cabeça e patas de pecã' },
+    { name: 'Quadradinhos Paraíso de Coco e Abacaxi Beijados de Sol', color: 'Amarelo', subtitle: 'com cobertura de coco e cúrcuma', hook: 'Um creme sedoso de abacaxi e castanha de caju sobre uma base de tâmara e amêndoa. Gosto de férias na praia, e firma no freezer enquanto você faz outra coisa.', makes: 'Rende 8', kidAngle: 'Parece uma fatia de sol. Ninguém pergunta onde estão os legumes.', alt: 'Quadradinhos de abacaxi e coco em camadas sobre um toco de madeira' },
+    { name: 'Muffins de Manga com Especiarias Chai', color: 'Laranja', subtitle: 'com chantilly de caju, laranja-sanguínea e cenoura', hook: 'Muffins de aveia e amêndoa adoçados só com um caramelo de tâmaras, cheios de manga madura e cobertos com um chantilly que esconde uma cenoura.', makes: 'Rende 8–10', kidAngle: 'Um cupcake com redemoinho em cima. A cenoura é segredo nosso.', alt: 'Muffins de manga com creme laranja de caju e flores tropicais' },
+    { name: 'Bliss Balls Azedinhas de Frutas Vermelhas', color: 'Vermelho', subtitle: 'joias de cereja, morango, cranberry e beterraba', hook: 'Sem forno, sem batedeira. Bata, enrole e passe na framboesa liofilizada crocante. A receita mais rápida do livro, e a que as crianças ajudam a fazer.', makes: 'Rende 12–14', kidAngle: 'Mãos pequenas conseguem enrolar. Beterraba nunca pareceu tanto com bala.', alt: 'Bolinhas rosadas de frutas vermelhas com cerejas e morangos' },
+    { name: 'Cheesecake da Longevidade de Batata-Doce Roxa', color: 'Roxo', subtitle: 'com frutas silvestres e inspiração nas Zonas Azuis', hook: 'Base de nozes e cacau, uma camada cremosa roxa feita de batata-doce e uma calda de frutas silvestres. A que todo mundo fotografa.', makes: 'Rende 8–10', kidAngle: 'É roxo. Esse é o argumento inteiro, e funciona.', alt: 'Fatia de cheesecake de batata-doce roxa com uma flor violeta' },
+    { name: 'Tacos de Pistache com Nicecream Supergreen Laguna', color: 'Verde', subtitle: 'um doce alegre e geladinho, com spirulina', hook: 'Biscoitos crocantes de pistache em formato de taco, recheados com sorvete cremoso feito de banana congelada. É sorvete, mas é fruta.', makes: 'Rende 6–8', kidAngle: 'Sorvete verde dentro de um taco. Some antes de derreter.', alt: 'Tacos de pistache verdes recheados com sorvete de banana e spirulina' },
+    { name: 'Barrinhas Banoffee de Amendoim', color: 'Caramelo', subtitle: 'um doce cru de três camadas entre o Brasil e a Inglaterra', hook: 'Base de amendoim estilo paçoca, creme de banana com caju e um caramelo escorrendo feito só de tâmaras. A estrela da capa.', makes: 'Rende 8–10', kidAngle: 'Pasta de amendoim e caramelo. Você não vai precisar oferecer duas vezes.', alt: 'Barrinhas banoffee com calda de caramelo de tâmaras num prato verde' },
+    { name: 'Tartarugas de Mousse de Cacau Escuro', color: 'Chocolate', subtitle: 'uma ode ao chocolate escuro, com uma pera surpresa', hook: 'Base de pecã e cacau, uma mousse batida com pera madura e uma casquinha brilhante de chocolate. Metades de pecã viram cabecinhas e patinhas.', makes: 'Rende 6–8', kidAngle: 'São tartarugas. De chocolate. Com uma pera escondida dentro.', alt: 'Tartarugas de mousse de chocolate com cabeça e patas de pecã' },
   ],
   learn: {
     kicker: 'Não são só receitas', title: 'Aprenda a mágica por trás delas',
@@ -285,7 +299,7 @@ const PT: EbookCopy = {
     ],
   },
   peek: {
-    kicker: 'Dê uma espiada', title: '{pages} páginas para cozinhar junto', lead: 'Toque em uma página para ver de perto. (As páginas estão em inglês, como o livro.)',
+    kicker: 'Dê uma espiada', title: '{pages} páginas para cozinhar junto', lead: 'Toque em uma página para ver de perto.',
     alts: ['Sumário do Sweet Escape', 'Regra nº 2: os seis pilares', 'Abertura da receita do Dia 1, Amarelo', 'Página de receita com ingredientes e modo de preparo', 'Por que abacaxi? A história do ingrediente', 'Benefícios de cada ingrediente', 'Abertura da receita do Dia 4, Roxo', 'A história da Dolly: do balé à cozinha na mata'],
   },
   family: {
@@ -315,7 +329,7 @@ const PT: EbookCopy = {
   offer: {
     kicker: 'Tudo o que você recebe', title: 'Seu sweet escape, hoje',
     stack: [
-      { what: 'O e-book Sweet Escape (em inglês)', detail: '{pages} páginas coloridas, 7 receitas completas com cada camada, passo e foto' },
+      { what: 'O e-book Sweet Escape', detail: '{pages} páginas coloridas, 7 receitas completas com cada camada, passo e foto' },
       { what: 'Os 6 pilares', detail: 'o método para você inventar seus próprios doces depois do sétimo dia' },
       { what: 'Histórias “Por que este ingrediente?”', detail: 'a história e a mágica do abacaxi, manga, frutas vermelhas, batata-doce, spirulina, amendoim e cacau' },
       { what: 'Benefícios de cada receita', detail: 'o que cada ingrediente faz por você e pela sua família, em palavras simples' },
@@ -325,12 +339,12 @@ const PT: EbookCopy = {
     ],
     promiseDays: 'dias', promiseTitle: 'A promessa doce',
     promiseText: 'Faça uma receita. Se não te conquistar, escreva pra gente em até 7 dias e devolvemos cada centavo.',
-    coverAlt: 'Capa do e-book Sweet Escape', usd: 'Pagamento único · PDF em inglês',
+    coverAlt: 'Capa do e-book Sweet Escape', usd: 'Pagamento único · PDF',
   },
   faq: {
     kicker: 'Dúvidas', title: 'Bom saber',
     items: [
-      { q: 'Em que língua está o livro?', a: 'Em inglês. Um inglês simples e amigável, escrito para leitores do mundo todo. Toda receita tem fotos, as medidas estão em xícaras (cups) e colheres e o forno em °C. Esta página está em português para você conhecer o livro, mas o livro em si é em inglês. Se precisar, o tradutor do celular (Google Lens ou Google Tradutor) ajuda bastante com uma receita.' },
+      { q: 'Em quais idiomas está o livro?', a: 'Em português do Brasil, com todas as receitas e fotos traduzidas. Também existe em English, Español e Nederlands: você escolhe o idioma no pedido. Quem lê outro idioma recebe a edição em inglês (um inglês simples e amigável, com medidas em xícaras e forno em °C).' },
       { q: 'Como eu recebo?', a: 'É um PDF. Pagando no cartão, o download abre na hora e um link pessoal chega por e-mail. No Pix, a Dolly confirma o pagamento à mão, normalmente em poucas horas, e o mesmo link se libera sozinho.' },
       { q: 'Preciso de algum equipamento especial?', a: 'Não. Um liquidificador ou processador, algumas forminhas de silicone ou uma assadeira, e um freezer. A maioria dos doces é crua: você bate, aperta e o freezer faz o resto. Só os muffins e os biscoitos de taco vão ao forno.' },
       { q: 'É mesmo sem açúcar refinado?', a: 'Toda receita é adoçada com tâmaras, uvas-passas e frutas. A única exceção é a casquinha de chocolate do Dia 7: o livro ensina a escolher um chocolate amargo sem açúcar refinado, porque a maioria dos de mercado tem um pouco.' },
@@ -343,10 +357,11 @@ const PT: EbookCopy = {
   final: {
     line: 'Sete cores. Sete criações. Sete pequenos motivos para se apaixonar de novo pelas plantas.',
     title1: 'Seu', script: 'sweet escape', title2: 'está esperando.',
-    ps: '**P.S.** Se você rolou direto até aqui: são {pages} páginas, 7 sobremesas de plantas que a sua família vai pedir de verdade, o método para inventar as suas e uma garantia de 7 dias. Tudo por {price}, menos que dois doces da nossa confeitaria. E lembre: o livro é em inglês.',
+    ps: '**P.S.** Se você rolou direto até aqui: são {pages} páginas, 7 sobremesas de plantas que a sua família vai pedir de verdade, o método para inventar as suas e uma garantia de 7 dias. Tudo por {price}, menos que dois doces da nossa confeitaria.',
   },
-  buyBar: { kicker: 'E-book Sweet Escape', note: 'PDF na hora · em inglês', label: 'Quero' },
+  buyBar: { kicker: 'E-book Sweet Escape', note: 'PDF na hora · em português', label: 'Quero' },
   form: {
+    bookLang: 'Idioma do livro',
     name: 'Seu nome', email: 'E-mail', emailNote: '(o livro chega aqui)', whatsapp: 'WhatsApp', optional: '(opcional)',
     payLegend: 'Como você quer pagar?',
     card: 'Cartão', cardNote: 'download na hora', pix: 'Pix', pixMethodNote: 'confirmado à mão', paypal: 'PayPal', paypalNote: 'de qualquer país',
@@ -361,7 +376,7 @@ const PT: EbookCopy = {
   thanks: {
     checking: 'Conferindo o seu pedido…', checkingSub: 'Leva só alguns segundos.',
     paidTitle: 'Boas-vindas à cozinha na mata{name}! 🌈',
-    paidText: 'O seu **Sweet Escape** está pronto (lembrando: o livro é em inglês). Salve no celular ou tablet e cozinhe direto dele. Esta página e o link do seu e-mail funcionam sempre que precisar.',
+    paidText: 'O seu **Sweet Escape** está pronto. Salve no celular ou tablet e cozinhe direto dele. Esta página e o link do seu e-mail funcionam sempre que precisar.',
     fileError: 'O download não começou. Tente mais uma vez; se ainda falhar, chame a gente no WhatsApp e enviamos na hora.',
     download: 'Baixar o Sweet Escape (PDF)',
     startTitle: 'Por onde começar',
@@ -380,12 +395,12 @@ const PT: EbookCopy = {
   },
   mail: {
     hi: 'Oi, {name}!',
-    receivedPix: 'Obrigada por pedir o Sweet Escape! O seu livro está reservado. Assim que o Pix de {price} cair e a Dolly confirmar, o botão abaixo libera o download. Guarde este e-mail: o link é seu para sempre. (Lembrando: o livro é em inglês.)',
-    receivedCard: 'Obrigada por pedir o Sweet Escape! Só estamos esperando a confirmação do pagamento, que costuma levar um minuto. O botão abaixo é o seu link pessoal de download, e é seu para sempre. (Lembrando: o livro é em inglês.)',
-    yourOrder: 'Seu pedido', receivedSubject: 'Seu pedido do Sweet Escape ({ref})',
+    receivedPix: 'Obrigada por pedir o Sweet Escape! O seu livro está reservado. Assim que o Pix de {price} cair e a Dolly confirmar, o botão abaixo libera o download. Guarde este e-mail: o link é seu para sempre.',
+    receivedCard: 'Obrigada por pedir o Sweet Escape! Só estamos esperando a confirmação do pagamento, que costuma levar um minuto. O botão abaixo é o seu link pessoal de download, e é seu para sempre.',
+    edition: 'Sua edição', yourOrder: 'Seu pedido', receivedSubject: 'Seu pedido do Sweet Escape ({ref})',
     receivedPreheaderPix: 'Um Pix de {price} e o livro é seu.', receivedPreheaderCard: 'O seu livro de doces de plantas está a caminho.',
     receivedHeading: 'Seu sweet escape está esperando', myPage: 'Minha página de download', receivedNote: 'Pedido {ref}. Dúvidas? Chame no WhatsApp: +55 11 93211-9196.',
-    paidText: 'Pagamento confirmado. Boas-vindas à cozinha na mata! O seu Sweet Escape está pronto para baixar: 72 páginas, sete cores, sete doces (em inglês).',
+    paidText: 'Pagamento confirmado. Boas-vindas à cozinha na mata! O seu Sweet Escape está pronto para baixar: 72 páginas, sete cores, sete doces.',
     whereToStart: 'Por onde começar',
     tips: ['Leia primeiro as seis regras (páginas 4–11). Elas são o “porquê” que deixa toda receita mais fácil.', 'O Dia 3, Red Berry Bliss Balls, não vai ao forno e é perfeito para fazer com as crianças.', 'Deixe a castanha de caju de molho na noite anterior aos Dias 1, 2 ou 6 e tudo fica mais rápido.'],
     paidLink: 'O link abaixo funciona sempre que precisar, em qualquer aparelho. Salve o PDF no celular ou tablet e cozinhe direto dele.',
@@ -397,17 +412,22 @@ const PT: EbookCopy = {
 const ES: EbookCopy = {
   meta: {
     title: 'Sweet Escape · 7 postres de plantas que tu familia va a amar | The Tropical Bakery',
-    description: 'El e-book de Dolly: 7 colores, 7 postres hechos con frutas, frutos secos y plantas enteras. Cremas sedosas, caramelo, mousse de chocolate, cheesecake. PDF al instante. E-book en inglés.',
+    description: 'El e-book de Dolly: 7 colores, 7 postres hechos con frutas, frutos secos y plantas enteras. Cremas sedosas, caramelo, mousse de chocolate, cheesecake. PDF al instante. En español, English, Português y Nederlands.',
     ogTitle: 'Sweet Escape · el libro de postres de plantas de la cocina de Dolly en la selva',
     ogLocale: 'es_ES',
   },
   langBar: { label: 'Lee esta página en', auto: 'traducción automática', suggest: '¿Prefieres leer en español?', suggestGo: 'Leer en' },
   english: {
     badge: 'E-book en inglés',
-    title: 'Importante: el e-book está en inglés',
-    text: 'Esta página está en español para que conozcas el libro, pero Sweet Escape está escrito en inglés, para lectores de todo el mundo. Es un inglés sencillo y cercano, cada receta tiene fotos, las medidas van en tazas (cups) y cucharas y el horno en °C y °F. Si te manejas con una receta en inglés, o con el traductor del móvil, te vas a sentir como en casa.',
-    tick: 'Entiendo que el e-book está en inglés.',
-    tickError: 'Confirma, por favor, que sabes que el e-book está en inglés.',
+    title: 'Atención: esta edición está en inglés',
+    text: 'Elegiste la edición en inglés: un inglés sencillo y cercano, con foto en cada receta, medidas en tazas (cups) y cucharas y horno en °C y °F. La edición en español también está a la venta: solo elige el idioma al pedir.',
+    tick: 'Entiendo que recibiré la edición en inglés.',
+    tickError: 'Confirma, por favor, que sabes que recibirás la edición en inglés.',
+  },
+  edition: {
+    badge: 'E-book en español',
+    title: 'Disponible en español (y en otros 3 idiomas)',
+    text: 'El libro entero, con todas sus recetas, está traducido al español. También hay English, Português y Nederlands: eliges al hacer el pedido. Otros idiomas reciben la edición en inglés.',
   },
   hero: {
     eyebrow: 'Nuevo · el e-book de la cocina de Dolly en la selva',
@@ -424,17 +444,17 @@ const ES: EbookCopy = {
       'Cada cena se convierte en una negociación por tres trocitos de brócoli.',
       'Ya probaste “postres saludables”. Todos fueron educados. Nadie repitió.',
     ],
-    bigIdea: 'El secreto que Dolly aprendió en su cocina: **los niños no comen verduras. Comen colores.** Hazlo rosa con remolacha, verde con espirulina, morado con boniato, y de repente las plantas son el premio.',
+    bigIdea: 'El secreto que Dolly aprendió en su cocina: **los niños no comen verduras. Comen colores.** Hazlo rosa con remolacha, verde con espirulina, morado con camote, y de repente las plantas son el premio.',
   },
   journey: { kicker: 'El viaje', title: '7 días. 7 colores. 7 dulces.', lead: 'Una receta por día, cada una con un color de la naturaleza. Toca un día.', day: 'Día', tabs: 'Elige un día' },
   recipes: [
-    { color: 'Amarillo', subtitle: 'con cobertura de coco y cúrcuma', hook: 'Una crema sedosa de piña y anacardo sobre una base de dátil y almendra. Sabe a vacaciones en la playa y cuaja en el congelador mientras haces otra cosa.', makes: 'Para 8', kidAngle: 'Parece una porción de sol. Nadie pregunta dónde están las verduras.', alt: 'Cuadraditos de piña y coco en capas sobre un tronco de madera' },
-    { color: 'Naranja', subtitle: 'con crema batida de anacardo, naranja sanguina y zanahoria', hook: 'Muffins de avena y almendra endulzados solo con un caramelo de dátiles, llenos de mango maduro y coronados con una crema que esconde una zanahoria.', makes: 'Salen 8–10', kidAngle: 'Un cupcake con remolino encima. La zanahoria es nuestro secreto.', alt: 'Muffins de mango con crema naranja de anacardo y flores tropicales' },
-    { color: 'Rojo', subtitle: 'joyas de cereza, fresa, arándano rojo y remolacha', hook: 'Sin horno, sin batidora. Tritura, forma bolitas y rebózalas en frambuesa liofilizada crujiente. La receta más rápida del libro, y la que los niños ayudan a hacer.', makes: 'Salen 12–14', kidAngle: 'Las manos pequeñas pueden formarlas. La remolacha nunca se pareció tanto a un caramelo.', alt: 'Bolitas rosadas de frutos rojos con cerezas y fresas' },
-    { color: 'Morado', subtitle: 'con frutos del bosque e inspiración de las Zonas Azules', hook: 'Base de nueces y cacao, una capa cremosa morada hecha de boniato y una salsa de frutos del bosque. La que todos fotografían.', makes: 'Para 8–10', kidAngle: 'Es morado. Ese es todo el argumento, y funciona.', alt: 'Porción de cheesecake de boniato morado con una flor violeta' },
-    { color: 'Verde', subtitle: 'un dulce alegre y helado, con espirulina', hook: 'Galletas crujientes de pistacho con forma de taco, rellenas de un helado cremoso hecho de plátano congelado. Es helado, pero es fruta.', makes: 'Salen 6–8', kidAngle: 'Helado verde dentro de un taco. Desaparece antes de derretirse.', alt: 'Tacos de pistacho verdes rellenos de helado de plátano y espirulina' },
-    { color: 'Caramelo', subtitle: 'un dulce crudo de tres capas entre Brasil y Gran Bretaña', hook: 'Base de cacahuete al estilo paçoca brasileña, crema de plátano y anacardo y un caramelo líquido hecho solo de dátiles. La estrella de la portada.', makes: 'Salen 8–10', kidAngle: 'Crema de cacahuete y caramelo. No vas a tener que ofrecerlo dos veces.', alt: 'Barritas banoffee con caramelo de dátiles en un plato verde' },
-    { color: 'Chocolate', subtitle: 'una oda al chocolate oscuro, con una pera sorpresa', hook: 'Base de pecanas y cacao, una mousse batida con pera madura y una capa brillante de chocolate. Las mitades de pecana se convierten en cabecitas y patitas.', makes: 'Salen 6–8', kidAngle: 'Son tortugas. De chocolate. Con una pera escondida dentro.', alt: 'Tortugas de mousse de chocolate con cabeza y patas de pecana' },
+    { name: 'Cuadritos Paraíso de Coco y Piña Besados por el Sol', color: 'Amarillo', subtitle: 'con cobertura de coco y cúrcuma', hook: 'Una crema sedosa de piña y anacardo sobre una base de dátil y almendra. Sabe a vacaciones en la playa y cuaja en el congelador mientras haces otra cosa.', makes: 'Para 8', kidAngle: 'Parece una porción de sol. Nadie pregunta dónde están las verduras.', alt: 'Cuadraditos de piña y coco en capas sobre un tronco de madera' },
+    { name: 'Muffins de Mango con Especias Chai', color: 'Naranja', subtitle: 'con crema batida de anacardo, naranja sanguina y zanahoria', hook: 'Muffins de avena y almendra endulzados solo con un caramelo de dátiles, llenos de mango maduro y coronados con una crema que esconde una zanahoria.', makes: 'Salen 8–10', kidAngle: 'Un cupcake con remolino encima. La zanahoria es nuestro secreto.', alt: 'Muffins de mango con crema naranja de anacardo y flores tropicales' },
+    { name: 'Bliss Balls Aciditas de Frutos Rojos', color: 'Rojo', subtitle: 'joyas de cereza, fresa, arándano rojo y remolacha', hook: 'Sin horno, sin batidora. Licúa, forma bolitas y rebózalas en frambuesa liofilizada crujiente. La receta más rápida del libro, y la que los niños ayudan a hacer.', makes: 'Salen 12–14', kidAngle: 'Las manos pequeñas pueden formarlas. La remolacha nunca se pareció tanto a un caramelo.', alt: 'Bolitas rosadas de frutos rojos con cerezas y fresas' },
+    { name: 'Cheesecake de la Longevidad de Camote Morado', color: 'Morado', subtitle: 'con frutos del bosque e inspiración de las Zonas Azules', hook: 'Base de nueces y cacao, una capa cremosa morada hecha de camote y una salsa de frutos del bosque. La que todos fotografían.', makes: 'Para 8–10', kidAngle: 'Es morado. Ese es todo el argumento, y funciona.', alt: 'Porción de cheesecake de camote morado con una flor violeta' },
+    { name: 'Tacos de Pistacho con Nicecream Supergreen Laguna', color: 'Verde', subtitle: 'un dulce alegre y helado, con espirulina', hook: 'Galletas crujientes de pistacho con forma de taco, rellenas de un helado cremoso hecho de banana congelado. Es helado, pero es fruta.', makes: 'Salen 6–8', kidAngle: 'Helado verde dentro de un taco. Desaparece antes de derretirse.', alt: 'Tacos de pistacho verdes rellenos de helado de banana y espirulina' },
+    { name: 'Barritas Banoffee de Maní', color: 'Caramelo', subtitle: 'un dulce crudo de tres capas entre Brasil y Gran Bretaña', hook: 'Base de maní al estilo paçoca brasileña, crema de banana y anacardo y un caramelo líquido hecho solo de dátiles. La estrella de la portada.', makes: 'Salen 8–10', kidAngle: 'Crema de maní y caramelo. No vas a tener que ofrecerlo dos veces.', alt: 'Barritas banoffee con caramelo de dátiles en un plato verde' },
+    { name: 'Tortugas de Mousse de Cacao Oscuro', color: 'Chocolate', subtitle: 'una oda al chocolate oscuro, con una pera sorpresa', hook: 'Base de pecanas y cacao, una mousse batida con pera madura y una capa brillante de chocolate. Las mitades de pecana se convierten en cabecitas y patitas.', makes: 'Salen 6–8', kidAngle: 'Son tortugas. De chocolate. Con una pera escondida dentro.', alt: 'Tortugas de mousse de chocolate con cabeza y patas de pecana' },
   ],
   learn: {
     kicker: 'No son solo recetas', title: 'Aprende la magia que hay detrás',
@@ -449,7 +469,7 @@ const ES: EbookCopy = {
     ],
   },
   peek: {
-    kicker: 'Echa un vistazo', title: '{pages} páginas para cocinar con ellas', lead: 'Toca una página para verla de cerca. (Las páginas están en inglés, como el libro.)',
+    kicker: 'Echa un vistazo', title: '{pages} páginas para cocinar con ellas', lead: 'Toca una página para verla de cerca.',
     alts: ['Índice de Sweet Escape', 'Regla n.º 2: los seis pilares', 'Apertura de la receta del Día 1, Amarillo', 'Página de receta con ingredientes y pasos', '¿Por qué piña? La historia del ingrediente', 'Beneficios de cada ingrediente', 'Apertura de la receta del Día 4, Morado', 'La historia de Dolly: del ballet a la cocina en la selva'],
   },
   family: {
@@ -479,27 +499,27 @@ const ES: EbookCopy = {
   offer: {
     kicker: 'Todo lo que recibes', title: 'Tu sweet escape, hoy',
     stack: [
-      { what: 'El e-book Sweet Escape (en inglés)', detail: '{pages} páginas a todo color, 7 recetas completas con cada capa, paso y foto' },
+      { what: 'El e-book Sweet Escape', detail: '{pages} páginas a todo color, 7 recetas completas con cada capa, paso y foto' },
       { what: 'Los 6 pilares', detail: 'el método para inventar tus propios dulces después del séptimo día' },
-      { what: 'Historias “¿Por qué este ingrediente?”', detail: 'la historia y la magia de la piña, el mango, los frutos rojos, el boniato, la espirulina, el cacahuete y el cacao' },
+      { what: 'Historias “¿Por qué este ingrediente?”', detail: 'la historia y la magia de la piña, el mango, los frutos rojos, el camote, la espirulina, el maní y el cacao' },
       { what: 'Beneficios de cada receta', detail: 'lo que hace cada ingrediente por ti y tu familia, en palabras sencillas' },
-      { what: 'Las seis reglas y el kit básico de Dolly', detail: 'una batidora, unos moldes y un congelador. Esa es toda la cocina.' },
+      { what: 'Las seis reglas y el kit básico de Dolly', detail: 'una licuadora, unos moldes y un congelador. Esa es toda la cocina.' },
       { what: 'Bonus: una llamada gratis de 30 minutos de Food Healing', detail: 'resérvala con Dolly desde un enlace dentro del libro', bonus: true },
       { what: 'Bonus: una invitación a Sunbaked Letters', detail: 'la carta semanal de Dolly con recetas y food healing (en inglés)', bonus: true },
     ],
     promiseDays: 'días', promiseTitle: 'La promesa dulce',
     promiseText: 'Haz una receta. Si no te conquista, escríbenos en 7 días y te devolvemos hasta el último céntimo.',
-    coverAlt: 'Portada del e-book Sweet Escape', usd: '≈ US$ {usd} · pago único · PDF en inglés',
+    coverAlt: 'Portada del e-book Sweet Escape', usd: '≈ US$ {usd} · pago único · PDF',
   },
   faq: {
     kicker: 'Preguntas', title: 'Bueno saberlo',
     items: [
-      { q: '¿En qué idioma está el libro?', a: 'En inglés. Un inglés sencillo y cercano, escrito para lectores de todo el mundo. Cada receta tiene fotos, las medidas van en tazas (cups) y cucharas y el horno en °C y °F. Esta página está en español para que conozcas el libro, pero el libro en sí está en inglés. Si lo necesitas, el traductor del móvil (Google Lens o Google Traductor) ayuda mucho con una receta.' },
+      { q: '¿En qué idiomas está el libro?', a: 'En español, con todas las recetas y fotos traducidas. También existe en English, Português y Nederlands: eliges el idioma al pedir. Quien lee otro idioma recibe la edición en inglés (un inglés sencillo y cercano, con medidas en tazas y horno en °C y °F).' },
       { q: '¿Cómo lo recibo?', a: 'Es un PDF. Pagando con tarjeta o PayPal, la descarga se abre al momento y te llega un enlace personal por e-mail. Con Pix (Brasil), Dolly confirma el pago a mano, normalmente en pocas horas, y el mismo enlace se desbloquea solo.' },
-      { q: '¿Necesito algún equipo especial?', a: 'No. Una batidora o procesador, unos moldes de silicona o una bandeja, y un congelador. La mayoría de los dulces son crudos: trituras, presionas y el congelador hace el resto. Solo los muffins y las galletas taco van al horno.' },
+      { q: '¿Necesito algún equipo especial?', a: 'No. Una licuadora o procesador, unos moldes de silicona o una bandeja, y un congelador. La mayoría de los dulces son crudos: licuas, presionas y el congelador hace el resto. Solo los muffins y las galletas taco van al horno.' },
       { q: '¿De verdad es sin azúcar refinado?', a: 'Cada receta se endulza con dátiles, pasas y fruta. La única excepción es la capa de chocolate del Día 7: el libro te enseña a elegir un chocolate negro sin azúcar refinado, porque la mayoría de los del súper llevan un poco.' },
       { q: '¿Es vegano? ¿Sin gluten?', a: '100% vegetal, sin lácteos, sin huevo y sin harina de trigo. Algunas recetas llevan avena: usa avena certificada sin gluten si lo necesitas.' },
-      { q: 'Mi hijo es alérgico a los frutos secos.', a: 'Ten cuidado, por favor: frutos secos, semillas y coco son el corazón de casi todas las recetas (almendra, anacardo, nuez, pecana, pistacho, cacahuete). El capítulo de los pilares ayuda a pensar en sustituciones, pero este libro no está escrito para una cocina sin frutos secos.' },
+      { q: 'Mi hijo es alérgico a los frutos secos.', a: 'Ten cuidado, por favor: frutos secos, semillas y coco son el corazón de casi todas las recetas (almendra, anacardo, nuez, pecana, pistacho, maní). El capítulo de los pilares ayuda a pensar en sustituciones, pero este libro no está escrito para una cocina sin frutos secos.' },
       { q: 'Soy principiante. ¿Podré hacerlo?', a: 'Sí. La Regla n.º 4 es literalmente “trabaja con inteligencia, no con esfuerzo”. Empieza por el Día 3, las Red Berry Bliss Balls: sin horno, diez minutos, y las manos pequeñas pueden formarlas.' },
       { q: '¿Y si no me gusta?', a: 'Escríbenos en 7 días y te devolvemos hasta el último céntimo. Sin formularios, sin rencores.' },
     ],
@@ -507,10 +527,11 @@ const ES: EbookCopy = {
   final: {
     line: 'Siete colores. Siete creaciones. Siete pequeñas razones para volver a enamorarte de las plantas.',
     title1: 'Tu', script: 'sweet escape', title2: 'te está esperando.',
-    ps: '**P.D.** Si bajaste directo hasta aquí: son {pages} páginas, 7 postres de plantas que tu familia va a pedir de verdad, el método para inventar los tuyos y una garantía de 7 días. Todo por {price}, menos que dos dulces de nuestra pastelería. Y recuerda: el libro está en inglés.',
+    ps: '**P.D.** Si bajaste directo hasta aquí: son {pages} páginas, 7 postres de plantas que tu familia va a pedir de verdad, el método para inventar los tuyos y una garantía de 7 días. Todo por {price}, menos que dos dulces de nuestra pastelería.',
   },
-  buyBar: { kicker: 'E-book Sweet Escape', note: 'PDF al instante · en inglés', label: 'Lo quiero' },
+  buyBar: { kicker: 'E-book Sweet Escape', note: 'PDF al instante · en español', label: 'Lo quiero' },
   form: {
+    bookLang: 'Idioma del libro',
     name: 'Tu nombre', email: 'E-mail', emailNote: '(aquí llega tu libro)', whatsapp: 'WhatsApp', optional: '(opcional)',
     payLegend: '¿Cómo quieres pagar?',
     card: 'Tarjeta', cardNote: 'descarga al instante', pix: 'Pix', pixMethodNote: 'Brasil · confirmado a mano', paypal: 'PayPal', paypalNote: 'desde cualquier país',
@@ -525,7 +546,7 @@ const ES: EbookCopy = {
   thanks: {
     checking: 'Revisando tu pedido…', checkingSub: 'Solo tarda unos segundos.',
     paidTitle: '¡Te damos la bienvenida a la cocina en la selva{name}! 🌈',
-    paidText: 'Tu **Sweet Escape** está listo (recuerda: el libro está en inglés). Guárdalo en el móvil o la tablet y cocina directamente desde él. Esta página y el enlace de tu e-mail funcionan siempre que los necesites.',
+    paidText: 'Tu **Sweet Escape** está listo. Guárdalo en el celular o la tablet y cocina directamente desde él. Esta página y el enlace de tu e-mail funcionan siempre que los necesites.',
     fileError: 'La descarga no empezó. Inténtalo una vez más; si sigue fallando, escríbenos por WhatsApp y te lo enviamos enseguida.',
     download: 'Descargar Sweet Escape (PDF)',
     startTitle: 'Por dónde empezar',
@@ -544,21 +565,192 @@ const ES: EbookCopy = {
   },
   mail: {
     hi: '¡Hola, {name}!',
-    receivedPix: '¡Gracias por pedir Sweet Escape! Tu libro está reservado. En cuanto llegue tu Pix de {price} y Dolly lo confirme, el botón de abajo desbloquea tu descarga. Guarda este e-mail: el enlace es tuyo para siempre. (Recuerda: el libro está en inglés.)',
-    receivedCard: '¡Gracias por pedir Sweet Escape! Solo estamos esperando la confirmación del pago, que suele tardar un minuto. El botón de abajo es tu enlace personal de descarga, y es tuyo para siempre. (Recuerda: el libro está en inglés.)',
-    yourOrder: 'Tu pedido', receivedSubject: 'Tu pedido de Sweet Escape ({ref})',
+    receivedPix: '¡Gracias por pedir Sweet Escape! Tu libro está reservado. En cuanto llegue tu Pix de {price} y Dolly lo confirme, el botón de abajo desbloquea tu descarga. Guarda este e-mail: el enlace es tuyo para siempre.',
+    receivedCard: '¡Gracias por pedir Sweet Escape! Solo estamos esperando la confirmación del pago, que suele tardar un minuto. El botón de abajo es tu enlace personal de descarga, y es tuyo para siempre.',
+    edition: 'Tu edición', yourOrder: 'Tu pedido', receivedSubject: 'Tu pedido de Sweet Escape ({ref})',
     receivedPreheaderPix: 'Un Pix de {price} y el libro es tuyo.', receivedPreheaderCard: 'Tu libro de postres de plantas está en camino.',
     receivedHeading: 'Tu sweet escape te está esperando', myPage: 'Mi página de descarga', receivedNote: 'Pedido {ref}. ¿Dudas? Escríbenos por WhatsApp: +55 11 93211-9196.',
-    paidText: 'Pago confirmado. ¡Te damos la bienvenida a la cocina en la selva! Tu Sweet Escape está listo para descargar: 72 páginas, siete colores, siete dulces (en inglés).',
+    paidText: 'Pago confirmado. ¡Te damos la bienvenida a la cocina en la selva! Tu Sweet Escape está listo para descargar: 72 páginas, siete colores, siete dulces.',
     whereToStart: 'Por dónde empezar',
     tips: ['Lee primero las seis reglas (páginas 4–11). Son el “porqué” que hace que cada receta sea más fácil.', 'El Día 3, Red Berry Bliss Balls, no lleva horno y es perfecto para hacer con niños.', 'Deja los anacardos en remojo la noche antes del Día 1, 2 o 6 y todo irá más rápido.'],
-    paidLink: 'El enlace de abajo funciona siempre que lo necesites, en cualquier dispositivo. Guarda el PDF en el móvil o la tablet y cocina directamente desde él.',
+    paidLink: 'El enlace de abajo funciona siempre que lo necesites, en cualquier dispositivo. Guarda el PDF en el celular o la tablet y cocina directamente desde él.',
     paidSubject: 'Tu e-book Sweet Escape está listo 🌈', paidPreheader: 'Tu enlace de descarga está dentro. ¡Disfruta!',
     paidHeading: 'Tu libro está listo', paidCta: 'Descargar Sweet Escape', paidNote: 'Pedido {ref}. Enséñanos lo que hagas: @thetropicalbakery en Instagram.',
   },
 };
 
-export const EBOOK_COPY: Record<EbookLang, EbookCopy> = { en: EN, pt: PT, es: ES };
+const NL: EbookCopy = {
+  meta: {
+    title: 'Sweet Escape · 7 plantaardige traktaties waar je gezin dol op wordt | The Tropical Bakery',
+    description: 'Het e-book van Dolly: 7 kleuren, 7 plantaardige desserts van fruit, noten en hele planten. Zijdezachte crèmes, karamel, chocolademousse, cheesecake. Meteen als PDF, in het Nederlands, English, Português en Español.',
+    ogTitle: 'Sweet Escape · het boek met plantaardige traktaties uit Dolly’s jungle-keuken',
+    ogLocale: 'nl_NL',
+  },
+  langBar: { label: 'Lees deze pagina in', auto: 'automatische vertaling', suggest: 'Liever in het Nederlands lezen?', suggestGo: 'Lezen in het' },
+  english: {
+    badge: 'E-book in het Engels',
+    title: 'Let op: deze editie is in het Engels',
+    text: 'Je koos de Engelse editie: eenvoudig, vriendelijk Engels, met een foto bij elk recept, maten in cups en lepels en ovenstanden in °C en °F. De Nederlandse editie is ook te koop: kies gewoon je taal bij het bestellen.',
+    tick: 'Ik begrijp dat ik de Engelse editie krijg.',
+    tickError: 'Bevestig even dat je weet dat je de Engelse editie krijgt.',
+  },
+  edition: {
+    badge: 'E-book in het Nederlands',
+    title: 'Beschikbaar in het Nederlands (en nog 3 talen)',
+    text: 'Het hele boek, recepten en foto’s, is vertaald naar het Nederlands. Er is ook English, Português en Español: kies bij het bestellen. Alle andere talen krijgen de Engelse editie.',
+  },
+  hero: {
+    eyebrow: 'Nieuw · het e-book uit Dolly’s jungle-keuken',
+    script: 'Zoete', title: 'traktaties waar je kinderen om smeken,', em: 'gemaakt van planten.',
+    lead: '**Sweet Escape** zijn zeven levendige plantaardige desserts, één voor elke kleur van de natuur, en de geheimen erachter. Zijdezachte crèmes, heerlijke karamel, chocolademousse, cheesecake: genieten en voeden in dezelfde hap.',
+    cta: 'Ja, ik wil Sweet Escape · {price}',
+    ticks: ['Meteen als PDF', '{pages} pagina’s', '7 dagen garantie'],
+    card: 'kleuren · 7 recepten', card2: 'één heerlijke ontsnapping',
+  },
+  problem: {
+    kicker: 'Komt dit je bekend voor?', title1: 'Jij wilt dat ze gezond eten.', title2: 'Zij willen dessert.',
+    pains: [
+      'Je staat in het snoepgangpad, verscheurd tussen de “gezonde” reep die naar karton smaakt en degene waar je straks spijt van krijgt.',
+      'Elk avondeten wordt een onderhandeling over drie stukjes broccoli.',
+      'Je probeerde “gezonde desserts”. Iedereen was beleefd. Niemand vroeg om meer.',
+    ],
+    bigIdea: 'Het geheim dat Dolly in haar keuken leerde: **kinderen eten geen groente. Ze eten kleuren.** Maak het roze met rode biet, groen met spirulina, paars met zoete aardappel, en ineens zijn de planten de traktatie.',
+  },
+  journey: { kicker: 'De reis', title: '7 dagen. 7 kleuren. 7 traktaties.', lead: 'Eén recept per dag, elk een kleur van de natuur. Tik op een dag.', day: 'Dag', tabs: 'Kies een dag' },
+  recipes: [
+    { name: 'Zongekuste Kokos-Ananas Paradijsblokjes', color: 'Geel', subtitle: 'met een kokostopping met kurkuma', hook: 'Een zijdezachte ananas-cashewcrème op een bodem van dadel en amandel. Smaakt naar een strandvakantie en trekt vast in de vriezer terwijl jij iets anders doet.', makes: 'Voor 8', kidAngle: 'Ziet eruit als een plak zonneschijn. Niemand vraagt waar de groente is.', alt: 'Gelaagde ananas-kokosblokjes op een boomstam' },
+    { name: 'Mangomuffins met Chai-kruiden', color: 'Oranje', subtitle: 'met cashew-slagroom van bloedsinaasappel en wortel', hook: 'Muffins van haver en amandel, alleen gezoet met dadelkaramel, vol rijpe mango en bekroond met een slagroom die een wortel verbergt.', makes: 'Goed voor 8–10', kidAngle: 'Een cupcake met een krul erop. De wortel is ons geheim.', alt: 'Mangomuffins met oranje cashewroom en tropische bloemen' },
+    { name: 'Frisse Rode Bessen Bliss Balls', color: 'Rood', subtitle: 'juweelachtige hapjes met kers, aardbei, cranberry en biet', hook: 'Geen oven, geen mixer. Mixen, rollen en wentelen door knapperige gevriesdroogde framboos. Het snelste recept uit het boek, en het recept waar kinderen bij helpen.', makes: 'Goed voor 12–14', kidAngle: 'Kleine handjes kunnen ze rollen. Biet leek nog nooit zo veel op snoep.', alt: 'Roze bessenballetjes met verse kersen en aardbeien' },
+    { name: 'Paarse Zoete Aardappel Longevity Cheesecake', color: 'Paars', subtitle: 'met donkere bosbessen en geïnspireerd op de Blue Zones', hook: 'Een bodem van walnoot en cacao, een romige paarse laag van zoete aardappel en een gietbare bessentopping. Degene die iedereen fotografeert.', makes: 'Voor 8–10', kidAngle: 'Hij is paars. Dat is het hele argument, en het werkt.', alt: 'Plak paarse zoete aardappel-cheesecake met een violette bloem' },
+    { name: 'Supergreen Laguna Nicecream Pistache Taco’s', color: 'Groen', subtitle: 'een vrolijke, smeltende traktatie boordevol spirulina', hook: 'Knapperige taco-koekjes van pistache, gevuld met zachte ijs van bevroren bananen. Het is ijs, maar het is fruit.', makes: 'Goed voor 6–8', kidAngle: 'Groen ijs in een taco. Is op voor het kan smelten.', alt: 'Groene pistache-taco’s gevuld met spirulina-bananenijs' },
+    { name: 'Pinda Banoffee Repen', color: 'Karamel', subtitle: 'een rauwe traktatie in drie lagen die Brazilië en Engeland verbindt', hook: 'Een bodem van pinda in paçoca-stijl, een banaan-cashewcrème en een vloeibare karamel van niets dan dadels. De ster van de cover.', makes: 'Goed voor 8–10', kidAngle: 'Pindakaas en karamel. Je hoeft het geen twee keer aan te bieden.', alt: 'Banoffee-repen met dadelkaramel op een groen bord' },
+    { name: 'Pure Cacao Mousse Schildpadjes', color: 'Chocolade', subtitle: 'een fluweelzachte ode aan de diepste chocolade, met een peerverrassing', hook: 'Een bodem van pecannoot en cacao, een mousse van rijpe peer en een glanzend laagje chocolade. Pecannoothelften worden kopjes en pootjes.', makes: 'Goed voor 6–8', kidAngle: 'Het zijn schildpadjes. Van chocolade. Met een peer erin verstopt.', alt: 'Chocolademousse-schildpadjes met kop en pootjes van pecannoot' },
+  ],
+  learn: {
+    kicker: 'Meer dan recepten', title: 'Leer de magie erachter',
+    lead: '“De magie zit niet in het uit je hoofd leren van recepten, maar in begrijpen *waarom* ze werken.” Waarom vervangen dadels suiker zo goed? Waarom maakt amandelmeel een traktatie zacht *én* verzadigend? Als je de zes bouwstenen kent, worden zeven recepten eindeloze mogelijkheden.',
+    blocks: [
+      { title: 'Gezonde vetten en eiwitten', text: 'Noten, zaden, avocado en kokos geven romigheid, rijkdom en een verzadiging die suiker nooit geeft.' },
+      { title: 'Natuurlijke zoetheid', text: 'Dadels, gedroogd en rijp fruit: hele, vezelrijke zoetheid zonder piek en dip.' },
+      { title: 'De bodem', text: 'Haver, amandelmeel en zelfs knolgewassen geven structuur en comfort, zonder wit tarwemeel.' },
+      { title: 'Smaken en specerijen', text: 'Cacao, vanille, kaneel, kardemom, kruidnagel en tropische rasp: de ziel van elke traktatie.' },
+      { title: 'Toppings en texturen', text: 'Gevriesdroogd fruit, zaden, kokos, een chocoladelaagje, eetbare bloemen: schoonheid en knapperigheid.' },
+      { title: 'Kleur en stemming', text: 'Rode biet, spirulina, kurkuma, bosbessen. Het palet van de natuur, en de reden dat kinderen ernaar grijpen.' },
+    ],
+  },
+  peek: {
+    kicker: 'Neem een kijkje', title: '{pages} pagina’s om uit te koken', lead: 'Tik op een pagina om hem van dichtbij te zien.',
+    alts: ['Inhoudsopgave van Sweet Escape', 'Regel nr. 2: de zes bouwstenen', 'Opening van het recept van Dag 1, Geel', 'Een receptpagina met ingrediënten en stappen', 'Waarom ananas? Het verhaal achter het ingrediënt', 'Gezondheidsvoordelen van elk ingrediënt', 'Opening van het recept van Dag 4, Paars', 'Dolly’s verhaal: van ballet naar de jungle-keuken'],
+  },
+  family: {
+    kicker: 'Voor ouders', title: 'Win ze voor je met een traktatie, niet met een preek',
+    lead: 'Dit zijn desserts die *verleiden*. Chocoladeschildpadjes met pecanpootjes. Groene ijs-taco’s. Roze juweeltjes die je samen aan de keukentafel rolt. Je gezin wordt verliefd op fruit, noten en hele planten zonder dat iemand zegt dat het gezond is.',
+    checks: [
+      'Ruil het koekje na school in voor iets waar je trots op bent',
+      'Laat de kinderen meekoken: de meeste recepten zijn mixen, rollen, drukken en bevriezen',
+      'Desserts die een verjaardag waardig zijn, zonder zuivel, eieren of witte suiker in de kom',
+      'Maak zondag een portie en de vriezer doet de rest van de week',
+    ],
+  },
+  math: {
+    kicker: 'Reken maar mee', title: 'Eén boek. Zo’n {n} traktaties.', treats: 'traktaties uit één ronde van alle 7 recepten',
+    bakery: 'wat ze bij onze bakkerij zouden kosten, tegen ~{each} per stuk', book: 'voor het boek waar je altijd uit kunt koken',
+    small: 'Ingrediënten niet inbegrepen, natuurlijk. Maar je weet waar de supermarkt is.',
+  },
+  story: {
+    kicker: 'Maak kennis met Dolly', title: 'Van het balletpodium naar een jungle-keuken',
+    paragraphs: [
+      'Mijn relatie met eten begon in een wereld waar discipline alles was: professioneel ballet. Ik leerde elke calorie, elke hap te beheersen, en dat maakte dat ik het plezier in eten kwijtraakte.',
+      'Door liefde en verlies bouwde ik mijn leven opnieuw op aan de Braziliaanse kust, omringd door de oceaan, het regenwoud, het zonlicht en de overvloed van Brazilië. Daar werd eten creativiteit, voeden werd genieten, en dessert werd een feest in plaats van een compromis.',
+      '*Sweet Escape* is alles wat ik leerde, verweven door zeven recepten, zodat jij diezelfde vreugde in je eigen keuken kunt brengen.',
+    ],
+    sign: 'Kom binnen in mijn jungle-keuken.', photoAlt: 'Dolly met een schaal van haar plantaardige traktaties in de tuin',
+  },
+  offer: {
+    kicker: 'Alles wat je krijgt', title: 'Jouw sweet escape, vandaag',
+    stack: [
+      { what: 'Het e-book Sweet Escape', detail: '{pages} pagina’s in vol kleur, 7 complete recepten met elke laag, stap en foto' },
+      { what: 'De 6 bouwstenen', detail: 'het raamwerk waarmee je na de zevende dag je eigen traktaties bedenkt' },
+      { what: 'Verhalen “Waarom dit ingrediënt?”', detail: 'de geschiedenis en magie van ananas, mango, bessen, zoete aardappel, spirulina, pinda en cacao' },
+      { what: 'Gezondheidsvoordelen bij elk recept', detail: 'wat elk ingrediënt doet voor jou en je gezin, in gewone woorden' },
+      { what: 'Dolly’s zes regels en eenvoudige keukenset', detail: 'een blender, wat vormpjes en een vriezer. Dat is de hele keuken.' },
+      { what: 'Bonus: een gratis Food Healing-gesprek van 30 minuten', detail: 'boek een kennismaking met Dolly vanuit het boek', bonus: true },
+      { what: 'Bonus: een uitnodiging voor Sunbaked Letters', detail: 'Dolly’s wekelijkse brief met recepten en food healing (in het Engels)', bonus: true },
+    ],
+    promiseDays: 'dagen', promiseTitle: 'De zoete belofte',
+    promiseText: 'Maak één recept. Wint het je niet voor zich, schrijf ons binnen 7 dagen en je krijgt elke cent terug.',
+    coverAlt: 'Omslag van het e-book Sweet Escape', usd: 'eenmalige betaling · PDF · afgerekend als {reais}',
+  },
+  faq: {
+    kicker: 'Vragen', title: 'Goed om te weten',
+    items: [
+      { q: 'In welke talen is het boek?', a: 'In het Nederlands, English, Português (Brazilië) en Español, volledig vertaald met recepten en foto’s. Kies je taal bij het bestellen. Wie een andere taal leest, krijgt de Engelse editie: eenvoudig, vriendelijk Engels met maten in cups en lepels en ovenstanden in °C en °F.' },
+      { q: 'Hoe krijg ik het?', a: 'Het is een PDF. Na betaling met kaart of PayPal opent je download meteen en komt er een persoonlijke link per e-mail. Met Pix (Brazilië) bevestigt Dolly de betaling met de hand, meestal binnen enkele uren, en dezelfde link ontgrendelt zichzelf.' },
+      { q: 'Heb ik speciale apparatuur nodig?', a: 'Nee. Een blender of keukenmachine, een paar siliconen vormpjes of een bakplaat, en een vriezer. De meeste traktaties zijn rauw: je mixt, drukt aan en de vriezer doet de rest. Alleen de muffins en de taco-koekjes gaan in de oven.' },
+      { q: 'Is het echt zonder geraffineerde suiker?', a: 'Elk recept wordt gezoet met dadels, rozijnen en fruit. De enige uitzondering is het chocoladelaagje van Dag 7: het boek leert je een pure chocolade zonder geraffineerde suiker te kiezen, want de meeste uit de winkel bevatten wat.' },
+      { q: 'Is het vegan? Glutenvrij?', a: '100% plantaardig, zonder zuivel, zonder eieren en zonder tarwemeel. Sommige recepten gebruiken haver: kies gecertificeerd glutenvrije haver als je dat nodig hebt.' },
+      { q: 'Mijn kind is allergisch voor noten.', a: 'Wees voorzichtig: noten, zaden en kokos zijn het hart van de meeste recepten (amandel, cashew, walnoot, pecannoot, pistache, pinda). Het hoofdstuk over de bouwstenen helpt je nadenken over alternatieven, maar dit boek is niet geschreven voor een notenvrije keuken.' },
+      { q: 'Ik ben beginner. Lukt dat?', a: 'Ja. Regel nr. 4 is letterlijk “werk slim, niet hard”. Begin met Dag 3, de Frisse Rode Bessen Bliss Balls: geen oven, tien minuten, en kleine handjes kunnen ze rollen.' },
+      { q: 'En als ik er niet blij mee ben?', a: 'Schrijf ons binnen 7 dagen en je krijgt elke cent terug. Geen formulieren, geen hard feelings.' },
+    ],
+  },
+  final: {
+    line: 'Zeven kleuren. Zeven creaties. Zeven kleine redenen om opnieuw verliefd te worden op planten.',
+    title1: 'Jouw', script: 'sweet escape', title2: 'wacht op je.',
+    ps: '**P.S.** Als je meteen naar beneden scrolde: het zijn {pages} pagina’s, 7 plantaardige desserts waar je gezin echt om vraagt, het raamwerk om je eigen te bedenken en 7 dagen garantie. Alles voor {price}, minder dan twee traktaties uit onze eigen bakkerij.',
+  },
+  buyBar: { kicker: 'E-book Sweet Escape', note: 'Meteen als PDF · in het Nederlands', label: 'Ik wil het' },
+  form: {
+    name: 'Je naam', email: 'E-mail', emailNote: '(hier komt je boek aan)', whatsapp: 'WhatsApp', optional: '(optioneel)',
+    bookLang: 'Taal van het boek',
+    payLegend: 'Hoe wil je betalen?',
+    card: 'Kaart', cardNote: 'meteen downloaden', pix: 'Pix', pixMethodNote: 'Brazilië · met de hand bevestigd', paypal: 'PayPal', paypalNote: 'vanuit elk land',
+    submit: 'Ja! Ik wil Sweet Escape · {price}', busy: 'Een moment…',
+    fine: '🔒 Veilig betalen · PDF per e-mail · 7 dagen garantie',
+    currencyNote: '',
+    errName: 'Vertel ons even je naam.', errEmail: 'Controleer je e-mail: daar komt je boek aan.', errGeneric: 'Er ging iets mis. Probeer het opnieuw.',
+    pixTitle: 'Bijna van jou! Betaal {price} met Pix', pixLabel: 'Of Pix copia e cola:', pixCopy: 'Kopieer de Pix-code', pixCopied: 'Gekopieerd ✓',
+    pixNote: 'We mailden deze code en je persoonlijke downloadlink ook naar **{email}**. Dolly bevestigt Pix-betalingen met de hand, meestal binnen enkele uren, en je link ontgrendelt zichzelf.',
+    pixPaid: 'Ik heb betaald · naar mijn download',
+  },
+  thanks: {
+    checking: 'Je bestelling controleren…', checkingSub: 'Dit duurt een paar seconden.',
+    paidTitle: 'Welkom in de jungle-keuken{name}! 🌈',
+    paidText: 'Jouw exemplaar van **Sweet Escape** staat klaar. Bewaar het op je telefoon of tablet en kook er rechtstreeks uit. Deze pagina en de link in je e-mail werken wanneer je ze nodig hebt.',
+    fileError: 'De download is niet gestart. Probeer het nog eens; lukt het nog niet, stuur ons dan een WhatsApp-bericht en we sturen het meteen.',
+    download: 'Download Sweet Escape (PDF)',
+    startTitle: 'Waar te beginnen',
+    start: ['Lees eerst de zes regels: ze maken elk recept makkelijker.', 'Dag 3, de Frisse Rode Bessen Bliss Balls, heeft geen oven nodig: perfect met kinderen.', 'Week de cashewnoten de avond voor Dag 1, 2 en 6 in.'],
+    waitTitle: 'Bedankt{name}! Bijna daar',
+    waitPix: 'Dolly bevestigt Pix-betalingen met de hand, meestal binnen enkele uren. Laat deze pagina open of kom terug via de link in je e-mail: je download ontgrendelt hier vanzelf.',
+    waitCard: 'We wachten op de betalingsbevestiging. Sommige banken doen er een of twee minuten over; deze pagina ververst zichzelf.',
+    failedTitle: 'De betaling is niet gelukt', failedText: 'Er is niets afgeschreven. Probeer het opnieuw met een andere kaart.', retry: 'Opnieuw proberen',
+    unknownTitle: 'We vinden deze bestelling niet', unknownText: 'Open de link uit je e-mail opnieuw. Als je betaald hebt en het werkt nog steeds niet, stuur ons dan een WhatsApp-bericht met je e-mailadres en we lossen het op.', back: 'Terug naar Sweet Escape',
+    nextTitle: 'Wil je dat iemand anders het bakken doet?',
+    next: [
+      { title: 'De Proefdoos', text: 'Dolly’s traktaties, vers uit onze keuken in Itamambuca (Brazilië).' },
+      { title: 'Kook met Dolly', text: 'Praktische cursussen om verder te gaan dan het boek.' },
+      { title: 'De retraite', text: 'Kook in de jungle-keuken zelf, op een steenworp van het strand.' },
+    ],
+  },
+  mail: {
+    hi: 'Hoi {name}!',
+    receivedPix: 'Bedankt voor je bestelling van Sweet Escape! Je boek is gereserveerd. Zodra je Pix van {price} binnen is en Dolly het bevestigt, ontgrendelt de knop hieronder je download. Bewaar deze e-mail: de link is voorgoed van jou.',
+    receivedCard: 'Bedankt voor je bestelling van Sweet Escape! We wachten alleen nog op de betalingsbevestiging, wat meestal een minuut duurt. De knop hieronder is je persoonlijke downloadlink, en die is voorgoed van jou.',
+    yourOrder: 'Je bestelling', receivedSubject: 'Je Sweet Escape-bestelling ({ref})',
+    receivedPreheaderPix: 'Eén Pix van {price} en het boek is van jou.', receivedPreheaderCard: 'Je boek met plantaardige traktaties is onderweg.',
+    edition: 'Jouw editie',
+    receivedHeading: 'Je sweet escape wacht op je', myPage: 'Mijn downloadpagina', receivedNote: 'Bestelling {ref}. Vragen? Stuur een WhatsApp-bericht: +55 11 93211-9196.',
+    paidText: 'Betaling bevestigd. Welkom in de jungle-keuken! Jouw exemplaar van Sweet Escape staat klaar om te downloaden: 72 pagina’s, zeven kleuren, zeven traktaties.',
+    whereToStart: 'Waar te beginnen',
+    tips: ['Lees eerst de zes regels (pagina’s 4–11). Ze zijn het “waarom” dat elk recept makkelijker maakt.', 'Dag 3, de Frisse Rode Bessen Bliss Balls, heeft geen oven nodig en is perfect om met kinderen te maken.', 'Week je cashewnoten de avond voor Dag 1, 2 of 6 in en alles gaat sneller.'],
+    paidLink: 'De link hieronder werkt wanneer je hem nodig hebt, op elk apparaat. Bewaar de PDF op je telefoon of tablet en kook er rechtstreeks uit.',
+    paidSubject: 'Je e-book Sweet Escape staat klaar 🌈', paidPreheader: 'Je downloadlink zit erin. Veel plezier!',
+    paidHeading: 'Je boek staat klaar', paidCta: 'Download Sweet Escape', paidNote: 'Bestelling {ref}. Laat ons zien wat je maakt: @thetropicalbakery op Instagram.',
+  },
+};
+
+export const EBOOK_COPY: Record<EbookLang, EbookCopy> = { en: EN, pt: PT, es: ES, nl: NL };
 
 /** Fills {placeholders}. */
 export const fill = (s: string, vars: Record<string, string | number>) =>

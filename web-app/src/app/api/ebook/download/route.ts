@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     if (!validKey(ref, k)) return NextResponse.redirect(new URL(EBOOK.pagePath, req.nextUrl.origin));
     const access = await ebookAccess(ref);
     if (!access.paid) return NextResponse.redirect(back);
-    return NextResponse.redirect(await signedEbookUrl());
+    return NextResponse.redirect(await signedEbookUrl(access.book));
   } catch (e) {
     console.error('ebook/download:', e);
     back.searchParams.set('erro', '1');

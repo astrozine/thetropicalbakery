@@ -15,14 +15,25 @@ export const EBOOK = {
   /** What English readers see. We still CHARGE priceBRL (card and PayPal convert for them), so keep this near priceBRL / BRL_PER_USD. */
   priceUSD: 9,
   pages: 72,
-  language: 'English',
   /** Private Supabase Storage bucket and file (migration_34). Uploaded by hand, see SETUP_ebook.md. */
   bucket: 'ebooks',
-  file: 'sweet-escape.pdf',
-  downloadName: 'Sweet Escape - The Tropical Bakery.pdf',
   pagePath: '/sweet-escape',
   thanksPath: '/sweet-escape/thank-you',
 } as const;
+
+/**
+ * One PDF per language in the private bucket. The book a buyer gets is the language they chose; any other language
+ * gets the English one. Upload each by hand (SETUP_ebook.md); a missing file falls back to English.
+ */
+export const BOOK_FILES = {
+  en: 'sweet-escape-en.pdf',
+  pt: 'sweet-escape-pt-br.pdf',
+  es: 'sweet-escape-es.pdf',
+  nl: 'sweet-escape-nl.pdf',
+} as const;
+export type BookLang = keyof typeof BOOK_FILES;
+export const isBookLang = (v: unknown): v is BookLang => typeof v === 'string' && v in BOOK_FILES;
+export const downloadName = (lang: BookLang) => `Sweet Escape - The Tropical Bakery (${lang}).pdf`;
 
 /** Rough exchange rate, only for showing dollar amounts to English readers (never used to charge anything). */
 export const BRL_PER_USD = 5.2;
@@ -35,8 +46,6 @@ export interface EbookRecipe {
   hex: string;
   /** Text color that reads on `hex`. */
   ink: string;
-  /** The book's own title, in English in every language. Descriptions live in ebookCopy.ts. */
-  name: string;
   makesCount: number;
   img: string;
 }
@@ -44,13 +53,13 @@ export interface EbookRecipe {
 const IMG = '/ebook/sweet-escape';
 
 export const RECIPES: EbookRecipe[] = [
-  { day: 1, hex: '#f7c600', ink: '#3b2a00', name: 'Sun-Kissed Coco-Pineapple Paradise Squares', makesCount: 8, img: `${IMG}/yellow.webp` },
-  { day: 2, hex: '#ff7a1a', ink: '#3d1a00', name: 'Chai-Spiced Mango Muffins', makesCount: 9, img: `${IMG}/orange.webp` },
-  { day: 3, hex: '#e8364f', ink: '#fff', name: 'Tangy Red Berry Bliss Balls', makesCount: 13, img: `${IMG}/red.webp` },
-  { day: 4, hex: '#a33fc4', ink: '#fff', name: 'Purple Sweet Potato Longevity Cheesecake', makesCount: 9, img: `${IMG}/purple.webp` },
-  { day: 5, hex: '#27b35a', ink: '#fff', name: 'Supergreen Laguna Nicecream Pistachio Tacos', makesCount: 7, img: `${IMG}/green.webp` },
-  { day: 6, hex: '#c9853c', ink: '#2e1800', name: 'Peanutty Banoffee Bars', makesCount: 9, img: `${IMG}/caramel.webp` },
-  { day: 7, hex: '#5a3421', ink: '#fff', name: 'Dark Cocoa Mousse Turtles', makesCount: 7, img: `${IMG}/chocolate.webp` },
+  { day: 1, hex: '#f7c600', ink: '#3b2a00', makesCount: 8, img: `${IMG}/yellow.webp` },
+  { day: 2, hex: '#ff7a1a', ink: '#3d1a00', makesCount: 9, img: `${IMG}/orange.webp` },
+  { day: 3, hex: '#e8364f', ink: '#fff', makesCount: 13, img: `${IMG}/red.webp` },
+  { day: 4, hex: '#a33fc4', ink: '#fff', makesCount: 9, img: `${IMG}/purple.webp` },
+  { day: 5, hex: '#27b35a', ink: '#fff', makesCount: 7, img: `${IMG}/green.webp` },
+  { day: 6, hex: '#c9853c', ink: '#2e1800', makesCount: 9, img: `${IMG}/caramel.webp` },
+  { day: 7, hex: '#5a3421', ink: '#fff', makesCount: 7, img: `${IMG}/chocolate.webp` },
 ];
 
 /** Everything a single run through the book makes. */

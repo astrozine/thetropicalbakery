@@ -4,11 +4,11 @@ import { SITE_URL, copyBox, esc, kicker, orderTable, paragraphs, bulletList } fr
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
 import { EBOOK } from '@/lib/ebook';
-import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
+import { EBOOK_COPY, LANG_LABEL, fill, type EbookLang } from '@/lib/ebookCopy';
 
 /**
- * The e-book's two e-mails, in the language the buyer read the page in (the book itself is English, and the
- * Portuguese and Spanish versions say so): "we got your order" (with the Pix code and the personal download
+ * The e-book's two e-mails, in the language the buyer read the page in (the book comes in English, Português,
+ * Español and Nederlands; the e-mail names the edition they bought): "we got your order" (with the Pix code and the personal download
  * link, which unlocks itself once the payment is confirmed) and "your book is ready". Words in ebookCopy.ts.
  * Transactional (topic `pedido`), one per order each, like the box receipts in ./receipts.ts.
  */
@@ -23,6 +23,8 @@ export interface EbookReceipt {
   /** The download key for this order (lib/payments/ebook.ts). */
   key: string;
   lang?: EbookLang;
+  /** Which language of the book they bought. */
+  book?: EbookLang;
 }
 
 const hello = (template: string, name: string) => {
@@ -52,7 +54,7 @@ export async function sendEbookOrderReceived(db: SupabaseClient, o: EbookReceipt
     hello(m.hi, o.customerName) +
     paragraphs(fill(isPix ? m.receivedPix : m.receivedCard, v)) +
     kicker(m.yourOrder) +
-    orderTable([{ label: EBOOK.lineName, amount: formatBRL(o.total) }, { label: 'Total', amount: formatBRL(o.total), strong: true }]) +
+    orderTable([{ label: `${EBOOK.lineName} · ${LANG_LABEL[o.book ?? 'en']}`, amount: formatBRL(o.total) }, { label: 'Total', amount: formatBRL(o.total), strong: true }]) +
     (isPix && o.pixPayload ? copyBox('Pix copia e cola', o.pixPayload) : '');
 
   await send(db, o, `ebook-received:${o.reference}`, fill(m.receivedSubject, v), {
@@ -71,6 +73,8 @@ export async function sendEbookPaid(db: SupabaseClient, o: EbookReceipt) {
   const body =
     hello(m.hi, o.customerName) +
     paragraphs(m.paidText) +
+    kicker(m.edition) +
+    paragraphs(`📖 ${LANG_LABEL[o.book ?? 'en']}`) +
     kicker(m.whereToStart) +
     bulletList(m.tips) +
     paragraphs(m.paidLink);
