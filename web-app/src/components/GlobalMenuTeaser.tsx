@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import menuItems from '@/data/menu.json';
+import { supabase } from '@/lib/supabase';
 import { thumb } from '@/lib/thumbs';
 
 /**
@@ -31,18 +31,33 @@ export default function GlobalMenuTeaser({ inPage = false }: { inPage?: boolean 
 
   // Only animate while the strip is on screen: an endless animation nobody is looking at still costs battery.
   const visible = inPage || SHOW_ON(bare);
+
+  // The strip shows what is live on the menu (treats ticked as available in the admin), never the old static list.
+  const [teaserItems, setTeaserItems] = useState<{ name: string; image: string }[]>([]);
+  useEffect(() => {
+    if (!visible) return;
+    let alive = true;
+    Promise.resolve(
+      supabase.from('treats').select('name, image_url').eq('is_available', true).not('image_url', 'is', null).order('created_at', { ascending: false }).limit(12),
+    ).then(({ data }) => {
+      if (alive) setTeaserItems(((data ?? []) as { name: string; image_url: string }[]).map(t => ({ name: t.name, image: t.image_url })));
+    }).catch(() => {});
+    return () => { alive = false; };
+  }, [visible]);
+
+  // The track only exists once the treats have loaded, so watch it again then.
   useEffect(() => {
     const el = trackRef.current;
-    if (!visible || !el || typeof IntersectionObserver === 'undefined') return;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
     const io = new IntersectionObserver(([entry]) => setRunning(entry.isIntersecting), { rootMargin: '100px' });
     io.observe(el);
     return () => io.disconnect();
-  }, [visible]);
+  }, [teaserItems.length]);
 
-  if (!visible) return null;
+  if (!visible || teaserItems.length === 0) return null;
 
-  // Take the first 10 items for the teaser
-  const teaserItems = menuItems.slice(0, 10);
+  // A short menu is repeated until one half of the track is wider than a screen, so the loop never shows a gap.
+  const loop = Array.from({ length: Math.max(teaserItems.length, Math.ceil(8 / teaserItems.length) * teaserItems.length) }, (_, i) => teaserItems[i % teaserItems.length]);
 
   const texts = {
     subtitle: isSpanish ? "Descubre Nuestras Creaciones" : "Descubra Nossas Criações",
@@ -62,18 +77,18 @@ export default function GlobalMenuTeaser({ inPage = false }: { inPage?: boolean 
       {/* Scrolling Gallery */}
       <div ref={trackRef} className="events-teaser__track" style={{ animationPlayState: running ? 'running' : 'paused' }}>
         {/* Double the array for seamless infinite scrolling */}
-        {[...teaserItems, ...teaserItems].map((item, idx) => (
+        {[...loop, ...loop].map((item, idx) => (
           <Link
             href={isSpanish ? "/es/menu" : "/menu"}
             key={idx}
             className="events-teaser__item"
-            aria-hidden={idx >= teaserItems.length ? true : undefined}
-            tabIndex={idx >= teaserItems.length ? -1 : undefined}
+            aria-hidden={idx >= loop.length ? true : undefined}
+            tabIndex={idx >= loop.length ? -1 : undefined}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={thumb(item.image)}
-              alt={idx >= teaserItems.length ? '' : item.name}
+              alt={idx >= loop.length ? '' : item.name}
               loading="lazy"
               decoding="async"
             />
