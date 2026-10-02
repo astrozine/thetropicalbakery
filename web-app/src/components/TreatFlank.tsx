@@ -48,26 +48,30 @@ interface Props {
   contentWidth: number;
   /** 'both' hangs photos on each side; 'right'/'left' only that side. */
   sides?: 'both' | 'left' | 'right';
+  /** Only these photos are shown (none given in the list = none shown). Leave out to use the live menu. */
+  photos?: Photo[];
   children: React.ReactNode;
 }
 
-export default function TreatFlank({ contentWidth, sides = 'both', children }: Props) {
-  const [photos, setPhotos] = useState<Photo[]>([]);
+export default function TreatFlank({ contentWidth, sides = 'both', photos: given, children }: Props) {
+  const [fetched, setFetched] = useState<Photo[]>([]);
+  const photos = given ?? fetched;
   const both = sides === 'both';
   const showAt = contentWidth + 2 * (COL + GAP) + 48;
   const id = React.useId().replace(/:/g, '');
 
   useEffect(() => {
     // Only fetch where the photos can actually be seen.
-    if (!window.matchMedia(`(min-width: ${showAt}px)`).matches) return;
+    if (given || !window.matchMedia(`(min-width: ${showAt}px)`).matches) return;
     let alive = true;
-    loadPhotos().then(list => { if (alive) setPhotos(list); });
+    loadPhotos().then(list => { if (alive) setFetched(list); });
     return () => { alive = false; };
-  }, [showAt]);
+  }, [showAt, given]);
 
   // Spread picks through the menu so the six are not all the same kind of sweet; each side starts elsewhere.
   const pick = (spots: Spot[], from: number) => {
     if (!photos.length) return [];
+    if (given) return given.slice(0, spots.length); // this box's own photos, in order, no repeats
     const step = Math.max(1, Math.floor(photos.length / (spots.length * (both ? 2 : 1))));
     return spots.map((_, i) => photos[(from + i * step) % photos.length]);
   };

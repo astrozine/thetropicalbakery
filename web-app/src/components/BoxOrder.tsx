@@ -19,7 +19,7 @@ import { boxPlan, planCaption, picksSuffix } from '@/lib/boxPicks';
 import type { BoxItem } from '@/lib/allergens';
 
 interface BoxOrderProps {
-  box: { id: string; title: string; image_url: string; price: number; items?: BoxItem[] | null } & Partial<BoxWindowFields>;
+  box: { id: string; title: string; image_url: string; price: number; items?: BoxItem[] | null; gallery?: string[] | null } & Partial<BoxWindowFields>;
   maxQuantity: number;
   /** Whether the box can be ordered today (ordering window + stock). Null while loading. */
   sale?: { state: SaleState; opensOn: string | null; closesOn?: string | null; windowLabel?: string } | null;
@@ -47,6 +47,11 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
   const [error, setError] = useState('');
   // The treats the customer chose for the 2-box, or the extras on the 6-box (see boxPicks.ts).
   const treats = (Array.isArray(box.items) ? box.items : []).filter(i => i && i.id && i.name);
+  // Beside the calendar: only pictures of THIS box (extra photos, then its treats'). None → nothing shown.
+  const boxPhotos = [
+    ...(Array.isArray(box.gallery) ? box.gallery : []).filter(Boolean).map(src => ({ src, name: box.title })),
+    ...treats.filter(t => t.image_url).map(t => ({ src: t.image_url, name: t.name })),
+  ].filter((p, i, all) => p.src !== box.image_url && all.findIndex(q => q.src === p.src) === i);
   const plan = boxPlan(treats.length, size);
   const [picks, setPicks] = useState<string[]>([]);
   const [pickNudge, setPickNudge] = useState(false);
@@ -174,7 +179,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
           <FulfillmentPicker value={fulfillment} onChange={setFulfillment} />
         </div>
 
-        <TreatFlank contentWidth={1100} sides="right">
+        <TreatFlank contentWidth={1100} sides="right" photos={boxPhotos}>
         <DeliveryCalendar value={date} onChange={pickDate} fulfillment={fulfillment}
           title={pickup ? '2 · Escolha o dia da retirada' : '2 · Escolha o dia da entrega'}
           window={{ from: box.delivery_from, until: box.delivery_until, presale }} />
