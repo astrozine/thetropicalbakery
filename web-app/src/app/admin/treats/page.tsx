@@ -3,19 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
-import ImagePicker from '@/components/ImagePicker';
-import ToggleSwitch from '@/components/ToggleSwitch';
-import ShowOnSiteSwitch from '@/components/ShowOnSiteSwitch';
 import { AllergenFields, EmojiField, IngredientsField, RawField, SugarCaffeineFields, TreatTypeField } from '@/components/TreatDetailsFields';
-import TreatInfo from '@/components/TreatInfo';
-import TreatRefineMenu, { emptyRefine, matchesRefine, refineCount, type RefineState } from '@/components/TreatRefineMenu';
+import TreatRefineMenu, { emptyRefine, matchesRefine, type RefineState } from '@/components/TreatRefineMenu';
 import TreatTypeBar from '@/components/TreatTypeBar';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { syncTreatIntoBoxes, withoutMissingColumn } from '@/lib/treatSync';
 import { WHOLE_FOOD, caffeineOf, isWholeFood, sugarsOf } from '@/lib/sugarCaffeine';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
-import { RAW, anyTyped, groupByType, isRaw, textOn, treatTypeById } from '@/lib/treatTypes';
+import { RAW, anyTyped, groupByType, isRaw, treatTypeById } from '@/lib/treatTypes';
 import { styleToggles } from '@/components/TreatTypeBar';
+import '../caixas/caixas.css';
+import './treats.css';
 
 interface Treat {
   id: string;
@@ -36,9 +34,6 @@ interface Treat {
   caffeine?: string | null;
 }
 
-const field: React.CSSProperties = { width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #ccc' };
-const label: React.CSSProperties = { display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem' };
-const card: React.CSSProperties = { background: 'white', padding: 'clamp(1.25rem, 3vw, 2rem)', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' };
 
 export default function TreatsAdmin() {
   const [treats, setTreats] = useState<Treat[]>([]);
@@ -50,6 +45,12 @@ export default function TreatsAdmin() {
   const [formData, setFormData] = useState<Partial<Treat>>({});
   const [uploading, setUploading] = useState(false);
   const [refine, setRefine] = useState<RefineState>(emptyRefine);
+  /** 'home' = every treat at a glance; 'edit' = one treat, all of it on one page. */
+  const [view, setView] = useState<'home' | 'edit'>('home');
+  /** The quick status filter above the grid. */
+  const [status, setStatus] = useState<'all' | 'on' | 'off' | 'todo'>('all');
+  /** The price being typed straight on a card. */
+  const [priceEdit, setPriceEdit] = useState<{ id: string; value: string } | null>(null);
 
   useEffect(() => {
     fetchTreats();
@@ -158,13 +159,33 @@ export default function TreatsAdmin() {
     setSaving(false);
     setEditingId(null);
     setFormData({});
+    setView('home');
+    window.scrollTo({ top: 0 });
     fetchTreats();
   };
 
   const handleEdit = (treat: Treat) => {
     setEditingId(treat.id);
     setFormData(treat);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setView('edit');
+    window.scrollTo({ top: 0 });
+  };
+
+  const startNew = () => {
+    setEditingId(null);
+    setFormData({ is_available: true, min_batch_size: 1, batch_multiplier: 1, emoji: '🍫' });
+    setView('edit');
+    window.scrollTo({ top: 0 });
+  };
+
+  /** The price typed on a card: only that one column, nothing else on the row. */
+  const savePrice = async (treat: Treat) => {
+    const value = priceEdit ? Number(priceEdit.value.replace(',', '.')) : NaN;
+    setPriceEdit(null);
+    if (!(value >= 0) || value === Number(treat.price)) return;
+    const { error } = await supabase.from('treats').update({ price: value }).eq('id', treat.id);
+    if (error) { brandAlert('Não foi possível mudar o preço: ' + error.message); return; }
+    setTreats(ts => ts.map(t => (t.id === treat.id ? { ...t, price: value } : t)));
   };
 
   const handleDelete = async (id: string) => {
@@ -172,7 +193,7 @@ export default function TreatsAdmin() {
 
     const { error } = await supabase.from('treats').delete().eq('id', id);
     if (error) brandAlert('Erro ao deletar: ' + error.message);
-    else fetchTreats();
+    else { if (editingId === id) { setEditingId(null); setFormData({}); setView('home'); } fetchTreats(); }
   };
 
   // The card's one-tap switch: only the visibility flag, nothing else on the row.
@@ -186,267 +207,295 @@ export default function TreatsAdmin() {
   const cancelEdit = () => {
     setEditingId(null);
     setFormData({});
+    setView('home');
+    window.scrollTo({ top: 0 });
   };
 
   if (loading) return <div style={{ padding: '2rem' }}>Carregando doces...</div>;
 
-  const visibleTreats = treats.filter(t => matchesRefine(t, refine));
+  // ═══════════════════════════════ THE EDITOR: one page, six coloured sections ═══════════════════════════════
+  if (view === 'edit') {
+    const f = formData;
+    const raw = isRaw(f);
+    const kind = treatTypeById(f.treat_type === 'raw' ? null : f.treat_type);
+    const done = [
+      !!(f.name?.trim() && f.image_url),
+      !!(kind || raw),
+      !!((f.price ?? 0) > 0 && (f.min_batch_size ?? 0) > 0),
+      (f.ingredients || []).length > 0,
+      (f.contains || []).length + (f.may_contain || []).length > 0,
+      !!(sugarsOf(f) && caffeineOf(f)),
+    ];
+    const SECTIONS = [
+      { id: 'tr-s1', c: 'var(--s1)', t: 'A cara do doce', h: 'Foto, nome e a frase que dá vontade.', todo: 'falta foto ou nome' },
+      { id: 'tr-s2', c: 'var(--s2)', t: 'Onde ele aparece', h: 'O tipo agrupa os doces no menu.', todo: 'opcional' },
+      { id: 'tr-s3', c: 'var(--s3)', t: 'Preço e pedido', h: 'Quanto custa e quantos dá para pedir.', todo: 'falta o preço' },
+      { id: 'tr-s4', c: 'var(--s4)', t: 'Ingredientes', h: 'Tudo o que vai na receita.', todo: 'nenhum ainda' },
+      { id: 'tr-s5', c: 'var(--s5)', t: 'Alérgenos', h: 'O que ele contém e o que pode conter.', todo: 'confira' },
+      { id: 'tr-s6', c: 'var(--s6)', t: 'Açúcar e cafeína', h: 'Para quem filtra por açúcar ou cafeína.', todo: 'falta marcar' },
+    ];
+    const jump = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const head = (i: number) => (
+      <div className="tr-sec__head">
+        <span className="tr-sec__num">{done[i] ? '✓' : i + 1}</span>
+        <div><h2 className="tr-sec__title">{SECTIONS[i].t}</h2><p className="tr-sec__hint">{SECTIONS[i].h}</p></div>
+      </div>
+    );
+    const count = done.filter(Boolean).length;
+    const save = (
+      <button type="submit" className="bx-btn bx-btn--gold" disabled={saving} style={{ width: '100%' }}>
+        {saving ? 'Salvando…' : editingId ? 'Salvar alterações' : 'Adicionar ao menu'}
+      </button>
+    );
 
-  // One card, reused whether the list is grouped by type or shown flat.
-  const renderTreatCard = (treat: Treat, grouped = false) => {
-    const kind = treatTypeById(treat.treat_type);
-    const raw = isRaw(treat);
     return (
-      <div key={treat.id} style={{ background: 'white', borderRadius: grouped ? '0 0 12px 12px' : '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ position: 'relative', height: '200px', background: '#f5f6fa', opacity: treat.is_available ? 1 : 0.55, filter: treat.is_available ? undefined : 'grayscale(0.6)' }}>
-          {treat.image_url ? (
-            <Image src={treat.image_url} alt={treat.name} fill style={{ objectFit: 'cover' }} />
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#bdc3c7' }}>Sem Foto</div>
-          )}
-          {!treat.is_available && (
-            <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#9a5b00', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-              🙈 Escondido
-            </div>
-          )}
-          <div style={{ position: 'absolute', left: '10px', bottom: '10px', right: '10px', display: 'flex', flexWrap: 'wrap-reverse', gap: '0.3rem' }}>
-            {raw && (
-              <span style={{ background: RAW.accent, color: '#fff', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
-                {RAW.emoji} {RAW.label}
-              </span>
-            )}
-            {isWholeFood(treat) === false && (
-              <span style={{ background: WHOLE_FOOD.no.accent, color: '#fff', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
-                {WHOLE_FOOD.no.emoji} {WHOLE_FOOD.no.label}
-              </span>
-            )}
-            {kind && (
-              <span style={{ background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
-                {kind.emoji} {kind.label}
-              </span>
-            )}
+      <div className="bx">
+        <div className="bx-flow__top" style={{ marginBottom: '1.25rem' }}>
+          <div>
+            <h1 className="bx-h1">{editingId ? f.name || 'Editar doce' : 'Novo doce'}</h1>
+            <p className="bx-sub">{count} de 6 partes completas. Tudo numa página: role ou toque numa parte.</p>
           </div>
+          <button type="button" className="bx-btn bx-btn--ghost" onClick={cancelEdit}>✕ Fechar</button>
         </div>
 
-        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ marginBottom: '0.9rem' }}>
-            <ShowOnSiteSwitch what="doce" shown={treat.is_available} onChange={v => setShown(treat, v)} />
-          </div>
-          <h3 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem', color: '#2c3e50' }}>{treat.emoji || '🍫'} {treat.name}</h3>
-          <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '1.2rem', margin: '0 0 0.75rem' }}>R$ {treat.price.toFixed(2).replace('.', ',')}</p>
+        <form onSubmit={handleSave} className="tr-edit tr-sections">
+          <div style={{ minWidth: 0 }}>
+            <nav className="tr-jump" aria-label="Partes do doce">
+              {SECTIONS.map((s, i) => (
+                <button key={s.id} type="button" onClick={() => jump(s.id)} style={{ '--c': s.c } as React.CSSProperties}>
+                  <i className={done[i] ? '' : 'is-todo'} />{i + 1}. {s.t}
+                </button>
+              ))}
+            </nav>
 
-          <p style={{ fontSize: '0.8rem', color: '#7f8c8d', marginBottom: '0.75rem' }}>
-            {(treat.ingredients || []).length} ingredientes · {(treat.contains || []).length} alérgenos
-            {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length === 0 && (
-              <span style={{ color: '#e67e22', fontWeight: 'bold' }}> — falta preencher</span>
-            )}
-            {(!sugarsOf(treat) || !caffeineOf(treat)) && (
-              <span style={{ display: 'block', color: '#e67e22', fontWeight: 'bold', marginTop: '0.2rem' }}>
-                Falta: {[!sugarsOf(treat) && 'açúcar', !caffeineOf(treat) && 'cafeína'].filter(Boolean).join(' e ')}
-              </span>
-            )}
-          </p>
+            <section id="tr-s1" className="tr-sec" style={{ '--c': 'var(--s1)' } as React.CSSProperties}>
+              {head(0)}
+              <div className="tr-photo-row">
+                <label className="bx-drop">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {f.image_url && <img src={f.image_url} alt="" />}
+                  {!f.image_url && <span style={{ fontSize: '2.4rem' }}>📷</span>}
+                  <span className="bx-drop__label">{uploading ? 'Enviando…' : f.image_url ? 'Trocar foto' : 'Escolher foto'}</span>
+                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} style={{ display: 'none' }} />
+                </label>
+                <div style={{ display: 'grid', gap: '1rem', minWidth: 0 }}>
+                  <label className="bx-field"><span>Nome do doce</span>
+                    <input className="bx-input bx-input--big" required value={f.name || ''} onChange={e => setFormData({ ...f, name: e.target.value })} placeholder="Ex: Tartarugas Trufadas de Cacau Noir" />
+                  </label>
+                  <label className="bx-field"><span>Descrição</span>
+                    <textarea className="bx-input" rows={4} value={f.description || ''} onChange={e => setFormData({ ...f, description: e.target.value })} placeholder="Textura, sabor, o que ele tem de especial…" />
+                  </label>
+                </div>
+              </div>
+              <EmojiField emoji={f.emoji || '🍫'} onChange={emoji => setFormData({ ...f, emoji })} />
+            </section>
 
-          {(treat.ingredients || []).length + (treat.contains || []).length + (treat.may_contain || []).length > 0 && (
-            <div style={{ marginBottom: '1rem' }}>
-              <TreatInfo ingredients={treat.ingredients} contains={treat.contains} may_contain={treat.may_contain} sugars={treat.sugars} caffeine={treat.caffeine} showEmptyNote={false} />
+            <section id="tr-s2" className="tr-sec" style={{ '--c': 'var(--s2)' } as React.CSSProperties}>
+              {head(1)}
+              <TreatTypeField value={f.treat_type} onChange={treat_type => setFormData({ ...f, treat_type })} />
+              <RawField checked={raw} onChange={is_raw => setFormData({ ...f, is_raw, treat_type: f.treat_type === 'raw' ? null : f.treat_type })} />
+            </section>
+
+            <section id="tr-s3" className="tr-sec" style={{ '--c': 'var(--s3)' } as React.CSSProperties}>
+              {head(2)}
+              <div className="tr-two">
+                <label className="bx-field"><span>Preço por unidade (R$)</span>
+                  <input className="bx-input" type="number" step="0.01" min="0" required value={f.price ?? ''} onChange={e => setFormData({ ...f, price: parseFloat(e.target.value) })} />
+                </label>
+                <label className="bx-field"><span>Pedido mínimo (un.)</span>
+                  <input className="bx-input" type="number" min="1" required value={f.min_batch_size || ''} onChange={e => setFormData({ ...f, min_batch_size: parseInt(e.target.value) })} />
+                  <small>Menos que isso o cliente não consegue pedir.</small>
+                </label>
+                <label className="bx-field"><span>De quanto em quanto</span>
+                  <input className="bx-input" type="number" min="1" placeholder="1" value={f.batch_multiplier || ''} onChange={e => setFormData({ ...f, batch_multiplier: parseInt(e.target.value) })} />
+                  <small>1 = qualquer quantidade.</small>
+                </label>
+              </div>
+              {(f.min_batch_size || 0) > 0 && (
+                <p className="bx-say" style={{ marginTop: 0 }}>
+                  👀 O cliente poderá pedir <strong>{[0, 1, 2, 3].map(i => (f.min_batch_size || 1) + i * (f.batch_multiplier || 1)).join(', ')}…</strong> unidades.
+                </p>
+              )}
+              <button type="button" className={`bx-switch${(f.is_available ?? true) ? ' is-on' : ''}`} onClick={() => setFormData({ ...f, is_available: !(f.is_available ?? true) })} aria-pressed={f.is_available ?? true}>
+                <span>
+                  <strong style={{ display: 'block' }}>{(f.is_available ?? true) ? 'Aparecendo no Menu de Eventos' : 'Escondido do menu'}</strong>
+                  <span style={{ color: '#6a6a6a', fontSize: '0.9rem' }}>{(f.is_available ?? true) ? 'Os clientes podem pedir.' : 'Fica guardado aqui e ainda pode ir nas caixas.'}</span>
+                </span>
+                <span className="bx-switch__knob" />
+              </button>
+            </section>
+
+            <section id="tr-s4" className="tr-sec" style={{ '--c': 'var(--s4)' } as React.CSSProperties}>
+              {head(3)}
+              <IngredientsField ingredients={f.ingredients || []} onChange={ingredients => setFormData({ ...f, ingredients })} />
+            </section>
+
+            <section id="tr-s5" className="tr-sec" style={{ '--c': 'var(--s5)' } as React.CSSProperties}>
+              {head(4)}
+              <AllergenFields contains={f.contains || []} mayContain={f.may_contain || []} onChange={a => setFormData({ ...f, ...a })} />
+            </section>
+
+            <section id="tr-s6" className="tr-sec" style={{ '--c': 'var(--s6)' } as React.CSSProperties}>
+              {head(5)}
+              <SugarCaffeineFields sugars={f.sugars} caffeine={f.caffeine} ingredients={f.ingredients || []} onChange={v => setFormData({ ...f, ...v })} />
+            </section>
+
+            <div className="bx-footer">
+              <button type="button" className="bx-link" onClick={cancelEdit}>Cancelar</button>
+              <div style={{ minWidth: '200px' }}>{save}</div>
             </div>
+          </div>
+
+          <aside className="tr-side">
+            <div className="tr-preview" aria-label="Como aparece no menu">
+              <div className="tr-preview__photo">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {f.image_url ? <img src={f.image_url} alt="" /> : (f.emoji || '🍫')}
+              </div>
+              <div className="tr-preview__body">
+                <p style={{ margin: '0 0 0.2rem', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6a6a6a' }}>
+                  {[kind && `${kind.emoji} ${kind.label}`, raw && `${RAW.emoji} ${RAW.label}`].filter(Boolean).join(' · ') || 'No menu'}
+                </p>
+                <p style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem', overflowWrap: 'anywhere' }}>{f.emoji || '🍫'} {f.name || 'Nome do doce'}</p>
+                <p style={{ margin: '0.25rem 0 0', fontWeight: 800 }}>{(f.price ?? 0) > 0 ? `R$ ${Number(f.price).toFixed(2).replace('.', ',')}` : 'R$ —'} <span style={{ fontWeight: 400, color: '#6a6a6a' }}>/ un.</span></p>
+              </div>
+            </div>
+            <ul className="tr-check">
+              {SECTIONS.map((s, i) => (
+                <li key={s.id}>
+                  <button type="button" onClick={() => jump(s.id)} style={{ '--c': s.c } as React.CSSProperties}>
+                    <span className={`tr-check__dot${done[i] ? '' : ' is-todo'}`}>{done[i] ? '✓' : i + 1}</span>
+                    {s.t}
+                    {!done[i] && <small>{s.todo}</small>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="tr-save" style={{ display: 'grid', gap: '0.6rem' }}>
+              {save}
+              {editingId && <button type="button" className="bx-link bx-link--danger" onClick={() => handleDelete(editingId)} style={{ justifySelf: 'center' }}>Excluir este doce</button>}
+            </div>
+          </aside>
+        </form>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════ HOME: every treat at a glance ═══════════════════════════════
+  const missing = (t: Treat) => [
+    !t.image_url && 'foto',
+    !(t.ingredients || []).length && 'ingredientes',
+    !sugarsOf(t) && 'açúcar',
+    !caffeineOf(t) && 'cafeína',
+  ].filter(Boolean) as string[];
+  const counts = {
+    all: treats.length,
+    on: treats.filter(t => t.is_available).length,
+    off: treats.filter(t => !t.is_available).length,
+    todo: treats.filter(t => missing(t).length > 0).length,
+  };
+  const visibleTreats = treats.filter(t => matchesRefine(t, refine)).filter(t =>
+    status === 'on' ? t.is_available : status === 'off' ? !t.is_available : status === 'todo' ? missing(t).length > 0 : true);
+  const typeGroups = anyTyped(visibleTreats) ? groupByType(visibleTreats) : null;
+
+  const tile = (treat: Treat) => {
+    const kind = treatTypeById(treat.treat_type);
+    const raw = isRaw(treat);
+    const miss = missing(treat);
+    return (
+      <div key={treat.id} className={`tr-card${treat.is_available ? '' : ' is-hidden'}`}>
+        <button type="button" className="tr-card__photo" onClick={() => handleEdit(treat)} title="Editar">
+          {treat.image_url
+            ? <Image src={treat.image_url} alt={treat.name} fill sizes="(max-width: 700px) 100vw, 300px" style={{ objectFit: 'cover' }} />
+            : <span style={{ display: 'grid', placeItems: 'center', height: '100%', fontSize: '2.6rem' }}>{treat.emoji || '🍫'}</span>}
+          <span className="tr-card__tags">
+            {kind && <span>{kind.emoji} {kind.label}</span>}
+            {raw && <span>{RAW.emoji} {RAW.label}</span>}
+            {isWholeFood(treat) === false && <span>{WHOLE_FOOD.no.emoji} {WHOLE_FOOD.no.label}</span>}
+          </span>
+        </button>
+        <p className="tr-card__name">{treat.emoji || '🍫'} {treat.name}</p>
+        <div className="tr-card__row">
+          {priceEdit?.id === treat.id ? (
+            <input className="tr-price-input" autoFocus type="number" step="0.01" min="0" value={priceEdit.value}
+              onChange={e => setPriceEdit({ id: treat.id, value: e.target.value })}
+              onBlur={() => savePrice(treat)} onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); if (e.key === 'Escape') setPriceEdit(null); }} />
+          ) : (
+            <button type="button" className="tr-price" onClick={() => setPriceEdit({ id: treat.id, value: String(treat.price ?? '') })} title="Tocar para mudar o preço">
+              R$ {Number(treat.price || 0).toFixed(2).replace('.', ',')}
+            </button>
           )}
-
-          <div style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: '1.5rem', background: '#f8f9fa', padding: '0.5rem', borderRadius: '4px' }}>
-            <div><strong>Min:</strong> {treat.min_batch_size} un.</div>
-            <div><strong>Aumenta de:</strong> {treat.batch_multiplier} em {treat.batch_multiplier}</div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-            <button onClick={() => handleEdit(treat)} style={{ flex: 1, padding: '0.5rem', background: '#f1c40f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-              Editar
-            </button>
-            <button onClick={() => handleDelete(treat.id)} style={{ flex: 1, padding: '0.5rem', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-              Excluir
-            </button>
-          </div>
+          <button type="button" className={`tr-mini-switch${treat.is_available ? ' is-on' : ''}`} onClick={() => setShown(treat, !treat.is_available)} aria-pressed={treat.is_available}>
+            <i />{treat.is_available ? 'No menu' : 'Escondido'}
+          </button>
+        </div>
+        <p className="tr-card__meta">mín. {treat.min_batch_size} · de {treat.batch_multiplier || 1} em {treat.batch_multiplier || 1} · {(treat.ingredients || []).length} ingredientes</p>
+        {miss.length > 0 && <div className="tr-card__missing">{miss.map(m => <span key={m}>falta {m}</span>)}</div>}
+        <div className="bx-tile__actions">
+          <button type="button" className="bx-link" onClick={() => handleEdit(treat)}>Editar</button>
+          <button type="button" className="bx-link bx-link--danger" onClick={() => handleDelete(treat.id)}>Excluir</button>
         </div>
       </div>
     );
   };
-  const typeGroups = anyTyped(visibleTreats) ? groupByType(visibleTreats) : null;
-  const cardGrid: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '1.5rem' };
 
   return (
-    <div style={{ maxWidth: '2200px' }}>
-      <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Catálogo de Doces (Menu de Eventos)</h1>
-      <p style={{ color: '#7f8c8d', marginBottom: '2rem', lineHeight: 1.7, maxWidth: '760px' }}>
-        Os mesmos doces podem estar aqui e dentro das Caixas de Degustação. Ingredientes e alérgenos que você mudar aqui são atualizados
-        também nas caixas que incluem o doce. Ainda testando uma receita? Use o botão <strong>Aparecendo no site</strong> em cada doce para
-        escondê-lo até ficar pronto: ele continua guardado aqui.
-      </p>
-
-      <h2 style={{ fontSize: '1.3rem', marginBottom: '1.25rem', color: '#3c2a21' }}>
-        {editingId ? 'Editar Doce' : 'Adicionar Novo Doce'}
-      </h2>
-
-      <form onSubmit={handleSave} style={{ marginBottom: '3rem' }}>
-        <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))', alignItems: 'start' }}>
-
-          {/* 1: the menu item */}
-          <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
-            <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>🧁 Sobre o doce</h3>
-
-            <ImagePicker label="Imagem" imageUrl={formData.image_url} uploading={uploading} onChange={handleImageUpload} />
-
-            <div>
-              <label style={label}>Nome do Doce</label>
-              <input type="text" required value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} style={field} />
-            </div>
-
-            <div>
-              <label style={label}>Descrição</label>
-              <textarea value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} style={{ ...field, minHeight: '100px' }} />
-            </div>
-
-            <TreatTypeField value={formData.treat_type} onChange={treat_type => setFormData({ ...formData, treat_type })} />
-
-            <RawField
-              checked={isRaw(formData)}
-              onChange={is_raw => setFormData({ ...formData, is_raw, treat_type: formData.treat_type === 'raw' ? null : formData.treat_type })}
-            />
-
-            <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
-              <div>
-                <label style={label}>Preço Unitário (R$)</label>
-                <input type="number" step="0.01" required value={formData.price || ''} onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) })} style={field} />
-              </div>
-              <div>
-                <label style={label}>Pedido Mínimo (un.)</label>
-                <input type="number" min="1" required value={formData.min_batch_size || ''} onChange={e => setFormData({ ...formData, min_batch_size: parseInt(e.target.value) })} style={field} />
-                <small style={{ color: '#7f8c8d' }}>Menos que isso o cliente não consegue pedir.</small>
-              </div>
-              <div>
-                <label style={label}>Aumentar de quanto em quanto</label>
-                <input type="number" min="1" placeholder="1" value={formData.batch_multiplier || ''} onChange={e => setFormData({ ...formData, batch_multiplier: parseInt(e.target.value) })} style={field} />
-                <small style={{ color: '#7f8c8d' }}>Use 1 se o cliente pode pedir qualquer quantidade.</small>
-              </div>
-            </div>
-
-            {(formData.min_batch_size || 0) > 0 && (
-              <p style={{ background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '8px', padding: '0.7rem 1rem', fontSize: '0.9rem', color: '#594a42', marginTop: '-0.5rem' }}>
-                👀 O cliente poderá pedir:{' '}
-                <strong>
-                  {[0, 1, 2, 3].map(i => (formData.min_batch_size || 1) + i * (formData.batch_multiplier || 1)).join(', ')}…
-                </strong>{' '}
-                unidades.
-              </p>
-            )}
-
-            <ToggleSwitch
-              checked={formData.is_available ?? true}
-              onChange={v => setFormData({ ...formData, is_available: v })}
-              label="Mostrar este doce no Menu"
-              onText="Ativado — aparecendo no menu"
-              offText="Escondido — ainda em preparo ou fora do menu (fica guardado aqui e pode ir em caixas)"
-            />
-
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button type="submit" disabled={saving} style={{ padding: '0.8rem 2rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: saving ? 'wait' : 'pointer', opacity: saving ? 0.7 : 1 }}>
-                {saving ? 'Salvando…' : editingId ? 'Salvar Alterações' : 'Adicionar Doce'}
-              </button>
-              {editingId && (
-                <button type="button" onClick={cancelEdit} style={{ padding: '0.8rem 2rem', background: '#ecf0f1', color: '#2c3e50', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  Cancelar
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* 2: what's in it, and allergens stacked underneath so this column fills the height of the first */}
-          <div style={{ display: 'grid', gap: '1.5rem' }}>
-            <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
-              <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>🌿 Ingredientes</h3>
-              <EmojiField emoji={formData.emoji || '🍫'} onChange={emoji => setFormData({ ...formData, emoji })} />
-              <IngredientsField ingredients={formData.ingredients || []} onChange={ingredients => setFormData({ ...formData, ingredients })} />
-            </div>
-
-            <div style={{ ...card, display: 'grid', gap: '1.25rem' }}>
-              <h3 style={{ fontSize: '1.15rem', color: '#2c3e50' }}>⚠️ Alérgenos, açúcar e cafeína</h3>
-              <AllergenFields
-                contains={formData.contains || []}
-                mayContain={formData.may_contain || []}
-                onChange={a => setFormData({ ...formData, ...a })}
-              />
-              <SugarCaffeineFields
-                sugars={formData.sugars}
-                caffeine={formData.caffeine}
-                ingredients={formData.ingredients || []}
-                onChange={v => setFormData({ ...formData, ...v })}
-              />
-            </div>
-          </div>
+    <div className="bx" style={{ maxWidth: '1600px' }}>
+      <div className="bx-head">
+        <div>
+          <h1 className="bx-h1">Doces do Menu</h1>
+          <p className="bx-sub">Tudo o que você faz, num olhar. Toque no preço para mudar, no botão para esconder ou mostrar.</p>
         </div>
-      </form>
+        <button type="button" className="bx-btn bx-btn--dark" onClick={startNew}>＋ Novo doce</button>
+      </div>
 
-      {/* Refine the list: folders of allergens and ingredients. A sticky left column on wide screens, above the list otherwise. */}
+      <div className="tr-status" role="group" aria-label="Mostrar">
+        {([
+          ['all', 'Todos', counts.all],
+          ['on', '🟢 No menu', counts.on],
+          ['off', '🙈 Escondidos', counts.off],
+          ['todo', '✏️ Falta informação', counts.todo],
+        ] as const).map(([k, l, n]) => (
+          <button key={k} type="button" className={`tr-pill${status === k ? ' is-on' : ''}${k === 'todo' && n > 0 ? ' tr-pill--warn' : ''}`} onClick={() => setStatus(k)} aria-pressed={status === k}>
+            {l} <b>{n}</b>
+          </button>
+        ))}
+      </div>
+
+      {/* The finer filters (type, allergens, ingredients) from before, unchanged. */}
       <style>{`
         .treats-aside { margin-bottom: 1.5rem; }
-        /* Same place as on /menu: the type picker sits at the top of the catalogue column,
-           pushed to the right once there's room for it beside the heading. */
         .treats-typebar { display: flex; flex-direction: column; align-items: stretch; gap: 0.75rem; margin-bottom: 1.25rem; }
         @media (min-width: 1280px) {
-          .treats-layout { display: grid; grid-template-columns: minmax(320px, 380px) minmax(0, 1fr); gap: 1.75rem; align-items: start; }
+          .treats-layout { display: grid; grid-template-columns: minmax(300px, 340px) minmax(0, 1fr); gap: 1.75rem; align-items: start; }
           .treats-aside { position: sticky; top: 7.5rem; max-height: calc(100vh - 9rem); overflow-y: auto; margin-bottom: 0; padding: 2px 6px 10px 2px; }
           .treats-typebar { align-items: flex-end; }
         }
       `}</style>
       <div className="treats-layout">
-      <aside className="treats-aside" aria-label="Refinar busca">
-        <TreatRefineMenu treats={treats} value={refine} onChange={setRefine} shown={visibleTreats.length} defaultOpen sheetBelow={1280} fabBottom="5.75rem" />
-      </aside>
+        <aside className="treats-aside" aria-label="Refinar busca">
+          <TreatRefineMenu treats={treats} value={refine} onChange={setRefine} shown={visibleTreats.length} sheetBelow={1280} fabBottom="5.75rem" />
+        </aside>
+        <div className="treats-main" style={{ minWidth: 0 }}>
+          <div className="treats-typebar">
+            <TreatTypeBar tone="light" treats={treats} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })}
+              toggles={styleToggles(treats, refine, setRefine)} />
+          </div>
 
-      <div className="treats-main">
-      <div className="treats-typebar">
-        <TreatTypeBar tone="light" treats={treats} value={refine.types} onChange={(types: string[]) => setRefine({ ...refine, types })}
-          toggles={styleToggles(treats, refine, setRefine)} />
-      </div>
-
-      {visibleTreats.length === 0 && (
-        <div style={{ ...card, textAlign: 'center', color: '#7f8c8d' }}>
-          <p style={{ marginBottom: '1rem' }}>Nenhum doce combina com esses filtros.</p>
-          {refineCount(refine) > 0 && (
-            <button type="button" onClick={() => setRefine({ ...emptyRefine, mode: refine.mode })}
-              style={{ padding: '0.6rem 1.25rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
-              Limpar filtros
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Treats List: grouped once at least one treat has a type, same idea as the overview's own
-          Atalhos grid — one continuous grid, the next category just slides in after the last card,
-          and only the first card of each group carries the little coloured tab with its name.
-          Otherwise (nothing typed yet) it's the same flat grid it always was. */}
-      {typeGroups ? (
-        <div style={cardGrid}>
-          {typeGroups.flatMap(group => group.items.map((treat, i) => (
-            <div key={treat.id} style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              <div style={{ height: '1.7rem', display: 'flex', alignItems: 'flex-end', borderBottom: `4px solid ${group.accent}` }}>
-                {i === 0 && (
-                  <span style={{
-                    display: 'inline-block', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    fontSize: '0.76rem', fontWeight: 800, lineHeight: 1, padding: '0.38rem 0.7rem', borderRadius: '8px 8px 0 0',
-                    background: group.accent, color: textOn(group.accent),
-                  }}>
-                    {group.emoji} {group.label}
-                  </span>
-                )}
-              </div>
-              {renderTreatCard(treat, true)}
+          {visibleTreats.length === 0 && (
+            <div className="bx-empty">
+              <p style={{ margin: '0 0 1rem', color: '#6a6a6a' }}>Nenhum doce aqui com esses filtros.</p>
+              <button type="button" className="bx-btn bx-btn--ghost" onClick={() => { setStatus('all'); setRefine({ ...emptyRefine, mode: refine.mode }); }}>Mostrar todos</button>
             </div>
-          )))}
+          )}
+
+          {typeGroups ? typeGroups.map(group => (
+            <div key={group.label}>
+              <h2 className="tr-group-title"><span style={{ width: 12, height: 12, borderRadius: '50%', background: group.accent, display: 'inline-block' }} />{group.emoji} {group.label} <span style={{ color: '#6a6a6a', fontWeight: 600 }}>{group.items.length}</span></h2>
+              <div className="tr-grid">{group.items.map(tile)}</div>
+            </div>
+          )) : <div className="tr-grid">{visibleTreats.map(tile)}</div>}
         </div>
-      ) : (
-        <div style={cardGrid}>{visibleTreats.map(t => renderTreatCard(t))}</div>
-      )}
-      </div>
       </div>
     </div>
   );
