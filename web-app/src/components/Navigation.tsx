@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import AccountMenu from '@/components/AccountMenu';
+import InstagramLink from '@/components/InstagramLink';
 import { SUB_STYLE } from '@/components/ClubeInvite';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
@@ -366,7 +367,9 @@ export default function Navigation() {
               </div>
             )}
           </div>
-          
+
+          <InstagramLink size={20} style={{ marginLeft: GAP, color: '#594a42', minWidth: 32, minHeight: 32 }} />
+
           <AccountMenu />
 
           <button
@@ -649,6 +652,8 @@ export default function Navigation() {
             ))}
 
             <AccountMenu variant="mobile" />
+
+            <InstagramLink size={22} showHandle style={{ marginTop: '1.5rem', color: '#594a42', fontSize: '1rem' }} />
           </div>
         </div>
       )}

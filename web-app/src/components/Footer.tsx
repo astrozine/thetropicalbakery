@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import AdminFooter from '@/components/AdminFooter';
 import { STORE_WHATSAPP, STORE_WHATSAPP_DISPLAY, SUBSTACK_URL } from '@/lib/siteContact';
 import { OriginSeal } from '@/components/BelgiumBrazil';
+import InstagramLink from '@/components/InstagramLink';
 
 export default function Footer() {
   // The back-office has its own slim footer: the public one (photo, columns, newsletter) is far too big there.
@@ -36,18 +37,7 @@ export default function Footer() {
           <p style={{ marginBottom: '1rem', color: '#e8e1d7' }}>Confeitaria saudável de luxo em Ubatuba, pelas mãos da chef belga Elisabeth “Dolly” Van Dam.</p>
           <OriginSeal tone="dark" style={{ marginBottom: '1.75rem' }} />
           <br />
-          <a href="https://www.instagram.com/_thetropicalbakery_/" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{
-            display: 'inline-block',
-            padding: '0.8rem 1.5rem',
-            background: '#d4af37',
-            color: '#3c2a21',
-            textDecoration: 'none',
-            borderRadius: '4px',
-            fontWeight: 'bold',
-            letterSpacing: '1px'
-          }}>
-            Siga-nos no Instagram
-          </a>
+          <InstagramLink size={22} showHandle style={{ color: '#e8e1d7', fontSize: '0.95rem', letterSpacing: '0.3px' }} />
         </div>
         
         <div>
