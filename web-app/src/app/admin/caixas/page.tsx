@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import HeldBoxes from './HeldBoxes';
 import ProductionTally from './ProductionTally';
 import PresaleGear from './PresaleGear';
 import BoxStock from '../BoxStock';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import ImagePicker from '@/components/ImagePicker';
-import ToggleSwitch from '@/components/ToggleSwitch';
 import BoxItemsEditor from '@/components/BoxItemsEditor';
 import { BoxItem, newBoxItem } from '@/lib/allergens';
 import { parseBoxItems } from '@/components/BoxItemList';
@@ -18,7 +16,8 @@ import { pushTreatDetails } from '@/lib/treatSync';
 import { BoxWindowFields, SaleState, deliveryWindowLabel, isPresale, longDay, nextBakeBox, saleState, splitActive } from '@/lib/boxWindow';
 import { toISODate } from '@/lib/deliverySchedule';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
-import { healBatchDate } from '@/lib/batchDate';
+import { formatBatchDate, healBatchDate } from '@/lib/batchDate';
+import './caixas.css';
 
 interface TastingBox extends BoxWindowFields {
   id: string;
@@ -44,14 +43,16 @@ const SALE_LABEL: Record<SaleState, { text: string; color: string; bg: string }>
   soldout: { text: 'Esgotada', color: '#c0392b', bg: '#fdecea' },
 };
 
-const input: React.CSSProperties = { width: '100%', padding: '0.8rem', border: '1px solid #ccc', borderRadius: '6px' };
-const label: React.CSSProperties = { display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' };
-const card: React.CSSProperties = { minWidth: 0, background: 'white', padding: 'clamp(1.25rem, 3vw, 2rem)', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' };
+/** The steps of the box editor, one question per screen. */
+const STEPS = ['Como vender', 'Doces', 'Nome e fotos', 'Entregas', 'Quantidade', 'Revisar'] as const;
 
 export default function AdminCaixas() {
   const [boxes, setBoxes] = useState<TastingBox[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  /** 'home' = the boxes on the site and the earlier ones; 'edit' = the step-by-step editor. */
+  const [view, setView] = useState<'home' | 'edit'>('home');
+  const [step, setStep] = useState(0);
 
   // Form State
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -83,9 +84,8 @@ export default function AdminCaixas() {
   const [leadDays, setLeadDays] = useState(2);
   /** After saving a box that is live: offer to tell the waiting list and customers. */
   const [announce, setAnnounce] = useState<{ title: string; treats: string; quantity: number } | null>(null);
-  /** What the browser refused on the last save attempt, said in the save bar instead of an off-screen bubble. */
+  /** What is missing on this step, said in the footer next to the button. */
   const [formProblem, setFormProblem] = useState('');
-  const firstInvalid = useRef(false);
 
   useEffect(() => {
     fetchBoxes();
@@ -203,8 +203,11 @@ export default function AdminCaixas() {
     setOrdersOpen(healBatchDate(box.orders_open_from || ''));
     setOrdersClose(healBatchDate(box.orders_close_on || ''));
     setSaleMode(isPresale(box) ? 'presale' : 'stock');
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Editing opens on the summary: every part is one tap away from there.
+    setFormProblem('');
+    setStep(STEPS.length - 1);
+    setView('edit');
+    window.scrollTo({ top: 0 });
   };
 
   /**
@@ -219,25 +222,7 @@ export default function AdminCaixas() {
   const hint = (msg: string) =>
     /items|ingredients|contains|emoji/.test(msg) ? ' — Rode as migrations 13 e 14 no Supabase primeiro.' : '';
 
-  /**
-   * A field the browser refuses (empty title, impossible date) blocks the save with a bubble that,
-   * on a phone, sits far off screen next to the field — so the button looks broken. Say it in the
-   * save bar, which is always under the thumb, and jump to the field.
-   */
-  const handleInvalid = (e: React.FormEvent) => {
-    const el = e.target as HTMLInputElement;
-    if (!firstInvalid.current) {
-      firstInvalid.current = true;
-      setTimeout(() => { firstInvalid.current = false; }, 0);
-      const name = el.getAttribute('data-nome') || 'Um campo';
-      setFormProblem(`${name}: ${el.validationMessage || 'confira este campo'}`);
-      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      setTimeout(() => el.focus({ preventScroll: true }), 300);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setFormProblem('');
     const windowProblem =
       deliveryFrom && deliveryUntil && deliveryUntil < deliveryFrom ? 'O último dia de entrega vem antes do primeiro.'
@@ -296,7 +281,8 @@ export default function AdminCaixas() {
       items: cleanItems,
       gallery,
       image_url: imageUrl,
-      batch_date_label: batchDateLabel,
+      // The edition's date on the site: the first delivery day unless one was set before.
+      batch_date_label: batchDateLabel || deliveryFrom || toISODate(new Date()),
       total_quantity: totalQuantity,
       sold_quantity: soldQuantity,
       // The 4-treat price, kept on the box for anything that still reads one price.
@@ -360,6 +346,8 @@ export default function AdminCaixas() {
     }
     setAnnounce(isActive ? { title, treats: cleanItems.map(i => `${i.emoji} ${i.name}`).join('\n'), quantity: totalQuantity } : null);
     resetForm();
+    setView('home');
+    window.scrollTo({ top: 0 });
     fetchBoxes();
   };
 
@@ -371,327 +359,414 @@ export default function AdminCaixas() {
   };
 
   const live = splitActive(boxes.filter(b => b.is_active));
+  const pastBoxes = boxes.filter(b => !b.is_active);
+
+  /** A brand-new box, or a copy of an earlier one to start from (its treats, name and photos; new dates and stock). */
+  const startNew = (base?: TastingBox) => {
+    resetForm();
+    if (base) {
+      setTitle(base.title);
+      setDescription(base.description || '');
+      setImageUrl(base.image_url || '');
+      setItems((base.items || []).map(i => ({ ...i })));
+      setGallery(Array.isArray(base.gallery) ? base.gallery : []);
+      setSaleMode(isPresale(base) ? 'presale' : 'stock');
+    }
+    setIsActive(true);
+    setFormProblem('');
+    setStep(0);
+    setView('edit');
+    window.scrollTo({ top: 0 });
+  };
+
+  const stepProblem = (s: number): string => {
+    if (s === 2 && !title.trim()) return 'Dê um nome para a caixa.';
+    if (s === 3) {
+      if (deliveryFrom && deliveryUntil && deliveryUntil < deliveryFrom) return 'O último dia de entrega vem antes do primeiro.';
+      if (pre && (!deliveryFrom || !deliveryUntil)) return 'Escolha o primeiro e o último dia de entrega da fornada.';
+      if (pre && !ordersClose) return 'Escolha até quando as encomendas ficam abertas.';
+      if (pre && ordersClose >= deliveryFrom) return 'As encomendas precisam fechar antes do primeiro dia de entrega.';
+    }
+    return '';
+  };
+  const next = () => {
+    const p = stepProblem(step);
+    if (p) { setFormProblem(p); return; }
+    setFormProblem('');
+    setStep(s => Math.min(STEPS.length - 1, s + 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const back = () => { setFormProblem(''); setStep(s => Math.max(0, s - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const goTo = (s: number) => { setFormProblem(''); setStep(s); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const publish = () => {
+    for (let s = 0; s < STEPS.length; s++) {
+      const p = stepProblem(s);
+      if (p) { setStep(s); setFormProblem(p); return; }
+    }
+    handleSubmit();
+  };
+
+  const treatsNamed = items.filter(i => i.name.trim());
+  const windowText = deliveryWindowLabel({ total_quantity: 0, sold_quantity: 0, delivery_from: deliveryFrom || null, delivery_until: deliveryUntil || null });
+
+  // ═══════════════════════════════ THE STEP-BY-STEP EDITOR ═══════════════════════════════
+  if (view === 'edit') {
+    return (
+      <div className="bx">
+        <div className="bx-flow">
+          <div className="bx-flow__top">
+            <span style={{ fontWeight: 800 }}>{editingId ? 'Editando a caixa' : 'Nova caixa'}</span>
+            <button type="button" className="bx-btn bx-btn--ghost" onClick={async () => {
+              if (await brandConfirm('Sair sem salvar? O que você mudou aqui se perde.', { confirmLabel: 'Sair sem salvar' })) { resetForm(); setView('home'); }
+            }}>✕ Sair</button>
+          </div>
+          <div className="bx-progress" aria-hidden>
+            {STEPS.map((_, i) => <span key={i} className={i <= step ? 'is-done' : ''}><i /></span>)}
+          </div>
+
+          <div className="bx-step" key={step}>
+            <p className="bx-step__kicker">Passo {step + 1} de {STEPS.length}</p>
+
+            {step === 0 && (
+              <>
+                <h1 className="bx-step__title">Como você vai vender esta caixa?</h1>
+                <p className="bx-step__lead">Dá para ter uma de cada no ar ao mesmo tempo.</p>
+                <div className="bx-choices">
+                  {([
+                    ['stock', '🧁', 'Pronta entrega', 'As caixas já estão feitas. Vende até acabar, e as entregas seguem pelo calendário enquanto sobrar caixa.'],
+                    ['presale', '🗓️', 'Pré-venda', 'A caixa da próxima semana. O cliente encomenda e paga antes, e você assa só o que foi pedido.'],
+                  ] as const).map(([m, icon, t, d]) => (
+                    <button key={m} type="button" className={`bx-choice${saleMode === m ? ' is-on' : ''}`} onClick={() => setSaleMode(m)} aria-pressed={saleMode === m}>
+                      <span className="bx-choice__icon">{icon}</span>
+                      <span className="bx-choice__title">{t}</span>
+                      <span className="bx-choice__text">{d}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {step === 1 && (
+              <>
+                <h1 className="bx-step__title">Quais doces vão na caixa?</h1>
+                <p className="bx-step__lead">Um doce de cada vez, com nome, foto e o que ele leva. Ou repita um que já fez antes.</p>
+                {listInDescription && (
+                  <div className="bx-card" style={{ background: '#fff8e6', borderColor: '#f0d09a', marginBottom: '1rem' }}>
+                    <p style={{ margin: '0 0 0.7rem', color: '#8a5a00', lineHeight: 1.5 }}>
+                      Os {listInDescription.items.length} doces desta caixa estão escritos como uma lista no texto. Separe em doces e dê um nome divertido a cada um.
+                    </p>
+                    <button type="button" className="bx-btn bx-btn--gold" onClick={importFromDescription}>✨ Separar em {listInDescription.items.length} doces</button>
+                  </div>
+                )}
+                <BoxItemsEditor key={items.length === 0 ? 'empty' : 'filled'} items={items} onChange={setItems} />
+                <details style={{ marginTop: '1.5rem' }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Frase de abertura (opcional)</summary>
+                  <textarea className="bx-input" style={{ marginTop: '0.75rem' }} rows={2} value={description} onChange={e => setDescription(e.target.value)}
+                    placeholder="Uma frase sobre o tema desta edição. Se ficar vazio, usamos a lista dos doces." />
+                </details>
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <h1 className="bx-step__title">Agora, um nome e uma foto</h1>
+                <p className="bx-step__lead">É o que as pessoas veem primeiro no site. Uma foto bonita da caixa aberta vende muito.</p>
+                <label className="bx-field" style={{ marginBottom: '1.5rem' }}>
+                  <span>Nome da caixa</span>
+                  <input className="bx-input bx-input--big" value={title} onChange={e => setTitle(e.target.value)} placeholder="Chegada da Primavera: Sensações Amarelas" maxLength={90} />
+                  <small>Dica: o que vem depois dos dois-pontos aparece em dourado no site.</small>
+                </label>
+                <label className="bx-drop">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {imageUrl && <img src={imageUrl} alt="" />}
+                  {!imageUrl && <span style={{ fontSize: '2.6rem' }}>📷</span>}
+                  <span className="bx-drop__label">{uploading ? 'Enviando…' : imageUrl ? 'Trocar a foto principal' : 'Escolher a foto principal'}</span>
+                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} style={{ display: 'none' }} />
+                </label>
+                <p style={{ fontWeight: 700, margin: '1.5rem 0 0' }}>Mais fotos desta caixa <span style={{ fontWeight: 400, color: '#6a6a6a' }}>(aparecem nos cartões do topo da página)</span></p>
+                <div className="bx-thumbs">
+                  {gallery.map(src => (
+                    <div key={src} className="bx-thumb">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={src} alt="" />
+                      <button type="button" aria-label="Remover foto" onClick={() => setGallery(g => g.filter(x => x !== src))}>✕</button>
+                    </div>
+                  ))}
+                  <label className="bx-thumb bx-thumb--add" aria-label="Adicionar fotos">
+                    {galleryUploading ? '…' : '+'}
+                    <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} disabled={galleryUploading} style={{ display: 'none' }} />
+                  </label>
+                </div>
+              </>
+            )}
+
+            {step === 3 && (
+              <>
+                <h1 className="bx-step__title">{pre ? 'Quando a fornada sai?' : 'Quando ela chega?'}</h1>
+                <p className="bx-step__lead">
+                  {pre
+                    ? 'Os dias de entrega das encomendas, e o último dia para encomendar (quando você precisa da contagem para assar).'
+                    : 'Os dias em que esta leva está planejada para sair. Pode deixar em branco: aí vale qualquer dia aberto do calendário.'}
+                </p>
+                <div className="bx-dates">
+                  <label className="bx-field"><span>Primeiro dia de entrega</span>
+                    <input type="date" className="bx-input" value={deliveryFrom} onChange={e => setDeliveryFrom(healBatchDate(e.target.value))} />
+                  </label>
+                  <label className="bx-field"><span>Último dia de entrega</span>
+                    <input type="date" className="bx-input" value={deliveryUntil} min={deliveryFrom || undefined} onChange={e => setDeliveryUntil(healBatchDate(e.target.value))} />
+                  </label>
+                  {pre && (
+                    <label className="bx-field"><span>Encomendas até</span>
+                      <input type="date" className="bx-input" value={ordersClose} max={deliveryFrom || undefined} onChange={e => setOrdersClose(healBatchDate(e.target.value))} />
+                    </label>
+                  )}
+                </div>
+                <details style={{ marginTop: '1.25rem' }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Deixar pronta para abrir num dia futuro</summary>
+                  <label className="bx-field" style={{ marginTop: '0.75rem', maxWidth: '260px' }}><span>Pedidos abrem em</span>
+                    <input type="date" className="bx-input" value={ordersOpen} onChange={e => setOrdersOpen(healBatchDate(e.target.value))} />
+                    <small>Vazio = abre assim que você publicar.</small>
+                  </label>
+                </details>
+                <p className="bx-say">
+                  👀 O cliente vai ver: {pre ? <><strong>pré-venda</strong>, </> : ''}
+                  {windowText ? <>entregas <strong>{windowText}</strong>. </> : <>qualquer dia aberto do calendário. </>}
+                  {pre && ordersClose ? <>Encomendas até <strong>{longDay(ordersClose)}</strong>. </> : ''}
+                  {!pre && <>Segue à venda até acabar; se a data passar e sobrar caixa, as entregas continuam.</>}
+                </p>
+              </>
+            )}
+
+            {step === 4 && (
+              <>
+                <h1 className="bx-step__title">{pre ? 'Quantas cabem nesta fornada?' : 'Quantas caixas você fez?'}</h1>
+                <p className="bx-step__lead">
+                  {pre ? 'Quando as encomendas chegarem nesse número, a pré-venda fecha sozinha. Sem limite = você assa tudo o que pedirem.' : 'O site conta sozinho a cada pedido e mostra quantas restam.'}
+                </p>
+                <div className="bx-card">
+                  <div className="bx-counter">
+                    <div className="bx-counter__label">{pre ? 'Limite de encomendas' : 'Caixas feitas'}<small>Cada caixa conta como uma, seja de 2, 4 ou 6 doces.</small></div>
+                    <div className="bx-counter__ctl">
+                      <button type="button" className="bx-round" onClick={() => setTotalQuantity(q => Math.max(0, q - 1))} disabled={totalQuantity <= 0} aria-label="Menos">−</button>
+                      <span className="bx-counter__value">{pre && totalQuantity === 0 ? '∞' : totalQuantity}</span>
+                      <button type="button" className="bx-round" onClick={() => setTotalQuantity(q => q + 1)} aria-label="Mais">+</button>
+                    </div>
+                  </div>
+                  {pre && (
+                    <div className="bx-counter">
+                      <div className="bx-counter__label">Sem limite</div>
+                      <button type="button" className={`bx-switch${totalQuantity === 0 ? ' is-on' : ''}`} style={{ width: 'auto', padding: '0.4rem' }}
+                        onClick={() => setTotalQuantity(q => (q === 0 ? 20 : 0))} aria-pressed={totalQuantity === 0}>
+                        <span className="bx-switch__knob" />
+                      </button>
+                    </div>
+                  )}
+                  {editingId && (
+                    <div className="bx-counter">
+                      <div className="bx-counter__label">{pre ? 'Encomendas feitas' : 'Já vendidas'}<small>Contado pelos pedidos. Mude só se vendeu por fora ou houve cancelamento.</small></div>
+                      <div className="bx-counter__ctl">
+                        <button type="button" className="bx-round" onClick={() => setSoldQuantity(q => Math.max(0, q - 1))} disabled={soldQuantity <= 0} aria-label="Menos">−</button>
+                        <span className="bx-counter__value">{soldQuantity}</span>
+                        <button type="button" className="bx-round" onClick={() => setSoldQuantity(q => q + 1)} aria-label="Mais">+</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {step === 5 && (
+              <>
+                <h1 className="bx-step__title">{editingId ? 'Tudo certo?' : 'Confira e publique'}</h1>
+                <p className="bx-step__lead">Toque em “Mudar” para voltar em qualquer parte.</p>
+                <div className="bx-preview">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {imageUrl ? <img src={imageUrl} alt="" /> : <span className="bx-preview__ph">📦</span>}
+                  <div style={{ minWidth: 0 }}>
+                    <span className="bx-chip" style={{ background: pre ? '#f3e8f8' : '#fff5d6', color: pre ? '#7d3c98' : '#8a6d00' }}>{pre ? '🗓️ Pré-venda' : '🧁 Pronta entrega'}</span>
+                    <p style={{ fontWeight: 800, fontSize: '1.25rem', margin: '0.4rem 0 0.2rem', overflowWrap: 'anywhere' }}>{title || 'Sem nome'}</p>
+                    <p style={{ color: '#6a6a6a', margin: 0 }}>{treatsNamed.map(i => `${i.emoji} ${i.name}`).join(' · ') || 'Nenhum doce ainda'}</p>
+                  </div>
+                </div>
+                <div className="bx-review">
+                  {[
+                    { s: 0, t: 'Como vender', v: pre ? 'Pré-venda (feita sob encomenda)' : 'Pronta entrega (já feitas)' },
+                    { s: 1, t: 'Doces', v: `${treatsNamed.length} ${treatsNamed.length === 1 ? 'doce' : 'doces'}` },
+                    { s: 2, t: 'Nome e fotos', v: `${title || '—'} · ${(imageUrl ? 1 : 0) + gallery.length || 'sem'} foto${(imageUrl ? 1 : 0) + gallery.length === 1 ? '' : 's'}` },
+                    { s: 3, t: 'Entregas', v: `${windowText || 'qualquer dia aberto do calendário'}${pre && ordersClose ? ` · encomendas até ${longDay(ordersClose)}` : ''}${ordersOpen ? ` · abre ${longDay(ordersOpen)}` : ''}` },
+                    { s: 4, t: pre ? 'Limite' : 'Quantidade', v: pre && totalQuantity === 0 ? 'sem limite' : `${totalQuantity} caixas${editingId ? ` · ${soldQuantity} ${pre ? 'encomendadas' : 'vendidas'}` : ''}` },
+                  ].map(r => (
+                    <div key={r.s} className="bx-review__row">
+                      <div style={{ minWidth: 0 }}><strong>{r.t}</strong><span>{r.v}</span></div>
+                      <button type="button" className="bx-link" onClick={() => goTo(r.s)}>Mudar</button>
+                    </div>
+                  ))}
+                </div>
+                <button type="button" className={`bx-switch${isActive ? ' is-on' : ''}`} style={{ marginTop: '1.25rem' }} onClick={() => setIsActive(a => !a)} aria-pressed={isActive}>
+                  <span>
+                    <strong style={{ display: 'block', fontSize: '1.05rem' }}>{isActive ? 'No site' : 'Guardada, fora do site'}</strong>
+                    <span style={{ color: '#6a6a6a', fontSize: '0.9rem' }}>
+                      {isActive
+                        ? `Aparece no site ao salvar.${pre ? (live.presale && live.presale.id !== editingId ? ` A pré-venda “${live.presale.title}” sai do site.` : '') : (live.stock && live.stock.id !== editingId ? ` A caixa “${live.stock.title}” sai do site.` : '')}`
+                        : 'Fica salva aqui para você publicar depois.'}
+                    </span>
+                  </span>
+                  <span className="bx-switch__knob" />
+                </button>
+              </>
+            )}
+          </div>
+
+          <div className="bx-footer">
+            {step > 0 ? <button type="button" className="bx-link" onClick={back}>← Voltar</button> : <span />}
+            {formProblem && <span className="bx-footer__msg" role="alert">{formProblem}</span>}
+            {step < STEPS.length - 1 ? (
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                {editingId && <button type="button" className="bx-btn bx-btn--ghost" onClick={publish} disabled={saving}>{saving ? 'Salvando…' : 'Salvar'}</button>}
+                <button type="button" className="bx-btn bx-btn--dark" onClick={next}>Avançar</button>
+              </div>
+            ) : (
+              <button type="button" className="bx-btn bx-btn--gold" onClick={publish} disabled={saving}>
+                {saving ? 'Salvando…' : editingId ? 'Salvar mudanças' : isActive ? '🚀 Publicar no site' : 'Salvar caixa'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════ HOME: WHAT IS ON THE SITE ═══════════════════════════════
+  const listing = (box: TastingBox) => {
+    const st = saleState(box, null);
+    const presale = isPresale(box);
+    const limited = box.total_quantity > 0;
+    const left = Math.max(0, box.total_quantity - box.sold_quantity);
+    const lbl = SALE_LABEL[st.state];
+    const win = deliveryWindowLabel(box);
+    return (
+      <article className="bx-listing" key={box.id}>
+        <div className="bx-listing__photo">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {box.image_url ? <img src={box.image_url} alt="" /> : <div style={{ display: 'grid', placeItems: 'center', height: '100%', fontSize: '3rem' }}>📦</div>}
+          <span className="bx-listing__badge">{presale ? '🗓️ Pré-venda' : '🧁 Pronta entrega'}</span>
+        </div>
+        <div className="bx-listing__body">
+          <span className="bx-chip" style={{ background: lbl.bg, color: lbl.color, justifySelf: 'start' }}>● {lbl.text}</span>
+          <h3 className="bx-listing__title">{box.title}</h3>
+          <div className="bx-listing__meta">
+            <span>🚚 {win ? `Entregas ${win}` : 'Qualquer dia aberto'}</span>
+            {presale && box.orders_close_on && <span>⏳ Encomendas até {longDay(box.orders_close_on)}</span>}
+            <span>🍫 {(box.items || []).length} doces</span>
+          </div>
+          {limited ? (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, marginBottom: '0.4rem' }}>
+                <span>{presale ? `${box.sold_quantity} encomendas` : `${left} de ${box.total_quantity} à venda`}</span>
+                <span style={{ color: '#6a6a6a' }}>{presale ? `limite ${box.total_quantity}` : `${box.sold_quantity} vendidas`}</span>
+              </div>
+              <div className="bx-meter"><span style={{ width: `${Math.min(100, (box.sold_quantity / box.total_quantity) * 100)}%` }} /></div>
+            </div>
+          ) : (
+            <p style={{ margin: 0, fontWeight: 700 }}>{box.sold_quantity} {presale ? 'encomendas' : 'vendidas'} · sem limite</p>
+          )}
+          <div className="bx-listing__actions">
+            <button type="button" className="bx-btn bx-btn--dark" onClick={() => handleEdit(box)}>✏️ Editar</button>
+            <a className="bx-btn bx-btn--ghost" href={presale ? '/caixas?edicao=pre' : '/caixas?edicao=pronta'} target="_blank" rel="noopener noreferrer">Ver no site ↗</a>
+          </div>
+        </div>
+      </article>
+    );
+  };
 
   return (
-    <div style={{ maxWidth: '1400px' }}>
-      <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '1rem' }}>Gerenciar Caixas de Degustação</h1>
+    <div className="bx">
+      <div className="bx-head">
+        <div>
+          <h1 className="bx-h1">Suas caixas</h1>
+          <p className="bx-sub">O que está no site agora, e tudo o que você já fez.</p>
+        </div>
+        <button type="button" className="bx-btn bx-btn--dark" onClick={() => startNew()}>＋ Nova caixa</button>
+      </div>
 
       {announce && (
-        <div role="status" style={{ background: '#e6f4ec', border: '1px solid #b7e1c6', borderRadius: '12px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.75rem 1.25rem', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ color: '#1e6b3c', lineHeight: 1.6 }}>
-            <strong>✅ Caixa salva e no ar.</strong><br />
+        <div role="status" className="bx-banner bx-banner--ok">
+          <div style={{ lineHeight: 1.6 }}>
+            <strong>🎉 Caixa salva e no ar.</strong><br />
             Quem está na fila de espera e os clientes que querem saber das caixas ainda não foram avisados.
           </div>
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-            <Link
-              href={`/admin/emails?campaign=box-live&title=${encodeURIComponent(announce.title)}&treats=${encodeURIComponent(announce.treats)}&quantity=${announce.quantity}`}
-              style={{ background: '#d4af37', color: 'white', padding: '0.7rem 1.2rem', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' }}
-            >
-              📧 Avisar a fila de espera e os clientes
+            <Link className="bx-btn bx-btn--gold" href={`/admin/emails?campaign=box-live&title=${encodeURIComponent(announce.title)}&treats=${encodeURIComponent(announce.treats)}&quantity=${announce.quantity}`}>
+              📧 Avisar por e-mail
             </Link>
-            <button type="button" onClick={() => setAnnounce(null)} style={{ background: 'white', border: '1px solid #b7e1c6', color: '#1e6b3c', padding: '0.7rem 1rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-              Agora não
-            </button>
+            <button type="button" className="bx-btn bx-btn--ghost" onClick={() => setAnnounce(null)}>Agora não</button>
           </div>
         </div>
       )}
 
-      {/* Next week's pre-sale, and the button that turns it into the ready box once it is baked. */}
-      {live.presale && <PresaleGear presale={live.presale} stock={live.stock} onChanged={fetchBoxes} />}
-      {/* The number that changes every day, before the long form that almost never does. */}
-      <BoxStock box={live.stock} onChanged={applyStock} />
-      {/* Customers choose their treats now, so "N boxes" no longer says how many of each to bake.
-          With a pre-sale on, that is the batch about to be baked. */}
-      <div style={{ marginBottom: '2rem' }}><ProductionTally box={nextBakeBox(boxes.filter(b => b.is_active))} /></div>
-
-      <div style={{ background: '#f8f9fa', padding: '1rem 1.5rem', borderRadius: '8px', borderLeft: '4px solid #d4af37', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h3 style={{ margin: 0, color: '#2c3e50' }}>Gerenciar Fila de Espera</h3>
-          <p style={{ margin: '0.5rem 0 0 0', color: '#7f8c8d', fontSize: '0.9rem' }}>Veja e gerencie todos que estão aguardando o próximo lote.</p>
+      {loading ? <p>Carregando…</p> : (live.stock || live.presale) ? (
+        <div className="bx-live">
+          {live.stock && listing(live.stock)}
+          {live.stock && <BoxStock box={live.stock} onChanged={applyStock} />}
+          {live.presale && listing(live.presale)}
+          {live.presale && <PresaleGear presale={live.presale} stock={live.stock} onChanged={fetchBoxes} />}
         </div>
-        <Link href="/admin/waitlist" style={{ background: '#d4af37', color: 'white', padding: '0.6rem 1.2rem', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' }}>
-          Ver Fila de Espera
-        </Link>
-      </div>
-
-      <h2 style={{ fontSize: '1.5rem', marginBottom: '1.25rem', color: '#2c3e50' }}>{editingId ? 'Editar Lote' : 'Novo Lote'}</h2>
-
-      <form onSubmit={handleSubmit} onInvalid={handleInvalid} style={{ marginBottom: '3rem' }}>
-        <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))', alignItems: 'start' }}>
-
-          {/* LEFT: the box itself + its picture */}
-          <div style={{ display: 'grid', gap: '1.5rem', alignContent: 'start', gridTemplateColumns: 'minmax(0, 1fr)', minWidth: 0 }}>
-            <div style={{ ...card, display: 'grid', gap: '1.25rem', gridTemplateColumns: 'minmax(0, 1fr)' }}>
-              <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>📦 Dados da caixa</h3>
-
-            <div>
-              <label style={label}>Como vender</label>
-              <div role="group" aria-label="Como vender" style={{ display: 'grid', gap: '0.6rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))' }}>
-                {([
-                  ['stock', '🧁 Pronta entrega', 'Caixas já feitas. Vende até acabar; as entregas seguem pelo calendário enquanto sobrar caixa.'],
-                  ['presale', '🗓️ Pré-venda', 'A caixa da próxima semana. O cliente encomenda e paga antes; você assa só o que foi pedido.'],
-                ] as const).map(([m, t, d]) => (
-                  <button key={m} type="button" onClick={() => setSaleMode(m)} aria-pressed={saleMode === m} style={{
-                    textAlign: 'left', padding: '0.8rem 0.9rem', borderRadius: '10px', cursor: 'pointer',
-                    border: saleMode === m ? `2px solid ${m === 'presale' ? '#8e44ad' : '#d4af37'}` : '2px solid #e5e5e5',
-                    background: saleMode === m ? (m === 'presale' ? '#f8f4fb' : '#fffdf6') : 'white',
-                  }}>
-                    <span style={{ display: 'block', fontWeight: 800, color: '#2c3e50' }}>{t}</span>
-                    <span style={{ display: 'block', fontSize: '0.8rem', color: '#7f8c8d', marginTop: '0.25rem', lineHeight: 1.45 }}>{d}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label style={label}>Título</label>
-              <input type="text" required data-nome="Título" value={title} onChange={e => setTitle(e.target.value)} placeholder="Ex: Caixa Surpresa da Semana" style={input} />
-            </div>
-
-            <div>
-              <label style={label}>Texto de abertura (opcional)</label>
-              <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} placeholder="Uma frase sobre o tema desta edição. Se ficar vazio, usamos a lista dos doces." style={input} />
-            </div>
-
-            <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))' }}>
-              <div>
-                <label style={label}>Data do Lote</label>
-                <input type="date" required min="2020-01-01" max="2100-12-31" data-nome="Data do Lote"
-                  value={batchDateLabel} onChange={e => setBatchDateLabel(healBatchDate(e.target.value))} style={input} />
-              </div>
-              <div>
-                <label style={label}>{pre ? 'Limite de encomendas' : 'Qtd. Total Produzida'}</label>
-                <input type="number" required value={totalQuantity} onChange={e => setTotalQuantity(Number(e.target.value))} style={input} />
-              </div>
-              <div>
-                <label style={label}>{pre ? 'Encomendas feitas' : 'Qtd. Vendida'}</label>
-                <input type="number" required value={soldQuantity} onChange={e => setSoldQuantity(Number(e.target.value))} style={input} />
-              </div>
-            </div>
-
-            <p style={{ fontSize: '0.8rem', color: '#7f8c8d' }}>
-              {pre
-                ? <>O limite é quantas caixas cabem nesta fornada (0 = sem limite). As encomendas são contadas sozinhas pelos pedidos. Quando assar, use o botão <strong>Fornada pronta</strong> no topo da página.</>
-                : <>A quantidade vendida é calculada automaticamente pelos pedidos. Edite manualmente apenas se houver cancelamentos ou vendas externas.</>}
-              {' '}Cada caixa conta como uma, seja de 2, 4 ou 6 doces.
-            </p>
-            </div>
-
-            <div style={{ ...card, display: 'grid', gap: '1rem', gridTemplateColumns: 'minmax(0, 1fr)', background: '#fffdf6', border: '1px solid #f0e2bf' }}>
-              <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>🎁 Tamanhos e preços</h3>
-              <p style={{ fontSize: '0.85rem', color: '#7f8c8d', lineHeight: 1.6, margin: 0 }}>
-                O cliente escolhe uma caixa de 2, 4 ou 6 doces. Estes preços valem para <strong>todas as caixas</strong> e para a
-                <strong> assinatura</strong> (cada plano dá o mesmo desconto de sempre em cada tamanho).
-              </p>
-              <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-                {TREAT_COUNTS.map(size => (
-                  <label key={size} style={{ fontSize: '0.85rem', fontWeight: 700 }}>{size} doces (R$)
-                    <input type="number" step="0.01" min="1" value={sizePrices[size] || ''} onChange={e => setSizePrices(p => ({ ...p, [size]: Number(e.target.value) }))} style={{ ...input, marginTop: '0.3rem' }} />
-                  </label>
-                ))}
-              </div>
-              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                <button type="button" onClick={saveSizePrices} style={{ background: '#2c3e50', color: 'white', padding: '0.6rem 1.2rem', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                  Salvar preços
-                </button>
-                {sizeSaving && <span style={{ color: '#1e6b3c', fontSize: '0.88rem', fontWeight: 700 }}>{sizeSaving}</span>}
-              </div>
-              {!sizePricesInDb && (
-                <p style={{ fontSize: '0.82rem', color: '#8a5a00', margin: 0 }}>
-                  Estes são os preços padrão. Para poder mudá-los aqui, rode a migration_24_box_sizes_and_names.sql no Supabase.
-                </p>
-              )}
-            </div>
-
-            <div style={{ ...card, display: 'grid', gap: '1.25rem', gridTemplateColumns: 'minmax(0, 1fr)' }}>
-              <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>🖼️ Imagem e visibilidade</h3>
-            <ImagePicker label="Imagem da Caixa" imageUrl={imageUrl} uploading={uploading} onChange={handleImageUpload} />
-
-            <div>
-              <label style={label}>Mais fotos desta caixa</label>
-              <p style={{ fontSize: '0.8rem', color: '#7f8c8d', margin: '0 0 0.6rem' }}>
-                Aparecem nos cartões de foto do topo da página /caixas, junto com a foto principal e as fotos de cada doce. Só fotos desta edição.
-              </p>
-              {gallery.length > 0 && (
-                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.7rem' }}>
-                  {gallery.map(src => (
-                    <div key={src} style={{ position: 'relative' }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={src} alt="" style={{ width: '84px', height: '84px', objectFit: 'cover', borderRadius: '8px', display: 'block' }} />
-                      <button type="button" aria-label="Remover foto" onClick={() => setGallery(g => g.filter(x => x !== src))}
-                        style={{ position: 'absolute', top: '-8px', right: '-8px', width: '26px', height: '26px', borderRadius: '50%', border: 'none', background: '#e74c3c', color: '#fff', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} disabled={galleryUploading} />
-              {galleryUploading && <span style={{ marginLeft: '0.5rem', fontSize: '0.85rem', color: '#7f8c8d' }}>Enviando…</span>}
-            </div>
-
-            <ToggleSwitch
-              checked={isActive}
-              onChange={setIsActive}
-              label="Mostrar esta caixa no site"
-              onText="Ativado — aparecendo no site"
-              offText="Desativado — escondida do site"
-              helper={pre
-                ? 'Ao ativar, outra pré-venda no ar sai do site. A caixa de pronta entrega continua: as duas ficam no ar juntas.'
-                : 'Ao ativar, a outra caixa de pronta entrega sai do site. Uma pré-venda no ar continua junto.'}
-            />
-            </div>
-          </div>
-
-          {/* RIGHT: when it goes out, then the treats inside */}
-          <div style={{ display: 'grid', gap: '1.5rem', alignContent: 'start', gridTemplateColumns: 'minmax(0, 1fr)', minWidth: 0 }}>
-            <div style={{ ...card, background: '#fdf7ee', border: '1px solid #e8e1d7', display: 'grid', gap: '1.1rem', gridTemplateColumns: 'minmax(0, 1fr)' }}>
-              <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>📅 Datas de entrega e pedidos</h3>
-              <div>
-                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🚚 {pre ? 'Dias de entrega da fornada' : 'Janela de entrega prevista'}</p>
-                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>
-                  {pre
-                    ? <>Os dias em que as encomendas saem. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas. Na pré-venda <strong>só estes dias</strong> são oferecidos. Quando a fornada virar pronta entrega, as caixas que sobrarem seguem sendo entregues pelo calendário.</>
-                    : <>Os dias em que esta leva está planejada para sair. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas. <strong>Se a janela passar e ainda houver caixas, a venda continua</strong>: as entregas passam a valer a partir do primeiro dia livre do calendário.</>}
-                </p>
-                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))' }}>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Primeiro dia
-                    <input type="date" data-nome="Primeiro dia de entrega" value={deliveryFrom} onChange={e => setDeliveryFrom(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
-                  </label>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Último dia
-                    <input type="date" data-nome="Último dia de entrega" value={deliveryUntil} min={deliveryFrom || undefined} onChange={e => setDeliveryUntil(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
-                  </label>
-                </div>
-              </div>
-              <div>
-                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🔔 Abertura dos pedidos</p>
-                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>
-                  {pre
-                    ? <>As encomendas fecham no dia em que você precisa da contagem para assar (ou antes, se a fornada encher).</>
-                    : <>Os pedidos ficam abertos até a caixa <strong>esgotar</strong> ou você <strong>desativá-la</strong> no botão abaixo. Só a data de abertura é opcional, para deixar uma caixa pronta para uma data futura.</>}
-                </p>
-                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))' }}>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Abre em <span style={{ fontWeight: 400, color: '#95a5a6' }}>(vazio = já)</span>
-                    <input type="date" data-nome="Abertura dos pedidos" value={ordersOpen} onChange={e => setOrdersOpen(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
-                  </label>
-                  {pre && (
-                    <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Encomendas até
-                      <input type="date" required data-nome="Último dia das encomendas" value={ordersClose} max={deliveryFrom || undefined}
-                        onChange={e => setOrdersClose(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
-                    </label>
-                  )}
-                </div>
-              </div>
-              {(() => {
-                const w = { total_quantity: totalQuantity, sold_quantity: soldQuantity, delivery_from: deliveryFrom || null, delivery_until: deliveryUntil || null, orders_open_from: ordersOpen || null, orders_close_on: null };
-                if (pre) {
-                  return (
-                    <p style={{ fontSize: '0.88rem', color: '#2c3e50', lineHeight: 1.6, background: '#fff', borderRadius: '8px', padding: '0.6rem 0.8rem' }}>
-                      👀 O cliente vai ver: <strong>pré-venda</strong>{deliveryWindowLabel(w) ? <>, entregas <strong>{deliveryWindowLabel(w)}</strong></> : ''}.
-                      {' '}Encomendas {ordersOpen ? <>abrem em <strong>{longDay(ordersOpen)}</strong> e </> : ''}{ordersClose ? <>vão até <strong>{longDay(ordersClose)}</strong></> : 'precisam de um último dia'}{totalQuantity > 0 ? <> ou até as {totalQuantity} vagas acabarem</> : ''}.
-                    </p>
-                  );
-                }
-                if (!deliveryFrom && !deliveryUntil && !ordersOpen) {
-                  return <p style={{ fontSize: '0.85rem', color: '#8a5a00' }}>Sem datas: o cliente escolhe qualquer dia aberto do calendário, e os pedidos ficam abertos até esgotar.</p>;
-                }
-                return (
-                  <p style={{ fontSize: '0.88rem', color: '#2c3e50', lineHeight: 1.6, background: '#fff', borderRadius: '8px', padding: '0.6rem 0.8rem' }}>
-                    👀 O cliente vai ver: {deliveryWindowLabel(w) ? <>entregas <strong>{deliveryWindowLabel(w)}</strong>. </> : ''}
-                    Pedidos {ordersOpen ? <>abrem em <strong>{longDay(ordersOpen)}</strong> e </> : ''}seguem abertos até esgotar ou você desativar a caixa.
-                  </p>
-                );
-              })()}
-            </div>
-
-          <div style={card}>
-            <h3 style={{ fontSize: '1.2rem', color: '#2c3e50', marginBottom: '0.25rem' }}>🍫 Doces desta caixa</h3>
-            <p style={{ fontSize: '0.85rem', color: '#7f8c8d', marginBottom: '1rem', lineHeight: 1.6 }}>
-              Um doce de cada vez: nome, descrição, foto, ingredientes e alérgenos. Você também pode repetir doces do Menu de Eventos
-              ou mandar um doce novo para lá. O site monta tudo numa lista que abre e fecha.
-            </p>
-            {listInDescription && (
-              <div style={{ background: '#fff8e6', border: '1px solid #f0d09a', borderRadius: '10px', padding: '0.9rem 1rem', marginBottom: '1rem' }}>
-                <p style={{ margin: '0 0 0.6rem', color: '#8a5a00', fontSize: '0.88rem', lineHeight: 1.5 }}>
-                  Os {listInDescription.items.length} doces desta caixa estão escritos como uma lista no texto de abertura. Separe a lista em
-                  doces e dê um <strong>nome divertido</strong> a cada um.
-                </p>
-                <button type="button" onClick={importFromDescription} style={{ background: '#d4af37', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.6rem 1.1rem', fontWeight: 'bold', cursor: 'pointer' }}>
-                  ✨ Separar a lista em {listInDescription.items.length} doces
-                </button>
-              </div>
-            )}
-            <BoxItemsEditor key={items.length === 0 ? 'empty' : 'filled'} items={items} onChange={setItems} />
-          </div>
-          </div>
+      ) : (
+        <div className="bx-empty">
+          <p className="bx-empty__icon">📦</p>
+          <h2 style={{ margin: '0 0 0.4rem', fontWeight: 800 }}>Nenhuma caixa no site agora</h2>
+          <p style={{ color: '#6a6a6a', margin: '0 0 1.25rem' }}>Crie uma nova, ou repita uma das anteriores aqui embaixo.</p>
+          <button type="button" className="bx-btn bx-btn--dark" onClick={() => startNew()}>＋ Nova caixa</button>
         </div>
+      )}
 
-        {/* Save bar: stays in view while scrolling a long treat list */}
-        <div style={{ ...card, position: 'sticky', bottom: '0.75rem', zIndex: 5, marginTop: '1.5rem', padding: '0.9rem 1.25rem', boxShadow: '0 -2px 12px rgba(0,0,0,0.12)' }}>
-            {formProblem && (
-              <p role="alert" style={{ margin: '0 0 0.7rem', color: '#c0392b', fontWeight: 700, fontSize: '0.9rem', lineHeight: 1.45 }}>
-                ⚠️ {formProblem}
-              </p>
-            )}
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button type="submit" disabled={saving} style={{ background: '#d4af37', color: 'white', padding: '0.8rem 2rem', border: 'none', borderRadius: '6px', cursor: saving ? 'wait' : 'pointer', fontWeight: 'bold', opacity: saving ? 0.7 : 1 }}>
-                {saving ? 'Salvando…' : editingId ? 'Atualizar Lote' : 'Criar Lote'}
-              </button>
-              {editingId && (
-                <button type="button" onClick={resetForm} style={{ background: '#95a5a6', color: 'white', padding: '0.8rem 2rem', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
-                  Cancelar Edição
-                </button>
-              )}
-            </div>
-        </div>
-      </form>
+      {!live.presale && live.stock && (
+        <button type="button" className="bx-card" onClick={() => { startNew(); setSaleMode('presale'); }}
+          style={{ marginTop: '1rem', width: '100%', textAlign: 'left', cursor: 'pointer', display: 'flex', gap: '1rem', alignItems: 'center', borderStyle: 'dashed' }}>
+          <span style={{ fontSize: '2rem' }}>🗓️</span>
+          <span><strong style={{ display: 'block' }}>Abrir a pré-venda da próxima semana</strong>
+            <span style={{ color: '#6a6a6a' }}>Venda antes de assar e faça só o que foi encomendado.</span></span>
+        </button>
+      )}
 
+      <ProductionTally box={nextBakeBox(boxes.filter(b => b.is_active))} />
       {boxes.filter(b => b.is_active).map(b => <HeldBoxes key={b.id} box={b} onReleased={fetchBoxes} />)}
 
-      <h2 style={{ fontSize: '1.5rem', color: '#2c3e50', marginBottom: '1.5rem' }}>Lotes Anteriores</h2>
+      <details className="bx-card" style={{ marginTop: '1.5rem' }}>
+        <summary style={{ cursor: 'pointer', fontWeight: 800, fontSize: '1.05rem' }}>💰 Preços das caixas <span style={{ fontWeight: 400, color: '#6a6a6a' }}>· {TREAT_COUNTS.map(n => `${n} doces R$ ${sizePrices[n]}`).join(' · ')}</span></summary>
+        <p style={{ color: '#6a6a6a', lineHeight: 1.6, margin: '0.9rem 0' }}>Valem para todas as caixas e para a assinatura (cada plano dá o mesmo desconto de sempre em cada tamanho).</p>
+        <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', maxWidth: '520px' }}>
+          {TREAT_COUNTS.map(size => (
+            <label key={size} className="bx-field"><span>{size} doces</span>
+              <input className="bx-input" type="number" step="0.01" min="1" value={sizePrices[size] || ''} onChange={e => setSizePrices(p => ({ ...p, [size]: Number(e.target.value) }))} />
+            </label>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginTop: '0.9rem', flexWrap: 'wrap' }}>
+          <button type="button" className="bx-btn bx-btn--dark" onClick={saveSizePrices}>Salvar preços</button>
+          {sizeSaving && <span style={{ color: '#1e6b3c', fontWeight: 700 }}>{sizeSaving}</span>}
+          {!sizePricesInDb && <span style={{ color: '#8a5a00', fontSize: '0.85rem' }}>Para mudar aqui, rode a migration_24 no Supabase.</span>}
+        </div>
+      </details>
 
-      {loading ? <p>Carregando...</p> : (
-        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 520px), 1fr))' }}>
-          {boxes.map(box => (
-            <div key={box.id} style={{ display: 'flex', gap: '1.25rem', background: 'white', padding: '1.25rem', borderRadius: '12px', borderLeft: box.is_active ? '5px solid #27ae60' : '5px solid #bdc3c7', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-              {box.image_url && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={box.image_url} alt={box.title} style={{ width: '110px', height: '110px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
-              )}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <h3 style={{ fontSize: '1.1rem', marginBottom: '0.4rem', color: box.is_active ? '#27ae60' : '#2c3e50' }}>
-                    {box.title} {box.is_active && '(Ativo)'}
-                    {isPresale(box) && <span style={{ marginLeft: '0.4rem', background: '#f3e8f8', color: '#8e44ad', fontSize: '0.75rem', fontWeight: 800, padding: '0.1rem 0.5rem', borderRadius: '6px', verticalAlign: 'middle' }}>🗓️ Pré-venda</span>}
-                  </h3>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button onClick={() => handleEdit(box)} style={{ background: '#3498db', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer' }}>Editar</button>
-                    <button onClick={() => handleDelete(box.id)} style={{ background: '#e74c3c', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer' }}>Excluir</button>
-                  </div>
-                </div>
-                <p style={{ color: '#7f8c8d', marginBottom: '0.25rem', fontSize: '0.9rem' }}>
-                  <strong>Data:</strong> {box.batch_date_label} · <strong>{(box.items || []).length}</strong> doces
-                </p>
-                {(() => {
-                  const st = saleState(box, null);
-                  const windowOver = !!box.delivery_until && box.delivery_until < toISODate(new Date());
-                  const lbl = SALE_LABEL[st.state];
-                  return (
-                    <p style={{ fontSize: '0.85rem', color: '#594a42', margin: '0.2rem 0 0', display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
-                      <span style={{ background: lbl.bg, color: lbl.color, fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '6px' }}>{lbl.text}</span>
-                      {deliveryWindowLabel(box) && <span>🚚 Entregas previstas {deliveryWindowLabel(box)}</span>}
-                      {windowOver && st.state === 'open' && !isPresale(box) && <span>· ↻ janela já passou, segue à venda a partir do próximo dia livre</span>}
-                    </p>
-                  );
-                })()}
-
-                <div style={{ marginTop: '0.75rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.3rem', fontWeight: 'bold' }}>
-                    <span>Vendidas: {box.sold_quantity}</span>
-                    <span>Total: {box.total_quantity}</span>
-                  </div>
-                  <div style={{ width: '100%', height: '10px', background: '#ecf0f1', borderRadius: '5px', overflow: 'hidden' }}>
-                    <div style={{ width: `${Math.min(100, (box.sold_quantity / box.total_quantity) * 100)}%`, height: '100%', background: box.sold_quantity >= box.total_quantity ? '#e74c3c' : '#f1c40f', transition: 'width 0.3s' }} />
-                  </div>
-                </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '1rem', flexWrap: 'wrap' }}>
+        <h2 className="bx-h2">Caixas anteriores</h2>
+        <Link href="/admin/waitlist" style={{ color: '#222', fontWeight: 700 }}>Fila de espera →</Link>
+      </div>
+      {pastBoxes.length === 0 ? <p style={{ color: '#6a6a6a' }}>As caixas que saírem do site aparecem aqui, prontas para repetir.</p> : (
+        <div className="bx-grid">
+          {pastBoxes.map(box => (
+            <div key={box.id} className="bx-tile">
+              <button type="button" className="bx-tile__photo" onClick={() => startNew(box)} title="Repetir esta caixa" style={{ border: 0, padding: 0, cursor: 'pointer' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {box.image_url ? <img src={box.image_url} alt="" loading="lazy" /> : <span style={{ fontSize: '2.5rem' }}>📦</span>}
+              </button>
+              <p className="bx-tile__title">{box.title}</p>
+              <p className="bx-tile__meta">{formatBatchDate(box.batch_date_label) || '—'} · {box.sold_quantity}{box.total_quantity > 0 ? ` de ${box.total_quantity}` : ''} vendidas</p>
+              <div className="bx-tile__actions">
+                <button type="button" className="bx-link" onClick={() => startNew(box)}>↻ Repetir</button>
+                <button type="button" className="bx-link" onClick={() => handleEdit(box)}>Editar</button>
+                <button type="button" className="bx-link bx-link--danger" onClick={() => handleDelete(box.id)}>Excluir</button>
               </div>
             </div>
           ))}
