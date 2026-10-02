@@ -223,7 +223,7 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
   const affiliate = /^[A-Z0-9_-]{2,30}$/.test(code) ? { affiliate_code: code } : {};
 
   const reference = `ORD${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
-  const payment_provider = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : 'pix';
+  const payment_provider = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : input.payMethod === 'stripe' ? 'stripe' : 'pix';
   const itemsSummary = lines.map(l => `${l.quantity}x ${l.name}`).join(', ');
   // The same boxes as data: which treats, how many, so the kitchen tally never has to read the summary text.
   const boxItems: BoxOrderItems | null = hasBox

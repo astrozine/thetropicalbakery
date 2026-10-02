@@ -32,7 +32,7 @@ export interface ReceiptOrder {
   summary?: string | null;
   fee: number;
   total: number;
-  /** 'pix' | 'mercadopago' | 'paypal' */
+  /** 'pix' | 'mercadopago' | 'paypal' | 'stripe' */
   method: string;
   /** ISO date the customer picked, when there is one. */
   date?: string | null;

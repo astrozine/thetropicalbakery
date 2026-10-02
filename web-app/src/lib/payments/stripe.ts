@@ -1,10 +1,11 @@
 import 'server-only';
 import crypto from 'node:crypto';
-import { findOrder, markOrderPaid } from './server';
+import { findOrder, markOrderPaid, siteUrl, type PayableOrder } from './server';
 import { EBOOK } from '@/lib/ebook';
 
 /**
- * Stripe Checkout, for card payments from anywhere in the world (the e-book, in US dollars).
+ * Stripe Checkout, for card payments from anywhere in the world: the e-book (in US dollars) and every order from
+ * /checkout, the boxes and the Menu de Eventos (in reais, the amount the server priced; the buyer's bank converts).
  *
  * No SDK: two plain REST calls. Same rules as Mercado Pago and PayPal in this folder:
  *  - the PRICE is decided here (EBOOK.priceUSD), never taken from the browser;
@@ -99,8 +100,44 @@ export async function createStripeCheckout(o: StripeCheckoutInput): Promise<stri
 }
 
 /**
- * Asks Stripe what happened to a Checkout session and, only if it is PAID for one of our e-book orders at exactly
- * the right amount and currency, marks that order paid. Used by the thank-you page and by the webhook.
+ * The Stripe payment page for an order placed in /checkout (reference ORD…), charged in reais at the total the
+ * server stored for it. For buyers without a Brazilian card or Pix.
+ */
+export async function createStripeOrderCheckout(order: PayableOrder): Promise<string> {
+  const account = accounts()[0];
+  if (!account || !stripeConfigured()) throw new Error('O cartão internacional ainda não está ativo.');
+  const back = `${siteUrl()}/checkout/retorno?provider=stripe&ref=${order.reference}`;
+  const body: Record<string, string> = {
+    mode: 'payment',
+    'line_items[0][quantity]': '1',
+    'line_items[0][price_data][currency]': 'brl',
+    'line_items[0][price_data][unit_amount]': String(Math.round(order.total * 100)),
+    'line_items[0][price_data][product_data][name]': `The Tropical Bakery · pedido ${order.reference}`,
+    client_reference_id: order.reference,
+    'metadata[reference]': order.reference,
+    locale: 'auto',
+    success_url: `${back}&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${back}&result=cancel`,
+  };
+  if (order.itemsSummary) body['line_items[0][price_data][product_data][description]'] = order.itemsSummary.slice(0, 480);
+  if (order.customerEmail && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(order.customerEmail)) body.customer_email = order.customerEmail;
+  const res = await fetch(`${API}/checkout/sessions`, {
+    method: 'POST',
+    headers: { ...headers(account.secret), 'Idempotency-Key': `tb-${order.reference}` },
+    body: form(body),
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || !json.url) {
+    console.error('Stripe session error:', res.status, JSON.stringify(json?.error ?? json));
+    throw new Error('A página do cartão não abriu. Tente de novo, ou pague por Pix.');
+  }
+  return json.url as string;
+}
+
+/**
+ * Asks Stripe what happened to a Checkout session and, only if it is PAID for one of our orders (e-book EBK… in
+ * dollars, or /checkout ORD… in reais) at exactly the right amount and currency, marks that order paid. Used by the
+ * return pages and by the webhook.
  */
 export async function confirmStripeSession(sessionId: string): Promise<{ ok: boolean; status: string; reference?: string }> {
   if (!/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sessionId)) return { ok: false, status: 'invalid' };
@@ -115,13 +152,15 @@ export async function confirmStripeSession(sessionId: string): Promise<{ ok: boo
 
   const reference = String(session.client_reference_id || '');
   const status = String(session.payment_status || '');
-  if (!/^EBK[A-Za-z0-9]+$/.test(reference)) return { ok: false, status: 'not_ours' };
+  const ebook = /^EBK[A-Za-z0-9]+$/.test(reference);
+  if (!ebook && !/^ORD[A-Za-z0-9]+$/.test(reference)) return { ok: false, status: 'not_ours' };
 
   const order = await findOrder(reference);
   if (!order) return { ok: false, status, reference };
 
   if (status === 'paid') {
-    if (session.currency !== 'usd' || session.amount_total !== EBOOK.priceUSD * 100) {
+    const want = ebook ? { currency: 'usd', amount: EBOOK.priceUSD * 100 } : { currency: 'brl', amount: Math.round(order.total * 100) };
+    if (session.currency !== want.currency || session.amount_total !== want.amount) {
       console.error(`Stripe amount mismatch on ${reference}: ${session.amount_total} ${session.currency}`);
       return { ok: false, status: 'amount_mismatch', reference };
     }

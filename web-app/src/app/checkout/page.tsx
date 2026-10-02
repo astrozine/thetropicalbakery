@@ -24,7 +24,7 @@ const parsePrice = (price: string) => parseFloat(price.replace(/[^\d,]/g, '').re
 const labelStyle: React.CSSProperties = { display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-primary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' };
 const inputStyle: React.CSSProperties = { width: '100%', padding: '1rem', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-body)', outline: 'none' };
 
-type PayMethod = 'pix' | 'card' | 'paypal';
+type PayMethod = 'pix' | 'card' | 'paypal' | 'stripe';
 
 interface PlacedOrder {
   items: CartItem[];
@@ -49,14 +49,14 @@ export default function CheckoutPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [placed, setPlaced] = useState<PlacedOrder | null>(null);
-  // Card and PayPal only appear once their keys are in Vercel (see /api/pay/methods).
+  // Card, PayPal and Stripe only appear once their keys are in Vercel (see /api/pay/methods).
   const [payMethod, setPayMethod] = useState<PayMethod>('pix');
-  const [available, setAvailable] = useState<{ card: boolean; paypal: boolean }>({ card: false, paypal: false });
+  const [available, setAvailable] = useState<{ card: boolean; paypal: boolean; stripe: boolean }>({ card: false, paypal: false, stripe: false });
 
   useEffect(() => {
     fetch('/api/pay/methods', { cache: 'no-store' })
       .then(r => r.json())
-      .then(j => setAvailable({ card: !!j.card, paypal: !!j.paypal }))
+      .then(j => setAvailable({ card: !!j.card, paypal: !!j.paypal, stripe: !!j.stripe }))
       .catch(() => { /* Pix only */ });
   }, []);
 
@@ -191,7 +191,7 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
 
-    const method: PayMethod = (payMethod === 'card' && available.card) || (payMethod === 'paypal' && available.paypal) ? payMethod : 'pix';
+    const method: PayMethod = (payMethod === 'card' && available.card) || (payMethod === 'paypal' && available.paypal) || (payMethod === 'stripe' && available.stripe) ? payMethod : 'pix';
 
     // The server places the order and prices it from the database. This page only says WHAT was picked;
     // what it costs (and the reference the Pix code and the card page use) comes back in the answer.
@@ -294,11 +294,11 @@ export default function CheckoutPage() {
       });
     }
 
-    // Card / PayPal: hand the customer to the payment page. The order is already saved,
+    // Card / PayPal / Stripe: hand the customer to the payment page. The order is already saved,
     // so the cart can be emptied; if the payment fails the return page offers a retry.
     if (method !== 'pix') {
       try {
-        const res = await fetch(`/api/pay/${method === 'card' ? 'mercadopago' : 'paypal'}`, {
+        const res = await fetch(`/api/pay/${method === 'card' ? 'mercadopago' : method}`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ reference: transactionId }),
         });
@@ -529,13 +529,14 @@ export default function CheckoutPage() {
                 </div>
 
                 <div style={{ marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(212,175,55,0.3)' }}>
-                  {(available.card || available.paypal) && (
+                  {(available.card || available.paypal || available.stripe) && (
                     <div style={{ marginBottom: '1.75rem' }}>
                       <label style={labelStyle}>Como você quer pagar?</label>
                       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                         {([
                           ['pix', '⚡', 'Pix', 'Na hora · sem taxa', true],
                           ['card', '💳', 'Cartão de crédito', 'Parcele em até 6x', available.card],
+                          ['stripe', '🌍', 'Cartão internacional', 'Cartão de fora do Brasil, sem Pix', available.stripe],
                           ['paypal', '🅿️', 'PayPal', 'Inclusive cartões de fora do Brasil', available.paypal],
                         ] as const).filter(m => m[4]).map(([value, emoji, title, hint]) => {
                           const on = payMethod === value;
@@ -560,10 +561,10 @@ export default function CheckoutPage() {
                     <button type="submit" disabled={submitting} className="btn btn-primary" style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem', borderRadius: '8px', opacity: submitting ? 0.7 : 1 }}>
                       {submitting
                         ? (payMethod === 'pix' ? 'Gerando seu Pix...' : 'Abrindo o pagamento...')
-                        : payMethod === 'card' ? 'Pagar com cartão ➔' : payMethod === 'paypal' ? 'Pagar com PayPal ➔' : 'Continuar para Pagamento ➔'}
+                        : payMethod === 'card' ? 'Pagar com cartão ➔' : payMethod === 'paypal' ? 'Pagar com PayPal ➔' : payMethod === 'stripe' ? 'Pagar com cartão internacional ➔' : 'Continuar para Pagamento ➔'}
                     </button>
                     <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '1rem' }}>
-                      🔒 {payMethod === 'pix' ? 'Pagamento 100% seguro via Pix' : payMethod === 'card' ? 'Pagamento seguro pelo Mercado Pago — não guardamos os dados do seu cartão' : 'Pagamento seguro pelo PayPal — não guardamos os dados do seu cartão'}
+                      🔒 {payMethod === 'pix' ? 'Pagamento 100% seguro via Pix' : payMethod === 'card' ? 'Pagamento seguro pelo Mercado Pago — não guardamos os dados do seu cartão' : payMethod === 'stripe' ? 'Pagamento seguro pela Stripe, cobrado em reais (seu banco converte) — não guardamos os dados do seu cartão' : 'Pagamento seguro pelo PayPal — não guardamos os dados do seu cartão'}
                     </p>
                   </div>
                 </div>

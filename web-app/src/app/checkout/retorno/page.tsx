@@ -8,10 +8,14 @@ const STORE_WHATSAPP = '5511932119196';
 
 type Phase = 'checking' | 'paid' | 'waiting' | 'failed' | 'cancelled' | 'unknown';
 
-/** Where Mercado Pago and PayPal send the customer back to after paying. */
+type Provider = 'mercadopago' | 'paypal' | 'stripe';
+const PROVIDER_NAME: Record<Provider, string> = { mercadopago: 'Mercado Pago', paypal: 'PayPal', stripe: 'Stripe' };
+
+/** Where Mercado Pago, PayPal and Stripe send the customer back to after paying. */
 function ReturnInner() {
   const q = useSearchParams();
-  const provider = q.get('provider') === 'paypal' ? 'paypal' : 'mercadopago';
+  const provider: Provider = q.get('provider') === 'paypal' ? 'paypal' : q.get('provider') === 'stripe' ? 'stripe' : 'mercadopago';
+  const stripeSession = q.get('session_id') || '';
   const ref = q.get('ref') || '';
   const result = q.get('result') || '';
   const paypalToken = q.get('token') || '';
@@ -22,6 +26,12 @@ function ReturnInner() {
   const [retrying, setRetrying] = useState(false);
   const [error, setError] = useState('');
   const ran = useRef(false);
+  // The retry buttons only offer what is switched on.
+  const [available, setAvailable] = useState({ card: true, paypal: true, stripe: false });
+  useEffect(() => {
+    fetch('/api/pay/methods', { cache: 'no-store' }).then(r => r.json())
+      .then(j => setAvailable({ card: !!j.card, paypal: !!j.paypal, stripe: !!j.stripe })).catch(() => { /* keep defaults */ });
+  }, []);
 
   const check = useCallback(async () => {
     try {
@@ -46,6 +56,14 @@ function ReturnInner() {
             body: JSON.stringify({ token: paypalToken, reference: ref }),
           }).catch(() => null);
         }
+      } else if (provider === 'stripe') {
+        if (result === 'cancel') { setPhase('cancelled'); return; }
+        if (stripeSession) {
+          await fetch('/api/pay/stripe/confirm', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: stripeSession }),
+          }).catch(() => null);
+        }
       } else if (mpPaymentId) {
         await fetch('/api/pay/mercadopago/confirm', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -64,9 +82,9 @@ function ReturnInner() {
     })();
 
     return () => { cancelled = true; };
-  }, [ref, provider, result, paypalToken, mpPaymentId, check]);
+  }, [ref, provider, result, paypalToken, mpPaymentId, stripeSession, check]);
 
-  const retry = async (which: 'mercadopago' | 'paypal') => {
+  const retry = async (which: Provider) => {
     setRetrying(true);
     setError('');
     try {
@@ -93,7 +111,7 @@ function ReturnInner() {
           <>
             <p style={{ fontSize: '2.6rem', marginBottom: '0.5rem' }}>⏳</p>
             <h1 style={h}>Confirmando seu pagamento…</h1>
-            <p style={p}>Só um instante, estamos conferindo com o {provider === 'paypal' ? 'PayPal' : 'Mercado Pago'}. Não feche esta página.</p>
+            <p style={p}>Só um instante, estamos conferindo com {provider === 'stripe' ? 'a' : 'o'} {PROVIDER_NAME[provider]}. Não feche esta página.</p>
           </>
         )}
 
@@ -127,8 +145,9 @@ function ReturnInner() {
             <h1 style={h}>{phase === 'cancelled' ? 'Pagamento cancelado' : 'O pagamento não foi aprovado'}</h1>
             <p style={p}>Nada foi cobrado. Seu pedido continua guardado — você pode tentar de novo, com outro cartão ou outra forma de pagamento.</p>
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
-              <button disabled={retrying} onClick={() => retry('mercadopago')} className="btn btn-primary" style={{ padding: '0.9rem 1.6rem' }}>💳 Tentar com cartão</button>
-              <button disabled={retrying} onClick={() => retry('paypal')} className="btn btn-secondary" style={{ padding: '0.9rem 1.6rem' }}>PayPal</button>
+              {available.card && <button disabled={retrying} onClick={() => retry('mercadopago')} className="btn btn-primary" style={{ padding: '0.9rem 1.6rem' }}>💳 Tentar com cartão</button>}
+              {available.stripe && <button disabled={retrying} onClick={() => retry('stripe')} className={available.card ? 'btn btn-secondary' : 'btn btn-primary'} style={{ padding: '0.9rem 1.6rem' }}>🌍 Cartão internacional</button>}
+              {available.paypal && <button disabled={retrying} onClick={() => retry('paypal')} className="btn btn-secondary" style={{ padding: '0.9rem 1.6rem' }}>PayPal</button>}
             </div>
             {error && <p style={{ color: '#c0392b', fontSize: '0.9rem', marginBottom: '1rem' }}>{error}</p>}
             <a href={wa} target="_blank" rel="noopener noreferrer" style={{ color: '#a6832b', fontWeight: 700 }}>Prefere pagar por Pix? Fale com a gente no WhatsApp</a>
