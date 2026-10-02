@@ -15,6 +15,7 @@ import TreatTypeBar, { styleToggles } from '@/components/TreatTypeBar';
 import SosFreeExplainer from '@/components/SosFreeExplainer';
 import { ALLERGEN_LIST_NEM } from '@/lib/allergens';
 import { anyTyped, groupByType, textOn } from '@/lib/treatTypes';
+import { useTreatTypes } from '@/lib/useTreatTypes';
 
 interface Treat {
   id: string;
@@ -36,6 +37,8 @@ interface Treat {
 }
 
 export default function MenuPage() {
+  // The categories Dolly edits (migration 37): re-render when they load.
+  useTreatTypes();
   const [menuItems, setMenuItems] = useState<Treat[]>([]);
   const [loading, setLoading] = useState(true);
   // Customers mostly arrive with an allergy in mind, so the panel starts on "Sem" (free of).

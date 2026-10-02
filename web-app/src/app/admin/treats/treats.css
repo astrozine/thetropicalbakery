@@ -80,3 +80,17 @@
   .tr-jump i.is-todo { background: #fff; border: 2px solid var(--c); }
 }
 @media (min-width: 1100px) { .tr-edit .bx-footer { display: none; } }
+
+/* The category picker on each card: a coloured dot and a plain select, so moving a treat is one tap. */
+.tr-cat { position: relative; display: flex; align-items: center; gap: 0.45rem; border: 1px solid var(--bx-line); border-radius: 999px; padding: 0 0.3rem 0 0.7rem; background: #fff; min-width: 0; }
+.tr-cat__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex-shrink: 0; }
+.tr-cat select { flex: 1; min-width: 0; border: 0; background: transparent; padding: 0.45rem 0.2rem; font-weight: 700; font-size: 0.85rem; color: var(--bx-ink); cursor: pointer; font-family: inherit; }
+.tr-cat:focus-within { outline: 2px solid var(--bx-ink); }
+
+/* A row of the categories panel: colour, emoji, name, then order and remove. On phones the buttons get their own line. */
+.tr-catrow { display: grid; grid-template-columns: auto 56px minmax(0, 1fr) auto; gap: 0.6rem; align-items: center; padding: 0.7rem 0.4rem; border-bottom: 1px solid #eee7dd; }
+.tr-catrow__act { display: flex; gap: 0.3rem; }
+@media (max-width: 600px) {
+  .tr-catrow { grid-template-columns: auto 48px minmax(0, 1fr); }
+  .tr-catrow__act { grid-column: 1 / -1; justify-content: flex-end; }
+}

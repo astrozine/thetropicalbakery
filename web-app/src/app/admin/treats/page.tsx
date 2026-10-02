@@ -10,7 +10,9 @@ import { uploadPublicImage } from '@/lib/imageUpload';
 import { syncTreatIntoBoxes, withoutMissingColumn } from '@/lib/treatSync';
 import { WHOLE_FOOD, caffeineOf, isWholeFood, sugarsOf } from '@/lib/sugarCaffeine';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
-import { RAW, anyTyped, groupByType, isRaw, treatTypeById } from '@/lib/treatTypes';
+import { RAW, TREAT_TYPES, anyTyped, groupByType, isRaw, treatTypeById } from '@/lib/treatTypes';
+import { useTreatTypes } from '@/lib/useTreatTypes';
+import CategoryManager from './CategoryManager';
 import { styleToggles } from '@/components/TreatTypeBar';
 import '../caixas/caixas.css';
 import './treats.css';
@@ -51,6 +53,10 @@ export default function TreatsAdmin() {
   const [status, setStatus] = useState<'all' | 'on' | 'off' | 'todo'>('all');
   /** The price being typed straight on a card. */
   const [priceEdit, setPriceEdit] = useState<{ id: string; value: string } | null>(null);
+  /** The categories panel (create, rename, colour, order, remove). */
+  const [showCats, setShowCats] = useState(false);
+  // The categories come from the database (migration 37); re-render when they load or change.
+  useTreatTypes();
 
   useEffect(() => {
     fetchTreats();
@@ -176,6 +182,16 @@ export default function TreatsAdmin() {
     setFormData({ is_available: true, min_batch_size: 1, batch_multiplier: 1, emoji: '🍫' });
     setView('edit');
     window.scrollTo({ top: 0 });
+  };
+
+  /** Move a treat to another category (or none) straight from its card. */
+  const setCategory = async (treat: Treat, id: string | null) => {
+    // A row from before migration 31 that still says 'raw' keeps being raw once it gets a real category.
+    const patch: Record<string, unknown> = { treat_type: id, ...(treat.treat_type === 'raw' ? { is_raw: true } : {}) };
+    let { error } = await supabase.from('treats').update(patch).eq('id', treat.id);
+    if (error && /is_raw/.test(error.message)) ({ error } = await supabase.from('treats').update({ treat_type: id }).eq('id', treat.id));
+    if (error) { brandAlert('Não foi possível mudar a categoria: ' + error.message); return; }
+    setTreats(ts => ts.map(t => (t.id === treat.id ? { ...t, treat_type: id, ...(treat.treat_type === 'raw' ? { is_raw: true } : {}) } : t)));
   };
 
   /** The price typed on a card: only that one column, nothing else on the row. */
@@ -415,6 +431,13 @@ export default function TreatsAdmin() {
           </span>
         </button>
         <p className="tr-card__name">{treat.emoji || '🍫'} {treat.name}</p>
+        <label className="tr-cat" style={{ '--c': kind?.accent ?? '#8a7a6b' } as React.CSSProperties}>
+          <span className="tr-cat__dot" aria-hidden />
+          <select aria-label="Categoria" value={kind?.id ?? ''} onChange={e => setCategory(treat, e.target.value || null)}>
+            {TREAT_TYPES.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>)}
+            <option value="">✨ Sem categoria (Outros)</option>
+          </select>
+        </label>
         <div className="tr-card__row">
           {priceEdit?.id === treat.id ? (
             <input className="tr-price-input" autoFocus type="number" step="0.01" min="0" value={priceEdit.value}
@@ -446,8 +469,13 @@ export default function TreatsAdmin() {
           <h1 className="bx-h1">Doces do Menu</h1>
           <p className="bx-sub">Tudo o que você faz, num olhar. Toque no preço para mudar, no botão para esconder ou mostrar.</p>
         </div>
-        <button type="button" className="bx-btn bx-btn--dark" onClick={startNew}>＋ Novo doce</button>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <button type="button" className="bx-btn bx-btn--ghost" onClick={() => setShowCats(v => !v)} aria-expanded={showCats}>🗂️ Categorias</button>
+          <button type="button" className="bx-btn bx-btn--dark" onClick={startNew}>＋ Novo doce</button>
+        </div>
       </div>
+
+      {showCats && <CategoryManager treats={treats} onTreatsChanged={fetchTreats} onClose={() => setShowCats(false)} />}
 
       <div className="tr-status" role="group" aria-label="Mostrar">
         {([
