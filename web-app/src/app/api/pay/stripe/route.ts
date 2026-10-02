@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     if (!stripeConfigured()) return NextResponse.json({ error: 'O cartão internacional ainda não está ativo.' }, { status: 503 });
     const { reference } = await req.json();
     const ref = String(reference || '');
-    if (!/^ORD[A-Za-z0-9]+$/.test(ref)) return NextResponse.json({ error: 'Pedido não encontrado.' }, { status: 404 });
+    if (!/^(ORD|PRP)[A-Za-z0-9]+$/.test(ref)) return NextResponse.json({ error: 'Pedido não encontrado.' }, { status: 404 });
     const order = await findOrder(ref);
     if (!order) return NextResponse.json({ error: 'Pedido não encontrado.' }, { status: 404 });
     if (isPaid(order.status)) return NextResponse.json({ error: 'Este pedido já foi pago.' }, { status: 409 });

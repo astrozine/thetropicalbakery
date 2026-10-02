@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
 interface Registration {
@@ -150,8 +151,15 @@ export default function CourseRegistrationsAdmin() {
                 )}
               </div>
 
+              <div style={{ flex: '0 0 auto', marginLeft: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <Link
+                  href={`/admin/propostas?from=course_registrations:${r.id}`}
+                  style={{ background: '#d4af37', color: 'white', padding: '0.8rem 1.4rem', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', textAlign: 'center', whiteSpace: 'nowrap' }}
+                >
+                  💳 Enviar proposta
+                </Link>
               {digitsOnly(r.customer_whatsapp) && (
-                <div style={{ flex: '0 0 auto', marginLeft: 'auto' }}>
+                <div>
                   <a
                     href={`https://wa.me/${digitsOnly(r.customer_whatsapp).length <= 11 ? '55' + digitsOnly(r.customer_whatsapp) : digitsOnly(r.customer_whatsapp)}`}
                     target="_blank"
@@ -162,6 +170,7 @@ export default function CourseRegistrationsAdmin() {
                   </a>
                 </div>
               )}
+              </div>
 
             </div>
           ))}

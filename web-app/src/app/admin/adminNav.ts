@@ -57,6 +57,7 @@ export const buildGroups = (): NavGroup[] => [
     items: [
       { name: 'Cursos', path: '/admin/courses', word: 'Cursos', emoji: '🎓', hint: 'Criar e editar os cursos' },
       { name: 'Inscrições em Cursos', path: '/admin/inscricoes', word: 'Inscritos', emoji: '✍️', hint: 'Quem se inscreveu' },
+      { name: 'Propostas de Pagamento', path: '/admin/propostas', word: 'Propostas', emoji: '💳', hint: 'Mandar para um interessado o link da página de pagamento do curso ou retiro' },
       { name: 'Retiros: fotos e preços', path: '/admin/retreats', word: 'Retiros', emoji: '🏝️', hint: 'Fotos, diárias e capacidade das acomodações' },
     ],
   },

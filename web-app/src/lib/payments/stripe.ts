@@ -103,10 +103,11 @@ export async function createStripeCheckout(o: StripeCheckoutInput): Promise<stri
  * The Stripe payment page for an order placed in /checkout (reference ORD…), charged in reais at the total the
  * server stored for it. For buyers without a Brazilian card or Pix.
  */
-export async function createStripeOrderCheckout(order: PayableOrder): Promise<string> {
+export async function createStripeOrderCheckout(order: PayableOrder, opts: { returnUrl?: string } = {}): Promise<string> {
   const account = accounts()[0];
   if (!account || !stripeConfigured()) throw new Error('O cartão internacional ainda não está ativo.');
-  const back = `${siteUrl()}/checkout/retorno?provider=stripe&ref=${order.reference}`;
+  // A proposal (PRP…) comes back to its own page; everything else to the checkout's return page.
+  const back = opts.returnUrl ? `${opts.returnUrl}&provider=stripe` : `${siteUrl()}/checkout/retorno?provider=stripe&ref=${order.reference}`;
   const body: Record<string, string> = {
     mode: 'payment',
     'line_items[0][quantity]': '1',
@@ -153,7 +154,7 @@ export async function confirmStripeSession(sessionId: string): Promise<{ ok: boo
   const reference = String(session.client_reference_id || '');
   const status = String(session.payment_status || '');
   const ebook = /^EBK[A-Za-z0-9]+$/.test(reference);
-  if (!ebook && !/^ORD[A-Za-z0-9]+$/.test(reference)) return { ok: false, status: 'not_ours' };
+  if (!ebook && !/^(ORD|PRP)[A-Za-z0-9]+$/.test(reference)) return { ok: false, status: 'not_ours' };
 
   const order = await findOrder(reference);
   if (!order) return { ok: false, status, reference };

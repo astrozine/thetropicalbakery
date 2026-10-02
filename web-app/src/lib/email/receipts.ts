@@ -139,12 +139,15 @@ export async function sendOrderReceived(db: SupabaseClient, order: ReceiptOrder)
 /** When the money actually arrives (card, PayPal, or an admin confirming a Pix). */
 export async function sendOrderPaid(db: SupabaseClient, order: ReceiptOrder) {
   const firstName = (order.customerName || '').trim().split(' ')[0];
-  const where = fulfilment(order);
+  // A course or retreat proposal (PRP…): a spot, not a box for the kitchen.
+  const spot = /^PRP/.test(order.reference);
+  const where = spot ? '' : fulfilment(order);
 
   const body =
     (firstName ? greeting(firstName) : '') +
-    paragraphs(
-      'Pagamento confirmado — seu pedido está na fila da cozinha. ' +
+    paragraphs(spot
+      ? 'Pagamento confirmado — sua vaga está garantida! A Dolly vai falar com você no WhatsApp com todos os detalhes.'
+      : 'Pagamento confirmado — seu pedido está na fila da cozinha. ' +
       (order.isPickup
         ? 'Quando estiver pronto a gente te avisa no WhatsApp para você vir buscar.'
         : 'A Dolly faz tudo à mão, fresco, o mais perto possível do dia da entrega.'),

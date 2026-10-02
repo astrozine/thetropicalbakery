@@ -399,6 +399,17 @@ function ItemCard({ row, onSet, compact }: {
           </a>
         )}
 
+        {/* Someone interested in a course or a retreat: send them the page where they pay. */}
+        {(item.type === 'course_inquiry' || item.type === 'retreat_inquiry' || item.type === 'contact_lead') && (
+          <Link
+            className="inbox-btn"
+            href={`/admin/propostas?from=${item.source_table}:${item.source_id}`}
+            style={{ ...actionBtn('#fff8e1', '#8a6d00', '#f0d98a'), justifyContent: 'center', textDecoration: 'none' }}
+          >
+            💳 Proposta
+          </Link>
+        )}
+
         {next && (
           <button
             className="inbox-btn inbox-btn--primary"
