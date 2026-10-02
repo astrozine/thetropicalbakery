@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import BoxesLeftBadge from '@/components/BoxesLeftBadge';
 
 export default function ExplodingTreats({ boxesLeft = null }: { boxesLeft?: number | null }) {
@@ -114,9 +115,9 @@ export default function ExplodingTreats({ boxesLeft = null }: { boxesLeft?: numb
               ))}
             </div>
           </div>
-          <a href="#order" className="btn btn-primary" style={{ padding: '1rem', fontSize: '1.1rem', pointerEvents: 'auto', width: '100%', textAlign: 'center', borderRadius: '999px', boxShadow: '0 10px 20px rgba(212,175,55,0.3)' }}>
+          <Link href="/caixas" className="btn btn-primary" style={{ padding: '1rem', fontSize: '1.1rem', pointerEvents: 'auto', width: '100%', textAlign: 'center', borderRadius: '999px', boxShadow: '0 10px 20px rgba(212,175,55,0.3)' }}>
             Garanta a Sua Caixa
-          </a>
+          </Link>
         </div>
 
         {/* Lightbox Modal */}
@@ -217,7 +218,7 @@ export default function ExplodingTreats({ boxesLeft = null }: { boxesLeft?: numb
               </span>
             ))}
           </div>
-          <a href="#order" className="btn btn-primary" style={{ padding: '0.9rem 2.25rem', fontSize: '1rem', display: 'inline-block' }}>Garanta a Sua Caixa</a>
+          <Link href="/caixas" className="btn btn-primary" style={{ padding: '0.9rem 2.25rem', fontSize: '1rem', display: 'inline-block' }}>Garanta a Sua Caixa</Link>
         </motion.div>
       </div>
 
