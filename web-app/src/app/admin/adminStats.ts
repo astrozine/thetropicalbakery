@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { fetchSchedule, selectableDates } from '@/lib/deliverySchedule';
+import { splitActive } from '@/lib/boxWindow';
 
 export interface ActiveBox {
   id: string;
@@ -44,7 +45,7 @@ export function useAdminStats(): AdminStats & { reload: () => void } {
   const load = useCallback(async () => {
     const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
     const [box, orders, status, partners, restock, customers, schedule] = await Promise.all([
-      supabase.from('tasting_boxes').select('id, title, batch_date_label, total_quantity, sold_quantity').eq('is_active', true).limit(1),
+      supabase.from('tasting_boxes').select('*').eq('is_active', true),   // the ready box first (splitActive), not next week's pre-sale
       supabase.from('orders').select('id, total_price, created_at').order('created_at', { ascending: false }).limit(1000),
       supabase.from('inbox_status').select('source_id, status').eq('source_table', 'orders'),
       supabase.from('partners').select('id', { count: 'exact', head: true }).eq('status', 'pendente'),
@@ -61,7 +62,7 @@ export function useAdminStats(): AdminStats & { reload: () => void } {
 
     setStats({
       loading: false,
-      box: (box.data?.[0] as ActiveBox | undefined) ?? null,
+      box: ((s => s.stock ?? s.presale)(splitActive(box.data as (ActiveBox & { sale_mode?: string | null })[] | null)) as ActiveBox | null),
       newOrders: orderRows.filter(o => !handled.has(String(o.id))).length,
       weekOrders: week.length,
       weekRevenue: week.reduce((sum, o) => sum + (Number.isFinite(Number(o.total_price)) ? Number(o.total_price) : 0), 0),

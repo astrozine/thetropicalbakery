@@ -6,6 +6,7 @@ import type { BoxItem } from '@/lib/allergens';
 import { boxPlan, namesText, surpriseText } from '@/lib/boxPicks';
 import { toTreatCount } from '@/lib/boxSizes';
 import BoxTreatPicker from '@/components/BoxTreatPicker';
+import { nextBakeBox } from '@/lib/boxWindow';
 
 interface Props {
   subscriptionId: string;
@@ -37,7 +38,9 @@ export default function SubscriberPicks({ subscriptionId, boxSize }: Props) {
     if (loadedFor.current === subscriptionId) return;
     loadedFor.current = subscriptionId;
     (async () => {
-      const { data: active } = await supabase.from('tasting_boxes').select('id, title, items').eq('is_active', true).maybeSingle();
+      // Next week's pre-sale when there is one: that is the box their treats are baked in.
+      const { data: live } = await supabase.from('tasting_boxes').select('*').eq('is_active', true);
+      const active = nextBakeBox(live as (ActiveBox & { sale_mode?: string | null })[] | null);
       if (!active) { setReady(true); return; }
       const { data: row, error } = await supabase
         .from('subscription_picks').select('picks, surprise')

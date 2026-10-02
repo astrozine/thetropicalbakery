@@ -10,6 +10,12 @@ import { parseISODate, toISODate } from '@/lib/deliverySchedule';
  * from now on (calendar days, minimum notice already applied) is offered, so the next delivery is
  * simply the first day that can still be picked. orders_close_on is kept in the database but no longer
  * closes anything.
+ *
+ * PRE-SALE (migration 35, sale_mode = 'presale'): next week's box, sold before it is baked so Dolly only
+ * makes what was ordered. It can be live NEXT TO the ready box (one of each). Two rules differ:
+ *  - its delivery window never rolls over: it is delivered on the planned days or not at all;
+ *  - orders_close_on DOES close it (the day Dolly needs the final count to bake).
+ * When the batch is baked, the admin turns it into the ready box ('stock') with the extras as its stock.
  */
 export interface BoxWindowFields {
   total_quantity: number;
@@ -18,13 +24,32 @@ export interface BoxWindowFields {
   delivery_until?: string | null;
   orders_open_from?: string | null;
   orders_close_on?: string | null;
+  /** 'stock' (boxes already made) or 'presale' (next week's, made to order). Missing before migration 35 = stock. */
+  sale_mode?: string | null;
 }
+
+export const isPresale = (b: { sale_mode?: string | null } | null | undefined) => b?.sale_mode === 'presale';
+
+/**
+ * The active boxes split into the ready one and the pre-sale one (at most one of each is live).
+ * Works on a database without migration 35 too: every box is then the ready one.
+ */
+export function splitActive<T extends { sale_mode?: string | null }>(rows: T[] | null | undefined): { stock: T | null; presale: T | null } {
+  const list = rows || [];
+  return { stock: list.find(b => !isPresale(b)) ?? null, presale: list.find(b => isPresale(b)) ?? null };
+}
+
+/** The box the kitchen bakes next (and subscribers choose treats for): next week's pre-sale if there is one. */
+export const nextBakeBox = <T extends { sale_mode?: string | null }>(rows: T[] | null | undefined): T | null => {
+  const { stock, presale } = splitActive(rows);
+  return presale ?? stock;
+};
 
 export type SaleState = 'open' | 'soon' | 'closed' | 'soldout';
 
 export const hasDeliveryWindow = (b: BoxWindowFields) => !!(b.delivery_from || b.delivery_until);
 
-export interface DayRange { from?: string | null; until?: string | null }
+export interface DayRange { from?: string | null; until?: string | null; presale?: boolean }
 
 /**
  * True when the planned window is over: there are deliverable days, but every one of them comes
@@ -32,6 +57,7 @@ export interface DayRange { from?: string | null; until?: string | null }
  */
 export function isRolledOver(all: string[], w: DayRange): boolean {
   const until = w.until;
+  if (w.presale) return false;   // a pre-sale is delivered on its planned days or not at all
   return !!until && all.length > 0 && all.every(d => d > until);
 }
 
@@ -46,7 +72,9 @@ export function windowedDates(dates: string[], w: DayRange, all: string[] = date
 }
 
 export const inDeliveryWindow = (dates: string[], b: BoxWindowFields, all: string[] = dates) =>
-  windowedDates(dates, { from: b.delivery_from, until: b.delivery_until }, all);
+  windowedDates(dates, boxRange(b), all);
+
+export const boxRange = (b: BoxWindowFields): DayRange => ({ from: b.delivery_from, until: b.delivery_until, presale: isPresale(b) });
 
 /**
  * Whether this box can be ordered today: on sale until it sells out (or is switched off, which
@@ -59,6 +87,8 @@ export function saleState(b: BoxWindowFields, choosable: string[] | null, today 
   const opensOn = b.orders_open_from || null;
   if (b.total_quantity > 0 && b.sold_quantity >= b.total_quantity) return { state: 'soldout', opensOn };
   if (opensOn && today < opensOn) return { state: 'soon', opensOn };
+  // A pre-sale stops taking orders on its deadline: after it Dolly is baking the count she has.
+  if (isPresale(b) && b.orders_close_on && today > b.orders_close_on) return { state: 'closed', opensOn };
   // Nothing at all to pick (the delivery calendar has no open day): can't take an order.
   if (choosable && choosable.length === 0) return { state: 'closed', opensOn };
   return { state: 'open', opensOn };

@@ -7,6 +7,7 @@ import { TREAT_COUNTS, TreatCount, planBoxPrice, toTreatCount } from '@/lib/boxS
 import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
 import { boxPlan, namesText, surpriseText } from '@/lib/boxPicks';
 import { getZone, formatBRL } from '@/lib/deliveryZones';
+import { nextBakeBox } from '@/lib/boxWindow';
 
 interface DeliveryRow {
   id: string;
@@ -67,7 +68,9 @@ export default function SubscriptionsAdmin() {
   const [weekPicks, setWeekPicks] = useState<Record<string, { picks: string[]; surprise: boolean }>>({});
   useEffect(() => {
     (async () => {
-      const { data: box } = await supabase.from('tasting_boxes').select('id, title, items').eq('is_active', true).maybeSingle();
+      // Next week's pre-sale when there is one: that is the box the subscribers' treats are baked in.
+      const { data: live } = await supabase.from('tasting_boxes').select('*').eq('is_active', true);
+      const box = nextBakeBox(live as { id: string; title: string; items: { id?: string; name?: string }[] | null; sale_mode?: string | null }[] | null);
       if (!box) return;
       const { data, error } = await supabase.from('subscription_picks').select('subscription_id, picks, surprise').eq('tasting_box_id', box.id);
       if (error) return; // migration 28 not run yet: show nothing rather than "ainda não escolheu" for everyone

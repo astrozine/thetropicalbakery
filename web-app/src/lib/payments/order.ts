@@ -1,8 +1,8 @@
 import 'server-only';
 import { supabaseAdmin } from './server';
 import { DELIVERY_ZONES, getZone } from '@/lib/deliveryZones';
-import { fetchSchedule, openDatesBetween, toISODate, parseISODate } from '@/lib/deliverySchedule';
-import { BoxWindowFields, inDeliveryWindow, saleState } from '@/lib/boxWindow';
+import { fetchSchedule, bookableDates, toISODate, parseISODate } from '@/lib/deliverySchedule';
+import { BoxWindowFields, inDeliveryWindow, isPresale, saleState } from '@/lib/boxWindow';
 import { dietSummary, normalizeDiet } from '@/lib/dietary';
 import { fetchBoxSizePrices, isTreatCount, sizeText, toTreatCount, type TreatCount } from '@/lib/boxSizes';
 import { sendOrderReceived } from '@/lib/email/receipts';
@@ -140,7 +140,7 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
 
   if (hasBox) {
     const schedule = await fetchSchedule();
-    const selectable = openDatesBetween(schedule.rules, schedule.overrides, toISODate(addDays(today, schedule.leadDays)), toISODate(addDays(today, 14 * 7)));
+    const selectable = bookableDates(schedule.rules, schedule.overrides, toISODate(addDays(today, schedule.leadDays)), toISODate(addDays(today, 14 * 7)));
     if (!selectable.includes(date)) throw new OrderError(409, 'Esse dia de entrega não está mais disponível. Escolha outro no calendário.');
 
     for (const [id, qty] of boxWanted) {
@@ -150,7 +150,9 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
       const { state } = saleState(row, choosable, todayISO);
       if (state === 'soldout') throw new OrderError(409, `"${row.title}" esgotou.`);
       if (state === 'soon') throw new OrderError(409, `Os pedidos de "${row.title}" ainda não abriram.`);
-      if (state === 'closed') throw new OrderError(409, `Os pedidos de "${row.title}" foram encerrados.`);
+      if (state === 'closed') throw new OrderError(409, isPresale(row)
+        ? `As encomendas de "${row.title}" fecharam. Veja as caixas prontas em /caixas.`
+        : `Os pedidos de "${row.title}" foram encerrados.`);
       if (!inDeliveryWindow([date], row, selectable).length) throw new OrderError(409, 'Esse dia está fora das entregas desta edição. Escolha outro dia.');
       const left = row.total_quantity > 0 ? row.total_quantity - row.sold_quantity : Infinity;
       if (qty > left) throw new OrderError(409, `Restam só ${left} unidades de "${row.title}".`);
@@ -177,7 +179,8 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
         }
       }
       subtotal += unit * qty;
-      lines.push({ name: `${row.title} (${sizeText(size)}${suffix})`, quantity: qty, unit });
+      // "pré-venda" in the name is how the inbox, the receipt and the kitchen tell next week's batch apart.
+      lines.push({ name: `${row.title}${isPresale(row) ? ' · pré-venda' : ''} (${sizeText(size)}${suffix})`, quantity: qty, unit });
     }
   } else if (parseISODate(date) < addDays(today, 3)) {
     throw new OrderError(400, 'Encomendas do Menu de Eventos precisam de pelo menos 3 dias de antecedência.');

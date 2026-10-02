@@ -9,7 +9,7 @@ import { OriginStory } from '@/components/BelgiumBrazil';
 import FeaturedBoxCard from '@/components/FeaturedBoxCard';
 import { formatBatchDate } from '@/lib/batchDate';
 import { fetchSchedule, selectableDates } from '@/lib/deliverySchedule';
-import { inDeliveryWindow, isRolledOver, noUpcomingEdition, saleState, shortDay } from '@/lib/boxWindow';
+import { boxRange, deliveryWindowLabel, inDeliveryWindow, isPresale, isRolledOver, noUpcomingEdition, saleState, shortDay, splitActive } from '@/lib/boxWindow';
 import NoBoxNotice from '@/components/NoBoxNotice';
 import ModalCard from '@/components/ModalCard';
 import HighlightsRail from '@/components/HighlightsRail';
@@ -31,12 +31,17 @@ export default async function Home() {
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
-  // Fetch active tasting box
-  const { data: activeBox } = await supabase
+  // The live boxes: the ready one and, maybe, next week's pre-sale (migration 35). The home page shows
+  // the ready one while it can be ordered, otherwise the pre-sale.
+  const { data: activeRows } = await supabase
     .from('tasting_boxes')
     .select('*')
-    .eq('is_active', true)
-    .single();
+    .eq('is_active', true);
+  const live = splitActive(activeRows);
+  const schedule = live.stock || live.presale ? await fetchSchedule() : null;
+  const all = schedule ? selectableDates(schedule) : [];
+  const orderable = (b: typeof live.stock) => !!b && saleState(b, inDeliveryWindow(all, b)).state === 'open';
+  const activeBox = orderable(live.stock) ? live.stock : orderable(live.presale) ? live.presale : live.stock ?? live.presale;
   
   // A box only counts as "on sale" if a customer could really order it: a delivery day is left
   // to pick and its ordering window is open. Otherwise say there is no box yet and offer the waiting list.
@@ -44,8 +49,6 @@ export default async function Home() {
   let boxesLeft: number | null = null;
   let boxDateLabel = activeBox ? formatBatchDate(activeBox.batch_date_label) : '';
   if (activeBox) {
-    const schedule = await fetchSchedule();
-    const all = selectableDates(schedule);
     const choosable = inDeliveryWindow(all, activeBox);
     const sale = saleState(activeBox, choosable);
     boxOnSale = !noUpcomingEdition(sale.state, choosable);
@@ -54,9 +57,11 @@ export default async function Home() {
       boxesLeft = Math.max(0, activeBox.total_quantity - activeBox.sold_quantity);
     }
     // The planned batch date is over but there are boxes left: say when they arrive now.
-    if (choosable.length && isRolledOver(all, { from: activeBox.delivery_from, until: activeBox.delivery_until })) {
+    if (choosable.length && isRolledOver(all, boxRange(activeBox))) {
       boxDateLabel = `entregas a partir de ${shortDay(choosable[0])}`;
     }
+    // Next week's box, made to order: say so, and when it arrives.
+    if (isPresale(activeBox)) boxDateLabel = `pré-venda · entregas ${deliveryWindowLabel(activeBox) || 'na próxima semana'}`;
   }
 
   const getContent = (sectionId: string, fallbackUrl: string) => {

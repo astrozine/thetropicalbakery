@@ -53,6 +53,8 @@ interface BoxRow {
   sold_quantity: number;
   is_active: boolean;
   orders_open_from?: string | null;
+  orders_close_on?: string | null;
+  sale_mode?: string | null;
 }
 
 /**
@@ -68,6 +70,8 @@ async function boxesOnSale(db: SupabaseClient, today: string): Promise<BoxRow[]>
   return ((data || []) as BoxRow[]).filter(b => {
     const opensOn = b.orders_open_from || null;
     if (opensOn && today < opensOn) return false;
+    // A pre-sale past its deadline is being baked, not sold (migration 35).
+    if (b.sale_mode === 'presale' && b.orders_close_on && today > b.orders_close_on) return false;
     return !(b.total_quantity > 0 && b.sold_quantity >= b.total_quantity);
   });
 }

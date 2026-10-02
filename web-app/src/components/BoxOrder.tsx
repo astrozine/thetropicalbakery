@@ -10,7 +10,7 @@ import { formatBRL } from '@/lib/deliveryZones';
 import { optimizedSrc } from '@/lib/thumbs';
 import Link from 'next/link';
 import WaitlistCapture from '@/components/WaitlistCapture';
-import { BoxWindowFields, SaleState, longDay } from '@/lib/boxWindow';
+import { BoxWindowFields, SaleState, isPresale, longDay } from '@/lib/boxWindow';
 import BoxSizePicker from '@/components/BoxSizePicker';
 import FulfillmentPicker, { Fulfillment, readFulfillment } from '@/components/FulfillmentPicker';
 import { BoxSizePrices, DEFAULT_TREAT_COUNT, TreatCount, sizeText } from '@/lib/boxSizes';
@@ -22,7 +22,7 @@ interface BoxOrderProps {
   box: { id: string; title: string; image_url: string; price: number; items?: BoxItem[] | null } & Partial<BoxWindowFields>;
   maxQuantity: number;
   /** Whether the box can be ordered today (ordering window + stock). Null while loading. */
-  sale?: { state: SaleState; opensOn: string | null } | null;
+  sale?: { state: SaleState; opensOn: string | null; closesOn?: string | null; windowLabel?: string } | null;
   /** Price of the 2 / 4 / 6-treat box (from site_settings). The server charges the same. */
   prices: BoxSizePrices;
 }
@@ -53,6 +53,8 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
   const [surprise, setSurprise] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
   const shownPicks = picks.slice(0, plan.picks);
+  /** Next week's box, made to order (migration 35): same form, its own words. */
+  const presale = isPresale(box);
 
   const changeSize = (s: TreatCount) => {
     setSize(s);
@@ -98,7 +100,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
     removeFromCart(`box-${box.id}`); // a cart from before the sizes existed
     addToCart({
       id,
-      name: `${box.title} (${sizeText(size)}${picksSuffix(plan, pickedNames)})`,
+      name: `${box.title}${presale ? ' · pré-venda' : ''} (${sizeText(size)}${picksSuffix(plan, pickedNames)})`,
       price: unit.toFixed(2).replace('.', ','),
       image: box.image_url,
       kind: 'box',
@@ -130,17 +132,26 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
       {/* Order details */}
       <div style={{ flex: '1 1 380px', minWidth: '260px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         <div>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '0.75rem' }}>Peça Sua Caixa</h2>
-          <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: 1.6 }}>
-            Receba em casa (Itamambuca, praias vizinhas e eventos em Paraty) ou retire no nosso home bakery. Escolha o dia e pague por Pix em seguida.
-          </p>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '0.75rem' }}>{presale ? 'Encomende Sua Caixa' : 'Peça Sua Caixa'}</h2>
+          {presale ? (
+            <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: 1.6 }}>
+              Feita sob encomenda: a Dolly assa só as caixas que foram pedidas, então a sua sai do forno
+              {sale?.windowLabel ? <> para a entrega <strong>{sale.windowLabel}</strong></> : ' para você'}.
+              {sale?.closesOn ? <> Encomendas até <strong>{longDay(sale.closesOn)}</strong>.</> : ''} Pague por Pix e está garantida.
+            </p>
+          ) : (
+            <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: 1.6 }}>
+              Receba em casa (Itamambuca, praias vizinhas e eventos em Paraty) ou retire no nosso home bakery. Escolha o dia e pague por Pix em seguida.
+            </p>
+          )}
           <OriginSeal text="Técnica belga · Ingredientes brasileiros" style={{ marginTop: '0.9rem' }} />
         </div>
 
         {sale && sale.state !== 'open' ? (
           <div style={{ padding: '1.5rem', background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '16px', color: '#3c2a21', lineHeight: 1.7 }}>
             <p style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.4rem' }}>
-              {sale.state === 'soldout' ? 'Esta edição esgotou 🧡'
+              {sale.state === 'soldout' ? (presale ? 'As vagas desta fornada acabaram 🧡' : 'Esta edição esgotou 🧡')
+                : sale.state === 'closed' && presale ? 'As encomendas desta fornada fecharam'
                 : sale.state === 'soon' ? `Os pedidos abrem ${sale.opensOn ? longDay(sale.opensOn) : 'em breve'}`
                 : 'Os pedidos desta edição foram encerrados'}
             </p>
@@ -166,7 +177,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         <TreatFlank contentWidth={1100} sides="right">
         <DeliveryCalendar value={date} onChange={pickDate} fulfillment={fulfillment}
           title={pickup ? '2 · Escolha o dia da retirada' : '2 · Escolha o dia da entrega'}
-          window={{ from: box.delivery_from, until: box.delivery_until }} />
+          window={{ from: box.delivery_from, until: box.delivery_until, presale }} />
         </TreatFlank>
 
         <BoxSizePicker
@@ -206,7 +217,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         {error && <p style={{ color: '#c0392b', fontSize: '0.92rem' }}>{error}</p>}
 
         <button type="button" onClick={goToCheckout} className="btn btn-primary" style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem', borderRadius: '40px' }}>
-          Continuar para o pagamento ➔
+          {presale ? 'Encomendar e pagar ➔' : 'Continuar para o pagamento ➔'}
         </button>
           </>
         )}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import HeldBoxes from './HeldBoxes';
 import ProductionTally from './ProductionTally';
+import PresaleGear from './PresaleGear';
 import BoxStock from '../BoxStock';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -14,7 +15,7 @@ import { parseBoxItems } from '@/components/BoxItemList';
 import { BoxSizePrices, DEFAULT_BOX_PRICES, SIZE_KEYS, TREAT_COUNTS, fetchBoxSizePrices } from '@/lib/boxSizes';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { pushTreatDetails } from '@/lib/treatSync';
-import { BoxWindowFields, SaleState, deliveryWindowLabel, longDay, saleState } from '@/lib/boxWindow';
+import { BoxWindowFields, SaleState, deliveryWindowLabel, isPresale, longDay, nextBakeBox, saleState, splitActive } from '@/lib/boxWindow';
 import { toISODate } from '@/lib/deliverySchedule';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 import { healBatchDate } from '@/lib/batchDate';
@@ -76,6 +77,9 @@ export default function AdminCaixas() {
   const [deliveryUntil, setDeliveryUntil] = useState('');
   const [ordersOpen, setOrdersOpen] = useState('');
   const [ordersClose, setOrdersClose] = useState('');
+  /** How this box is sold (migration 35): 'stock' = already baked, 'presale' = next week's, made to order. */
+  const [saleMode, setSaleMode] = useState<'stock' | 'presale'>('stock');
+  const pre = saleMode === 'presale';
   const [leadDays, setLeadDays] = useState(2);
   /** After saving a box that is live: offer to tell the waiting list and customers. */
   const [announce, setAnnounce] = useState<{ title: string; treats: string; quantity: number } | null>(null);
@@ -179,6 +183,7 @@ export default function AdminCaixas() {
     setDeliveryUntil('');
     setOrdersOpen('');
     setOrdersClose('');
+    setSaleMode('stock');
   };
 
   const handleEdit = (box: TastingBox) => {
@@ -197,6 +202,7 @@ export default function AdminCaixas() {
     setDeliveryUntil(healBatchDate(box.delivery_until || ''));
     setOrdersOpen(healBatchDate(box.orders_open_from || ''));
     setOrdersClose(healBatchDate(box.orders_close_on || ''));
+    setSaleMode(isPresale(box) ? 'presale' : 'stock');
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -235,6 +241,9 @@ export default function AdminCaixas() {
     setFormProblem('');
     const windowProblem =
       deliveryFrom && deliveryUntil && deliveryUntil < deliveryFrom ? 'O último dia de entrega vem antes do primeiro.'
+      : pre && (!deliveryFrom || !deliveryUntil) ? 'Na pré-venda, diga o primeiro e o último dia de entrega: só esses dias são oferecidos.'
+      : pre && !ordersClose ? 'Na pré-venda, diga até quando as encomendas ficam abertas (o dia em que você precisa da contagem para assar).'
+      : pre && ordersClose >= deliveryFrom ? 'As encomendas precisam fechar antes do primeiro dia de entrega.'
       : '';
     if (windowProblem) { brandAlert(windowProblem); return; }
     const unnamed = items.findIndex(i => !i.name.trim() && (i.description.trim() || i.image_url || i.ingredients.length));
@@ -269,9 +278,15 @@ export default function AdminCaixas() {
       cleanItems.push({ ...stored, treat_id: treatId });
     }
 
-    // 2. Only one box is live at a time.
+    // 2. One ready box and one pre-sale can be live together: switching this one on takes down the
+    //    other box of the SAME kind only. (Before migration 35 there are no kinds: all others go down.)
     if (isActive) {
-      await supabase.from('tasting_boxes').update({ is_active: false }).neq('id', editingId || '00000000-0000-0000-0000-000000000000');
+      const others = supabase.from('tasting_boxes').update({ is_active: false }).neq('id', editingId || '00000000-0000-0000-0000-000000000000');
+      const { error: modeErr } = await others.eq('sale_mode', saleMode);
+      if (modeErr) {
+        if (pre) { brandAlert('Para usar a pré-venda, rode a migration_35_box_presale.sql no Supabase primeiro.'); setSaving(false); return; }
+        await supabase.from('tasting_boxes').update({ is_active: false }).neq('id', editingId || '00000000-0000-0000-0000-000000000000');
+      }
     }
 
     const payload = {
@@ -290,7 +305,9 @@ export default function AdminCaixas() {
       delivery_from: deliveryFrom || null,
       delivery_until: deliveryUntil || null,
       orders_open_from: ordersOpen || null,
-      orders_close_on: ordersClose || null,
+      // The ready box never closes by date (it sells until it runs out); the pre-sale closes on its deadline.
+      orders_close_on: pre ? (ordersClose || null) : null,
+      sale_mode: saleMode,
     };
 
     const save = (body: Record<string, unknown>) => editingId
@@ -304,6 +321,12 @@ export default function AdminCaixas() {
       ({ error } = await save(rest));
       if (!error && gallery.length) brandAlert('Caixa salva, mas sem as fotos extras. Rode a migration_24_box_sizes_and_names.sql no Supabase e salve de novo.');
     }
+    if (error && /sale_mode/.test(error.message) && !pre) {
+      // Migration 35 not run yet: a ready box saves exactly as before.
+      const rest: Record<string, unknown> = { ...payload };
+      delete rest.sale_mode;
+      ({ error } = await save(rest));
+    }
     if (error && /delivery_from|delivery_until|orders_open_from|orders_close_on/.test(error.message)) {
       // Migration 21 not run yet: save everything else, and say what's missing.
       const rest: Record<string, unknown> = { ...payload };
@@ -312,7 +335,9 @@ export default function AdminCaixas() {
       if (!error) brandAlert('Caixa salva, mas sem as janelas de entrega e de pedidos. Rode a migration_21_box_windows.sql no Supabase e salve de novo.');
     }
     if (error) {
-      brandAlert(`Erro ao salvar: ${error.message}${hint(error.message)}`);
+      brandAlert(/sale_mode/.test(error.message)
+        ? 'Para salvar uma pré-venda, rode a migration_35_box_presale.sql no Supabase primeiro.'
+        : `Erro ao salvar: ${error.message}${hint(error.message)}`);
       setSaving(false);
       return;
     }
@@ -345,6 +370,8 @@ export default function AdminCaixas() {
     else fetchBoxes();
   };
 
+  const live = splitActive(boxes.filter(b => b.is_active));
+
   return (
     <div style={{ maxWidth: '1400px' }}>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '1rem' }}>Gerenciar Caixas de Degustação</h1>
@@ -369,10 +396,13 @@ export default function AdminCaixas() {
         </div>
       )}
 
+      {/* Next week's pre-sale, and the button that turns it into the ready box once it is baked. */}
+      {live.presale && <PresaleGear presale={live.presale} stock={live.stock} onChanged={fetchBoxes} />}
       {/* The number that changes every day, before the long form that almost never does. */}
-      <BoxStock box={boxes.find(b => b.is_active) ?? null} onChanged={applyStock} />
-      {/* Customers choose their treats now, so "N boxes" no longer says how many of each to bake. */}
-      <div style={{ marginBottom: '2rem' }}><ProductionTally box={boxes.find(b => b.is_active) ?? null} /></div>
+      <BoxStock box={live.stock} onChanged={applyStock} />
+      {/* Customers choose their treats now, so "N boxes" no longer says how many of each to bake.
+          With a pre-sale on, that is the batch about to be baked. */}
+      <div style={{ marginBottom: '2rem' }}><ProductionTally box={nextBakeBox(boxes.filter(b => b.is_active))} /></div>
 
       <div style={{ background: '#f8f9fa', padding: '1rem 1.5rem', borderRadius: '8px', borderLeft: '4px solid #d4af37', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
@@ -395,6 +425,25 @@ export default function AdminCaixas() {
               <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>📦 Dados da caixa</h3>
 
             <div>
+              <label style={label}>Como vender</label>
+              <div role="group" aria-label="Como vender" style={{ display: 'grid', gap: '0.6rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))' }}>
+                {([
+                  ['stock', '🧁 Pronta entrega', 'Caixas já feitas. Vende até acabar; as entregas seguem pelo calendário enquanto sobrar caixa.'],
+                  ['presale', '🗓️ Pré-venda', 'A caixa da próxima semana. O cliente encomenda e paga antes; você assa só o que foi pedido.'],
+                ] as const).map(([m, t, d]) => (
+                  <button key={m} type="button" onClick={() => setSaleMode(m)} aria-pressed={saleMode === m} style={{
+                    textAlign: 'left', padding: '0.8rem 0.9rem', borderRadius: '10px', cursor: 'pointer',
+                    border: saleMode === m ? `2px solid ${m === 'presale' ? '#8e44ad' : '#d4af37'}` : '2px solid #e5e5e5',
+                    background: saleMode === m ? (m === 'presale' ? '#f8f4fb' : '#fffdf6') : 'white',
+                  }}>
+                    <span style={{ display: 'block', fontWeight: 800, color: '#2c3e50' }}>{t}</span>
+                    <span style={{ display: 'block', fontSize: '0.8rem', color: '#7f8c8d', marginTop: '0.25rem', lineHeight: 1.45 }}>{d}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
               <label style={label}>Título</label>
               <input type="text" required data-nome="Título" value={title} onChange={e => setTitle(e.target.value)} placeholder="Ex: Caixa Surpresa da Semana" style={input} />
             </div>
@@ -411,18 +460,20 @@ export default function AdminCaixas() {
                   value={batchDateLabel} onChange={e => setBatchDateLabel(healBatchDate(e.target.value))} style={input} />
               </div>
               <div>
-                <label style={label}>Qtd. Total Produzida</label>
+                <label style={label}>{pre ? 'Limite de encomendas' : 'Qtd. Total Produzida'}</label>
                 <input type="number" required value={totalQuantity} onChange={e => setTotalQuantity(Number(e.target.value))} style={input} />
               </div>
               <div>
-                <label style={label}>Qtd. Vendida</label>
+                <label style={label}>{pre ? 'Encomendas feitas' : 'Qtd. Vendida'}</label>
                 <input type="number" required value={soldQuantity} onChange={e => setSoldQuantity(Number(e.target.value))} style={input} />
               </div>
             </div>
 
             <p style={{ fontSize: '0.8rem', color: '#7f8c8d' }}>
-              A quantidade vendida é calculada automaticamente pelos pedidos. Edite manualmente apenas se houver cancelamentos ou vendas externas.
-              Cada caixa conta como uma, seja de 2, 4 ou 6 doces.
+              {pre
+                ? <>O limite é quantas caixas cabem nesta fornada (0 = sem limite). As encomendas são contadas sozinhas pelos pedidos. Quando assar, use o botão <strong>Fornada pronta</strong> no topo da página.</>
+                : <>A quantidade vendida é calculada automaticamente pelos pedidos. Edite manualmente apenas se houver cancelamentos ou vendas externas.</>}
+              {' '}Cada caixa conta como uma, seja de 2, 4 ou 6 doces.
             </p>
             </div>
 
@@ -483,7 +534,9 @@ export default function AdminCaixas() {
               label="Mostrar esta caixa no site"
               onText="Ativado — aparecendo no site"
               offText="Desativado — escondida do site"
-              helper="Ao ativar, as outras caixas são desativadas automaticamente."
+              helper={pre
+                ? 'Ao ativar, outra pré-venda no ar sai do site. A caixa de pronta entrega continua: as duas ficam no ar juntas.'
+                : 'Ao ativar, a outra caixa de pronta entrega sai do site. Uma pré-venda no ar continua junto.'}
             />
             </div>
           </div>
@@ -493,8 +546,12 @@ export default function AdminCaixas() {
             <div style={{ ...card, background: '#fdf7ee', border: '1px solid #e8e1d7', display: 'grid', gap: '1.1rem', gridTemplateColumns: 'minmax(0, 1fr)' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#2c3e50' }}>📅 Datas de entrega e pedidos</h3>
               <div>
-                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🚚 Janela de entrega prevista</p>
-                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os dias em que esta leva está planejada para sair. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas. <strong>Se a janela passar e ainda houver caixas, a venda continua</strong>: as entregas passam a valer a partir do primeiro dia livre do calendário.</p>
+                <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🚚 {pre ? 'Dias de entrega da fornada' : 'Janela de entrega prevista'}</p>
+                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>
+                  {pre
+                    ? <>Os dias em que as encomendas saem. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas. Na pré-venda <strong>só estes dias</strong> são oferecidos. Quando a fornada virar pronta entrega, as caixas que sobrarem seguem sendo entregues pelo calendário.</>
+                    : <>Os dias em que esta leva está planejada para sair. Cada cliente escolhe o dia dele entre estes, só nos dias abertos do Calendário de Entregas. <strong>Se a janela passar e ainda houver caixas, a venda continua</strong>: as entregas passam a valer a partir do primeiro dia livre do calendário.</>}
+                </p>
                 <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))' }}>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Primeiro dia
                     <input type="date" data-nome="Primeiro dia de entrega" value={deliveryFrom} onChange={e => setDeliveryFrom(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
@@ -506,15 +563,33 @@ export default function AdminCaixas() {
               </div>
               <div>
                 <p style={{ fontWeight: 800, color: '#3c2a21', marginBottom: '0.2rem' }}>🔔 Abertura dos pedidos</p>
-                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>Os pedidos ficam abertos até a caixa <strong>esgotar</strong> ou você <strong>desativá-la</strong> no botão abaixo. Só a data de abertura é opcional, para deixar uma caixa pronta para uma data futura.</p>
+                <p style={{ fontSize: '0.82rem', color: '#7f8c8d', marginBottom: '0.6rem' }}>
+                  {pre
+                    ? <>As encomendas fecham no dia em que você precisa da contagem para assar (ou antes, se a fornada encher).</>
+                    : <>Os pedidos ficam abertos até a caixa <strong>esgotar</strong> ou você <strong>desativá-la</strong> no botão abaixo. Só a data de abertura é opcional, para deixar uma caixa pronta para uma data futura.</>}
+                </p>
                 <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))' }}>
                   <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Abre em <span style={{ fontWeight: 400, color: '#95a5a6' }}>(vazio = já)</span>
                     <input type="date" data-nome="Abertura dos pedidos" value={ordersOpen} onChange={e => setOrdersOpen(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
                   </label>
+                  {pre && (
+                    <label style={{ fontSize: '0.85rem', fontWeight: 700 }}>Encomendas até
+                      <input type="date" required data-nome="Último dia das encomendas" value={ordersClose} max={deliveryFrom || undefined}
+                        onChange={e => setOrdersClose(healBatchDate(e.target.value))} style={{ ...input, marginTop: '0.3rem' }} />
+                    </label>
+                  )}
                 </div>
               </div>
               {(() => {
                 const w = { total_quantity: totalQuantity, sold_quantity: soldQuantity, delivery_from: deliveryFrom || null, delivery_until: deliveryUntil || null, orders_open_from: ordersOpen || null, orders_close_on: null };
+                if (pre) {
+                  return (
+                    <p style={{ fontSize: '0.88rem', color: '#2c3e50', lineHeight: 1.6, background: '#fff', borderRadius: '8px', padding: '0.6rem 0.8rem' }}>
+                      👀 O cliente vai ver: <strong>pré-venda</strong>{deliveryWindowLabel(w) ? <>, entregas <strong>{deliveryWindowLabel(w)}</strong></> : ''}.
+                      {' '}Encomendas {ordersOpen ? <>abrem em <strong>{longDay(ordersOpen)}</strong> e </> : ''}{ordersClose ? <>vão até <strong>{longDay(ordersClose)}</strong></> : 'precisam de um último dia'}{totalQuantity > 0 ? <> ou até as {totalQuantity} vagas acabarem</> : ''}.
+                    </p>
+                  );
+                }
                 if (!deliveryFrom && !deliveryUntil && !ordersOpen) {
                   return <p style={{ fontSize: '0.85rem', color: '#8a5a00' }}>Sem datas: o cliente escolhe qualquer dia aberto do calendário, e os pedidos ficam abertos até esgotar.</p>;
                 }
@@ -569,7 +644,7 @@ export default function AdminCaixas() {
         </div>
       </form>
 
-      <HeldBoxes box={boxes.find(b => b.is_active) ?? null} onReleased={fetchBoxes} />
+      {boxes.filter(b => b.is_active).map(b => <HeldBoxes key={b.id} box={b} onReleased={fetchBoxes} />)}
 
       <h2 style={{ fontSize: '1.5rem', color: '#2c3e50', marginBottom: '1.5rem' }}>Lotes Anteriores</h2>
 
@@ -583,7 +658,10 @@ export default function AdminCaixas() {
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <h3 style={{ fontSize: '1.1rem', marginBottom: '0.4rem', color: box.is_active ? '#27ae60' : '#2c3e50' }}>{box.title} {box.is_active && '(Ativo)'}</h3>
+                  <h3 style={{ fontSize: '1.1rem', marginBottom: '0.4rem', color: box.is_active ? '#27ae60' : '#2c3e50' }}>
+                    {box.title} {box.is_active && '(Ativo)'}
+                    {isPresale(box) && <span style={{ marginLeft: '0.4rem', background: '#f3e8f8', color: '#8e44ad', fontSize: '0.75rem', fontWeight: 800, padding: '0.1rem 0.5rem', borderRadius: '6px', verticalAlign: 'middle' }}>🗓️ Pré-venda</span>}
+                  </h3>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button onClick={() => handleEdit(box)} style={{ background: '#3498db', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer' }}>Editar</button>
                     <button onClick={() => handleDelete(box.id)} style={{ background: '#e74c3c', color: 'white', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer' }}>Excluir</button>
@@ -600,7 +678,7 @@ export default function AdminCaixas() {
                     <p style={{ fontSize: '0.85rem', color: '#594a42', margin: '0.2rem 0 0', display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
                       <span style={{ background: lbl.bg, color: lbl.color, fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '6px' }}>{lbl.text}</span>
                       {deliveryWindowLabel(box) && <span>🚚 Entregas previstas {deliveryWindowLabel(box)}</span>}
-                      {windowOver && st.state === 'open' && <span>· ↻ janela já passou, segue à venda a partir do próximo dia livre</span>}
+                      {windowOver && st.state === 'open' && !isPresale(box) && <span>· ↻ janela já passou, segue à venda a partir do próximo dia livre</span>}
                     </p>
                   );
                 })()}

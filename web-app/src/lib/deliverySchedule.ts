@@ -100,6 +100,44 @@ export function openDatesBetween(rules: ScheduleRule[], overrides: DateOverride[
   return out;
 }
 
+const shiftISO = (iso: string, days: number) => {
+  const d = parseISODate(iso);
+  d.setDate(d.getDate() + days);
+  return toISODate(d);
+};
+
+/** How far ahead the carried-forward days reach (they keep moving with the date). */
+const CARRY_DAYS = 14;
+
+/**
+ * The days a box can be ordered for. Normally just the open days. But when the calendar has NO open
+ * day ahead (Dolly opens dates one by one and the last ones have passed) while boxes are still on sale,
+ * the delivery days keep running: the weekdays of the last week that had deliveries repeat for the next
+ * two weeks, skipping any day she blocked. Opening a real date puts her calendar back in charge.
+ * Only box ordering uses this; the subscriber and "new dates" e-mails read openDatesBetween, so nobody
+ * is ever told about a day she did not open herself.
+ */
+export function bookableDates(rules: ScheduleRule[], overrides: DateOverride[], fromISO: string, toISO: string): string[] {
+  const open = openDatesBetween(rules, overrides, fromISO, toISO);
+  if (open.length) return open;
+  return carriedForwardDates(rules, overrides, fromISO, toISO);
+}
+
+/** The repeated days on their own (empty when the calendar has open days ahead, or never had any). */
+export function carriedForwardDates(rules: ScheduleRule[], overrides: DateOverride[], fromISO: string, toISO: string): string[] {
+  const before = openDatesBetween(rules, overrides, shiftISO(fromISO, -56), shiftISO(fromISO, -1));
+  if (!before.length) return [];
+  const last = before[before.length - 1];
+  const weekdays = new Set(before.filter(d => d > shiftISO(last, -7)).map(d => parseISODate(d).getDay()));
+  const map = overrideMap(overrides);
+  const end = [toISO, shiftISO(fromISO, CARRY_DAYS - 1)].sort()[0];
+  const out: string[] = [];
+  for (let iso = fromISO; iso <= end; iso = shiftISO(iso, 1)) {
+    if (weekdays.has(parseISODate(iso).getDay()) && map.get(iso)?.is_open !== false) out.push(iso);
+  }
+  return out;
+}
+
 export interface DeliverySchedule {
   rules: ScheduleRule[];
   overrides: DateOverride[];
@@ -125,7 +163,7 @@ export function selectableDates(schedule: DeliverySchedule, weeksAhead = 14): st
   const today = new Date();
   const earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + schedule.leadDays);
   const latest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + weeksAhead * 7);
-  return openDatesBetween(schedule.rules, schedule.overrides, toISODate(earliest), toISODate(latest));
+  return bookableDates(schedule.rules, schedule.overrides, toISODate(earliest), toISODate(latest));
 }
 
 /** "Toda sexta", "Quinta sim, quinta não", "1º sábado do mês"… for humans. */

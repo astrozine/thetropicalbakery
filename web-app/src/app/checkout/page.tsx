@@ -14,7 +14,7 @@ import { DELIVERY_ZONES, getZone, formatBRL } from '@/lib/deliveryZones';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
 import { legacyFlags, normalizeDiet, tagsFromLegacy } from '@/lib/dietary';
 import { fetchSchedule, selectableDates, toISODate } from '@/lib/deliverySchedule';
-import { BoxWindowFields, inDeliveryWindow, longDay, saleState } from '@/lib/boxWindow';
+import { BoxWindowFields, boxRange, inDeliveryWindow, longDay, saleState } from '@/lib/boxWindow';
 
 const STORE_WHATSAPP = '5511932119196';
 const DATE_KEY = 'checkout_delivery_date';
@@ -90,7 +90,7 @@ export default function CheckoutPage() {
     supabase.from('tasting_boxes').select('*').in('id', boxIdsKey.split(','))
       .then(({ data }) => setBoxRows((data as (BoxWindowFields & { id: string; title: string })[]) || []));
   }, [boxIdsKey]);
-  const boxWindows = boxRows.map(b => ({ from: b.delivery_from, until: b.delivery_until }));   // each one rolls over on its own
+  const boxWindows = boxRows.map(boxRange);   // each one rolls over on its own (a pre-sale never does)
   // Pickup is only for boxes. The address is never on the site: it appears in Minha Conta once the Pix is confirmed.
   const isPickup = hasBox && fulfillment === 'pickup';
   const zone = getZone(zoneId);

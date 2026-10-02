@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { DeliverySchedule, fetchSchedule, selectableDates } from '@/lib/deliverySchedule';
-import { BoxWindowFields, deliveryWindowLabel, inDeliveryWindow, isRolledOver, lastOrderDay, saleState, shortDay } from '@/lib/boxWindow';
+import { BoxWindowFields, boxRange, deliveryWindowLabel, inDeliveryWindow, isPresale, isRolledOver, lastOrderDay, saleState, shortDay } from '@/lib/boxWindow';
 
 /**
  * Loads the delivery calendar once and says whether this box can be ordered right now.
@@ -18,8 +18,11 @@ export function useBoxSale(box: BoxWindowFields | null) {
     const leadDays = schedule?.leadDays ?? 2;
     const all = schedule ? selectableDates(schedule) : null;
     const choosable = all ? inDeliveryWindow(all, box) : null;
-    const rolledOver = !!all && isRolledOver(all, { from: box.delivery_from, until: box.delivery_until });
+    const rolledOver = !!all && isRolledOver(all, boxRange(box));
     const windowLabel = rolledOver && choosable?.length ? `a partir de ${shortDay(choosable[0])}` : deliveryWindowLabel(box);
-    return { ...saleState(box, choosable), choosable, leadDays, loaded: !!schedule, rolledOver, windowLabel, closesOn: lastOrderDay(box, leadDays) };
+    const presale = isPresale(box);
+    // A pre-sale closes on its own deadline; the ready box only ever closes by selling out.
+    const closesOn = presale ? (box.orders_close_on || null) : lastOrderDay(box, leadDays);
+    return { ...saleState(box, choosable), choosable, leadDays, loaded: !!schedule, rolledOver, windowLabel, closesOn, presale };
   }, [box, schedule]);
 }

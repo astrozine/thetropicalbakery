@@ -5,7 +5,7 @@ import {
   DeliverySchedule, fetchSchedule, selectableDates, dayState, overrideMap,
   toISODate, parseISODate, describeRule,
 } from '@/lib/deliverySchedule';
-import { windowedDates } from '@/lib/boxWindow';
+import { DayRange, windowedDates } from '@/lib/boxWindow';
 import { PICKUP_EXTRA_DAYS, pickupDays, pickupLastDay, shortDay } from '@/lib/pickupWindow';
 
 const WEEKDAY = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
@@ -19,9 +19,9 @@ interface Props {
   highlight?: string[];
   title?: string;
   /** Only offer days inside this range (a box edition's delivery window, YYYY-MM-DD). */
-  window?: { from?: string | null; until?: string | null };
+  window?: DayRange;
   /** Several boxes at once (checkout): a day must suit every one of them. Each window rolls over on its own. */
-  windows?: { from?: string | null; until?: string | null }[];
+  windows?: DayRange[];
   /** Box orders: whether the customer comes to get it. They still pick the box day (when it is ready); for a
    *  pickup the calendar then also lights up the days after it that the box waits in the fridge (pickupWindow.ts). */
   fulfillment?: 'delivery' | 'pickup';
@@ -58,18 +58,19 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
 
   const from = range?.from || null;
   const until = range?.until || null;
-  const windowsKey = (windows || []).map(w => `${w.from || ''}~${w.until || ''}`).join('|');
-  const hasWindow = !!(from || until || windowsKey.replace(/[~|]/g, ''));
+  const presale = !!range?.presale;   // a pre-sale's window never rolls over
+  const windowsKey = (windows || []).map(w => `${w.from || ''}~${w.until || ''}${w.presale ? '~p' : ''}`).join('|');
+  const hasWindow = !!(from || until || windowsKey.replace(/[~|p]/g, ''));
   const selectable = useMemo(() => {
     if (!schedule) return new Set<string>();
     const all = selectableDates(schedule);
     // A window that is over (while the box is still on sale) stops limiting the days, see boxWindow.ts.
-    const wins = [{ from, until }, ...(windows || [])];
+    const wins: DayRange[] = [{ from, until, presale }, ...(windows || [])];
     let days = all;
     for (const w of wins) days = windowedDates(days, w, all);
     return new Set(days);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schedule, from, until, windowsKey]);
+  }, [schedule, from, until, presale, windowsKey]);
   const overrides = useMemo(() => overrideMap(schedule?.overrides || []), [schedule]);
   const sortedSelectable = useMemo(() => Array.from(selectable).sort(), [selectable]);
   const nextBoxDay = sortedSelectable[0];
