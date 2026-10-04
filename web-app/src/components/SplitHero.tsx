@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import HeroPhoto from './HeroPhoto';
-import WhatsAppGate from './WhatsAppGate';
+import WhatsAppGate, { type GateLocale } from './WhatsAppGate';
 
 interface SplitHeroProps {
   eyebrow: string;
@@ -18,6 +18,8 @@ interface SplitHeroProps {
   ctaLabel: string;
   /** Saved with the lead when the CTA is a WhatsApp link (see WhatsAppGate). */
   ctaTopic?: string;
+  /** Language of the WhatsApp gate's own text. */
+  ctaLocale?: GateLocale;
   /** Optional second, smaller photo layered onto the main one. */
   accentImage?: string;
   /** Portrait treat photos layered as tilted prints over the main photo. */
@@ -30,10 +32,12 @@ interface SplitHeroProps {
  * thing seen. The photo is never overlaid or dimmed — that's the whole point.
  */
 export default function SplitHero({
-  eyebrow, title, intro, image, images, imageAlt, regionNote, itamambucaBadge, ctaHref, ctaLabel, ctaTopic, accentImage, treats,
+  eyebrow, title, intro, image, images, imageAlt, regionNote, itamambucaBadge, ctaHref, ctaLabel, ctaTopic, ctaLocale, accentImage, treats,
 }: SplitHeroProps) {
+  const ctaStyle: React.CSSProperties = { alignSelf: 'flex-start', padding: '1rem 2.25rem', fontSize: '1rem', letterSpacing: '1px' };
+  // "#ser-parceiro" jumps to the form on the same page; anything else is a WhatsApp link behind the gate.
   // "Parcerias para Hotéis" -> small kicker + a huge "HOTÉIS", so a visitor knows at a glance which program this is.
-  const m = eyebrow.match(/^(Parcerias para)\s+(.+)$/i);
+  const m = eyebrow.match(/^(Parcerias para|Partnerships for)\s+(.+)$/i);
   const kicker = m ? m[1] : null;
   const category = m ? m[2] : eyebrow;
   return (
@@ -64,15 +68,20 @@ export default function SplitHero({
             📍 {regionNote}
           </p>
         )}
-        <WhatsAppGate
-          href={ctaHref}
-          topic={ctaTopic || eyebrow}
-          tags={['parceiro']}
-          className="btn btn-secondary"
-          style={{ alignSelf: 'flex-start', padding: '1rem 2.25rem', fontSize: '1rem', letterSpacing: '1px' }}
-        >
-          {ctaLabel}
-        </WhatsAppGate>
+        {ctaHref.startsWith('#') ? (
+          <a href={ctaHref} className="btn btn-secondary" style={ctaStyle}>{ctaLabel}</a>
+        ) : (
+          <WhatsAppGate
+            href={ctaHref}
+            topic={ctaTopic || eyebrow}
+            tags={['parceiro']}
+            locale={ctaLocale}
+            className="btn btn-secondary"
+            style={ctaStyle}
+          >
+            {ctaLabel}
+          </WhatsAppGate>
+        )}
       </div>
 
       {/* Photo */}

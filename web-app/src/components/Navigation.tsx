@@ -15,6 +15,11 @@ import { clearGoogleTranslate as clearEbookTranslation } from '@/components/eboo
 const GAP = 'clamp(0.7rem, 1.1vw, 1.5rem)';
 const TOP_SIZE = 'clamp(0.74rem, 0.78vw, 0.9rem)';
 
+/** Portuguese page -> its hand-written English version (the language menu sends people between them). */
+const HAND_TRANSLATED_EN: Record<string, string> = {
+  '/b2b/barcos': '/en/b2b/boats',
+};
+
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -43,6 +48,20 @@ export default function Navigation() {
     if (pathname?.startsWith('/sweet-escape') && !pathname.includes('/thank-you')) {
       clearEbookTranslation();
       window.location.href = isEbookLang(langCode) ? LANG_PATH[langCode] : `${LANG_PATH.en}?tl=${langCode}`;
+      return;
+    }
+    // Pages with a hand-written English twin: English goes to the twin, and from the twin every
+    // other language goes back to the Portuguese page (where Google Translate can work from the original).
+    const twinEn = HAND_TRANSLATED_EN[pathname ?? ''];
+    const twinPt = Object.keys(HAND_TRANSLATED_EN).find(pt => HAND_TRANSLATED_EN[pt] === pathname);
+    if ((twinEn && langCode === 'en') || (twinPt && langCode !== 'en')) {
+      const host = window.location.hostname;
+      const value = langCode === 'en' || langCode === 'pt' ? '' : `/pt/${langCode}`;
+      const expire = value ? 'path=/;' : 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      document.cookie = `googtrans=${value}; ${expire}`;
+      document.cookie = `googtrans=${value}; ${expire} domain=${host};`;
+      document.cookie = `googtrans=${value}; ${expire} domain=.${host};`;
+      window.location.href = twinEn && langCode === 'en' ? twinEn : (twinPt as string);
       return;
     }
     if (langCode === 'pt') {
@@ -93,6 +112,7 @@ export default function Navigation() {
     { name: 'Airbnbs', path: '/b2b/airbnbs' },
     { name: 'Restaurantes', path: '/b2b/restaurants' },
     { name: 'Padarias', path: '/b2b/bakeries' },
+    { name: 'Barcos e Marinas', path: '/b2b/barcos' },
     { name: 'Travel Managers', path: '/b2b/travel-managers' },
     { name: 'Afiliados', path: '/b2b/affiliates' },
     // Not a B2B account, but it belongs in the same "ways to partner with us"

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { trackMeta } from '@/lib/metaPixel';
 import { useAuth } from '@/context/AuthContext';
-import { PARTNER_KINDS, PartnerKind } from '@/lib/portals';
+import { PARTNER_KINDS, PartnerKind, partnerKind } from '@/lib/portals';
 import { optimizedSrc } from '@/lib/thumbs';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
 import { dietSummary, matchDiet } from '@/lib/dietary';
@@ -23,7 +23,72 @@ interface Props {
   /** Pre-picked on each B2B page, e.g. 'pousada' on the pousadas page. */
   defaultKind: PartnerKind;
   whatsappHref: string;
+  /** 'en' on the hand-written English partner pages. */
+  locale?: 'pt' | 'en';
 }
+
+const COPY = {
+  pt: {
+    picksLine: 'Itens que fariam meus clientes pirarem: ',
+    dietLine: 'Restrições que o meu negócio precisa atender: ',
+    errMissing: 'O cadastro de parceiros está sendo preparado. Fale com a gente no WhatsApp que resolvemos na hora.',
+    errSend: 'Não conseguimos enviar. Confira o e-mail e tente de novo, ou fale com a gente no WhatsApp.',
+    sentTitle: 'Pedido enviado',
+    sentBefore: 'A Dolly vai confirmar sua parceria e te chamar no WhatsApp. Depois disso, entre com',
+    sentAfter: 'no Portal do Parceiro para pedir reposição e acompanhar tudo.',
+    toPortal: 'Ir para o portal', talkNow: 'Falar agora',
+    railLabel: 'Como funciona e outras parcerias', howTitle: 'Como funciona',
+    steps: ['Você preenche em 2 minutos', 'A Dolly te chama no WhatsApp', 'Portal liberado para pedir reposição'],
+    others: 'Outras parcerias',
+    kicker: 'Quero ser parceiro', title: 'Abrir minha parceria',
+    intro: 'Preencha e a Dolly confirma com você. Depois de aprovado, você tem um portal próprio para pedir reposição, acompanhar a meta do mês e ver as condições combinadas.',
+    business: 'Nome do seu negócio', businessPh: 'Ex: Pousada do Sol', kind: 'Tipo',
+    contact: 'Seu nome', email: 'E-mail (será seu acesso ao portal)', emailPh: 'contato@seunegocio.com',
+    hood: 'Bairro / praia', hoodPh: 'Itamambuca',
+    picksTitle: 'Quais itens fariam seus clientes pirarem?',
+    picksHint: 'Toque nos que você imagina vendendo ou servindo. Escolha quantos quiser: eles vão junto com a sua mensagem.',
+    picksWarn: ' Os que contêm o que você marcou acima aparecem avisados.',
+    contains: 'contém', mayContain: 'pode conter',
+    noneYet: 'Nenhum escolhido ainda (opcional).',
+    chosen: (n: number) => `${n} ${n === 1 ? 'item escolhido' : 'itens escolhidos'}`,
+    notes: 'O que você tem em mente', notesPh: 'Ex: geladeira na recepção, sobremesa no cardápio, café da manhã…',
+    sending: 'Enviando…', submit: 'Quero ser parceiro',
+    already: 'Já é parceiro?', signIn: 'Entrar no portal',
+  },
+  en: {
+    picksLine: 'Treats my guests would love: ',
+    dietLine: 'Diets my business needs to cater for: ',
+    errMissing: 'Partner sign-up is being set up. Message us on WhatsApp and we will sort it out right away.',
+    errSend: 'We could not send this. Check the e-mail and try again, or message us on WhatsApp.',
+    sentTitle: 'Application sent',
+    sentBefore: 'Dolly will confirm your partnership and message you on WhatsApp. After that, sign in with',
+    sentAfter: 'at the Partner Portal to place orders and follow everything.',
+    toPortal: 'Go to the portal', talkNow: 'Message us now',
+    railLabel: 'How it works and other partnerships', howTitle: 'How it works',
+    steps: ['You fill it in, 2 minutes', 'Dolly messages you on WhatsApp', 'Portal unlocked for orders'],
+    others: 'Other partnerships',
+    kicker: 'Become a partner', title: 'Open my partnership',
+    intro: 'Fill this in and Dolly confirms with you. Once approved you get your own portal to place orders, follow your monthly goal and see the terms we agreed.',
+    business: 'Business name', businessPh: 'e.g. Paraty Sailing Charters', kind: 'Type',
+    contact: 'Your name', email: 'E-mail (your portal login)', emailPh: 'hello@yourbusiness.com',
+    hood: 'Marina / town', hoodPh: 'Paraty',
+    picksTitle: 'Which treats would your guests love?',
+    picksHint: 'Tap the ones you can picture serving. Pick as many as you like: they go along with your message.',
+    picksWarn: '',
+    contains: 'contains', mayContain: 'may contain',
+    noneYet: 'None picked yet (optional).',
+    chosen: (n: number) => `${n} ${n === 1 ? 'treat picked' : 'treats picked'}`,
+    notes: 'What do you have in mind?', notesPh: 'e.g. a box for every private trip, welcome boxes for overnight charters…',
+    sending: 'Sending…', submit: 'Become a partner',
+    already: 'Already a partner?', signIn: 'Sign in to the portal',
+  },
+};
+
+/** The kind names in English; the database and the admin keep the Portuguese ones. */
+const KIND_EN: Record<PartnerKind, string> = {
+  hotel: 'Hotel', pousada: 'Guesthouse (pousada)', airbnb: 'Airbnb / holiday rental', restaurante: 'Restaurant',
+  padaria: 'Bakery / café', barco: 'Boat / charter / marina', afiliado: 'Affiliate (refer and earn)', outro: 'Other',
+};
 
 /** The other partnership pages, shown as a quiet rail beside the form on wide screens. */
 const OTHER_PARTNERSHIPS: { kind: PartnerKind; href: string; emoji: string; label: string }[] = [
@@ -32,6 +97,7 @@ const OTHER_PARTNERSHIPS: { kind: PartnerKind; href: string; emoji: string; labe
   { kind: 'airbnb', href: '/b2b/airbnbs', emoji: '🏡', label: 'Airbnbs' },
   { kind: 'restaurante', href: '/b2b/restaurants', emoji: '🍽️', label: 'Restaurantes' },
   { kind: 'padaria', href: '/b2b/bakeries', emoji: '🥐', label: 'Padarias e cafés' },
+  { kind: 'barco', href: '/b2b/barcos', emoji: '⛵', label: 'Barcos e Marinas' },
   { kind: 'afiliado', href: '/b2b/affiliates', emoji: '🤝', label: 'Afiliados' },
   { kind: 'outro', href: '/b2b/travel-managers', emoji: '✈️', label: 'Agências e grupos' },
 ];
@@ -61,7 +127,9 @@ const label: React.CSSProperties = {
  * "Quero ser parceiro" — the form that opens an account in the partner portal.
  * Dolly approves it in /admin/parceiros; until then the portal shows "waiting".
  */
-export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
+export default function PartnerApply({ defaultKind, whatsappHref, locale = 'pt' }: Props) {
+  const c = COPY[locale];
+  const en = locale === 'en';
   const { user, profile } = useAuth();
   const [form, setForm] = useState({
     business_name: '', kind: defaultKind, contact_name: '', email: '', whatsapp: '', neighborhood: '', notes: '',
@@ -82,10 +150,12 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
   const togglePick = (id: string) => setPicked(p => (p.includes(id) ? p.filter(x => x !== id) : [...p, id]));
   const chosen = treats.filter(t => picked.includes(t.id)).map(t => t.name);
   const showPicker = treats.length > 0 && form.kind !== 'afiliado';
+  // The diet vocabulary (DietaryPicker) only exists in Portuguese, so the English page leaves it to the notes.
+  const showDiet = showPicker && !en;
   // The picks travel inside the message the partner sends, so Dolly reads them next to the note.
-  const pickLine = showPicker && chosen.length > 0 ? `Itens que fariam meus clientes pirarem: ${chosen.join(', ')}` : '';
+  const pickLine = showPicker && chosen.length > 0 ? `${c.picksLine}${chosen.join(', ')}` : '';
   const dietText = dietSummary(diet.tags, diet.allergens);
-  const dietLine = showPicker && dietText ? `Restrições que o meu negócio precisa atender: ${dietText}` : '';
+  const dietLine = showDiet && dietText ? `${c.dietLine}${dietText}` : '';
   const extraLines = [dietLine, pickLine].filter(Boolean);
 
   // Anything we already know about them is filled in.
@@ -102,21 +172,24 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
     e.preventDefault();
     setSending(true);
     setError('');
-    const { error: err } = await supabase.rpc('partner_apply', {
+    const apply = (kind: PartnerKind, lead: string[]) => supabase.rpc('partner_apply', {
       p_business_name: form.business_name.trim(),
-      p_kind: form.kind,
+      p_kind: kind,
       p_contact_name: form.contact_name.trim() || null,
       p_email: form.email.trim(),
       p_whatsapp: form.whatsapp.trim() || null,
       p_address: null,
       p_neighborhood: form.neighborhood.trim() || null,
-      p_notes: [form.notes.trim(), ...extraLines].filter(Boolean).join('\n\n') || null,
+      p_notes: [...lead, form.notes.trim(), ...extraLines].filter(Boolean).join('\n\n') || null,
     });
+    let { error: err } = await apply(form.kind, []);
+    // A kind newer than the database (e.g. 'barco' before migration 38): file it as 'outro' and say what it was.
+    if (err && /check constraint/i.test(err.message) && form.kind !== 'outro') {
+      ({ error: err } = await apply('outro', [`Tipo: ${partnerKind(form.kind).label}`]));
+    }
     setSending(false);
     if (err) {
-      setError(/function/.test(err.message)
-        ? 'O cadastro de parceiros está sendo preparado. Fale com a gente no WhatsApp que resolvemos na hora.'
-        : 'Não conseguimos enviar. Confira o e-mail e tente de novo, ou fale com a gente no WhatsApp.');
+      setError(/function/.test(err.message) ? c.errMissing : c.errSend);
       return;
     }
     trackMeta('Lead', { content_name: `parceiro:${form.kind}` });
@@ -133,15 +206,15 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
         <div style={{ maxWidth: '560px', margin: '0 auto', textAlign: 'center', background: '#fff', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '20px', padding: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
           <p style={{ fontSize: '2.4rem', marginBottom: '0.75rem' }}>🤝</p>
           <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.5rem, 4vw, 2rem)', color: 'var(--color-primary)', marginBottom: '1rem' }}>
-            Pedido enviado
+            {c.sentTitle}
           </h2>
           <p style={{ color: '#594a42', lineHeight: 1.8, marginBottom: '1.5rem' }}>
-            A Dolly vai confirmar sua parceria e te chamar no WhatsApp. Depois disso, entre com{' '}
-            <strong>{form.email}</strong> no Portal do Parceiro para pedir reposição e acompanhar tudo.
+            {c.sentBefore}{' '}
+            <strong>{form.email}</strong> {c.sentAfter}
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/parceiro" className="btn btn-primary" style={{ padding: '0.9rem 1.6rem' }}>Ir para o portal</Link>
-            <a href={whatsappWithPicks} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.9rem 1.6rem' }}>Falar agora</a>
+            <Link href="/parceiro" className="btn btn-primary" style={{ padding: '0.9rem 1.6rem' }}>{c.toPortal}</Link>
+            <a href={whatsappWithPicks} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.9rem 1.6rem' }}>{c.talkNow}</a>
           </div>
         </div>
       </section>
@@ -154,7 +227,7 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
   const gutterPhotos = PHOTO_SPOTS.map((_, i) => withPhoto[(i * step + 2) % Math.max(1, withPhoto.length)]).filter(Boolean);
 
   return (
-    <section id="ser-parceiro" style={{ padding: 'clamp(2rem, 7vw, 5rem) 1.5rem', background: '#fdf7ee' }}>
+    <section id="ser-parceiro" style={{ padding: 'clamp(2rem, 7vw, 5rem) 1.5rem', background: '#fdf7ee', scrollMarginTop: '5rem' }}>
       <style>{`
         .pa-wrap { position: relative; max-width: 680px; margin: 0 auto; }
         .pa-rail, .pa-photos { display: none; }
@@ -177,18 +250,16 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
         .pa-photo figcaption { padding: 0.35rem 0.2rem 0.5rem; font-size: 0.75rem; line-height: 1.25; text-align: center; color: #6b5a4e; }
       `}</style>
       <div className="pa-wrap">
-        <aside className="pa-rail" aria-label="Como funciona e outras parcerias">
+        <aside className="pa-rail" aria-label={c.railLabel}>
           <div className="pa-rail-inner" style={{ display: 'grid', gap: '0.9rem' }}>
             <div className="pa-card">
-              <h3>Como funciona</h3>
+              <h3>{c.howTitle}</h3>
               <ol className="pa-steps">
-                <li><b>1</b><span>Você preenche em 2 minutos</span></li>
-                <li><b>2</b><span>A Dolly te chama no WhatsApp</span></li>
-                <li><b>3</b><span>Portal liberado para pedir reposição</span></li>
+                {c.steps.map((s, i) => <li key={i}><b>{i + 1}</b><span>{s}</span></li>)}
               </ol>
             </div>
             <div className="pa-card">
-              <h3>Outras parcerias</h3>
+              <h3>{c.others}</h3>
               <div className="pa-links">
                 {OTHER_PARTNERSHIPS.filter(o => o.kind !== defaultKind).map(o => (
                   <Link key={o.kind} href={o.href}><span aria-hidden>{o.emoji}</span>{o.label}</Link>
@@ -214,33 +285,32 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
         )}
 
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <span style={{ ...label, display: 'block' }}>Quero ser parceiro</span>
+          <span style={{ ...label, display: 'block' }}>{c.kicker}</span>
           <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.7rem, 4.5vw, 2.6rem)', color: 'var(--color-primary)', lineHeight: 1.2, marginBottom: '1rem' }}>
-            Abrir minha parceria
+            {c.title}
           </h2>
           <p style={{ color: '#594a42', lineHeight: 1.8 }}>
-            Preencha e a Dolly confirma com você. Depois de aprovado, você tem um portal próprio para pedir reposição,
-            acompanhar a meta do mês e ver as condições combinadas.
+            {c.intro}
           </p>
         </div>
 
         <form onSubmit={submit} style={{ background: '#fff', border: '1px solid #e8e1d7', borderRadius: '20px', padding: 'clamp(1.5rem, 4vw, 2.25rem)', display: 'grid', gap: '1.1rem' }}>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <div style={{ flex: '2 1 240px' }}>
-              <label style={label} htmlFor="pa-name">Nome do seu negócio</label>
-              <input id="pa-name" required type="text" value={form.business_name} onChange={e => setForm({ ...form, business_name: e.target.value })} placeholder="Ex: Pousada do Sol" style={input} />
+              <label style={label} htmlFor="pa-name">{c.business}</label>
+              <input id="pa-name" required type="text" value={form.business_name} onChange={e => setForm({ ...form, business_name: e.target.value })} placeholder={c.businessPh} style={input} />
             </div>
             <div style={{ flex: '1 1 180px' }}>
-              <label style={label} htmlFor="pa-kind">Tipo</label>
+              <label style={label} htmlFor="pa-kind">{c.kind}</label>
               <select id="pa-kind" value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value as PartnerKind })} style={{ ...input, cursor: 'pointer' }}>
-                {PARTNER_KINDS.map(k => <option key={k.id} value={k.id}>{k.emoji} {k.label}</option>)}
+                {PARTNER_KINDS.map(k => <option key={k.id} value={k.id}>{k.emoji} {en ? KIND_EN[k.id] : k.label}</option>)}
               </select>
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 200px' }}>
-              <label style={label} htmlFor="pa-contact">Seu nome</label>
+              <label style={label} htmlFor="pa-contact">{c.contact}</label>
               <input id="pa-contact" type="text" value={form.contact_name} onChange={e => setForm({ ...form, contact_name: e.target.value })} style={input} />
             </div>
             <div style={{ flex: '1 1 200px' }}>
@@ -251,16 +321,16 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <div style={{ flex: '2 1 240px' }}>
-              <label style={label} htmlFor="pa-email">E-mail (será seu acesso ao portal)</label>
-              <input id="pa-email" required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="contato@seunegocio.com" style={input} />
+              <label style={label} htmlFor="pa-email">{c.email}</label>
+              <input id="pa-email" required type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder={c.emailPh} style={input} />
             </div>
             <div style={{ flex: '1 1 180px' }}>
-              <label style={label} htmlFor="pa-hood">Bairro / praia</label>
-              <input id="pa-hood" type="text" value={form.neighborhood} onChange={e => setForm({ ...form, neighborhood: e.target.value })} placeholder="Itamambuca" style={input} />
+              <label style={label} htmlFor="pa-hood">{c.hood}</label>
+              <input id="pa-hood" type="text" value={form.neighborhood} onChange={e => setForm({ ...form, neighborhood: e.target.value })} placeholder={c.hoodPh} style={input} />
             </div>
           </div>
 
-          {showPicker && (
+          {showDiet && (
             <div>
               <span style={label}>Que restrições alimentares e alergias o seu negócio precisa atender?</span>
               <p style={{ fontSize: '0.88rem', color: '#7a6a61', lineHeight: 1.6, margin: '0 0 0.75rem' }}>
@@ -272,16 +342,16 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
 
           {showPicker && (
             <div>
-              <span style={label}>Quais itens fariam seus clientes pirarem?</span>
+              <span style={label}>{c.picksTitle}</span>
               <p style={{ fontSize: '0.88rem', color: '#7a6a61', lineHeight: 1.6, margin: '0 0 0.75rem' }}>
-                Toque nos que você imagina vendendo ou servindo. Escolha quantos quiser: eles vão junto com a sua mensagem.{diet.allergens.length > 0 && ' Os que contêm o que você marcou acima aparecem avisados.'}
+                {c.picksHint}{diet.allergens.length > 0 && c.picksWarn}
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(104px, 1fr))', gap: '0.6rem', maxHeight: '340px', overflowY: 'auto', padding: '2px' }}>
                 {treats.map(t => {
                   const on = picked.includes(t.id);
                   const m = diet.allergens.length ? matchDiet(diet.allergens, t.contains, t.may_contain) : null;
-                  const flag = m && m.status === 'unsafe' ? `⚠ contém ${m.conflicts.map(a => a.label).join(', ')}`
-                    : m && m.status === 'may' ? `🔸 pode conter ${m.traces.map(a => a.label).join(', ')}` : '';
+                  const flag = m && m.status === 'unsafe' ? `⚠ ${c.contains} ${m.conflicts.map(a => a.label).join(', ')}`
+                    : m && m.status === 'may' ? `🔸 ${c.mayContain} ${m.traces.map(a => a.label).join(', ')}` : '';
                   return (
                     <button
                       key={t.id}
@@ -304,25 +374,25 @@ export default function PartnerApply({ defaultKind, whatsappHref }: Props) {
                 })}
               </div>
               <p style={{ fontSize: '0.85rem', color: on0(chosen), marginTop: '0.6rem', fontWeight: 600 }}>
-                {chosen.length === 0 ? 'Nenhum escolhido ainda (opcional).' : `${chosen.length} ${chosen.length === 1 ? 'item escolhido' : 'itens escolhidos'}: ${chosen.join(', ')}`}
+                {chosen.length === 0 ? c.noneYet : `${c.chosen(chosen.length)}: ${chosen.join(', ')}`}
               </p>
             </div>
           )}
 
           <div>
-            <label style={label} htmlFor="pa-notes">O que você tem em mente</label>
+            <label style={label} htmlFor="pa-notes">{c.notes}</label>
             <textarea id="pa-notes" rows={3} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
-              placeholder="Ex: geladeira na recepção, sobremesa no cardápio, café da manhã…" style={{ ...input, resize: 'vertical' }} />
+              placeholder={c.notesPh} style={{ ...input, resize: 'vertical' }} />
           </div>
 
           {error && <p style={{ color: '#c0392b', fontSize: '0.92rem', lineHeight: 1.6 }}>{error}</p>}
 
           <button type="submit" disabled={sending} className="btn btn-primary" style={{ padding: '1.1rem 2rem', fontSize: '1.02rem' }}>
-            {sending ? 'Enviando…' : 'Quero ser parceiro'}
+            {sending ? c.sending : c.submit}
           </button>
 
           <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#7a6a61' }}>
-            Já é parceiro? <Link href="/parceiro" style={{ color: '#8a6d1f', fontWeight: 700, display: 'inline-block', padding: '0.6rem 0.25rem' }}>Entrar no portal</Link>
+            {c.already} <Link href="/parceiro" style={{ color: '#8a6d1f', fontWeight: 700, display: 'inline-block', padding: '0.6rem 0.25rem' }}>{c.signIn}</Link>
           </p>
         </form>
       </div>
