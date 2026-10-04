@@ -22,6 +22,8 @@ interface B2BPageLayoutProps {
   intro: string;
   /** Scene photo (people at a hotel, restaurant...) shown large in the hero. */
   heroScene: string;
+  /** The scene photo is portrait (3:4): show it whole instead of cropping it to fill the panel. */
+  heroPortrait?: boolean;
   /** Portrait treat photos layered over the scene. */
   heroTreats: string[];
   optionsHeading?: string;
@@ -57,6 +59,7 @@ export default function B2BPageLayout({
   title,
   intro,
   heroScene,
+  heroPortrait,
   heroTreats,
   optionsHeading,
   options,
@@ -83,7 +86,8 @@ export default function B2BPageLayout({
         eyebrow={eyebrow}
         title={title}
         intro={intro}
-        image={heroScene}
+        image={heroPortrait ? undefined : heroScene}
+        images={heroPortrait ? [heroScene] : undefined}
         treats={heroTreats}
         imageAlt={title}
         regionNote={regionNote}
