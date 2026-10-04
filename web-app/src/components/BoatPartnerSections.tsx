@@ -1,4 +1,5 @@
 import React from 'react';
+import { HERO_EXTRA_MEDIA } from '@/components/SplitHero';
 
 /**
  * The parts of the boats / charters / marinas page that the other partner pages don't have:
@@ -23,8 +24,8 @@ const h2: React.CSSProperties = {
 };
 
 // "Para quem é" and "Por que vale a pena" sit in the hero beside the tall photo on wide screens
-// (BoatHeroExtra); there the page copies hide, so nothing is said twice. 1880px matches SplitHero's .sh-extra: below it the photo is shorter than the text would be.
-const HIDE_WIDE = `@media (min-width: 1880px) { .boat-hide-wide { display: none; } }`;
+// (BoatHeroExtra); there the page copies hide, so nothing is said twice. Same media query as SplitHero's .sh-extra.
+const HIDE_WIDE = `@media ${HERO_EXTRA_MEDIA} { .boat-hide-wide { display: none; } }`;
 
 const kicker: React.CSSProperties = {
   display: 'block', color: '#d4af37', letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.9rem',
@@ -32,7 +33,7 @@ const kicker: React.CSSProperties = {
 
 export function BoatHeroExtra({ c }: { c: BoatCopy }) {
   return (
-    <div style={{ display: 'grid', gap: '1.75rem', maxWidth: '560px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.75rem 2.5rem', maxWidth: '980px' }}>
       <div>
         <span style={kicker}>{c.forWhoTitle}</span>
         <div style={{ display: 'grid', gap: '0.65rem' }}>

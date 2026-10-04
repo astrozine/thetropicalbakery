@@ -25,8 +25,8 @@ interface SplitHeroProps {
   /** Portrait treat photos layered as tilted prints over the main photo. */
   treats?: string[];
   /**
-   * Extra content under the button, shown only on screens 1880px and wider, where a tall portrait
-   * photo leaves room for it. The text then starts at the top instead of floating in the middle.
+   * Extra content under the button, shown only on big screens (HERO_EXTRA_MEDIA), where the portrait
+   * photo is tall enough to sit beside it. The text then starts at the top instead of floating in the middle.
    */
   extra?: React.ReactNode;
 }
@@ -36,9 +36,13 @@ interface SplitHeroProps {
  * above the text (flex-wrap: wrap-reverse) so the image is still the first
  * thing seen. The photo is never overlaid or dimmed — that's the whole point.
  */
+/** Where SplitHero's `extra` shows: wide and tall enough that the photo (sized to the window height) is taller than the text. */
+export const HERO_EXTRA_MEDIA = '(min-width: 1500px) and (min-height: 1050px)';
+
 export default function SplitHero({
   eyebrow, title, intro, image, images, imageAlt, regionNote, itamambucaBadge, ctaHref, ctaLabel, ctaTopic, ctaLocale, accentImage, treats, extra,
 }: SplitHeroProps) {
+  const fitPortrait = images?.length === 1;
   const ctaStyle: React.CSSProperties = { alignSelf: 'flex-start', padding: '1rem 2.25rem', fontSize: '1rem', letterSpacing: '1px' };
   // "#ser-parceiro" jumps to the form on the same page; anything else is a WhatsApp link behind the gate.
   // "Parcerias para Hotéis" -> small kicker + a huge "HOTÉIS", so a visitor knows at a glance which program this is.
@@ -89,14 +93,17 @@ export default function SplitHero({
         )}
         {extra && (
           <>
-            <style>{`.sh-extra { display: none; } @media (min-width: 1880px) { .sh-extra { display: block; margin-top: 2.5rem; } }`}</style>
+            <style>{`.sh-extra { display: none; } @media ${HERO_EXTRA_MEDIA} { .sh-extra { display: block; margin-top: 2.5rem; } }`}</style>
             <div className="sh-extra">{extra}</div>
           </>
         )}
       </div>
 
       {/* Photo */}
-      <div style={{ flex: '1 1 460px', position: 'relative', minHeight: images?.length ? undefined : 'clamp(360px, 46vw, 760px)', display: images?.length ? 'grid' : 'block', gridTemplateColumns: images?.length ? `repeat(${images.length}, 1fr)` : undefined, gap: '4px' }}>
+      {/* One portrait photo: on wide screens it is sized to the window's height (146px = banner + menu), so it shows whole
+          without scrolling, and the text column takes the rest of the width. */}
+      {fitPortrait && <style>{`@media (min-width: 960px) { .sh-photo-fit { flex: 0 0 min(50%, calc((100svh - 146px) * 0.75)) !important; align-self: flex-start; } }`}</style>}
+      <div className={fitPortrait ? 'sh-photo-fit' : undefined} style={{ flex: '1 1 460px', position: 'relative', minHeight: images?.length ? undefined : 'clamp(360px, 46vw, 760px)', display: images?.length ? 'grid' : 'block', gridTemplateColumns: images?.length ? `repeat(${images.length}, 1fr)` : undefined, gap: '4px' }}>
         {images?.length ? images.map((src, i) => (
           <HeroPhoto key={i} src={src} alt={`${imageAlt} ${i + 1}`} preload sizes={`(min-width: 900px) ${Math.round(50 / images.length)}vw, ${Math.round(100 / images.length)}vw`}
             style={{ aspectRatio: '3 / 4' }} />
@@ -124,7 +131,7 @@ export default function SplitHero({
                 fadeFrame
                 sizes="(min-width: 900px) 13vw, 30vw"
                 style={{
-                  width: 'clamp(96px, 13vw, 210px)', aspectRatio: '3 / 4', borderRadius: '12px',
+                  width: fitPortrait ? 'clamp(96px, 7.5vw, 150px)' : 'clamp(96px, 13vw, 210px)', aspectRatio: '3 / 4', borderRadius: '12px',
                   border: '3px solid #fdfaf3', boxShadow: '0 18px 40px rgba(0,0,0,0.45)',
                   transform: `rotate(${i % 2 === 0 ? -5 : 4}deg) translateY(${i % 2 === 0 ? 0 : -18}px)`,
                   marginLeft: i === 0 ? 0 : 'clamp(-34px, -2.5vw, -18px)',
