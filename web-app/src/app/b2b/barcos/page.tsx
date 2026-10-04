@@ -50,9 +50,9 @@ export default function BarcosPage() {
       partnerKind="barco"
       eyebrow="Parcerias para Barcos e Marinas"
       title="Um presente a bordo que seus clientes vão lembrar"
-      intro="Doces finos da chef belga Dolly Van Dam, 100% vegetais e sem glúten, entregues no píer antes da saída, em embalagem dourada de presente."
-      heroScene="/retreats/Island with boat.webp"
-      heroTreats={['/box1.jpg', '/box2.jpg']}
+      intro="Doces finos da chef belga Dolly Van Dam, 100% vegetais e sem glúten, entregues no píer antes da saída, numa caixa kraft de presente."
+      heroScene="/assets/boat_deck_box.jpg"
+      heroTreats={[]}
       regionNote="Ubatuba (Saco da Ribeira) e Paraty"
       applyCta="Quero ser parceiro"
       optionsHeading="O que oferecemos"

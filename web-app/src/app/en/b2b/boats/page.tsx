@@ -53,9 +53,9 @@ export default function BoatsPage() {
         partnerKind="barco"
         eyebrow="Partnerships for Boats & Marinas"
         title="An on-board gift your guests will remember"
-        intro="Fine sweets by Belgian chef Dolly Van Dam, 100% plant-based and gluten-free, delivered to the pier before departure in gold gift wrapping."
-        heroScene="/retreats/Island with boat.webp"
-        heroTreats={['/box1.jpg', '/box2.jpg']}
+        intro="Fine sweets by Belgian chef Dolly Van Dam, 100% plant-based and gluten-free, delivered to the pier before departure in a kraft gift box."
+        heroScene="/assets/boat_deck_box.jpg"
+        heroTreats={[]}
         regionNote="Ubatuba (Saco da Ribeira) and Paraty"
         applyCta="Become a partner"
         optionsHeading="What we offer"

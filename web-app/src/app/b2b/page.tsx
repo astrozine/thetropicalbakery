@@ -71,7 +71,7 @@ const PARTNERSHIPS = [
     title: 'Barcos e Marinas',
     tagline:
       'Um presente a bordo que o cliente lembra: caixas de doces finos entregues no píer antes do passeio, para charters, marinas e agências.',
-    image: '/retreats/Island with boat.webp',
+    image: '/assets/boat_deck_box.jpg',
     treat: '/box1.jpg',
     emoji: '⛵',
     tags: ['Kit a Bordo', 'Entrega no Píer', 'Comissão'],
