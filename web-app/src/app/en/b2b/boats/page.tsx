@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import B2BPageLayout from '@/components/B2BPageLayout';
-import { BoatCopy, BoatDetails, BoatForWho } from '@/components/BoatPartnerSections';
+import { BoatCopy, BoatDetails, BoatForWho, BoatHeroExtra } from '@/components/BoatPartnerSections';
 
 // The English twin of /b2b/barcos. Same numbers to confirm with Andrew (R$249, 10–15%, 48 h): change both pages.
 
@@ -56,6 +56,7 @@ export default function BoatsPage() {
         intro="Fine sweets by Belgian chef Dolly Van Dam, 100% plant-based and gluten-free, delivered to the pier before departure in a kraft gift box."
         heroScene="/assets/boat_deck_box.jpg"
         heroPortrait
+        heroExtra={<BoatHeroExtra c={copy} />}
         heroTreats={['/box1.jpg', '/box2.jpg']}
         regionNote="Ubatuba (Saco da Ribeira) and Paraty"
         applyCta="Become a partner"

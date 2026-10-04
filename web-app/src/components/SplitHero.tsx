@@ -24,6 +24,11 @@ interface SplitHeroProps {
   accentImage?: string;
   /** Portrait treat photos layered as tilted prints over the main photo. */
   treats?: string[];
+  /**
+   * Extra content under the button, shown only on screens 1880px and wider, where a tall portrait
+   * photo leaves room for it. The text then starts at the top instead of floating in the middle.
+   */
+  extra?: React.ReactNode;
 }
 
 /**
@@ -32,7 +37,7 @@ interface SplitHeroProps {
  * thing seen. The photo is never overlaid or dimmed — that's the whole point.
  */
 export default function SplitHero({
-  eyebrow, title, intro, image, images, imageAlt, regionNote, itamambucaBadge, ctaHref, ctaLabel, ctaTopic, ctaLocale, accentImage, treats,
+  eyebrow, title, intro, image, images, imageAlt, regionNote, itamambucaBadge, ctaHref, ctaLabel, ctaTopic, ctaLocale, accentImage, treats, extra,
 }: SplitHeroProps) {
   const ctaStyle: React.CSSProperties = { alignSelf: 'flex-start', padding: '1rem 2.25rem', fontSize: '1rem', letterSpacing: '1px' };
   // "#ser-parceiro" jumps to the form on the same page; anything else is a WhatsApp link behind the gate.
@@ -44,7 +49,7 @@ export default function SplitHero({
     <section style={{ display: 'flex', flexWrap: 'wrap-reverse', background: '#3c2a21', overflow: 'hidden' }}>
       {/* Text panel */}
       <div style={{
-        flex: '1 1 460px', display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        flex: '1 1 460px', display: 'flex', flexDirection: 'column', justifyContent: extra ? 'flex-start' : 'center',
         padding: 'clamp(2rem, 6vw, 5.5rem) clamp(1.5rem, 5vw, 4.5rem)',
         position: 'relative',
       }}>
@@ -81,6 +86,12 @@ export default function SplitHero({
           >
             {ctaLabel}
           </WhatsAppGate>
+        )}
+        {extra && (
+          <>
+            <style>{`.sh-extra { display: none; } @media (min-width: 1880px) { .sh-extra { display: block; margin-top: 2.5rem; } }`}</style>
+            <div className="sh-extra">{extra}</div>
+          </>
         )}
       </div>
 

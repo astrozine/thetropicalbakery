@@ -24,6 +24,8 @@ interface B2BPageLayoutProps {
   heroScene: string;
   /** The scene photo is portrait (3:4): show it whole instead of cropping it to fill the panel. */
   heroPortrait?: boolean;
+  /** Shown in the hero under the button on wide screens (see SplitHero `extra`). */
+  heroExtra?: React.ReactNode;
   /** Portrait treat photos layered over the scene. */
   heroTreats: string[];
   optionsHeading?: string;
@@ -60,6 +62,7 @@ export default function B2BPageLayout({
   intro,
   heroScene,
   heroPortrait,
+  heroExtra,
   heroTreats,
   optionsHeading,
   options,
@@ -88,6 +91,7 @@ export default function B2BPageLayout({
         intro={intro}
         image={heroPortrait ? undefined : heroScene}
         images={heroPortrait ? [heroScene] : undefined}
+        extra={heroExtra}
         treats={heroTreats}
         imageAlt={title}
         regionNote={regionNote}

@@ -22,9 +22,42 @@ const h2: React.CSSProperties = {
   textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.6rem, 4vw, 2rem)', color: '#3c2a21', marginBottom: '2rem',
 };
 
+// "Para quem é" and "Por que vale a pena" sit in the hero beside the tall photo on wide screens
+// (BoatHeroExtra); there the page copies hide, so nothing is said twice. 1880px matches SplitHero's .sh-extra: below it the photo is shorter than the text would be.
+const HIDE_WIDE = `@media (min-width: 1880px) { .boat-hide-wide { display: none; } }`;
+
+const kicker: React.CSSProperties = {
+  display: 'block', color: '#d4af37', letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.9rem',
+};
+
+export function BoatHeroExtra({ c }: { c: BoatCopy }) {
+  return (
+    <div style={{ display: 'grid', gap: '1.75rem', maxWidth: '560px' }}>
+      <div>
+        <span style={kicker}>{c.forWhoTitle}</span>
+        <div style={{ display: 'grid', gap: '0.65rem' }}>
+          {c.forWho.map(w => (
+            <div key={w.text} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', border: '1px solid rgba(212,175,55,0.35)', background: 'rgba(253,250,243,0.05)', borderRadius: '12px', padding: '0.8rem 1rem' }}>
+              <span aria-hidden style={{ fontSize: '1.5rem', lineHeight: 1 }}>{w.icon}</span>
+              <span style={{ color: '#fdfaf3', lineHeight: 1.45 }}>{w.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <span style={kicker}>{c.whyTitle}</span>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '0.55rem', color: 'rgba(253,250,243,0.85)', lineHeight: 1.55 }}>
+          {c.why.map(line => <li key={line}><span style={{ color: '#d4af37' }}>✦</span> {line}</li>)}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 export function BoatForWho({ c }: { c: BoatCopy }) {
   return (
-    <section className="container px-4 max-w-5xl mx-auto" style={{ paddingTop: 'clamp(3rem, 7vw, 5rem)' }}>
+    <section className="container px-4 max-w-5xl mx-auto boat-hide-wide" style={{ paddingTop: 'clamp(3rem, 7vw, 5rem)' }}>
+      <style>{HIDE_WIDE}</style>
       <h2 style={h2}>{c.forWhoTitle}</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
         {c.forWho.map(w => (
@@ -42,7 +75,8 @@ export function BoatDetails({ c }: { c: BoatCopy }) {
   return (
     <>
       {/* Why it pays */}
-      <section className="container px-4 max-w-4xl mx-auto text-center" style={{ paddingBottom: 'clamp(3rem, 7vw, 4.5rem)' }}>
+      <style>{HIDE_WIDE}</style>
+      <section className="container px-4 max-w-4xl mx-auto text-center boat-hide-wide" style={{ paddingBottom: 'clamp(3rem, 7vw, 4.5rem)' }}>
         <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#d4af37', fontFamily: 'var(--font-heading)' }}>{c.whyTitle}</h3>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#594a42', lineHeight: 2, fontSize: '1.05rem' }}>
           {c.why.map(line => <li key={line}>✦ {line}</li>)}

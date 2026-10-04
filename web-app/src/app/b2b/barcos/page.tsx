@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import B2BPageLayout from '@/components/B2BPageLayout';
-import { BoatCopy, BoatDetails, BoatForWho } from '@/components/BoatPartnerSections';
+import { BoatCopy, BoatDetails, BoatForWho, BoatHeroExtra } from '@/components/BoatPartnerSections';
 
 // Still to confirm with Andrew: the R$ 249 price, the 10–15% commission and the 48 h notice.
 // The English page (/en/b2b/boats) repeats these numbers; change both.
@@ -53,6 +53,7 @@ export default function BarcosPage() {
       intro="Doces finos da chef belga Dolly Van Dam, 100% vegetais e sem glúten, entregues no píer antes da saída, numa caixa kraft de presente."
       heroScene="/assets/boat_deck_box.jpg"
       heroPortrait
+      heroExtra={<BoatHeroExtra c={copy} />}
       heroTreats={['/box1.jpg', '/box2.jpg']}
       regionNote="Ubatuba (Saco da Ribeira) e Paraty"
       applyCta="Quero ser parceiro"
