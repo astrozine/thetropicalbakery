@@ -100,10 +100,18 @@ export default function SplitHero({
       </div>
 
       {/* Photo */}
-      {/* One portrait photo: on wide screens it is sized to the window's height (146px = banner + menu), so it shows whole
-          without scrolling, and the text column takes the rest of the width. */}
-      {fitPortrait && <style>{`@media (min-width: 960px) { .sh-photo-fit { flex: 0 0 min(50%, calc((100svh - 146px) * 0.75)) !important; align-self: flex-start; } }`}</style>}
-      <div className={fitPortrait ? 'sh-photo-fit' : undefined} style={{ flex: '1 1 460px', position: 'relative', minHeight: images?.length ? undefined : 'clamp(360px, 46vw, 760px)', display: images?.length ? 'grid' : 'block', gridTemplateColumns: images?.length ? `repeat(${images.length}, 1fr)` : undefined, gap: '4px' }}>
+      {/* One portrait photo: on phones it is full-bleed like any other. On wide screens it floats, centred in the right half,
+          sized to the window's height (146px = banner + menu) so it shows whole, instead of hugging the edge and leaving the
+          middle of the page empty. */}
+      {fitPortrait && <style>{`.sh-fit-col { flex: 1 1 460px; display: flex; } .sh-photo-fit { flex: 1 1 auto; }
+        @media (min-width: 960px) {
+          .sh-fit-col { align-items: center; justify-content: center; padding: 3rem clamp(1.5rem, 4vw, 4.5rem) 3rem 0; }
+          .sh-photo-fit { flex: 0 0 auto; width: min(100%, calc((100svh - 146px - 6rem) * 0.75)); }
+          .sh-photo-fit > :first-child { border-radius: 18px; overflow: hidden; box-shadow: 0 30px 70px rgba(0,0,0,0.5); }
+          .sh-photo-fit > .sh-frame { border-radius: 10px; }
+        }`}</style>}
+      <PhotoColumn fit={fitPortrait}>
+      <div className={fitPortrait ? 'sh-photo-fit' : undefined} style={{ flex: fitPortrait ? undefined : '1 1 460px', position: 'relative', minHeight: images?.length ? undefined : 'clamp(360px, 46vw, 760px)', display: images?.length ? 'grid' : 'block', gridTemplateColumns: images?.length ? `repeat(${images.length}, 1fr)` : undefined, gap: '4px' }}>
         {images?.length ? images.map((src, i) => (
           <HeroPhoto key={i} src={src} alt={`${imageAlt} ${i + 1}`} preload sizes={`(min-width: 900px) ${Math.round(50 / images.length)}vw, ${Math.round(100 / images.length)}vw`}
             style={{ aspectRatio: '3 / 4' }} />
@@ -112,7 +120,7 @@ export default function SplitHero({
             style={{ position: 'absolute', inset: 0 }} />
         )}
         {/* Thin gold inner frame */}
-        <div style={{ position: 'absolute', inset: 'clamp(12px, 1.6vw, 22px)', border: '1px solid rgba(212,175,55,0.7)', pointerEvents: 'none' }} />
+        <div className="sh-frame" style={{ position: 'absolute', inset: 'clamp(12px, 1.6vw, 22px)', border: '1px solid rgba(212,175,55,0.7)', pointerEvents: 'none' }} />
         {accentImage && (
           <HeroPhoto src={accentImage} alt="" preload fadeFrame sizes="(min-width: 900px) 16vw, 30vw" style={{
             position: 'absolute', left: 'clamp(24px, 4vw, 56px)', bottom: 'clamp(24px, 4vw, 56px)',
@@ -146,6 +154,12 @@ export default function SplitHero({
           </div>
         )}
       </div>
+      </PhotoColumn>
     </section>
   );
+}
+
+/** The centring column around a fitted portrait photo; nothing for the other layouts. */
+function PhotoColumn({ fit, children }: { fit: boolean; children: React.ReactNode }) {
+  return fit ? <div className="sh-fit-col">{children}</div> : <>{children}</>;
 }

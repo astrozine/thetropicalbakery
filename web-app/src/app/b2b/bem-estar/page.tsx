@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import B2BPageLayout from '@/components/B2BPageLayout';
+import WellnessScenes from '@/components/WellnessScenes';
 
 // The mini fridge is still an idea (no fridges, no stocking routine yet): it is offered here as a
 // pilot people can sign up for, never as something ready. Change the wording once it exists.
@@ -45,7 +46,9 @@ export default function BemEstarPage() {
         'Um diferencial que seus alunos comentam e trazem os amigos para provar.',
       ]}
       whatsappHref="https://wa.me/5511932119196?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20uma%20parceria%20para%20meu%20espa%C3%A7o%20de%20bem-estar!"
-      galleryImages={['/assets/wellness_street_table.jpg', '/assets/wellness_studio_reception.jpg', '/assets/wellness_studio_box.jpg', '/box1.jpg', '/menu-items/1000215018.jpg', '/menu-items/20250914_132214.jpg', '/box3.jpg']}
-    />
+      galleryImages={['/box1.jpg', '/menu-items/1000215018.jpg', '/menu-items/20250914_132214.jpg', '/box3.jpg']}
+    >
+      <WellnessScenes />
+    </B2BPageLayout>
   );
 }
