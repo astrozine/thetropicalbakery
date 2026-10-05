@@ -46,6 +46,22 @@ const SALE_LABEL: Record<SaleState, { text: string; color: string; bg: string }>
 /** The steps of the box editor, one question per screen. */
 const STEPS = ['Como vender', 'Doces', 'Nome e fotos', 'Entregas', 'Quantidade', 'Revisar'] as const;
 
+/**
+ * The editor's work so far, kept in this browser as it is typed. If the page reloads or crashes
+ * mid-way (a lost connection, a closed tab), the box comes back instead of having to start over.
+ */
+const DRAFT_KEY = 'tb-admin-box-draft';
+interface BoxDraft {
+  savedAt: number; step: number; editingId: string | null; title: string; description: string; imageUrl: string;
+  batchDateLabel: string; totalQuantity: number; soldQuantity: number; price: number; isActive: boolean;
+  items: BoxItem[]; gallery: string[]; deliveryFrom: string; deliveryUntil: string; ordersOpen: string;
+  ordersClose: string; saleMode: 'stock' | 'presale';
+}
+const readDraft = (): BoxDraft | null => {
+  try { const raw = localStorage.getItem(DRAFT_KEY); return raw ? JSON.parse(raw) as BoxDraft : null; } catch { return null; }
+};
+const clearDraft = () => { try { localStorage.removeItem(DRAFT_KEY); } catch { /* storage off: nothing kept */ } };
+
 export default function AdminCaixas() {
   const [boxes, setBoxes] = useState<TastingBox[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,6 +102,34 @@ export default function AdminCaixas() {
   const [announce, setAnnounce] = useState<{ title: string; treats: string; quantity: number } | null>(null);
   /** What is missing on this step, said in the footer next to the button. */
   const [formProblem, setFormProblem] = useState('');
+  /** An unfinished box from an earlier visit, offered back on the home screen. */
+  const [draft, setDraft] = useState<BoxDraft | null>(null);
+
+  useEffect(() => { setDraft(readDraft()); }, []);
+
+  // Keep the editor's work in this browser while it is open.
+  useEffect(() => {
+    if (view !== 'edit') return;
+    const d: BoxDraft = {
+      savedAt: Date.now(), step, editingId, title, description, imageUrl, batchDateLabel, totalQuantity, soldQuantity,
+      price, isActive, items, gallery, deliveryFrom, deliveryUntil, ordersOpen, ordersClose, saleMode,
+    };
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } catch { /* storage off: nothing kept */ }
+  }, [view, step, editingId, title, description, imageUrl, batchDateLabel, totalQuantity, soldQuantity, price, isActive, items, gallery, deliveryFrom, deliveryUntil, ordersOpen, ordersClose, saleMode]);
+
+  const resumeDraft = (d: BoxDraft) => {
+    setEditingId(d.editingId); setTitle(d.title); setDescription(d.description); setImageUrl(d.imageUrl);
+    setBatchDateLabel(d.batchDateLabel); setTotalQuantity(d.totalQuantity); setSoldQuantity(d.soldQuantity);
+    setPrice(d.price); setIsActive(d.isActive); setItems(d.items || []); setGallery(d.gallery || []);
+    setDeliveryFrom(d.deliveryFrom); setDeliveryUntil(d.deliveryUntil); setOrdersOpen(d.ordersOpen);
+    setOrdersClose(d.ordersClose); setSaleMode(d.saleMode);
+    setFormProblem(''); setStep(Math.min(STEPS.length - 1, Math.max(0, d.step || 0)));
+    setDraft(null); setView('edit'); window.scrollTo({ top: 0 });
+  };
+  const discardDraft = async () => {
+    if (!(await brandConfirm('Apagar a caixa que ficou pela metade?', { danger: true, confirmLabel: 'Sim, apagar' }))) return;
+    clearDraft(); setDraft(null);
+  };
 
   useEffect(() => {
     fetchBoxes();
@@ -344,6 +388,8 @@ export default function AdminCaixas() {
       const one = hiddenInMenu.length === 1;
       brandAlert(`${hiddenInMenu.map(n => `"${n}"`).join(', ')} ${one ? 'entrou' : 'entraram'} no Menu de Eventos ${one ? 'escondido' : 'escondidos'}, porque ainda não ${one ? 'tem' : 'têm'} preço. Coloque o preço em Menu de Eventos para ${one ? 'ele aparecer' : 'eles aparecerem'}.`);
     }
+    clearDraft();
+    setDraft(null);
     setAnnounce(isActive ? { title, treats: cleanItems.map(i => `${i.emoji} ${i.name}`).join('\n'), quantity: totalQuantity } : null);
     resetForm();
     setView('home');
@@ -417,7 +463,7 @@ export default function AdminCaixas() {
           <div className="bx-flow__top">
             <span style={{ fontWeight: 800 }}>{editingId ? 'Editando a caixa' : 'Nova caixa'}</span>
             <button type="button" className="bx-btn bx-btn--ghost" onClick={async () => {
-              if (await brandConfirm('Sair sem salvar? O que você mudou aqui se perde.', { confirmLabel: 'Sair sem salvar' })) { resetForm(); setView('home'); }
+              if (await brandConfirm('Sair sem salvar? O que você mudou aqui se perde.', { confirmLabel: 'Sair sem salvar' })) { clearDraft(); setDraft(null); resetForm(); setView('home'); }
             }}>✕ Sair</button>
           </div>
           <div className="bx-progress" aria-hidden>
@@ -688,6 +734,19 @@ export default function AdminCaixas() {
         </div>
         <button type="button" className="bx-btn bx-btn--dark" onClick={() => startNew()}>＋ Nova caixa</button>
       </div>
+
+      {draft && (
+        <div role="status" className="bx-banner" style={{ background: '#fff8e6', border: '1px solid #f0d09a', color: '#8a5a00' }}>
+          <div style={{ lineHeight: 1.6 }}>
+            <strong>📝 Uma caixa ficou pela metade{draft.title.trim() ? <>: “{draft.title.trim()}”</> : null}.</strong><br />
+            {draft.items.length} {draft.items.length === 1 ? 'doce' : 'doces'} já preenchidos. Tudo o que você fez está guardado.
+          </div>
+          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <button type="button" className="bx-btn bx-btn--gold" onClick={() => resumeDraft(draft)}>Continuar de onde parei</button>
+            <button type="button" className="bx-btn bx-btn--ghost" onClick={discardDraft}>Apagar</button>
+          </div>
+        </div>
+      )}
 
       {announce && (
         <div role="status" className="bx-banner bx-banner--ok">

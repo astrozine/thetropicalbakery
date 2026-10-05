@@ -55,6 +55,30 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col">
+        {/*
+          The language switcher (Google Translate, below) swaps the page's text nodes for its own.
+          When React later adds or removes a bit of text (a "✓" on an allergen, the date summary),
+          it can't find the node it wrote and the whole page goes blank, losing a half-filled form.
+          Let those two DOM calls skip a node that is no longer where React left it (facebook/react#11538).
+        */}
+        <Script id="translate-dom-guard" strategy="beforeInteractive">
+          {`
+            (function () {
+              if (typeof Node !== 'function' || !Node.prototype || Node.prototype.__tbGuard) return;
+              Node.prototype.__tbGuard = true;
+              var removeChild = Node.prototype.removeChild;
+              Node.prototype.removeChild = function (child) {
+                if (child.parentNode !== this) return child;
+                return removeChild.apply(this, arguments);
+              };
+              var insertBefore = Node.prototype.insertBefore;
+              Node.prototype.insertBefore = function (newNode, referenceNode) {
+                if (referenceNode && referenceNode.parentNode !== this) return this.appendChild(newNode);
+                return insertBefore.apply(this, arguments);
+              };
+            })();
+          `}
+        </Script>
         <Providers>
           <Navigation />
           <CartDrawer />
