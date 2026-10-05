@@ -17,6 +17,8 @@ export interface BoatCopy {
   howTitle: string;
   steps: string[];
   note: string;
+  /** Alt text for the photo of guests sharing a box on board. */
+  photoAlt: string;
 }
 
 const h2: React.CSSProperties = {
@@ -75,6 +77,13 @@ export function BoatForWho({ c }: { c: BoatCopy }) {
 export function BoatDetails({ c }: { c: BoatCopy }) {
   return (
     <>
+      {/* Guests sharing a box on board: what the partner is really selling */}
+      <figure className="container px-4 max-w-5xl mx-auto" style={{ margin: '0 auto', paddingBottom: 'clamp(3rem, 7vw, 4.5rem)' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/assets/boat_guests_box.jpg" alt={c.photoAlt} loading="lazy" decoding="async" width={1024} height={572}
+          style={{ display: 'block', width: '100%', height: 'auto', borderRadius: '18px', border: '3px solid #fdfaf3', boxShadow: '0 0 0 1px rgba(212,175,55,0.6), 0 24px 50px rgba(60,42,33,0.22)' }} />
+      </figure>
+
       {/* Why it pays */}
       <style>{HIDE_WIDE}</style>
       <section className="container px-4 max-w-4xl mx-auto text-center boat-hide-wide" style={{ paddingBottom: 'clamp(3rem, 7vw, 4.5rem)' }}>

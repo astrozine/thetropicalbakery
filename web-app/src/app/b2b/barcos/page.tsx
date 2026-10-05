@@ -41,6 +41,7 @@ const copy: BoatCopy = {
     'A Dolly liga pelo WhatsApp para combinar os detalhes',
     'Você recebe acesso ao portal de parceiros para fazer pedidos e acompanhar suas comissões',
   ],
+  photoAlt: 'Três amigos rindo a bordo de um veleiro, provando doces de uma caixa kraft The Tropical Bakery',
   note: 'Nenhuma receita leva glúten, mas a cozinha não é certificada: pode haver traços. Doces com chocolate vegano aparecem marcados.',
 };
 

@@ -41,6 +41,7 @@ const copy: BoatCopy = {
     'Dolly calls you on WhatsApp to agree the details',
     'You get access to the partner portal to order and track your commissions',
   ],
+  photoAlt: 'Three friends laughing on board a sailboat, tasting sweets from a The Tropical Bakery kraft box',
   note: 'None of our recipes contain gluten, but the kitchen is not certified, so traces are possible. Sweets with vegan chocolate are marked.',
 };
 
