@@ -15,7 +15,7 @@ export default function BemEstarPage() {
   return (
     <B2BPageLayout
       partnerKind="bemestar"
-      eyebrow="Parcerias para Bem-Estar"
+      eyebrow="Parcerias para Yoga, Pilates e Academias"
       title="O doce que combina com quem se cuida"
       intro="Estúdios de yoga e pilates, academias, retiros e spas: seus alunos e clientes procuram algo gostoso que não desfaça o treino. Doces da chef belga Dolly, 100% vegetais, sem glúten e sem açúcar refinado, com o açúcar e a cafeína de cada um informados às claras."
       heroScene="/assets/wellness_pilates_door.jpg"
