@@ -13,6 +13,11 @@ export default function PousadasPage() {
       regionNote="Atendemos toda a região: Itamambuca, Ubatuba, praias vizinhas e eventos em Paraty."
       options={[
         {
+          icon: '🎁',
+          title: 'Welcome Box no Quarto',
+          description: 'Uma caixinha de doces da semana esperando o hóspede na suíte, com um cartão da sua pousada. O primeiro "uau" da estadia, e a primeira foto que vai para o Instagram.',
+        },
+        {
           icon: '🧊',
           title: 'Mini Fridge The Tropical Bakery',
           description: 'Uma geladeira de exposição com nossa marca na área comum ou recepção, sempre abastecida. O hóspede se serve, você lucra sem esforço extra.',

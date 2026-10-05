@@ -60,6 +60,7 @@ export default function Footer() {
             <li><Link href="/b2b/restaurants" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Restaurantes</Link></li>
             <li><Link href="/b2b/bakeries" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Padarias</Link></li>
             <li><Link href="/b2b/barcos" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Barcos e Marinas</Link></li>
+            <li><Link href="/b2b/bem-estar" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Yoga, Academias e Spas</Link></li>
           </ul>
         </div>
         <div>

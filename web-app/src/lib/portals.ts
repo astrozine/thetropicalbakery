@@ -1,6 +1,6 @@
 /** Shared types and labels for the two private areas: partners (B2B) and workers (equipe). */
 
-export type PartnerKind = 'hotel' | 'pousada' | 'airbnb' | 'restaurante' | 'padaria' | 'barco' | 'afiliado' | 'outro';
+export type PartnerKind = 'hotel' | 'pousada' | 'airbnb' | 'restaurante' | 'padaria' | 'barco' | 'bemestar' | 'afiliado' | 'outro';
 export type PartnerStatus = 'pendente' | 'ativo' | 'pausado';
 
 export interface Partner {
@@ -38,6 +38,7 @@ export const PARTNER_KINDS: { id: PartnerKind; label: string; emoji: string }[] 
   { id: 'restaurante', label: 'Restaurante', emoji: '🍽️' },
   { id: 'padaria', label: 'Padaria / café', emoji: '🥐' },
   { id: 'barco', label: 'Barco / charter / marina', emoji: '⛵' },
+  { id: 'bemestar', label: 'Yoga / pilates / academia / spa', emoji: '🧘' },
   { id: 'afiliado', label: 'Afiliado (indica e ganha)', emoji: '🤝' },
   { id: 'outro', label: 'Outro', emoji: '✨' },
 ];

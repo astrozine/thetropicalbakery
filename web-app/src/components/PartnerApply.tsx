@@ -87,7 +87,7 @@ const COPY = {
 /** The kind names in English; the database and the admin keep the Portuguese ones. */
 const KIND_EN: Record<PartnerKind, string> = {
   hotel: 'Hotel', pousada: 'Guesthouse (pousada)', airbnb: 'Airbnb / holiday rental', restaurante: 'Restaurant',
-  padaria: 'Bakery / café', barco: 'Boat / charter / marina', afiliado: 'Affiliate (refer and earn)', outro: 'Other',
+  padaria: 'Bakery / café', barco: 'Boat / charter / marina', bemestar: 'Yoga / pilates / gym / spa', afiliado: 'Affiliate (refer and earn)', outro: 'Other',
 };
 
 /** The other partnership pages, shown as a quiet rail beside the form on wide screens. */
@@ -98,6 +98,7 @@ const OTHER_PARTNERSHIPS: { kind: PartnerKind; href: string; emoji: string; labe
   { kind: 'restaurante', href: '/b2b/restaurants', emoji: '🍽️', label: 'Restaurantes' },
   { kind: 'padaria', href: '/b2b/bakeries', emoji: '🥐', label: 'Padarias e cafés' },
   { kind: 'barco', href: '/b2b/barcos', emoji: '⛵', label: 'Barcos e Marinas' },
+  { kind: 'bemestar', href: '/b2b/bem-estar', emoji: '🧘', label: 'Yoga, academias e spas' },
   { kind: 'afiliado', href: '/b2b/affiliates', emoji: '🤝', label: 'Afiliados' },
   { kind: 'outro', href: '/b2b/travel-managers', emoji: '✈️', label: 'Agências e grupos' },
 ];

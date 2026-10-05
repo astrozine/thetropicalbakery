@@ -113,6 +113,7 @@ export default function Navigation() {
     { name: 'Restaurantes', path: '/b2b/restaurants' },
     { name: 'Padarias', path: '/b2b/bakeries' },
     { name: 'Barcos e Marinas', path: '/b2b/barcos' },
+    { name: 'Yoga, Academias e Spas', path: '/b2b/bem-estar' },
     { name: 'Travel Managers', path: '/b2b/travel-managers' },
     { name: 'Afiliados', path: '/b2b/affiliates' },
     // Not a B2B account, but it belongs in the same "ways to partner with us"

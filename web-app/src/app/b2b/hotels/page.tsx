@@ -12,6 +12,11 @@ export default function HotelsPage() {
       heroTreats={["/b2b-hero/treat-0.jpg", "/b2b-hero/treat-1.jpg"]}
       options={[
         {
+          icon: '🎁',
+          title: 'Welcome Box no Quarto',
+          description: 'Uma caixinha de doces finos esperando o hóspede no quarto, com um cartão de boas-vindas do seu hotel. Para suítes, lua de mel, aniversários ou todos os check-ins. Você nos diz quantas chegadas tem, a gente entrega pronto.',
+        },
+        {
           icon: '🧊',
           title: 'Mini Fridge The Tropical Bakery',
           description: 'Uma geladeira de exposição com a nossa marca, abastecida semanalmente, posicionada na recepção, no lounge ou na sala de café. O hóspede compra na hora, você fica com a margem — dinheiro rápido, sem esforço da sua equipe.',

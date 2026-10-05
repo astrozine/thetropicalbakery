@@ -6,7 +6,7 @@ import WhatsAppGate from '@/components/WhatsAppGate';
 export const metadata: Metadata = {
   title: 'Todas as Parcerias | The Tropical Bakery',
   description:
-    'Hotéis, pousadas, Airbnbs, restaurantes, padarias, travel managers e afiliados — conheça todas as formas de crescer junto com a The Tropical Bakery em Itamambuca e Ubatuba.',
+    'Hotéis, pousadas, Airbnbs, restaurantes, padarias, barcos, estúdios de yoga, academias, spas, travel managers e afiliados — conheça todas as formas de crescer junto com a The Tropical Bakery em Itamambuca e Ubatuba.',
 };
 
 const PARTNERSHIPS = [
@@ -15,22 +15,22 @@ const PARTNERSHIPS = [
     eyebrow: 'Hospedagem · Premium',
     title: 'Hotéis',
     tagline:
-      'Uma The Tropical Bakery dentro do seu hotel — mini-fridge de exposição, café da manhã artesanal e pedido por QR code em cada quarto. Receita extra sem esforço da sua equipe.',
+      'Uma The Tropical Bakery dentro do seu hotel — welcome box esperando no quarto, mini-fridge de exposição, café da manhã artesanal e pedido por QR code. Receita extra sem esforço da sua equipe.',
     image: '/assets/realistic_hotel.jpg',
     treat: '/b2b-hero/treat-1.jpg',
     emoji: '🏨',
-    tags: ['Mini Fridge', 'Café da Manhã', 'QR Code'],
+    tags: ['Welcome Box', 'Mini Fridge', 'Café da Manhã', 'QR Code'],
   },
   {
     slug: '/b2b/pousadas',
     eyebrow: 'Hospedagem · Boutique',
     title: 'Pousadas',
     tagline:
-      'Café da manhã inesquecível que vira avaliação 5 estrelas — ou uma mini-loja que se paga sozinha. Ideal para quem já oferece hospitalidade de verdade.',
+      'Uma welcome box na suíte, um café da manhã inesquecível que vira avaliação 5 estrelas, ou uma mini-loja que se paga sozinha. Ideal para quem já oferece hospitalidade de verdade.',
     image: '/assets/glamorous_pousada_1789884603550.jpg',
     treat: '/b2b-hero/treat-9.jpg',
     emoji: '🌿',
-    tags: ['Mini Fridge', 'Café da Manhã', 'QR Code'],
+    tags: ['Welcome Box', 'Mini Fridge', 'Café da Manhã', 'QR Code'],
   },
   {
     slug: '/b2b/airbnbs',
@@ -75,6 +75,17 @@ const PARTNERSHIPS = [
     treat: '/box1.jpg',
     emoji: '⛵',
     tags: ['Kit a Bordo', 'Entrega no Píer', 'Comissão'],
+  },
+  {
+    slug: '/b2b/bem-estar',
+    eyebrow: 'Bem-Estar · Yoga, Pilates, Academias e Spas',
+    title: 'Yoga, Academias e Spas',
+    tagline:
+      'Um doce que combina com quem se cuida: 100% vegetal, sem glúten e sem açúcar refinado, entregue para depois da aula, em welcome boxes de retiros e spa days.',
+    image: '/retreats/real-cachoeira.jpg',
+    treat: '/b2b-hero/treat-5.jpg',
+    emoji: '🧘',
+    tags: ['Depois da Aula', 'Welcome Box', 'Retiros e Spa Day'],
   },
   {
     slug: '/b2b/travel-managers',
@@ -143,7 +154,7 @@ export default function TodasAsParcerias() {
           cabe em muitos formatos. Conheça cada um e descubra qual é o seu.
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', justifyContent: 'center' }}>
-          {['🏨 Hotéis', '🌿 Pousadas', '🏡 Airbnbs', '🍽️ Restaurantes', '🥐 Padarias', '✈️ Travel Managers', '🔗 Afiliados'].map(t => (
+          {['🏨 Hotéis', '🌿 Pousadas', '🏡 Airbnbs', '🍽️ Restaurantes', '🥐 Padarias', '⛵ Barcos', '🧘 Yoga e Spas', '✈️ Travel Managers', '🔗 Afiliados'].map(t => (
             <span key={t} style={{
               background: 'rgba(60,42,33,0.1)',
               color: '#3c2a21',
