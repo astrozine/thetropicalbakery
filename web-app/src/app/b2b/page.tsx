@@ -82,7 +82,7 @@ const PARTNERSHIPS = [
     title: 'Yoga, Academias e Spas',
     tagline:
       'Um doce que combina com quem se cuida: 100% vegetal, sem glúten e sem açúcar refinado, entregue para depois da aula, em welcome boxes de retiros e spa days.',
-    image: '/retreats/real-cachoeira.jpg',
+    image: '/assets/wellness_street_table.jpg',
     treat: '/b2b-hero/treat-5.jpg',
     emoji: '🧘',
     tags: ['Depois da Aula', 'Welcome Box', 'Retiros e Spa Day'],
