@@ -17,7 +17,7 @@ export default function BemEstarPage() {
       eyebrow="Parcerias para Bem-Estar"
       title="O doce que combina com quem se cuida"
       intro="Estúdios de yoga e pilates, academias, retiros e spas: seus alunos e clientes procuram algo gostoso que não desfaça o treino. Doces da chef belga Dolly, 100% vegetais, sem glúten e sem açúcar refinado, com o açúcar e a cafeína de cada um informados às claras."
-      heroScene="/assets/wellness_studio_box.jpg"
+      heroScene="/assets/wellness_pilates_door.jpg"
       heroPortrait
       heroTreats={['/b2b-hero/treat-5.jpg', '/b2b-hero/treat-2.jpg']}
       regionNote="Itamambuca, Ubatuba e praias vizinhas"
@@ -45,7 +45,7 @@ export default function BemEstarPage() {
         'Um diferencial que seus alunos comentam e trazem os amigos para provar.',
       ]}
       whatsappHref="https://wa.me/5511932119196?text=Ol%C3%A1%2C%20tenho%20interesse%20em%20uma%20parceria%20para%20meu%20espa%C3%A7o%20de%20bem-estar!"
-      galleryImages={['/box1.jpg', '/menu-items/1000215018.jpg', '/menu-items/20250914_132214.jpg', '/box3.jpg']}
+      galleryImages={['/assets/wellness_street_table.jpg', '/assets/wellness_studio_reception.jpg', '/assets/wellness_studio_box.jpg', '/box1.jpg', '/menu-items/1000215018.jpg', '/menu-items/20250914_132214.jpg', '/box3.jpg']}
     />
   );
 }
