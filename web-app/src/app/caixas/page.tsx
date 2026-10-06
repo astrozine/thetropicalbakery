@@ -259,9 +259,9 @@ export default function CaixasPage() {
         </div>
       </section>
 
-      {isPre && <PresaleSteps key={activeBox.id} closesOn={sale?.closesOn ?? null} windowLabel={sale?.windowLabel || ''} />}
+      {isPre && <PresaleSteps key={`steps-${activeBox.id}`} closesOn={sale?.closesOn ?? null} windowLabel={sale?.windowLabel || ''} />}
 
-      {activeBox.items && activeBox.items.length > 0 && <BoxContents key={activeBox.id} items={activeBox.items} />}
+      {activeBox.items && activeBox.items.length > 0 && <BoxContents key={`contents-${activeBox.id}`} items={activeBox.items} />}
 
       {/* How to keep them: buyers who plan ahead (gifts, later in the week) need to know the freezer keeps them 4 weeks. */}
       <section style={{ padding: '1.5rem 1rem 0' }}>
@@ -279,7 +279,7 @@ export default function CaixasPage() {
 
       {/* The other boxes on sale: one or the other, or both in the same checkout. */}
       {others.length > 0 && (
-        <section key={activeBox.id} style={{ padding: '0 1rem clamp(3rem, 7vw, 4.5rem)' }}>
+        <section key={`others-${activeBox.id}`} style={{ padding: '0 1rem clamp(3rem, 7vw, 4.5rem)' }}>
           <BoxCards boxes={others} prices={sizePrices} onPick={id => pick(id, true)}
             heading={others.length === 1 ? 'Também à venda esta semana' : 'Também à venda'}
             sub="Peça uma, a outra, ou as duas: vão juntas no mesmo pedido e na mesma entrega." />
@@ -319,7 +319,7 @@ export default function CaixasPage() {
       <Marquee text="CAIXA DE DEGUSTAÇÃO SEMANAL ✦ FEITA À MÃO EM ITAMAMBUCA ✦ " speed={120} />
 
       {/* Phones only: keeps the price and one tap to order under the thumb the whole way down. */}
-      <MobileBuyBar key={activeBox.id}
+      <MobileBuyBar key={`buybar-${activeBox.id}`}
         kicker={`${isPre ? 'Pré-venda' : limited && remainingQuantity > 0 ? `Restam ${remainingQuantity}` : special ? 'Edição especial' : 'Caixa da semana'}${own ? '' : ' · a partir de'}`}
         price={`R$ ${Math.round(own ?? Math.min(...TREAT_COUNTS.map(n => sizePrices[n])))}`}
         note={isPre || sale?.windowLabel ? (sale?.windowLabel ? `entregas ${sale.windowLabel}` : undefined) : activeBox.batch_date_label ? formatBatchDate(activeBox.batch_date_label) : undefined}
