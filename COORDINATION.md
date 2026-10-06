@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **35**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **41**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -149,6 +149,13 @@ Verified live, 2026-09-26:
   so the nav's 🌐 picker sends people to the hand-written page on `/sweet-escape*`, and FR/DE/IT go to
   `/sweet-escape?tl=fr` (Google; FR/DE/IT get the English edition). Choosing the English edition while reading in another
   language (or through Google) shows "this edition is in English" and requires a tick before paying. The buyer's language rides on `orders.delivery_address` (`… · pt`) for the e-mails.
+- **Several boxes on sale at once (written 2026-10-06, `migration_40_special_boxes.sql` NOT run yet).** Besides the weekly ready box and
+  the pre-sale, Dolly can publish any number of **special editions** (`tasting_boxes.edition = 'special'`, e.g. Dia das Crianças), optionally
+  sold closed at their own price (`fixed_price`, charged by `createOrder`; null = the usual 2/4/6 sizes). A special never takes another box off
+  the site, never rolls over past its delivery days, and is ignored by `splitActive` / `nextBakeBox` (subscribers, kitchen tally). Every live
+  box shows in the home hero (`HeroLiveBoxes`), as its own card in the home box section, in the box switch at the top of `/caixas`
+  (`?caixa=<id>`; `?edicao=pre|pronta` still work), under "Também à venda" there, and as "Quer levar também?" at checkout (`BoxCards.tsx`).
+  Sort order in `sortLive()` (boxWindow.ts). Until migration 40 runs everything behaves as before and saving a special says to run it.
 - **Migration 21 is RUN**: `tasting_boxes.delivery_from` / `orders_open_from` answer.
 - **The delivery calendar runs out.** `delivery_schedule_rules` is EMPTY and `delivery_dates` only holds one-off days, so once the
   last one passes `selectableDates()` returns nothing, every box goes to `closed`, and the home page and `/caixas` show the

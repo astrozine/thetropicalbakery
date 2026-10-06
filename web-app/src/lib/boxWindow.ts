@@ -1,4 +1,5 @@
 import { parseISODate, toISODate } from '@/lib/deliverySchedule';
+import { TREAT_COUNTS, type BoxSizePrices } from '@/lib/boxSizes';
 
 /**
  * How a Degustation Box edition is offered (migration 21 added the dates):
@@ -16,6 +17,12 @@ import { parseISODate, toISODate } from '@/lib/deliverySchedule';
  *  - its delivery window never rolls over: it is delivered on the planned days or not at all;
  *  - orders_close_on DOES close it (the day Dolly needs the final count to bake).
  * When the batch is baked, the admin turns it into the ready box ('stock') with the extras as its stock.
+ *
+ * SPECIAL EDITIONS (migration 40, edition = 'special'): themed boxes (Dia das Crianças, Natal...) on sale
+ * NEXT TO the weekly ones, any number of them. Like a pre-sale, a special box is delivered only inside
+ * its own delivery days (it never rolls over) and orders_close_on, if set, closes it. It may be sold as
+ * it is at its own price (fixed_price) instead of in the 2 / 4 / 6 sizes. Subscribers and the weekly
+ * kitchen tally ignore it: splitActive() and nextBakeBox() only look at weekly boxes.
  */
 export interface BoxWindowFields {
   total_quantity: number;
@@ -26,21 +33,60 @@ export interface BoxWindowFields {
   orders_close_on?: string | null;
   /** 'stock' (boxes already made) or 'presale' (next week's, made to order). Missing before migration 35 = stock. */
   sale_mode?: string | null;
+  /** 'weekly' or 'special' (a themed box next to the weekly ones). Missing before migration 40 = weekly. */
+  edition?: string | null;
 }
 
 export const isPresale = (b: { sale_mode?: string | null } | null | undefined) => b?.sale_mode === 'presale';
+export const isSpecial = (b: { edition?: string | null } | null | undefined) => b?.edition === 'special';
+
+/** Sold as it is at its own price (migration 40), or null = the usual 2 / 4 / 6 sizes. */
+export const fixedPrice = (b: { fixed_price?: number | string | null } | null | undefined): number | null => {
+  const n = Number(b?.fixed_price);
+  return b?.fixed_price != null && n > 0 ? n : null;
+};
+
+/** "R$ 79" for a box sold as it is, "a partir de R$ 59" for the usual sizes. */
+export function boxPriceText(box: { fixed_price?: number | string | null }, prices: BoxSizePrices): string {
+  const own = fixedPrice(box);
+  return own ? `R$ ${Math.round(own)}` : `a partir de R$ ${Math.round(Math.min(...TREAT_COUNTS.map(n => prices[n])))}`;
+}
+
+type EditionFields ={ sale_mode?: string | null; edition?: string | null };
+
+/** The words on a box's badge: "Edição especial", "Pré-venda" or "Pronta entrega". */
+export const editionLabel = (b: EditionFields) =>
+  isSpecial(b) ? 'Edição especial' : isPresale(b) ? 'Pré-venda' : 'Pronta entrega';
+export const editionIcon = (b: EditionFields) => (isSpecial(b) ? '🎁' : isPresale(b) ? '🗓️' : '🧁');
+
+/** "Chegada da Primavera: Sensações Amarelas" -> "Chegada da Primavera" (for small cards and switches). */
+export const shortTitle = (title: string) => {
+  const i = title.indexOf(':');
+  return (i > 0 ? title.slice(0, i) : title).trim();
+};
 
 /**
- * The active boxes split into the ready one and the pre-sale one (at most one of each is live).
+ * The order boxes are shown in when several are live: ones that can be ordered right now first; among
+ * them the special editions (the newest announcement leads), then the ready box, then the pre-sale.
+ * `open(b)` says whether a box can be ordered today (the caller knows the calendar, this file doesn't).
+ */
+export function sortLive<T extends EditionFields & { created_at?: string | null }>(rows: T[], open: (b: T) => boolean): T[] {
+  const rank = (b: T) => (open(b) ? 0 : 3) + (isSpecial(b) ? 0 : isPresale(b) ? 2 : 1);
+  return [...rows].sort((a, b) => rank(a) - rank(b) || String(b.created_at || '').localeCompare(String(a.created_at || '')));
+}
+
+/**
+ * The active WEEKLY boxes split into the ready one and the pre-sale one (at most one of each is live).
+ * Special editions are left out: they are extra boxes, not the box of the week.
  * Works on a database without migration 35 too: every box is then the ready one.
  */
-export function splitActive<T extends { sale_mode?: string | null }>(rows: T[] | null | undefined): { stock: T | null; presale: T | null } {
-  const list = rows || [];
+export function splitActive<T extends EditionFields>(rows: T[] | null | undefined): { stock: T | null; presale: T | null } {
+  const list = (rows || []).filter(b => !isSpecial(b));
   return { stock: list.find(b => !isPresale(b)) ?? null, presale: list.find(b => isPresale(b)) ?? null };
 }
 
 /** The box the kitchen bakes next (and subscribers choose treats for): next week's pre-sale if there is one. */
-export const nextBakeBox = <T extends { sale_mode?: string | null }>(rows: T[] | null | undefined): T | null => {
+export const nextBakeBox = <T extends EditionFields>(rows: T[] | null | undefined): T | null => {
   const { stock, presale } = splitActive(rows);
   return presale ?? stock;
 };
@@ -49,6 +95,7 @@ export type SaleState = 'open' | 'soon' | 'closed' | 'soldout';
 
 export const hasDeliveryWindow = (b: BoxWindowFields) => !!(b.delivery_from || b.delivery_until);
 
+/** `presale` = the window never rolls over (a pre-sale, or a special edition: its own days or not at all). */
 export interface DayRange { from?: string | null; until?: string | null; presale?: boolean }
 
 /**
@@ -74,7 +121,7 @@ export function windowedDates(dates: string[], w: DayRange, all: string[] = date
 export const inDeliveryWindow = (dates: string[], b: BoxWindowFields, all: string[] = dates) =>
   windowedDates(dates, boxRange(b), all);
 
-export const boxRange = (b: BoxWindowFields): DayRange => ({ from: b.delivery_from, until: b.delivery_until, presale: isPresale(b) });
+export const boxRange = (b: BoxWindowFields): DayRange => ({ from: b.delivery_from, until: b.delivery_until, presale: isPresale(b) || isSpecial(b) });
 
 /**
  * Whether this box can be ordered today: on sale until it sells out (or is switched off, which
@@ -88,7 +135,8 @@ export function saleState(b: BoxWindowFields, choosable: string[] | null, today 
   if (b.total_quantity > 0 && b.sold_quantity >= b.total_quantity) return { state: 'soldout', opensOn };
   if (opensOn && today < opensOn) return { state: 'soon', opensOn };
   // A pre-sale stops taking orders on its deadline: after it Dolly is baking the count she has.
-  if (isPresale(b) && b.orders_close_on && today > b.orders_close_on) return { state: 'closed', opensOn };
+  // A special edition closes on its date too, when it has one.
+  if ((isPresale(b) || isSpecial(b)) && b.orders_close_on && today > b.orders_close_on) return { state: 'closed', opensOn };
   // Nothing at all to pick (the delivery calendar has no open day): can't take an order.
   if (choosable && choosable.length === 0) return { state: 'closed', opensOn };
   return { state: 'open', opensOn };

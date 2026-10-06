@@ -4,8 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import BoxesLeftBadge from '@/components/BoxesLeftBadge';
+import HeroLiveBoxes, { type HeroBox } from '@/components/HeroLiveBoxes';
 
-export default function ExplodingTreats({ boxesLeft = null }: { boxesLeft?: number | null }) {
+/** `liveBoxes`: every box that can be ordered now, listed in the hero card ("À venda agora"). */
+export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { boxesLeft?: number | null; liveBoxes?: HeroBox[] }) {
+  const cta = liveBoxes.length > 1 ? 'Ver as caixas' : 'Garanta a Sua Caixa';
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -115,8 +118,9 @@ export default function ExplodingTreats({ boxesLeft = null }: { boxesLeft?: numb
               ))}
             </div>
           </div>
+          <HeroLiveBoxes boxes={liveBoxes} />
           <Link href="/caixas" className="btn btn-primary" style={{ padding: '1rem', fontSize: '1.1rem', pointerEvents: 'auto', width: '100%', textAlign: 'center', borderRadius: '999px', boxShadow: '0 10px 20px rgba(212,175,55,0.3)' }}>
-            Garanta a Sua Caixa
+            {cta}
           </Link>
         </div>
 
@@ -204,7 +208,7 @@ export default function ExplodingTreats({ boxesLeft = null }: { boxesLeft?: numb
             position: 'relative',
           }}
         >
-          {boxesLeft !== null && boxesLeft > 0 && <BoxesLeftBadge remaining={boxesLeft} variant="sticker" />}
+          {liveBoxes.length <= 1 && boxesLeft !== null && boxesLeft > 0 && <BoxesLeftBadge remaining={boxesLeft} variant="sticker" />}
           <span style={{ display: 'inline-block', color: '#a6832b', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
             🌴 Itamambuca · Ubatuba
           </span>
@@ -218,7 +222,8 @@ export default function ExplodingTreats({ boxesLeft = null }: { boxesLeft?: numb
               </span>
             ))}
           </div>
-          <Link href="/caixas" className="btn btn-primary" style={{ padding: '0.9rem 2.25rem', fontSize: '1rem', display: 'inline-block' }}>Garanta a Sua Caixa</Link>
+          {liveBoxes.length > 0 && <div style={{ marginBottom: '1.25rem' }}><HeroLiveBoxes boxes={liveBoxes} /></div>}
+          <Link href="/caixas" className="btn btn-primary" style={{ padding: '0.9rem 2.25rem', fontSize: '1rem', display: 'inline-block' }}>{cta}</Link>
         </motion.div>
       </div>
 

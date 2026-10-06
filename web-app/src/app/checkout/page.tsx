@@ -16,6 +16,7 @@ import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
 import { legacyFlags, normalizeDiet, tagsFromLegacy } from '@/lib/dietary';
 import { fetchSchedule, selectableDates, toISODate } from '@/lib/deliverySchedule';
 import { BoxWindowFields, boxRange, inDeliveryWindow, longDay, saleState } from '@/lib/boxWindow';
+import { AlsoOnSale } from '@/components/BoxCards';
 
 const STORE_WHATSAPP = '5511932119196';
 const DATE_KEY = 'checkout_delivery_date';
@@ -384,6 +385,14 @@ export default function CheckoutPage() {
             <span style={{ fontWeight: 'bold', color: step === 2 ? 'var(--color-secondary)' : '#9ca3af' }}>Pagamento</span>
           </div>
         </div>
+
+        {/* Another box on sale (a special edition next to the box of the week): add it to the same order and delivery. */}
+        {step === 1 && hasBox && (
+          <div style={{ marginBottom: '2rem' }}>
+            <AlsoOnSale excludeIds={boxItems.map(i => i.tasting_box_id || '').filter(Boolean)}
+              sub="Vai no mesmo pedido e chega na mesma entrega." />
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', flexDirection: 'row-reverse' }}>
 

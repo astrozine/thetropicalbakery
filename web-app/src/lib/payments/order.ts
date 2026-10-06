@@ -2,7 +2,7 @@ import 'server-only';
 import { supabaseAdmin } from './server';
 import { DELIVERY_ZONES, getZone } from '@/lib/deliveryZones';
 import { fetchSchedule, bookableDates, toISODate, parseISODate } from '@/lib/deliverySchedule';
-import { BoxWindowFields, inDeliveryWindow, isPresale, saleState } from '@/lib/boxWindow';
+import { BoxWindowFields, fixedPrice, inDeliveryWindow, isPresale, saleState } from '@/lib/boxWindow';
 import { dietSummary, normalizeDiet } from '@/lib/dietary';
 import { fetchBoxSizePrices, isTreatCount, sizeText, toTreatCount, type TreatCount } from '@/lib/boxSizes';
 import { sendOrderReceived } from '@/lib/email/receipts';
@@ -56,7 +56,7 @@ function brasiliaToday(): Date {
 
 const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 
-interface BoxRow extends BoxWindowFields { id: string; title: string; price: number; is_active: boolean; items?: { id?: string; name?: string }[] | null }
+interface BoxRow extends BoxWindowFields { id: string; title: string; price: number; is_active: boolean; fixed_price?: number | string | null; items?: { id?: string; name?: string }[] | null }
 interface TreatRow { id: string; name: string; price: number; is_available: boolean; min_batch_size: number | null; batch_multiplier: number | null }
 
 /** `userToken` is the visitor's session token, if they are signed in (needed for pickup and to link the order to them). */
@@ -159,8 +159,18 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
     }
     // Every box is priced by its size (2, 4 or 6 treats) from the settings Dolly edits in /admin/caixas.
     const { prices } = await fetchBoxSizePrices(db);
-    for (const { id, size, picks, qty } of boxLines.values()) {
+    for (const line of boxLines.values()) {
+      const { id, size, picks, qty } = line;
       const row = boxRows.find(b => b.id === id)!;
+      // A special edition sold as it is (migration 40): its own price, all its treats, no sizes or picks.
+      const own = fixedPrice(row);
+      if (own) {
+        const count = (Array.isArray(row.items) ? row.items : []).filter(t => t && t.name).length;
+        line.picks = [];
+        subtotal += own * qty;
+        lines.push({ name: `${row.title} (caixa completa${count ? ` · ${sizeText(count)}` : ''})`, quantity: qty, unit: own });
+        continue;
+      }
       const unit = Number(prices[size]);
       if (!(unit > 0)) throw new OrderError(500, 'Preço da caixa inválido.');
       // The 2-box is the customer's favourites, the 6-box the complete one plus two more (src/lib/boxPicks.ts).
@@ -227,7 +237,12 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
   const itemsSummary = lines.map(l => `${l.quantity}x ${l.name}`).join(', ');
   // The same boxes as data: which treats, how many, so the kitchen tally never has to read the summary text.
   const boxItems: BoxOrderItems | null = hasBox
-    ? { kind: 'caixa', boxes: [...boxLines.values()].map(l => ({ box_id: l.id, size: l.size, picks: l.picks, qty: l.qty })) }
+    ? { kind: 'caixa', boxes: [...boxLines.values()].map(l => {
+        // A box sold as it is holds all of its treats, whatever size the cart said.
+        const row = boxRows.find(b => b.id === l.id);
+        const whole = fixedPrice(row) ? (Array.isArray(row?.items) ? row.items : []).filter(t => t && t.name).length : 0;
+        return { box_id: l.id, size: whole || l.size, picks: l.picks, qty: l.qty };
+      }) }
     : null;
 
   // ---- keep the box counter honest: reserve first, in one safe step per box

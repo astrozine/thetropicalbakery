@@ -13,7 +13,7 @@ import { parseBoxItems } from '@/components/BoxItemList';
 import { BoxSizePrices, DEFAULT_BOX_PRICES, SIZE_KEYS, TREAT_COUNTS, fetchBoxSizePrices } from '@/lib/boxSizes';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { pushTreatDetails } from '@/lib/treatSync';
-import { BoxWindowFields, SaleState, deliveryWindowLabel, isPresale, longDay, nextBakeBox, saleState, splitActive } from '@/lib/boxWindow';
+import { BoxWindowFields, SaleState, deliveryWindowLabel, editionIcon, editionLabel, fixedPrice, isPresale, isSpecial, longDay, nextBakeBox, saleState, splitActive } from '@/lib/boxWindow';
 import { toISODate } from '@/lib/deliverySchedule';
 import { brandAlert, brandConfirm } from '@/lib/brandDialog';
 import { formatBatchDate, healBatchDate } from '@/lib/batchDate';
@@ -31,7 +31,12 @@ interface TastingBox extends BoxWindowFields {
   is_active: boolean;
   items?: BoxItem[] | null;
   gallery?: string[] | null;
+  /** Sold as it is at this price (migration 40); null = the usual 2 / 4 / 6 sizes. */
+  fixed_price?: number | string | null;
 }
+
+/** How a box is sold, as the first step of the editor asks it: the two weekly ways, or a special edition. */
+type BoxKind = 'stock' | 'presale' | 'special';
 
 const WINDOW_KEYS = ['delivery_from', 'delivery_until', 'orders_open_from', 'orders_close_on'] as const;
 
@@ -55,7 +60,7 @@ interface BoxDraft {
   savedAt: number; step: number; editingId: string | null; title: string; description: string; imageUrl: string;
   batchDateLabel: string; totalQuantity: number; soldQuantity: number; price: number; isActive: boolean;
   items: BoxItem[]; gallery: string[]; deliveryFrom: string; deliveryUntil: string; ordersOpen: string;
-  ordersClose: string; saleMode: 'stock' | 'presale';
+  ordersClose: string; saleMode: 'stock' | 'presale'; special?: boolean; ownPrice?: number;
 }
 const readDraft = (): BoxDraft | null => {
   try { const raw = localStorage.getItem(DRAFT_KEY); return raw ? JSON.parse(raw) as BoxDraft : null; } catch { return null; }
@@ -97,6 +102,17 @@ export default function AdminCaixas() {
   /** How this box is sold (migration 35): 'stock' = already baked, 'presale' = next week's, made to order. */
   const [saleMode, setSaleMode] = useState<'stock' | 'presale'>('stock');
   const pre = saleMode === 'presale';
+  /** A special edition (migration 40): a themed box on sale next to the weekly ones, never replacing them. */
+  const [special, setSpecial] = useState(false);
+  /** Its own price when sold as it is (all its treats); 0 = the usual 2 / 4 / 6 sizes. */
+  const [ownPrice, setOwnPrice] = useState(0);
+  const kind: BoxKind = special ? 'special' : saleMode;
+  const setKind = (k: BoxKind) => {
+    setSpecial(k === 'special');
+    setSaleMode(k === 'presale' ? 'presale' : 'stock');
+    // A themed box is usually sold closed at its own price (0.01 = "own price, not typed yet").
+    if (k === 'special') setOwnPrice(p => p || 0.01);
+  };
   const [leadDays, setLeadDays] = useState(2);
   /** After saving a box that is live: offer to tell the waiting list and customers. */
   const [announce, setAnnounce] = useState<{ title: string; treats: string; quantity: number } | null>(null);
@@ -112,17 +128,17 @@ export default function AdminCaixas() {
     if (view !== 'edit') return;
     const d: BoxDraft = {
       savedAt: Date.now(), step, editingId, title, description, imageUrl, batchDateLabel, totalQuantity, soldQuantity,
-      price, isActive, items, gallery, deliveryFrom, deliveryUntil, ordersOpen, ordersClose, saleMode,
+      price, isActive, items, gallery, deliveryFrom, deliveryUntil, ordersOpen, ordersClose, saleMode, special, ownPrice,
     };
     try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } catch { /* storage off: nothing kept */ }
-  }, [view, step, editingId, title, description, imageUrl, batchDateLabel, totalQuantity, soldQuantity, price, isActive, items, gallery, deliveryFrom, deliveryUntil, ordersOpen, ordersClose, saleMode]);
+  }, [view, step, editingId, title, description, imageUrl, batchDateLabel, totalQuantity, soldQuantity, price, isActive, items, gallery, deliveryFrom, deliveryUntil, ordersOpen, ordersClose, saleMode, special, ownPrice]);
 
   const resumeDraft = (d: BoxDraft) => {
     setEditingId(d.editingId); setTitle(d.title); setDescription(d.description); setImageUrl(d.imageUrl);
     setBatchDateLabel(d.batchDateLabel); setTotalQuantity(d.totalQuantity); setSoldQuantity(d.soldQuantity);
     setPrice(d.price); setIsActive(d.isActive); setItems(d.items || []); setGallery(d.gallery || []);
     setDeliveryFrom(d.deliveryFrom); setDeliveryUntil(d.deliveryUntil); setOrdersOpen(d.ordersOpen);
-    setOrdersClose(d.ordersClose); setSaleMode(d.saleMode);
+    setOrdersClose(d.ordersClose); setSaleMode(d.saleMode); setSpecial(!!d.special); setOwnPrice(d.ownPrice || 0);
     setFormProblem(''); setStep(Math.min(STEPS.length - 1, Math.max(0, d.step || 0)));
     setDraft(null); setView('edit'); window.scrollTo({ top: 0 });
   };
@@ -228,6 +244,8 @@ export default function AdminCaixas() {
     setOrdersOpen('');
     setOrdersClose('');
     setSaleMode('stock');
+    setSpecial(false);
+    setOwnPrice(0);
   };
 
   const handleEdit = (box: TastingBox) => {
@@ -247,6 +265,8 @@ export default function AdminCaixas() {
     setOrdersOpen(healBatchDate(box.orders_open_from || ''));
     setOrdersClose(healBatchDate(box.orders_close_on || ''));
     setSaleMode(isPresale(box) ? 'presale' : 'stock');
+    setSpecial(isSpecial(box));
+    setOwnPrice(fixedPrice(box) ?? 0);
     // Editing opens on the summary: every part is one tap away from there.
     setFormProblem('');
     setStep(STEPS.length - 1);
@@ -307,14 +327,16 @@ export default function AdminCaixas() {
       cleanItems.push({ ...stored, treat_id: treatId });
     }
 
-    // 2. One ready box and one pre-sale can be live together: switching this one on takes down the
-    //    other box of the SAME kind only. (Before migration 35 there are no kinds: all others go down.)
-    if (isActive) {
-      const others = supabase.from('tasting_boxes').update({ is_active: false }).neq('id', editingId || '00000000-0000-0000-0000-000000000000');
-      const { error: modeErr } = await others.eq('sale_mode', saleMode);
+    // 2. One ready box and one pre-sale of the week can be live together: switching a weekly box on takes
+    //    down the other WEEKLY box of the same kind only. Special editions never take anything down and are
+    //    never taken down (migration 40). Before migration 40 there are no specials; before 35, no kinds.
+    if (isActive && !special) {
+      const others = () => supabase.from('tasting_boxes').update({ is_active: false }).neq('id', editingId || '00000000-0000-0000-0000-000000000000');
+      let { error: modeErr } = await others().eq('sale_mode', saleMode).eq('edition', 'weekly');
+      if (modeErr) ({ error: modeErr } = await others().eq('sale_mode', saleMode));
       if (modeErr) {
         if (pre) { brandAlert('Para usar a pré-venda, rode a migration_35_box_presale.sql no Supabase primeiro.'); setSaving(false); return; }
-        await supabase.from('tasting_boxes').update({ is_active: false }).neq('id', editingId || '00000000-0000-0000-0000-000000000000');
+        await others();
       }
     }
 
@@ -335,31 +357,44 @@ export default function AdminCaixas() {
       delivery_from: deliveryFrom || null,
       delivery_until: deliveryUntil || null,
       orders_open_from: ordersOpen || null,
-      // The ready box never closes by date (it sells until it runs out); the pre-sale closes on its deadline.
-      orders_close_on: pre ? (ordersClose || null) : null,
+      // The ready box never closes by date (it sells until it runs out); the pre-sale closes on its deadline,
+      // and a special edition on its date when it has one.
+      orders_close_on: pre || special ? (ordersClose || null) : null,
       sale_mode: saleMode,
+      edition: special ? 'special' : 'weekly',
+      fixed_price: special && ownPrice >= 1 ? ownPrice : null,
     };
 
     const save = (body: Record<string, unknown>) => editingId
       ? supabase.from('tasting_boxes').update(body).eq('id', editingId)
       : supabase.from('tasting_boxes').insert([body]);
-    let { error } = await save(payload);
+    // Each fallback below drops what a missing migration does not know, on top of the earlier ones.
+    const rest: Record<string, unknown> = { ...payload };
+    let { error } = await save(rest);
+    if (error && /edition|fixed_price/.test(error.message)) {
+      if (special) {
+        brandAlert('Para publicar uma edição especial, rode a migration_40_special_boxes.sql no Supabase primeiro.');
+        setSaving(false);
+        return;
+      }
+      // Migration 40 not run yet: a weekly box saves exactly as before.
+      delete rest.edition;
+      delete rest.fixed_price;
+      ({ error } = await save(rest));
+    }
     if (error && /gallery/.test(error.message)) {
       // Migration 24 not run yet: save without the extra photos.
-      const rest: Record<string, unknown> = { ...payload };
       delete rest.gallery;
       ({ error } = await save(rest));
       if (!error && gallery.length) brandAlert('Caixa salva, mas sem as fotos extras. Rode a migration_24_box_sizes_and_names.sql no Supabase e salve de novo.');
     }
     if (error && /sale_mode/.test(error.message) && !pre) {
       // Migration 35 not run yet: a ready box saves exactly as before.
-      const rest: Record<string, unknown> = { ...payload };
       delete rest.sale_mode;
       ({ error } = await save(rest));
     }
     if (error && /delivery_from|delivery_until|orders_open_from|orders_close_on/.test(error.message)) {
       // Migration 21 not run yet: save everything else, and say what's missing.
-      const rest: Record<string, unknown> = { ...payload };
       WINDOW_KEYS.forEach(k => delete rest[k]);
       ({ error } = await save(rest));
       if (!error) brandAlert('Caixa salva, mas sem as janelas de entrega e de pedidos. Rode a migration_21_box_windows.sql no Supabase e salve de novo.');
@@ -405,7 +440,17 @@ export default function AdminCaixas() {
   };
 
   const live = splitActive(boxes.filter(b => b.is_active));
+  /** Special editions on the site (any number, next to the weekly boxes). */
+  const liveSpecials = boxes.filter(b => b.is_active && isSpecial(b));
   const pastBoxes = boxes.filter(b => !b.is_active);
+
+  /** Takes one box off the site (it moves to "Caixas anteriores", ready to repeat). */
+  const takeDown = async (box: TastingBox) => {
+    if (!(await brandConfirm(`Tirar “${box.title}” do site? Ela fica guardada em Caixas anteriores.`, { confirmLabel: 'Tirar do site' }))) return;
+    const { error } = await supabase.from('tasting_boxes').update({ is_active: false }).eq('id', box.id);
+    if (error) brandAlert('Não foi possível tirar do site: ' + error.message);
+    fetchBoxes();
+  };
 
   /** A brand-new box, or a copy of an earlier one to start from (its treats, name and photos; new dates and stock). */
   const startNew = (base?: TastingBox) => {
@@ -417,6 +462,8 @@ export default function AdminCaixas() {
       setItems((base.items || []).map(i => ({ ...i })));
       setGallery(Array.isArray(base.gallery) ? base.gallery : []);
       setSaleMode(isPresale(base) ? 'presale' : 'stock');
+      setSpecial(isSpecial(base));
+      setOwnPrice(fixedPrice(base) ?? 0);
     }
     setIsActive(true);
     setFormProblem('');
@@ -433,6 +480,7 @@ export default function AdminCaixas() {
       if (pre && !ordersClose) return 'Escolha até quando as encomendas ficam abertas.';
       if (pre && ordersClose >= deliveryFrom) return 'As encomendas precisam fechar antes do primeiro dia de entrega.';
     }
+    if (s === 4 && special && ownPrice > 0 && ownPrice < 1) return 'Diga o preço da caixa, ou escolha vender nos tamanhos de sempre.';
     return '';
   };
   const next = () => {
@@ -476,13 +524,14 @@ export default function AdminCaixas() {
             {step === 0 && (
               <>
                 <h1 className="bx-step__title">Como você vai vender esta caixa?</h1>
-                <p className="bx-step__lead">Dá para ter uma de cada no ar ao mesmo tempo.</p>
+                <p className="bx-step__lead">Pode ter uma caixa da semana de cada jeito no ar, e quantas edições especiais quiser ao lado delas.</p>
                 <div className="bx-choices">
                   {([
-                    ['stock', '🧁', 'Pronta entrega', 'As caixas já estão feitas. Vende até acabar, e as entregas seguem pelo calendário enquanto sobrar caixa.'],
+                    ['stock', '🧁', 'Pronta entrega', 'A caixa da semana, já feita. Vende até acabar, e as entregas seguem pelo calendário enquanto sobrar caixa.'],
                     ['presale', '🗓️', 'Pré-venda', 'A caixa da próxima semana. O cliente encomenda e paga antes, e você assa só o que foi pedido.'],
+                    ['special', '🎁', 'Edição especial', 'Uma caixa temática (Dia das Crianças, Natal, Páscoa…) à venda junto com a da semana. O cliente pode pedir uma, a outra, ou as duas.'],
                   ] as const).map(([m, icon, t, d]) => (
-                    <button key={m} type="button" className={`bx-choice${saleMode === m ? ' is-on' : ''}`} onClick={() => setSaleMode(m)} aria-pressed={saleMode === m}>
+                    <button key={m} type="button" className={`bx-choice${kind === m ? ' is-on' : ''}`} onClick={() => setKind(m)} aria-pressed={kind === m}>
                       <span className="bx-choice__icon">{icon}</span>
                       <span className="bx-choice__title">{t}</span>
                       <span className="bx-choice__text">{d}</span>
@@ -552,6 +601,8 @@ export default function AdminCaixas() {
                 <p className="bx-step__lead">
                   {pre
                     ? 'Os dias de entrega das encomendas, e o último dia para encomendar (quando você precisa da contagem para assar).'
+                    : special
+                    ? 'Os dias em que esta edição é entregue. Depois do último dia ela sai de venda sozinha (não passa para a semana seguinte).'
                     : 'Os dias em que esta leva está planejada para sair. Pode deixar em branco: aí vale qualquer dia aberto do calendário.'}
                 </p>
                 <div className="bx-dates">
@@ -561,8 +612,8 @@ export default function AdminCaixas() {
                   <label className="bx-field"><span>Último dia de entrega</span>
                     <input type="date" className="bx-input" value={deliveryUntil} min={deliveryFrom || undefined} onChange={e => setDeliveryUntil(healBatchDate(e.target.value))} />
                   </label>
-                  {pre && (
-                    <label className="bx-field"><span>Encomendas até</span>
+                  {(pre || special) && (
+                    <label className="bx-field"><span>Encomendas até{special ? ' (opcional)' : ''}</span>
                       <input type="date" className="bx-input" value={ordersClose} max={deliveryFrom || undefined} onChange={e => setOrdersClose(healBatchDate(e.target.value))} />
                     </label>
                   )}
@@ -577,15 +628,17 @@ export default function AdminCaixas() {
                 <p className="bx-say">
                   👀 O cliente vai ver: {pre ? <><strong>pré-venda</strong>, </> : ''}
                   {windowText ? <>entregas <strong>{windowText}</strong>. </> : <>qualquer dia aberto do calendário. </>}
-                  {pre && ordersClose ? <>Encomendas até <strong>{longDay(ordersClose)}</strong>. </> : ''}
-                  {!pre && <>Segue à venda até acabar; se a data passar e sobrar caixa, as entregas continuam.</>}
+                  {special ? <><strong>edição especial</strong>, </> : ''}
+                  {(pre || special) && ordersClose ? <>Encomendas até <strong>{longDay(ordersClose)}</strong>. </> : ''}
+                  {special && <>Fica à venda até acabar ou até o último dia de entrega, o que vier primeiro.</>}
+                  {!pre && !special && <>Segue à venda até acabar; se a data passar e sobrar caixa, as entregas continuam.</>}
                 </p>
               </>
             )}
 
             {step === 4 && (
               <>
-                <h1 className="bx-step__title">{pre ? 'Quantas cabem nesta fornada?' : 'Quantas caixas você fez?'}</h1>
+                <h1 className="bx-step__title">{pre ? 'Quantas cabem nesta fornada?' : special ? 'Quantas caixas, e por quanto?' : 'Quantas caixas você fez?'}</h1>
                 <p className="bx-step__lead">
                   {pre ? 'Quando as encomendas chegarem nesse número, a pré-venda fecha sozinha. Sem limite = você assa tudo o que pedirem.' : 'O site conta sozinho a cada pedido e mostra quantas restam.'}
                 </p>
@@ -618,6 +671,30 @@ export default function AdminCaixas() {
                     </div>
                   )}
                 </div>
+                {special && (
+                  <div className="bx-card" style={{ marginTop: '1rem' }}>
+                    <p style={{ fontWeight: 800, margin: '0 0 0.75rem' }}>Como o cliente compra esta caixa?</p>
+                    <div className="bx-choices">
+                      <button type="button" className={`bx-choice${ownPrice > 0 ? ' is-on' : ''}`} aria-pressed={ownPrice > 0}
+                        onClick={() => setOwnPrice(p => (p > 0 ? p : 0.01))}>
+                        <span className="bx-choice__icon">🎁</span>
+                        <span className="bx-choice__title">Caixa fechada, preço próprio</span>
+                        <span className="bx-choice__text">Vai do jeito que você montou, com todos os {treatsNamed.length || ''} doces. Bom para caixas temáticas menores.</span>
+                      </button>
+                      <button type="button" className={`bx-choice${ownPrice <= 0 ? ' is-on' : ''}`} aria-pressed={ownPrice <= 0} onClick={() => setOwnPrice(0)}>
+                        <span className="bx-choice__icon">🧁</span>
+                        <span className="bx-choice__title">Nos tamanhos de sempre</span>
+                        <span className="bx-choice__text">2, 4 ou 6 doces, aos preços das outras caixas ({TREAT_COUNTS.map(n => `R$ ${sizePrices[n]}`).join(' · ')}).</span>
+                      </button>
+                    </div>
+                    {ownPrice > 0 && (
+                      <label className="bx-field" style={{ marginTop: '1rem', maxWidth: '220px' }}><span>Preço da caixa (R$)</span>
+                        <input className="bx-input bx-input--big" type="number" inputMode="decimal" min="1" step="0.01"
+                          value={ownPrice >= 1 ? ownPrice : ''} placeholder="79" onChange={e => setOwnPrice(Number(e.target.value) || 0.01)} />
+                      </label>
+                    )}
+                  </div>
+                )}
               </>
             )}
 
@@ -629,18 +706,18 @@ export default function AdminCaixas() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {imageUrl ? <img src={imageUrl} alt="" /> : <span className="bx-preview__ph">📦</span>}
                   <div style={{ minWidth: 0 }}>
-                    <span className="bx-chip" style={{ background: pre ? '#f3e8f8' : '#fff5d6', color: pre ? '#7d3c98' : '#8a6d00' }}>{pre ? '🗓️ Pré-venda' : '🧁 Pronta entrega'}</span>
+                    <span className="bx-chip" style={{ background: pre ? '#f3e8f8' : special ? '#e8f4ff' : '#fff5d6', color: pre ? '#7d3c98' : special ? '#1a5276' : '#8a6d00' }}>{pre ? '🗓️ Pré-venda' : special ? '🎁 Edição especial' : '🧁 Pronta entrega'}</span>
                     <p style={{ fontWeight: 800, fontSize: '1.25rem', margin: '0.4rem 0 0.2rem', overflowWrap: 'anywhere' }}>{title || 'Sem nome'}</p>
                     <p style={{ color: '#6a6a6a', margin: 0 }}>{treatsNamed.map(i => `${i.emoji} ${i.name}`).join(' · ') || 'Nenhum doce ainda'}</p>
                   </div>
                 </div>
                 <div className="bx-review">
                   {[
-                    { s: 0, t: 'Como vender', v: pre ? 'Pré-venda (feita sob encomenda)' : 'Pronta entrega (já feitas)' },
+                    { s: 0, t: 'Como vender', v: pre ? 'Pré-venda (feita sob encomenda)' : special ? 'Edição especial (junto com a caixa da semana)' : 'Pronta entrega (já feitas)' },
                     { s: 1, t: 'Doces', v: `${treatsNamed.length} ${treatsNamed.length === 1 ? 'doce' : 'doces'}` },
                     { s: 2, t: 'Nome e fotos', v: `${title || '—'} · ${(imageUrl ? 1 : 0) + gallery.length || 'sem'} foto${(imageUrl ? 1 : 0) + gallery.length === 1 ? '' : 's'}` },
-                    { s: 3, t: 'Entregas', v: `${windowText || 'qualquer dia aberto do calendário'}${pre && ordersClose ? ` · encomendas até ${longDay(ordersClose)}` : ''}${ordersOpen ? ` · abre ${longDay(ordersOpen)}` : ''}` },
-                    { s: 4, t: pre ? 'Limite' : 'Quantidade', v: pre && totalQuantity === 0 ? 'sem limite' : `${totalQuantity} caixas${editingId ? ` · ${soldQuantity} ${pre ? 'encomendadas' : 'vendidas'}` : ''}` },
+                    { s: 3, t: 'Entregas', v: `${windowText || 'qualquer dia aberto do calendário'}${(pre || special) && ordersClose ? ` · encomendas até ${longDay(ordersClose)}` : ''}${ordersOpen ? ` · abre ${longDay(ordersOpen)}` : ''}` },
+                    { s: 4, t: pre ? 'Limite' : special ? 'Quantidade e preço' : 'Quantidade', v: `${pre && totalQuantity === 0 ? 'sem limite' : `${totalQuantity} caixas${editingId ? ` · ${soldQuantity} ${pre ? 'encomendadas' : 'vendidas'}` : ''}`}${special ? (ownPrice >= 1 ? ` · R$ ${ownPrice} a caixa fechada` : ' · tamanhos de sempre') : ''}` },
                   ].map(r => (
                     <div key={r.s} className="bx-review__row">
                       <div style={{ minWidth: 0 }}><strong>{r.t}</strong><span>{r.v}</span></div>
@@ -653,7 +730,7 @@ export default function AdminCaixas() {
                     <strong style={{ display: 'block', fontSize: '1.05rem' }}>{isActive ? 'No site' : 'Guardada, fora do site'}</strong>
                     <span style={{ color: '#6a6a6a', fontSize: '0.9rem' }}>
                       {isActive
-                        ? `Aparece no site ao salvar.${pre ? (live.presale && live.presale.id !== editingId ? ` A pré-venda “${live.presale.title}” sai do site.` : '') : (live.stock && live.stock.id !== editingId ? ` A caixa “${live.stock.title}” sai do site.` : '')}`
+                        ? `Aparece no site ao salvar.${special ? ' Fica junto com as outras caixas que já estão no site.' : pre ? (live.presale && live.presale.id !== editingId ? ` A pré-venda “${live.presale.title}” sai do site.` : '') : (live.stock && live.stock.id !== editingId ? ` A caixa “${live.stock.title}” sai do site.` : '')}`
                         : 'Fica salva aqui para você publicar depois.'}
                     </span>
                   </span>
@@ -695,15 +772,16 @@ export default function AdminCaixas() {
         <div className="bx-listing__photo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {box.image_url ? <img src={box.image_url} alt="" /> : <div style={{ display: 'grid', placeItems: 'center', height: '100%', fontSize: '3rem' }}>📦</div>}
-          <span className="bx-listing__badge">{presale ? '🗓️ Pré-venda' : '🧁 Pronta entrega'}</span>
+          <span className="bx-listing__badge">{editionIcon(box)} {editionLabel(box)}</span>
         </div>
         <div className="bx-listing__body">
           <span className="bx-chip" style={{ background: lbl.bg, color: lbl.color, justifySelf: 'start' }}>● {lbl.text}</span>
           <h3 className="bx-listing__title">{box.title}</h3>
           <div className="bx-listing__meta">
             <span>🚚 {win ? `Entregas ${win}` : 'Qualquer dia aberto'}</span>
-            {presale && box.orders_close_on && <span>⏳ Encomendas até {longDay(box.orders_close_on)}</span>}
+            {(presale || isSpecial(box)) && box.orders_close_on && <span>⏳ Encomendas até {longDay(box.orders_close_on)}</span>}
             <span>🍫 {(box.items || []).length} doces</span>
+            {fixedPrice(box) && <span>💰 R$ {fixedPrice(box)} a caixa fechada</span>}
           </div>
           {limited ? (
             <div>
@@ -718,7 +796,8 @@ export default function AdminCaixas() {
           )}
           <div className="bx-listing__actions">
             <button type="button" className="bx-btn bx-btn--dark" onClick={() => handleEdit(box)}>✏️ Editar</button>
-            <a className="bx-btn bx-btn--ghost" href={presale ? '/caixas?edicao=pre' : '/caixas?edicao=pronta'} target="_blank" rel="noopener noreferrer">Ver no site ↗</a>
+            <a className="bx-btn bx-btn--ghost" href={`/caixas?caixa=${box.id}`} target="_blank" rel="noopener noreferrer">Ver no site ↗</a>
+            <button type="button" className="bx-link" onClick={() => takeDown(box)}>Tirar do site</button>
           </div>
         </div>
       </article>
@@ -763,12 +842,18 @@ export default function AdminCaixas() {
         </div>
       )}
 
-      {loading ? <p>Carregando…</p> : (live.stock || live.presale) ? (
+      {loading ? <p>Carregando…</p> : (live.stock || live.presale || liveSpecials.length) ? (
         <div className="bx-live">
           {live.stock && listing(live.stock)}
           {live.stock && <BoxStock box={live.stock} onChanged={applyStock} />}
           {live.presale && listing(live.presale)}
           {live.presale && <PresaleGear presale={live.presale} stock={live.stock} onChanged={fetchBoxes} />}
+          {liveSpecials.map(b => (
+            <React.Fragment key={b.id}>
+              {listing(b)}
+              <BoxStock box={b} onChanged={applyStock} />
+            </React.Fragment>
+          ))}
         </div>
       ) : (
         <div className="bx-empty">
@@ -785,6 +870,15 @@ export default function AdminCaixas() {
           <span style={{ fontSize: '2rem' }}>🗓️</span>
           <span><strong style={{ display: 'block' }}>Abrir a pré-venda da próxima semana</strong>
             <span style={{ color: '#6a6a6a' }}>Venda antes de assar e faça só o que foi encomendado.</span></span>
+        </button>
+      )}
+
+      {!loading && (
+        <button type="button" className="bx-card" onClick={() => { startNew(); setKind('special'); }}
+          style={{ marginTop: '1rem', width: '100%', textAlign: 'left', cursor: 'pointer', display: 'flex', gap: '1rem', alignItems: 'center', borderStyle: 'dashed' }}>
+          <span style={{ fontSize: '2rem' }}>🎁</span>
+          <span><strong style={{ display: 'block' }}>Lançar uma edição especial</strong>
+            <span style={{ color: '#6a6a6a' }}>Dia das Crianças, Natal, Páscoa… à venda junto com a caixa da semana, sem tirar nenhuma do site.</span></span>
         </button>
       )}
 

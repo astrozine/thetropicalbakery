@@ -15,6 +15,12 @@ interface FeaturedBoxCardProps {
   imageUrl: string;
   /** Already formatted for reading, e.g. "23 de setembro". */
   dateLabel: string;
+  /** The words before the date on the gold badge (default "Apenas esta semana!"). */
+  badge?: string;
+  /** Where the button goes: this box's own page when several are on sale. */
+  href?: string;
+  /** "R$ 79" or "a partir de R$ 59", shown on the button. */
+  priceText?: string;
 }
 
 /**
@@ -22,7 +28,7 @@ interface FeaturedBoxCardProps {
  * edge (cover, no bars): side by side with the text on a wide screen, stacked at its
  * own proportions on a phone. Tap the photo to see it full size.
  */
-export default function FeaturedBoxCard({ title, description, items, imageUrl, dateLabel }: FeaturedBoxCardProps) {
+export default function FeaturedBoxCard({ title, description, items, imageUrl, dateLabel, badge = 'Apenas esta semana!', href = '/caixas', priceText }: FeaturedBoxCardProps) {
   // "Chegada da Primavera: Sensações Amarelas" -> the part after the colon is the theme; give it its own colour and size.
   const colon = title.indexOf(':');
   const lead = colon > 0 ? title.slice(0, colon + 1) : title;
@@ -53,7 +59,7 @@ export default function FeaturedBoxCard({ title, description, items, imageUrl, d
 
         <div className="fbc-text">
           <span style={{ alignSelf: 'flex-start', display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>
-            Apenas esta semana!{dateLabel ? ` • ${dateLabel}` : ''}
+            {badge}{dateLabel ? ` • ${dateLabel}` : ''}
           </span>
           <h2 style={{ fontSize: 'clamp(1.8rem, 3.6vw, 2.7rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '1.25rem' }}>
             {lead}
@@ -66,11 +72,11 @@ export default function FeaturedBoxCard({ title, description, items, imageUrl, d
       <div className="fbc-cta">
         <SquiggleCta>
           <Link
-            href="/caixas"
+            href={href}
             className="btn btn-primary fbc-btn"
             style={{ padding: '1.1rem 2rem', display: 'block', width: '100%', textAlign: 'center', background: 'linear-gradient(135deg, #d4af37, #c19b2e)', border: 'none', borderRadius: '40px' }}
           >
-            Reservar Minha Caixa
+            Reservar Minha Caixa{priceText ? ` · ${priceText}` : ''}
           </Link>
         </SquiggleCta>
       </div>

@@ -10,7 +10,7 @@ import { formatBRL } from '@/lib/deliveryZones';
 import { optimizedSrc } from '@/lib/thumbs';
 import Link from 'next/link';
 import WaitlistCapture from '@/components/WaitlistCapture';
-import { BoxWindowFields, SaleState, isPresale, longDay } from '@/lib/boxWindow';
+import { BoxWindowFields, SaleState, fixedPrice, isPresale, isSpecial, longDay } from '@/lib/boxWindow';
 import BoxSizePicker from '@/components/BoxSizePicker';
 import FulfillmentPicker, { Fulfillment, readFulfillment } from '@/components/FulfillmentPicker';
 import { BoxSizePrices, DEFAULT_TREAT_COUNT, TreatCount, sizeText } from '@/lib/boxSizes';
@@ -19,7 +19,7 @@ import { boxPlan, planCaption, picksSuffix } from '@/lib/boxPicks';
 import type { BoxItem } from '@/lib/allergens';
 
 interface BoxOrderProps {
-  box: { id: string; title: string; image_url: string; price: number; items?: BoxItem[] | null; gallery?: string[] | null } & Partial<BoxWindowFields>;
+  box: { id: string; title: string; image_url: string; price: number; items?: BoxItem[] | null; gallery?: string[] | null; fixed_price?: number | string | null } & Partial<BoxWindowFields>;
   maxQuantity: number;
   /** Whether the box can be ordered today (ordering window + stock). Null while loading. */
   sale?: { state: SaleState; opensOn: string | null; closesOn?: string | null; windowLabel?: string } | null;
@@ -39,7 +39,9 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
   const { addToCart, removeFromCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState<TreatCount>(DEFAULT_TREAT_COUNT);
-  const unit = prices[size];
+  /** A special edition sold as it is (migration 40): one price, all its treats, no sizes to choose. */
+  const own = fixedPrice(box);
+  const unit = own ?? prices[size];
   const [date, setDate] = useState('');
   const [fulfillment, setFulfillment] = useState<Fulfillment>('delivery');
   useEffect(() => { const saved = readFulfillment(); if (saved) setFulfillment(saved); }, []);
@@ -52,7 +54,8 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
     ...(Array.isArray(box.gallery) ? box.gallery : []).filter(Boolean).map(src => ({ src, name: box.title })),
     ...treats.filter(t => t.image_url).map(t => ({ src: t.image_url, name: t.name })),
   ].filter((p, i, all) => p.src !== box.image_url && all.findIndex(q => q.src === p.src) === i);
-  const plan = boxPlan(treats.length, size);
+  const plan = own ? { fixed: treats.length, picks: 0 } : boxPlan(treats.length, size);
+  const wholeText = `caixa completa${treats.length ? ` · ${sizeText(treats.length)}` : ''}`;
   const [picks, setPicks] = useState<string[]>([]);
   const [pickNudge, setPickNudge] = useState(false);
   const [surprise, setSurprise] = useState(false);
@@ -100,18 +103,20 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
     }
     const chosen = surprise ? [] : shownPicks;
     const pickedNames = chosen.map(id => treats.find(t => t.id === id)?.name || '');
-    const id = `box-${box.id}-${size}`;
+    const id = own ? `box-${box.id}-whole` : `box-${box.id}-${size}`;
     removeFromCart(id); // re-adding sets the exact quantity instead of stacking on an older order
     removeFromCart(`box-${box.id}`); // a cart from before the sizes existed
     addToCart({
       id,
-      name: `${box.title}${presale ? ' · pré-venda' : ''} (${sizeText(size)}${picksSuffix(plan, pickedNames)})`,
+      name: own
+        ? `${box.title} (${wholeText})`
+        : `${box.title}${presale ? ' · pré-venda' : ''} (${sizeText(size)}${picksSuffix(plan, pickedNames)})`,
       price: unit.toFixed(2).replace('.', ','),
       image: box.image_url,
       kind: 'box',
       tasting_box_id: box.id,
       max_quantity: maxQuantity,
-      box_size: size,
+      box_size: own ? undefined : size,
       box_picks: plan.picks > 0 ? chosen : undefined,
     }, { open: false, quantity });
     router.push('/checkout');
@@ -182,16 +187,27 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         <TreatFlank contentWidth={1100} sides="right" photos={boxPhotos}>
         <DeliveryCalendar value={date} onChange={pickDate} fulfillment={fulfillment}
           title={pickup ? '2 · Escolha o dia da retirada' : '2 · Escolha o dia da entrega'}
-          window={{ from: box.delivery_from, until: box.delivery_until, presale }} />
+          window={{ from: box.delivery_from, until: box.delivery_until, presale: presale || isSpecial(box) }} />
         </TreatFlank>
 
-        <BoxSizePicker
+        {own && (
+          <div style={{ display: 'flex', gap: '0.9rem', alignItems: 'center', background: '#fff', border: '2px solid #d4af37', borderRadius: '16px', padding: '1rem 1.1rem', color: '#3c2a21' }}>
+            <span style={{ fontSize: '1.8rem' }} aria-hidden>🎁</span>
+            <span style={{ flex: 1, minWidth: 0, lineHeight: 1.45 }}>
+              <strong style={{ display: 'block' }}>Caixa completa{treats.length ? `: os ${treats.length} doces desta edição` : ''}</strong>
+              <span style={{ fontSize: '0.9rem', color: '#594a42' }}>Vem montada assim, do jeito que a Dolly pensou.</span>
+            </span>
+            <strong style={{ fontSize: '1.15rem', whiteSpace: 'nowrap' }}>{formatBRL(own)}</strong>
+          </div>
+        )}
+
+        {!own && <BoxSizePicker
           value={size} onChange={changeSize} priceOf={s => prices[s]} title="3 · Quantos doces na caixa?"
           picksOf={treats.length ? s => boxPlan(treats.length, s).picks : undefined}
           captionOf={treats.length ? s => planCaption(boxPlan(treats.length, s)) : undefined}
-        />
+        />}
 
-        {treats.length > 0 && (
+        {!own && treats.length > 0 && (
           <div ref={pickerRef} style={{ scrollMarginTop: '6rem' }}>
             <BoxTreatPicker
               items={treats} plan={plan} picks={surprise ? [] : shownPicks} attention={pickNudge}
@@ -212,7 +228,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         </div>
 
         <div style={{ fontSize: 'clamp(1.1rem, 3vw, 1.3rem)', color: '#3c2a21', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.5rem' }}>
-          <span>{quantity}x {sizeText(size)} · {formatBRL(unit)}</span>
+          <span>{quantity}x {own ? wholeText : sizeText(size)} · {formatBRL(unit)}</span>
           <strong>{formatBRL(quantity * unit)}</strong>
         </div>
         <p style={{ fontSize: '0.8rem', color: '#7a6a61', marginTop: '-0.75rem', padding: '0 0.5rem' }}>

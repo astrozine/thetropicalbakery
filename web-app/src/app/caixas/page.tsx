@@ -12,14 +12,16 @@ import { TreatCareCard } from '@/components/TreatCare';
 import { BoxItem } from '@/lib/allergens';
 import { formatBatchDate } from '@/lib/batchDate';
 import BoxItemList from '@/components/BoxItemList';
-import { BoxWindowFields, longDay, noUpcomingEdition, splitActive } from '@/lib/boxWindow';
+import { BoxWindowFields, boxPriceText, editionIcon, editionLabel, fixedPrice, isPresale, isSpecial, longDay, shortTitle, sortLive } from '@/lib/boxWindow';
 import NoBoxNotice from '@/components/NoBoxNotice';
-import { useBoxSale } from '@/lib/useBoxSale';
+import { boxSale, useSchedule, type BoxSale } from '@/lib/useBoxSale';
+import { BoxCards, showable } from '@/components/BoxCards';
 import HeroBoxCard, { HeroBoxStrip, type HeroBoxPhoto } from '@/components/HeroBoxCard';
 import MobileBuyBar from '@/components/MobileBuyBar';
 import BoxesLeftBadge from '@/components/BoxesLeftBadge';
 import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
 import { TREAT_COUNTS } from '@/lib/boxSizes';
+import { optimizedSrc } from '@/lib/thumbs';
 
 // Real photos of earlier boxes, only for the "no box yet" notice (the hero shows the current box only).
 const FALLBACK_BOX_PHOTOS: HeroBoxPhoto[] = ['/box1.jpg', '/box2.jpg', '/box3.jpg', '/box4.jpg'].map(src => ({ src }));
@@ -36,29 +38,31 @@ interface TastingBox extends BoxWindowFields {
   items?: BoxItem[] | null;
   /** Extra photos of this box (migration 24). */
   gallery?: string[] | null;
+  /** Sold as it is at this price instead of in sizes (migration 40). */
+  fixed_price?: number | string | null;
+  created_at?: string | null;
 }
 
-type Mode = 'stock' | 'presale';
-
-/** `?edicao=pre` opens the pre-sale (for ads and posts), `?edicao=pronta` the ready box. */
-const modeFromUrl = (): Mode | null => {
+/**
+ * Which box the link asks for: `?caixa=<id>` (every card and the admin's "Ver no site"), or the older
+ * `?edicao=pre` / `?edicao=pronta` (the weekly pre-sale / ready box, still used in ads and posts).
+ */
+const choiceFromUrl = (): string | null => {
   if (typeof window === 'undefined') return null;
-  const v = new URLSearchParams(window.location.search).get('edicao');
-  return v === 'pre' ? 'presale' : v === 'pronta' ? 'stock' : null;
+  const q = new URLSearchParams(window.location.search);
+  const v = q.get('edicao');
+  return q.get('caixa') || (v === 'pre' ? 'presale' : v === 'pronta' ? 'stock' : null);
 };
 
 export default function CaixasPage() {
-  // Up to two boxes are live (migration 35): the ready one ("pronta entrega", already baked, sold until
-  // it runs out) and next week's pre-sale (made to order, closes on its deadline).
-  const [stockBox, setStockBox] = useState<TastingBox | null>(null);
-  const [presaleBox, setPresaleBox] = useState<TastingBox | null>(null);
+  // Every live box: the weekly ready box, next week's pre-sale, and any special editions (migrations 35, 40).
+  const [boxes, setBoxes] = useState<TastingBox[]>([]);
   const [loading, setLoading] = useState(true);
   const [pastPhotos, setPastPhotos] = useState<HeroBoxPhoto[]>([]);
-  const stockSale = useBoxSale(stockBox);
-  const presaleSale = useBoxSale(presaleBox);
+  const schedule = useSchedule();
   const sizePrices = useBoxSizePrices();
-  const [chosen, setChosen] = useState<Mode | null>(null);
-  useEffect(() => { setChosen(modeFromUrl()); }, []);
+  const [chosen, setChosen] = useState<string | null>(null);
+  useEffect(() => { setChosen(choiceFromUrl()); }, []);
 
   useEffect(() => {
     const fetchPastBoxes = async () => {
@@ -79,11 +83,7 @@ export default function CaixasPage() {
         .select('*')
         .eq('is_active', true);
 
-      if (!error && data) {
-        const { stock, presale } = splitActive(data as TastingBox[]);
-        setStockBox(stock);
-        setPresaleBox(presale);
-      }
+      if (!error && data) setBoxes(data as TastingBox[]);
       setLoading(false);
     };
 
@@ -95,28 +95,31 @@ export default function CaixasPage() {
   }
 
   // Wait for the delivery calendar too, so a box with no days left never flashes on screen first.
-  if ((stockSale && !stockSale.loaded) || (presaleSale && !presaleSale.loaded)) {
+  if (boxes.length && !schedule) {
     return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Carregando a surpresa da semana...</div>;
   }
 
-  // Which box can be shown. The ready box stays visible when it sells out (the waiting list lives there),
-  // unless the pre-sale can take the order instead: then a sold-out box would only be in the way.
-  const presaleOk = !!presaleBox && !!presaleSale && !noUpcomingEdition(presaleSale.state, presaleSale.choosable);
-  const stockShowable = !!stockBox && !!stockSale && !noUpcomingEdition(stockSale.state, stockSale.choosable);
-  const stockOk = stockShowable && !(presaleOk && stockSale!.state === 'soldout');
-  const mode: Mode | null =
-    chosen === 'presale' && presaleOk ? 'presale'
-    : chosen === 'stock' && stockOk ? 'stock'
-    : stockOk && stockSale!.state === 'open' ? 'stock'
-    : presaleOk ? 'presale'
-    : stockOk ? 'stock' : null;
-  const activeBox = mode === 'presale' ? presaleBox : mode === 'stock' ? stockBox : null;
-  const sale = mode === 'presale' ? presaleSale : stockSale;
-  const isPre = mode === 'presale';
-  const bothLive = stockOk && presaleOk;
-  const pick = (m: Mode) => {
-    setChosen(m);
-    try { window.history.replaceState(null, '', m === 'presale' ? '?edicao=pre' : '?edicao=pronta'); } catch { /* old browser */ }
+  // Which boxes can be shown. A sold-out box stays visible (the waiting list lives there) only while
+  // nothing else can take the order: next to a box that can, it would only be in the way.
+  const sales = new Map<string, BoxSale>(boxes.map(b => [b.id, boxSale(b, schedule)]));
+  const saleOf = (b: TastingBox) => sales.get(b.id)!;
+  const candidates = boxes.filter(b => showable(saleOf(b)));
+  const anyAvailable = candidates.some(b => saleOf(b).state !== 'soldout');
+  const shown = sortLive(candidates.filter(b => !anyAvailable || saleOf(b).state !== 'soldout'), b => saleOf(b).state === 'open');
+  const activeBox =
+    shown.find(b => b.id === chosen)
+    ?? (chosen === 'presale' ? shown.find(b => isPresale(b) && !isSpecial(b)) : chosen === 'stock' ? shown.find(b => !isPresale(b) && !isSpecial(b)) : undefined)
+    ?? shown[0] ?? null;
+  const sale = activeBox ? saleOf(activeBox) : null;
+  const isPre = !!activeBox && isPresale(activeBox);
+  const special = !!activeBox && isSpecial(activeBox);
+  const own = fixedPrice(activeBox);
+  const others = shown.filter(b => b.id !== activeBox?.id);
+  const heroTag = isPre ? 'Próxima fornada' : special ? 'Edição especial' : 'Nesta caixa';
+  const pick = (id: string, scroll = false) => {
+    setChosen(id);
+    try { window.history.replaceState(null, '', `?caixa=${id}`); } catch { /* old browser */ }
+    if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Nothing to order: no box set up, or the one that is has no delivery day left / is past its ordering window.
@@ -161,22 +164,27 @@ export default function CaixasPage() {
           }}
         />
         
-        <HeroBoxCard side="left" photos={leftPhotos} tag={isPre ? 'Próxima fornada' : 'Nesta caixa'} />
-        <HeroBoxCard side="right" photos={rightPhotos} delayMs={2750} tag={isPre ? 'Próxima fornada' : 'Nesta caixa'} />
+        <HeroBoxCard key={`l-${activeBox.id}`} side="left" photos={leftPhotos} tag={heroTag} />
+        <HeroBoxCard key={`r-${activeBox.id}`} side="right" photos={rightPhotos} delayMs={2750} tag={heroTag} />
         {limited && sale?.state === 'open' && <BoxesLeftBadge remaining={remainingQuantity} />}
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
-          <HeroBoxStrip photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} tag={isPre ? 'Próxima fornada' : 'Nesta caixa'} />
-          {bothLive && (
-            <EditionSwitch mode={mode!} onPick={pick}
-              stockLeft={stockBox!.total_quantity > 0 ? Math.max(0, stockBox!.total_quantity - stockBox!.sold_quantity) : null}
-              stockWindow={stockSale?.windowLabel || ''} presaleWindow={presaleSale?.windowLabel || ''} />
+          <HeroBoxStrip key={activeBox.id} photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} tag={heroTag} />
+          {shown.length > 1 && (
+            <BoxSwitch boxes={shown} activeId={activeBox.id} onPick={id => pick(id)}
+              subOf={b => {
+                const s = saleOf(b);
+                const left = b.total_quantity > 0 ? `restam ${Math.max(0, b.total_quantity - b.sold_quantity)}` : '';
+                return [s.state === 'soldout' ? 'esgotada' : left || boxPriceText(b, sizePrices), s.windowLabel].filter(Boolean).join(' · ');
+              }} />
           )}
           <ScrollReveal>
             <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.5rem' }}>
               {isPre
                 ? <>Pré-venda • {sale?.windowLabel ? `entregas ${sale.windowLabel}` : 'próxima semana'}</>
-                : <>{bothLive ? 'Pronta entrega' : 'Edição Limitada'} • {sale?.rolledOver ? `entregas ${sale.windowLabel}` : formatBatchDate(activeBox.batch_date_label)}</>}
+                : special
+                ? <>🎁 Edição especial{sale?.windowLabel ? ` • entregas ${sale.windowLabel}` : ''}</>
+                : <>{shown.length > 1 ? 'Pronta entrega' : 'Edição Limitada'} • {sale?.rolledOver ? `entregas ${sale.windowLabel}` : formatBatchDate(activeBox.batch_date_label)}</>}
             </span>
             <h1 style={{ fontSize: 'clamp(1.95rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem' }}>
               {(() => {
@@ -262,6 +270,15 @@ export default function CaixasPage() {
         </div>
       </section>
 
+      {/* The other boxes on sale: one or the other, or both in the same checkout. */}
+      {others.length > 0 && (
+        <section style={{ padding: '0 1rem clamp(3rem, 7vw, 4.5rem)' }}>
+          <BoxCards boxes={others} prices={sizePrices} onPick={id => pick(id, true)}
+            heading={others.length === 1 ? 'Também à venda esta semana' : 'Também à venda'}
+            sub="Peça uma, a outra, ou as duas: vão juntas no mesmo pedido e na mesma entrega." />
+        </section>
+      )}
+
       {/* Offered after the one-off purchase, where the value of not having to
           come back and do this every week is most obvious. */}
       <StripedBackground tone="dark" bandHeight={80} image="/textures/copacabana-baker.webp" imagePosition="80% 55%" style={{ padding: 'clamp(3.5rem, 8vw, 5.5rem) 1.5rem' }}>
@@ -296,8 +313,8 @@ export default function CaixasPage() {
 
       {/* Phones only: keeps the price and one tap to order under the thumb the whole way down. */}
       <MobileBuyBar
-        kicker={`${isPre ? 'Pré-venda' : limited && remainingQuantity > 0 ? `Restam ${remainingQuantity}` : 'Caixa da semana'} · a partir de`}
-        price={`R$ ${Math.round(Math.min(...TREAT_COUNTS.map(n => sizePrices[n])))}`}
+        kicker={`${isPre ? 'Pré-venda' : limited && remainingQuantity > 0 ? `Restam ${remainingQuantity}` : special ? 'Edição especial' : 'Caixa da semana'}${own ? '' : ' · a partir de'}`}
+        price={`R$ ${Math.round(own ?? Math.min(...TREAT_COUNTS.map(n => sizePrices[n])))}`}
         note={isPre || sale?.rolledOver ? (sale?.windowLabel ? `entregas ${sale.windowLabel}` : undefined) : activeBox.batch_date_label ? formatBatchDate(activeBox.batch_date_label) : undefined}
         label={isPre ? 'Encomendar' : 'Pedir'}
         targetId="#order"
@@ -314,32 +331,44 @@ export default function CaixasPage() {
   );
 }
 
-/** "Pronta entrega" or "Pré-venda", when both are on sale. Sits at the top of the hero, on the dark photo. */
-function EditionSwitch({ mode, onPick, stockLeft, stockWindow, presaleWindow }: {
-  mode: Mode; onPick: (m: Mode) => void; stockLeft: number | null; stockWindow: string; presaleWindow: string;
+/**
+ * Which box, when more than one is on sale (the box of the week, the pre-sale, special editions).
+ * Sits at the top of the hero, on the dark photo. Two boxes share the row; three or more scroll sideways.
+ */
+function BoxSwitch({ boxes, activeId, onPick, subOf }: {
+  boxes: TastingBox[]; activeId: string; onPick: (id: string) => void; subOf: (b: TastingBox) => string;
 }) {
-  const opt = (m: Mode, title: string, sub: string) => {
-    const on = mode === m;
-    return (
-      <button type="button" onClick={() => onPick(m)} aria-pressed={on} style={{
-        flex: '1 1 0', minWidth: 0, padding: '0.7rem 0.8rem', borderRadius: '14px', cursor: 'pointer', textAlign: 'center',
-        border: on ? '2px solid #d4af37' : '2px solid transparent',
-        background: on ? '#fdfaf3' : 'transparent', color: on ? '#3c2a21' : '#fdfaf3',
-        transition: 'background 0.2s, color 0.2s',
-      }}>
-        <span style={{ display: 'block', fontWeight: 800, fontSize: '0.98rem', lineHeight: 1.2 }}>{title}</span>
-        <span style={{ display: 'block', fontSize: '0.78rem', marginTop: '0.2rem', opacity: on ? 0.75 : 0.85, lineHeight: 1.3 }}>{sub}</span>
-      </button>
-    );
-  };
-  const stockSub = [stockLeft != null ? `restam ${stockLeft}` : 'já saiu do forno', stockWindow].filter(Boolean).join(' · ');
+  const many = boxes.length > 2;
   return (
-    <div role="group" aria-label="Qual caixa" style={{
-      display: 'flex', gap: '0.35rem', maxWidth: '520px', margin: '0 auto 1.75rem', padding: '0.35rem',
+    <div role="group" aria-label="Qual caixa" className="hide-scrollbars" style={{
+      display: 'flex', gap: '0.35rem', maxWidth: many ? '720px' : '560px', margin: '0 auto 1.75rem', padding: '0.35rem',
       background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(10px)', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.2)',
+      overflowX: many ? 'auto' : undefined, scrollSnapType: many ? 'x mandatory' : undefined,
     }}>
-      {opt('stock', '🧁 Pronta entrega', stockSub)}
-      {opt('presale', '🗓️ Pré-venda', presaleWindow ? `próxima fornada · ${presaleWindow}` : 'próxima fornada')}
+      {boxes.map(b => {
+        const on = b.id === activeId;
+        return (
+          <button key={b.id} type="button" onClick={() => onPick(b.id)} aria-pressed={on} style={{
+            flex: many ? '0 0 min(72%, 230px)' : '1 1 0', minWidth: 0, minHeight: '44px', padding: '0.55rem 0.6rem', borderRadius: '14px',
+            cursor: 'pointer', textAlign: 'left', display: 'flex', gap: '0.55rem', alignItems: 'center', scrollSnapAlign: 'start',
+            border: on ? '2px solid #d4af37' : '2px solid transparent',
+            background: on ? '#fdfaf3' : 'transparent', color: on ? '#3c2a21' : '#fdfaf3',
+            transition: 'background 0.2s, color 0.2s',
+          }}>
+            {b.image_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={optimizedSrc(b.image_url, 256)} alt="" style={{ width: '40px', height: '40px', flexShrink: 0, borderRadius: '10px', objectFit: 'cover' }} />
+            )}
+            <span style={{ minWidth: 0 }}>
+              <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: on ? '#a6832b' : '#e9cf7a' }}>
+                {editionIcon(b)} {editionLabel(b)}
+              </span>
+              <span style={{ display: 'block', fontWeight: 800, fontSize: '0.95rem', lineHeight: 1.2, overflowWrap: 'anywhere' }}>{shortTitle(b.title)}</span>
+              <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.1rem', opacity: on ? 0.75 : 0.85, lineHeight: 1.3 }}>{subOf(b)}</span>
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
