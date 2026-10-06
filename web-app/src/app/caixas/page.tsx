@@ -185,13 +185,13 @@ export default function CaixasPage() {
               }} />
           )}
           <div ref={detailsRef} style={{ scrollMarginTop: '5.5rem' }} />
-          <ScrollReveal>
+          <ScrollReveal key={activeBox.id}>
             <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.5rem' }}>
               {isPre
                 ? <>Pré-venda • {sale?.windowLabel ? `entregas ${sale.windowLabel}` : 'próxima semana'}</>
                 : special
                 ? <>🎁 Edição especial{sale?.windowLabel ? ` • entregas ${sale.windowLabel}` : ''}</>
-                : <>{shown.length > 1 ? 'Pronta entrega' : 'Edição Limitada'} • {sale?.rolledOver ? `entregas ${sale.windowLabel}` : formatBatchDate(activeBox.batch_date_label)}</>}
+                : <>{shown.length > 1 ? 'Pronta entrega' : 'Edição Limitada'} • {sale?.windowLabel ? `entregas ${sale.windowLabel}` : formatBatchDate(activeBox.batch_date_label)}</>}
             </span>
             <h1 style={{ fontSize: 'clamp(1.95rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem' }}>
               {(() => {
@@ -259,9 +259,9 @@ export default function CaixasPage() {
         </div>
       </section>
 
-      {isPre && <PresaleSteps closesOn={sale?.closesOn ?? null} windowLabel={sale?.windowLabel || ''} />}
+      {isPre && <PresaleSteps key={activeBox.id} closesOn={sale?.closesOn ?? null} windowLabel={sale?.windowLabel || ''} />}
 
-      {activeBox.items && activeBox.items.length > 0 && <BoxContents items={activeBox.items} />}
+      {activeBox.items && activeBox.items.length > 0 && <BoxContents key={activeBox.id} items={activeBox.items} />}
 
       {/* How to keep them: buyers who plan ahead (gifts, later in the week) need to know the freezer keeps them 4 weeks. */}
       <section style={{ padding: '1.5rem 1rem 0' }}>
@@ -271,7 +271,7 @@ export default function CaixasPage() {
       {/* Checkout Section */}
       <section id="order" style={{ padding: '4rem 2rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <ScrollReveal>
+          <ScrollReveal key={activeBox.id}>
             <BoxOrder key={activeBox.id} box={activeBox} maxQuantity={remainingQuantity} sale={sale} prices={sizePrices} />
           </ScrollReveal>
         </div>
@@ -279,7 +279,7 @@ export default function CaixasPage() {
 
       {/* The other boxes on sale: one or the other, or both in the same checkout. */}
       {others.length > 0 && (
-        <section style={{ padding: '0 1rem clamp(3rem, 7vw, 4.5rem)' }}>
+        <section key={activeBox.id} style={{ padding: '0 1rem clamp(3rem, 7vw, 4.5rem)' }}>
           <BoxCards boxes={others} prices={sizePrices} onPick={id => pick(id, true)}
             heading={others.length === 1 ? 'Também à venda esta semana' : 'Também à venda'}
             sub="Peça uma, a outra, ou as duas: vão juntas no mesmo pedido e na mesma entrega." />
@@ -319,10 +319,10 @@ export default function CaixasPage() {
       <Marquee text="CAIXA DE DEGUSTAÇÃO SEMANAL ✦ FEITA À MÃO EM ITAMAMBUCA ✦ " speed={120} />
 
       {/* Phones only: keeps the price and one tap to order under the thumb the whole way down. */}
-      <MobileBuyBar
+      <MobileBuyBar key={activeBox.id}
         kicker={`${isPre ? 'Pré-venda' : limited && remainingQuantity > 0 ? `Restam ${remainingQuantity}` : special ? 'Edição especial' : 'Caixa da semana'}${own ? '' : ' · a partir de'}`}
         price={`R$ ${Math.round(own ?? Math.min(...TREAT_COUNTS.map(n => sizePrices[n])))}`}
-        note={isPre || sale?.rolledOver ? (sale?.windowLabel ? `entregas ${sale.windowLabel}` : undefined) : activeBox.batch_date_label ? formatBatchDate(activeBox.batch_date_label) : undefined}
+        note={isPre || sale?.windowLabel ? (sale?.windowLabel ? `entregas ${sale.windowLabel}` : undefined) : activeBox.batch_date_label ? formatBatchDate(activeBox.batch_date_label) : undefined}
         label={isPre ? 'Encomendar' : 'Pedir'}
         targetId="#order"
       />
@@ -343,60 +343,108 @@ export default function CaixasPage() {
  * editions), they are shown side by side as equal products — photo, name, price, how many are left —
  * at the top of the hero, before anything about one box in particular. Tapping one shows its details
  * and order form below. Two boxes share the row (also on a phone); three or more scroll sideways.
+ *
+ * Dolly found plain tiles too easy to miss, so the choice is made loud: "OPÇÃO 1 / OPÇÃO 2" on the photos,
+ * a gold "OU" coin between two boxes, a handwritten "Olha esta também!" with a drawn arrow pointing at the
+ * box you are NOT looking at, and that box gives a little wiggle every few seconds until something is tapped.
  */
 function BoxPicker({ boxes, activeId, onPick, priceOf, subOf }: {
   boxes: TastingBox[]; activeId: string; onPick: (id: string) => void;
   priceOf: (b: TastingBox) => string; subOf: (b: TastingBox) => string;
 }) {
   const many = boxes.length > 2;
+  const two = boxes.length === 2;
+  const [touched, setTouched] = useState(false);
+  // The arrow points at the other box (of two): right when the first one is showing, left otherwise.
+  const target = boxes[0]?.id === activeId ? 1 : 0;
+  const count = boxes.length === 2 ? 'duas' : boxes.length === 3 ? 'três' : String(boxes.length);
   return (
     <div className="bxp" style={{ marginBottom: '2rem' }}>
       <style>{`
-        .bxp-k { color: #e9cf7a; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin: 0 0 0.35rem; }
-        .bxp-h { font-family: var(--font-heading); font-size: clamp(1.5rem, 4.5vw, 2.2rem); line-height: 1.15; margin: 0 0 0.35rem; color: #fdfaf3; }
-        .bxp-s { color: rgba(253,250,243,0.85); font-size: 0.95rem; margin: 0 0 1.1rem; }
-        .bxp-row { display: grid; gap: 0.75rem; grid-template-columns: repeat(${many ? boxes.length : 2}, minmax(0, 1fr)); max-width: ${many ? 'none' : '640px'}; margin: 0 auto; }
-        .bxp-row.is-many { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 0.25rem; }
+        .bxp-k { display: inline-block; background: #d4af37; color: #3c2a21; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.35rem 0.9rem; border-radius: 999px; margin: 0 0 0.6rem; }
+        .bxp-h { font-family: var(--font-heading); font-size: clamp(1.6rem, 5vw, 2.4rem); line-height: 1.15; margin: 0 0 0.35rem; color: #fdfaf3; }
+        .bxp-s { color: rgba(253,250,243,0.85); font-size: 0.95rem; margin: 0 0 0.5rem; }
+        .bxp-stage { position: relative; max-width: ${many ? 'none' : '640px'}; margin: 0 auto; padding-top: ${two ? '4.6rem' : '0.6rem'}; }
+        .bxp-row { display: grid; gap: 0.75rem; grid-template-columns: repeat(${many ? boxes.length : 2}, minmax(0, 1fr)); }
+        .bxp-row.is-many { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0.5rem 0 0.25rem; }
         .bxp-row.is-many .bxp-t { flex: 0 0 min(46%, 240px); scroll-snap-align: start; }
-        .bxp-t { position: relative; display: flex; flex-direction: column; text-align: left; padding: 0; border-radius: 18px; overflow: hidden; cursor: pointer; background: #fdfaf3; color: #3c2a21; border: 3px solid transparent; box-shadow: 0 14px 30px rgba(0,0,0,0.3); transition: transform 0.2s, border-color 0.2s, opacity 0.2s; font: inherit; }
-        .bxp-t:not(.is-on) { opacity: 0.88; }
-        .bxp-t:hover { transform: translateY(-2px); opacity: 1; }
-        .bxp-t.is-on { border-color: #d4af37; opacity: 1; }
+        .bxp-t { position: relative; display: flex; flex-direction: column; text-align: left; padding: 0; border-radius: 18px; overflow: hidden; cursor: pointer; background: #fdfaf3; color: #3c2a21; border: 3px solid rgba(253,250,243,0.35); box-shadow: 0 14px 30px rgba(0,0,0,0.3); transition: transform 0.2s, border-color 0.2s; font: inherit; }
+        .bxp-t:hover { transform: translateY(-3px); }
+        .bxp-t.is-on { border-color: #d4af37; box-shadow: 0 0 0 4px rgba(212,175,55,0.35), 0 14px 30px rgba(0,0,0,0.3); }
+        .bxp-t.is-nudge { animation: bxp-nudge 3.6s ease-in-out 1.2s infinite; }
+        @keyframes bxp-nudge {
+          0%, 78%, 100% { transform: none; }
+          82% { transform: translateY(-6px) rotate(-2deg); }
+          86% { transform: translateY(-6px) rotate(2deg); }
+          90% { transform: translateY(-3px) rotate(-1.5deg); }
+          94% { transform: none; }
+        }
+        .bxp-photo { position: relative; display: block; }
         .bxp-t img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #f5efe2; }
+        .bxp-opt { position: absolute; top: 8px; left: 8px; background: #3c2a21; color: #fdfaf3; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; padding: 0.3rem 0.6rem; border-radius: 999px; box-shadow: 0 4px 10px rgba(0,0,0,0.25); }
+        .bxp-t.is-on .bxp-opt { background: #d4af37; color: #3c2a21; }
         .bxp-b { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.7rem 0.75rem 0.8rem; flex: 1; }
         .bxp-badge { font-size: 0.75rem; font-weight: 800; color: #a6832b; }
         .bxp-title { font-weight: 800; font-size: 1rem; line-height: 1.2; overflow-wrap: anywhere; }
         .bxp-price { font-weight: 800; color: #3c2a21; font-size: 0.95rem; }
         .bxp-sub { font-size: 0.78rem; color: #594a42; line-height: 1.35; }
         .bxp-cta { margin-top: auto; padding-top: 0.5rem; }
-        .bxp-cta span { display: block; text-align: center; border-radius: 999px; padding: 0.5rem 0.4rem; font-size: 0.8rem; font-weight: 800; background: #f3ead6; color: #3c2a21; }
+        .bxp-cta span { display: block; text-align: center; border-radius: 999px; padding: 0.55rem 0.4rem; font-size: 0.82rem; font-weight: 800; background: #3c2a21; color: #fdfaf3; }
         .bxp-t.is-on .bxp-cta span { background: #d4af37; color: #fff; }
-        @media (min-width: 768px) { .bxp-title { font-size: 1.1rem; } .bxp-b { padding: 0.9rem 1rem 1rem; } }
+        /* The gold coin between two boxes, on the line where the photos end. */
+        .bxp-or { position: absolute; z-index: 3; left: 50%; top: calc(4.6rem + (min(100vw - 2rem, 640px) - 0.75rem) * 0.375); transform: translate(-50%, -50%);
+          width: 54px; height: 54px; border-radius: 50%; background: #d4af37; color: #3c2a21; border: 4px solid #3c2a21; box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+          display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-weight: 800; font-size: 1rem; pointer-events: none; }
+        /* Handwritten note + drawn arrow over the box you are not looking at. */
+        .bxp-note { position: absolute; z-index: 2; top: 0; width: 50%; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+        .bxp-note span { font-family: 'Yellowtail', 'Brush Script MT', cursive; color: #e9cf7a; font-size: clamp(1.45rem, 4.6vw, 1.9rem); line-height: 1; white-space: nowrap; transform: rotate(-5deg); text-shadow: 0 2px 10px rgba(0,0,0,0.55); }
+        .bxp-note svg { width: 54px; height: 44px; margin-top: 0.15rem; overflow: visible; }
+        .bxp-note path { fill: none; stroke: #e9cf7a; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 120; stroke-dashoffset: 120; animation: bxp-draw 0.9s ease-out 0.35s forwards; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        @keyframes bxp-draw { to { stroke-dashoffset: 0; } }
+        @media (min-width: 768px) { .bxp-title { font-size: 1.1rem; } .bxp-b { padding: 0.9rem 1rem 1rem; } .bxp-or { width: 64px; height: 64px; font-size: 1.15rem; } }
+        @media (prefers-reduced-motion: reduce) { .bxp-t.is-nudge { animation: none; } .bxp-note path { animation: none; stroke-dashoffset: 0; } }
       `}</style>
-      <p className="bxp-k">{boxes.length} caixas à venda</p>
-      <h2 className="bxp-h">Escolha a sua caixa</h2>
-      <p className="bxp-s">Ou leve mais de uma: vão juntas no mesmo pedido e na mesma entrega.</p>
-      <div role="group" aria-label="Qual caixa" className={`bxp-row hide-scrollbars${many ? ' is-many' : ''}`}>
-        {boxes.map(b => {
-          const on = b.id === activeId;
-          return (
-            <button key={b.id} type="button" className={`bxp-t${on ? ' is-on' : ''}`} onClick={() => onPick(b.id)} aria-pressed={on}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {b.image_url ? <img src={optimizedSrc(b.image_url, 640)} alt="" /> : <span style={{ fontSize: '3rem', textAlign: 'center', padding: '1rem' }}>📦</span>}
-              <span className="bxp-b">
-                <span className="bxp-badge">{editionIcon(b)} {editionLabel(b)}</span>
-                <span className="bxp-title">{shortTitle(b.title)}</span>
-                <span className="bxp-price">{priceOf(b)}</span>
-                <span className="bxp-sub">{subOf(b)}</span>
-                <span className="bxp-cta"><span>{on ? '✓ Escolhida' : 'Ver esta caixa'}</span></span>
-              </span>
-            </button>
-          );
-        })}
+      <p className="bxp-k">✨ Esta semana tem {count} caixas</p>
+      <h2 className="bxp-h">Escolha a sua (ou leve {boxes.length === 2 ? 'as duas' : 'mais de uma'})</h2>
+      <p className="bxp-s">Vão juntas no mesmo pedido e na mesma entrega.</p>
+      <div className="bxp-stage">
+        {two && (
+          <div key={target} className="bxp-note" style={{ left: target ? '50%' : 0 }} aria-hidden>
+            <span>Olha esta também!</span>
+            <svg viewBox="0 0 54 44">
+              {/* A hand-drawn curve ending in an arrowhead, pointing down into the tile. */}
+              <path d={target ? 'M8 4 C 30 6, 34 22, 28 38 M19 30 L28 39 L35 28' : 'M46 4 C 24 6, 20 22, 26 38 M19 28 L26 39 L35 30'} />
+            </svg>
+          </div>
+        )}
+        <div role="group" aria-label="Qual caixa" className={`bxp-row hide-scrollbars${many ? ' is-many' : ''}`}>
+          {boxes.map((b, i) => {
+            const on = b.id === activeId;
+            return (
+              <button key={b.id} type="button" className={`bxp-t${on ? ' is-on' : ''}${!on && !touched ? ' is-nudge' : ''}`}
+                onClick={() => { setTouched(true); onPick(b.id); }} aria-pressed={on}>
+                <span className="bxp-photo">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {b.image_url ? <img src={optimizedSrc(b.image_url, 640)} alt="" /> : <span style={{ display: 'block', fontSize: '3rem', textAlign: 'center', padding: '1rem' }}>📦</span>}
+                  <span className="bxp-opt">OPÇÃO {i + 1}</span>
+                </span>
+                <span className="bxp-b">
+                  <span className="bxp-badge">{editionIcon(b)} {editionLabel(b)}</span>
+                  <span className="bxp-title">{shortTitle(b.title)}</span>
+                  <span className="bxp-price">{priceOf(b)}</span>
+                  <span className="bxp-sub">{subOf(b)}</span>
+                  <span className="bxp-cta"><span key={on ? 'on' : 'off'}>{on ? '✓ Você está vendo esta' : '👉 Ver esta caixa'}</span></span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        {two && <span className="bxp-or" aria-hidden>OU</span>}
       </div>
     </div>
   );
 }
+
 
 
 /** Why pre-order: three steps, so "pay now, get it next week" reads as fresher, not as waiting. */
