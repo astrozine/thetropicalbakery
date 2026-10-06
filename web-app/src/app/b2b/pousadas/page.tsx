@@ -10,7 +10,7 @@ export default function PousadasPage() {
       intro="Sua pousada já oferece hospitalidade de verdade — deixe a gente cuidar da parte doce. Café da manhã inesquecível, ou uma mini loja que se paga sozinha."
       heroScene="/assets/glamorous_pousada_1789884603550.jpg"
       heroTreats={["/b2b-hero/treat-9.jpg", "/b2b-hero/treat-7.jpg"]}
-      regionNote="Atendemos toda a região: Itamambuca, Ubatuba, praias vizinhas e eventos em Paraty."
+      regionNote="Atendemos toda a região: Itamambuca, Ubatuba, praias vizinhas e Paraty (pedidos a partir de R$ 600)."
       options={[
         {
           icon: '🎁',
