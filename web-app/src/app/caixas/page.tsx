@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import StripedBackground from '@/components/StripedBackground';
@@ -62,6 +62,8 @@ export default function CaixasPage() {
   const schedule = useSchedule();
   const sizePrices = useBoxSizePrices();
   const [chosen, setChosen] = useState<string | null>(null);
+  /** Where a tap on a box tile scrolls to: the chosen box's name and details. */
+  const detailsRef = useRef<HTMLDivElement>(null);
   useEffect(() => { setChosen(choiceFromUrl()); }, []);
 
   useEffect(() => {
@@ -115,6 +117,7 @@ export default function CaixasPage() {
   const special = !!activeBox && isSpecial(activeBox);
   const own = fixedPrice(activeBox);
   const others = shown.filter(b => b.id !== activeBox?.id);
+  const multi = shown.length > 1;
   const heroTag = isPre ? 'Próxima fornada' : special ? 'Edição especial' : 'Nesta caixa';
   const pick = (id: string, scroll = false) => {
     setChosen(id);
@@ -166,18 +169,22 @@ export default function CaixasPage() {
         
         <HeroBoxCard key={`l-${activeBox.id}`} side="left" photos={leftPhotos} tag={heroTag} />
         <HeroBoxCard key={`r-${activeBox.id}`} side="right" photos={rightPhotos} delayMs={2750} tag={heroTag} />
-        {limited && sale?.state === 'open' && <BoxesLeftBadge remaining={remainingQuantity} />}
+        {/* With several boxes the tiles carry each one's photo and count: no extra strip or sticker. */}
+        {!multi && limited && sale?.state === 'open' && <BoxesLeftBadge remaining={remainingQuantity} />}
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
-          <HeroBoxStrip key={activeBox.id} photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} tag={heroTag} />
-          {shown.length > 1 && (
-            <BoxSwitch boxes={shown} activeId={activeBox.id} onPick={id => pick(id)}
+          {!multi && <HeroBoxStrip key={activeBox.id} photos={[leftPhotos[0], rightPhotos[0]].filter(Boolean)} tag={heroTag} />}
+          {multi && (
+            <BoxPicker boxes={shown} activeId={activeBox.id}
+              onPick={id => { pick(id); setTimeout(() => detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); }}
+              priceOf={b => boxPriceText(b, sizePrices)}
               subOf={b => {
                 const s = saleOf(b);
                 const left = b.total_quantity > 0 ? `restam ${Math.max(0, b.total_quantity - b.sold_quantity)}` : '';
-                return [s.state === 'soldout' ? 'esgotada' : left || boxPriceText(b, sizePrices), s.windowLabel].filter(Boolean).join(' · ');
+                return [s.state === 'soldout' ? 'esgotada' : left, s.windowLabel ? `entregas ${s.windowLabel}` : ''].filter(Boolean).join(' · ');
               }} />
           )}
+          <div ref={detailsRef} style={{ scrollMarginTop: '5.5rem' }} />
           <ScrollReveal>
             <span style={{ display: 'inline-block', background: '#d4af37', color: 'white', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.5rem' }}>
               {isPre
@@ -332,46 +339,65 @@ export default function CaixasPage() {
 }
 
 /**
- * Which box, when more than one is on sale (the box of the week, the pre-sale, special editions).
- * Sits at the top of the hero, on the dark photo. Two boxes share the row; three or more scroll sideways.
+ * "Escolha a sua caixa": when more than one box is on sale (the box of the week, the pre-sale, special
+ * editions), they are shown side by side as equal products — photo, name, price, how many are left —
+ * at the top of the hero, before anything about one box in particular. Tapping one shows its details
+ * and order form below. Two boxes share the row (also on a phone); three or more scroll sideways.
  */
-function BoxSwitch({ boxes, activeId, onPick, subOf }: {
-  boxes: TastingBox[]; activeId: string; onPick: (id: string) => void; subOf: (b: TastingBox) => string;
+function BoxPicker({ boxes, activeId, onPick, priceOf, subOf }: {
+  boxes: TastingBox[]; activeId: string; onPick: (id: string) => void;
+  priceOf: (b: TastingBox) => string; subOf: (b: TastingBox) => string;
 }) {
   const many = boxes.length > 2;
   return (
-    <div role="group" aria-label="Qual caixa" className="hide-scrollbars" style={{
-      display: 'flex', gap: '0.35rem', maxWidth: many ? '720px' : '560px', margin: '0 auto 1.75rem', padding: '0.35rem',
-      background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(10px)', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.2)',
-      overflowX: many ? 'auto' : undefined, scrollSnapType: many ? 'x mandatory' : undefined,
-    }}>
-      {boxes.map(b => {
-        const on = b.id === activeId;
-        return (
-          <button key={b.id} type="button" onClick={() => onPick(b.id)} aria-pressed={on} style={{
-            flex: many ? '0 0 min(72%, 230px)' : '1 1 0', minWidth: 0, minHeight: '44px', padding: '0.55rem 0.6rem', borderRadius: '14px',
-            cursor: 'pointer', textAlign: 'left', display: 'flex', gap: '0.55rem', alignItems: 'center', scrollSnapAlign: 'start',
-            border: on ? '2px solid #d4af37' : '2px solid transparent',
-            background: on ? '#fdfaf3' : 'transparent', color: on ? '#3c2a21' : '#fdfaf3',
-            transition: 'background 0.2s, color 0.2s',
-          }}>
-            {b.image_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={optimizedSrc(b.image_url, 256)} alt="" style={{ width: '40px', height: '40px', flexShrink: 0, borderRadius: '10px', objectFit: 'cover' }} />
-            )}
-            <span style={{ minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: on ? '#a6832b' : '#e9cf7a' }}>
-                {editionIcon(b)} {editionLabel(b)}
+    <div className="bxp" style={{ marginBottom: '2rem' }}>
+      <style>{`
+        .bxp-k { color: #e9cf7a; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin: 0 0 0.35rem; }
+        .bxp-h { font-family: var(--font-heading); font-size: clamp(1.5rem, 4.5vw, 2.2rem); line-height: 1.15; margin: 0 0 0.35rem; color: #fdfaf3; }
+        .bxp-s { color: rgba(253,250,243,0.85); font-size: 0.95rem; margin: 0 0 1.1rem; }
+        .bxp-row { display: grid; gap: 0.75rem; grid-template-columns: repeat(${many ? boxes.length : 2}, minmax(0, 1fr)); max-width: ${many ? 'none' : '640px'}; margin: 0 auto; }
+        .bxp-row.is-many { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 0.25rem; }
+        .bxp-row.is-many .bxp-t { flex: 0 0 min(46%, 240px); scroll-snap-align: start; }
+        .bxp-t { position: relative; display: flex; flex-direction: column; text-align: left; padding: 0; border-radius: 18px; overflow: hidden; cursor: pointer; background: #fdfaf3; color: #3c2a21; border: 3px solid transparent; box-shadow: 0 14px 30px rgba(0,0,0,0.3); transition: transform 0.2s, border-color 0.2s, opacity 0.2s; font: inherit; }
+        .bxp-t:not(.is-on) { opacity: 0.88; }
+        .bxp-t:hover { transform: translateY(-2px); opacity: 1; }
+        .bxp-t.is-on { border-color: #d4af37; opacity: 1; }
+        .bxp-t img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #f5efe2; }
+        .bxp-b { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.7rem 0.75rem 0.8rem; flex: 1; }
+        .bxp-badge { font-size: 0.75rem; font-weight: 800; color: #a6832b; }
+        .bxp-title { font-weight: 800; font-size: 1rem; line-height: 1.2; overflow-wrap: anywhere; }
+        .bxp-price { font-weight: 800; color: #3c2a21; font-size: 0.95rem; }
+        .bxp-sub { font-size: 0.78rem; color: #594a42; line-height: 1.35; }
+        .bxp-cta { margin-top: auto; padding-top: 0.5rem; }
+        .bxp-cta span { display: block; text-align: center; border-radius: 999px; padding: 0.5rem 0.4rem; font-size: 0.8rem; font-weight: 800; background: #f3ead6; color: #3c2a21; }
+        .bxp-t.is-on .bxp-cta span { background: #d4af37; color: #fff; }
+        @media (min-width: 768px) { .bxp-title { font-size: 1.1rem; } .bxp-b { padding: 0.9rem 1rem 1rem; } }
+      `}</style>
+      <p className="bxp-k">{boxes.length} caixas à venda</p>
+      <h2 className="bxp-h">Escolha a sua caixa</h2>
+      <p className="bxp-s">Ou leve mais de uma: vão juntas no mesmo pedido e na mesma entrega.</p>
+      <div role="group" aria-label="Qual caixa" className={`bxp-row hide-scrollbars${many ? ' is-many' : ''}`}>
+        {boxes.map(b => {
+          const on = b.id === activeId;
+          return (
+            <button key={b.id} type="button" className={`bxp-t${on ? ' is-on' : ''}`} onClick={() => onPick(b.id)} aria-pressed={on}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {b.image_url ? <img src={optimizedSrc(b.image_url, 640)} alt="" /> : <span style={{ fontSize: '3rem', textAlign: 'center', padding: '1rem' }}>📦</span>}
+              <span className="bxp-b">
+                <span className="bxp-badge">{editionIcon(b)} {editionLabel(b)}</span>
+                <span className="bxp-title">{shortTitle(b.title)}</span>
+                <span className="bxp-price">{priceOf(b)}</span>
+                <span className="bxp-sub">{subOf(b)}</span>
+                <span className="bxp-cta"><span>{on ? '✓ Escolhida' : 'Ver esta caixa'}</span></span>
               </span>
-              <span style={{ display: 'block', fontWeight: 800, fontSize: '0.95rem', lineHeight: 1.2, overflowWrap: 'anywhere' }}>{shortTitle(b.title)}</span>
-              <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.1rem', opacity: on ? 0.75 : 0.85, lineHeight: 1.3 }}>{subOf(b)}</span>
-            </span>
-          </button>
-        );
-      })}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
+
 
 /** Why pre-order: three steps, so "pay now, get it next week" reads as fresher, not as waiting. */
 function PresaleSteps({ closesOn, windowLabel }: { closesOn: string | null; windowLabel: string }) {
