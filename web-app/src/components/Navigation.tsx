@@ -9,7 +9,7 @@ import InstagramLink from '@/components/InstagramLink';
 import { SUB_STYLE } from '@/components/ClubeInvite';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
-import { clearGoogleTranslate as clearEbookTranslation } from '@/components/ebook/EbookLang';
+import { clearGoogleTranslate } from '@/lib/googleTranslate';
 
 // Desktop menu (xl and up): one line at 1280px, roomier on bigger screens.
 const GAP = 'clamp(0.7rem, 1.1vw, 1.5rem)';
@@ -46,7 +46,7 @@ export default function Navigation() {
     // The e-book page is written in English with hand-made Portuguese and Spanish versions; Google Translate
     // can't produce Portuguese from it (it thinks every page already is). Send people to the real version.
     if (pathname?.startsWith('/sweet-escape') && !pathname.includes('/thank-you')) {
-      clearEbookTranslation();
+      clearGoogleTranslate();
       window.location.href = isEbookLang(langCode) ? LANG_PATH[langCode] : `${LANG_PATH.en}?tl=${langCode}`;
       return;
     }
@@ -55,12 +55,8 @@ export default function Navigation() {
     const twinEn = HAND_TRANSLATED_EN[pathname ?? ''];
     const twinPt = Object.keys(HAND_TRANSLATED_EN).find(pt => HAND_TRANSLATED_EN[pt] === pathname);
     if ((twinEn && langCode === 'en') || (twinPt && langCode !== 'en')) {
-      const host = window.location.hostname;
-      const value = langCode === 'en' || langCode === 'pt' ? '' : `/pt/${langCode}`;
-      const expire = value ? 'path=/;' : 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      document.cookie = `googtrans=${value}; ${expire}`;
-      document.cookie = `googtrans=${value}; ${expire} domain=${host};`;
-      document.cookie = `googtrans=${value}; ${expire} domain=.${host};`;
+      clearGoogleTranslate();
+      if (langCode !== 'en' && langCode !== 'pt') document.cookie = `googtrans=/pt/${langCode}; path=/;`;
       window.location.href = twinEn && langCode === 'en' ? twinEn : (twinPt as string);
       return;
     }
@@ -68,12 +64,9 @@ export default function Navigation() {
       // The site's own language: asking Google Translate to translate
       // Portuguese into Portuguese doesn't no-op, it actually runs the
       // translation pass and mangles words. Clearing its cookie and
-      // reloading restores the real, original text instead.
-      const host = window.location.hostname;
-      const expire = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      document.cookie = `googtrans=; ${expire}`;
-      document.cookie = `googtrans=; ${expire} domain=${host};`;
-      document.cookie = `googtrans=; ${expire} domain=.${host};`;
+      // reloading restores the real, original text instead. (It must clear the
+      // parent-domain copy too, or www.thetropicalbakery.com stays in English.)
+      clearGoogleTranslate();
       window.location.reload();
       return;
     }

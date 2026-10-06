@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { clearGoogleTranslate } from '@/lib/googleTranslate';
 import { EBOOK_COPY, GOOGLE_LANGS, LANG_LABEL, LANG_PATH, EBOOK_LANGS, type EbookLang } from '@/lib/ebookCopy';
 
 /**
@@ -27,13 +28,7 @@ export function rich(s: string): React.ReactNode {
   return out;
 }
 
-export function clearGoogleTranslate() {
-  const host = window.location.hostname;
-  const expire = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  document.cookie = `googtrans=; ${expire}`;
-  document.cookie = `googtrans=; ${expire} domain=${host};`;
-  document.cookie = `googtrans=; ${expire} domain=.${host};`;
-}
+export { clearGoogleTranslate };
 
 const isTranslated = () => /\btranslated-(ltr|rtl)\b/.test(document.documentElement.className);
 
