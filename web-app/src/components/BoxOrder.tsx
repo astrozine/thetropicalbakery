@@ -151,7 +151,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
             </p>
           ) : (
             <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: 1.6 }}>
-              Receba em casa (Itamambuca, praias vizinhas e eventos em Paraty) ou retire no nosso home bakery. Escolha o dia e pague por Pix em seguida.
+              Receba em casa (Itamambuca, praias vizinhas e pedidos maiores em Paraty, a partir de R$ 500) ou retire no nosso home bakery. Escolha o dia e pague por Pix em seguida.
             </p>
           )}
           <OriginSeal text="Técnica belga · Ingredientes brasileiros" style={{ marginTop: '0.9rem' }} />

@@ -195,7 +195,7 @@ export default function Navigation() {
         fontSize: 'clamp(0.78rem, 2vw, 0.9rem)',
         padding: 'clamp(0.5rem, 1.5vw, 0.8rem)'
       }}>
-        <span>🌴 Entregas exclusivas: Itamambuca, Ubatuba e Região. Eventos em Paraty! 🌴</span>
+        <span>🌴 Entregas exclusivas: Itamambuca, Ubatuba e Região. Paraty para pedidos a partir de R$ 500! 🌴</span>
       </div>
 
       <nav className="mobile-header-nav" data-tucked={tucked && !isOpen ? 'true' : 'false'} style={{
