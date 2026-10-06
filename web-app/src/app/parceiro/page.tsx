@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import { formatBRL } from '@/lib/deliveryZones';
+import { CARE_PATH, FREEZER_WEEKS, FRIDGE_DAYS, THAW_MINUTES } from '@/lib/treatCare';
 import {
   Partner, RestockRequest, PARTNER_STATUS, RESTOCK_STATUS, partnerKind,
 } from '@/lib/portals';
@@ -264,6 +265,21 @@ export default function PartnerPortalPage() {
               </p>
             </div>
           )}
+
+          {/* How to keep the treats: partners hold stock, so they get the freezer rules before they ask for more. */}
+          <div style={{ ...card, gridColumn: '1 / -1' }}>
+            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', color: 'var(--color-primary)', marginBottom: '0.75rem' }}>Como guardar e servir</h2>
+            <ul style={{ color: '#594a42', fontSize: '0.92rem', lineHeight: 1.7, paddingLeft: '1.2rem', margin: 0, display: 'grid', gap: '0.35rem' }}>
+              <li><strong>Chegou, freezer.</strong> Guarde as caixas no freezer assim que receber: ficam ótimas por até {FREEZER_WEEKS} semanas. Use primeiro as que chegaram antes.</li>
+              <li><strong>Geladeira ou vitrine refrigerada: {FRIDGE_DAYS} dias no máximo.</strong> Anote na caixa o dia em que saiu do freezer.</li>
+              <li><strong>Crus e cremosos:</strong> tire do freezer uns {THAW_MINUTES} minutos antes de servir. <strong>Cookies e tortinhas:</strong> descongelam em temperatura ambiente, ou vão mornos na airfryer/forno baixo.</li>
+              <li><strong>Fora do freezer e da geladeira, poucas horas</strong>, menos ainda no calor. Não deixe doce cremoso exposto ao sol.</li>
+              <li><strong>Alérgenos:</strong> nada leva trigo, mas todos podem ter traços de glúten, castanhas, amendoim, coco, gergelim, soja e aveia. Se um cliente perguntar, mostre os ingredientes no site ou chame a Dolly.</li>
+            </ul>
+            <Link href={CARE_PATH} target="_blank" style={{ display: 'inline-block', marginTop: '0.9rem', fontSize: '0.88rem', fontWeight: 600, color: '#a6832b' }}>
+              Página para mostrar aos seus clientes →
+            </Link>
+          </div>
 
           {/* Restock */}
           <div style={{ ...card, gridColumn: affiliate ? '1 / -1' : undefined }}>

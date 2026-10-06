@@ -159,5 +159,5 @@ export function dietLine(match: DietMatch, avoidCount: number): string {
     const names = match.traces.map(a => a.label.toLowerCase()).join(', ');
     return `Atenção: pode conter traços de ${names}. Tudo é feito na mesma cozinha, então preferimos te avisar.`;
   }
-  return '✅ Conferimos para você: não leva nada do que você pediu para evitar.';
+  return '✅ Conferimos para você: a receita não leva nada do que você pediu para evitar. Como tudo é feito na mesma cozinha, traços são possíveis; se for uma alergia séria, fale com a gente antes.';
 }

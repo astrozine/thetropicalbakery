@@ -24,7 +24,7 @@ const copy: BoatCopy = {
     'Comissão de 10% a 15% em cada pedido indicado',
     'Nenhum estoque, nenhum trabalho: entregamos direto no píer',
     'Um extra de luxo que aumenta o valor do passeio',
-    'Opções para clientes veganos, sem glúten e sem açúcar refinado',
+    'Opções para clientes veganos e sem glúten, com o açúcar de cada doce informado',
   ],
   whereTitle: 'Onde entregamos',
   places: [
@@ -64,13 +64,13 @@ export default function BarcosPage() {
         {
           icon: '🎁',
           title: 'Kit a Bordo',
-          description: 'Uma caixa com 8 doces da semana, embalada como presente e protegida para o calor. Perfeito para aniversários, pedidos de casamento, lua de mel e grupos especiais.',
+          description: 'Uma caixa com 8 doces da semana, embalada como presente e entregue no píer numa caixa térmica com gelo: a bordo, fica no cooler até a hora de servir. Perfeito para aniversários, pedidos de casamento, lua de mel e grupos especiais.',
           note: 'Valor sugerido ao cliente: a partir de R$ 249',
         },
         {
           icon: '🌙',
           title: 'Boas-vindas para viagens de vários dias',
-          description: 'Caixas para charters com pernoite, entregues na marina antes da partida, para a tripulação servir durante a viagem.',
+          description: 'Caixas para charters com pernoite, entregues congeladas na marina antes da partida. No freezer de bordo duram a viagem toda; a tripulação tira uns 10 minutos antes de servir.',
         },
         {
           icon: '🥂',

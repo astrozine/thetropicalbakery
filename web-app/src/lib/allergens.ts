@@ -53,10 +53,14 @@ export function normalizeAllergens(ids: string[] | null | undefined): string[] {
  */
 export const KITCHEN_FACTS = [
   { emoji: '🌱', text: '100% vegetal: nenhum doce leva leite, ovos, mel ou qualquer ingrediente de origem animal.' },
-  { emoji: '🌾', text: 'Nenhuma receita leva glúten, mas a cozinha não é certificada sem glúten: pode haver traços. Se você é celíaco, fale com a gente antes.' },
+  // Dolly, 2026-10-05: no wheat in any recipe, but bought-in flours (almond etc.) may come from places that process wheat.
+  { emoji: '🌾', text: 'Não usamos trigo nem nenhum ingrediente com glúten nas receitas. Mas alguns ingredientes que compramos prontos, como farinha de amêndoa e outras farinhas, podem ter sido processados em lugares que também processam trigo: por isso não garantimos ausência de traços de glúten. Se você é celíaco, fale com a gente antes.' },
   // Andrew, 2026-09-30: the ONE refined ingredient is the industrial vegan chocolate (sugar and oil); the
   // rest is SOS-free. Those treats are marked "Com chocolate vegano" (src/lib/sugarCaffeine.ts).
   { emoji: '🍯', text: 'SOS-free: nossas receitas não levam sal, óleo nem açúcar refinado; a doçura vem de tâmaras e frutas, açúcar de coco ou rapadura. A única exceção é o chocolate vegano que alguns doces levam, que já vem com açúcar e óleo: esses aparecem marcados com “🍫 Com chocolate vegano”.' },
+  // Dolly, 2026-10-05: all six are in the kitchen, so traces are possible in every treat, not only the ones ticked.
+  { emoji: '⚠️', text: `Na nossa cozinha passam ${ALLERGENS.map(a => a.label.toLowerCase()).join(', ').replace(/, ([^,]+)$/, ' e $1')}: qualquer doce pode ter traços deles, mesmo quando a receita não leva.` },
+  { emoji: '✨', text: 'Sem conservantes e sem nenhum ingrediente artificial.' },
 ];
 
 export const allergenById = (id: string) => ALLERGENS.find(a => a.id === (LEGACY_IDS[id] || id));

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { trackMeta } from '@/lib/metaPixel';
 import Link from 'next/link';
+import { CARE_PATH, FREEZER_WEEKS } from '@/lib/treatCare';
 import { useCart, CartItem } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
@@ -508,6 +509,10 @@ export default function CheckoutPage() {
                         <label style={labelStyle}>{isPickup ? 'Quando você quer retirar sua caixa?' : 'Quando você quer receber sua caixa?'}</label>
                         <DeliveryCalendar value={formData.date} onChange={setDate} windows={boxWindows} fulfillment={fulfillment}
                           title={isPickup ? 'Dia da retirada' : 'Dia da entrega'} />
+                        <p style={{ fontSize: '0.82rem', color: '#7a6a61', marginTop: '0.6rem', lineHeight: 1.6 }}>
+                          🧊 Vai guardar para depois? No freezer os doces ficam ótimos por até {FREEZER_WEEKS} semanas.{' '}
+                          <Link href={CARE_PATH} target="_blank" style={{ color: '#a6832b', fontWeight: 600 }}>Como guardar</Link>
+                        </p>
                       </>
                     ) : (
                       <>

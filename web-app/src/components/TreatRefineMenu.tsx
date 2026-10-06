@@ -97,7 +97,7 @@ export function matchesRefine(t: RefinableTreat, r: RefineState, opts: { hideUnk
 const MODES: { id: RefineMode; label: string; help: string }[] = [
   { id: 'contains', label: '⚠️ Contém', help: 'Mostra os doces que têm TODOS os itens marcados.' },
   { id: 'may', label: '🔸 Pode conter', help: 'Mostra os doces que podem conter (contaminação cruzada) TODOS os alérgenos marcados.' },
-  { id: 'free', label: '🌱 Livre de', help: 'Mostra os doces que não têm NENHUM dos itens marcados, nem como traço.' },
+  { id: 'free', label: '🌱 Livre de', help: 'Mostra os doces que não levam NENHUM dos itens marcados, nem estão marcados como "pode conter". Tudo passa pela mesma cozinha, então traços são sempre possíveis.' },
 ];
 
 export default function TreatRefineMenu({ treats, value, onChange, shown, variant = 'admin', defaultOpen = false, sheetBelow, fabBottom = '1rem' }: {

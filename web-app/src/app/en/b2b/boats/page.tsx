@@ -24,7 +24,7 @@ const copy: BoatCopy = {
     '10% to 15% commission on every referred order',
     'No stock, no work: we deliver straight to the pier',
     'A luxury extra that raises the value of the trip',
-    'Options for vegan, gluten-free and refined-sugar-free guests',
+    'Options for vegan and gluten-free guests, with the sugar in every treat spelled out',
   ],
   whereTitle: 'Where we deliver',
   places: [
@@ -67,13 +67,13 @@ export default function BoatsPage() {
           {
             icon: '🎁',
             title: 'On-Board Kit',
-            description: "A box of 8 of this week's sweets, gift-wrapped and protected from the heat. Perfect for birthdays, proposals, honeymoons and special groups.",
+            description: "A box of 8 of this week's sweets, gift-wrapped and delivered to the pier in a cooler with ice packs: on board, keep it in the cooler until serving time. Perfect for birthdays, proposals, honeymoons and special groups.",
             note: 'Suggested guest price: from R$249',
           },
           {
             icon: '🌙',
             title: 'Welcome boxes for multi-day trips',
-            description: 'Delivered to the marina before departure for the crew to serve during the trip.',
+            description: 'Delivered frozen to the marina before departure. In the on-board freezer they last the whole trip; the crew takes them out about 10 minutes before serving.',
           },
           {
             icon: '🥂',

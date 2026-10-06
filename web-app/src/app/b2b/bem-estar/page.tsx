@@ -8,7 +8,7 @@ import WellnessScenes from '@/components/WellnessScenes';
 
 export const metadata: Metadata = {
   title: 'Parcerias para Estúdios de Yoga, Pilates, Academias e Spas | The Tropical Bakery',
-  description: 'Doces finos 100% vegetais, sem glúten e sem açúcar refinado para estúdios de yoga e pilates, academias, retiros e spas em Ubatuba e região.',
+  description: 'Doces finos 100% vegetais e sem glúten, adoçados com frutas, açúcar de coco ou rapadura, para estúdios de yoga e pilates, academias, retiros e spas em Ubatuba e região.',
 };
 
 export default function BemEstarPage() {
@@ -17,7 +17,7 @@ export default function BemEstarPage() {
       partnerKind="bemestar"
       eyebrow="Parcerias para Yoga, Pilates e Academias"
       title="O doce que combina com quem se cuida"
-      intro="Estúdios de yoga e pilates, academias, retiros e spas: seus alunos e clientes procuram algo gostoso que não desfaça o treino. Doces da chef belga Dolly, 100% vegetais, sem glúten e sem açúcar refinado, com o açúcar e a cafeína de cada um informados às claras."
+      intro="Estúdios de yoga e pilates, academias, retiros e spas: seus alunos e clientes procuram algo gostoso que não desfaça o treino. Doces da chef belga Dolly, 100% vegetais, sem glúten e adoçados com frutas, com o açúcar e a cafeína de cada um informados às claras."
       heroScene="/assets/wellness_pilates_door.jpg"
       heroPortrait
       heroTreats={['/b2b-hero/treat-5.jpg', '/b2b-hero/treat-2.jpg']}
@@ -40,7 +40,7 @@ export default function BemEstarPage() {
         },
       ]}
       whyChooseUs={[
-        'Tudo 100% vegetal, sem glúten na receita e sem açúcar refinado: combina com o que você ensina.',
+        'Tudo 100% vegetal, sem glúten na receita e adoçado com frutas, açúcar de coco ou rapadura (quando entra chocolate vegano, que tem um pouco de açúcar refinado, vem indicado): combina com o que você ensina.',
         'Açúcar e cafeína de cada doce informados, para quem cuida da alimentação.',
         'Nenhum estoque para administrar: a gente entrega pronto, no dia combinado.',
         'Um diferencial que seus alunos comentam e trazem os amigos para provar.',

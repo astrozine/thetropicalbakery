@@ -191,7 +191,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
               className="dc-day"
               disabled={!interactive || !isSelectable}
               onClick={() => onChange?.(iso)}
-              title={isFridge ? 'Sua caixa ainda está te esperando na geladeira' : isSelectable ? `Dia de ${dayWord} das caixas` : isOpenButTooSoon ? 'Prazo de pedido encerrado para este dia' : undefined}
+              title={isFridge ? 'Sua caixa ainda está te esperando no freezer' : isSelectable ? `Dia de ${dayWord} das caixas` : isOpenButTooSoon ? 'Prazo de pedido encerrado para este dia' : undefined}
               style={{
                 aspectRatio: '1', borderRadius: '50%', border, background, color, animation: anim,
                 cursor: interactive && isSelectable ? 'pointer' : 'default',
@@ -237,7 +237,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
             </p>
             <p style={{ fontSize: '0.85rem', color: 'rgba(253,250,243,0.8)' }}>
               {value && pickup
-                ? `Fica pronta ${readyIn(focus!)}. Guardamos na geladeira por até ${PICKUP_EXTRA_DAYS} dias. Venha no dia que for melhor para você.`
+                ? `Fica pronta ${readyIn(focus!)}. Guardamos no freezer por até ${PICKUP_EXTRA_DAYS} dias. Venha no dia que for melhor para você.`
                 : `${countdown(focus!)} — ${value
                   ? 'feita à mão, fresquinha, na sua porta.'
                   : (pickup ? 'reserve a sua e venha buscar fresquinha.' : 'reserve a sua e receba fresquinha.')}`}
@@ -248,7 +248,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
 
       {pickup && !value && (
         <p style={{ fontSize: '0.82rem', color: '#7a6a61', marginTop: '0.8rem', lineHeight: 1.6 }}>
-          🛍️ Escolha o dia em que a caixa fica pronta. Depois ela te espera na geladeira por até {PICKUP_EXTRA_DAYS} dias: é só vir quando for melhor para você.
+          🛍️ Escolha o dia em que a caixa fica pronta. Depois ela te espera no nosso freezer por até {PICKUP_EXTRA_DAYS} dias: é só vir quando for melhor para você.
         </p>
       )}
 

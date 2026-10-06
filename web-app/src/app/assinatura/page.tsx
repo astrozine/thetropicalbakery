@@ -16,6 +16,7 @@ import WhatsAppGate from '@/components/WhatsAppGate';
 import { OriginSeal } from '@/components/BelgiumBrazil';
 import { planBoxPrice } from '@/lib/boxSizes';
 import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
+import { CARE_SHORT } from '@/lib/treatCare';
 
 /** The single-box price we compare plans against. */
 const BASE_BOX_PRICE = 99;
@@ -70,6 +71,10 @@ const WHY_SUBSCRIBE = [
 ];
 
 const FAQ = [
+  {
+    q: 'Como guardo os doces?',
+    a: `${CARE_SHORT} Todos os cuidados em thetropicalbakery.com/cuidados.`,
+  },
   {
     q: 'Como funciona o pagamento?',
     a: 'Você reserva sua vaga aqui no site sem pagar nada. A Dolly te chama no WhatsApp para confirmar tudo e combinar o Pix — normalmente no mesmo dia. Depois é uma cobrança por ciclo, sempre avisada antes.',

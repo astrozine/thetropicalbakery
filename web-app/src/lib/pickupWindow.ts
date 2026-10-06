@@ -1,5 +1,5 @@
 /**
- * A pickup box is made for a box day and then waits in the fridge. The customer can come
+ * A pickup box is made for a box day and then waits in the kitchen freezer (never the fridge). The customer can come
  * that day or any of the next PICKUP_EXTRA_DAYS days, never later (freshness).
  *
  * The order still stores only the box day (`requested_date`): the last pickup day is always

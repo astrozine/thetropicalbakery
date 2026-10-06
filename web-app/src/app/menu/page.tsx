@@ -317,6 +317,10 @@ export default function MenuPage() {
           que açúcar leva e se tem cafeína) está em cada um. Tudo é feito na mesma cozinha, então pode haver traços, inclusive de glúten. Se algum convidado tem alergia grave ou é celíaco,
           fale com a gente no WhatsApp antes de fechar o pedido.
         </p>
+        <p style={{ maxWidth: '760px', margin: '1rem auto 0', textAlign: 'center', color: '#7a6a61', fontSize: '0.85rem', lineHeight: 1.75 }}>
+          🧊 Os doces chegam gelados e ficam no freezer até a festa. Os crus e cremosos saem uns 10 minutos antes de servir, e o que já foi servido é para comer
+          em poucas horas. Bandejas que nem saíram do freezer continuam ótimas por até 4 semanas. <a href="/cuidados" style={{ color: '#a6832b', fontWeight: 600 }}>Como guardar e servir</a>
+        </p>
       </section>
 
       {/* Last stop for anyone who browsed the catalogue instead of tapping photos: the same "build it together" path. */}

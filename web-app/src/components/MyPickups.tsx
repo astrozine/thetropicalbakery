@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { parseISODate } from '@/lib/deliverySchedule';
 import { PICKUP_EXTRA_DAYS, pickupLastDay, shortDay } from '@/lib/pickupWindow';
+import { TreatCareCard } from '@/components/TreatCare';
 
 interface PickupOrder {
   order_id: string;
@@ -152,9 +153,10 @@ export default function MyPickups() {
                   </div>
                   {o.requested_date && o.stage !== 'picked_up' && (
                     <p style={{ fontSize: '0.85rem', color: 'rgba(253,250,243,0.85)', marginTop: '0.8rem' }}>
-                      🧊 Sua caixa fica na geladeira te esperando de {shortDay(o.requested_date)} até {shortDay(pickupLastDay(o.requested_date))} ({PICKUP_EXTRA_DAYS} dias depois de pronta).
+                      🧊 Sua caixa fica no nosso freezer te esperando de {shortDay(o.requested_date)} até {shortDay(pickupLastDay(o.requested_date))} ({PICKUP_EXTRA_DAYS} dias depois de pronta).
                     </p>
                   )}
+                  <TreatCareCard tone="dark" style={{ marginTop: '1rem' }} />
                   <p style={{ fontSize: '0.75rem', color: 'rgba(253,250,243,0.6)', marginTop: '0.8rem' }}>
                     Este endereço é só para você. Por favor, não compartilhe.
                   </p>

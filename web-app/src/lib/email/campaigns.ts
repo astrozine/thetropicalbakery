@@ -6,6 +6,7 @@
  */
 
 import { SITE_URL, bulletList, esc, kicker, paragraphs } from './layout';
+import { CARE_PATH, CARE_SHORT } from '@/lib/treatCare';
 import type { EmailFact, EmailTheme } from './layout';
 import type { ContactTag } from '@/lib/emailTopics';
 
@@ -233,7 +234,10 @@ export const CAMPAIGNS: Campaign[] = [
         paragraphs(
           `A Dolly já está preparando a sua caixa da semana. Ela sai fresquinha e chega em ${prettyDate(v.date)}.\n\n` +
           'Na caixa de 2 você escolhe os seus favoritos, e na de 6 escolhe os 2 extras: é só entrar em Minha Conta. Se preferir, toque no dado e a Dolly escolhe por você.',
-        ) + (v.preview ? paragraphs(v.preview) : ''),
+        ) + (v.preview ? paragraphs(v.preview) : '') +
+        kicker('Quando a caixa chegar') + paragraphs(`${CARE_SHORT}
+
+Todos os cuidados: ${url(CARE_PATH)}`),
       facts: [{ num: shortDate(v.date), label: weekday(v.date) || 'dia da entrega' }, { num: 'Fresca', label: 'do forno direto para a sua porta' }],
       cta: { label: 'Escolher meus doces', href: url('/minha-conta') },
       note: 'Precisa pular esta semana ou mudar o endereço? É só responder no WhatsApp.',

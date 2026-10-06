@@ -84,6 +84,8 @@ export default function Footer() {
         <p className="footer-legal" style={{ fontSize: '0.8rem' }}>
           <Link href="/privacidade" style={{ color: '#b2bec3', textDecoration: 'underline', display: 'inline-block', padding: '0.7rem 0.25rem' }}>Política de Privacidade</Link>
           {' · '}
+          <Link href="/cuidados" style={{ color: '#b2bec3', textDecoration: 'underline', display: 'inline-block', padding: '0.7rem 0.25rem' }}>Cuidados com os doces</Link>
+          {' · '}
           <Link href="/preferencias" style={{ color: '#b2bec3', textDecoration: 'underline', display: 'inline-block', padding: '0.7rem 0.25rem' }}>Preferências de e-mail</Link>
         </p>
       </div>

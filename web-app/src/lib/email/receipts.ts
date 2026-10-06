@@ -4,6 +4,7 @@ import { PICKUP_EXTRA_DAYS, pickupWindowText } from '@/lib/pickupWindow';
 import { SITE_URL, STORE_WHATSAPP, copyBox, greeting, kicker, orderTable, paragraphs, type LayoutOptions } from './layout';
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
+import { CARE_PATH, CARE_SHORT } from '@/lib/treatCare';
 
 /**
  * The two e-mails nobody has to ask for: "we got your order" and "your payment
@@ -74,7 +75,7 @@ function amounts(order: ReceiptOrder) {
 function fulfilment(order: ReceiptOrder): string {
   if (order.isPickup) {
     return order.date
-      ? `Retirada no nosso home bakery em Itamambuca: ${pickupWindowText(order.date)}. Guardamos a caixa na geladeira por até ${PICKUP_EXTRA_DAYS} dias; o endereço aparece em Minha Conta assim que o pagamento for confirmado.`
+      ? `Retirada no nosso home bakery em Itamambuca: ${pickupWindowText(order.date)}. Guardamos a caixa no nosso freezer por até ${PICKUP_EXTRA_DAYS} dias; o endereço aparece em Minha Conta assim que o pagamento for confirmado.`
       : 'Retirada no nosso home bakery em Itamambuca.';
   }
   if (order.date) return `Entrega prevista para ${prettyDate(order.date)}.`;
@@ -154,7 +155,11 @@ export async function sendOrderPaid(db: SupabaseClient, order: ReceiptOrder) {
     ) +
     kicker('O que você pediu') +
     amounts(order) +
-    (where ? paragraphs(where) : '');
+    (where ? paragraphs(where) : '') +
+    // How to keep the treats (src/lib/treatCare.ts): this is the e-mail everyone who paid gets.
+    (spot ? '' : kicker('Quando a caixa chegar') + paragraphs(`${CARE_SHORT}
+
+Todos os cuidados: ${SITE_URL}${CARE_PATH}`));
 
   await send(db, order, `order-paid:${order.reference}`, `Pagamento confirmado ✅ ${order.reference}`, {
     preheader: `Recebemos ${formatBRL(order.total)}. Seu pedido está confirmado.`,

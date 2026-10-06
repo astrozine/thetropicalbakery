@@ -8,6 +8,7 @@ import BoxOrder from '@/components/BoxOrder';
 import ScrollReveal from '@/components/ScrollReveal';
 import Marquee from '@/components/Marquee';
 import BoxContents from '@/components/BoxContents';
+import { TreatCareCard } from '@/components/TreatCare';
 import { BoxItem } from '@/lib/allergens';
 import { formatBatchDate } from '@/lib/batchDate';
 import BoxItemList from '@/components/BoxItemList';
@@ -246,6 +247,11 @@ export default function CaixasPage() {
       {isPre && <PresaleSteps closesOn={sale?.closesOn ?? null} windowLabel={sale?.windowLabel || ''} />}
 
       {activeBox.items && activeBox.items.length > 0 && <BoxContents items={activeBox.items} />}
+
+      {/* How to keep them: buyers who plan ahead (gifts, later in the week) need to know the freezer keeps them 4 weeks. */}
+      <section style={{ padding: '1.5rem 1rem 0' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}><TreatCareCard /></div>
+      </section>
 
       {/* Checkout Section */}
       <section id="order" style={{ padding: '4rem 2rem' }}>
