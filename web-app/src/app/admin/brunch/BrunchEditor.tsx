@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { uploadPublicImage } from '@/lib/imageUpload';
+import { uploadPublicImage, LOGO_MAX_SIDE } from '@/lib/imageUpload';
 import { brandConfirm } from '@/lib/brandDialog';
 import {
   DEFAULT_INCLUDES, EXTRA_SUGGESTIONS, SPONSOR_KINDS, VENUE_KINDS, VOTE_CLOSE_DAYS, brasiliaToIso, fmtWhen, isoToBrasilia, slugify,
@@ -58,10 +58,10 @@ export default function BrunchEditor({ initial, privateInfo, onDone }: {
   const [saving, setSaving] = useState(false);
   const [problem, setProblem] = useState('');
 
-  const upload = async (file: File | undefined, key: string, set: (url: string) => void) => {
+  const upload = async (file: File | undefined, key: string, set: (url: string) => void, maxSide?: number) => {
     if (!file) return;
     setUploading(key);
-    try { set(await uploadPublicImage(file, 'brunch')); } catch { setProblem('A foto não subiu. Tente de novo.'); }
+    try { set(await uploadPublicImage(file, 'brunch', maxSide)); } catch { setProblem('A foto não subiu. Tente de novo.'); }
     setUploading('');
   };
 
@@ -328,7 +328,7 @@ export default function BrunchEditor({ initial, privateInfo, onDone }: {
                     <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                       <label className="bx-thumb" style={{ cursor: 'pointer', flexShrink: 0 }} aria-label="Logo">
                         {s.logo_url ? <img src={s.logo_url} alt="" /> : <span style={{ fontSize: '1.4rem' }}>{uploading === `sp${i}` ? '…' : '🏷️'}</span>}
-                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => upload(e.target.files?.[0], `sp${i}`, url => setSponsor(i, { logo_url: url }))} />
+                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => upload(e.target.files?.[0], `sp${i}`, url => setSponsor(i, { logo_url: url }), LOGO_MAX_SIDE)} />
                       </label>
                       <input className="bx-input" value={s.name} onChange={e => setSponsor(i, { name: e.target.value })} placeholder="Nome" />
                     </div>

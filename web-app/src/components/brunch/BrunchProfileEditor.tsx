@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { resizeImage } from '@/lib/imageUpload';
+import { resizeImage, LOGO_MAX_SIDE } from '@/lib/imageUpload';
 import { EMOJI_CHOICES, type BrunchProfile, type RoomMember } from '@/lib/brunch';
 import { Avatar } from './BrunchChat';
 
@@ -73,9 +73,9 @@ export default function BrunchProfileEditor({ userId, initial, fallbackName, onS
     setUploading(true);
     setMsg(null);
     try {
-      const blob = await resizeImage(file, 600, 0.85);
-      const path = `${userId}/avatar-${Date.now()}.jpg`;
-      const { error } = await supabase.storage.from('brunch').upload(path, blob, { contentType: 'image/jpeg', upsert: true });
+      const blob = await resizeImage(file, LOGO_MAX_SIDE, 0.85);
+      const path = `${userId}/avatar-${Date.now()}.${blob.type === 'image/webp' ? 'webp' : blob.type === 'image/png' ? 'png' : 'jpg'}`;
+      const { error } = await supabase.storage.from('brunch').upload(path, blob, { contentType: blob.type, upsert: true });
       if (error) throw error;
       setD(prev => ({ ...prev, photo_url: supabase.storage.from('brunch').getPublicUrl(path).data.publicUrl }));
     } catch {
