@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { EBOOK } from '@/lib/ebook';
+import { BOOK_OFFERS, EBOOK } from '@/lib/ebook';
 import { EBOOK_COPY, EBOOK_LANGS, LANG_LABEL, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import { EnglishNotice, rich } from './EbookLang';
@@ -17,12 +17,18 @@ interface PixResult { reference: string; key: string; payload: string; base64: s
  * The book comes in four languages: the buyer's own is pre-selected. Anyone about to get the English edition while
  * reading in another language (the page, or the browser's translation of it) must confirm they know it is English.
  */
-export default function EbookBuyBox({ lang = 'en', translated = false }: { lang?: EbookLang; translated?: boolean }) {
+export default function EbookBuyBox({ lang = 'en', translated = false, offer }: {
+  lang?: EbookLang;
+  translated?: boolean;
+  /** A welcome-price link (free-recipes e-mails): shown at that price, and the server checks it again. */
+  offer?: string;
+}) {
   const c = EBOOK_COPY[lang];
   const f = c.form;
   // Stripe charges US dollars; Pix, Mercado Pago and PayPal charge reais. The button always shows what the chosen way charges.
-  const reais = `R$ ${EBOOK.priceBRL}`;
-  const dollars = `US$ ${EBOOK.priceUSD}`;
+  const prices = BOOK_OFFERS[offer ? 'welcome' : 'full'];
+  const reais = `R$ ${prices.brl}`;
+  const dollars = `US$ ${prices.usd}`;
 
   const [methods, setMethods] = useState<{ card: boolean; paypal: boolean; stripe: boolean }>({ card: false, paypal: false, stripe: false });
   const [method, setMethod] = useState<Method>('pix');
@@ -67,12 +73,12 @@ export default function EbookBuyBox({ lang = 'en', translated = false }: { lang?
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return setError(f.errEmail);
     if (needsEnglishTick && !english) return setError(c.english.tickError);
     setBusy(true);
-    trackMeta('InitiateCheckout', { value: EBOOK.priceBRL, content_name: EBOOK.id, content_type: 'product', num_items: 1 });
+    trackMeta('InitiateCheckout', { value: prices.brl, content_name: EBOOK.id, content_type: 'product', num_items: 1 });
     try {
       const r = await fetch('/api/ebook/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ name, email, whatsapp, payMethod: method, lang, book }),
+        body: JSON.stringify({ name, email, whatsapp, payMethod: method, lang, book, offer }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || f.errGeneric);
@@ -149,7 +155,7 @@ export default function EbookBuyBox({ lang = 'en', translated = false }: { lang?
         ))}
       </fieldset>
 
-      {f.currencyNote && method !== 'stripe' && <p className="se-currency">{fill(f.currencyNote, { reais, usd: EBOOK.priceUSD })}</p>}
+      {f.currencyNote && method !== 'stripe' && <p className="se-currency">{fill(f.currencyNote, { reais, usd: prices.usd })}</p>}
 
       {needsEnglishTick && <EnglishNotice lang={lang} />}
       {needsEnglishTick && (

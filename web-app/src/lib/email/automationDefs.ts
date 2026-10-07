@@ -111,6 +111,16 @@ export const AUTOMATIONS: AutomationDef[] = [
     knobs: ['threshold'],
     knobLabel: { threshold: 'Avisar quando restarem' },
   },
+  {
+    id: 'receitas-sequencia',
+    name: 'Receitas grátis: sequência de e-mails',
+    emoji: '🍓',
+    campaignId: 'receitas-d1',
+    watches: 'Alguém baixou as receitas grátis (/receitas, /free-recipes) há 1, 3, 5, 7 ou 9 dias.',
+    sends: 'Dia 1 dicas para fazer · dia 3 as outras 5 cores do livro · dia 5 o livro pelo preço de boas-vindas (2 dias) · dia 7 último dia · dia 9, só para quem está em Ubatuba/Paraty, a caixa, o brunch, os cursos e os eventos. Quem já comprou o livro não recebe as ofertas.',
+    knobs: [],
+    knobLabel: {},
+  },
 ];
 
 export const automationById = (id: string) => AUTOMATIONS.find(a => a.id === id);

@@ -228,3 +228,26 @@ Where things live:
   columns use `display: contents` and `order` so the stamp card comes right after the live boxes.
 - Gotcha found on the way: a grid of `AccountSection`s needs `grid-template-columns: minmax(0, 1fr)`, or the
   one-line summaries (`white-space: nowrap`) stretch the grid past a 412px screen and the page clip hides it.
+
+# The free-recipes funnel (/receitas, /free-recipes)
+
+Ads and posts land on a page that gives away 2 recipes from Sweet Escape (Red Berry Bliss Balls, Peanutty Banoffee
+Bars) for an e-mail. Built 2026-10-07; guide for Andrew with the ad copy: `SETUP_free_recipes.md`. Schema:
+`migration_43_free_recipes_funnel.sql` (`funnel_leads`, admin-only; the site writes it with the service key).
+
+- **Every fact in `src/lib/funnel.ts`** (paths, segments, interests → local offers, the e-mail SEQUENCE, page copy in
+  en/pt/es/nl). **Prices only in `src/lib/ebook.ts` `BOOK_OFFERS`** (`full` 47/9, `welcome` 27/5). Stripe's charge and its
+  verification both read the dollars from the order's BRL total (`usdForBRL`), so a new offer needs a distinct BRL price.
+- **Steps:** opt-in with "where are you?" (local / visiting / away) and an order bump (the book at full price) →
+  `/free-recipes/obrigado` (PDF download, the book's payment status or a one-time offer, the local "what would you love?"
+  picker for nearby people, WhatsApp share) → automation `receitas-sequencia` (days 1, 3, 5, 7, 9; **seeded off**).
+- **The downsell** is a signed, expiring link (`offerToken` / `offerExpiry` in `lib/payments/ebook.ts`) on
+  `/free-recipes/oferta`; `createEbookOrder` checks it again and prices it. Never accept a price from the browser.
+- **Book orders still go through `createEbookOrder`** (bump: `createLead`, one-time offer: `buyBookFromLead`, welcome:
+  `/api/ebook/order` with `offer`). `ebookCheckoutUrl` opens card/PayPal/Stripe for all of them.
+- **E-mails:** the PDF e-mail is transactional (`funnelMail.ts`, 4 languages, once per address); the sequence is
+  `FUNNEL_CAMPAIGNS` (`groupOnly`, topic `receitas`, tag `receitas`) in en/pt via the layout's new `lang: 'en'` frame
+  (`Campaign.lang` / `reasonEn`). Buyers of the book are left out of the selling steps (`paidBookEmails`).
+- Nothing may lose a sign-up: without migration 43 the recipes are still e-mailed and the thank-you page still works
+  (language and segment ride in its address).
+- Admin: `/admin/receitas` (Divulgação › Funil de Receitas): sign-ups, bump rate, book sales per door, which UTM converts.

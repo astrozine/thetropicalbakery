@@ -5,6 +5,9 @@ import { summarizeAllergens, type BoxItem } from '@/lib/allergens';
 import type { AutomationDef, AutomationRow } from './automationDefs';
 import type { DietTargeting, SendRequest } from './send';
 import { HOST, creditDeadline, fmtWhen, normalizeEvent, venueKind, type BrunchEvent } from '@/lib/brunch';
+import { SEQUENCE, WELCOME_DAYS, isNearby, type Segment } from '@/lib/funnel';
+import { offerToken } from '@/lib/payments/ebook';
+import { paidBookEmails } from '@/lib/payments/funnel';
 
 /**
  * What each always-on rule does when the scheduler looks at it.
@@ -322,6 +325,49 @@ export async function planFor(db: SupabaseClient, def: AutomationDef, row: Autom
         notes.push(`"${e.title}": ${left} lugar(es)`);
       }
       return requests.length ? { requests, note: notes.join('; ') + '.' } : nothing(`Nenhum brunch com ${threshold} ou menos lugares.`);
+    }
+
+    // ---------------------------------------------------- receitas-sequencia
+    case 'receitas-sequencia': {
+      const oldest = Math.max(...SEQUENCE.map(st => st.day)) + 2;
+      const { data, error } = await db.from('funnel_leads').select('email, lang, segment, created_at')
+        .gte('created_at', new Date(Date.now() - (oldest + 1) * 86400000).toISOString());
+      if (error) return nothing('Rode a migration_43_free_recipes_funnel.sql primeiro.');
+      const leads = (data || []) as { email: string; lang: string; segment: Segment; created_at: string }[];
+      if (!leads.length) return nothing('Ninguém baixou as receitas nos últimos dias.');
+
+      const buyers = new Set(await paidBookEmails(db, leads.map(l => l.email)));
+      // The end of a Brasília day, `n` days from today: when a welcome price stops working.
+      const endOf = (n: number) => new Date(`${addDaysISO(today, n)}T23:59:59-03:00`);
+      const spell = (d: Date, lang: 'pt' | 'en') =>
+        d.toLocaleDateString(lang === 'pt' ? 'pt-BR' : 'en-US', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'long' });
+
+      const requests: SendRequest[] = [];
+      const notes: string[] = [];
+      for (const step of SEQUENCE) {
+        // A day of slack: if the cron missed a day, the step still goes out (messageKey stops any repeat).
+        const due = leads.filter(l => {
+          const age = daysBetween(brasiliaDay(l.created_at), today);
+          if (age < step.day || age > step.day + 1) return false;
+          if (step.nearbyOnly && !isNearby(l.segment)) return false;
+          return !(step.sells && buyers.has(l.email.toLowerCase()));
+        });
+        for (const lang of ['pt', 'en'] as const) {
+          const emails = due.filter(l => (l.lang === 'pt' ? 'pt' : 'en') === lang).map(l => l.email);
+          if (!emails.length) continue;
+          const values: Record<string, string> = { lang };
+          if (step.campaignId === 'receitas-d5' || step.campaignId === 'receitas-d7') {
+            const until = endOf(step.campaignId === 'receitas-d5' ? WELCOME_DAYS : 0);
+            values.offer = offerToken(until);
+            values.until = spell(until, lang);
+          }
+          requests.push({ campaignId: step.campaignId, values, onlyEmails: emails });
+        }
+        if (due.length) notes.push(`dia ${step.day}: ${due.length}`);
+      }
+      return requests.length
+        ? { requests, note: `Receitas grátis, ${notes.join(', ')}.` }
+        : nothing(`${leads.length} cadastro(s) recentes, nenhum no dia de receber e-mail.`);
     }
 
     default:

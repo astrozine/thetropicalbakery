@@ -7,8 +7,9 @@
 
 import { SITE_URL, bulletList, esc, kicker, paragraphs } from './layout';
 import { CARE_PATH, CARE_SHORT } from '@/lib/treatCare';
-import type { EmailFact, EmailTheme } from './layout';
+import type { EmailFact, EmailLang, EmailTheme } from './layout';
 import type { ContactTag } from '@/lib/emailTopics';
+import { FUNNEL_CAMPAIGNS } from './funnelCampaigns';
 
 export type FieldType = 'text' | 'textarea' | 'date' | 'number';
 
@@ -51,6 +52,10 @@ export interface Campaign {
   description: string;
   /** Line explaining to the reader why they got it. */
   reason: string;
+  /** The language of this send (default Portuguese): the greeting and the e-mail's frame follow it. */
+  lang?: (v: CampaignValues) => EmailLang;
+  /** `reason` in English, for sends whose lang is 'en'. */
+  reasonEn?: string;
   fields: CampaignField[];
   subject: (v: CampaignValues) => string;
   /** Unique per send. The same key is never delivered twice to one address. */
@@ -627,6 +632,9 @@ Todos os cuidados: ${url(CARE_PATH)}`),
       cta: { label: 'Abrir a sala do brunch', href: url(`/brunch/sala/${v.slug}`) },
     }),
   },
+
+  // The free-recipes sequence (automation receitas-sequencia), kept in its own file.
+  ...FUNNEL_CAMPAIGNS,
 ];
 
 export const campaignById = (id: string) => CAMPAIGNS.find(c => c.id === id);

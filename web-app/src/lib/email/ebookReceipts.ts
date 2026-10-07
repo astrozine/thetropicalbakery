@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { SITE_URL, copyBox, esc, kicker, orderTable, paragraphs, bulletList } from './layout';
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
-import { EBOOK } from '@/lib/ebook';
+import { EBOOK, usdForBRL } from '@/lib/ebook';
 import { EBOOK_COPY, LANG_LABEL, fill, type EbookLang } from '@/lib/ebookCopy';
 
 /**
@@ -28,7 +28,7 @@ export interface EbookReceipt {
 }
 
 /** What they were actually charged: dollars for Stripe, reais for everything else. */
-const money = (o: EbookReceipt) => (o.method === 'stripe' ? `US$ ${EBOOK.priceUSD}` : formatBRL(o.total));
+const money = (o: EbookReceipt) => (o.method === 'stripe' ? `US$ ${usdForBRL(o.total)}` : formatBRL(o.total));
 
 const hello = (template: string, name: string) => {
   const first = (name || '').trim().split(' ')[0];

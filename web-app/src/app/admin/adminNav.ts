@@ -67,6 +67,7 @@ export const buildGroups = (): NavGroup[] => [
     id: 'divulgacao', name: 'Divulgação', emoji: '📣', accent: '#9bab3c', shade: '#36536f',
     items: [
       { name: 'E-mails', path: '/admin/emails', word: 'E-mails', emoji: '✉️', hint: 'Escrever e enviar e-mails para clientes, parceiros e candidatos' },
+      { name: 'Funil de Receitas', path: '/admin/receitas', word: 'Funil', emoji: '🍓', hint: 'As 2 receitas grátis dos anúncios: cadastros, vendas do livro, quem está na região e qual anúncio funciona' },
       { name: 'Faixa de Anúncio', path: '/admin/anuncio', word: 'Anúncio', emoji: '🎉', hint: 'O aviso especial que aparece no topo da página inicial' },
     ],
   },

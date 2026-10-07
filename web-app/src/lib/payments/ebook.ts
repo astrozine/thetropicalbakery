@@ -1,8 +1,11 @@
 import 'server-only';
 import crypto from 'node:crypto';
-import { supabaseAdmin, isPaid } from './server';
+import { supabaseAdmin, isPaid, findOrder } from './server';
+import { createMercadoPagoCheckout, mercadoPagoConfigured } from './mercadopago';
+import { createPayPalCheckout, paypalConfigured } from './paypal';
+import { createStripeCheckout, stripeConfigured } from './stripe';
 import { OrderError } from './order';
-import { BOOK_FILES, EBOOK, downloadName, isBookLang, type BookLang } from '@/lib/ebook';
+import { BOOK_FILES, BOOK_OFFERS, EBOOK, downloadName, isBookLang, type BookLang, type BookOffer } from '@/lib/ebook';
 import { generatePixData } from '@/utils/pix';
 import { sendEbookOrderReceived, sendEbookPaid } from '@/lib/email/ebookReceipts';
 import { isEbookLang, type EbookLang } from '@/lib/ebookCopy';
@@ -27,6 +30,8 @@ export interface EbookOrderInput {
   lang?: string;
   /** Which language of the book they want: en, pt, es or nl (anything else is the English edition). */
   book?: string;
+  /** A welcome-price link from the free-recipes e-mails (offerToken). Anything invalid or expired = full price. */
+  offer?: string;
 }
 
 const text = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max);
@@ -47,6 +52,27 @@ export function validKey(reference: string, key: string): boolean {
   const a = Buffer.from(ebookKey(reference));
   const b = Buffer.from(String(key));
   return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+/**
+ * The welcome price (BOOK_OFFERS.welcome) travels as `<expiry>.<signature>` in the link of one free-recipes e-mail.
+ * Not tied to a person on purpose: it is a coupon that runs out, and passing it to a friend is fine. The server
+ * checks the signature and the date; nobody can make one up or stretch one.
+ */
+export function offerToken(expiresAt: Date): string {
+  const exp = Math.floor(expiresAt.getTime() / 1000);
+  return `${exp}.${crypto.createHmac('sha256', linkSecret()).update(`welcome:${exp}`).digest('base64url').slice(0, 16)}`;
+}
+
+/** When a welcome link runs out, or null if it is not one of ours or has already run out. */
+export function offerExpiry(token: unknown): Date | null {
+  const m = /^(\d{9,11})\.([A-Za-z0-9_-]{16})$/.exec(String(token ?? ''));
+  if (!m) return null;
+  const want = Buffer.from(offerToken(new Date(Number(m[1]) * 1000)).split('.')[1]);
+  const got = Buffer.from(m[2]);
+  if (want.length !== got.length || !crypto.timingSafeEqual(want, got)) return null;
+  const at = new Date(Number(m[1]) * 1000);
+  return at.getTime() > Date.now() ? at : null;
 }
 
 export function thanksUrl(site: string, reference: string, lang: EbookLang = 'en'): string {
@@ -78,6 +104,9 @@ export interface CreatedEbookOrder {
   method: 'pix' | 'mercadopago' | 'paypal' | 'stripe';
   lang: EbookLang;
   book: BookLang;
+  offer: BookOffer;
+  /** What this order charges in dollars if paid through Stripe. */
+  usd: number;
   pix?: { payload: string; base64: string };
 }
 
@@ -103,7 +132,8 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
   // total_price is always the BRL list price so the admin's numbers stay in one currency; the dollars are noted
   // in items_summary and verified against Stripe itself (lib/payments/stripe.ts).
   const method = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : input.payMethod === 'stripe' ? 'stripe' : 'pix';
-  const total = EBOOK.priceBRL;
+  const offer: BookOffer = offerExpiry(input.offer) ? 'welcome' : 'full';
+  const { brl: total, usd } = BOOK_OFFERS[offer];
   const reference = `EBK${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
   const today = new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
 
@@ -125,7 +155,7 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
     fulfillment: 'digital',
     user_id: userId,
     delivery_fee: 0,
-    items_summary: method === 'stripe' ? `1x ${EBOOK.lineName} · US$ ${EBOOK.priceUSD} (Stripe)` : `1x ${EBOOK.lineName}`,
+    items_summary: `1x ${EBOOK.lineName}${offer === 'welcome' ? ' · preço de boas-vindas' : ''}${method === 'stripe' ? ` · US$ ${usd} (Stripe)` : ''}`,
   };
 
   // Newest columns first, then fall back, so a missing migration never loses a sale. `order_type` has only
@@ -152,7 +182,28 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
     console.error('createEbookOrder: receipt e-mail failed (order is saved):', e);
   }
 
-  return { reference, key: ebookKey(reference), total, method, lang, book, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
+  return { reference, key: ebookKey(reference), total, method, lang, book, offer, usd, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
+}
+
+/** Why this way of paying cannot be used right now (its keys are not in Vercel), or null if it can. */
+export function unavailableMethod(payMethod: unknown): string | null {
+  if (payMethod === 'card' && !mercadoPagoConfigured()) return 'Card payments are not switched on yet. Please use Pix.';
+  if (payMethod === 'stripe' && !stripeConfigured()) return 'Card payments are not switched on yet. Please use Pix.';
+  if (payMethod === 'paypal' && !paypalConfigured()) return 'PayPal is not switched on yet. Please use Pix or card.';
+  return null;
+}
+
+/**
+ * The card / PayPal page for a just-created e-book order, returning the buyer to `returnUrl` (the book's own thank-you
+ * page, or the free-recipes one). Charges what the order stores; Stripe charges the dollars of that same offer.
+ */
+export async function ebookCheckoutUrl(order: CreatedEbookOrder, email: string, returnUrl: string): Promise<string> {
+  const saved = await findOrder(order.reference);
+  if (!saved) throw new Error('order vanished after saving');
+  const opts = { returnUrl, title: `${EBOOK.title} e-book (PDF) · The Tropical Bakery` };
+  if (order.method === 'stripe') return createStripeCheckout({ reference: order.reference, email: email.trim(), lang: order.lang, returnUrl, usd: order.usd });
+  if (order.method === 'mercadopago') return createMercadoPagoCheckout(saved, opts);
+  return createPayPalCheckout(saved, { ...opts, locale: order.lang === 'pt' ? 'pt-BR' : order.lang === 'es' ? 'es-ES' : order.lang === 'nl' ? 'nl-NL' : 'en-US' });
 }
 
 export interface EbookAccess {

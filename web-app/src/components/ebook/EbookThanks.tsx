@@ -1,15 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { EBOOK } from '@/lib/ebook';
 import { EBOOK_COPY, fill, isEbookLang, LANG_LABEL, LANG_PATH } from '@/lib/ebookCopy';
-import { trackMeta } from '@/lib/metaPixel';
 import { rich } from './EbookLang';
+import { useEbookPayment } from './useEbookPayment';
 import './sweetEscape.css';
-
-type Phase = 'checking' | 'paid' | 'waiting' | 'failed' | 'unknown';
 
 const NEXT = [
   { href: '/caixas', img: '/box1.jpg' },
@@ -19,8 +16,7 @@ const NEXT = [
 
 /**
  * Where every buyer lands: back from Mercado Pago / PayPal, after "I've paid" on Pix, and from the link in
- * the e-mails. Confirms card / PayPal with the provider (never trusting the URL), then waits for the payment
- * and shows the download button. Pix is confirmed by hand, so while waiting it checks again every 20 s.
+ * the e-mails. useEbookPayment confirms the payment and waits for it; this shows the download button.
  * Speaks the language the buyer read the sales page in (?lang=).
  */
 export default function EbookThanks() {
@@ -30,60 +26,8 @@ export default function EbookThanks() {
   const langParam = q.get('lang');
   const lang = isEbookLang(langParam) ? langParam : 'en';
   const c = EBOOK_COPY[lang].thanks;
-  const provider = q.get('provider') || '';
-  const result = q.get('result') || '';
-  const paypalToken = q.get('token') || '';
-  const mpPaymentId = q.get('payment_id') || q.get('collection_id') || '';
-  const stripeSession = q.get('session_id') || '';
   const fileError = q.get('erro') === '1';
-
-  const [phase, setPhase] = useState<Phase>(ref && k ? 'checking' : 'unknown');
-  const [firstName, setFirstName] = useState('');
-  const [method, setMethod] = useState('');
-  const [book, setBook] = useState<string>('');
-  const ran = useRef(false);
-  const tracked = useRef(false);
-
-  useEffect(() => {
-    if (ran.current || !ref || !k) return;
-    ran.current = true;
-    let stop = false;
-
-    const check = async (): Promise<Phase> => {
-      try {
-        const r = await fetch(`/api/ebook/access?ref=${encodeURIComponent(ref)}&k=${encodeURIComponent(k)}`, { cache: 'no-store' });
-        const j = await r.json();
-        if (!j.found) return 'unknown';
-        setFirstName(j.firstName || '');
-        setMethod(j.method || '');
-        setBook(j.book || '');
-        if (j.paid && !tracked.current) {
-          tracked.current = true;
-          trackMeta('Purchase', { value: Number(j.total) || EBOOK.priceBRL, content_name: EBOOK.id, content_type: 'product', num_items: 1 }, ref);
-        }
-        return j.paid ? 'paid' : 'waiting';
-      } catch { return 'waiting'; }
-    };
-
-    (async () => {
-      if (provider === 'paypal' && result !== 'cancel' && paypalToken) {
-        await fetch('/api/pay/paypal/capture', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: paypalToken, reference: ref }) }).catch(() => null);
-      } else if (provider === 'stripe' && result !== 'cancel' && stripeSession) {
-        await fetch('/api/pay/stripe/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: stripeSession }) }).catch(() => null);
-      } else if (provider === 'mercadopago' && mpPaymentId) {
-        await fetch('/api/pay/mercadopago/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payment_id: mpPaymentId }) }).catch(() => null);
-      }
-      // Cards can take a few seconds; Pix can take hours (Dolly confirms by hand).
-      for (let i = 0; !stop; i++) {
-        const s = await check();
-        if (s === 'paid' || s === 'unknown') { setPhase(s); return; }
-        if (i === 0 && (result === 'failure' || result === 'cancel')) { setPhase('failed'); return; }
-        setPhase('waiting');
-        await new Promise(res => setTimeout(res, i < 8 ? 3000 : 20000));
-      }
-    })();
-    return () => { stop = true; };
-  }, [ref, k, provider, result, paypalToken, mpPaymentId, stripeSession]);
+  const { phase, firstName, method, book, provider } = useEbookPayment(ref, k);
 
   const download = `/api/ebook/download?ref=${encodeURIComponent(ref)}&k=${encodeURIComponent(k)}&lang=${lang}`;
   const name = firstName ? `, ${firstName}` : '';

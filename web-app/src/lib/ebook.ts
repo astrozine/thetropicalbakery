@@ -22,6 +22,21 @@ export const EBOOK = {
 } as const;
 
 /**
+ * The prices the book can be sold at. `full` everywhere (sales page, the order bump and the offer on the free-recipes
+ * thank-you page); `welcome` only with a signed, expiring link from the free-recipes e-mails (the downsell,
+ * lib/payments/ebook.ts offerToken). The server picks the row; the browser only shows it.
+ */
+export const BOOK_OFFERS = {
+  full: { brl: EBOOK.priceBRL, usd: EBOOK.priceUSD },
+  welcome: { brl: 27, usd: 5 },
+} as const;
+export type BookOffer = keyof typeof BOOK_OFFERS;
+
+/** What Stripe should have charged in dollars for an order stored at this BRL total (every offer has its own pair). */
+export const usdForBRL = (totalBRL: number): number =>
+  Object.values(BOOK_OFFERS).find(o => Math.abs(o.brl - totalBRL) < 0.01)?.usd ?? EBOOK.priceUSD;
+
+/**
  * One PDF per language in the private bucket. The book a buyer gets is the language they chose; any other language
  * gets the English one. Upload each by hand (SETUP_ebook.md); a missing file falls back to English.
  */

@@ -10,7 +10,7 @@
  */
 
 /** Lists a contact can belong to. A topic reaches a person only if their tags match. */
-export type ContactTag = 'cliente' | 'assinante' | 'eventos' | 'cursos' | 'retiros' | 'parceiro' | 'candidato' | 'brunch';
+export type ContactTag = 'cliente' | 'assinante' | 'eventos' | 'cursos' | 'retiros' | 'parceiro' | 'candidato' | 'brunch' | 'receitas';
 
 export const TAG_LABELS: Record<ContactTag, string> = {
   cliente: 'Cliente',
@@ -21,6 +21,7 @@ export const TAG_LABELS: Record<ContactTag, string> = {
   parceiro: 'Parceria B2B',
   candidato: 'Candidato a vaga',
   brunch: 'Brunch / Círculo Tropical',
+  receitas: 'Receitas grátis (funil do e-book)',
 };
 
 export interface EmailTopic {
@@ -108,6 +109,14 @@ export const EMAIL_TOPICS: EmailTopic[] = [
     emoji: '💬',
     audience: 'Quem comprou ingresso de brunch',
     tags: ['brunch'],
+  },
+  {
+    id: 'receitas',
+    label: 'Receitas e o livro da Dolly',
+    description: 'Os e-mails que vêm depois das receitas grátis: dicas para fazer, as outras cores do Sweet Escape e ofertas do livro.',
+    emoji: '🍓',
+    audience: 'Quem baixou as receitas grátis',
+    tags: ['receitas'],
   },
   {
     id: 'novidades',

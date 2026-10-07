@@ -28,6 +28,31 @@ const MUTED = '#a89a90';
 const HEADING_FONT = `'Unbounded','Outfit',Helvetica,Arial,sans-serif`;
 const BODY_FONT = `'Outfit',Helvetica,Arial,sans-serif`;
 
+/**
+ * The shell speaks Portuguese; an e-mail written for an English reader (the free-recipes funnel) passes lang: 'en'
+ * and gets the frame in English too. Only the frame's own words live here; the message itself is the caller's.
+ */
+export type EmailLang = 'pt' | 'en';
+
+const UI = {
+  pt: {
+    html: 'pt-BR', choose: 'Escolher quais e-mails receber', leave: 'Descadastrar de tudo', hi: 'Oi',
+    originKicker: 'Maestria belga &middot; Natureza brasileira',
+    origin: 'Receitas de Elisabeth &ldquo;Dolly&rdquo; Van Dam, com cacau, castanhas e frutas da Mata Atlântica. Vegano, sem glúten, feito à mão em Itamambuca.',
+    flagsAlt: 'Bélgica e Brasil',
+    deeper: 'Para ir mais fundo:', newsletter: 'a newsletter da Dolly no Substack', inEnglish: '(em inglês)',
+    whatsapp: 'Falar com a gente no WhatsApp', prefs: 'Preferências de e-mail', unsub: 'Descadastrar',
+  },
+  en: {
+    html: 'en', choose: 'Choose which e-mails you get', leave: 'Unsubscribe from everything', hi: 'Hi',
+    originKicker: 'Belgian craft &middot; Brazilian nature',
+    origin: 'Recipes by Elisabeth &ldquo;Dolly&rdquo; Van Dam, with cacao, nuts and fruit from the Atlantic rainforest. Vegan, gluten-free, handmade on Itamambuca beach.',
+    flagsAlt: 'Belgium and Brazil',
+    deeper: 'To go deeper:', newsletter: 'Dolly’s newsletter on Substack', inEnglish: '',
+    whatsapp: 'Talk to us on WhatsApp', prefs: 'E-mail preferences', unsub: 'Unsubscribe',
+  },
+} as const;
+
 /** Which page an e-mail belongs to. Picks the top photo, the kicker and the photo strip. */
 export type EmailTheme = 'caixa' | 'assinatura' | 'eventos' | 'cursos' | 'retiros' | 'parcerias' | 'equipe' | 'novidades' | 'brunch';
 
@@ -158,6 +183,8 @@ export interface LayoutOptions {
   unsubscribeUrl?: string;
   /** Why this person is getting it, e.g. "Você recebe este e-mail porque assina a Caixa de Degustação." */
   reason?: string;
+  /** The frame's language. Default Portuguese. */
+  lang?: EmailLang;
 }
 
 /** Escapes text coming from the admin form so a stray < can't break the e-mail. */
@@ -187,9 +214,9 @@ export const bulletList = (items: string[]) =>
         .join('')}</table>`
     : '';
 
-/** "Oi, Ana!" at the top of the body, in the e-mail's own font. */
-export const greeting = (firstName: string) =>
-  `<p style="color:${COCOA};font-family:${BODY_FONT};font-size:17px;font-weight:bold;margin:0 0 12px;">Oi, ${esc(firstName)}!</p>`;
+/** "Oi, Ana!" (or "Hi, Ana!") at the top of the body, in the e-mail's own font. */
+export const greeting = (firstName: string, lang: EmailLang = 'pt') =>
+  `<p style="color:${COCOA};font-family:${BODY_FONT};font-size:17px;font-weight:bold;margin:0 0 12px;">${UI[lang].hi}, ${esc(firstName)}!</p>`;
 
 /** Small gold uppercase label above a list or section, the same one the site uses. */
 export const kicker = (text: string) =>
@@ -229,6 +256,27 @@ export const orderTable = (lines: OrderLine[]) =>
  */
 export const copyBox = (label: string, code: string) =>
   `${kicker(label)}<div style="margin:0 0 20px;padding:12px 14px;border-radius:10px;background:${SAND};border:1px solid ${LINE};color:${COCOA};font-family:'Courier New',Courier,monospace;font-size:13px;line-height:1.6;word-break:break-all;">${esc(code)}</div>`;
+
+/** The English words for a theme's frame, where an English e-mail uses that theme. */
+const THEMES_EN: Partial<Record<EmailTheme, Partial<ThemeDef>>> = {
+  novidades: {
+    kicker: 'From Dolly’s kitchen',
+    heroAlt: 'A table of tropical treats',
+    stripTitle: 'From our table',
+    strip: [
+      { img: 'tile-mango', caption: 'Tasting Box', alt: 'Vegan mango cheesecake', path: '/caixas' },
+      { img: 'tile-event-night', caption: 'Events Menu', alt: 'A tropical dinner at night', path: '/menu' },
+      { img: 'tile-island', caption: 'Retreats', alt: 'Prumirim island from above', path: '/retreats' },
+    ],
+  },
+};
+
+const FOOTER_LINKS_EN: { label: string; path: string }[] = [
+  { label: 'Sweet Escape', path: '/sweet-escape' },
+  { label: 'Tasting Box', path: '/caixas' },
+  { label: 'Events Menu', path: '/menu' },
+  { label: 'Retreats', path: '/retreats' },
+];
 
 const FOOTER_LINKS: { label: string; path: string }[] = [
   { label: 'Caixa de Degustação', path: '/caixas' },
@@ -281,16 +329,15 @@ function photoStrip(t: ThemeDef, base: string): string {
     </td></tr>`;
 }
 
-function originBand(base: string): string {
+function originBand(base: string, t: (typeof UI)[EmailLang]): string {
   return `
     <tr><td style="padding:30px 0 0;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td bgcolor="${COCOA}" style="background:${COCOA};border-radius:18px;padding:26px 24px;text-align:center;">
-          <img src="${img(base, 'flags', 'png')}" width="66" height="36" alt="Bélgica e Brasil" style="display:block;margin:0 auto 12px;border:0;">
-          <p style="font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;color:${GOLD};margin:0 0 10px;">Maestria belga &middot; Natureza brasileira</p>
+          <img src="${img(base, 'flags', 'png')}" width="66" height="36" alt="${t.flagsAlt}" style="display:block;margin:0 auto 12px;border:0;">
+          <p style="font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;color:${GOLD};margin:0 0 10px;">${t.originKicker}</p>
           <p style="font-family:${BODY_FONT};font-size:14px;line-height:1.7;color:#d9cfc4;margin:0;">
-            Receitas de Elisabeth &ldquo;Dolly&rdquo; Van Dam, com cacau, castanhas e frutas da Mata Atlântica.
-            Vegano, sem glúten, feito à mão em Itamambuca.
+            ${t.origin}
           </p>
         </td></tr>
       </table>
@@ -299,8 +346,11 @@ function originBand(base: string): string {
 
 export function renderEmail(o: LayoutOptions): string {
   const base = (o.assetBase || SITE_URL).replace(/\/$/, '');
-  const theme = THEMES[o.theme || 'novidades'];
   const themeName = o.theme || 'novidades';
+  const lang: EmailLang = o.lang === 'en' ? 'en' : 'pt';
+  const t = UI[lang];
+  const theme: ThemeDef = lang === 'en' ? { ...THEMES[themeName], ...(THEMES_EN[themeName] || {}) } : THEMES[themeName];
+  const footerLinks = lang === 'en' ? FOOTER_LINKS_EN : FOOTER_LINKS;
 
   const note = o.note
     ? `<p style="color:${MUTED};font-family:${BODY_FONT};font-size:12px;line-height:1.6;text-align:center;margin:16px 0 0;">${o.note}</p>`
@@ -309,9 +359,9 @@ export function renderEmail(o: LayoutOptions): string {
   const manage = o.prefsUrl
     ? `<p style="color:${MUTED};font-family:${BODY_FONT};font-size:12px;line-height:1.7;margin:14px 0 0;">
          ${o.reason ? `${esc(o.reason)}<br>` : ''}
-         <a href="${o.prefsUrl}" style="color:${MUTED};text-decoration:underline;">Escolher quais e-mails receber</a>
+         <a href="${o.prefsUrl}" style="color:${MUTED};text-decoration:underline;">${t.choose}</a>
          &nbsp;·&nbsp;
-         <a href="${o.unsubscribeUrl || o.prefsUrl}" style="color:${MUTED};text-decoration:underline;">Descadastrar de tudo</a>
+         <a href="${o.unsubscribeUrl || o.prefsUrl}" style="color:${MUTED};text-decoration:underline;">${t.leave}</a>
        </p>`
     : '';
 
@@ -319,7 +369,7 @@ export function renderEmail(o: LayoutOptions): string {
   const preheaderPad = '&#847;&zwnj;&nbsp;'.repeat(60);
 
   return `<!doctype html>
-<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml"><head>
+<html lang="${t.html}" xmlns="http://www.w3.org/1999/xhtml"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light">
 <title>${esc(o.heading)}</title>
@@ -372,21 +422,21 @@ export function renderEmail(o: LayoutOptions): string {
         </td></tr>
 
         ${photoStrip(theme, base)}
-        ${originBand(base)}
+        ${originBand(base, t)}
 
         <tr><td align="center" style="padding:26px 8px 0;">
           <p style="color:${TEXT};font-family:${BODY_FONT};font-size:13px;line-height:1.7;margin:0 0 16px;">
-            Para ir mais fundo: <a href="${SUBSTACK_URL}" style="color:${GOLD_DEEP};font-weight:bold;text-decoration:underline;">Sunbaked Letters</a>,
-            a newsletter da Dolly no Substack <span style="color:${MUTED};">(em inglês)</span>.
+            ${t.deeper} <a href="${SUBSTACK_URL}" style="color:${GOLD_DEEP};font-weight:bold;text-decoration:underline;">Sunbaked Letters</a>,
+            ${t.newsletter}${t.inEnglish ? ` <span style="color:${MUTED};">${t.inEnglish}</span>` : ''}.
           </p>
           <p style="margin:0 0 12px;font-family:${BODY_FONT};line-height:2;">
-            ${FOOTER_LINKS.map(
+            ${footerLinks.map(
               l => `<a href="${SITE_URL}${l.path}" style="color:${TEXT};font-size:12px;text-decoration:none;margin:0 4px;white-space:nowrap;">${l.label}</a>`,
             ).join(`<span style="color:${GOLD};">&nbsp;&#10022;&nbsp;</span>`)}
           </p>
           <p style="color:${MUTED};font-family:${BODY_FONT};font-size:12px;line-height:1.7;margin:0;">
             The Tropical Bakery · Itamambuca, Ubatuba — SP<br>
-            <a href="https://wa.me/${STORE_WHATSAPP}" style="color:${GOLD_DEEP};text-decoration:none;">Falar com a gente no WhatsApp</a>
+            <a href="https://wa.me/${STORE_WHATSAPP}" style="color:${GOLD_DEEP};text-decoration:none;">${t.whatsapp}</a>
             &nbsp;·&nbsp;
             <a href="${SITE_URL}" style="color:${GOLD_DEEP};text-decoration:none;">thetropicalbakery.com</a>
           </p>
@@ -413,8 +463,8 @@ export function plainTextFallback(o: LayoutOptions): string {
     '',
     `The Tropical Bakery — Itamambuca, Ubatuba/SP`,
     SITE_URL,
-    o.prefsUrl ? `\nPreferências de e-mail: ${o.prefsUrl}` : '',
-    o.unsubscribeUrl ? `Descadastrar: ${o.unsubscribeUrl}` : '',
+    o.prefsUrl ? `\n${UI[o.lang === 'en' ? 'en' : 'pt'].prefs}: ${o.prefsUrl}` : '',
+    o.unsubscribeUrl ? `${UI[o.lang === 'en' ? 'en' : 'pt'].unsub}: ${o.unsubscribeUrl}` : '',
   ]
     .filter(Boolean)
     .join('\n');

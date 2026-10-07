@@ -199,6 +199,7 @@ export async function sendCampaign(db: SupabaseClient, req: SendRequest): Promis
     };
   }
 
+  const lang = campaign.lang?.(req.values) ?? 'pt';
   const boxContains = req.diet?.contains || [];
   const boxMayContain = req.diet?.mayContain || [];
   const batch = pending.slice(0, limit);
@@ -220,8 +221,9 @@ export async function sendCampaign(db: SupabaseClient, req: SendRequest): Promis
     const layout: LayoutOptions = {
       ...content,
       theme: campaign.theme,
-      body: (firstName ? greeting(firstName) : '') + personal + content.body,
-      ...(topic.transactional ? {} : { prefsUrl, unsubscribeUrl, reason: campaign.reason }),
+      lang,
+      body: (firstName ? greeting(firstName, lang) : '') + personal + content.body,
+      ...(topic.transactional ? {} : { prefsUrl, unsubscribeUrl, reason: lang === 'en' && campaign.reasonEn ? campaign.reasonEn : campaign.reason }),
     };
 
     const outcome = await deliver(db, {
