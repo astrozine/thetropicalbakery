@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **42**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **43**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -128,6 +128,10 @@ Verified live, 2026-09-26:
     name the chocolate exception, and the stance: treats are for special occasions, celebrating without wrecking your health.
   - Never imply any link with Goldhamer or TrueNorth.
   - Still fine: teaching claims (courses/retreats teach cooking without refined sugar), customer diet labels.
+- **Prospecção (written 2026-10-07).** `/admin/prospeccao` is the outreach pipeline for businesses we contacted by e-mail/WhatsApp
+  (table `partner_leads`, `migration_42_partner_leads.sql`, **NOT run yet**; the page shows a hint until it runs). Kept apart from
+  `partners` on purpose: a `partners` row can sign in to the portal. The contact list is loaded by `seed_partner_leads.sql`, kept
+  in the project files, never in git.
 - **Sweet Escape e-book (written 2026-09-30).** English sales page `/sweet-escape` (`src/components/ebook/`), price and
   recipes in `src/lib/ebook.ts`. Orders go through `createEbookOrder` (`src/lib/payments/ebook.ts`): server price, saved in
   `orders` with `order_kind = 'ebook'`, reference `EBK…`. Buyers get `/sweet-escape/thank-you?ref=…&k=…` (`k` = HMAC of the

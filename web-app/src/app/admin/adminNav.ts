@@ -31,6 +31,7 @@ export const PINNED: Omit<NavItem, 'badge'>[] = [
   // Communication with people: as prominent as the orders, so not buried in a group.
   { name: 'Clientes & Campanhas', path: '/admin/crm', word: 'Clientes', emoji: '💌', hint: 'Lista de clientes e mensagens em massa' },
   { name: 'Parceiros B2B', path: '/admin/parceiros', word: 'Parceiros', emoji: '🤝', hint: 'Hotéis, pousadas, restaurantes, afiliados e os pedidos de reposição' },
+  { name: 'Prospecção', path: '/admin/prospeccao', word: 'Contatos', emoji: '🎯', hint: 'Negócios que contatamos por e-mail e WhatsApp: quem respondeu, o que combinamos, quando retomar' },
 ];
 
 /** Where the big "+" goes: the form to make the box of the week (it is the first thing on that page). */
