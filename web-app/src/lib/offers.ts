@@ -38,6 +38,8 @@ export type PublicOffer = Pick<Offer, 'id' | 'kind' | 'lang' | 'title' | 'dates_
   /** The order a payment was started on (to check it after a card/PayPal page sends them back). */
   reference: string | null;
   expired: boolean;
+  /** The reader's gift applies (lib/bookPerk.ts): `price` is already 15% lower and `anchor_price` the proposal's own. */
+  perk?: boolean;
 };
 
 export const firstName = (name: string) => (name || '').trim().split(/\s+/)[0] || '';

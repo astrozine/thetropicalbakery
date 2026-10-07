@@ -251,3 +251,21 @@ Bars) for an e-mail. Built 2026-10-07; guide for Andrew with the ad copy: `SETUP
 - Nothing may lose a sign-up: without migration 43 the recipes are still e-mailed and the thank-you page still works
   (language and segment ride in its address).
 - Admin: `/admin/receitas` (Divulgação › Funil de Receitas): sign-ups, bump rate, book sales per door, which UTM converts.
+
+# The reader's gift: 15% off after buying Sweet Escape
+
+Anyone with a PAID e-book order gets 15% off their first paid purchase of anything else after it. Asked for by Andrew
+2026-10-07. Everything (the percent, the order line, the words in 4 languages, and the rule `hasBookPerk(db, email)`)
+lives in **`src/lib/bookPerk.ts`**.
+
+- **Applied by the server, by e-mail, while pricing:** `createOrder` (/checkout: boxes and Events Menu; products only,
+  never the delivery fee; checks the order's e-mail and the signed-in account's), `createBrunchOrder` (ticket price),
+  and proposals (`priceFor` in `lib/payments/offer.ts`: courses and retreats). It shows as its own order line
+  `Presente de leitor Sweet Escape (-15%)`, so the inbox, receipts and Dolly see it.
+- **Used up** by the first paid non-book order after the first paid book; unpaid (abandoned) orders don't use it up.
+- **Subscription** has no order to discount: Admin › Assinaturas flags pending subscribers who have it, and Dolly takes
+  15% off the first payment by hand.
+- **Previews:** `/api/perk` answers only for the signed-in visitor's own address (never for a typed e-mail: that would
+  reveal who bought the book); `useBookPerk` shows the lower price in the checkout and the brunch panel.
+- Told to buyers in the "book is ready" e-mail, both download pages, and as a bonus line on the funnel's one-time offer.
+- Known gap, accepted: someone typing a book buyer's e-mail at checkout gets the 15% (the receipts go to that buyer).

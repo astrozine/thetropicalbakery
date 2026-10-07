@@ -10,6 +10,7 @@ import { FUNNEL, FUNNEL_COPY, INTERESTS, freeCover, freePdf, isNearby, isSegment
 import { trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
 import { useEbookPayment } from '@/components/ebook/useEbookPayment';
+import { PERK_COPY } from '@/lib/bookPerk';
 import { PayPicker, PixBox, bookPrice, toPath, usePayMethods } from './FunnelPay';
 import '@/components/ebook/sweetEscape.css';
 import './funnel.css';
@@ -140,6 +141,10 @@ export default function FreeRecipesThanks() {
               <>
                 <p>{t.bookPaid}</p>
                 <a className="se-btn se-btn--primary se-btn--big" href={`/api/ebook/download?ref=${encodeURIComponent(ref)}&k=${encodeURIComponent(k)}&lang=${lang}`}>{t.bookDownload}</a>
+                <div className="se-thanks__tips">
+                  <b>🎁 {PERK_COPY[lang].title}</b>
+                  <p style={{ margin: 0 }}>{PERK_COPY[lang].text}</p>
+                </div>
               </>
             ) : (
               <><div className="se-spinner" aria-hidden /><p>{t.bookWait}</p></>
@@ -174,6 +179,7 @@ export default function FreeRecipesThanks() {
                   <Link className="se-btn se-btn--primary se-btn--big" href={`${LANG_PATH[lang]}#buy`}>{fill(t.otoCta, { price: lang === 'pt' ? `R$ ${BOOK_OFFERS.full.brl}` : `US$ ${BOOK_OFFERS.full.usd}` })}</Link>
                 )}
                 <p className="fr-oto__promise">{t.otoPromise}</p>
+                {isNearby(segment) && <p className="fr-oto__promise">{t.otoPerk}</p>}
                 <button type="button" className="fr-oto__no" onClick={() => setDeclined(true)}>{t.otoNo}</button>
               </>
             )}

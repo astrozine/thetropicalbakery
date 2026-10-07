@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { BOOK_PERK } from '@/lib/bookPerk';
 import { useSearchParams } from 'next/navigation';
 import HeroBoxCard, { HeroBoxStrip } from '@/components/HeroBoxCard';
 import MobileBuyBar from '@/components/MobileBuyBar';
@@ -200,6 +201,11 @@ export default function OfferLanding({ offer, methods }: Props) {
               {anchor && <p className="pp-price__was">{c.valueLabel}: <s>{brl(anchor)}</s></p>}
               <p className="pp-price__label">{c.todayLabel}</p>
               <p className="pp-price__now">{price}</p>
+              {offer.perk && (
+                <p className="pp-price__label">
+                  🎁 {offer.lang === 'en' ? `${BOOK_PERK.percent}% off: your Sweet Escape reader’s gift` : `${BOOK_PERK.percent}% de desconto: seu presente de leitor Sweet Escape`}
+                </p>
+              )}
             </div>
 
             {closed && <p className="pp-alert">{c.closedTitle}</p>}

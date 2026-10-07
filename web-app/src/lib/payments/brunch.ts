@@ -1,6 +1,7 @@
 import 'server-only';
 import { supabaseAdmin } from './server';
 import { OrderError } from './order';
+import { BOOK_PERK, hasBookPerk, perkDiscount } from '@/lib/bookPerk';
 import { generatePixData } from '@/utils/pix';
 import { HOLD_HOURS, normalizeEvent, type BrunchEvent } from '@/lib/brunch';
 import { sendBrunchConfirmed, sendBrunchReserved, sendBrunchWaitlist } from '@/lib/email/brunchMail';
@@ -61,13 +62,16 @@ export async function createBrunchOrder(input: BrunchOrderInput, userToken: stri
   const event: BrunchEvent = normalizeEvent(row);
 
   const free = event.price <= 0;
+  // The reader's gift (lib/bookPerk.ts): 15% off the ticket if this is their first purchase after Sweet Escape.
+  const perk = !free && (await hasBookPerk(db, email));
+  const price = perk ? Math.round((event.price - perkDiscount(event.price)) * 100) / 100 : event.price;
   const method: CreatedBrunchOrder['method'] = free ? 'free'
     : input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : 'pix';
   const reference = free ? null : `BRU${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
 
   const { data: res, error: resErr } = await db.rpc('brunch_reserve', {
     p_event: event.id, p_user: user.id, p_email: email, p_name: name, p_whatsapp: whatsapp,
-    p_reference: reference, p_price: event.price,
+    p_reference: reference, p_price: price,
     p_hold_hours: method === 'pix' ? HOLD_HOURS.pix : HOLD_HOURS.card,
     p_waitlist: true,
   });
@@ -87,7 +91,7 @@ export async function createBrunchOrder(input: BrunchOrderInput, userToken: stri
 
   if (result === 'espera') {
     try { await sendBrunchWaitlist(db, { event, name, email }); } catch (e) { console.error('brunch waitlist mail:', e); }
-    return { result: 'espera', total: event.price, method, slug: event.slug };
+    return { result: 'espera', total: price, method, slug: event.slug };
   }
   if (result !== 'ok') throw new OrderError(409, REASONS[result] ?? 'Não foi possível reservar.');
 
@@ -103,7 +107,7 @@ export async function createBrunchOrder(input: BrunchOrderInput, userToken: stri
     customer_whatsapp: whatsapp,
     delivery_address: `BRUNCH · ${event.venue_name || event.city || 'Itamambuca'}`,
     requested_date: new Date(when.getTime() - 3 * 3600 * 1000).toISOString().slice(0, 10),
-    total_price: event.price,
+    total_price: price,
     pix_transaction_id: reference,
     status: 'PENDING',
     order_type: 'EVENTO',
@@ -115,7 +119,7 @@ export async function createBrunchOrder(input: BrunchOrderInput, userToken: stri
     fulfillment: 'evento',
     user_id: user.id,
     delivery_fee: 0,
-    items_summary: `1x Ingresso Brunch Tropical: ${event.title}`,
+    items_summary: `1x Ingresso Brunch Tropical: ${event.title}${perk ? ` · ${BOOK_PERK.line}` : ''}`,
   };
 
   // Newest columns first, then fall back, so a missing column never loses a seat.
@@ -131,15 +135,15 @@ export async function createBrunchOrder(input: BrunchOrderInput, userToken: stri
     throw new OrderError(500, 'Não conseguimos salvar o seu pedido agora. Tente de novo em um instante.');
   }
 
-  const pix = method === 'pix' ? await generatePixData({ value: event.price, transactionId: reference! }) : undefined;
+  const pix = method === 'pix' ? await generatePixData({ value: price, transactionId: reference! }) : undefined;
 
   try {
-    await sendBrunchReserved(db, { event, name, email, reference: reference!, total: event.price, method, pixPayload: pix?.payload ?? null });
+    await sendBrunchReserved(db, { event, name, email, reference: reference!, total: price, method, pixPayload: pix?.payload ?? null });
   } catch (e) {
     console.error('createBrunchOrder: receipt e-mail failed (seat is saved):', e);
   }
 
-  return { result: 'ok', reference: reference!, total: event.price, method, slug: event.slug, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
+  return { result: 'ok', reference: reference!, total: price, method, slug: event.slug, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
 }
 
 /**

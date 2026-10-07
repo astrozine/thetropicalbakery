@@ -8,6 +8,7 @@ import { fetchBoxSizePrices, isTreatCount, sizeText, toTreatCount, type TreatCou
 import { sendOrderReceived } from '@/lib/email/receipts';
 import { boxPlan, picksSuffix, type BoxOrderItems } from '@/lib/boxPicks';
 import { generatePixData } from '@/utils/pix';
+import { BOOK_PERK, hasBookPerk, perkDiscount } from '@/lib/bookPerk';
 
 /**
  * Creates an order on the SERVER, pricing it from the database.
@@ -37,6 +38,8 @@ export interface OrderInput {
 export interface CreatedOrder {
   reference: string;
   subtotal: number;
+  /** The reader's gift (lib/bookPerk.ts), already taken off `total`; 0 when it does not apply. */
+  discount: number;
   fee: number;
   total: number;
   lines: { name: string; quantity: number; unit: number }[];
@@ -73,9 +76,11 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
   if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new OrderError(400, 'O e-mail parece estar incompleto.');
 
   let userId: string | null = null;
+  let userEmail = '';
   if (userToken) {
     const { data } = await db.auth.getUser(userToken);
     userId = data.user?.id ?? null;
+    userEmail = (data.user?.email ?? '').toLowerCase();
   }
 
   // ---- what
@@ -222,7 +227,13 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
   }
   const fee = hasBox && !isPickup ? zone.fee : 0;
   subtotal = round2(subtotal);
-  const total = round2(subtotal + fee);
+
+  // ---- the reader's gift: 15% off the products (never the delivery fee) on the first purchase after Sweet Escape.
+  // Checked against the order's e-mail and, if they are signed in, their account's.
+  const perk = (await hasBookPerk(db, email)) || (!!userEmail && userEmail !== email.toLowerCase() && (await hasBookPerk(db, userEmail)));
+  const discount = perk ? perkDiscount(subtotal) : 0;
+  if (discount > 0) lines.push({ name: BOOK_PERK.line, quantity: 1, unit: -discount });
+  const total = round2(subtotal - discount + fee);
 
   // ---- diet and partner code
   // In today's vocabulary, whatever an older page or saved profile sent.
@@ -325,5 +336,5 @@ export async function createOrder(input: OrderInput, userToken: string | null): 
     console.error('createOrder: receipt e-mail failed (order is saved):', e);
   }
 
-  return { reference, subtotal, fee, total, lines };
+  return { reference, subtotal, discount, fee, total, lines };
 }

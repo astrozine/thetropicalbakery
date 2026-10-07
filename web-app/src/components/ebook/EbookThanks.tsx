@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { EBOOK_COPY, fill, isEbookLang, LANG_LABEL, LANG_PATH } from '@/lib/ebookCopy';
 import { rich } from './EbookLang';
 import { useEbookPayment } from './useEbookPayment';
+import { PERK_COPY } from '@/lib/bookPerk';
 import './sweetEscape.css';
 
 const NEXT = [
@@ -49,6 +50,10 @@ export default function EbookThanks() {
               <p>{rich(c.paidText)}</p>
               {fileError && <p className="se-error" role="alert">{c.fileError}</p>}
               <a className="se-btn se-btn--primary se-btn--big" href={download}>{c.download}</a>
+              <div className="se-thanks__tips">
+                <b>🎁 {PERK_COPY[lang].title}</b>
+                <p style={{ margin: 0 }}>{PERK_COPY[lang].text}</p>
+              </div>
               <div className="se-thanks__tips">
                 <b>{c.startTitle}</b>
                 <ul>{c.start.map(t => <li key={t}>{t}</li>)}</ul>

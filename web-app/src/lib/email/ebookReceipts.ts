@@ -4,6 +4,7 @@ import { SITE_URL, copyBox, esc, kicker, orderTable, paragraphs, bulletList } fr
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
 import { EBOOK, usdForBRL } from '@/lib/ebook';
+import { PERK_COPY } from '@/lib/bookPerk';
 import { EBOOK_COPY, LANG_LABEL, fill, type EbookLang } from '@/lib/ebookCopy';
 
 /**
@@ -80,7 +81,10 @@ export async function sendEbookPaid(db: SupabaseClient, o: EbookReceipt) {
     paragraphs(`📖 ${LANG_LABEL[o.book ?? 'en']}`) +
     kicker(m.whereToStart) +
     bulletList(m.tips) +
-    paragraphs(m.paidLink);
+    paragraphs(m.paidLink) +
+    // The reader's gift (lib/bookPerk.ts): 15% off their first purchase of anything else.
+    kicker(`🎁 ${PERK_COPY[o.lang ?? 'en'].title}`) +
+    paragraphs(PERK_COPY[o.lang ?? 'en'].text);
 
   await send(db, o, `ebook-paid:${o.reference}`, m.paidSubject, {
     preheader: m.paidPreheader,

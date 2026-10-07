@@ -8,10 +8,12 @@ import { supabase } from '@/lib/supabase';
 import { formatBRL } from '@/lib/deliveryZones';
 import { HOLD_HOURS, fmtWhen, membersOnlyNow, roomPath, seatsLeft, type Availability, type BrunchEvent } from '@/lib/brunch';
 import { SeatMeter } from './BrunchEventCard';
+import { useBookPerk } from '@/components/useBookPerk';
+import { BOOK_PERK, perkDiscount } from '@/lib/bookPerk';
 
 type Method = 'pix' | 'card' | 'paypal';
 type Done =
-  | { kind: 'pix'; reference: string; payload: string; base64: string }
+  | { kind: 'pix'; reference: string; payload: string; base64: string; total: number }
   | { kind: 'espera' }
   | { kind: 'pago' };
 
@@ -31,6 +33,9 @@ export default function BrunchBuy({ event, avail, onChange }: { event: BrunchEve
   const [done, setDone] = useState<Done | null>(null);
   const [copied, setCopied] = useState(false);
   const [mine, setMine] = useState<string | null>(null);
+  // The reader's gift (15% off the first purchase after Sweet Escape): a preview; the server prices the ticket.
+  const perk = useBookPerk(user?.id) && event.price > 0;
+  const price = perk ? event.price - perkDiscount(event.price) : event.price;
 
   useEffect(() => {
     fetch('/api/pay/methods', { cache: 'no-store' }).then(r => r.json())
@@ -75,7 +80,7 @@ export default function BrunchBuy({ event, avail, onChange }: { event: BrunchEve
       if (j.url) { window.location.href = j.url; return; }
       if (j.result === 'espera') setDone({ kind: 'espera' });
       else if (j.result === 'pago') setDone({ kind: 'pago' });
-      else if (j.pix) setDone({ kind: 'pix', reference: j.reference, payload: j.pix.payload, base64: j.pix.base64 });
+      else if (j.pix) setDone({ kind: 'pix', reference: j.reference, payload: j.pix.payload, base64: j.pix.base64, total: Number(j.total) || price });
       onChange?.();
     } catch {
       setError('Sem conexão. Tente de novo.');
@@ -90,9 +95,11 @@ export default function BrunchBuy({ event, avail, onChange }: { event: BrunchEve
   const head = (
     <>
       <div className="bn-buy__price">
-        <b>{event.price > 0 ? formatBRL(event.price) : 'Gratuito'}</b>
+        {perk && <s className="bn-muted">{formatBRL(event.price)}</s>}
+        <b>{event.price > 0 ? formatBRL(price) : 'Gratuito'}</b>
         <span className="bn-muted">por pessoa</span>
       </div>
+      {perk && <p className="bn-ok" style={{ margin: '0 0 0.8rem' }}>🎁 {BOOK_PERK.percent}% de desconto: presente de leitor Sweet Escape, na sua primeira compra.</p>}
       <p className="bn-muted" style={{ marginBottom: '0.8rem' }}>🗓️ {fmtWhen(event)}</p>
       {!past && <SeatMeter event={event} avail={avail} />}
     </>
@@ -112,7 +119,7 @@ export default function BrunchBuy({ event, avail, onChange }: { event: BrunchEve
     return (
       <aside className="bn-buy bn-pix" id="garantir">
         <p className="bn-kicker">Seu lugar está guardado</p>
-        <h3 className="bn-h3">Falta só o Pix de {formatBRL(event.price)}</h3>
+        <h3 className="bn-h3">Falta só o Pix de {formatBRL(done.total)}</h3>
         <p className="bn-muted">Guardamos o seu lugar por {HOLD_HOURS.pix} horas. Quando o Pix cair, a Dolly confirma e você entra no grupo.</p>
         <img src={done.base64} alt="QR code do Pix" width={220} height={220} />
         <div className="bn-copy">
@@ -188,7 +195,7 @@ export default function BrunchBuy({ event, avail, onChange }: { event: BrunchEve
           )}
           {error && <p className="bn-error">{error}</p>}
           <button type="button" className="bn-btn bn-btn--gold bn-btn--block" onClick={buy} disabled={busy}>
-            {busy ? 'Reservando…' : left === 0 ? 'Entrar na lista de espera' : event.price > 0 ? `Garantir meu lugar · ${formatBRL(event.price)}` : 'Garantir meu lugar'}
+            {busy ? 'Reservando…' : left === 0 ? 'Entrar na lista de espera' : event.price > 0 ? `Garantir meu lugar · ${formatBRL(price)}` : 'Garantir meu lugar'}
           </button>
         </div>
       )}

@@ -6,6 +6,7 @@ import { createPayPalCheckout, paypalConfigured } from './paypal';
 import { createStripeOrderCheckout, stripeConfigured } from './stripe';
 import { generatePixData } from '@/utils/pix';
 import { firstName, type Offer, type PublicOffer } from '@/lib/offers';
+import { BOOK_PERK, hasBookPerk, perkDiscount } from '@/lib/bookPerk';
 
 /**
  * Paying a proposal (migration 36). Same rules as every other purchase: the PRICE is the one Dolly saved on the
@@ -36,15 +37,27 @@ async function orderOf(offer: Offer): Promise<PayableOrder | null> {
   return offer.order_reference ? findOrder(offer.order_reference) : null;
 }
 
+/**
+ * What this proposal costs this client: Dolly's price, or 15% less with the reader's gift (bought Sweet Escape and
+ * nothing else since, lib/bookPerk.ts). Once paid, what they paid.
+ */
+async function priceFor(offer: Offer, order: PayableOrder | null): Promise<{ price: number; perk: boolean }> {
+  if (order && isPaid(order.status)) return { price: order.total, perk: order.total < offer.price - 0.009 };
+  const perk = await hasBookPerk(supabaseAdmin(), offer.customer_email);
+  return { price: perk ? Math.round((offer.price - perkDiscount(offer.price)) * 100) / 100 : offer.price, perk };
+}
+
 /** What the client's page shows. Leaves out their phone and e-mail. */
 export async function publicOffer(id: string): Promise<PublicOffer | null> {
   const offer = await loadOffer(id);
   if (!offer) return null;
   const order = await orderOf(offer);
   const paid = !!order && isPaid(order.status);
+  const { price, perk } = await priceFor(offer, order);
   return {
     id: offer.id, kind: offer.kind, lang: offer.lang, title: offer.title, dates_label: offer.dates_label,
-    price: offer.price, anchor_price: offer.anchor_price, included: offer.included, bonuses: offer.bonuses,
+    price, perk,
+    anchor_price: perk ? Math.max(offer.anchor_price ?? 0, offer.price) : offer.anchor_price, included: offer.included, bonuses: offer.bonuses,
     note: offer.note, image_url: offer.image_url, expires_on: offer.expires_on, status: offer.status,
     firstName: firstName(offer.customer_name),
     paid,
@@ -77,8 +90,9 @@ export async function payOffer(id: string, method: OfferMethod): Promise<OfferPa
   let order = await orderOf(offer);
   if (order && isPaid(order.status)) throw new OrderError(409, 'Esta proposta já foi paga.');
 
-  // One order per proposal: trying another way to pay reuses it, at the proposal's price.
-  if (order && Math.abs(order.total - offer.price) > 0.009) order = null;
+  // One order per proposal: trying another way to pay reuses it, at the proposal's price (with the reader's gift, if any).
+  const { price, perk } = await priceFor(offer, order);
+  if (order && Math.abs(order.total - price) > 0.009) order = null;
   if (order) {
     await db.from('orders').update({ payment_provider: PROVIDER[method] }).eq('id', order.id);
   } else {
@@ -90,7 +104,7 @@ export async function payOffer(id: string, method: OfferMethod): Promise<OfferPa
       customer_whatsapp: (offer.customer_whatsapp || '').replace(/\D/g, ''),
       delivery_address: `${label.toUpperCase()} · proposta${offer.dates_label ? ` · ${offer.dates_label}` : ''}`,
       requested_date: brasiliaToday(),
-      total_price: offer.price,
+      total_price: price,
       pix_transaction_id: reference,
       status: 'PENDING',
       order_type: label.toUpperCase(),
@@ -100,7 +114,7 @@ export async function payOffer(id: string, method: OfferMethod): Promise<OfferPa
       payment_provider: PROVIDER[method],
       order_kind: offer.kind,
       delivery_fee: 0,
-      items_summary: `1x ${label}: ${offer.title}${offer.dates_label ? ` · ${offer.dates_label}` : ''} (proposta)`,
+      items_summary: `1x ${label}: ${offer.title}${offer.dates_label ? ` · ${offer.dates_label}` : ''} (proposta)${perk ? ` · ${BOOK_PERK.line}` : ''}`,
     };
     // Newest columns first, then fall back (as the e-book does), so a missing migration never loses a sale.
     const attempts = [rich, { ...rich, order_type: 'EVENTO' }, base, { ...base, order_type: 'EVENTO' }];

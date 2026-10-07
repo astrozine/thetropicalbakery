@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { CARE_PATH, FREEZER_WEEKS } from '@/lib/treatCare';
 import { useCart, CartItem } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { useBookPerk } from '@/components/useBookPerk';
+import { BOOK_PERK, perkDiscount } from '@/lib/bookPerk';
 import LoginPanel from '@/components/LoginPanel';
 import DeliveryCalendar from '@/components/DeliveryCalendar';
 import FulfillmentPicker, { readFulfillment } from '@/components/FulfillmentPicker';
@@ -31,6 +33,8 @@ type PayMethod = 'pix' | 'card' | 'paypal' | 'stripe';
 interface PlacedOrder {
   items: CartItem[];
   subtotal: number;
+  /** The reader's gift (lib/bookPerk.ts), already off the total. */
+  discount: number;
   fee: number;
   total: number;
   isBox: boolean;
@@ -44,6 +48,8 @@ interface PlacedOrder {
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
   const { user, profile, saveProfile } = useAuth();
+  // Bought Sweet Escape? Show the 15% before they pay (signed in only; the server decides it again on the order).
+  const perk = useBookPerk(user?.id);
   const [step, setStep] = useState(1);
   const [pixPayload, setPixPayload] = useState('');
   const [pixQR, setPixQR] = useState('');
@@ -197,7 +203,7 @@ export default function CheckoutPage() {
 
     // The server places the order and prices it from the database. This page only says WHAT was picked;
     // what it costs (and the reference the Pix code and the card page use) comes back in the answer.
-    let order: { reference: string; subtotal: number; fee: number; total: number };
+    let order: { reference: string; subtotal: number; discount?: number; fee: number; total: number };
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch('/api/checkout/order', {
@@ -318,7 +324,7 @@ export default function CheckoutPage() {
     }
 
     setPlaced({
-      items: [...items], subtotal: order.subtotal, fee: order.fee, total: order.total, isBox: hasBox, isPickup,
+      items: [...items], subtotal: order.subtotal, discount: order.discount || 0, fee: order.fee, total: order.total, isBox: hasBox, isPickup,
       date: formData.date, zoneLabel: isPickup ? 'Retirada' : (zone?.label ?? ''), saved,
     });
     setPixPayload(payload);
@@ -353,7 +359,8 @@ export default function CheckoutPage() {
   const shown = step === 2 && placed ? placed.items : items;
   const shownSubtotal = step === 2 && placed ? placed.subtotal : totalPrice;
   const shownFee = step === 2 && placed ? placed.fee : deliveryFee;
-  const shownTotal = step === 2 && placed ? placed.total : total;
+  const shownDiscount = step === 2 && placed ? placed.discount : perk ? perkDiscount(totalPrice) : 0;
+  const shownTotal = step === 2 && placed ? placed.total : total - shownDiscount;
   const shownIsBox = step === 2 && placed ? placed.isBox : hasBox;
   const shownIsPickup = step === 2 && placed ? placed.isPickup : isPickup;
 
@@ -422,6 +429,12 @@ export default function CheckoutPage() {
                   <span>Subtotal</span>
                   <span>{formatBRL(shownSubtotal)}</span>
                 </div>
+                {shownDiscount > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', fontSize: '0.9rem', color: '#1e6b3c', fontWeight: 600 }}>
+                    <span>🎁 {BOOK_PERK.line}</span>
+                    <span>-{formatBRL(shownDiscount)}</span>
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#555' }}>
                   <span>{shownIsPickup ? 'Retirada' : 'Entrega'}</span>
                   <span style={{ color: 'var(--color-secondary)', fontWeight: 'bold' }}>

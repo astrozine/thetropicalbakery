@@ -75,7 +75,7 @@ export interface FunnelCopy {
     checking: string; title: string; text: string; download: string; spam: string;
     unknownTitle: string; unknownText: string; back: string;
     bookTitle: string; bookWait: string; bookPaid: string; bookDownload: string;
-    otoKicker: string; otoTitle: string; otoText: string; otoMissing: string; otoPromise: string; otoCta: string; otoNo: string; otoDeclined: string;
+    otoKicker: string; otoTitle: string; otoText: string; otoMissing: string; otoPromise: string; otoPerk: string; otoCta: string; otoNo: string; otoDeclined: string;
     nearKicker: string; nearTitle: Record<'local' | 'visiting', string>; nearQuestion: string;
     interests: Record<Interest, { label: string; title: string; text: string; cta: string; second?: string }>;
     another: string;
@@ -153,6 +153,7 @@ const EN: FunnelCopy = {
     otoText: 'You have Red and Caramel. The full book adds the other five, one for every day of the week, plus the why behind every ingredient so you can invent your own.',
     otoMissing: 'Still waiting for you:',
     otoPromise: 'Instant PDF · 7-day money-back promise',
+    otoPerk: '🎁 Bonus for you: buying the book also gives you 15% off your first Tasting Box, brunch, course or events order.',
     otoCta: 'Add the full book · {price}',
     otoNo: 'No thanks, the 2 recipes are enough for now',
     otoDeclined: 'No problem! The book is always at thetropicalbakery.com/sweet-escape.',
@@ -254,6 +255,7 @@ const PT: FunnelCopy = {
     otoText: 'Você já tem o Vermelho e o Caramelo. O livro completo traz as outras cinco, uma para cada dia da semana, e o porquê de cada ingrediente para você inventar as suas.',
     otoMissing: 'Ainda esperando por você:',
     otoPromise: 'PDF na hora · garantia de 7 dias',
+    otoPerk: '🎁 Bônus para você: com o livro, você ganha 15% de desconto na primeira Caixa de Degustação, brunch, curso ou pedido de eventos.',
     otoCta: 'Quero o livro completo · {price}',
     otoNo: 'Não, obrigada, as 2 receitas bastam por agora',
     otoDeclined: 'Tudo bem! O livro está sempre em thetropicalbakery.com/sweet-escape/pt.',
@@ -355,6 +357,7 @@ const ES: FunnelCopy = {
     otoText: 'Ya tienes el Rojo y el Caramelo. El libro completo trae los otros cinco, uno para cada día de la semana, y el porqué de cada ingrediente para que inventes los tuyos.',
     otoMissing: 'Todavía te esperan:',
     otoPromise: 'PDF al instante · garantía de 7 días',
+    otoPerk: '🎁 Un extra para ti: con el libro tienes 15% de descuento en tu primera Caja de Degustación, brunch, curso o pedido para eventos.',
     otoCta: 'Quiero el libro completo · {price}',
     otoNo: 'No, gracias, con las 2 recetas me basta por ahora',
     otoDeclined: '¡Sin problema! El libro está siempre en thetropicalbakery.com/sweet-escape/es.',
@@ -456,6 +459,7 @@ const NL: FunnelCopy = {
     otoText: 'Je hebt Rood en Karamel. Het hele boek voegt de andere vijf toe, één voor elke dag van de week, plus het waarom achter elk ingrediënt zodat je je eigen kunt bedenken.',
     otoMissing: 'Ze wachten nog op je:',
     otoPromise: 'Direct als pdf · 7 dagen geld-terug-belofte',
+    otoPerk: '🎁 Extraatje: met het boek krijg je 15% korting op je eerste Proefdoos, brunch, cursus of eventbestelling.',
     otoCta: 'Voeg het hele boek toe · {price}',
     otoNo: 'Nee, dank je, de 2 recepten zijn genoeg voor nu',
     otoDeclined: 'Geen probleem! Het boek staat altijd op thetropicalbakery.com/sweet-escape/nl.',

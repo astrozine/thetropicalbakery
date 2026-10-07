@@ -8,6 +8,7 @@ import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
 import { boxPlan, namesText, surpriseText } from '@/lib/boxPicks';
 import { getZone, formatBRL } from '@/lib/deliveryZones';
 import { nextBakeBox } from '@/lib/boxWindow';
+import { BOOK_PERK, hasBookPerk } from '@/lib/bookPerk';
 
 interface DeliveryRow {
   id: string;
@@ -53,6 +54,8 @@ const card: React.CSSProperties = {
 export default function SubscriptionsAdmin() {
   const [tab, setTab] = useState<'subscribers' | 'roster'>('subscribers');
   const [subs, setSubs] = useState<Subscription[]>([]);
+  // New subscribers who bought Sweet Escape and still have the reader's gift: 15% off their first payment (by hand).
+  const [readers, setReaders] = useState<Set<string>>(new Set());
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const sizePrices = useBoxSizePrices();
   const [loading, setLoading] = useState(true);
@@ -152,6 +155,23 @@ export default function SubscriptionsAdmin() {
   }, []);
 
   useEffect(() => { loadSubs(); }, [loadSubs]);
+
+  useEffect(() => {
+    const waiting = subs.filter(s => s.status === 'pending' && s.email).map(s => String(s.email).toLowerCase());
+    if (!waiting.length) return;
+    let live = true;
+    (async () => {
+      // Narrow to people with any e-book order first, then ask the full rule only for them.
+      const { data } = await supabase.from('orders').select('customer_email').like('pix_transaction_id', 'EBK%');
+      const bookEmails = new Set((data || []).map(r => String(r.customer_email ?? '').toLowerCase()));
+      const found = new Set<string>();
+      for (const e of [...new Set(waiting)].filter(e => bookEmails.has(e))) {
+        if (await hasBookPerk(supabase, e)) found.add(e);
+      }
+      if (live) setReaders(found);
+    })().catch(() => {});
+    return () => { live = false; };
+  }, [subs]);
   useEffect(() => { if (tab === 'roster') loadRoster(rosterDate); }, [tab, rosterDate, loadRoster]);
 
   const setStatus = async (id: string, status: SubscriptionStatus) => {
@@ -302,6 +322,9 @@ export default function SubscriptionsAdmin() {
                     <div style={{ color: '#7f8c8d', fontSize: '0.9rem', lineHeight: 1.9, wordBreak: 'break-word' }}>
                       <div>📱 {formatPhone(s.whatsapp_number)}</div>
                       {s.email && <div>✉️ {s.email}</div>}
+                      {s.email && s.status === 'pending' && readers.has(String(s.email).toLowerCase()) && (
+                        <div style={{ color: '#1e6b3c', fontWeight: 'bold' }}>🎁 Leitor Sweet Escape: {BOOK_PERK.percent}% de desconto na primeira cobrança</div>
+                      )}
                       <div>📍 {s.address_oneline || '—'}</div>
                       {s.address_reference && <div style={{ fontStyle: 'italic' }}>🧭 {s.address_reference}</div>}
                       <div>🚚 {zone?.label ?? '—'}</div>
