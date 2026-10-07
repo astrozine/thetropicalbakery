@@ -62,12 +62,12 @@ export const BRUNCH_CSS = `
 .bn-hero__ctas { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; }
 .bn-hero__proof { margin-top: 1.2rem; display: flex; gap: 0.4rem 1.2rem; justify-content: center; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,0.8); }
 @media (min-width: 900px) {
-  .bn-hero { min-height: 88vh; display: flex; align-items: center; padding: 6rem 0; }
-  .bn-hero__photos { position: absolute; inset: 0; width: auto; margin: 0; padding: 0; pointer-events: none; }
-  .bn-polaroid--a { position: absolute; top: 12%; left: 2.5%; width: clamp(200px, 22vw, 360px); transform: rotate(-5deg); }
-  .bn-polaroid--b { position: absolute; bottom: 10%; right: 2.5%; width: clamp(200px, 22vw, 360px); margin: 0; transform: rotate(4deg); }
-  .bn-float--dolly { width: 120px; top: 14%; right: 12%; }
-  .bn-float--treat { width: 110px; bottom: 14%; left: 12%; }
+  .bn-hero { min-height: min(88vh, 820px); display: flex; align-items: center; padding: 5rem 0; }
+  .bn-hero__photos { position: absolute; top: 0; bottom: 0; left: 50%; width: min(1180px, 100%); transform: translateX(-50%); margin: 0; padding: 0; pointer-events: none; }
+  .bn-polaroid--a { position: absolute; top: 14%; left: 1%; width: clamp(200px, 22vw, 300px); transform: rotate(-5deg); }
+  .bn-polaroid--b { position: absolute; bottom: 12%; right: 1%; width: clamp(200px, 22vw, 300px); margin: 0; transform: rotate(4deg); }
+  .bn-float--dolly { width: 110px; top: 16%; right: 14%; }
+  .bn-float--treat { width: 100px; bottom: 16%; left: 14%; }
   .bn-hero__content { max-width: 540px; }
   .bn-hero__title { font-size: clamp(2rem, 3.6vw, 3.3rem); }
 }
