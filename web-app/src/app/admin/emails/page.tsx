@@ -275,7 +275,8 @@ export default function AdminEmailsPage() {
       <div style={{ ...card, marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.1rem', color: '#2c3e50', marginBottom: '1rem' }}>1. Que e-mail é este?</h2>
         <div style={{ display: 'grid', gap: '0.6rem', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))' }}>
-          {CAMPAIGNS.map(c => {
+          {/* groupOnly e-mails go to one brunch's guests and are sent from /admin/brunch. */}
+          {CAMPAIGNS.filter(c => !c.groupOnly).map(c => {
             const on = c.id === campaignId;
             const t = topicById(c.topic);
             return (

@@ -14,6 +14,8 @@ import AccountHero, { HeroAction } from '@/components/account/AccountHero';
 import StampCard from '@/components/account/StampCard';
 import TropicalTrail from '@/components/account/TropicalTrail';
 import MyOrders from '@/components/account/MyOrders';
+import MyBrunches from '@/components/brunch/MyBrunches';
+import { roomPath, type MyBrunches as BrunchData } from '@/lib/brunch';
 import { allergensFrom, dietTagsFrom, legacyFlags, normalizeDiet, tagsFromLegacy } from '@/lib/dietary';
 import { Journey, STAMPS_PER_REWARD, TRAIL, levelFor, trailDone } from '@/lib/loyalty';
 import { SUBSTACK_URL } from '@/lib/siteContact';
@@ -108,6 +110,11 @@ export default function MyAccountPage() {
   const [journey, setJourney] = useState<Journey | null>(null);
   const [subStatus, setSubStatus] = useState<string | null>(null);
   const [loadedAt, setLoadedAt] = useState(0);
+  // Brunch tickets (migration 41); null when there are none or the migration has not run.
+  const [brunches, setBrunches] = useState<BrunchData | null>(null);
+  const loadBrunches = useCallback(() => {
+    supabase.rpc('my_brunches').then(({ data, error }) => { if (!error && data) setBrunches(data as BrunchData); });
+  }, []);
 
   const toggle = (id: string) => setOpenIds(ids => (ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]));
 
@@ -140,8 +147,9 @@ export default function MyAccountPage() {
       const current = (subs || []).find(s => s.status !== 'cancelled');
       setSubStatus(current?.status ?? null);
     })();
+    loadBrunches();
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, loadBrunches]);
 
   useEffect(() => {
     if (!profile) return;
@@ -287,7 +295,11 @@ export default function MyAccountPage() {
   const subscriber = subStatus === 'active' || subStatus === 'paused' || subStatus === 'pending';
   const paidBoxes = journey?.paid_boxes ?? 0;
   const { level, next, toNext } = levelFor(paidBoxes, subStatus === 'active');
-  const trail = trailDone(journey, subscriber);
+  const brunchTickets = (brunches?.tickets || []).filter(t => t.status === 'pago');
+  const nextBrunch = brunchTickets
+    .filter(t => new Date(t.starts_at).getTime() > loadedAt)
+    .sort((a, b) => a.starts_at.localeCompare(b.starts_at))[0];
+  const trail = trailDone(journey, subscriber, brunchTickets.length > 0);
   const nextStep = TRAIL.find(s => !trail[s.id]);
   const orders = journey?.orders ?? [];
   const liveOrder = orders.find(o => o.stage === 'ready')
@@ -306,6 +318,9 @@ export default function MyAccountPage() {
   } else if (liveOrder) {
     heroAlert = '⏳ Seu pedido está esperando o Pix. O código está no e-mail que mandamos.';
     primary = { label: 'Ver meu pedido', onClick: () => setTab('pedidos') };
+  } else if (nextBrunch) {
+    heroAlert = `🥂 Seu brunch: ${new Date(nextBrunch.starts_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'long' })}`;
+    primary = { label: 'Entrar no grupo do brunch', href: roomPath(nextBrunch.slug) };
   } else if (subStatus === 'pending') {
     heroAlert = '⏳ Sua assinatura está aguardando o pagamento.';
     primary = { label: 'Ver minha assinatura', onClick: scrollToLive };
@@ -387,6 +402,7 @@ export default function MyAccountPage() {
         <div role="tabpanel" hidden={tab !== 'inicio'} className="acct-home">
           <div className="acct-col-main">
             <div id="acct-live" className="acct-live">
+              <MyBrunches data={brunches} reload={loadBrunches} />
               <MyPickups />
               <MySubscription />
             </div>

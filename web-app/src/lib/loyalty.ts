@@ -66,7 +66,7 @@ export const ORDER_STAGE: Record<JourneyOrder['stage'], { label: string; color: 
 };
 
 /** The value ladder, in the order we'd like people to climb it. */
-export type StepId = 'caixa' | 'assinatura' | 'eventos' | 'curso' | 'retiro';
+export type StepId = 'caixa' | 'assinatura' | 'brunch' | 'eventos' | 'curso' | 'retiro';
 
 export interface TrailStep {
   id: StepId;
@@ -93,6 +93,11 @@ export const TRAIL: TrailStep[] = [
     cta: 'Ver planos de assinatura', href: '/assinatura', image: '/box2.jpg', doneLabel: 'Assinante',
   },
   {
+    id: 'brunch', emoji: '🥂', title: 'Brunch Tropical',
+    pitch: 'Uma manhã de chá, doces e conversa com mulheres que vivem de saúde e bem-estar, num lugar lindo da região. E o ingresso vira crédito na assinatura anual.',
+    cta: 'Ver os próximos brunches', href: '/brunch', image: '/brunch/brunch-mesa.webp', doneLabel: 'Do Círculo',
+  },
+  {
     id: 'eventos', emoji: '🎉', title: 'Doces para o seu evento',
     pitch: 'Aniversário, casamento, café da empresa: bolos, tartelettes e cupcakes da Dolly para todo mundo comer, inclusive quem tem restrição.',
     cta: 'Montar meu orçamento', href: '/menu', image: '/event_hero.jpg', doneLabel: 'Festejou',
@@ -109,10 +114,12 @@ export const TRAIL: TrailStep[] = [
   },
 ];
 
-export function trailDone(j: Journey | null, subscriber: boolean): Record<StepId, boolean> {
+/** `brunchGoer`: has a paid brunch ticket (my_brunches(), migration 41). */
+export function trailDone(j: Journey | null, subscriber: boolean, brunchGoer = false): Record<StepId, boolean> {
   return {
     caixa: !!j && j.paid_boxes > 0,
     assinatura: subscriber,
+    brunch: brunchGoer,
     eventos: !!j && j.paid_events + j.event_quotes > 0,
     curso: !!j && j.course_inquiries > 0,
     retiro: !!j && j.retreat_inquiries > 0,

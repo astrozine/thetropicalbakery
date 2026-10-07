@@ -59,6 +59,8 @@ export interface SendRequest {
    * automations that target a known group, e.g. the waiting list.
    */
   onlyEmails?: string[];
+  /** Leave these addresses out (e.g. people who already bought, on a "last seats" nudge). */
+  exceptEmails?: string[];
   /** Override BATCH_LIMIT. The scheduler raises it because nobody is waiting on a click. */
   limit?: number;
 }
@@ -152,6 +154,10 @@ export function audienceFor(campaign: Campaign, contacts: Contact[], diet?: Diet
  */
 export async function sendCampaign(db: SupabaseClient, req: SendRequest): Promise<SendResult> {
   const { campaign, topic, messageKey, subject, content } = prepare(req.campaignId, req.values);
+  // A group e-mail (one brunch's guests) must never fall through to the whole list.
+  if (campaign.groupOnly && !req.onlyEmails && !req.testEmail) {
+    throw new SendError(400, 'Este e-mail vai só para um grupo; envie pela página do grupo.');
+  }
   const contacts = await loadContacts(db);
 
   let eligible = audienceFor(campaign, contacts, req.diet);
@@ -160,6 +166,11 @@ export async function sendCampaign(db: SupabaseClient, req: SendRequest): Promis
   if (req.onlyEmails) {
     const wanted = new Set(req.onlyEmails.map(e => e.trim().toLowerCase()).filter(Boolean));
     eligible = eligible.filter(c => wanted.has(c.email.toLowerCase()));
+  }
+
+  if (req.exceptEmails?.length) {
+    const skip = new Set(req.exceptEmails.map(e => e.trim().toLowerCase()));
+    eligible = eligible.filter(c => !skip.has(c.email.toLowerCase()));
   }
 
   // A test goes only to the address given, ignoring the audience entirely.

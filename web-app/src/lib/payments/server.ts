@@ -114,6 +114,13 @@ async function sendPaidReceipt(orderId: string) {
     return;
   }
 
+  // A brunch seat: mark the ticket paid and send the welcome with the group link, not a delivery receipt.
+  if (data.order_kind === 'brunch' || /^BRU/.test(String(data.pix_transaction_id ?? ''))) {
+    const { onBrunchOrderPaid } = await import('./brunch');
+    await onBrunchOrderPaid(data);
+    return;
+  }
+
   const address = String(data.delivery_address ?? '');
   await sendOrderPaid(db, {
     reference: String(data.pix_transaction_id ?? ''),

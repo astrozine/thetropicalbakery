@@ -4,6 +4,7 @@ import { openDatesBetween, type DateOverride, type ScheduleRule } from '@/lib/de
 import { summarizeAllergens, type BoxItem } from '@/lib/allergens';
 import type { AutomationDef, AutomationRow } from './automationDefs';
 import type { DietTargeting, SendRequest } from './send';
+import { HOST, creditDeadline, fmtWhen, normalizeEvent, venueKind, type BrunchEvent } from '@/lib/brunch';
 
 /**
  * What each always-on rule does when the scheduler looks at it.
@@ -113,6 +114,32 @@ async function deliveryDays(db: SupabaseClient, today: string, weeks = 8) {
   return { open, unannounced: open.filter(d => !announced.has(d)) };
 }
 
+// ------------------------------------------------------------------ brunch
+
+/** The Brasília calendar day of a moment. */
+const brasiliaDay = (iso: string) => brasiliaNow(new Date(iso)).today;
+const daysBetween = (fromIso: string, toIso: string) =>
+  Math.round((Date.parse(toIso + 'T00:00:00Z') - Date.parse(fromIso + 'T00:00:00Z')) / 86400000);
+
+const brunchWhere = (e: BrunchEvent) => {
+  const v = venueKind(e.venue_kind);
+  return `${e.venue_name || v.label}${e.city ? `, ${e.city}` : ''}`;
+};
+
+/** Published brunches (and finished ones, when asked: the follow-up and the chat go on after the day). */
+async function brunchEvents(db: SupabaseClient, includeFinished = false): Promise<BrunchEvent[]> {
+  const { data, error } = await db.from('brunch_events').select('*')
+    .in('status', includeFinished ? ['publicado', 'encerrado'] : ['publicado']);
+  if (error) return []; // migration 41 not run: the brunch rules simply have nothing to do
+  return ((data || []) as Record<string, unknown>[]).map(normalizeEvent);
+}
+
+/** The e-mails of everyone who paid for this brunch. */
+async function brunchGuests(db: SupabaseClient, eventId: string): Promise<string[]> {
+  const { data } = await db.from('brunch_tickets').select('email').eq('event_id', eventId).eq('status', 'pago');
+  return [...new Set((data || []).map(t => String(t.email).toLowerCase()))];
+}
+
 /**
  * Works out what one rule wants to do right now. Never sends, never writes.
  * `send_hour` has already been checked by the caller.
@@ -194,6 +221,107 @@ export async function planFor(db: SupabaseClient, def: AutomationDef, row: Autom
         requests: [{ campaignId: 'subscriber-delivery', values: { date: target } }],
         note: `Entrega em ${target}, avisando ${offset} dia(s) antes.`,
       };
+    }
+
+    // -------------------------------------------------------- brunch-reminder
+    case 'brunch-reminder': {
+      const offset = row.offset_days ?? 2;
+      const days = [...new Set([offset, 1])];
+      const events = await brunchEvents(db);
+      const requests: SendRequest[] = [];
+      const notes: string[] = [];
+      for (const e of events) {
+        const d = daysBetween(today, brasiliaDay(e.starts_at));
+        if (!days.includes(d)) continue;
+        const guests = await brunchGuests(db, e.id);
+        if (!guests.length) continue;
+        requests.push({
+          campaignId: 'brunch-reminder',
+          values: { slug: e.slug, title: e.title, when: fmtWhen(e), where: brunchWhere(e), days: String(d), guests: String(guests.length) },
+          onlyEmails: guests,
+        });
+        notes.push(`"${e.title}" em ${d} dia(s), ${guests.length} convidada(s)`);
+      }
+      return requests.length ? { requests, note: notes.join('; ') + '.' } : nothing('Nenhum brunch na data de lembrete.');
+    }
+
+    // ----------------------------------------------------- brunch-chat-digest
+    case 'brunch-chat-digest': {
+      const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+      const { data: msgs } = await db.from('brunch_messages').select('event_id, user_id, body, is_host, created_at')
+        .gte('created_at', since).order('created_at', { ascending: true });
+      const byEvent = new Map<string, { user_id: string; body: string; is_host: boolean }[]>();
+      for (const m of (msgs || []) as { event_id: string; user_id: string; body: string; is_host: boolean }[]) {
+        byEvent.set(m.event_id, [...(byEvent.get(m.event_id) || []), m]);
+      }
+      if (!byEvent.size) return nothing('Nenhuma mensagem nova nos grupos de brunch.');
+
+      const events = (await brunchEvents(db, true)).filter(e => byEvent.has(e.id));
+      const requests: SendRequest[] = [];
+      for (const e of events) {
+        const list = byEvent.get(e.id)!;
+        const { data: tickets } = await db.from('brunch_tickets').select('user_id, email, full_name, paid_at').eq('event_id', e.id).eq('status', 'pago');
+        const rows = (tickets || []) as { user_id: string | null; email: string; full_name: string | null; paid_at: string | null }[];
+        const guests = rows.map(t => t.email.toLowerCase());
+        if (!guests.length) continue;
+        const ids = [...new Set(list.map(m => m.user_id))];
+        const { data: profs } = await db.from('brunch_profiles').select('user_id, display_name').in('user_id', ids);
+        const nameOf = (m: { user_id: string; is_host: boolean }) =>
+          (profs || []).find(p => p.user_id === m.user_id)?.display_name
+          || (m.is_host ? HOST.name : (rows.find(t => t.user_id === m.user_id)?.full_name || '').split(' ')[0] || 'Alguém');
+        const preview = list.slice(-5).map(m => `${nameOf(m)}: ${m.body.replace(/\s+/g, ' ').slice(0, 140)}`).join('\n');
+        const newcomers = rows.filter(t => t.paid_at && t.paid_at >= since).map(t => (t.full_name || '').split(' ')[0]).filter(Boolean).join(', ');
+        requests.push({
+          campaignId: 'brunch-chat-digest',
+          values: { slug: e.slug, title: e.title, date: today, count: String(list.length), preview, newcomers },
+          onlyEmails: guests,
+        });
+      }
+      return requests.length
+        ? { requests, note: `Resumo de ${requests.length} grupo(s) de brunch.` }
+        : nothing('Mensagens novas, mas nenhum grupo com convidadas.');
+    }
+
+    // -------------------------------------------------------- brunch-followup
+    case 'brunch-followup': {
+      const offset = row.offset_days ?? 1;
+      const events = (await brunchEvents(db, true)).filter(e => daysBetween(brasiliaDay(e.starts_at), today) === offset);
+      const requests: SendRequest[] = [];
+      for (const e of events) {
+        const guests = await brunchGuests(db, e.id);
+        if (!guests.length) continue;
+        const until = creditDeadline(e.starts_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: 'numeric', month: 'long' });
+        requests.push({
+          campaignId: 'brunch-followup',
+          values: { slug: e.slug, title: e.title, credit: e.price > 0 ? String(e.price) : '', creditUntil: e.price > 0 ? until : '' },
+          onlyEmails: guests,
+        });
+      }
+      return requests.length
+        ? { requests, note: `Obrigada de ${requests.length} brunch(es).` }
+        : nothing(`Nenhum brunch aconteceu há ${offset} dia(s).`);
+    }
+
+    // ------------------------------------------------------ brunch-last-seats
+    case 'brunch-last-seats': {
+      const threshold = row.threshold ?? 3;
+      const events = (await brunchEvents(db)).filter(e => e.status === 'publicado');
+      const { data: avail } = await db.rpc('brunch_availability');
+      const requests: SendRequest[] = [];
+      const notes: string[] = [];
+      for (const e of events) {
+        const a = ((avail || []) as { event_id: string; taken: number }[]).find(x => x.event_id === e.id);
+        const left = e.capacity - (a?.taken ?? 0);
+        if (left <= 0 || left > threshold) continue;
+        const { data: buyers } = await db.from('brunch_tickets').select('email').eq('event_id', e.id).neq('status', 'cancelado');
+        requests.push({
+          campaignId: 'brunch-last-seats',
+          values: { slug: e.slug, title: e.title, when: fmtWhen(e), remaining: String(left) },
+          exceptEmails: (buyers || []).map(b => String(b.email)),
+        });
+        notes.push(`"${e.title}": ${left} lugar(es)`);
+      }
+      return requests.length ? { requests, note: notes.join('; ') + '.' } : nothing(`Nenhum brunch com ${threshold} ou menos lugares.`);
     }
 
     default:

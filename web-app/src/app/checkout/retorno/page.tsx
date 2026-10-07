@@ -115,7 +115,19 @@ function ReturnInner() {
           </>
         )}
 
-        {phase === 'paid' && (
+        {/* A brunch seat (BRU…): the next step is the group, not the kitchen. */}
+        {phase === 'paid' && /^BRU/.test(ref) && (
+          <>
+            <p style={{ fontSize: '2.6rem', marginBottom: '0.5rem' }}>🥂</p>
+            <h1 style={h}>Seu lugar está garantido!</h1>
+            <p style={p}>Você está dentro. O grupo do brunch, o endereço e o seu cartão de apresentação estão em <strong>Minha Conta</strong>. Mandamos tudo por e-mail também.</p>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link href="/minha-conta" className="btn btn-primary" style={{ padding: '0.9rem 1.6rem' }}>Entrar no grupo do brunch</Link>
+            </div>
+          </>
+        )}
+
+        {phase === 'paid' && !/^BRU/.test(ref) && (
           <>
             <p style={{ fontSize: '2.6rem', marginBottom: '0.5rem' }}>🎉</p>
             <h1 style={h}>Pagamento confirmado!</h1>

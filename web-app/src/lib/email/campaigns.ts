@@ -43,6 +43,11 @@ export interface Campaign {
   theme: EmailTheme;
   /** Extra tag filter on top of the topic, when the audience is narrower. */
   tags?: ContactTag[];
+  /**
+   * Only ever sent to a named group (sendCampaign's onlyEmails), e.g. the guests of one brunch. Hidden from the
+   * campaign picker in /admin/emails, and refused by sendCampaign without a group.
+   */
+  groupOnly?: boolean;
   description: string;
   /** Line explaining to the reader why they got it. */
   reason: string;
@@ -405,6 +410,221 @@ Todos os cuidados: ${url(CARE_PATH)}`),
       heading: v.title,
       body: paragraphs(v.body),
       cta: v.ctaLabel ? { label: v.ctaLabel, href: url(v.ctaPath || '/') } : undefined,
+    }),
+  },
+  // ------------------------------------------------------------ Brunch Tropical
+  // Announcements reach the whole list (topic 'brunch'); everything about one brunch goes only to its guests
+  // (groupOnly, sendCampaign's onlyEmails) and is sent from /admin/brunch or by the brunch automations.
+
+  {
+    id: 'brunch-new',
+    theme: 'brunch',
+    name: 'Brunch novo na agenda',
+    emoji: '🥂',
+    topic: 'brunch',
+    description: 'Anuncia um brunch novo: tema, data, lugar e quantos lugares existem. Também sai pelo botão "Anunciar" em Admin › Brunch.',
+    reason: 'Você recebe este e-mail porque está na lista da Tropical Bakery e não pediu para parar de receber os brunches.',
+    fields: [
+      { name: 'slug', label: 'Endereço do brunch no site (depois de /brunch/)', type: 'text', required: true, placeholder: 'cha-das-empreendedoras-novembro' },
+      { name: 'title', label: 'Nome do brunch', type: 'text', required: true, placeholder: 'Chá das Empreendedoras do Bem-Estar' },
+      { name: 'theme', label: 'Sobre o que vamos conversar', type: 'textarea', placeholder: 'Como transformar o que você sabe sobre saúde num trabalho que paga as contas.' },
+      { name: 'when', label: 'Quando', type: 'text', required: true, placeholder: 'sábado, 8 de novembro, 10h às 13h' },
+      { name: 'where', label: 'Onde', type: 'text', placeholder: 'Pousada parceira em Itamambuca' },
+      { name: 'price', label: 'Valor (R$)', type: 'number', placeholder: '180' },
+      { name: 'seats', label: 'Quantos lugares', type: 'number', placeholder: '12' },
+    ],
+    subject: v => `Brunch novo com a Dolly: ${v.title}`,
+    messageKey: v => `brunch-new:${slug(v.slug || v.title)}`,
+    build: v => ({
+      preheader: `${v.when}. São só ${v.seats || 'poucos'} lugares, por ordem de pagamento.`,
+      heading: v.title,
+      body:
+        paragraphs(v.theme || 'Uma manhã de chá, doces saudáveis e conversa boa sobre saúde, bem-estar e como viver disso.') +
+        paragraphs(`${v.when}${v.where ? `\n${v.where}` : ''}`) +
+        kicker('No seu ingresso') +
+        bulletList([
+          'Mesa de doces saudáveis da Dolly e chás da estação',
+          'Roda de conversa com mulheres que vivem de saúde e bem-estar',
+          'O grupo do brunch com a Dolly, antes e depois',
+          'O valor do ingresso vira crédito na assinatura anual da Caixa',
+        ]),
+      facts: [
+        ...(v.seats ? [{ num: v.seats, label: 'lugares, e só' }] : []),
+        ...(v.price ? [{ num: `R$ ${v.price}`, label: 'por pessoa' }] : []),
+        { num: '1º', label: 'quem paga primeiro garante' },
+      ],
+      cta: { label: 'Garantir meu lugar', href: url(`/brunch/${v.slug}`) },
+      note: 'Os lugares são limitados e vão por ordem de pagamento.',
+    }),
+  },
+
+  {
+    id: 'brunch-last-seats',
+    theme: 'brunch',
+    name: 'Últimos lugares no brunch',
+    emoji: '⏳',
+    topic: 'brunch',
+    description: 'Empurrãozinho quando restam poucos lugares num brunch.',
+    reason: 'Você recebe este e-mail porque está na lista da Tropical Bakery e não pediu para parar de receber os brunches.',
+    fields: [
+      { name: 'slug', label: 'Endereço do brunch (depois de /brunch/)', type: 'text', required: true },
+      { name: 'title', label: 'Nome do brunch', type: 'text', required: true },
+      { name: 'when', label: 'Quando', type: 'text', placeholder: 'sábado, 8 de novembro, 10h' },
+      { name: 'remaining', label: 'Quantos lugares restam', type: 'number', required: true, placeholder: '3' },
+    ],
+    subject: v => `Restam ${v.remaining} lugares: ${v.title}`,
+    messageKey: v => `brunch-last-seats:${slug(v.slug || v.title)}`,
+    build: v => ({
+      preheader: `Últimos lugares no brunch ${v.title}.`,
+      heading: `Últimos ${esc(v.remaining)} lugares`,
+      body: paragraphs(`O brunch "${v.title}"${v.when ? ` (${v.when})` : ''} está quase cheio: restam ${v.remaining} lugares. A mesa é pequena de propósito, para todo mundo conversar com todo mundo.`),
+      facts: [{ num: String(v.remaining || ''), label: 'lugares restantes' }],
+      cta: { label: 'Garantir o meu', href: url(`/brunch/${v.slug}`) },
+    }),
+  },
+
+  {
+    id: 'brunch-seat-open',
+    theme: 'brunch',
+    groupOnly: true,
+    name: 'Abriu um lugar (lista de espera)',
+    emoji: '🎟️',
+    topic: 'brunch',
+    description: 'Para a lista de espera de um brunch, quando alguém desiste. Enviado por Admin › Brunch.',
+    reason: 'Você recebe este e-mail porque entrou na lista de espera deste brunch.',
+    fields: [
+      { name: 'slug', label: 'Endereço do brunch', type: 'text', required: true },
+      { name: 'title', label: 'Nome do brunch', type: 'text', required: true },
+      { name: 'round', label: 'Rodada (preenchido sozinho)', type: 'text', required: true },
+    ],
+    subject: v => `Abriu um lugar: ${v.title}`,
+    messageKey: v => `brunch-seat-open:${slug(v.slug)}:${v.round}`,
+    build: v => ({
+      preheader: 'Quem pagar primeiro fica com ele.',
+      heading: 'Abriu um lugar para você',
+      body: paragraphs(`Alguém desistiu do brunch "${v.title}" e você estava na lista de espera. Avisamos todo mundo da lista ao mesmo tempo: quem pagar primeiro fica com o lugar.`),
+      cta: { label: 'Pegar o lugar', href: url(`/brunch/${v.slug}`) },
+    }),
+  },
+
+  {
+    id: 'brunch-reminder',
+    theme: 'brunch',
+    groupOnly: true,
+    name: 'Lembrete do brunch (convidadas)',
+    emoji: '🔔',
+    topic: 'circulo',
+    description: 'Avisa as convidadas de um brunch que ele está chegando, com o link da sala (endereço e grupo).',
+    reason: 'Você recebe este e-mail porque tem um ingresso para este brunch.',
+    fields: [
+      { name: 'slug', label: 'Endereço do brunch', type: 'text', required: true },
+      { name: 'title', label: 'Nome do brunch', type: 'text', required: true },
+      { name: 'when', label: 'Quando', type: 'text', required: true },
+      { name: 'where', label: 'Onde', type: 'text' },
+      { name: 'days', label: 'Faltam quantos dias', type: 'number', required: true, placeholder: '2' },
+      { name: 'guests', label: 'Quantas pessoas vão', type: 'number' },
+    ],
+    subject: v => (Number(v.days) <= 1 ? `É amanhã: ${v.title} 🥂` : `Faltam ${v.days} dias: ${v.title}`),
+    messageKey: v => `brunch-reminder:${slug(v.slug)}:${v.days}`,
+    build: v => ({
+      preheader: `${v.when}. O endereço e o grupo estão na sua sala.`,
+      heading: Number(v.days) <= 1 ? 'É amanhã!' : `Faltam ${esc(v.days)} dias`,
+      body:
+        paragraphs(`O brunch "${v.title}" está chegando: ${v.when}${v.where ? `, ${v.where}` : ''}.`) +
+        bulletList([
+          'O endereço exato e como chegar estão na sua sala do brunch.',
+          'Já montou o seu cartão? Foto, emoji e com o que você pode ajudar: é assim que as pessoas te acham.',
+          'Traga cartões de visita, ou o seu Instagram na ponta da língua.',
+        ]),
+      facts: v.guests ? [{ num: v.guests, label: 'pessoas confirmadas' }] : undefined,
+      cta: { label: 'Abrir a sala do brunch', href: url(`/brunch/sala/${v.slug}`) },
+    }),
+  },
+
+  {
+    id: 'brunch-chat-digest',
+    theme: 'brunch',
+    groupOnly: true,
+    name: 'Resumo do grupo do brunch',
+    emoji: '💬',
+    topic: 'circulo',
+    description: 'Uma vez por dia, para as convidadas de um brunch: as mensagens novas do grupo e quem chegou.',
+    reason: 'Você recebe este e-mail porque está no grupo deste brunch. Dá para desligar só este resumo nas preferências ("Meu grupo do brunch").',
+    fields: [
+      { name: 'slug', label: 'Endereço do brunch', type: 'text', required: true },
+      { name: 'title', label: 'Nome do brunch', type: 'text', required: true },
+      { name: 'date', label: 'Dia do resumo (AAAA-MM-DD)', type: 'date', required: true },
+      { name: 'count', label: 'Quantas mensagens novas', type: 'number', required: true },
+      { name: 'preview', label: 'Últimas mensagens (uma por linha)', type: 'textarea' },
+      { name: 'newcomers', label: 'Quem chegou (separado por vírgula)', type: 'text' },
+    ],
+    subject: v => `${v.count} ${Number(v.count) === 1 ? 'mensagem nova' : 'mensagens novas'} no grupo: ${v.title}`,
+    messageKey: v => `brunch-chat:${slug(v.slug)}:${v.date}`,
+    build: v => {
+      const lines = (v.preview || '').split('\n').map(s => s.trim()).filter(Boolean);
+      return {
+        preheader: lines[0]?.slice(0, 90) || 'A conversa está andando no grupo do brunch.',
+        heading: 'O grupo está conversando',
+        body:
+          (v.newcomers ? paragraphs(`Chegou gente nova: ${v.newcomers}. Dê as boas-vindas!`) : '') +
+          (lines.length ? kicker('Últimas mensagens') + bulletList(lines) : paragraphs('Tem conversa nova esperando por você.')),
+        cta: { label: 'Responder no grupo', href: url(`/brunch/sala/${v.slug}`) },
+      };
+    },
+  },
+
+  {
+    id: 'brunch-followup',
+    theme: 'brunch',
+    groupOnly: true,
+    name: 'Depois do brunch (obrigada + crédito)',
+    emoji: '💛',
+    topic: 'circulo',
+    description: 'No dia seguinte: obrigada, o grupo continua, e o prazo do crédito do ingresso na assinatura anual.',
+    reason: 'Você recebe este e-mail porque esteve neste brunch.',
+    fields: [
+      { name: 'slug', label: 'Endereço do brunch', type: 'text', required: true },
+      { name: 'title', label: 'Nome do brunch', type: 'text', required: true },
+      { name: 'credit', label: 'Valor do crédito (R$)', type: 'number', placeholder: '180' },
+      { name: 'creditUntil', label: 'Crédito vale até', type: 'text', placeholder: '8 de dezembro' },
+    ],
+    subject: v => `Obrigada por ter vindo 💛 ${v.title}`,
+    messageKey: v => `brunch-followup:${slug(v.slug)}`,
+    build: v => ({
+      preheader: v.creditUntil ? `Seu ingresso vira crédito na assinatura anual até ${v.creditUntil}.` : 'O grupo continua aberto.',
+      heading: 'Obrigada por ter vindo',
+      body:
+        paragraphs('Foi lindo ter você à mesa. O grupo do brunch continua aberto: troque contatos, mande aquela indicação que você prometeu, poste as fotos.') +
+        (v.creditUntil
+          ? kicker('O seu crédito') + paragraphs(`O valor do seu ingresso${v.credit ? ` (R$ ${v.credit})` : ''} vira desconto na sua primeira mensalidade da assinatura Anual da Caixa de Degustação, se você assinar até ${v.creditUntil}. É só tocar em "Usar meu crédito" em Minha Conta.`)
+          : ''),
+      cta: { label: 'Voltar para o grupo', href: url(`/brunch/sala/${v.slug}`) },
+      note: 'Os próximos brunches abrem antes para quem já é do Círculo Tropical.',
+    }),
+  },
+
+  {
+    id: 'brunch-note',
+    theme: 'brunch',
+    groupOnly: true,
+    name: 'Recado da Dolly para as convidadas',
+    emoji: '✍️',
+    topic: 'circulo',
+    description: 'Texto livre para as convidadas de um brunch (mudança de horário, o que levar, fotos). Enviado por Admin › Brunch.',
+    reason: 'Você recebe este e-mail porque tem um ingresso para este brunch.',
+    fields: [
+      { name: 'slug', label: 'Endereço do brunch', type: 'text', required: true },
+      { name: 'title', label: 'Nome do brunch', type: 'text', required: true },
+      { name: 'subject', label: 'Assunto', type: 'text', required: true, placeholder: 'Mudança de horário' },
+      { name: 'body', label: 'Recado', type: 'textarea', required: true },
+    ],
+    subject: v => `${v.subject} · ${v.title}`,
+    messageKey: v => `brunch-note:${slug(v.slug)}:${slug(v.subject)}`,
+    build: v => ({
+      preheader: v.body?.slice(0, 90) || v.subject,
+      heading: v.subject,
+      body: paragraphs(v.body),
+      cta: { label: 'Abrir a sala do brunch', href: url(`/brunch/sala/${v.slug}`) },
     }),
   },
 ];

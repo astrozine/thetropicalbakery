@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **41**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **42**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -149,6 +149,12 @@ Verified live, 2026-09-26:
   so the nav's 🌐 picker sends people to the hand-written page on `/sweet-escape*`, and FR/DE/IT go to
   `/sweet-escape?tl=fr` (Google; FR/DE/IT get the English edition). Choosing the English edition while reading in another
   language (or through Google) shows "this edition is in English" and requires a tick before paying. The buyer's language rides on `orders.delivery_address` (`… · pt`) for the e-mails.
+- **Brunch Tropical (written 2026-10-07, `migration_41_brunch.sql` NOT run yet).** Ticketed brunches with a private group per
+  brunch, networking cards, a live vote on treats/topics and the Círculo perks; see the section in `web-app/CLAUDE.md`.
+  Until migration 41 runs, `/brunch` shows "a próxima data sai em breve" with an e-mail capture and `/admin/brunch` shows a
+  "rode a migration 41" hint. Small edits to shared files: `server.ts` (brunch branch in the paid receipt), `send.ts`
+  (`groupOnly` guard, `exceptEmails`), `ebook-paid` route (also sends the brunch welcome), retorno page, Navigation, adminNav,
+  Minha Conta (tickets at the top of Início, a brunch step in the trail).
 - **Several boxes on sale at once (written 2026-10-06, `migration_40_special_boxes.sql` NOT run yet).** Besides the weekly ready box and
   the pre-sale, Dolly can publish any number of **special editions** (`tasting_boxes.edition = 'special'`, e.g. Dia das Crianças), optionally
   sold closed at their own price (`fixed_price`, charged by `createOrder`; null = the usual 2/4/6 sizes). A special never takes another box off

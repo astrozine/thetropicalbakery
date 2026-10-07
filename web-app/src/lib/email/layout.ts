@@ -29,7 +29,7 @@ const HEADING_FONT = `'Unbounded','Outfit',Helvetica,Arial,sans-serif`;
 const BODY_FONT = `'Outfit',Helvetica,Arial,sans-serif`;
 
 /** Which page an e-mail belongs to. Picks the top photo, the kicker and the photo strip. */
-export type EmailTheme = 'caixa' | 'assinatura' | 'eventos' | 'cursos' | 'retiros' | 'parcerias' | 'equipe' | 'novidades';
+export type EmailTheme = 'caixa' | 'assinatura' | 'eventos' | 'cursos' | 'retiros' | 'parcerias' | 'equipe' | 'novidades' | 'brunch';
 
 interface ThemeDef {
   kicker: string;
@@ -107,6 +107,16 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
       { img: 'tile-chef', caption: 'Mão na massa', alt: 'Confeiteiras trabalhando juntas', path: '/trabalhe-conosco' },
       { img: 'tile-box', caption: 'Caixas montadas à mão', alt: 'Caixa de doces montada', path: '/trabalhe-conosco' },
       { img: 'tile-caramel', caption: 'Pequenos lotes', alt: 'Bolinhos com calda de caramelo', path: '/trabalhe-conosco' },
+    ],
+  },
+  brunch: {
+    kicker: 'Brunch Tropical',
+    heroAlt: 'Mulheres rindo em volta de uma mesa de brunch tropical com doces e chá',
+    stripTitle: 'Como é um brunch com a Dolly',
+    strip: [
+      { img: 'tile-brunch-box', caption: 'A mesa de doces', alt: 'Mesa com doces saudáveis, frutas e chá', path: '/brunch' },
+      { img: 'tile-brunch-talk', caption: 'A roda de conversa', alt: 'Convidadas conversando à mesa', path: '/brunch' },
+      { img: 'tile-brunch-toast', caption: 'Gente boa por perto', alt: 'Convidadas brindando no jardim', path: '/brunch' },
     ],
   },
   novidades: {

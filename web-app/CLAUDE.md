@@ -159,6 +159,41 @@ that only add columns or policies to existing tables need nothing extra.
 - Left as plain links on purpose: footer, privacy page, admin, logged-in areas (partner, team, my account,
   my subscription), the order-return page and e-mail templates.
 
+# Brunch Tropical and the Círculo Tropical (ticketed brunches)
+
+Dolly's paid brunches (tea, healthy treats, a talk about working in health and wellness), aimed mostly at women
+in the field, one rung above the subscription on the value ladder. Schema: `migration_41_brunch.sql`. Every
+promise (perks, credit days, hold hours, vote budget, venue kinds) lives in **`src/lib/brunch.ts`**, like
+`loyalty.ts` for the club; the SQL repeats only the numbers it must enforce (30 credit days, 3 votes,
+3 suggestions, 2 days before) and says so.
+
+- **Pages:** `/brunch` (landing + agenda), `/brunch/<slug>` (one brunch + buy panel), `/brunch/sala/<slug>` (the private
+  room: group chat, the guests' networking cards, the vote, address and countdown). Components in `src/components/brunch/`,
+  styles `brunchStyles.ts` (`bn-` prefix). Admin `/admin/brunch` (bx- styles): create in steps, guests, Pix, check-in,
+  waiting list, credits, pop-up requests, e-mails, the chat and vote as host, and "O Círculo" (everyone who came).
+- **Buying = the same rules as a box.** `POST /api/brunch/order` -> `createBrunchOrder` (`src/lib/payments/brunch.ts`):
+  signed-in only (the seat comes with the group), price read from `brunch_events`, the seat taken by `brunch_reserve()`
+  (service role only, locks the row: two people never get the last seat), then an `orders` row (`order_kind = 'brunch'`,
+  reference `BRU…`). Unpaid holds expire (Pix 24 h, card 2 h) and stop counting. Full = waiting list (`status = 'espera'`).
+  Paid: `markOrderPaid` -> `onBrunchOrderPaid`; a Pix confirmed in the inbox flips the ticket by trigger
+  (`brunch_follow_inbox`) and the inbox's existing call to `/api/admin/ebook-paid` sends the welcome e-mail.
+- **The address is private** (`brunch_event_private`, admins only); guests get it through `my_brunches()` /
+  `brunch_room()` once paid. Never add a SELECT policy on tickets or private for customers.
+- **Chat:** `brunch_messages`, readable and writable only by paid guests of that brunch and admins (`brunch_is_member`).
+  The host flag is set by a trigger from `is_admin()`; an admin without a brunch profile shows as Dolly with
+  `/dolly/dolly-face.jpg`. Realtime-enabled.
+- **The vote ("Monte o brunch"):** `brunch_poll_options` + `brunch_votes`. 3 votes per kind (doces / temas) per guest,
+  3 own suggestions, treats can be picked from the menu (name and photo filled from `treats` by the trigger), closes
+  `votes_close_at` or 2 days before. Dolly marks winners (`chosen`) — closing the loop is the point, keep it visible.
+- **E-mails:** transactional `src/lib/email/brunchMail.ts` (seat held + Pix, you're in, waiting list). Everything to a
+  group is a campaign with `groupOnly: true` (hidden from /admin/emails, refused by `sendCampaign` without `onlyEmails`).
+  Topics `brunch` (announcements, whole list) and `circulo` (reminders, chat digest, follow-up; tag `brunch`).
+  Automations `brunch-reminder`, `brunch-chat-digest`, `brunch-followup`, `brunch-last-seats`, **seeded off**.
+- **Credit:** a paid ticket can become credit on the Anual subscription within 30 days of the brunch. The guest taps
+  "Usar meu crédito" (`brunch_claim_credit`), Dolly takes it off the first payment by hand and marks it applied.
+  The Círculo perks (credit, 10% on the events menu, members-first pre-sale) were proposed by Claude on 2026-10-07:
+  confirm with Andrew before making them bigger. Nothing applies the 10% automatically; Dolly honours it on the quote.
+
 # Minha Conta: the Clube Tropical home (a design that worked)
 
 Andrew asked for an account page that "keeps people buying and gets them up the value ladder" and called the

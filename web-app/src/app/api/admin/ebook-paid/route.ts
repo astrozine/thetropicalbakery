@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { supabaseAdmin } from '@/lib/payments/server';
 import { ebookAccess, sendPaidEmailForOrder } from '@/lib/payments/ebook';
+import { isBrunchReference, onBrunchOrderPaid } from '@/lib/payments/brunch';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,13 @@ export async function POST(req: NextRequest) {
   try {
     const { orderId } = await req.json();
     const { data: order } = await supabaseAdmin().from('orders').select('*').eq('id', String(orderId || '')).maybeSingle();
+    // A brunch seat paid by Pix: the inbox trigger (migration 41) already marked it paid; send the welcome + group link.
+    if (order && isBrunchReference(order.pix_transaction_id)) {
+      const { data: inbox } = await supabaseAdmin().from('inbox_status').select('status').eq('source_table', 'orders').eq('source_id', order.id).maybeSingle();
+      if (!inbox || inbox.status === 'new' || inbox.status === 'cancelled') return NextResponse.json({ ok: true, sent: false, why: 'not confirmed yet' });
+      await onBrunchOrderPaid(order);
+      return NextResponse.json({ ok: true, sent: true });
+    }
     if (!order || !/^EBK/.test(String(order.pix_transaction_id ?? ''))) return NextResponse.json({ ok: true, sent: false, why: 'not an e-book order' });
 
     const access = await ebookAccess(String(order.pix_transaction_id));

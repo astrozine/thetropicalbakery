@@ -84,6 +84,7 @@ export default function Navigation() {
     { name: 'Assinatura', path: '/assinatura', highlight: true, sub: 'caixa toda semana' },
     { name: 'Caixa de Degustação', path: '/caixas' },
     { name: 'Menu de Eventos', path: '/menu' },
+    { name: 'Brunch Tropical', path: '/brunch' },
     { name: 'Retiros', path: '/retreats' },
     { name: 'Chef Dolly', path: '/dolly' },
     { name: 'E-book', path: '/sweet-escape/pt' },

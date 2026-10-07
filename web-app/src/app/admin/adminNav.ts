@@ -53,8 +53,9 @@ export const buildGroups = (): NavGroup[] => [
     ],
   },
   {
-    id: 'cursos', name: 'Cursos & Retiros', emoji: '🌴', accent: '#d9453a', shade: '#324c66',
+    id: 'cursos', name: 'Brunch, Cursos & Retiros', emoji: '🌴', accent: '#d9453a', shade: '#324c66',
     items: [
+      { name: 'Brunch Tropical', path: '/admin/brunch', word: 'Brunch', emoji: '🥂', hint: 'Os brunches da Dolly: datas, convidadas, o grupo de cada um e o Círculo' },
       { name: 'Cursos', path: '/admin/courses', word: 'Cursos', emoji: '🎓', hint: 'Criar e editar os cursos' },
       { name: 'Inscrições em Cursos', path: '/admin/inscricoes', word: 'Inscritos', emoji: '✍️', hint: 'Quem se inscreveu' },
       { name: 'Propostas de Pagamento', path: '/admin/propostas', word: 'Propostas', emoji: '💳', hint: 'Mandar para um interessado o link da página de pagamento do curso ou retiro' },
