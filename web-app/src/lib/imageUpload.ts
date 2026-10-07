@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 
 /** Shrinks a phone photo (often 4–8 MB) to something a web page should load, keeping it sharp. */
-export async function resizeImage(file: File, maxSide = 1400, quality = 0.86): Promise<Blob> {
+export async function resizeImage(file: File, maxSide = 1400, quality = 0.82): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement('canvas');

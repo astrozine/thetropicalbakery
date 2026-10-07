@@ -3,6 +3,7 @@
 import ImagePicker from '@/components/ImagePicker';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { uploadPublicImage } from '@/lib/imageUpload';
 import { brandAlert } from '@/lib/brandDialog';
 
 interface SiteContent {
@@ -44,19 +45,8 @@ export default function SiteContentAdmin() {
       const file = e.target.files?.[0];
       if (!file) return;
 
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `site/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('uploads')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('uploads')
-        .getPublicUrl(filePath);
+      // Shrunk before upload, like every other admin photo: a phone original is 4-8 MB.
+      const publicUrl = await uploadPublicImage(file, 'site');
 
       setFormData({ ...formData, image_url: publicUrl });
     } catch (error) {
