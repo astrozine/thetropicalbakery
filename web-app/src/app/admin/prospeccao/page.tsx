@@ -174,8 +174,8 @@ export default function AdminProspectsPage() {
           <option value="todos">Todos os tipos</option>
           {segments.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <form onSubmit={add} style={{ display: 'flex', gap: '0.4rem', flex: '1 1 260px' }}>
-          <input type="text" placeholder="Novo contato (nome do negócio)" value={newName} onChange={e => setNewName(e.target.value)} style={field} />
+        <form onSubmit={add} style={{ display: 'flex', gap: '0.4rem', flex: '1 1 260px', minWidth: 0 }}>
+          <input type="text" placeholder="Novo contato (nome do negócio)" value={newName} onChange={e => setNewName(e.target.value)} style={{ ...field, minWidth: 0 }} />
           <button type="submit" style={{ ...btn, background: '#d4af37' }}>Adicionar</button>
         </form>
       </div>
@@ -235,7 +235,8 @@ function LeadCard({ l, due, patch, openWhatsApp }: {
         {l.website && <a href={l.website} target="_blank" rel="noopener noreferrer" style={{ ...btn, background: '#95a5a6' }}>Site</a>}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: replied ? '1fr 1fr 1fr' : '1fr 1fr', gap: '0.5rem', marginTop: '0.85rem' }}>
+      {/* minmax(0, 1fr): a select or date input must never push the card past a phone's width. */}
+      <div style={{ display: 'grid', gridTemplateColumns: replied ? 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))' : 'repeat(2, minmax(0, 1fr))', gap: '0.5rem', marginTop: '0.85rem' }}>
         <label style={{ fontSize: '0.72rem', color: '#7f8c8d', fontWeight: 700 }}>Etapa
           <select value={l.stage} onChange={e => patch(l, { stage: e.target.value as Stage })} style={{ ...field, marginTop: '0.2rem' }}>
             {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
@@ -260,7 +261,7 @@ function LeadCard({ l, due, patch, openWhatsApp }: {
         style={{ ...field, marginTop: '0.6rem', resize: 'vertical' }} />
 
       {(l.research || l.whatsapp_message) && (
-        <details style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#7f8c8d' }}>
+        <details style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#7f8c8d', overflowWrap: 'anywhere' }}>
           <summary style={{ cursor: 'pointer' }}>Pesquisa e mensagem</summary>
           {l.research && <p style={{ marginTop: '0.4rem', lineHeight: 1.6 }}>{l.research}</p>}
           {l.whatsapp_message && <p style={{ marginTop: '0.4rem', lineHeight: 1.6, fontStyle: 'italic' }}>&ldquo;{l.whatsapp_message}&rdquo;</p>}
