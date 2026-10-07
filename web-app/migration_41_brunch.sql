@@ -1,6 +1,6 @@
 -- migration_41_brunch.sql
 --
--- Brunch Tropical: Dolly's ticketed brunches (tea, healthy treats, a conversation about wellness as a
+-- Brunch Tropical: Dolly’s ticketed brunches (tea, healthy treats, a conversation about wellness as a
 -- career) and the Círculo Tropical, the private group of everyone who comes.
 --
 --   brunch_events          one row per brunch: theme, date, venue (our house, a partner pousada, a beach,
@@ -16,7 +16,7 @@
 --   brunch_messages        the group chat of one brunch. Read/write for paid guests of that brunch and admins
 --                          (admins post as the host). Realtime-enabled.
 --
--- Payment: a ticket is an order in `orders` (order_kind = 'brunch', reference BRU…), created by
+-- Payment: a ticket is an order in `orders` (order_kind = ’brunch’, reference BRU…), created by
 -- POST /api/brunch/order through createBrunchOrder (server price). Card / PayPal confirm themselves
 -- (markOrderPaid); a Pix confirmed by hand in the inbox flips the ticket by the trigger at the bottom.
 --
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS public.brunch_tickets (
     -- The ticket price as credit on an annual box subscription (src/lib/brunch.ts, CREDIT_DAYS).
     credit_claimed_at  timestamptz,
     credit_applied_at  timestamptz,
-    -- "I'd like to bring my pop-up table" — Dolly answers by hand.
+    -- "I’d like to bring my pop-up table" — Dolly answers by hand.
     popup_request      text,
     admin_notes        text,
     created_at         timestamptz NOT NULL DEFAULT now()
@@ -189,7 +189,7 @@ GRANT EXECUTE ON FUNCTION public.brunch_availability() TO anon, authenticated, s
 -- ------------------------------------------------------------ reservation
 -- The ONLY way a seat is taken. Called by the server (createBrunchOrder) with the service key, after it has
 -- read the price itself. Locks the brunch row so two people can never get the last seat.
--- Returns { result: 'ok' | 'espera' | 'ja_tem' | 'so_membros' | 'fechado', ticket_id }.
+-- Returns { result: ’ok’ | ’espera’ | ’ja_tem’ | ’so_membros’ | ’fechado’, ticket_id }.
 CREATE OR REPLACE FUNCTION public.brunch_reserve(
     p_event      uuid,
     p_user       uuid,
@@ -270,7 +270,7 @@ REVOKE ALL ON FUNCTION public.brunch_reserve(uuid, uuid, text, text, text, text,
 GRANT EXECUTE ON FUNCTION public.brunch_reserve(uuid, uuid, text, text, text, text, numeric, integer, boolean) TO service_role;
 
 -- --------------------------------------------------------- the member side
--- Everything Minha Conta needs: the caller's tickets (with the address once paid), their networking card,
+-- Everything Minha Conta needs: the caller’s tickets (with the address once paid), their networking card,
 -- and whether they are a Círculo member (has been to a brunch). Also links tickets bought under their
 -- e-mail to their account.
 CREATE OR REPLACE FUNCTION public.my_brunches()
@@ -438,7 +438,7 @@ $$;
 REVOKE ALL ON FUNCTION public.brunch_claim_credit(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.brunch_claim_credit(uuid) TO authenticated;
 
--- "I'd like to bring my pop-up table." Free text, Dolly answers by hand.
+-- "I’d like to bring my pop-up table." Free text, Dolly answers by hand.
 CREATE OR REPLACE FUNCTION public.brunch_request_popup(p_ticket uuid, p_text text)
 RETURNS boolean
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
@@ -509,7 +509,7 @@ BEGIN
     END IF;
 END $$;
 
--- ------------------------------------------------------- the guests' vote
+-- ------------------------------------------------------- the guests’ vote
 -- "Monte o brunch": the guests of a brunch vote on which treats Dolly makes and which topics the conversation
 -- covers. Each guest has 3 votes per kind (a budget makes every vote mean something), may suggest up to 3 options
 -- of their own, and sees the tally move live. Voting closes at votes_close_at (default: 2 days before, so the
