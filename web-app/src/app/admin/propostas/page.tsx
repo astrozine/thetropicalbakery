@@ -130,7 +130,7 @@ function Propostas() {
   /** The included list and the gift follow the kind and the language, unless Dolly already changed them. */
   const switchKind = (k: OfferKind, l: OfferLang = lang) => {
     setIncluded(cur => {
-      const defaults = (['retiro', 'curso'] as OfferKind[]).flatMap(x => (['pt', 'en'] as OfferLang[]).map(y => DEFAULT_INCLUDED[x][y].join('\n')));
+      const defaults = (['retiro', 'curso', 'pacote'] as OfferKind[]).flatMap(x => (['pt', 'en'] as OfferLang[]).map(y => DEFAULT_INCLUDED[x][y].join('\n')));
       return !cur.trim() || defaults.includes(cur) ? DEFAULT_INCLUDED[k][l].join('\n') : cur;
     });
     setBonuses(cur => (!cur.trim() || cur === DEFAULT_BONUS.pt || cur === DEFAULT_BONUS.en ? DEFAULT_BONUS[l] : cur));
@@ -184,7 +184,9 @@ function Propostas() {
     }]).select('*').single();
     setSaving(false);
     if (error || !data) {
-      brandAlert(/payment_offers/.test(error?.message || '')
+      brandAlert(/kind_check/.test(error?.message || '')
+        ? 'Para propostas de Pacote, rode a migration_44_prepaid_packages.sql no Supabase primeiro.'
+        : /payment_offers/.test(error?.message || '')
         ? 'Rode a migration_36_payment_offers.sql no Supabase primeiro.'
         : `Não foi possível salvar: ${error?.message ?? ''}`);
       return;
@@ -270,6 +272,7 @@ function Propostas() {
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button type="button" style={chip(kind === 'retiro')} onClick={() => switchKind('retiro')}>🏝️ Retiro</button>
                   <button type="button" style={chip(kind === 'curso')} onClick={() => switchKind('curso')}>🎓 Curso</button>
+                  <button type="button" style={chip(kind === 'pacote')} onClick={() => switchKind('pacote')} title="Pago adiantado: assinatura de fundador, primeiro pedido de parceiro, sinal de evento">📦 Pacote</button>
                 </div>
               </div>
               <div>
@@ -379,7 +382,7 @@ function Propostas() {
                     <span style={{ background: st.bg, color: st.c, fontWeight: 800, fontSize: '0.78rem', padding: '0.15rem 0.55rem', borderRadius: '6px' }}>{st.t}</span>
                   </div>
                   <div style={{ color: '#576574', fontSize: '0.92rem', overflowWrap: 'anywhere' }}>
-                    {r.kind === 'retiro' ? '🏝️' : '🎓'} {r.title} · <strong>{brl(r.price)}</strong>{r.dates_label ? ` · ${r.dates_label}` : ''}
+                    {r.kind === 'retiro' ? '🏝️' : r.kind === 'pacote' ? '📦' : '🎓'} {r.title} · <strong>{brl(r.price)}</strong>{r.dates_label ? ` · ${r.dates_label}` : ''}
                   </div>
                   <div style={{ color: '#95a5a6', fontSize: '0.8rem', marginTop: '0.2rem' }}>
                     Criada em {new Date(r.created_at).toLocaleDateString('pt-BR')}{r.expires_on ? ` · reservada até ${new Date(r.expires_on + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}
