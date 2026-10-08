@@ -167,7 +167,7 @@ export const CAMPAIGNS: Campaign[] = [
         { num: '0%', label: 'glúten nas receitas' },
       ],
       cta: { label: 'Ver a caixa desta semana', href: url('/caixas') },
-      note: 'Cada caixa é vegana e sem glúten, e cada doce diz que açúcar leva.',
+      note: 'Cada caixa é vegana e sem trigo, e cada doce diz que açúcar leva.',
     }),
   },
 
@@ -279,7 +279,7 @@ Todos os cuidados: ${url(CARE_PATH)}`),
         bulletList(listFrom(v.highlights)) +
         (v.deadline ? paragraphs(`Para garantir produção, encomende ${v.deadline}.`) : ''),
       cta: { label: 'Ver o Menu de Eventos', href: url('/menu') },
-      note: 'Tudo vegano e sem glúten — seus convidados com restrição comem igual a todo mundo.',
+      note: 'Tudo vegano e sem trigo — seus convidados com restrição comem igual a todo mundo.',
     }),
   },
 
@@ -335,7 +335,7 @@ Todos os cuidados: ${url(CARE_PATH)}`),
       heading: `Retiro em Itamambuca — ${v.period}`,
       body:
         paragraphs(v.intro || 'Abrimos novas datas na nossa casa a 100 metros da praia de Itamambuca.') +
-        bulletList([`Quando: ${v.period}`, ...(v.focus ? [`Foco: ${v.focus}`] : []), 'Comida vegana e sem glúten', 'Aulas de surfe podem ser somadas ao pacote']),
+        bulletList([`Quando: ${v.period}`, ...(v.focus ? [`Foco: ${v.focus}`] : []), 'Comida vegana e sem trigo', 'Aulas de surfe podem ser somadas ao pacote']),
       facts: [
         { num: '100 m', label: 'da casa até a areia' },
         { num: '15–20 min', label: 'até a Ilha do Prumirim' },

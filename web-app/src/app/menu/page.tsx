@@ -139,7 +139,7 @@ export default function MenuPage() {
               </summary>
               <div style={{ padding: '1rem 0', color: '#7a6a61', lineHeight: '1.8' }}>
                 Planejando um aniversário, casamento, retiro ou encontro corporativo na nossa região? 
-                Abaixo você encontra nosso portfólio de doces de luxo, 100% veganos, sem glúten e SOS-free: sem sal, sem óleo e sem açúcar refinado, com a doçura vindo de tâmaras, frutas, açúcar de coco ou rapadura. A única exceção é o chocolate vegano que alguns doces levam, que vem pronto com açúcar e óleo: esses aparecem marcados com “🍫 Com chocolate vegano”. 
+                Abaixo você encontra nosso portfólio de doces de luxo, 100% veganos, sem trigo e SOS-free: sem sal, sem óleo e sem açúcar refinado, com a doçura vindo de tâmaras, frutas, açúcar de coco ou rapadura. A única exceção é o chocolate vegano que alguns doces levam, que vem pronto com açúcar e óleo: esses aparecem marcados com “🍫 Com chocolate vegano”. 
                 Todos os itens abaixo são para <strong>encomendas em grandes quantidades</strong>. Entre em contato conosco via WhatsApp para organizarmos os detalhes, quantidades e a data de entrega do seu evento!
               </div>
             </details>
@@ -313,7 +313,7 @@ export default function MenuPage() {
         )}
 
         <p style={{ maxWidth: '760px', margin: '3rem auto 0', textAlign: 'center', color: '#7a6a61', fontSize: '0.85rem', lineHeight: 1.75 }}>
-          Todos os doces são 100% vegetais e feitos sem glúten. O que muda de um doce para outro ({ALLERGEN_LIST_NEM.replace(' nem ', ' e ')},
+          Todos os doces são 100% vegetais e feitos sem trigo. O que muda de um doce para outro ({ALLERGEN_LIST_NEM.replace(' nem ', ' e ')},
           que açúcar leva e se tem cafeína) está em cada um. Tudo é feito na mesma cozinha, então pode haver traços, inclusive de glúten. Se algum convidado tem alergia grave ou é celíaco,
           fale com a gente no WhatsApp antes de fechar o pedido.
         </p>

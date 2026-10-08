@@ -50,7 +50,7 @@ export const MAGIC_TRICKS: Record<string, MagicTrick> = {
   chocolate: { emoji: '🍫', craving: 'Chocolate intenso', trick: 'Cacau puro com fruta doce e um fundo de especiarias: profundo, amargo na medida, e o corpo não pede “só mais um” por culpa.' },
   acidez: { emoji: '🍋', craving: 'O “doce que brilha”', trick: 'Maracujá, limão e tamarindo acendem a língua: a acidez faz a fruta parecer mais doce do que é.' },
   especiarias: { emoji: '✨', craving: 'Doce sem açúcar que parece doce', trick: 'Canela, cardamomo e fava de baunilha têm cheiro de doce. O nariz convence a boca antes da primeira mordida.' },
-  textura: { emoji: '🥥', craving: 'A mordida de um bolo de padaria', trick: 'Farinhas de castanha e coco, bem hidratadas, dão aquela massa úmida e macia, sem glúten e sem manteiga.' },
+  textura: { emoji: '🥥', craving: 'A mordida de um bolo de padaria', trick: 'Farinhas de castanha e coco, bem hidratadas, dão aquela massa úmida e macia, sem trigo e sem manteiga.' },
 };
 
 const m = (...ids: string[]) => ids.map(id => MAGIC_TRICKS[id]);
@@ -64,7 +64,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     heroImage: '/assets/surfers_retreat_treats_1789884582282.jpg',
     floating: ['/menu-items/Screenshot_20260412_123155_Edits.jpg', '/menu-items/20260724_154636.jpg', '/retreats/Beach shot Itamambuca.webp'],
     story: [
-      'Você veio para Itamambuca pela praia. Leve para casa uma coisa que ninguém mais vai ter: um dia inteiro aprendendo com a Dolly, a chef belga por trás da The Tropical Bakery, a transformar frutas da Mata Atlântica em sobremesas de vitrine, 100% plant-based, sem glúten e adoçadas com frutas.',
+      'Você veio para Itamambuca pela praia. Leve para casa uma coisa que ninguém mais vai ter: um dia inteiro aprendendo com a Dolly, a chef belga por trás da The Tropical Bakery, a transformar frutas da Mata Atlântica em sobremesas de vitrine, 100% plant-based, sem trigo e adoçadas com frutas.',
       'É mão na massa do começo ao fim, em clima de férias. Você prova, erra, ri, acerta, e sai com as receitas, a técnica e aquela sensação boa de ter aprendido algo que vai usar a vida inteira.',
     ],
     whoFor: ['Turistas e moradores de Itamambuca e Ubatuba', 'Casais, amigos e famílias em busca de uma experiência diferente', 'Quem ama doce e quer comer melhor sem abrir mão do prazer', 'Iniciantes: não precisa saber nada de confeitaria'],
@@ -82,7 +82,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     familyText: 'Choveu? O Turismo Gastronômico vira programa de família: crianças e adultos na mesma bancada, cada um fazendo o seu doce, e todo mundo pode repetir.',
     faq: [
       { q: 'Preciso saber cozinhar?', a: 'Não. O dia foi pensado para iniciantes. A Dolly acompanha cada passo.' },
-      { q: 'Tem alguma restrição alimentar?', a: 'Tudo é 100% plant-based e sem glúten, adoçado com tâmaras, frutas, açúcar de coco ou rapadura. Se alguma receita usar chocolate vegano industrializado (que vem com açúcar cristal), a gente avisa. Se você tem alergia a castanhas ou outra alergia séria, avise no formulário e a gente adapta.' },
+      { q: 'Tem alguma restrição alimentar?', a: 'Tudo é 100% plant-based e sem trigo, adoçado com tâmaras, frutas, açúcar de coco ou rapadura. Se alguma receita usar chocolate vegano industrializado (que vem com açúcar cristal), a gente avisa. Se você tem alergia a castanhas ou outra alergia séria, avise no formulário e a gente adapta.' },
       { q: 'Posso ir com crianças?', a: 'Pode, e é ótimo em dia de chuva. Conte quantas pessoas e as idades no formulário.' },
       { q: 'Dá para combinar com hospedagem?', a: 'Dá. Veja o formato Curso + Retiro abaixo, ou marque essa opção quando falar com a gente.' },
     ],
@@ -107,7 +107,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     magic: m('crocante', 'cremoso', 'textura', 'especiarias'),
     journey: [
       { title: 'Base e diagnóstico', text: 'O que a casa onde você trabalha come, o que precisa mudar, e as restrições de cada pessoa.' },
-      { title: 'Substituições e técnica', text: 'Semana a semana, as trocas que funcionam: sem glúten, sem óleo, sem açúcar refinado, sem perder a graça.' },
+      { title: 'Substituições e técnica', text: 'Semana a semana, as trocas que funcionam: sem trigo, sem óleo, sem açúcar refinado, sem perder a graça.' },
       { title: 'Os truques de sabor', text: 'Crocância sem fritura, cremosidade sem lácteos, doçura sem açúcar: a parte que faz a família pedir bis.' },
       { title: 'Cardápio da semana', text: 'Você monta cardápios completos, com lista de compras e preparo adiantado, para o dia a dia real.' },
     ],
@@ -131,7 +131,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     floating: ['/menu-items/Screenshot_20260518_122444_Gallery.jpg', '/menu-items/20250907_143728.jpg', '/menu-items/Screenshot_20260818_075043_Gallery.jpg'],
     story: [
       'Este é o curso para quem já tentou “comer direito” e desistiu porque tudo ficava sem graça. Ou para quem recebeu um diagnóstico, precisa mudar a alimentação da casa e não sabe por onde começar.',
-      'A Dolly ensina a lógica por trás de cada ingrediente: por que a gente sente vontade do que sente, e como montar sobremesas e pratos que entregam exatamente aquela sensação, com ingredientes integrais, plant-based, sem glúten e sem açúcar refinado. Não é dieta. É aprender a comer bem e gostar muito.',
+      'A Dolly ensina a lógica por trás de cada ingrediente: por que a gente sente vontade do que sente, e como montar sobremesas e pratos que entregam exatamente aquela sensação, com ingredientes integrais, plant-based, sem trigo e sem açúcar refinado. Não é dieta. É aprender a comer bem e gostar muito.',
     ],
     whoFor: ['Quem quer reduzir açúcar, glúten, lactose ou ultraprocessados', 'Quem cuida da alimentação da família', 'Pessoas em transição para o veganismo ou com orientação médica para mudar a dieta', 'Quem ama doce e quer continuar amando, com saúde'],
     youLeaveWith: ['Receitas que matam a vontade de doce sem culpa', 'O entendimento de por que certos alimentos viciam, e como substituí-los', 'Um cardápio que a família inteira aceita (inclusive as crianças)', 'Mais energia, mais consciência e menos briga com a comida'],
@@ -139,7 +139,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     magic: m('caramelo', 'chocolate', 'cremoso', 'crocante', 'especiarias', 'acidez'),
     journey: [
       { title: 'Entender a vontade', text: 'O que o açúcar, o sal e a gordura fazem com o paladar, e por que a gente sempre quer mais.' },
-      { title: 'Os ingredientes certos', text: 'Integrais, plant-based e sem glúten: o que usar, onde comprar em Ubatuba e como guardar.' },
+      { title: 'Os ingredientes certos', text: 'Integrais, plant-based e sem trigo: o que usar, onde comprar em Ubatuba e como guardar.' },
       { title: 'A mágica dos sabores', text: 'As combinações que imitam caramelo, chocolate, creme e crocância, na prática.' },
       { title: 'Para a vida real', text: 'Um plano simples para a sua casa, e receitas que cabem na rotina.' },
     ],

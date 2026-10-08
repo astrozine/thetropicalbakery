@@ -38,7 +38,7 @@ const TRACKS = [
     intro: 'Para quem quer aprender a fazer os doces que a gente faz.',
     items: [
       'Workshops práticos de confeitaria saudável com a Dolly',
-      'Técnicas sem glúten e sem açúcar refinado',
+      'Técnicas sem trigo e sem açúcar refinado',
       'Degustação e receitas para levar para casa',
     ],
   },

@@ -41,7 +41,7 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
   ];
 
   // Only what is true of every treat: some carry an industrial vegan chocolate with crystal sugar.
-  const tags = ['100% Vegetal', 'Sem Sal', 'Sem Glúten', 'Feito à Mão'];
+  const tags = ['100% Vegetal', 'Sem Sal', 'Sem Trigo', 'Feito à Mão'];
 
   if (isMobile) {
     // Mobile: Native App Home Screen Experience

@@ -27,7 +27,7 @@ const ALL_PATHS: PathId[] = ['saude', 'negocio', 'consciencia', 'equipe'];
 const FAQ = [
   { q: 'Qual curso é para mim?', a: 'Está de passagem e quer uma experiência? Turismo Gastronômico. Cozinha profissionalmente ou quer fazer disso uma profissão? Capacitação Profissional. Quer mudar a sua alimentação e a da sua casa? Saúde, Sabores e Bem-Estar. Na dúvida, fale com a gente.' },
   { q: 'Preciso ter experiência na cozinha?', a: 'Não. Cada curso começa pela base, e a Dolly acompanha de perto.' },
-  { q: 'Os cursos atendem restrições alimentares?', a: 'Tudo é 100% plant-based e sem glúten, adoçado com tâmaras, frutas, açúcar de coco ou rapadura. Se alguma receita usar chocolate vegano industrializado (que vem com açúcar cristal), a gente avisa. Alergias sérias (como alergia a castanhas) devem ser avisadas no formulário, para a gente adaptar.' },
+  { q: 'Os cursos atendem restrições alimentares?', a: 'Tudo é 100% plant-based e sem trigo, adoçado com tâmaras, frutas, açúcar de coco ou rapadura. Se alguma receita usar chocolate vegano industrializado (que vem com açúcar cristal), a gente avisa. Alergias sérias (como alergia a castanhas) devem ser avisadas no formulário, para a gente adaptar.' },
   { q: 'Dá para juntar curso e hospedagem?', a: 'Dá: é o formato Curso + Retiro, na casa de retiro em Itamambuca. Veja mais abaixo.' },
   { q: 'E se chover no dia?', a: 'Melhor ainda: a cozinha é coberta, quentinha e cheia de cheiro de cacau. Temos até uma versão pensada para a família inteira.' },
 ];
@@ -71,12 +71,12 @@ export default function CursosPage() {
           <h2 className="crs-h2">Você aprende a mágica, não só a receita</h2>
           <p className="crs-lead" style={{ margin: '0 auto 2.5rem' }}>
             A Dolly veio da Bélgica, a terra do chocolate, para a Mata Atlântica. Ela criou um jeito próprio de fazer
-            doces 100% plant-based e sem glúten, adoçados com frutas, que ninguém consegue acreditar que são saudáveis.
+            doces 100% plant-based e sem trigo, adoçados com frutas, que ninguém consegue acreditar que são saudáveis.
             Nos cursos, você aprende o porquê de cada ingrediente, para criar as suas próprias receitas pelo resto da vida.
           </p>
           <OriginSeal text="Aprenda a técnica belga com ingredientes brasileiros" style={{ marginBottom: '2rem' }} />
           <div className="crs-rain-points" style={{ maxWidth: '860px' }}>
-            {['🌱 100% plant-based', '🌾 Sem glúten', '🍯 Adoçado com frutas', '🧂 Sem sal e sem óleo', '🌴 Frutas da Mata Atlântica', '👩‍🍳 Mão na massa'].map(t => (
+            {['🌱 100% plant-based', '🌾 Sem trigo', '🍯 Adoçado com frutas', '🧂 Sem sal e sem óleo', '🌴 Frutas da Mata Atlântica', '👩‍🍳 Mão na massa'].map(t => (
               <span key={t} style={{ background: '#fff', color: '#3c2a21', border: '1px solid #eadfcb' }}>{t}</span>
             ))}
           </div>

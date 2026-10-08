@@ -39,7 +39,7 @@ export default function EventQuoteDecor() {
         <div className="decor-bob" style={{ ['--r' as string]: '4deg', background: '#d9b98a', color: '#3c2a21', borderRadius: 10, padding: '1.1rem 1rem 1rem', textAlign: 'center', boxShadow: '0 12px 24px rgba(60,42,33,0.2)', position: 'relative', animationDelay: '0.6s' }}>
           <div style={{ position: 'absolute', top: 9, left: '50%', width: 12, height: 12, marginLeft: -6, borderRadius: '50%', background: '#fdfaf3', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)' }} />
           <div style={{ marginTop: 14, fontFamily: 'var(--font-heading)', fontSize: '1.05rem', lineHeight: 1.2 }}>Casamentos, festas &amp; restaurantes</div>
-          <div style={{ fontSize: '0.78rem', marginTop: 8, lineHeight: 1.45 }}>100% vegetal e sem glúten</div>
+          <div style={{ fontSize: '0.78rem', marginTop: 8, lineHeight: 1.45 }}>100% vegetal e sem trigo</div>
         </div>
         <div style={{ display: 'flex', gap: 12, marginTop: 28, marginLeft: 10 }}>
           <div className="decor-bob" style={{ ['--r' as string]: '-8deg', ...sticker('#e4efd9') }}>🥥</div>

@@ -19,7 +19,7 @@ const GLANCE = [
   { emoji: '🌱', label: '100% plant-based' },
   { emoji: '🌾', label: 'SOS-free*' },
   { emoji: '🍯', label: 'Adoçado com frutas' },
-  { emoji: '✨', label: 'Sem glúten**' },
+  { emoji: '✨', label: 'Sem trigo**' },
 ];
 
 const CHIPS = ['Festas', 'Eventos', 'Celebrações', 'Mesas de sobremesa', 'Catering', 'Presentes', 'Sob encomenda'];
@@ -116,7 +116,7 @@ const panels: Panel[] = [
     emoji: '🌿',
     title: 'O que tem dentro',
     badge: '100% plant-based',
-    glance: 'Vegano, SOS-free e sem glúten',
+    glance: 'Vegano, SOS-free e sem trigo',
     body: (
       <>
         <div>
@@ -124,7 +124,7 @@ const panels: Panel[] = [
             ['🌱', '100% plant-based', 'Nenhum ingrediente de origem animal.'],
             ['🌾', 'SOS-free*', 'Sem sal, sem óleo e sem açúcar refinado. A doçura vem de tâmaras, frutas, açúcar de coco ou rapadura.'],
             ['🍯', 'Para ocasiões especiais', 'Doce não é para todo dia. É para celebrar sem bagunçar a saúde.'],
-            ['✨', 'Sem glúten**', 'Receitas sem ingredientes com glúten.'],
+            ['✨', 'Sem trigo**', 'Receitas sem ingredientes com glúten.'],
           ].map(([emoji, name, text]) => (
             <div key={name} style={{ display: 'flex', gap: '0.85rem', padding: '0.65rem 0', borderBottom: '1px dashed rgba(60,42,33,0.2)' }}>
               <span aria-hidden style={{ fontSize: '1.3rem', lineHeight: 1.4 }}>{emoji}</span>

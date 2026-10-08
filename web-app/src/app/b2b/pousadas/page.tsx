@@ -25,7 +25,7 @@ export default function PousadasPage() {
         {
           icon: '🥐',
           title: 'Café da Manhã',
-          description: 'Opções de alta qualidade, 100% veganas e sem glúten, com o açúcar de cada doce informado às claras, direto no seu buffet.',
+          description: 'Opções de alta qualidade, 100% veganas e sem trigo, com o açúcar de cada doce informado às claras, direto no seu buffet.',
         },
         {
           icon: '📱',

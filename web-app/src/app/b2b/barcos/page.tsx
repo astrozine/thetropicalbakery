@@ -8,7 +8,7 @@ import { BoatCopy, BoatDetails, BoatForWho, BoatHeroExtra } from '@/components/B
 
 export const metadata: Metadata = {
   title: 'Kit a Bordo para Barcos, Charters e Marinas | The Tropical Bakery',
-  description: 'Doces finos veganos e sem glúten da chef belga Dolly, entregues no píer antes do passeio. Parcerias para charters, marinas e agências em Ubatuba e Paraty.',
+  description: 'Doces finos veganos e sem trigo da chef belga Dolly, entregues no píer antes do passeio. Parcerias para charters, marinas e agências em Ubatuba e Paraty.',
   alternates: { languages: { 'pt-BR': '/b2b/barcos', en: '/en/b2b/boats' } },
 };
 
@@ -24,7 +24,7 @@ const copy: BoatCopy = {
     'Comissão de 10% a 15% em cada pedido indicado',
     'Nenhum estoque, nenhum trabalho: entregamos direto no píer',
     'Um extra de luxo que aumenta o valor do passeio',
-    'Opções para clientes veganos e sem glúten, com o açúcar de cada doce informado',
+    'Opções para clientes veganos e sem trigo, com o açúcar de cada doce informado',
   ],
   whereTitle: 'Onde entregamos',
   places: [
@@ -51,7 +51,7 @@ export default function BarcosPage() {
       partnerKind="barco"
       eyebrow="Parcerias para Barcos e Marinas"
       title="Um presente a bordo que seus clientes vão lembrar"
-      intro="Doces finos da chef belga Dolly Van Dam, 100% vegetais e sem glúten, entregues no píer antes da saída, numa caixa kraft de presente."
+      intro="Doces finos da chef belga Dolly Van Dam, 100% vegetais e sem trigo, entregues no píer antes da saída, numa caixa kraft de presente."
       heroScene="/assets/boat_deck_box.jpg"
       heroPortrait
       heroExtra={<BoatHeroExtra c={copy} />}

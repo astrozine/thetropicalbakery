@@ -35,7 +35,7 @@ const IDEAS = [
   },
   {
     title: 'Onde a gente faz diferente',
-    body: 'Não seguimos todas as regras deles, e não pedimos que você siga. O que a gente pegou foi a lógica: comida de verdade, densa em nutrientes e com o mínimo possível dos três vilões do paladar. Depois disso, o critério é que seja gostoso e caiba numa rotina real. Sobremesa vegana e sem glúten, feita para dar prazer.',
+    body: 'Não seguimos todas as regras deles, e não pedimos que você siga. O que a gente pegou foi a lógica: comida de verdade, densa em nutrientes e com o mínimo possível dos três vilões do paladar. Depois disso, o critério é que seja gostoso e caiba numa rotina real. Sobremesa vegana e sem trigo, feita para dar prazer.',
   },
   {
     title: 'Como isso vira aprendizado nos retiros',

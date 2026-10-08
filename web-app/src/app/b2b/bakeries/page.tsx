@@ -7,7 +7,7 @@ export default function BakeriesPage() {
       partnerKind="padaria"
       eyebrow="Parcerias para Padarias"
       title="A Vitrine Inclusiva que Seus Clientes Estão Pedindo"
-      intro="Atenda o público que busca opções veganas, sem glúten, sem óleo e sem sal, com o açúcar de cada doce informado às claras — sem sobrecarregar sua produção. A Dolly cria, você recebe pronto para vender."
+      intro="Atenda o público que busca opções veganas, sem trigo, sem óleo e sem sal, com o açúcar de cada doce informado às claras — sem sobrecarregar sua produção. A Dolly cria, você recebe pronto para vender."
       heroScene="/assets/realistic_bakery.jpg"
       heroTreats={["/b2b-hero/treat-4.jpg", "/b2b-hero/treat-5.jpg"]}
       options={[
