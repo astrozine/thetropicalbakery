@@ -2,9 +2,9 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { EBOOK, BOOK_OFFERS } from '@/lib/ebook';
-import { fill, type EbookLang } from '@/lib/ebookCopy';
-import { FUNNEL_COPY, SEGMENTS, freeCover, type Segment } from '@/lib/funnel';
+import { EBOOK, BOOK_OFFERS, RECIPES } from '@/lib/ebook';
+import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
+import { FUNNEL, FUNNEL_COPY, SEGMENTS, freeCover, type Segment } from '@/lib/funnel';
 import { trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
 import { PayPicker, PixBox, bookPrice, shownPrice, toPath, usePayMethods } from './FunnelPay';
@@ -13,6 +13,11 @@ import './funnel.css';
 
 const IMG = '/ebook/sweet-escape';
 const SEG_ICON: Record<Segment, string> = { local: '🌴', visiting: '🧳', away: '🌍' };
+const isFree = (day: number) => (FUNNEL.recipeDays as readonly number[]).includes(day);
+
+const Lock = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden><path fill="currentColor" d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1Zm2 0h6V7a3 3 0 0 0-6 0v3Z" /></svg>
+);
 
 /**
  * /free-recipes (and /receitas, /free-recipes/es, /nl): where the ads land. One job: get the e-mail. The form sits in
@@ -22,6 +27,7 @@ const SEG_ICON: Record<Segment, string> = { local: '🌴', visiting: '🧳', awa
 export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }) {
   const c = FUNNEL_COPY[lang];
   const f = c.form;
+  const book = EBOOK_COPY[lang].recipes;
   const { methods, method, setMethod } = usePayMethods(lang);
 
   const [name, setName] = useState('');
@@ -60,6 +66,9 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
     setTimeout(() => formRef.current?.querySelector('input')?.focus({ preventScroll: true }), 500);
   };
 
+  // "Yes, I want all 7": tick the order bump and take them to the form.
+  const wantAll = (e: React.MouseEvent) => { setBump(true); toForm(e); };
+
   const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     setError('');
@@ -91,6 +100,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
   };
 
   const price = bump ? bookPrice(method) : shownPrice(lang);
+  const full = shownPrice(lang);
 
   return (
     <div className="se fr" lang={lang}>
@@ -103,21 +113,42 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
             <h1 className="se-hero__title">{c.hero.title} <em>{c.hero.em}</em></h1>
           </div>
 
+          {/* The paid book behind, the free mini-book pulled out of it in front: "these two come from that one". */}
           <div className="se-hero__stage fr-stage" aria-hidden>
+            <div className="fr-paid">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`${IMG}/${lang}/cover.webp`} alt="" />
+              <span className="fr-paid__tag">{fill(c.hero.paidTag, { price: full })}</span>
+            </div>
             <div className="se-book">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={freeCover(lang)} alt="" />
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="se-float se-float--a" src={`${IMG}/red.webp`} alt="" />
+            <img className="se-float se-float--b" src={`${IMG}/red.webp`} alt="" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="se-float se-float--d" src={`${IMG}/caramel.webp`} alt="" />
-            <div className="se-hero__card fr-badge"><b>2</b><span>{c.hero.badge}</span></div>
+            <div className="se-hero__card fr-badge"><b>2</b><span><strong>{c.hero.badge}</strong>{c.hero.badgeOf}</span></div>
           </div>
 
           <div className="se-hero__body">
             <p className="se-hero__lead">{rich(c.hero.lead)}</p>
             <ul className="se-hero__ticks fr-ticks">{c.hero.ticks.map(t => <li key={t}>{t}</li>)}</ul>
+
+            {/* ══ 2 OF 7: the whole book, the two free recipes lit up ══ */}
+            <div className="fr-seven">
+              <ol className="fr-seven__row">
+                {RECIPES.map((r, i) => (
+                  <li key={r.day} className={isFree(r.day) ? 'is-free' : ''} style={{ '--c': r.hex } as React.CSSProperties}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={r.img} alt={book[i].name} />
+                    {isFree(r.day) ? <span className="fr-seven__free">{c.strip.free}</span> : <span className="fr-seven__lock"><Lock /></span>}
+                  </li>
+                ))}
+              </ol>
+              <p className="fr-seven__label">{rich(c.strip.label)}</p>
+              <p className="fr-seven__worth">{rich(fill(c.strip.worth, { price: full }))}</p>
+            </div>
 
             <div className="fr-card" ref={formRef} id="get">
               {pix ? (
@@ -183,6 +214,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
               <article key={r.name} className="fr-recipe" style={{ '--c': i === 0 ? '#e8364f' : '#c9853c' } as React.CSSProperties}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`${IMG}/${i === 0 ? 'red-scatter' : 'caramel-close'}.webp`} alt={r.name} loading="lazy" />
+                <span className="fr-recipe__free">{c.strip.free}</span>
                 <div>
                   <small>{r.note}</small>
                   <h3>{r.name}</h3>
@@ -190,6 +222,30 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ THE OTHER FIVE: still in the book ══ */}
+      <section className="se-sec fr-rest">
+        <div className="se-wrap">
+          <div className="se-narrow se-center">
+            <p className="se-kicker">{c.rest.kicker}</p>
+            <h2 className="se-h2">{c.rest.title}</h2>
+          </div>
+          <ul className="fr-rest__grid">
+            {RECIPES.map((r, i) => isFree(r.day) ? null : (
+              <li key={r.day} style={{ '--c': r.hex, '--ink': r.ink } as React.CSSProperties}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={r.img} alt={book[i].alt} loading="lazy" />
+                <span className="fr-rest__lock"><Lock /></span>
+                <div><small>{book[i].color}</small><b>{book[i].name}</b></div>
+              </li>
+            ))}
+          </ul>
+          <div className="se-narrow se-center">
+            <p className="fr-rest__text">{rich(fill(c.rest.text, { price: full }))}</p>
+            <a href="#get" onClick={wantAll} className="se-btn se-btn--primary se-btn--big">{c.rest.cta}</a>
           </div>
         </div>
       </section>
@@ -213,6 +269,10 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
 
       {/* ══ FINAL CALL ══ */}
       <section className="se-final">
+        <div className="se-final__photos" aria-hidden>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {RECIPES.map(r => <img key={r.day} src={r.img} alt="" loading="lazy" style={{ borderColor: r.hex }} />)}
+        </div>
         <div className="se-wrap se-narrow se-center">
           <h2 className="se-final__title">{c.final.title}</h2>
           <a href="#get" onClick={toForm} className="se-btn se-btn--primary se-btn--big">{c.final.cta}</a>

@@ -62,13 +62,17 @@ export const WELCOME_DAYS = 2;
 
 export interface FunnelCopy {
   meta: { title: string; description: string; ogLocale: string };
-  hero: { eyebrow: string; title: string; em: string; lead: string; ticks: string[]; badge: string };
+  hero: { eyebrow: string; title: string; em: string; lead: string; ticks: string[]; badge: string; badgeOf: string; paidTag: string };
+  /** The "2 of the 7" strip in the hero: the whole book as seven photos, the two free ones lit up. */
+  strip: { label: string; worth: string; free: string };
   form: {
     title: string; name: string; email: string; where: string; segments: Record<Segment, string>;
     submit: string; submitBump: string; busy: string; fine: string; errName: string; errEmail: string; errWhere: string; errGeneric: string;
   };
   bump: { tag: string; title: string; text: string; pay: string };
   recipes: { kicker: string; title: string; items: { name: string; note: string; line: string }[] };
+  /** The five recipes that stay in the paid book, as a tease that ticks the order bump. */
+  rest: { kicker: string; title: string; text: string; cta: string };
   dolly: { kicker: string; title: string; text: string; sign: string };
   final: { title: string; cta: string };
   thanks: {
@@ -92,12 +96,14 @@ const EN: FunnelCopy = {
     ogLocale: 'en_US',
   },
   hero: {
-    eyebrow: 'Free · from Dolly’s kitchen',
+    eyebrow: 'Free · 2 recipes from my book Sweet Escape',
     title: '2 treats that taste like',
     em: 'a beach holiday',
-    lead: 'Two recipes from my book **Sweet Escape**, free: tangy **Red Berry Bliss Balls** and three-layer **Peanutty Banoffee Bars**. No oven, no refined sugar, no wheat flour. Just fruit, nuts and dates.',
+    lead: 'Two of the seven recipes from my paid book **Sweet Escape**, yours free: tangy **Red Berry Bliss Balls** and three-layer **Peanutty Banoffee Bars**. No oven, no refined sugar, no wheat flour. Just fruit, nuts and dates.',
     ticks: ['No oven, 20 minutes of work', 'Vegan, no refined sugar, no gluten', 'Instant PDF in your language'],
-    badge: 'FREE',
+    badge: 'FREE', badgeOf: 'of 7 recipes', paidTag: '7 recipes · {price}',
+  },
+  strip: { label: '**2 of the 7** recipes from Sweet Escape', worth: 'The book sells for **{price}**. These two are on me.', free: 'Free',
   },
   form: {
     title: 'Where should I send them?',
@@ -121,13 +127,14 @@ const EN: FunnelCopy = {
     pay: 'How to pay for the book',
   },
   recipes: {
-    kicker: 'What you get',
-    title: 'Two of my favorites',
+    kicker: 'Free in your PDF',
+    title: 'Your 2 free recipes',
     items: [
       { name: 'Tangy Red Berry Bliss Balls', note: 'Day 3 · Red · makes 12–14', line: 'Cherries, strawberries and dates, rolled in crunchy raspberry. Kids love rolling them.' },
       { name: 'Peanutty Banoffee Bars', note: 'Day 6 · Caramel · makes 8–10', line: 'Peanut base, banana-cashew cream, date caramel on top. Brazil’s paçoca meets Britain’s banoffee.' },
     ],
   },
+  rest: { kicker: 'Hooked already?', title: '5 more treats are waiting in the book', text: 'Sweet Escape has a treat for every day of the week, each one a different color. Get all 7 with your free ones for **{price}**: just tick the box in the form.', cta: 'Yes, I want all 7' },
   dolly: {
     kicker: 'Hi, I’m Dolly',
     title: 'Treats that love you back',
@@ -194,12 +201,14 @@ const PT: FunnelCopy = {
     ogLocale: 'pt_BR',
   },
   hero: {
-    eyebrow: 'Grátis · da cozinha da Dolly',
+    eyebrow: 'Grátis · 2 receitas do meu livro Sweet Escape',
     title: '2 doces com gosto de',
     em: 'férias na praia',
-    lead: 'Duas receitas do meu livro **Sweet Escape**, de presente: **Bliss Balls Azedinhas de Frutas Vermelhas** e **Barrinhas Banoffee de Amendoim** em três camadas. Sem forno, sem açúcar refinado, sem farinha de trigo. Só fruta, castanhas e tâmaras.',
+    lead: 'Duas das sete receitas do meu livro **Sweet Escape**, de presente: **Bliss Balls Azedinhas de Frutas Vermelhas** e **Barrinhas Banoffee de Amendoim** em três camadas. Sem forno, sem açúcar refinado, sem farinha de trigo. Só fruta, castanhas e tâmaras.',
     ticks: ['Sem forno, 20 minutos de trabalho', 'Vegano, sem açúcar refinado, sem glúten', 'PDF na hora, em português'],
-    badge: 'GRÁTIS',
+    badge: 'GRÁTIS', badgeOf: 'de 7 receitas', paidTag: '7 receitas · {price}',
+  },
+  strip: { label: '**2 das 7** receitas do Sweet Escape', worth: 'O livro custa **{price}**. Estas duas são presente meu.', free: 'Grátis',
   },
   form: {
     title: 'Para onde eu mando?',
@@ -223,13 +232,14 @@ const PT: FunnelCopy = {
     pay: 'Como pagar o livro',
   },
   recipes: {
-    kicker: 'O que você recebe',
-    title: 'Duas das minhas favoritas',
+    kicker: 'Grátis no seu PDF',
+    title: 'Suas 2 receitas grátis',
     items: [
       { name: 'Bliss Balls Azedinhas de Frutas Vermelhas', note: 'Dia 3 · Vermelho · rende 12–14', line: 'Cereja, morango e tâmara, passadas na framboesa crocante. As crianças adoram enrolar.' },
       { name: 'Barrinhas Banoffee de Amendoim', note: 'Dia 6 · Caramelo · rende 8–10', line: 'Base de amendoim, creme de banana e caju, caramelo de tâmaras por cima. A paçoca encontra o banoffee.' },
     ],
   },
+  rest: { kicker: 'Já se apaixonou?', title: 'Mais 5 doces esperam por você no livro', text: 'O Sweet Escape tem um doce para cada dia da semana, cada um de uma cor. Leve as 7 junto com as grátis por **{price}**: é só marcar a caixinha no formulário.', cta: 'Sim, quero as 7' },
   dolly: {
     kicker: 'Oi, eu sou a Dolly',
     title: 'Doces que cuidam de você',
@@ -296,12 +306,14 @@ const ES: FunnelCopy = {
     ogLocale: 'es_ES',
   },
   hero: {
-    eyebrow: 'Gratis · de la cocina de Dolly',
+    eyebrow: 'Gratis · 2 recetas de mi libro Sweet Escape',
     title: '2 postres que saben a',
     em: 'vacaciones en la playa',
-    lead: 'Dos recetas de mi libro **Sweet Escape**, de regalo: **Bliss Balls Aciditas de Frutos Rojos** y **Barritas Banoffee de Maní** en tres capas. Sin horno, sin azúcar refinada, sin harina de trigo. Solo fruta, frutos secos y dátiles.',
+    lead: 'Dos de las siete recetas de mi libro **Sweet Escape**, de regalo: **Bliss Balls Aciditas de Frutos Rojos** y **Barritas Banoffee de Maní** en tres capas. Sin horno, sin azúcar refinada, sin harina de trigo. Solo fruta, frutos secos y dátiles.',
     ticks: ['Sin horno, 20 minutos de trabajo', 'Vegano, sin azúcar refinada, sin gluten', 'PDF al instante, en español'],
-    badge: 'GRATIS',
+    badge: 'GRATIS', badgeOf: 'de 7 recetas', paidTag: '7 recetas · {price}',
+  },
+  strip: { label: '**2 de las 7** recetas de Sweet Escape', worth: 'El libro cuesta **{price}**. Estas dos te las regalo.', free: 'Gratis',
   },
   form: {
     title: '¿Adónde te las envío?',
@@ -325,13 +337,14 @@ const ES: FunnelCopy = {
     pay: 'Cómo pagar el libro',
   },
   recipes: {
-    kicker: 'Lo que recibes',
-    title: 'Dos de mis favoritas',
+    kicker: 'Gratis en tu PDF',
+    title: 'Tus 2 recetas gratis',
     items: [
       { name: 'Bliss Balls Aciditas de Frutos Rojos', note: 'Día 3 · Rojo · salen 12–14', line: 'Cereza, fresa y dátil, rebozadas en frambuesa crujiente. A los niños les encanta hacerlas.' },
       { name: 'Barritas Banoffee de Maní', note: 'Día 6 · Caramelo · salen 8–10', line: 'Base de maní, crema de plátano y anacardo, caramelo de dátiles encima. La paçoca brasileña se encuentra con el banoffee.' },
     ],
   },
+  rest: { kicker: '¿Ya te enamoraste?', title: 'Otros 5 postres te esperan en el libro', text: 'Sweet Escape tiene un postre para cada día de la semana, cada uno de un color. Llévate las 7 junto con las gratis por **{price}**: solo marca la casilla del formulario.', cta: 'Sí, quiero las 7' },
   dolly: {
     kicker: 'Hola, soy Dolly',
     title: 'Postres que te cuidan',
@@ -398,12 +411,14 @@ const NL: FunnelCopy = {
     ogLocale: 'nl_NL',
   },
   hero: {
-    eyebrow: 'Gratis · uit Dolly’s keuken',
+    eyebrow: 'Gratis · 2 recepten uit mijn boek Sweet Escape',
     title: '2 lekkernijen die smaken naar',
     em: 'een strandvakantie',
-    lead: 'Twee recepten uit mijn boek **Sweet Escape**, cadeau: frisse **Rode Bessen Bliss Balls** en **Pinda Banoffee Repen** in drie lagen. Zonder oven, zonder geraffineerde suiker, zonder tarwebloem. Alleen fruit, noten en dadels.',
+    lead: 'Twee van de zeven recepten uit mijn boek **Sweet Escape**, cadeau: frisse **Rode Bessen Bliss Balls** en **Pinda Banoffee Repen** in drie lagen. Zonder oven, zonder geraffineerde suiker, zonder tarwebloem. Alleen fruit, noten en dadels.',
     ticks: ['Zonder oven, 20 minuten werk', 'Vegan, geen geraffineerde suiker, glutenvrij', 'Direct als pdf, in het Nederlands'],
-    badge: 'GRATIS',
+    badge: 'GRATIS', badgeOf: 'van 7 recepten', paidTag: '7 recepten · {price}',
+  },
+  strip: { label: '**2 van de 7** recepten uit Sweet Escape', worth: 'Het boek kost **{price}**. Deze twee krijg je van mij.', free: 'Gratis',
   },
   form: {
     title: 'Waar mag ik ze heen sturen?',
@@ -427,13 +442,14 @@ const NL: FunnelCopy = {
     pay: 'Hoe wil je het boek betalen',
   },
   recipes: {
-    kicker: 'Wat je krijgt',
-    title: 'Twee van mijn favorieten',
+    kicker: 'Gratis in je pdf',
+    title: 'Je 2 gratis recepten',
     items: [
       { name: 'Frisse Rode Bessen Bliss Balls', note: 'Dag 3 · Rood · voor 12–14', line: 'Kersen, aardbeien en dadels, gerold in knapperige framboos. Kinderen rollen ze graag mee.' },
       { name: 'Pinda Banoffee Repen', note: 'Dag 6 · Karamel · voor 8–10', line: 'Pindabodem, banaan-cashewcrème, dadelkaramel erop. Braziliaanse paçoca ontmoet Britse banoffee.' },
     ],
   },
+  rest: { kicker: 'Al verliefd?', title: 'Nog 5 lekkernijen wachten in het boek', text: 'Sweet Escape heeft een lekkernij voor elke dag van de week, elk in een andere kleur. Neem alle 7 erbij voor **{price}**: vink gewoon het vakje in het formulier aan.', cta: 'Ja, ik wil alle 7' },
   dolly: {
     kicker: 'Hoi, ik ben Dolly',
     title: 'Lekkernijen die goed voor je zijn',
