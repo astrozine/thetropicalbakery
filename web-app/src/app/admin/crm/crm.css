@@ -1,0 +1,9 @@
+/* /admin/crm: tap-to-pick pills for the "Adicionar pessoa" flow. Sits on top of the bx- styles from caixas.css. */
+
+.crm-pills { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.crm-pill { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; padding: 0.55rem 1rem; border-radius: 999px;
+  border: 1.5px solid var(--bx-line, #e6e2dc); background: #fff; color: var(--bx-ink, #222); font-weight: 700; font-size: 0.95rem;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.crm-pill:hover { border-color: #bdb5aa; }
+.crm-pill.is-on { border-color: var(--bx-ink, #222); background: #fcfaf7; box-shadow: 0 0 0 1px var(--bx-ink, #222); }
+.crm-pill--warn.is-on { border-color: #c0392b; background: #fdecea; color: #a03027; box-shadow: 0 0 0 1px #c0392b; }

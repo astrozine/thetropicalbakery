@@ -4,6 +4,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { DIET_TAGS, allergensFrom, dietTagsFrom, tagsFromLegacy } from '@/lib/dietary';
 import { ALLERGENS, normalizeAllergens } from '@/lib/allergens';
+import AddPersonFlow from './AddPersonFlow';
+import '../caixas/caixas.css';
 
 interface CrmRow {
   id: string;
@@ -20,6 +22,9 @@ interface CrmRow {
   diet_tags?: string[] | null;
   allergens_avoid?: string[] | null;
   diet_notes?: string | null;
+  /** 'manual' = Dolly added them in the admin (migration 45); null = came from the site. */
+  source?: string | null;
+  admin_notes?: string | null;
   created_at: string;
 }
 
@@ -60,6 +65,8 @@ interface Customer {
   allergies: string[];
   dietNotes: string | null;
   itamambuca: boolean;
+  manual: boolean;
+  adminNotes: string | null;
 }
 
 const isItamambucaAddress = (address: string | null) => /itamambuca/i.test(address || '');
@@ -114,6 +121,8 @@ export default function CRMAdmin() {
   const [onlyItamambuca, setOnlyItamambuca] = useState(false);
   const [dietFilter, setDietFilter] = useState('');
   const [allergenFilter, setAllergenFilter] = useState('');
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState('');
 
   useEffect(() => {
     load();
@@ -126,9 +135,11 @@ export default function CRMAdmin() {
     // Two sources of truth, deliberately: `users` is everyone who has ordered,
     // `user_profiles` is everyone who has created an account. Plenty of people
     // are in one and not the other, so we merge rather than pick.
-    const [crmRes, profileRes] = await Promise.all([
+    const [crmRes, profileRes, ordersRes] = await Promise.all([
       supabase.from('users').select('*').order('created_at', { ascending: false }),
       supabase.from('user_profiles').select('*'),
+      // Only to tell whether someone added by hand has ordered since.
+      supabase.from('orders').select('customer_whatsapp, customer_email'),
     ]);
 
     if (crmRes.error) {
@@ -147,6 +158,9 @@ export default function CRMAdmin() {
       profiles.filter(p => phoneKey(p.phone)).map(p => [phoneKey(p.phone), p]),
     );
     const usedProfileIds = new Set<string>();
+    const orders = (ordersRes.error ? [] : (ordersRes.data || [])) as { customer_whatsapp: string | null; customer_email: string | null }[];
+    const orderedPhones = new Set(orders.map(o => phoneKey(o.customer_whatsapp)).filter(Boolean));
+    const orderedEmails = new Set(orders.map(o => (o.customer_email || '').trim().toLowerCase()).filter(Boolean));
 
     const merged: Customer[] = crm.map(c => {
       const profile =
@@ -157,6 +171,7 @@ export default function CRMAdmin() {
       if (profile) usedProfileIds.add(profile.id);
 
       const address = c.location || profile?.address || null;
+      const manual = c.source === 'manual';
       return {
         key: `crm-${c.id}`,
         name: c.full_name || profile?.full_name || 'Sem nome',
@@ -165,11 +180,16 @@ export default function CRMAdmin() {
         address,
         provider: profile?.auth_provider || null,
         hasAccount: Boolean(profile),
-        ordered: true,
+        // Site rows are written at order time; a hand-added one counts once an order matches it.
+        ordered: !manual
+          || orderedPhones.has(phoneKey(c.whatsapp_number))
+          || orderedEmails.has((c.email || '').trim().toLowerCase()),
         createdAt: c.created_at,
         // The CRM row is written at order time, so it's the fresher record.
         ...dietOf(c),
         itamambuca: isItamambucaAddress(address),
+        manual,
+        adminNotes: c.admin_notes || null,
       };
     });
 
@@ -188,6 +208,8 @@ export default function CRMAdmin() {
         createdAt: p.created_at,
         ...dietOf(p),
         itamambuca: isItamambucaAddress(p.address),
+        manual: false,
+        adminNotes: null,
       });
     }
 
@@ -204,7 +226,7 @@ export default function CRMAdmin() {
     if (allergenFilter) list = list.filter(c => c.allergenIds.includes(allergenFilter));
     if (!q) return list;
     return list.filter(c =>
-      [c.name, c.email, c.address, c.whatsapp, c.dietNotes, ...c.dietary, ...c.allergies]
+      [c.name, c.email, c.address, c.whatsapp, c.dietNotes, c.adminNotes, ...c.dietary, ...c.allergies]
         .filter(Boolean)
         .some(v => String(v).toLowerCase().includes(q)),
     );
@@ -228,15 +250,41 @@ export default function CRMAdmin() {
     itamambuca: customers.filter(c => c.itamambuca).length,
   }), [customers]);
 
+  if (adding) {
+    return (
+      <AddPersonFlow
+        onCancel={() => setAdding(false)}
+        onDone={(name, status) => {
+          setAdding(false);
+          setAdded(status === 'updated'
+            ? `${name} já estava no CRM: completamos a ficha com o que você escreveu.`
+            : `${name} entrou no CRM.`);
+          setSearch('');
+          load();
+        }}
+      />
+    );
+  }
+
   if (loading) return <div style={{ padding: '2rem' }}>Carregando CRM...</div>;
 
   return (
-    <div>
-      <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>CRM &amp; Base de Clientes</h1>
+    <div className="bx" style={{ maxWidth: 'none' }}>
+      <div className="bx-head" style={{ marginBottom: '0.5rem' }}>
+        <h1 style={{ fontSize: '2rem', color: '#2c3e50', margin: 0 }}>CRM &amp; Base de Clientes</h1>
+        <button type="button" className="bx-btn bx-btn--dark" onClick={() => { setAdded(''); setAdding(true); }}>+ Adicionar pessoa</button>
+      </div>
       <p style={{ color: '#7f8c8d', marginBottom: '2rem', lineHeight: 1.7 }}>
-        Todo mundo que fez um pedido ou criou uma conta no site. Quem tem conta não precisa
+        Todo mundo que fez um pedido ou criou uma conta no site, e quem você adicionou à mão. Quem tem conta não precisa
         digitar nome, WhatsApp e endereço de novo — já vem preenchido no próximo pedido.
       </p>
+
+      {added && (
+        <div className="bx-banner bx-banner--ok" role="status">
+          <span>✓ {added}</span>
+          <button type="button" className="bx-link" onClick={() => setAdded('')}>Fechar</button>
+        </div>
+      )}
 
       {error && (
         <div style={{ background: '#fdecea', border: '1px solid #f5c6cb', color: '#a03027', padding: '1rem 1.25rem', borderRadius: '8px', marginBottom: '2rem', lineHeight: 1.6 }}>
@@ -323,6 +371,11 @@ export default function CRMAdmin() {
                         {provider.label}
                       </span>
                     )}
+                    {c.manual && (
+                      <span style={{ background: '#f3e8f8', color: '#7d3c98', padding: '0.15rem 0.6rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        ✍️ Cadastro manual
+                      </span>
+                    )}
                     {!c.hasAccount && (
                       <span style={{ background: '#f1f2f6', color: '#7f8c8d', padding: '0.15rem 0.6rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         Sem conta
@@ -344,6 +397,7 @@ export default function CRMAdmin() {
                     <div>📱 {formatPhone(c.whatsapp)}</div>
                     <div>✉️ {c.email || '—'}</div>
                     <div>📍 {c.address || 'Endereço não informado'}</div>
+                    {c.adminNotes && <div style={{ whiteSpace: 'pre-line', color: '#5d4a3a' }}>📝 {c.adminNotes}</div>}
                     {c.createdAt && (
                       <div style={{ fontSize: '0.8rem', color: '#b2bec3' }}>
                         Desde {new Date(c.createdAt).toLocaleDateString('pt-BR')}
