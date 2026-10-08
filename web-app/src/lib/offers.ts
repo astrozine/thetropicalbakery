@@ -1,10 +1,14 @@
 /**
  * Payment proposals ("propostas", migration 36): a personal offer Dolly sends to someone interested in a
- * course or a retreat, as a link to /proposta/<id>. Pure data and words, shared by the admin (which writes
+ * course, a retreat or a paid-up-front package (migration 44: a founding subscription, a partner's first order,
+ * an events deposit), as a link to /proposta/<id>. Pure data and words, shared by the admin (which writes
  * them) and the client's page (which sells them). No server-only imports here.
  */
 
-export type OfferKind = 'retiro' | 'curso';
+export type OfferKind = 'retiro' | 'curso' | 'pacote';
+
+/** What the order line and the inbox call each kind. */
+export const OFFER_KIND_LABEL: Record<OfferKind, string> = { retiro: 'Retiro', curso: 'Curso', pacote: 'Pacote' };
 export type OfferLang = 'pt' | 'en';
 
 export interface Offer {
@@ -48,8 +52,9 @@ export const firstName = (name: string) => (name || '').trim().split(/\s+/)[0] |
 export const OFFER_PHOTOS: Record<OfferKind, string[]> = {
   retiro: ['/retreats/Terrace.webp', '/retreats/Beach shot Itamambuca.webp', '/retreats/Prumirim waterfall.webp', '/retreats/Room shot with view on window and plants.webp'],
   curso: ['/dolly/dolly-tray.jpg', '/ebook/sweet-escape/chocolate-cut.webp', '/ebook/sweet-escape/yellow-stack.webp', '/dolly/dolly-spatula.jpg'],
+  pacote: ['/box1.jpg', '/box2.jpg', '/box3.jpg', '/box4.jpg'],
 };
-export const OFFER_HERO: Record<OfferKind, string> = { retiro: '/retreats/Drone shot of Itamabuca.webp', curso: '/dolly/hero-mata.webp' };
+export const OFFER_HERO: Record<OfferKind, string> = { retiro: '/retreats/Drone shot of Itamabuca.webp', curso: '/dolly/hero-mata.webp', pacote: '/dolly/dolly-tray.jpg' };
 
 /** Starting points for the admin form: Dolly edits them per person. */
 export const DEFAULT_INCLUDED: Record<OfferKind, Record<OfferLang, string[]>> = {
@@ -77,6 +82,19 @@ export const DEFAULT_INCLUDED: Record<OfferKind, Record<OfferLang, string[]>> = 
       'Hands-on classes with Chef Dolly, start to finish',
       'Belgian technique with Brazilian ingredients',
       'Every recipe from class, to make again at home',
+    ],
+  },
+  // The founding subscription, paid 3 months up front: Dolly edits it per person (or rewrites it for a partner or an event).
+  pacote: {
+    pt: [
+      '3 meses da Assinatura Tropical: uma caixa de doces da Dolly toda semana, pagos de uma vez',
+      'Preço de membro fundador travado por 12 meses, mesmo se a assinatura subir',
+      'Você escolhe os doces da semana e pausa quando viajar',
+    ],
+    en: [
+      '3 months of the Tropical Subscription: a box of Dolly’s treats every week, paid up front',
+      'Founding-member price locked for 12 months, even if the subscription goes up',
+      'Pick your treats each week and pause when you travel',
     ],
   },
 };
@@ -130,6 +148,7 @@ export const OFFER_COPY: Record<OfferLang, Copy> = {
     promise: {
       retiro: 'Dias de mar, mata e doces feitos à mão, no seu ritmo. Você volta para casa outra pessoa.',
       curso: 'Aprenda a fazer doces que impressionam, com quem faz isso todo dia, e leve a técnica para a sua cozinha.',
+      pacote: 'Doces feitos à mão pela Dolly, na sua porta toda semana, com preço de fundador.',
     },
     heroCta: 'Quero garantir minha vaga',
     validUntil: d => `Reservado para você até ${d}`,
@@ -175,6 +194,7 @@ export const OFFER_COPY: Record<OfferLang, Copy> = {
     promise: {
       retiro: 'Days of ocean, rainforest and handmade treats, at your own pace. You go home a different person.',
       curso: 'Learn to make treats that wow from someone who bakes them every day, and take the technique home.',
+      pacote: 'Treats handmade by Dolly, at your door every week, at a founding-member price.',
     },
     heroCta: 'I want my spot',
     validUntil: d => `Held for you until ${d}`,

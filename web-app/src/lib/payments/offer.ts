@@ -5,7 +5,7 @@ import { createMercadoPagoCheckout, mercadoPagoConfigured } from './mercadopago'
 import { createPayPalCheckout, paypalConfigured } from './paypal';
 import { createStripeOrderCheckout, stripeConfigured } from './stripe';
 import { generatePixData } from '@/utils/pix';
-import { firstName, type Offer, type PublicOffer } from '@/lib/offers';
+import { OFFER_KIND_LABEL, firstName, type Offer, type PublicOffer } from '@/lib/offers';
 import { BOOK_PERK, hasBookPerk, perkDiscount } from '@/lib/bookPerk';
 
 /**
@@ -97,7 +97,7 @@ export async function payOffer(id: string, method: OfferMethod): Promise<OfferPa
     await db.from('orders').update({ payment_provider: PROVIDER[method] }).eq('id', order.id);
   } else {
     const reference = `PRP${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
-    const label = offer.kind === 'retiro' ? 'Retiro' : 'Curso';
+    const label = OFFER_KIND_LABEL[offer.kind] || 'Curso';
     const base = {
       customer_name: offer.customer_name,
       customer_email: offer.customer_email || '',
