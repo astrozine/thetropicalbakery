@@ -97,8 +97,8 @@ const EN: FunnelCopy = {
   },
   hero: {
     eyebrow: 'Free · 2 recipes from my book Sweet Escape',
-    title: '2 treats that taste like',
-    em: 'a beach holiday',
+    title: '2 desserts nobody will guess are',
+    em: 'healthy',
     lead: 'Two of the seven recipes from my paid book **Sweet Escape**, yours free: tangy **Red Berry Bliss Balls** and three-layer **Peanutty Banoffee Bars**. No oven, no refined sugar, no wheat flour. Just fruit, nuts and dates.',
     ticks: ['No oven, 20 minutes of work', 'Vegan, no refined sugar, no gluten', 'Instant PDF in your language'],
     badge: 'FREE', badgeOf: 'of 7 recipes', paidTag: '7 recipes · {price}',
@@ -202,8 +202,8 @@ const PT: FunnelCopy = {
   },
   hero: {
     eyebrow: 'Grátis · 2 receitas do meu livro Sweet Escape',
-    title: '2 doces com gosto de',
-    em: 'férias na praia',
+    title: '2 doces que ninguém vai acreditar que são',
+    em: 'saudáveis',
     lead: 'Duas das sete receitas do meu livro **Sweet Escape**, de presente: **Bliss Balls Azedinhas de Frutas Vermelhas** e **Barrinhas Banoffee de Amendoim** em três camadas. Sem forno, sem açúcar refinado, sem farinha de trigo. Só fruta, castanhas e tâmaras.',
     ticks: ['Sem forno, 20 minutos de trabalho', 'Vegano, sem açúcar refinado, sem glúten', 'PDF na hora, em português'],
     badge: 'GRÁTIS', badgeOf: 'de 7 receitas', paidTag: '7 receitas · {price}',
@@ -307,8 +307,8 @@ const ES: FunnelCopy = {
   },
   hero: {
     eyebrow: 'Gratis · 2 recetas de mi libro Sweet Escape',
-    title: '2 postres que saben a',
-    em: 'vacaciones en la playa',
+    title: '2 postres que nadie creerá que son',
+    em: 'saludables',
     lead: 'Dos de las siete recetas de mi libro **Sweet Escape**, de regalo: **Bliss Balls Aciditas de Frutos Rojos** y **Barritas Banoffee de Maní** en tres capas. Sin horno, sin azúcar refinada, sin harina de trigo. Solo fruta, frutos secos y dátiles.',
     ticks: ['Sin horno, 20 minutos de trabajo', 'Vegano, sin azúcar refinada, sin gluten', 'PDF al instante, en español'],
     badge: 'GRATIS', badgeOf: 'de 7 recetas', paidTag: '7 recetas · {price}',
@@ -412,8 +412,8 @@ const NL: FunnelCopy = {
   },
   hero: {
     eyebrow: 'Gratis · 2 recepten uit mijn boek Sweet Escape',
-    title: '2 lekkernijen die smaken naar',
-    em: 'een strandvakantie',
+    title: '2 desserts waarvan niemand gelooft dat ze',
+    em: 'gezond zijn',
     lead: 'Twee van de zeven recepten uit mijn boek **Sweet Escape**, cadeau: frisse **Rode Bessen Bliss Balls** en **Pinda Banoffee Repen** in drie lagen. Zonder oven, zonder geraffineerde suiker, zonder tarwebloem. Alleen fruit, noten en dadels.',
     ticks: ['Zonder oven, 20 minuten werk', 'Vegan, geen geraffineerde suiker, glutenvrij', 'Direct als pdf, in het Nederlands'],
     badge: 'GRATIS', badgeOf: 'van 7 recepten', paidTag: '7 recepten · {price}',
