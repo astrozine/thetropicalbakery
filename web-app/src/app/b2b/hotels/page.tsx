@@ -24,7 +24,7 @@ export default function HotelsPage() {
         {
           icon: '🥐',
           title: 'Café da Manhã',
-          description: 'Entrega recorrente de itens de padaria vegana e sem glúten para o seu buffet, elevando a experiência de café da manhã sem exigir preparo interno.',
+          description: 'Entrega recorrente de itens de padaria vegana e sem trigo para o seu buffet, elevando a experiência de café da manhã sem exigir preparo interno.',
         },
         {
           icon: '📱',

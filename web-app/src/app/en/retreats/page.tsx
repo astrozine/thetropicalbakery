@@ -23,7 +23,7 @@ export default function RetreatsPage() {
     },
     foodHero: {
       title: 'The Tropical Bakery Signature Creations',
-      subtitle: '100% Vegan · Gluten-Free · Made with fresh tropical ingredients',
+      subtitle: '100% Vegan · Wheat-Free · Made with fresh tropical ingredients',
     },
     suites: {
       subtitle: 'Salt n\' Paradise',

@@ -7,7 +7,7 @@ export default function RestaurantsPage() {
       partnerKind="restaurante"
       eyebrow="Parcerias para Restaurantes"
       title="Sobremesas com a Cara do Seu Restaurante"
-      intro="Atenda o público que busca opções veganas, sem glúten, sem óleo e sem sal, com o açúcar de cada doce informado às claras — sem sobrecarregar sua cozinha. A Dolly cria a sobremesa, você recebe pronta, sua equipe só finaliza o prato."
+      intro="Atenda o público que busca opções veganas, sem trigo, sem óleo e sem sal, com o açúcar de cada doce informado às claras — sem sobrecarregar sua cozinha. A Dolly cria a sobremesa, você recebe pronta, sua equipe só finaliza o prato."
       heroScene="/assets/tropical_restaurant_vegan_1789884909542.jpg"
       heroTreats={["/b2b-hero/treat-3.jpg", "/b2b-hero/treat-2.jpg"]}
       options={[
@@ -28,7 +28,7 @@ export default function RestaurantsPage() {
         },
       ]}
       whyChooseUs={[
-        'Forneça sobremesas veganas e sem glúten premium instantaneamente.',
+        'Forneça sobremesas veganas e sem trigo premium instantaneamente.',
         'Fornecimento no atacado confiável e adaptado ao seu volume.',
         'Potencial de empratamento deslumbrante para experiências gastronômicas sofisticadas.',
       ]}

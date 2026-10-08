@@ -23,7 +23,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "The Tropical Bakery",
-  description: "Experience the ultimate in healthy, tropical indulgence. Vegan, gluten-free surprise treat boxes, handmade in Itamambuca.",
+  description: "Experience the ultimate in healthy, tropical indulgence. Vegan, wheat-free surprise treat boxes, handmade in Itamambuca.",
   metadataBase: new URL('https://the-tropical-bakery.vercel.app'),
   openGraph: {
     title: "The Tropical Bakery",

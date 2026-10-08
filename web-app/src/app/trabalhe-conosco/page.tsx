@@ -17,7 +17,7 @@ const ROLES = [
     looking: [
       'Cuidado com detalhe — nossos doces são pequenos e precisos',
       'Higiene impecável, sem exceção',
-      'Vontade de aprender confeitaria vegana, sem glúten e com ingredientes integrais',
+      'Vontade de aprender confeitaria vegana, sem trigo e com ingredientes integrais',
       'Experiência é bem-vinda, mas atitude conta mais',
     ],
     when: 'Quintas e sextas (produção), sábados (finalização)',
@@ -42,7 +42,7 @@ const ROLES = [
     summary: 'Escolher a matéria-prima. É a função que mais define a qualidade da caixa.',
     looking: [
       'Saber escolher fruta no ponto — e reconhecer a que já passou',
-      'Diferenciar qualidade de castanhas, cocos, cacau e farinhas sem glúten',
+      'Diferenciar qualidade de castanhas, cocos, cacau e farinhas sem trigo',
       'Ler rótulo com atenção: um ingrediente errado inutiliza um lote inteiro',
       'Negociar com produtores e feirantes de Ubatuba',
       'Ser confiável com dinheiro e com prazo',

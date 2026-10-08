@@ -48,18 +48,18 @@ const PARTNERSHIPS = [
     eyebrow: 'Food Service · Atacado',
     title: 'Restaurantes',
     tagline:
-      'Sobremesas com a cara do seu restaurante, 100% veganas e sem glúten. A Dolly cria, você recebe pronto — sua equipe só finaliza o prato.',
+      'Sobremesas com a cara do seu restaurante, 100% veganas e sem trigo. A Dolly cria, você recebe pronto — sua equipe só finaliza o prato.',
     image: '/assets/tropical_restaurant_vegan_1789884909542.jpg',
     treat: '/b2b-hero/treat-3.jpg',
     emoji: '🍽️',
-    tags: ['Cardápio Personalizado', 'Entrega Sob Demanda', 'Sem Glúten'],
+    tags: ['Cardápio Personalizado', 'Entrega Sob Demanda', 'Sem Trigo'],
   },
   {
     slug: '/b2b/bakeries',
     eyebrow: 'Varejo · Vitrine Inclusiva',
     title: 'Padarias',
     tagline:
-      'Expanda sua vitrine com opções veganas e sem glúten sem sobrecarregar sua produção. Atenda quem hoje sai de mãos vazias.',
+      'Expanda sua vitrine com opções veganas e sem trigo sem sobrecarregar sua produção. Atenda quem hoje sai de mãos vazias.',
     image: '/assets/realistic_bakery.jpg',
     treat: '/b2b-hero/treat-4.jpg',
     emoji: '🥐',
@@ -81,7 +81,7 @@ const PARTNERSHIPS = [
     eyebrow: 'Bem-Estar · Yoga, Pilates, Academias e Spas',
     title: 'Yoga, Academias e Spas',
     tagline:
-      'Um doce que combina com quem se cuida: 100% vegetal, sem glúten e adoçado com frutas, entregue para depois da aula, em welcome boxes de retiros e spa days.',
+      'Um doce que combina com quem se cuida: 100% vegetal, sem trigo e adoçado com frutas, entregue para depois da aula, em welcome boxes de retiros e spa days.',
     image: '/assets/wellness_street_table.jpg',
     treat: '/b2b-hero/treat-5.jpg',
     emoji: '🧘',

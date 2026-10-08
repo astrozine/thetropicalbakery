@@ -7,7 +7,7 @@ import { BoatCopy, BoatDetails, BoatForWho, BoatHeroExtra } from '@/components/B
 
 export const metadata: Metadata = {
   title: 'On-Board Kit for Boats, Charters and Marinas | The Tropical Bakery',
-  description: 'Fine vegan, gluten-free sweets by Belgian chef Dolly, delivered to the pier before departure. Partnerships for charters, marinas and agencies in Ubatuba and Paraty.',
+  description: 'Fine vegan, wheat-free sweets by Belgian chef Dolly, delivered to the pier before departure. Partnerships for charters, marinas and agencies in Ubatuba and Paraty.',
   alternates: { languages: { 'pt-BR': '/b2b/barcos', en: '/en/b2b/boats' } },
   openGraph: { locale: 'en_US' },
 };
@@ -24,7 +24,7 @@ const copy: BoatCopy = {
     '10% to 15% commission on every referred order',
     'No stock, no work: we deliver straight to the pier',
     'A luxury extra that raises the value of the trip',
-    'Options for vegan and gluten-free guests, with the sugar in every treat spelled out',
+    'Options for vegan and wheat-free guests, with the sugar in every treat spelled out',
   ],
   whereTitle: 'Where we deliver',
   places: [
@@ -54,7 +54,7 @@ export default function BoatsPage() {
         partnerKind="barco"
         eyebrow="Partnerships for Boats & Marinas"
         title="An on-board gift your guests will remember"
-        intro="Fine sweets by Belgian chef Dolly Van Dam, 100% plant-based and gluten-free, delivered to the pier before departure in a kraft gift box."
+        intro="Fine sweets by Belgian chef Dolly Van Dam, 100% plant-based and wheat-free, delivered to the pier before departure in a kraft gift box."
         heroScene="/assets/boat_deck_box.jpg"
         heroPortrait
         heroExtra={<BoatHeroExtra c={copy} />}
