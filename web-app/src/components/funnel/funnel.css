@@ -14,10 +14,14 @@
 .fr-badge b { font-size: 2.1rem; }
 .fr-badge span { display: flex; flex-direction: column; font-size: 0.78rem; font-weight: 600; }
 .fr-badge strong { font-weight: 800; letter-spacing: 2px; color: var(--se-orange-deep); font-size: 0.95rem; }
-.fr-ticks { margin-bottom: 1.2rem; }
+/* Phones: headline, books, promise, 2-of-7 strip, form, in that order. Wide: see the 900px block. */
+.fr-hero .se-hero__grid { grid-template-areas: 'head' 'stage' 'body' 'seven' 'form'; }
+.fr-hero .se-hero__lead { margin-bottom: 1rem; }
+.fr-seven { grid-area: seven; }
+.fr-card { grid-area: form; }
 
 /* ══ 2 OF 7: seven photos, the free two big and lit, the other five dimmed with a lock ══ */
-.fr-seven { margin: 0 0 1.3rem; max-width: 520px; padding: 0.9rem 0.9rem 0.8rem; border-radius: 18px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 210, 168, 0.28); backdrop-filter: blur(6px); }
+.fr-seven { margin: 0; width: 100%; max-width: 520px; padding: 0.9rem 0.9rem 0.8rem; border-radius: 18px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 210, 168, 0.28); backdrop-filter: blur(6px); }
 .fr-seven__row { list-style: none; margin: 0 0 0.7rem; padding: 0.5rem 0 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.35rem; align-items: center; }
 .fr-seven__row li { position: relative; }
 .fr-seven__row img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.25); filter: brightness(0.5) saturate(0.7); }
@@ -128,6 +132,12 @@
 }
 
 @media (min-width: 900px) {
+  /* The books beside the headline, the 2-of-7 strip beside the form (it follows the form down as they fill it in),
+     so neither column is left empty. overflow: clip instead of hidden keeps the sticky strip working. */
+  .fr-hero { overflow: clip; }
+  .fr-hero .se-hero__grid { grid-template-areas: 'head stage' 'body stage' 'form seven'; }
+  .fr-hero .se-hero__stage { align-self: center; }
+  .fr-seven { align-self: start; justify-self: center; position: sticky; top: 110px; }
   .fr-stage { width: 100%; max-width: 500px; aspect-ratio: 1 / 1.02; }
   .fr-paid { left: 0; top: 7%; width: 48%; }
   .fr-paid__tag { font-size: 0.78rem; }

@@ -134,70 +134,70 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
           <div className="se-hero__body">
             <p className="se-hero__lead">{rich(c.hero.lead)}</p>
             <ul className="se-hero__ticks fr-ticks">{c.hero.ticks.map(t => <li key={t}>{t}</li>)}</ul>
+          </div>
 
-            {/* ══ 2 OF 7: the whole book, the two free recipes lit up ══ */}
-            <div className="fr-seven">
-              <ol className="fr-seven__row">
-                {RECIPES.map((r, i) => (
-                  <li key={r.day} className={isFree(r.day) ? 'is-free' : ''} style={{ '--c': r.hex } as React.CSSProperties}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={r.img} alt={book[i].name} />
-                    {isFree(r.day) ? <span className="fr-seven__free">{c.strip.free}</span> : <span className="fr-seven__lock"><Lock /></span>}
-                  </li>
-                ))}
-              </ol>
-              <p className="fr-seven__label">{rich(c.strip.label)}</p>
-              <p className="fr-seven__worth">{rich(fill(c.strip.worth, { price: full }))}</p>
-            </div>
+          {/* ══ 2 OF 7: the whole book, the two free recipes lit up. On wide screens it sits beside the form. ══ */}
+          <div className="fr-seven">
+            <ol className="fr-seven__row">
+              {RECIPES.map((r, i) => (
+                <li key={r.day} className={isFree(r.day) ? 'is-free' : ''} style={{ '--c': r.hex } as React.CSSProperties}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={r.img} alt={book[i].name} />
+                  {isFree(r.day) ? <span className="fr-seven__free">{c.strip.free}</span> : <span className="fr-seven__lock"><Lock /></span>}
+                </li>
+              ))}
+            </ol>
+            <p className="fr-seven__label">{rich(c.strip.label)}</p>
+            <p className="fr-seven__worth">{rich(fill(c.strip.worth, { price: full }))}</p>
+          </div>
 
-            <div className="fr-card" ref={formRef} id="get">
-              {pix ? (
-                <PixBox lang={lang} payload={pix.payload} base64={pix.base64} email={email} next={pix.thanks} />
-              ) : (
-                <form className="se-form" onSubmit={submit} noValidate>
-                  <p className="fr-card__title">{f.title}</p>
-                  <label className="se-field">
-                    <span>{f.name}</span>
-                    <input value={name} onChange={e => setName(e.target.value)} autoComplete="given-name" required />
-                  </label>
-                  <label className="se-field">
-                    <span>{f.email}</span>
-                    <input type="email" inputMode="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required />
-                  </label>
+          <div className="fr-card" ref={formRef} id="get">
+            {pix ? (
+              <PixBox lang={lang} payload={pix.payload} base64={pix.base64} email={email} next={pix.thanks} />
+            ) : (
+              <form className="se-form" onSubmit={submit} noValidate>
+                <p className="fr-card__title">{f.title}</p>
+                <label className="se-field">
+                  <span>{f.name}</span>
+                  <input value={name} onChange={e => setName(e.target.value)} autoComplete="given-name" required />
+                </label>
+                <label className="se-field">
+                  <span>{f.email}</span>
+                  <input type="email" inputMode="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required />
+                </label>
 
-                  <fieldset className="fr-where">
-                    <legend>{f.where}</legend>
-                    {SEGMENTS.map(s => (
-                      <label key={s} className={segment === s ? 'is-on' : ''}>
-                        <input type="radio" name="fr-where" value={s} checked={segment === s} onChange={() => setSegment(s)} />
-                        <span aria-hidden>{SEG_ICON[s]}</span> {f.segments[s]}
-                      </label>
-                    ))}
-                  </fieldset>
-
-                  {/* ══ ORDER BUMP ══ */}
-                  <div className={`fr-bump${bump ? ' is-on' : ''}`}>
-                    <label className="fr-bump__head">
-                      <input type="checkbox" checked={bump} onChange={e => setBump(e.target.checked)} />
-                      <span className="fr-bump__arrow" aria-hidden>➜</span>
-                      <span><small>{c.bump.tag}</small><b>{c.bump.title}</b></span>
+                <fieldset className="fr-where">
+                  <legend>{f.where}</legend>
+                  {SEGMENTS.map(s => (
+                    <label key={s} className={segment === s ? 'is-on' : ''}>
+                      <input type="radio" name="fr-where" value={s} checked={segment === s} onChange={() => setSegment(s)} />
+                      <span aria-hidden>{SEG_ICON[s]}</span> {f.segments[s]}
                     </label>
-                    <div className="fr-bump__body">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`${IMG}/${lang}/cover.webp`} alt="Sweet Escape" loading="lazy" />
-                      <p>{rich(fill(c.bump.text, { pages: EBOOK.pages, price: shownPrice(lang) }))}</p>
-                    </div>
-                    {bump && <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} legend={c.bump.pay} />}
-                  </div>
+                  ))}
+                </fieldset>
 
-                  {error && <p className="se-error" role="alert">{error}</p>}
-                  <button type="submit" className="se-btn se-btn--primary se-btn--big" disabled={busy}>
-                    {busy ? f.busy : bump ? fill(f.submitBump, { price }) : f.submit}
-                  </button>
-                  <p className="se-form__fine">{f.fine}</p>
-                </form>
-              )}
-            </div>
+                {/* ══ ORDER BUMP ══ */}
+                <div className={`fr-bump${bump ? ' is-on' : ''}`}>
+                  <label className="fr-bump__head">
+                    <input type="checkbox" checked={bump} onChange={e => setBump(e.target.checked)} />
+                    <span className="fr-bump__arrow" aria-hidden>➜</span>
+                    <span><small>{c.bump.tag}</small><b>{c.bump.title}</b></span>
+                  </label>
+                  <div className="fr-bump__body">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`${IMG}/${lang}/cover.webp`} alt="Sweet Escape" loading="lazy" />
+                    <p>{rich(fill(c.bump.text, { pages: EBOOK.pages, price: shownPrice(lang) }))}</p>
+                  </div>
+                  {bump && <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} legend={c.bump.pay} />}
+                </div>
+
+                {error && <p className="se-error" role="alert">{error}</p>}
+                <button type="submit" className="se-btn se-btn--primary se-btn--big" disabled={busy}>
+                  {busy ? f.busy : bump ? fill(f.submitBump, { price }) : f.submit}
+                </button>
+                <p className="se-form__fine">{f.fine}</p>
+              </form>
+            )}
           </div>
         </div>
       </section>
