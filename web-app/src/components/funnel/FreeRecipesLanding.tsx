@@ -28,7 +28,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
   const c = FUNNEL_COPY[lang];
   const f = c.form;
   const book = EBOOK_COPY[lang].recipes;
-  const { methods, method, setMethod } = usePayMethods(lang);
+  const { methods, method, setMethod, wallet, setWallet } = usePayMethods(lang);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -99,8 +99,8 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
     }
   };
 
-  const price = bump ? bookPrice(method) : shownPrice(lang);
-  const full = shownPrice(lang);
+  const price = bump ? bookPrice(method) : shownPrice(wallet);
+  const full = shownPrice(wallet);
 
   return (
     <div className="se fr" lang={lang}>
@@ -186,9 +186,9 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
                   <div className="fr-bump__body">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={`${IMG}/${lang}/cover.webp`} alt="Sweet Escape" loading="lazy" />
-                    <p>{rich(fill(c.bump.text, { pages: EBOOK.pages, price: shownPrice(lang) }))}</p>
+                    <p>{rich(fill(c.bump.text, { pages: EBOOK.pages, price: shownPrice(wallet) }))}</p>
                   </div>
-                  {bump && <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} legend={c.bump.pay} />}
+                  {bump && <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} setWallet={setWallet} legend={c.bump.pay} name="fr-method" />}
                 </div>
 
                 {error && <p className="se-error" role="alert">{error}</p>}

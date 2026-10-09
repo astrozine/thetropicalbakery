@@ -10,6 +10,7 @@ import { SUB_STYLE } from '@/components/ClubeInvite';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
 import { clearGoogleTranslate } from '@/lib/googleTranslate';
+import { FUNNEL } from '@/lib/funnel';
 
 // Desktop menu (xl and up): one line at 1280px, roomier on bigger screens.
 const GAP = 'clamp(0.7rem, 1.1vw, 1.5rem)';
@@ -48,6 +49,17 @@ export default function Navigation() {
     if (pathname?.startsWith('/sweet-escape') && !pathname.includes('/thank-you')) {
       clearGoogleTranslate();
       window.location.href = isEbookLang(langCode) ? LANG_PATH[langCode] : `${LANG_PATH.en}?tl=${langCode}`;
+      return;
+    }
+    // The free-recipes pages too: each language is its own hand-written page (and its own price, see BookPay). Other
+    // languages translate the English page, starting from Google's cookie so it opens already translated.
+    const funnelPages = Object.values(FUNNEL.pagePath);
+    if (pathname && funnelPages.includes(pathname)) {
+      clearGoogleTranslate();
+      if (!isEbookLang(langCode)) document.cookie = `googtrans=/en/${langCode}; path=/;`;
+      const target = FUNNEL.pagePath[isEbookLang(langCode) ? langCode : 'en'];
+      if (target === pathname && isEbookLang(langCode)) window.location.reload();
+      else window.location.href = target;
       return;
     }
     // Pages with a hand-written English twin: English goes to the twin, and from the twin every

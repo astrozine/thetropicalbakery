@@ -8,6 +8,7 @@ import { FUNNEL_COPY } from '@/lib/funnel';
 import { trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
 import EbookBuyBox from '@/components/ebook/EbookBuyBox';
+import { priceIn, useBookWallet } from '@/components/ebook/BookPay';
 import '@/components/ebook/sweetEscape.css';
 import './funnel.css';
 
@@ -19,8 +20,9 @@ import './funnel.css';
 export default function WelcomeOffer({ lang, token, expiresAt }: { lang: EbookLang; token: string; expiresAt: string | null }) {
   const c = FUNNEL_COPY[lang].offer;
   const pt = lang === 'pt';
-  const welcome = pt ? `R$ ${BOOK_OFFERS.welcome.brl}` : `US$ ${BOOK_OFFERS.welcome.usd}`;
-  const full = pt ? `R$ ${BOOK_OFFERS.full.brl}` : `US$ ${BOOK_OFFERS.full.usd}`;
+  const { wallet } = useBookWallet(lang);
+  const welcome = priceIn(wallet, BOOK_OFFERS.welcome);
+  const full = priceIn(wallet, BOOK_OFFERS.full);
 
   useEffect(() => {
     if (expiresAt) trackMeta('ViewContent', { value: BOOK_OFFERS.welcome.brl, content_name: `${EBOOK.id}-welcome`, content_type: 'product' });

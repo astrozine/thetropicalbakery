@@ -346,3 +346,7 @@
 .se-booklang label:focus-within { outline: 3px solid rgba(255, 79, 10, 0.3); }
 .se-thanks__edition { display: inline-block; margin: 0 0 1rem; padding: 0.2rem 0.8rem; border-radius: 999px; background: #fff7d6; border: 1px solid #f7c600; font-size: 0.85rem; font-weight: 700; color: #3b2a00; }
 @media (min-width: 600px) { .se-booklang { grid-template-columns: repeat(4, 1fr); } }
+
+/* ══ R$ / US$: the wallet switch above the ways to pay (BookPay) ══ */
+.se-wallet { grid-template-columns: repeat(2, 1fr); }
+.se-wallet b { font-size: 1.05rem; }

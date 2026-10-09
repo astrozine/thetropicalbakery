@@ -9,6 +9,7 @@ import { EditionNotice, EnglishNotice, LangBar, rich, useGoogleTranslated } from
 import { BAKERY_TREAT_PRICE_BRL, BRL_PER_USD, EBOOK, RECIPES, TOTAL_TREATS } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
+import { useBookWallet } from './BookPay';
 import './sweetEscape.css';
 
 const IMG = '/ebook/sweet-escape';
@@ -35,8 +36,9 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
   // On the English page, a visitor whose browser translated it (French, German, Italian...) gets the English edition:
   // tell them so in their language. Everyone else is told which editions exist.
   const foreign = translated;
-  // Everyone but the Portuguese page sees dollars (Stripe charges them; other ways charge R$ 47 and the form says so).
-  const dollars = lang !== 'pt';
+  // Prices follow the buyer's wallet, not the page's language (BookPay): the R$ / US$ switch in the form moves them all.
+  const { wallet } = useBookWallet(lang);
+  const dollars = wallet === 'usd';
   const reais = `R$ ${EBOOK.priceBRL}`;
   const price = dollars ? `US$ ${EBOOK.priceUSD}` : reais;
   const eachUsd = Math.round(BAKERY_TREAT_PRICE_BRL / BRL_PER_USD);

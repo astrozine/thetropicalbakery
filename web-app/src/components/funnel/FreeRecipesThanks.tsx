@@ -11,7 +11,7 @@ import { trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
 import { useEbookPayment } from '@/components/ebook/useEbookPayment';
 import { PERK_COPY } from '@/lib/bookPerk';
-import { PayPicker, PixBox, bookPrice, toPath, usePayMethods } from './FunnelPay';
+import { PayPicker, PixBox, bookPrice, shownPrice, toPath, usePayMethods } from './FunnelPay';
 import '@/components/ebook/sweetEscape.css';
 import './funnel.css';
 
@@ -41,7 +41,7 @@ export default function FreeRecipesThanks() {
   const [ref, setRef] = useState(q.get('ref') || '');
   const [k, setK] = useState(q.get('k') || '');
   const pay = useEbookPayment(ref, k);
-  const { methods, method, setMethod } = usePayMethods(lang);
+  const { methods, method, setMethod, wallet, setWallet } = usePayMethods(lang);
   const [declined, setDeclined] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -169,14 +169,14 @@ export default function FreeRecipesThanks() {
                 </ul>
                 {id && lead?.found ? (
                   <div className="se-form">
-                    <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} legend={c.bump.pay} />
+                    <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} setWallet={setWallet} legend={c.bump.pay} name="fr-method" />
                     {error && <p className="se-error" role="alert">{error}</p>}
                     <button type="button" className="se-btn se-btn--primary se-btn--big" disabled={busy} onClick={buy}>
                       {busy ? c.form.busy : fill(t.otoCta, { price: bookPrice(method) })}
                     </button>
                   </div>
                 ) : (
-                  <Link className="se-btn se-btn--primary se-btn--big" href={`${LANG_PATH[lang]}#buy`}>{fill(t.otoCta, { price: lang === 'pt' ? `R$ ${BOOK_OFFERS.full.brl}` : `US$ ${BOOK_OFFERS.full.usd}` })}</Link>
+                  <Link className="se-btn se-btn--primary se-btn--big" href={`${LANG_PATH[lang]}#buy`}>{fill(t.otoCta, { price: shownPrice(wallet) })}</Link>
                 )}
                 <p className="fr-oto__promise">{t.otoPromise}</p>
                 {isNearby(segment) && <p className="fr-oto__promise">{t.otoPerk}</p>}

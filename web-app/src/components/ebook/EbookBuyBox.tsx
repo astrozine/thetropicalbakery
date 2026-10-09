@@ -6,8 +6,7 @@ import { BOOK_OFFERS, EBOOK } from '@/lib/ebook';
 import { EBOOK_COPY, EBOOK_LANGS, LANG_LABEL, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import { EnglishNotice, rich } from './EbookLang';
-
-type Method = 'card' | 'pix' | 'paypal' | 'stripe';
+import { PayPicker, priceFor, usePayMethods } from './BookPay';
 
 interface PixResult { reference: string; key: string; payload: string; base64: string }
 
@@ -28,10 +27,9 @@ export default function EbookBuyBox({ lang = 'en', translated = false, offer }: 
   // Stripe charges US dollars; Pix, Mercado Pago and PayPal charge reais. The button always shows what the chosen way charges.
   const prices = BOOK_OFFERS[offer ? 'welcome' : 'full'];
   const reais = `R$ ${prices.brl}`;
-  const dollars = `US$ ${prices.usd}`;
 
-  const [methods, setMethods] = useState<{ card: boolean; paypal: boolean; stripe: boolean }>({ card: false, paypal: false, stripe: false });
-  const [method, setMethod] = useState<Method>('pix');
+  // The R$ / US$ switch and the ways to pay in each (BookPay): the same picker as the free-recipes pages.
+  const { methods, method, setMethod, wallet, setWallet } = usePayMethods(lang);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
@@ -43,18 +41,9 @@ export default function EbookBuyBox({ lang = 'en', translated = false, offer }: 
   const [error, setError] = useState('');
   const [pix, setPix] = useState<PixResult | null>(null);
   const [copied, setCopied] = useState(false);
-  const price = method === 'stripe' ? dollars : reais;
+  const price = priceFor(method, prices);
 
   useEffect(() => {
-    fetch('/api/pay/methods', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(m => {
-        setMethods({ card: !!m.card, paypal: !!m.paypal, stripe: !!m.stripe });
-        // Outside Brazil, a card goes through Stripe (any card, in dollars); in Portuguese, through Mercado Pago.
-        if (m.stripe && lang !== 'pt') setMethod('stripe');
-        else if (m.card) setMethod('card');
-      })
-      .catch(() => {});
     // Signed in? Fill in what we know and link the order to their account.
     supabase.auth.getSession().then(({ data }) => {
       const s = data.session;
@@ -112,13 +101,6 @@ export default function EbookBuyBox({ lang = 'en', translated = false, offer }: 
     );
   }
 
-  const options: { id: Method; label: string; note: string; show: boolean }[] = [
-    { id: 'stripe', label: f.card, note: 'Visa · Mastercard · Apple Pay · Google Pay', show: methods.stripe && lang !== 'pt' },
-    { id: 'card', label: f.card, note: f.cardNote, show: methods.card && (lang === 'pt' || !methods.stripe) },
-    { id: 'pix', label: f.pix, note: f.pixMethodNote, show: true },
-    { id: 'paypal', label: f.paypal, note: f.paypalNote, show: methods.paypal },
-  ];
-
   return (
     <form className="se-form" onSubmit={submit} noValidate>
       <label className="se-field">
@@ -144,18 +126,7 @@ export default function EbookBuyBox({ lang = 'en', translated = false, offer }: 
         ))}
       </fieldset>
 
-      <fieldset className="se-methods">
-        <legend>{f.payLegend}</legend>
-        {options.filter(o => o.show).map(o => (
-          <label key={o.id} className={`se-method${method === o.id ? ' is-on' : ''}`}>
-            <input type="radio" name="se-method" value={o.id} checked={method === o.id} onChange={() => setMethod(o.id)} />
-            <b>{o.label}</b>
-            <small>{o.note}</small>
-          </label>
-        ))}
-      </fieldset>
-
-      {f.currencyNote && method !== 'stripe' && <p className="se-currency">{fill(f.currencyNote, { reais, usd: prices.usd })}</p>}
+      <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} setWallet={setWallet} legend={f.payLegend} prices={prices} />
 
       {needsEnglishTick && <EnglishNotice lang={lang} />}
       {needsEnglishTick && (
