@@ -43,6 +43,23 @@ const ROOM_STYLE: Record<string, { color: string; emoji: string; airbnb: string;
   big_suite: { color: '#7b4fa3', emoji: '🌊', airbnb: 'Luxury Surf & Beach ~Suite 1~', airbnbId: '589851889015316995' },
   small_suite: { color: '#d9822b', emoji: '🌴', airbnb: 'Practical Surf & Beach Kitnet', airbnbId: '873138853997998343' },
 };
+// Each room reads one calendar per platform. They are stored together (retreat_calendar.import_urls) and told
+// apart by the address, so a link always lands back in its own box.
+const PLATFORMS = [
+  { id: 'airbnb', name: 'Airbnb', color: '#ff385c', match: /airbnb\./i, hint: 'https://www.airbnb.com/calendar/ical/....ics?t=...' },
+  { id: 'booking', name: 'Booking.com', color: '#003580', match: /booking\.com/i, hint: 'https://admin.booking.com/hotel/hoteladmin/ical.html?t=...' },
+  { id: 'vrbo', name: 'VRBO', color: '#1d4ed8', match: /vrbo|homeaway/i, hint: 'https://www.vrbo.com/icalendar/....ics' },
+] as const;
+type PlatformId = (typeof PLATFORMS)[number]['id'] | 'other';
+type Drafts = Record<PlatformId, string>;
+const splitUrls = (urls: string[]): Drafts => {
+  const d: Drafts = { airbnb: '', booking: '', vrbo: '', other: '' };
+  for (const u of urls) {
+    const p = PLATFORMS.find(x => x.match.test(u))?.id ?? 'other';
+    d[p] = d[p] ? `${d[p]} ${u}` : u;
+  }
+  return d;
+};
 const roomStyle = (id: string) => ROOM_STYLE[id] ?? { color: '#7f8c8d', emoji: '🛏️', airbnb: '', airbnbId: '' };
 const COLORS = { free: '#dff3e5', guest: '#5f6b78', closed: '#b9c0c8', linked: 'repeating-linear-gradient(135deg, #d5dade 0 4px, #f1f3f5 4px 8px)', reservado: '#f1c84b', confirmado: '#3f8f5a' };
 type CellKind = keyof typeof COLORS;
@@ -71,7 +88,7 @@ export default function RetreatReservations() {
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncNote, setSyncNote] = useState('');
-  const [urlDrafts, setUrlDrafts] = useState<Record<string, string>>({});
+  const [urlDrafts, setUrlDrafts] = useState<Record<string, Drafts>>({});
   const [copied, setCopied] = useState('');
   const [roomNote, setRoomNote] = useState<Record<string, { ok: boolean; text: string }>>({});
   const [fee, setFee] = useState(IMMERSION_FEE_PER_GUEST_PER_NIGHT);
@@ -93,7 +110,7 @@ export default function RetreatReservations() {
     const order = ['house', 'penthouse', 'big_suite', 'small_suite'];
     setRooms((roomsRes.data ?? []).sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)));
     setCal(calRes.data ?? []);
-    setUrlDrafts(Object.fromEntries((calRes.data ?? []).map(c => [c.room_id, (c.import_urls ?? []).join('\n')])));
+    setUrlDrafts(Object.fromEntries((calRes.data ?? []).map(c => [c.room_id, splitUrls(c.import_urls ?? [])])));
     setBookings(bookRes.data ?? []);
     setCoursePrice(Object.fromEntries((coursesRes.data ?? []).map(c => [c.slug, Number(c.price) || 0])));
     await loadBusy();
@@ -190,7 +207,7 @@ export default function RetreatReservations() {
   };
 
   const saveUrls = async (roomId: string) => {
-    const urls = (urlDrafts[roomId] ?? '').split(/\s+/).map(u => u.trim()).filter(u => /^https?:\/\//.test(u));
+    const urls = Object.values(urlDrafts[roomId] ?? {}).join(' ').split(/\s+/).map(u => u.trim()).filter(u => /^https?:\/\//.test(u));
     const { error } = await supabase.from('retreat_calendar').update({ import_urls: urls, last_synced_at: null }).eq('room_id', roomId);
     if (error) { await brandAlert(error.message); return; }
     setRoomNote(n => ({ ...n, [roomId]: { ok: true, text: 'Lendo o Airbnb…' } }));
@@ -418,14 +435,14 @@ export default function RetreatReservations() {
             {
               title: 'Cole aqui, no cartão da cor certa',
               items: [
-                <>Cole o link na <b>caixa preta</b> do quarto</>,
+                <>Cole na caixa preta com o nome do site (<b>Airbnb</b>, <b>Booking.com</b> ou <b>VRBO</b>), no cartão do quarto</>,
                 <>Aperte <b>Salvar e ler</b> e espere a mensagem verde</>,
               ],
             },
             {
               title: 'Agora o caminho de volta: do site para o Airbnb',
               items: [
-                <>Aqui no cartão, aperte <b>Copiar</b> no “Link para o Airbnb importar”</>,
+                <>Aqui no cartão, aperte <b>Copiar</b> no “② Nosso link”</>,
                 <>No Airbnb, “Etapa 2”: cole em <b>Other website link</b></>,
                 <>Nome: <b>Retiros Tropical Bakery</b> → <b>Add calendar</b></>,
               ],
@@ -435,7 +452,7 @@ export default function RetreatReservations() {
               items: [
                 <>O site só oferece noites livres, e cada retiro salvo bloqueia o Airbnb sozinho</>,
                 <>O Airbnb relê a cada ~2 horas. Repita para cada um dos 4 quartos</>,
-                <><b>Booking.com e VRBO também:</b> o link de cada um vai numa linha nova da caixa preta, e o nosso link vai em “importar calendário” lá</>,
+                <><b>Booking.com e VRBO:</b> faça os passos 1 a 3 lá também, para cada quarto que estiver anunciado neles</>,
               ],
             },
           ].map((step, i) => (
@@ -456,7 +473,7 @@ export default function RetreatReservations() {
             if (!c) return null;
             const st = roomStyle(r.id);
             // A link copied from the wrong Airbnb listing carries that listing's number.
-            const wrongRoom = Object.entries(ROOM_STYLE).find(([id, o]) => id !== r.id && (urlDrafts[r.id] ?? '').includes(o.airbnbId));
+            const wrongRoom = Object.entries(ROOM_STYLE).find(([id, o]) => id !== r.id && (urlDrafts[r.id]?.airbnb ?? '').includes(o.airbnbId));
             return (
               <div key={r.id} style={{ border: `2px solid ${st.color}`, borderTop: `10px solid ${st.color}`, background: `${st.color}12`, borderRadius: '12px', padding: '1rem 1.1rem 1.2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.15rem' }}>
@@ -464,11 +481,19 @@ export default function RetreatReservations() {
                   {st.airbnb && <span style={{ fontSize: '0.8rem', color: '#555' }}>no Airbnb: <strong>{st.airbnb}</strong> <span style={{ color: '#888' }}>(nº {st.airbnbId})</span></span>}
                 </div>
                 <span style={{ fontSize: '0.8rem', color: c.last_sync_error ? '#c0392b' : '#7f8c8d', marginLeft: '0.6rem' }}>
-                  {c.last_sync_error ? `⚠️ erro: ${c.last_sync_error}` : c.last_synced_at ? `lido ${new Date(c.last_synced_at).toLocaleString('pt-BR')} · ${busyData?.ical[r.id]?.length ?? 0} noites ocupadas` : c.import_urls?.length ? 'ainda não lido' : 'sem link'}
+                  {c.last_sync_error ? `⚠️ erro: ${c.last_sync_error}` : c.last_synced_at ? `lido ${new Date(c.last_synced_at).toLocaleString('pt-BR')} · ${(busyData?.ical[r.id]?.length ?? 0) + (busyData?.blocked?.[r.id]?.length ?? 0)} noites ocupadas` : c.import_urls?.length ? 'ainda não lido' : 'sem link'}
                 </span>
-                <label style={{ ...label, marginTop: '0.6rem' }}>Links do Airbnb / Booking (um por linha)</label>
-                <textarea className="rr-code" style={{ ...input, minHeight: '70px', fontFamily: 'Consolas, "Courier New", monospace', fontSize: '0.82rem' }} placeholder="https://www.airbnb.com/calendar/ical/....ics?s=..."
-                  value={urlDrafts[r.id] ?? ''} onChange={e => setUrlDrafts(u => ({ ...u, [r.id]: e.target.value }))} />
+                <div style={{ ...label, marginTop: '0.9rem', fontSize: '0.92rem' }}>① Cole aqui o link de <u>exportar</u> de cada site <span style={{ fontWeight: 400, color: '#7f8c8d' }}>(deixe vazio se o quarto não está nesse site)</span></div>
+                <div style={{ display: 'grid', gap: '0.5rem' }}>
+                  {[...PLATFORMS, ...(urlDrafts[r.id]?.other ? [{ id: 'other' as const, name: 'Outro', color: '#7f8c8d', hint: '' }] : [])].map(pf => (
+                    <div key={pf.id} style={{ display: 'grid', gridTemplateColumns: '7.5rem 1fr', gap: '0.5rem', alignItems: 'center' }}>
+                      <span style={{ background: pf.color, color: 'white', fontWeight: 800, fontSize: '0.85rem', padding: '0.55rem 0.4rem', borderRadius: '8px', textAlign: 'center' }}>{pf.name}</span>
+                      <input className="rr-code" style={{ ...input, fontFamily: 'Consolas, "Courier New", monospace', fontSize: '0.8rem' }} placeholder={pf.hint}
+                        value={urlDrafts[r.id]?.[pf.id] ?? ''}
+                        onChange={e => setUrlDrafts(u => ({ ...u, [r.id]: { ...(u[r.id] ?? { airbnb: '', booking: '', vrbo: '', other: '' }), [pf.id]: e.target.value } }))} />
+                    </div>
+                  ))}
+                </div>
                 {wrongRoom && (
                   <p style={{ margin: '0.5rem 0 0', padding: '0.5rem 0.8rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.88rem', background: '#fff3cd', color: '#8a6100' }}>
                     ⚠️ Esse link é do anúncio “{wrongRoom[1].airbnb}”. Cole no cartão {wrongRoom[1].emoji} {rooms.find(x => x.id === wrongRoom[0])?.name ?? wrongRoom[0]}.
@@ -480,7 +505,7 @@ export default function RetreatReservations() {
                     {roomNote[r.id].text}
                   </p>
                 )}
-                <label style={{ ...label, marginTop: '0.9rem' }}>Link para o Airbnb importar</label>
+                <div style={{ ...label, marginTop: '1.1rem', fontSize: '0.92rem' }}>② Nosso link: cole em “<u>importar</u> calendário” no Airbnb, no Booking e no VRBO <span style={{ fontWeight: 400, color: '#7f8c8d' }}>(o mesmo link nos três)</span></div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <input readOnly className="rr-code" style={{ ...input, fontFamily: 'Consolas, "Courier New", monospace', fontSize: '0.78rem' }} value={exportUrl(c)} onFocus={e => e.target.select()} />
                   <button type="button" style={{ ...chip(false), background: copied === r.id ? '#2e7d4f' : '#ff2d95', borderColor: copied === r.id ? '#2e7d4f' : '#ff2d95', color: 'white', whiteSpace: 'nowrap' }} onClick={() => { navigator.clipboard.writeText(exportUrl(c)); setCopied(r.id); setTimeout(() => setCopied(''), 2000); }}>
