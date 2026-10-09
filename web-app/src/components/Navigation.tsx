@@ -79,7 +79,6 @@ export default function Navigation() {
 
   const links: { name: string; path: string; highlight?: boolean; sub?: string }[] = [
     { name: 'Chef Dolly', path: '/dolly' },
-    { name: 'E-book', path: '/sweet-escape/pt' },
   ];
 
   // A course Dolly has hidden in the admin ("em preparo") leaves this menu too.
@@ -107,9 +106,14 @@ export default function Navigation() {
       { name: 'Retiros', path: '/retreats' },
       ...cursosLinks,
     ] },
+    // The free 2-recipe sampler (/receitas) is the door into Sweet Escape, the full 7-day book.
+    { id: 'ebook', name: 'E-book', links: [
+      { name: '2 Receitas Grátis', path: '/receitas' },
+      { name: 'Livro Completo', path: '/sweet-escape/pt', highlight: true, sub: '7 dias, 7 doces' },
+    ] },
   ];
   const [openGroup, setOpenGroup] = useState<string | null>(null);
-  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true });
+  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true, ebook: true });
 
   const b2bLinks = [
     { name: 'Todas as Parcerias', path: '/b2b', highlight: true },
