@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import AccountMenu from '@/components/AccountMenu';
-import InstagramLink from '@/components/InstagramLink';
+import { INSTAGRAM_HANDLE, InstagramIcon } from '@/components/InstagramLink';
+import { STORE_INSTAGRAM_URL } from '@/lib/siteContact';
 import { SUB_STYLE } from '@/components/ClubeInvite';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
@@ -20,6 +21,21 @@ const TOP_SIZE = 'clamp(0.74rem, 0.78vw, 0.9rem)';
 const HAND_TRANSLATED_EN: Record<string, string> = {
   '/b2b/barcos': '/en/b2b/boats',
 };
+
+type NavLink = { name: string; path: string; highlight?: boolean; sub?: string; external?: boolean };
+
+/** A menu entry: a page on the site, or (external) somewhere else, opened in a new tab so the shop stays open. */
+function NavItem({ link, style, onClick, children }: { link: NavLink; style: React.CSSProperties; onClick?: () => void; children: React.ReactNode }) {
+  if (!link.external) return <Link href={link.path} onClick={onClick} style={style}>{children}</Link>;
+  return (
+    <a href={link.path} target="_blank" rel="noopener noreferrer" onClick={onClick} className="notranslate" translate="no" style={style}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+        <InstagramIcon size={18} />
+        <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>{children}</span>
+      </span>
+    </a>
+  );
+}
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -89,10 +105,6 @@ export default function Navigation() {
     }
   };
 
-  const links: { name: string; path: string; highlight?: boolean; sub?: string }[] = [
-    { name: 'Chef Dolly', path: '/dolly' },
-  ];
-
   // A course Dolly has hidden in the admin ("em preparo") leaves this menu too.
   const shownCourses = useShownCourses();
   const cursosLinks = [
@@ -104,7 +116,7 @@ export default function Navigation() {
 
   // The logo is the way home, so there is no "Início" link. The boxes, the events and the
   // courses + retreats each fold into one menu so the bar stays on one line with the logo beside it.
-  const groups: { id: string; name: string; links: { name: string; path: string; highlight?: boolean; sub?: string }[] }[] = [
+  const groups: { id: string; name: string; links: NavLink[] }[] = [
     { id: 'caixa', name: 'Caixa de Degustação', links: [
       { name: 'Caixa da Semana', path: '/caixas' },
       // The weekly subscription is the core of the business, so it keeps the foil treatment.
@@ -122,6 +134,12 @@ export default function Navigation() {
     { id: 'ebook', name: 'E-book', links: [
       { name: '2 Receitas Grátis', path: '/receitas' },
       { name: 'Livro Completo', path: '/sweet-escape/pt', highlight: true, sub: '7 dias, 7 doces' },
+    ] },
+    // Dolly's page first, her Instagram second and inside the menu: the feed is one deliberate tap away (new tab),
+    // not a bare icon in the bar that takes people off the site before they have seen it.
+    { id: 'dolly', name: 'Chef Dolly', links: [
+      { name: 'Conheça a Dolly', path: '/dolly' },
+      { name: 'Instagram', path: STORE_INSTAGRAM_URL, sub: INSTAGRAM_HANDLE, external: true },
     ] },
   ];
   const [openGroup, setOpenGroup] = useState<string | null>(null);
@@ -281,7 +299,7 @@ export default function Navigation() {
                     display: 'flex', flexDirection: 'column', gap: '0.5rem',
                   }}>
                     {group.links.map((link) => (
-                      <Link key={link.path} href={link.path} onClick={() => setOpenGroup(null)} style={{
+                      <NavItem key={link.path} link={link} onClick={() => setOpenGroup(null)} style={{
                         padding: '0.5rem 1.5rem',
                         color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
                         textDecoration: 'none',
@@ -296,35 +314,13 @@ export default function Navigation() {
                       }}>
                         {link.name}
                         {link.sub && <span style={{ ...SUB_STYLE, textAlign: 'left' }}>{link.sub}</span>}
-                      </Link>
+                      </NavItem>
                     ))}
                   </div>
                 )}
               </div>
             );
           })}
-
-          {links.map((link) => (
-            <Link key={link.path} href={link.path} style={{
-              marginLeft: GAP,
-              textDecoration: 'none',
-              color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#3c2a21',
-              fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: TOP_SIZE,
-              whiteSpace: 'nowrap',
-              ...(link.highlight ? {
-                background: '#d4af37',
-                padding: '0.35rem 0.9rem',
-                borderRadius: '6px',
-                display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.15,
-              } : {}),
-            }}>
-              {link.name}
-              {link.sub && <span style={SUB_STYLE}>{link.sub}</span>}
-            </Link>
-          ))}
 
           {/* Custom Language Switcher — each language name must stay in its own
               language regardless of the page's current translation, otherwise a
@@ -421,8 +417,6 @@ export default function Navigation() {
           </div>
 
           <div className="nav-actions" style={{ display: 'flex', alignItems: 'center', justifySelf: 'end' }}>
-          <InstagramLink size={20} style={{ marginLeft: GAP, color: '#594a42', minWidth: 32, minHeight: 32 }} />
-
           <AccountMenu />
 
           <button
@@ -554,9 +548,9 @@ export default function Navigation() {
                   {group.name} <span>{mobileGroupsOpen[group.id] ? '▲' : '▼'}</span>
                 </button>
                 {mobileGroupsOpen[group.id] && group.links.map((link) => (
-                  <Link
+                  <NavItem
                     key={link.path}
-                    href={link.path}
+                    link={link}
                     onClick={closeMenu}
                     style={{
                       display: 'block',
@@ -572,38 +566,11 @@ export default function Navigation() {
                   >
                     {link.name}
                     {link.sub && <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, opacity: 0.85 }}>{link.sub}</span>}
-                  </Link>
+                  </NavItem>
                 ))}
               </div>
             ))}
 
-            {/* Main Links */}
-            {links.map((link) => (
-              <Link 
-                key={link.path} 
-                href={link.path} 
-                onClick={closeMenu}
-                style={{
-                  display: 'block',
-                  padding: link.highlight ? '0.9rem 1rem' : '1rem 0',
-                  textDecoration: 'none',
-                  color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#3c2a21',
-                  fontWeight: link.highlight || pathname === link.path ? 'bold' : '500',
-                  fontSize: '1.2rem',
-                  borderBottom: link.highlight ? 'none' : '1px solid rgba(0,0,0,0.06)',
-                  letterSpacing: '0.5px',
-                  ...(link.highlight ? {
-                    background: '#d4af37',
-                    borderRadius: '8px',
-                    margin: '0.5rem 0',
-                    textAlign: 'center' as const,
-                  } : {}),
-                }}
-              >
-                {link.name}
-                {link.sub && <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, opacity: 0.85 }}>{link.sub}</span>}
-              </Link>
-            ))}
 
             {/* B2B Section Header */}
             <button 
@@ -695,8 +662,6 @@ export default function Navigation() {
             ))}
 
             <AccountMenu variant="mobile" />
-
-            <InstagramLink size={22} showHandle style={{ marginTop: '1.5rem', color: '#594a42', fontSize: '1rem' }} />
           </div>
         </div>
       )}
