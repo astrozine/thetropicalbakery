@@ -54,6 +54,7 @@ export default function RetreatReservations() {
   const [syncNote, setSyncNote] = useState('');
   const [urlDrafts, setUrlDrafts] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState('');
+  const [roomNote, setRoomNote] = useState<Record<string, { ok: boolean; text: string }>>({});
   const [fee, setFee] = useState(IMMERSION_FEE_PER_GUEST_PER_NIGHT);
   const [coursePrice, setCoursePrice] = useState<Record<string, number>>({});
 
@@ -166,7 +167,19 @@ export default function RetreatReservations() {
     const urls = (urlDrafts[roomId] ?? '').split(/\s+/).map(u => u.trim()).filter(u => /^https?:\/\//.test(u));
     const { error } = await supabase.from('retreat_calendar').update({ import_urls: urls, last_synced_at: null }).eq('room_id', roomId);
     if (error) { await brandAlert(error.message); return; }
+    setRoomNote(n => ({ ...n, [roomId]: { ok: true, text: 'Lendo o Airbnb…' } }));
     await syncNow();
+    // syncNow refreshed the stored nights; say what this room ended up with, right under the button.
+    const { data: row } = await supabase.from('retreat_calendar').select('last_sync_error').eq('room_id', roomId).maybeSingle();
+    const { count } = await supabase.from('retreat_busy_nights').select('night', { count: 'exact', head: true }).eq('room_id', roomId).gte('night', todayBR());
+    setRoomNote(n => ({
+      ...n,
+      [roomId]: !urls.length
+        ? { ok: true, text: 'Link removido.' }
+        : row?.last_sync_error
+          ? { ok: false, text: `Não consegui ler esse link: ${row.last_sync_error}. Confira se copiou o link inteiro.` }
+          : { ok: true, text: `✓ Pronto! Li o calendário: ${count ?? 0} noites ocupadas daqui para frente. Elas já aparecem cinza no mês lá em cima.` },
+    }));
   };
 
   const exportUrl = (c: CalRow) => `${window.location.origin}/api/retreats/ical/${c.room_id}.ics?token=${c.export_token}`;
@@ -359,12 +372,17 @@ export default function RetreatReservations() {
               <div key={r.id} style={{ border: '1px solid #eee', borderRadius: '10px', padding: '1rem' }}>
                 <strong>{r.name}</strong>
                 <span style={{ fontSize: '0.8rem', color: c.last_sync_error ? '#c0392b' : '#7f8c8d', marginLeft: '0.6rem' }}>
-                  {c.last_sync_error ? `⚠️ erro: ${c.last_sync_error}` : c.last_synced_at ? `lido ${new Date(c.last_synced_at).toLocaleString('pt-BR')}` : c.import_urls?.length ? 'ainda não lido' : 'sem link'}
+                  {c.last_sync_error ? `⚠️ erro: ${c.last_sync_error}` : c.last_synced_at ? `lido ${new Date(c.last_synced_at).toLocaleString('pt-BR')} · ${busyData?.ical[r.id]?.length ?? 0} noites ocupadas` : c.import_urls?.length ? 'ainda não lido' : 'sem link'}
                 </span>
                 <label style={{ ...label, marginTop: '0.6rem' }}>Links do Airbnb / Booking (um por linha)</label>
                 <textarea style={{ ...input, minHeight: '60px', fontFamily: 'monospace', fontSize: '0.8rem' }} placeholder="https://www.airbnb.com/calendar/ical/....ics?s=..."
                   value={urlDrafts[r.id] ?? ''} onChange={e => setUrlDrafts(u => ({ ...u, [r.id]: e.target.value }))} />
                 <button type="button" style={{ ...dark, marginTop: '0.5rem', padding: '0.5rem 1rem' }} onClick={() => saveUrls(r.id)}>Salvar e ler</button>
+                {roomNote[r.id] && (
+                  <p style={{ margin: '0.6rem 0 0', padding: '0.6rem 0.8rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.9rem', background: roomNote[r.id].ok ? '#e8f5e9' : '#ffebee', color: roomNote[r.id].ok ? '#2e7d32' : '#c62828' }}>
+                    {roomNote[r.id].text}
+                  </p>
+                )}
                 <label style={{ ...label, marginTop: '0.9rem' }}>Link para o Airbnb importar</label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <input readOnly style={{ ...input, fontFamily: 'monospace', fontSize: '0.75rem' }} value={exportUrl(c)} onFocus={e => e.target.select()} />
