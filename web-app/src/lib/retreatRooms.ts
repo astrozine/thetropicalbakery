@@ -39,7 +39,7 @@ export const RETREAT_ROOMS: RetreatRoomInfo[] = [
     amenities: ['Ar-condicionado', 'Wi-Fi', 'Lavanderia grátis', 'Chuveiro de praia', 'Terraço e jardim', 'Cafeteira e café'],
     photos: photos('house', 14),
     airbnbUrl:
-      'https://www.airbnb.com/rooms/1257394362209121684?guests=1&adults=1&s=67&unique_share_id=cf9c74bc-e0ea-4161-9b3f-e9f1faa303d5',
+      'https://www.airbnb.com/rooms/873166894206646380',
   },
   {
     id: 'penthouse',

@@ -34,6 +34,16 @@ const chip = (on: boolean): React.CSSProperties => ({
 });
 const dark: React.CSSProperties = { background: '#2c3e50', color: 'white', border: 'none', padding: '0.7rem 1.2rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 };
 const MONTHS = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+// One color per rental, so the four cards below (and the rows of the month above) are easy to tell apart.
+// `airbnbId` is the number in that listing's Airbnb address and calendar link; it is how a link pasted in the
+// wrong card gets caught.
+const ROOM_STYLE: Record<string, { color: string; emoji: string; airbnb: string; airbnbId: string }> = {
+  house: { color: '#2e7d4f', emoji: '🏡', airbnb: 'Fabulous Luxury Beach House', airbnbId: '873166894206646380' },
+  penthouse: { color: '#2b6cb0', emoji: '🌅', airbnb: 'Luxury Family Beach Penthouse', airbnbId: '1257394362209121684' },
+  big_suite: { color: '#7b4fa3', emoji: '🌊', airbnb: 'Luxury Surf & Beach ~Suite 1~', airbnbId: '589851889015316995' },
+  small_suite: { color: '#d9822b', emoji: '🌴', airbnb: 'Practical Surf & Beach Kitnet', airbnbId: '873138853997998343' },
+};
+const roomStyle = (id: string) => ROOM_STYLE[id] ?? { color: '#7f8c8d', emoji: '🛏️', airbnb: '', airbnbId: '' };
 const COLORS = { airbnb: '#b0b7bf', linked: '#dfe3e7', reservado: '#f1c84b', confirmado: '#3f8f5a' };
 const br = (iso: string) => `${iso.slice(8)}/${iso.slice(5, 7)}`;
 const waNumber = (v: string | null) => { const d = (v || '').replace(/\D/g, ''); return d ? (d.length <= 11 ? `55${d}` : d) : ''; };
@@ -237,7 +247,7 @@ export default function RetreatReservations() {
             <tbody>
               {rooms.map(r => (
                 <tr key={r.id}>
-                  <td style={{ fontWeight: 700, paddingRight: '0.5rem', whiteSpace: 'nowrap' }}>{r.name}</td>
+                  <td style={{ fontWeight: 700, paddingRight: '0.5rem', whiteSpace: 'nowrap', borderLeft: `6px solid ${roomStyle(r.id).color}`, paddingLeft: '0.5rem' }}>{roomStyle(r.id).emoji} {r.name}</td>
                   {days.map(d => {
                     const c = cellOf(r.id, d);
                     const past = d < todayBR();
@@ -368,16 +378,27 @@ export default function RetreatReservations() {
           {rooms.map(r => {
             const c = cal.find(x => x.room_id === r.id);
             if (!c) return null;
+            const st = roomStyle(r.id);
+            // A link copied from the wrong Airbnb listing carries that listing's number.
+            const wrongRoom = Object.entries(ROOM_STYLE).find(([id, o]) => id !== r.id && (urlDrafts[r.id] ?? '').includes(o.airbnbId));
             return (
-              <div key={r.id} style={{ border: '1px solid #eee', borderRadius: '10px', padding: '1rem' }}>
-                <strong>{r.name}</strong>
+              <div key={r.id} style={{ border: `2px solid ${st.color}`, borderTop: `10px solid ${st.color}`, background: `${st.color}12`, borderRadius: '12px', padding: '1rem 1.1rem 1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.15rem' }}>
+                  <span style={{ background: st.color, color: 'white', fontWeight: 800, fontSize: '1.05rem', padding: '0.3rem 0.85rem', borderRadius: '999px' }}>{st.emoji} {r.name}</span>
+                  {st.airbnb && <span style={{ fontSize: '0.8rem', color: '#555' }}>no Airbnb: <strong>{st.airbnb}</strong> <span style={{ color: '#888' }}>(nº {st.airbnbId})</span></span>}
+                </div>
                 <span style={{ fontSize: '0.8rem', color: c.last_sync_error ? '#c0392b' : '#7f8c8d', marginLeft: '0.6rem' }}>
                   {c.last_sync_error ? `⚠️ erro: ${c.last_sync_error}` : c.last_synced_at ? `lido ${new Date(c.last_synced_at).toLocaleString('pt-BR')} · ${busyData?.ical[r.id]?.length ?? 0} noites ocupadas` : c.import_urls?.length ? 'ainda não lido' : 'sem link'}
                 </span>
                 <label style={{ ...label, marginTop: '0.6rem' }}>Links do Airbnb / Booking (um por linha)</label>
                 <textarea style={{ ...input, minHeight: '60px', fontFamily: 'monospace', fontSize: '0.8rem' }} placeholder="https://www.airbnb.com/calendar/ical/....ics?s=..."
                   value={urlDrafts[r.id] ?? ''} onChange={e => setUrlDrafts(u => ({ ...u, [r.id]: e.target.value }))} />
-                <button type="button" style={{ ...dark, marginTop: '0.5rem', padding: '0.5rem 1rem' }} onClick={() => saveUrls(r.id)}>Salvar e ler</button>
+                {wrongRoom && (
+                  <p style={{ margin: '0.5rem 0 0', padding: '0.5rem 0.8rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.88rem', background: '#fff3cd', color: '#8a6100' }}>
+                    ⚠️ Esse link é do anúncio “{wrongRoom[1].airbnb}”. Cole no cartão {wrongRoom[1].emoji} {rooms.find(x => x.id === wrongRoom[0])?.name ?? wrongRoom[0]}.
+                  </p>
+                )}
+                <button type="button" style={{ ...dark, background: st.color, marginTop: '0.5rem', padding: '0.5rem 1rem' }} onClick={() => saveUrls(r.id)}>Salvar e ler</button>
                 {roomNote[r.id] && (
                   <p style={{ margin: '0.6rem 0 0', padding: '0.6rem 0.8rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.9rem', background: roomNote[r.id].ok ? '#e8f5e9' : '#ffebee', color: roomNote[r.id].ok ? '#2e7d32' : '#c62828' }}>
                     {roomNote[r.id].text}
