@@ -7,6 +7,8 @@ import { RetreatRoom, quoteRetreatPackage, IMMERSION_FEE_PER_GUEST_PER_NIGHT } f
 import { getSiteSetting } from '@/lib/siteSettings';
 import { useExchangeRates, formatForeign } from '@/lib/currency';
 import WhatsAppGate from '@/components/WhatsAppGate';
+import { COURSE_CONTENT } from '@/lib/courseContent';
+import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 
 const DEFAULT_ROOMS: RetreatRoom[] = [
   { id: 'penthouse', name: 'Cobertura (Penthouse)', airbnb_nightly_rate: 0, max_guests: 6 },
@@ -39,6 +41,12 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
   const [guests, setGuests] = useState(2);
   const [immersionFee, setImmersionFee] = useState(IMMERSION_FEE_PER_GUEST_PER_NIGHT);
   const { rates } = useExchangeRates();
+  // Someone travelling in plans the stay and the classes together: the courses ride along in the same quote.
+  const shownCourses = useShownCourses();
+  const courseOptions = COURSE_CONTENT.filter(c => courseIsShown(shownCourses, c.slug));
+  const [courseSlugs, setCourseSlugs] = useState<string[]>([]);
+  const toggleCourse = (slug: string) => setCourseSlugs(s => s.includes(slug) ? s.filter(x => x !== slug) : [...s, slug]);
+  const pickedCourses = courseOptions.filter(c => courseSlugs.includes(c.slug));
 
   useEffect(() => {
     supabase
@@ -55,6 +63,9 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
         }
       });
     getSiteSetting('retreat_immersion_fee_per_guest_per_night', IMMERSION_FEE_PER_GUEST_PER_NIGHT).then(setImmersionFee);
+    // A course page can send people here with the course already picked: /retreats?curso=<slug>#pacote
+    const pre = new URLSearchParams(window.location.search).get('curso');
+    if (pre) setCourseSlugs([pre]);
   }, []);
 
   const room = rooms.find(r => r.id === roomId) || rooms[0];
@@ -119,6 +130,24 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
             </div>
           </div>
         </div>
+
+        {courseOptions.length > 0 && (
+          <div>
+            <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.6rem' }}>
+              Cursos durante a estadia <span style={{ color: 'rgba(253,250,243,0.55)', fontWeight: 500, textTransform: 'none', letterSpacing: 0 }}>(opcional, escolha quantos quiser)</span>
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {courseOptions.map(c => (
+                <button key={c.slug} type="button" aria-pressed={courseSlugs.includes(c.slug)} onClick={() => toggleCourse(c.slug)} style={chipStyle(courseSlugs.includes(c.slug))}>
+                  {courseSlugs.includes(c.slug) ? '✓ ' : '+ '}{c.title}
+                </button>
+              ))}
+            </div>
+            <a href="/cursos" style={{ display: 'inline-block', marginTop: '0.6rem', fontSize: '0.82rem', color: '#d4af37', textDecoration: 'underline' }}>
+              Ver o que cada curso ensina →
+            </a>
+          </div>
+        )}
       </div>
 
       <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '14px', padding: '1.5rem', marginBottom: '1.5rem' }}>
@@ -130,8 +159,14 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
           <span>Imersão Tropical Bakery ({cappedGuests}p × {nights}n × {formatBRL(immersionFee)})</span>
           <span>{formatBRL(quote.immersionSubtotal)}</span>
         </div>
+        {pickedCourses.length > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', color: 'rgba(253,250,243,0.85)', fontSize: '0.92rem', marginBottom: '0.9rem' }}>
+            <span>Cursos: {pickedCourses.map(c => c.title).join(', ')}</span>
+            <span style={{ whiteSpace: 'nowrap', opacity: 0.75 }}>valor a combinar</span>
+          </div>
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '0.9rem', color: '#fdfaf3', fontWeight: 800, fontSize: '1.3rem' }}>
-          <span>Total</span>
+          <span>Total{pickedCourses.length ? ' (sem os cursos)' : ''}</span>
           <span>{formatBRL(quote.total)}</span>
         </div>
         {foreignLine && (
@@ -143,8 +178,8 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
 
       <WhatsAppGate
         href={`https://wa.me/${whatsappNumber}?text=${message}`}
-        topic={`Retiro: pacote ${room.name}`}
-        tags={['retiros']}
+        topic={`Retiro: pacote ${room.name}${pickedCourses.length ? ` + ${pickedCourses.map(c => c.title).join(', ')}` : ''}`}
+        tags={pickedCourses.length ? ['retiros', 'cursos'] : ['retiros']}
         locale={locale}
         className="btn btn-secondary"
         style={{ width: '100%', textAlign: 'center', display: 'block', padding: '1rem', fontSize: '1.05rem' }}

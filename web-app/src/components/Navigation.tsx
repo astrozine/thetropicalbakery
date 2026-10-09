@@ -22,7 +22,14 @@ const HAND_TRANSLATED_EN: Record<string, string> = {
   '/b2b/barcos': '/en/b2b/boats',
 };
 
-type NavLink = { name: string; path: string; highlight?: boolean; sub?: string; external?: boolean };
+type NavLink = { name: string; path: string; highlight?: boolean; feature?: boolean; sub?: string; external?: boolean };
+
+// The "plan your trip" button: forest green with a gold edge, so it reads as the way in for travellers
+// without competing with the gold "highlight" link beside it.
+const FEATURE_STYLE: React.CSSProperties = {
+  background: 'linear-gradient(135deg, #2e4432 0%, #3d5a40 100%)', color: '#fdfaf3', border: '1px solid #d4af37',
+  boxShadow: '0 6px 16px rgba(46,68,50,0.25)', fontWeight: 'bold', display: 'flex', flexDirection: 'column', lineHeight: 1.2,
+};
 
 /** A menu entry: a page on the site, or (external) somewhere else, opened in a new tab so the shop stays open. */
 function NavItem({ link, style, onClick, children }: { link: NavLink; style: React.CSSProperties; onClick?: () => void; children: React.ReactNode }) {
@@ -127,7 +134,8 @@ export default function Navigation() {
       { name: 'Menu de Eventos', path: '/menu' },
     ] },
     { id: 'cursos', name: 'Cursos e Retiros', links: [
-      { name: 'Retiros', path: '/retreats' },
+      // People travelling in plan the stay and pick their courses in one place: the package builder on /retreats.
+      { name: '✈️ Planejar meu Retiro', path: '/retreats#pacote', feature: true, sub: 'hospedagem + cursos, num só pacote' },
       ...cursosLinks,
     ] },
     // The free 2-recipe sampler (/receitas) is the door into Sweet Escape, the full 7-day book.
@@ -270,7 +278,7 @@ export default function Navigation() {
           <div className="nav-links" style={{ display: 'flex', alignItems: 'center', justifySelf: 'center' }}>
           {/* Caixa de Degustação / Eventos: open on hover, or on a click (tablets have no hover). */}
           {groups.map((group) => {
-            const active = group.links.some(l => l.path === pathname);
+            const active = group.links.some(l => l.path.split('#')[0] === pathname);
             const open = openGroup === group.id;
             return (
               <div
@@ -312,6 +320,7 @@ export default function Navigation() {
                           background: '#d4af37', borderRadius: '6px', margin: '0 0.75rem', padding: '0.5rem 0.75rem',
                           display: 'flex', flexDirection: 'column', lineHeight: 1.2,
                         } : {}),
+                        ...(link.feature ? { ...FEATURE_STYLE, borderRadius: '8px', margin: '0 0.75rem 0.25rem', padding: '0.7rem 0.9rem' } : {}),
                       }}>
                         {link.name}
                         {link.sub && <span style={{ ...SUB_STYLE, textAlign: 'left' }}>{link.sub}</span>}
@@ -560,9 +569,10 @@ export default function Navigation() {
                       color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
                       fontWeight: link.highlight || pathname === link.path ? 'bold' : '400',
                       fontSize: '1.1rem',
-                      borderBottom: link.highlight ? 'none' : '1px solid rgba(0,0,0,0.04)',
+                      borderBottom: link.highlight || link.feature ? 'none' : '1px solid rgba(0,0,0,0.04)',
                       animation: 'fadeIn 0.2s ease-out',
                       ...(link.highlight ? { background: '#d4af37', borderRadius: '8px', margin: '0.3rem 0', padding: '0.8rem 1rem' } : {}),
+                      ...(link.feature ? { ...FEATURE_STYLE, borderRadius: '8px', margin: '0.3rem 0', padding: '0.9rem 1rem' } : {}),
                     }}
                   >
                     {link.name}
