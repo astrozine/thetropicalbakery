@@ -369,11 +369,56 @@ export default function RetreatReservations() {
       {/* Connecting Airbnb / Booking */}
       <div style={card}>
         <h2 style={{ marginTop: 0 }}>Ligar ao Airbnb e ao Booking</h2>
-        <ol style={{ lineHeight: 1.7, paddingLeft: '1.2rem', color: '#444' }}>
-          <li><strong>Airbnb → site:</strong> no Airbnb, abra o anúncio → <em>Calendário</em> → <em>Disponibilidade</em> → <em>Conectar calendários</em> → <em>Exportar calendário</em>. Copie o link e cole aqui, no quarto certo. No Booking.com: <em>Tarifas e disponibilidade → Sincronizar calendários → Exportar</em>.</li>
-          <li><strong>Site → Airbnb:</strong> copie o “link para o Airbnb” do quarto e cole no mesmo lugar do Airbnb, em <em>Importar calendário</em> (nome: “Retiros Tropical Bakery”). Faça o mesmo no Booking.</li>
-          <li>Pronto: o site só oferece noites livres, e cada retiro salvo aqui bloqueia o Airbnb sozinho (o Airbnb relê a cada ~2 horas).</li>
-        </ol>
+        <style>{`
+          .rr-code { background: #0d0d0d !important; color: #fff !important; border: 1px solid #333 !important; caret-color: #ff2d95; letter-spacing: 0.2px; }
+          .rr-code::placeholder { color: #8a8a8a; }
+          .rr-code::selection { background: #ff2d95; color: #fff; }
+        `}</style>
+        <div style={{ display: 'grid', gap: '0.9rem', margin: '1rem 0 1.5rem' }}>
+          {[
+            {
+              title: 'Pegue o link no Airbnb',
+              items: [
+                <>Airbnb → <b>Calendário</b> → clique no anúncio</>,
+                <><b>Configurações de disponibilidade</b> → <b>Conectar a outro site</b></>,
+                <>Em “Etapa 1”, aperte o botão preto <b>Copy</b></>,
+              ],
+            },
+            {
+              title: 'Cole aqui, no cartão da cor certa',
+              items: [
+                <>Cole o link na <b>caixa preta</b> do quarto</>,
+                <>Aperte <b>Salvar e ler</b> e espere a mensagem verde</>,
+              ],
+            },
+            {
+              title: 'Agora o caminho de volta: do site para o Airbnb',
+              items: [
+                <>Aqui no cartão, aperte <b>Copiar</b> no “Link para o Airbnb importar”</>,
+                <>No Airbnb, “Etapa 2”: cole em <b>Other website link</b></>,
+                <>Nome: <b>Retiros Tropical Bakery</b> → <b>Add calendar</b></>,
+              ],
+            },
+            {
+              title: 'Pronto!',
+              items: [
+                <>O site só oferece noites livres, e cada retiro salvo bloqueia o Airbnb sozinho</>,
+                <>O Airbnb relê a cada ~2 horas. Repita para cada um dos 4 quartos</>,
+                <>No Booking.com: <i>Tarifas e disponibilidade → Sincronizar calendários</i></>,
+              ],
+            },
+          ].map((step, i) => (
+            <div key={step.title} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', background: '#fff0f7', border: '1px solid #ffc2e0', borderRadius: '14px', padding: '0.9rem 1.1rem' }}>
+              <span style={{ flex: '0 0 auto', width: '46px', height: '46px', borderRadius: '50%', background: '#ff2d95', color: 'white', fontWeight: 900, fontSize: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(255,45,149,0.4)' }}>{i + 1}</span>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#2c3e50', marginBottom: '0.3rem' }}>{step.title}</div>
+                <ul style={{ margin: 0, paddingLeft: '1.1rem', lineHeight: 1.65, color: '#444' }}>
+                  {step.items.map((it, j) => <li key={j}>{it}</li>)}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
         <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
           {rooms.map(r => {
             const c = cal.find(x => x.room_id === r.id);
@@ -391,7 +436,7 @@ export default function RetreatReservations() {
                   {c.last_sync_error ? `⚠️ erro: ${c.last_sync_error}` : c.last_synced_at ? `lido ${new Date(c.last_synced_at).toLocaleString('pt-BR')} · ${busyData?.ical[r.id]?.length ?? 0} noites ocupadas` : c.import_urls?.length ? 'ainda não lido' : 'sem link'}
                 </span>
                 <label style={{ ...label, marginTop: '0.6rem' }}>Links do Airbnb / Booking (um por linha)</label>
-                <textarea style={{ ...input, minHeight: '60px', fontFamily: 'monospace', fontSize: '0.8rem' }} placeholder="https://www.airbnb.com/calendar/ical/....ics?s=..."
+                <textarea className="rr-code" style={{ ...input, minHeight: '70px', fontFamily: 'Consolas, "Courier New", monospace', fontSize: '0.82rem' }} placeholder="https://www.airbnb.com/calendar/ical/....ics?s=..."
                   value={urlDrafts[r.id] ?? ''} onChange={e => setUrlDrafts(u => ({ ...u, [r.id]: e.target.value }))} />
                 {wrongRoom && (
                   <p style={{ margin: '0.5rem 0 0', padding: '0.5rem 0.8rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.88rem', background: '#fff3cd', color: '#8a6100' }}>
@@ -406,8 +451,8 @@ export default function RetreatReservations() {
                 )}
                 <label style={{ ...label, marginTop: '0.9rem' }}>Link para o Airbnb importar</label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <input readOnly style={{ ...input, fontFamily: 'monospace', fontSize: '0.75rem' }} value={exportUrl(c)} onFocus={e => e.target.select()} />
-                  <button type="button" style={chip(copied === r.id)} onClick={() => { navigator.clipboard.writeText(exportUrl(c)); setCopied(r.id); setTimeout(() => setCopied(''), 2000); }}>
+                  <input readOnly className="rr-code" style={{ ...input, fontFamily: 'Consolas, "Courier New", monospace', fontSize: '0.78rem' }} value={exportUrl(c)} onFocus={e => e.target.select()} />
+                  <button type="button" style={{ ...chip(false), background: copied === r.id ? '#2e7d4f' : '#ff2d95', borderColor: copied === r.id ? '#2e7d4f' : '#ff2d95', color: 'white', whiteSpace: 'nowrap' }} onClick={() => { navigator.clipboard.writeText(exportUrl(c)); setCopied(r.id); setTimeout(() => setCopied(''), 2000); }}>
                     {copied === r.id ? 'Copiado ✓' : 'Copiar'}
                   </button>
                 </div>
