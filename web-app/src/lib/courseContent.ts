@@ -38,6 +38,8 @@ export interface CourseContent {
   faq: { q: string; a: string }[];
   /** What the enquiry form records as the interest. */
   enquiry: string;
+  /** How many class days the course takes inside a retreat (one class every other day; see retreatPlan.ts). */
+  retreatClasses: number;
   cta: string;
   gallery: string[];
 }
@@ -87,6 +89,7 @@ export const COURSE_CONTENT: CourseContent[] = [
       { q: 'Dá para combinar com hospedagem?', a: 'Dá. Veja o formato Curso + Retiro abaixo, ou marque essa opção quando falar com a gente.' },
     ],
     enquiry: 'Turismo Gastronômico (1 Dia)',
+    retreatClasses: 1,
     cta: 'Reservar meu dia com a Dolly',
     gallery: ['/menu-items/Screenshot_20260412_123155_Edits.jpg', '/menu-items/20260724_154636.jpg', '/menu-items/Screenshot_20260623_080155_Gallery.jpg', '/menu-items/Screenshot_20260810_135948_Photos.jpg'],
   },
@@ -119,6 +122,8 @@ export const COURSE_CONTENT: CourseContent[] = [
       { q: 'Isso pode virar trabalho com a Tropical Bakery?', a: 'Pode. Quem se destaca pode ser chamado para eventos, produção ou parcerias. Veja também a página Trabalhe Conosco.' },
     ],
     enquiry: 'Capacitação Profissional para Cozinheiros',
+    // The weekly course, done as an intensive: its four modules in three full class days.
+    retreatClasses: 3,
     cta: 'Quero me matricular',
     gallery: ['/menu-items/20250823_121752.jpg', '/menu-items/Screenshot_20260623_080155_Gallery.jpg', '/menu-items/20250907_143728.jpg', '/menu-items/Screenshot_20260415_110305_Gallery.jpg'],
   },
@@ -153,6 +158,7 @@ export const COURSE_CONTENT: CourseContent[] = [
       { q: 'Posso fazer junto com um retiro?', a: 'Pode. Veja o formato Curso + Retiro abaixo.' },
     ],
     enquiry: 'Curso de Saúde e Bem-Estar',
+    retreatClasses: 2,
     cta: 'Começar minha jornada',
     gallery: ['/menu-items/20260620_163438.jpg', '/menu-items/Screenshot_20260518_122444_Gallery.jpg', '/menu-items/20250907_143728.jpg', '/menu-items/Screenshot_20260818_075043_Gallery.jpg'],
   },

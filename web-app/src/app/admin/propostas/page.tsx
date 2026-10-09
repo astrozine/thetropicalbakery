@@ -104,12 +104,21 @@ function Propostas() {
   useEffect(() => {
     const from = q.get('from') || '';
     const [source, id] = from.split(':');
-    if (!id || !['course_registrations', 'contact_leads'].includes(source)) return;
+    if (!id || !['course_registrations', 'contact_leads', 'retreat_bookings'].includes(source)) return;
     (async () => {
       const { data } = await supabase.from(source).select('*').eq('id', id).maybeSingle();
       if (!data) return;
       setLead({ source, id });
-      if (source === 'course_registrations') {
+      if (source === 'retreat_bookings') {
+        // A retreat reserved in /admin/retreats/reservas: the stay, the people and the dates are already decided.
+        setName(data.guest_name || '');
+        setWhatsapp(data.whatsapp || '');
+        setEmail(data.email || '');
+        switchKind('retiro');
+        setRoomId(data.room_id);
+        setGuests(Number(data.guests) || 2);
+        setNights(Math.round((Date.parse(data.check_out) - Date.parse(data.check_in)) / 86400000) || 3);
+      } else if (source === 'course_registrations') {
         setName(data.customer_name || '');
         setWhatsapp(data.customer_whatsapp || '');
         setEmail(data.email || '');
