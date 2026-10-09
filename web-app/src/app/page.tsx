@@ -71,7 +71,8 @@ export default async function Home() {
   const liveBoxes: HeroBox[] = openBoxes.map(b => ({
     id: b.id, title: b.title, image: b.image_url || '',
     kicker: `${editionIcon(b)} ${editionLabel(b)}`,
-    meta: [priceOf(b), left(b) != null ? `restam ${left(b)}` : '', isSpecial(b) || isPresale(b) ? deliveryWindowLabel(b) : ''].filter(Boolean).join(' · '),
+    price: priceOf(b),
+    sub: [left(b) != null ? `restam ${left(b)}` : '', isSpecial(b) || isPresale(b) ? deliveryWindowLabel(b) && `entregas ${deliveryWindowLabel(b)}` : ''].filter(Boolean).join(' · '),
   }));
 
   const getContent = (sectionId: string, fallbackUrl: string) => {

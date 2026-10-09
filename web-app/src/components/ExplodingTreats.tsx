@@ -245,7 +245,8 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
             border: '1px solid rgba(212,175,55,0.4)',
             borderRadius: '22px',
             padding: '2rem 2.5rem',
-            maxWidth: '480px',
+            // Wider when two boxes sit side by side, so their photos are big enough to want.
+            maxWidth: liveBoxes.length > 1 ? '600px' : '480px',
             textAlign: 'center',
             boxShadow: '0 25px 50px -12px rgba(60,42,33,0.3)',
             pointerEvents: 'auto',
