@@ -18,24 +18,21 @@ import { planBoxPrice } from '@/lib/boxSizes';
 import { useBoxSizePrices } from '@/lib/useBoxSizePrices';
 import { CARE_SHORT } from '@/lib/treatCare';
 
-/** The single-box price we compare plans against. */
-const BASE_BOX_PRICE = 99;
-
 const HOW_IT_WORKS = [
   {
-    step: '01',
-    title: 'Você escolhe seu ritmo',
-    body: 'Mensal, trimestral ou anual. Em todos, uma Caixa de Degustação chega toda semana.',
+    step: '1',
+    title: 'Escolha o tamanho e o plano',
+    body: 'Caixa de 2, 4 ou 6 doces. Mensal sem compromisso, ou trimestral e anual com desconto em cada caixa.',
   },
   {
-    step: '02',
-    title: 'A Dolly cria o menu da semana',
-    body: 'Nada de catálogo fixo. Cada caixa é uma criação nova, feita com o que está no melhor momento.',
+    step: '2',
+    title: 'Toda semana, uma caixa nova',
+    body: 'A Dolly cria um menu diferente a cada semana. Você nunca recebe a mesma caixa duas vezes.',
   },
   {
-    step: '03',
-    title: 'Sua caixa chega no dia de entrega',
-    body: 'Feita no dia, entregue fresca em Itamambuca e região. Os dias de entrega estão no calendário aí embaixo — você só abre e se serve.',
+    step: '3',
+    title: 'Chega sozinha na sua porta',
+    body: 'Fresquinha, no dia de entrega. Sem pedir de novo, sem lembrar. Vai viajar? É só pausar.',
   },
 ];
 
@@ -71,6 +68,10 @@ const WHY_SUBSCRIBE = [
 ];
 
 const FAQ = [
+  {
+    q: 'Qual a diferença para comprar uma caixa avulsa?',
+    a: 'É a mesma Caixa de Degustação, com um menu novo a cada semana. Na assinatura ela chega sozinha toda semana, sem você precisar pedir de novo, e cada caixa sai mais barata nos planos trimestral e anual. Ainda vem com prioridade nas edições limitadas e descontos em cursos e eventos.',
+  },
   {
     q: 'Como guardo os doces?',
     a: `${CARE_SHORT} Todos os cuidados em thetropicalbakery.com/cuidados.`,
@@ -129,6 +130,19 @@ export default function SubscriptionPage() {
   const scrollToSignup = () => {
     document.getElementById('reservar')?.scrollIntoView({ behavior: 'smooth' });
   };
+  const scrollToPlans = () => {
+    document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // The cheapest plan's price for the usual 4-treat box, against buying that box on its own.
+  const single = sizePrices[4];
+  const bestDeal = plans.length > 0
+    ? (() => {
+        const price = Math.min(...plans.map(p => sizePrice(p, 4)));
+        return { price, pct: single > 0 ? Math.round((1 - price / single) * 100) : 0 };
+      })()
+    : null;
+  const pctOff = (plan: SubscriptionPlan) => single > 0 ? Math.round((1 - sizePrice(plan, 4) / single) * 100) : 0;
 
   return (
     <main style={{ background: 'var(--color-background)' }}>
@@ -137,42 +151,60 @@ export default function SubscriptionPage() {
       <StripedBackground tone="dark" bandHeight={96} image="/textures/copacabana-baker.webp" imagePosition="35% 60%" style={{ paddingTop: 'clamp(4.5rem, 12vw, 10rem)', paddingBottom: 'clamp(2.25rem, 8vw, 7rem)' }}>
         <HighlightsHero>
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center' }}>
-          <img src="/logo-gold.webp" alt="" style={{ height: 'clamp(72px, 12vw, 104px)', margin: '0 auto 2rem', display: 'block' }} />
 
           <span style={{
             display: 'inline-block', border: '1px solid rgba(212,175,55,0.6)', color: '#d4af37',
             padding: '0.4rem 1.1rem', borderRadius: '30px', fontSize: '0.8rem',
             textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '1.75rem',
           }}>
-            Assinatura Semanal
+            Assinatura da Caixa de Degustação
           </span>
 
           <h1 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.95rem, 7vw, 4.6rem)',
             lineHeight: 1.05, color: '#fdfaf3', marginBottom: '1.5rem',
           }}>
-            Caixa de Degustação,<br />
-            <span style={{ color: '#d4af37' }}>toda semana</span>
+            Uma caixa de doces nova<br />
+            <span style={{ color: '#d4af37' }}>toda semana, mais barata</span>
           </h1>
 
           <p style={{
             fontSize: 'clamp(1rem, 2.4vw, 1.2rem)', color: 'rgba(253,250,243,0.86)',
-            lineHeight: 1.85, maxWidth: '620px', margin: '0 auto 2.5rem',
+            lineHeight: 1.75, maxWidth: '620px', margin: '0 auto 2rem',
           }}>
-            Uma criação nova a cada semana, feita à mão pela Dolly em Itamambuca.
-            Vegana, sem trigo — e sem nunca repetir a semana anterior.
+            Assine uma vez e a Caixa de Degustação da Dolly chega na sua porta <strong style={{ color: '#fdfaf3' }}>toda semana</strong>,
+            com doces diferentes a cada vez{bestDeal && bestDeal.pct > 0 ? <> e <strong style={{ color: '#d4af37' }}>até {bestDeal.pct}% mais barata</strong> que comprar avulsa</> : null}.
           </p>
 
-          <OriginSeal tone="dark" style={{ marginBottom: '2.25rem' }} />
-          <br />
+          {/* The whole offer in three chips, so nobody has to read a paragraph to get it. */}
+          <div className="tb-sub-facts" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.6rem', marginBottom: '2rem' }}>
+            {[
+              { k: 'Quando', v: '1 caixa por semana' },
+              { k: 'Preço', v: bestDeal ? `${formatBRL(bestDeal.price)} por caixa` : 'desconto por caixa', strike: bestDeal && bestDeal.pct > 0 ? formatBRL(sizePrices[4]) : null },
+              { k: 'Liberdade', v: 'pause quando viajar' },
+            ].map(f => (
+              <div key={f.k} style={{
+                background: 'rgba(253,250,243,0.08)', border: '1px solid rgba(212,175,55,0.45)',
+                borderRadius: '14px', padding: '0.6rem 1rem', textAlign: 'left', minWidth: 0,
+              }}>
+                <span style={{ display: 'block', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#d4af37' }}>{f.k}</span>
+                <span style={{ color: '#fdfaf3', fontWeight: 700, fontSize: '0.98rem' }}>
+                  {f.strike && <s style={{ opacity: 0.55, fontWeight: 400, marginRight: '0.35rem' }}>{f.strike}</s>}
+                  {f.v}
+                </span>
+              </div>
+            ))}
+          </div>
 
-          <button onClick={scrollToSignup} className="btn btn-secondary" style={{
+          <button onClick={scrollToPlans} className="btn btn-secondary" style={{
             background: '#d4af37', color: '#3c2a21', border: 'none', padding: '1.1rem 2.5rem',
             borderRadius: '10px', fontWeight: 700, fontSize: '1.05rem', cursor: 'pointer',
             letterSpacing: '0.02em',
           }}>
-            Ver os planos
+            Ver planos e preços
           </button>
+
+          <OriginSeal tone="dark" style={{ marginTop: '2rem' }} />
 
           <p style={{ fontSize: '0.8rem', color: 'rgba(253,250,243,0.6)', marginTop: '1.5rem' }}>
             Vagas limitadas — tudo é feito em uma cozinha, por uma pessoa.
@@ -187,31 +219,252 @@ export default function SubscriptionPage() {
           <ScrollReveal>
             <h2 style={{
               fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
-              color: 'var(--color-primary)', textAlign: 'center', marginBottom: '3.5rem',
+              color: 'var(--color-primary)', textAlign: 'center', marginBottom: '0.6rem',
             }}>
-              Como funciona
+              Como funciona a assinatura
             </h2>
+            <p style={{ textAlign: 'center', color: '#7a6a61', marginBottom: '2.5rem' }}>
+              É a mesma Caixa de Degustação da loja. A diferença: chega toda semana, e custa menos.
+            </p>
           </ScrollReveal>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2.5rem' }}>
+          {/* Single box vs subscription, side by side: the one comparison that explains the page. */}
+          <ScrollReveal>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1rem', maxWidth: '820px', margin: '0 auto 3.5rem' }}>
+              <div style={{ background: '#fff', border: '1px solid #e8e1d7', borderRadius: '18px', padding: '1.4rem 1.5rem' }}>
+                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#7a6a61', marginBottom: '0.4rem' }}>Caixa avulsa</p>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: 'var(--color-primary)', lineHeight: 1.1, marginBottom: '0.75rem' }}>
+                  {formatBRL(single)} <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: '#7a6a61' }}>por caixa</span>
+                </p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#594a42', lineHeight: 1.7, fontSize: '0.93rem' }}>
+                  <li>· Uma caixa, uma vez</li>
+                  <li>· Você pede de novo quando lembrar</li>
+                  <li>· Preço cheio</li>
+                </ul>
+              </div>
+              <div style={{ background: 'var(--color-primary)', border: '2px solid #d4af37', borderRadius: '18px', padding: '1.4rem 1.5rem', position: 'relative', boxShadow: '0 18px 40px rgba(212,175,55,0.22)' }}>
+                {bestDeal && bestDeal.pct > 0 && (
+                  <span style={{ position: 'absolute', top: '-0.8rem', right: '1rem', background: '#d4af37', color: '#3c2a21', fontWeight: 800, fontSize: '0.78rem', padding: '0.3rem 0.75rem', borderRadius: '20px', letterSpacing: '0.04em' }}>
+                    ATÉ {bestDeal.pct}% OFF
+                  </span>
+                )}
+                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#d4af37', marginBottom: '0.4rem' }}>Assinatura</p>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#fdfaf3', lineHeight: 1.1, marginBottom: '0.75rem' }}>
+                  {bestDeal && bestDeal.pct > 0 && <span style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: '0.85rem', color: 'rgba(253,250,243,0.7)' }}>a partir de</span>}
+                  {formatBRL(bestDeal?.price ?? single)} <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: 'rgba(253,250,243,0.7)' }}>por caixa</span>
+                </p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'rgba(253,250,243,0.9)', lineHeight: 1.7, fontSize: '0.93rem' }}>
+                  <li><span style={{ color: '#d4af37' }}>✓</span> Uma caixa nova <strong>toda semana</strong></li>
+                  <li><span style={{ color: '#d4af37' }}>✓</span> Chega sozinha, sem pedir de novo</li>
+                  <li><span style={{ color: '#d4af37' }}>✓</span> Desconto em cada caixa + mimos de assinante</li>
+                </ul>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2rem' }}>
             {HOW_IT_WORKS.map(s => (
               <ScrollReveal key={s.step}>
-                <div>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                   <div style={{
-                    fontFamily: 'var(--font-heading)', fontSize: '2.6rem', color: '#d4af37',
-                    lineHeight: 1, marginBottom: '1rem',
+                    fontFamily: 'var(--font-heading)', fontSize: '1.4rem', color: '#3c2a21', background: '#d4af37',
+                    width: '2.6rem', height: '2.6rem', borderRadius: '50%', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {s.step}
                   </div>
-                  <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary)', fontWeight: 700, marginBottom: '0.6rem' }}>
-                    {s.title}
-                  </h3>
-                  <p style={{ color: '#594a42', lineHeight: 1.8 }}>{s.body}</p>
+                  <div>
+                    <h3 style={{ fontSize: '1.1rem', color: 'var(--color-primary)', fontWeight: 700, marginBottom: '0.4rem' }}>
+                      {s.title}
+                    </h3>
+                    <p style={{ color: '#594a42', lineHeight: 1.7, margin: 0 }}>{s.body}</p>
+                  </div>
                 </div>
               </ScrollReveal>
             ))}
           </div>
         </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- PLANS */}
+      <section id="planos" style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 0' }}>
+        <div style={{ maxWidth: '1150px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <h2 style={{
+            fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
+            color: 'var(--color-primary)', textAlign: 'center', marginBottom: '0.75rem',
+          }}>
+            Quanto mais tempo, mais barato
+          </h2>
+          <p style={{ textAlign: 'center', color: '#7a6a61', marginBottom: '2.5rem', fontSize: '1rem', maxWidth: '620px', marginLeft: 'auto', marginRight: 'auto' }}>
+            Todo plano é <strong>1 caixa por semana</strong> (4 por mês). O que muda é por quanto tempo você fica,
+            e quanto paga por caixa.
+          </p>
+        </div>
+
+        {loading ? (
+          <p style={{ textAlign: 'center', color: '#7a6a61' }}>Carregando planos...</p>
+        ) : plans.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#7a6a61', padding: '0 1.5rem' }}>
+            Os planos estarão disponíveis em instantes. Fale com a gente no{' '}
+            <WhatsAppGate href="https://wa.me/5511932119196" topic="Assinatura: planos" tags={['assinatura']} style={{ color: 'var(--color-secondary)', fontWeight: 600, textDecoration: 'underline' }}>WhatsApp</WhatsAppGate>.
+          </p>
+        ) : (
+          <div className="tb-plan-rail-wrap" style={{ position: 'relative' }}>
+            {/* Right-edge fade gradient — the most friction-free swipe cue.
+                On wide screens the cards sit in a normal row; this overlay is
+                invisible when no overflow exists. */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute', right: 0, top: 0, bottom: 0, width: '5rem',
+                background: 'linear-gradient(to left, var(--color-background) 10%, transparent)',
+                zIndex: 2, pointerEvents: 'none',
+              }}
+            />
+            <div
+              className="tb-plan-rail"
+              style={{
+                display: 'flex',
+                gap: '1.75rem',
+                overflowX: 'auto',
+                scrollSnapType: 'x mandatory',
+                // Without this, snapping puts each card flush against the screen edge and ignores the padding.
+                scrollPaddingLeft: '1.5rem',
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                padding: '1.5rem 1.5rem 2rem',
+                paddingRight: 'calc(1.5rem + 2rem)',
+              }}
+            >
+              {[...plans].sort((a, b) => pctOff(b) - pctOff(a)).map(plan => {
+                const featured = Boolean(plan.badge);
+                const savings = monthlySavings(plan, single, 1);
+                const isSelected = plan.id === selectedPlanId;
+                const off = pctOff(plan);
+
+                return (
+                  <div
+                    key={plan.id}
+                    onClick={() => setSelectedPlanId(plan.id)}
+                    style={{
+                      background: featured ? 'var(--color-primary)' : '#fff',
+                      color: featured ? '#fdfaf3' : 'var(--color-text)',
+                      border: '2px solid',
+                      borderColor: isSelected ? '#d4af37' : featured ? 'var(--color-primary)' : '#e8e1d7',
+                      borderRadius: '20px',
+                      padding: '2rem 1.5rem',
+                      paddingTop: plan.badge ? '3.1rem' : '2rem',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      minWidth: 0,
+                      transform: featured ? 'scale(1.02)' : 'none',
+                      boxShadow: isSelected ? '0 18px 40px rgba(212,175,55,0.28)' : '0 8px 24px rgba(60,42,33,0.07)',
+                      transition: 'box-shadow 0.25s, border-color 0.25s',
+                      scrollSnapAlign: 'start',
+                      flex: '0 0 min(300px, 82vw)',
+                    }}
+                  >
+                    {plan.badge && (
+                      <span style={{
+                        // A tab hanging from the top edge: inside the card, so overflow:hidden never clips it.
+                        position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                        background: '#d4af37', color: '#3c2a21', padding: '0.35rem 1.1rem 0.4rem',
+                        borderRadius: '0 0 12px 12px', fontSize: '0.75rem', fontWeight: 800,
+                        textTransform: 'uppercase', letterSpacing: '0.12em', whiteSpace: 'nowrap',
+                      }}>
+                        {plan.badge}
+                      </span>
+                    )}
+
+                    <h3 style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 'clamp(1.4rem, 5vw, 1.9rem)',
+                      color: featured ? '#d4af37' : 'var(--color-primary)',
+                      marginBottom: '0.4rem',
+                      wordBreak: 'break-word',
+                      overflowWrap: 'anywhere',
+                    }}>
+                      {plan.name}
+                    </h3>
+                    <p style={{
+                      fontSize: '0.88rem', lineHeight: 1.6, minHeight: '2.6rem',
+                      color: featured ? 'rgba(253,250,243,0.75)' : '#7a6a61', marginBottom: '1.5rem',
+                    }}>
+                      {plan.tagline}
+                    </p>
+
+                    {/* The price people compare is per box (vs the single box), so that leads; the
+                        monthly total sits under it. Menu-style: small "R$", big whole number. */}
+                    {off > 0 ? (
+                      <p style={{ fontSize: '0.85rem', marginBottom: '0.3rem' }}>
+                        <s style={{ opacity: 0.6 }}>{formatBRL(single)}</s>{' '}
+                        <span style={{
+                          background: '#d4af37', color: '#3c2a21', fontWeight: 800, fontSize: '0.75rem',
+                          padding: '0.15rem 0.5rem', borderRadius: '6px', marginLeft: '0.25rem',
+                        }}>-{off}%</span>
+                      </p>
+                    ) : (
+                      <p style={{ fontSize: '0.85rem', marginBottom: '0.3rem', opacity: 0.75 }}>Preço da caixa avulsa</p>
+                    )}
+                    <div style={{ marginBottom: '0.35rem', display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.15rem', fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
+                      <span style={{ fontSize: '1rem', marginTop: '0.35rem', opacity: 0.8 }}>R$</span>
+                      <span style={{ fontSize: 'clamp(2.4rem, 7vw, 3rem)' }}>
+                        {Math.round(sizePrice(plan, 4)).toLocaleString('pt-BR')}
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.95rem', opacity: 0.7, alignSelf: 'flex-end', marginLeft: '0.3rem' }}>por caixa</span>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', opacity: 0.8, marginBottom: savings > 0 ? '0.6rem' : '1.75rem', lineHeight: 1.6 }}>
+                      <strong>1 caixa por semana</strong> (4 doces) = {formatBRL(plan.monthly_price)}/mês
+                      <span style={{ display: 'block' }}>
+                        {plan.commitment_months > 1 ? `Plano de ${plan.commitment_months} meses` : 'Sem compromisso, cancele quando quiser'}
+                      </span>
+                      <span style={{ display: 'block', marginTop: '0.2rem', opacity: 0.85 }}>
+                        Caixa de 2 doces: {formatBRL(sizePrice(plan, 2))} · de 6: {formatBRL(sizePrice(plan, 6))}
+                      </span>
+                    </p>
+                    {savings > 0 && (
+                      <p style={{
+                        display: 'inline-block', background: featured ? 'rgba(212,175,55,0.2)' : 'rgba(46,68,50,0.09)',
+                        color: featured ? '#d4af37' : '#2e4432', padding: '0.3rem 0.8rem', borderRadius: '20px',
+                        fontSize: '0.78rem', fontWeight: 700, marginBottom: '1.75rem',
+                      }}>
+                        Você economiza {formatBRL(savings)} por mês
+                      </p>
+                    )}
+
+                    <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.75rem 0' }}>
+                      {plan.perks.map(perk => (
+                        <li key={perk} style={{
+                          display: 'flex', gap: '0.6rem', alignItems: 'flex-start',
+                          fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '0.7rem',
+                          color: featured ? 'rgba(253,250,243,0.9)' : '#594a42',
+                        }}>
+                          <span style={{ color: '#d4af37', flexShrink: 0 }}>✓</span>
+                          <span>{perk}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); setSelectedPlanId(plan.id); scrollToSignup(); }}
+                      style={{
+                        width: '100%', padding: '0.95rem', borderRadius: '10px', cursor: 'pointer',
+                        fontWeight: 700, fontSize: '0.95rem', border: 'none',
+                        // Filled foil with dark cocoa text on every card — an
+                        // outlined variant here was too faint to read.
+                        background: '#d4af37', color: '#3c2a21',
+                      }}
+                    >
+                      Escolher {plan.name}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ---------------------------------------------------- DELIVERY CALENDAR */}
@@ -268,175 +521,6 @@ export default function SubscriptionPage() {
           </div>
         </div>
       </StripedBackground>
-
-      {/* ---------------------------------------------------------------- PLANS */}
-      <section id="planos" style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 0' }}>
-        <div style={{ maxWidth: '1150px', margin: '0 auto', padding: '0 1.5rem' }}>
-          <h2 style={{
-            fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
-            color: 'var(--color-primary)', textAlign: 'center', marginBottom: '0.75rem',
-          }}>
-            Escolha seu ritmo
-          </h2>
-          <p style={{ textAlign: 'center', color: '#7a6a61', marginBottom: '3.5rem', fontSize: '1rem' }}>
-            Todos os planos entregam uma caixa por semana. Quanto maior o compromisso, menor o valor por caixa.
-          </p>
-        </div>
-
-        {loading ? (
-          <p style={{ textAlign: 'center', color: '#7a6a61' }}>Carregando planos...</p>
-        ) : plans.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#7a6a61', padding: '0 1.5rem' }}>
-            Os planos estarão disponíveis em instantes. Fale com a gente no{' '}
-            <WhatsAppGate href="https://wa.me/5511932119196" topic="Assinatura: planos" tags={['assinatura']} style={{ color: 'var(--color-secondary)', fontWeight: 600, textDecoration: 'underline' }}>WhatsApp</WhatsAppGate>.
-          </p>
-        ) : (
-          <div className="tb-plan-rail-wrap" style={{ position: 'relative' }}>
-            {/* Right-edge fade gradient — the most friction-free swipe cue.
-                On wide screens the cards sit in a normal row; this overlay is
-                invisible when no overflow exists. */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute', right: 0, top: 0, bottom: 0, width: '5rem',
-                background: 'linear-gradient(to left, var(--color-background) 10%, transparent)',
-                zIndex: 2, pointerEvents: 'none',
-              }}
-            />
-            <div
-              className="tb-plan-rail"
-              style={{
-                display: 'flex',
-                gap: '1.75rem',
-                overflowX: 'auto',
-                scrollSnapType: 'x mandatory',
-                // Without this, snapping puts each card flush against the screen edge and ignores the padding.
-                scrollPaddingLeft: '1.5rem',
-                WebkitOverflowScrolling: 'touch',
-                scrollbarWidth: 'none',
-                padding: '1.5rem 1.5rem 2rem',
-                paddingRight: 'calc(1.5rem + 2rem)',
-              }}
-            >
-              {plans.map(plan => {
-                const featured = Boolean(plan.badge);
-                const savings = monthlySavings(plan, BASE_BOX_PRICE, 1);
-                const isSelected = plan.id === selectedPlanId;
-
-                return (
-                  <div
-                    key={plan.id}
-                    onClick={() => setSelectedPlanId(plan.id)}
-                    style={{
-                      background: featured ? 'var(--color-primary)' : '#fff',
-                      color: featured ? '#fdfaf3' : 'var(--color-text)',
-                      border: '2px solid',
-                      borderColor: isSelected ? '#d4af37' : featured ? 'var(--color-primary)' : '#e8e1d7',
-                      borderRadius: '20px',
-                      padding: '2rem 1.5rem',
-                      paddingTop: plan.badge ? '3.1rem' : '2rem',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      minWidth: 0,
-                      transform: featured ? 'scale(1.02)' : 'none',
-                      boxShadow: isSelected ? '0 18px 40px rgba(212,175,55,0.28)' : '0 8px 24px rgba(60,42,33,0.07)',
-                      transition: 'box-shadow 0.25s, border-color 0.25s',
-                      scrollSnapAlign: 'start',
-                      flex: '0 0 min(300px, 82vw)',
-                    }}
-                  >
-                    {plan.badge && (
-                      <span style={{
-                        // A tab hanging from the top edge: inside the card, so overflow:hidden never clips it.
-                        position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
-                        background: '#d4af37', color: '#3c2a21', padding: '0.35rem 1.1rem 0.4rem',
-                        borderRadius: '0 0 12px 12px', fontSize: '0.75rem', fontWeight: 800,
-                        textTransform: 'uppercase', letterSpacing: '0.12em', whiteSpace: 'nowrap',
-                      }}>
-                        {plan.badge}
-                      </span>
-                    )}
-
-                    <h3 style={{
-                      fontFamily: 'var(--font-heading)',
-                      fontSize: 'clamp(1.4rem, 5vw, 1.9rem)',
-                      color: featured ? '#d4af37' : 'var(--color-primary)',
-                      marginBottom: '0.4rem',
-                      wordBreak: 'break-word',
-                      overflowWrap: 'anywhere',
-                    }}>
-                      {plan.name}
-                    </h3>
-                    <p style={{
-                      fontSize: '0.88rem', lineHeight: 1.6, minHeight: '2.6rem',
-                      color: featured ? 'rgba(253,250,243,0.75)' : '#7a6a61', marginBottom: '1.5rem',
-                    }}>
-                      {plan.tagline}
-                    </p>
-
-                    {/* Menu-style price: small "R$", big whole number, small cents. The full
-                        "R$ 396,00" in the heading font was wider than the card and got clipped. */}
-                    <div style={{ marginBottom: '0.35rem', display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.15rem', fontFamily: 'var(--font-heading)', lineHeight: 1 }}>
-                      <span style={{ fontSize: '1rem', marginTop: '0.35rem', opacity: 0.8 }}>R$</span>
-                      <span style={{ fontSize: 'clamp(2.4rem, 7vw, 3rem)' }}>
-                        {Math.floor(plan.monthly_price).toLocaleString('pt-BR')}
-                      </span>
-                      <span style={{ fontSize: '1rem', marginTop: '0.35rem' }}>
-                        ,{String(Math.round((plan.monthly_price % 1) * 100)).padStart(2, '0')}
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.95rem', opacity: 0.7, alignSelf: 'flex-end', marginLeft: '0.3rem' }}>/mês</span>
-                    </div>
-                    <p style={{ fontSize: '0.85rem', opacity: 0.75, marginBottom: savings > 0 ? '0.6rem' : '1.75rem' }}>
-                      {formatBRL(plan.price_per_box)} por caixa de 4 doces
-                      {plan.commitment_months > 1 && ` · ${plan.commitment_months} meses`}
-                      <span style={{ display: 'block', marginTop: '0.2rem' }}>
-                        ou 2 doces por {formatBRL(sizePrice(plan, 2))} · 6 por {formatBRL(sizePrice(plan, 6))}
-                      </span>
-                    </p>
-                    {savings > 0 && (
-                      <p style={{
-                        display: 'inline-block', background: featured ? 'rgba(212,175,55,0.2)' : 'rgba(46,68,50,0.09)',
-                        color: featured ? '#d4af37' : '#2e4432', padding: '0.3rem 0.8rem', borderRadius: '20px',
-                        fontSize: '0.78rem', fontWeight: 700, marginBottom: '1.75rem',
-                      }}>
-                        Economize {formatBRL(savings)}/mês
-                      </p>
-                    )}
-
-                    <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.75rem 0' }}>
-                      {plan.perks.map(perk => (
-                        <li key={perk} style={{
-                          display: 'flex', gap: '0.6rem', alignItems: 'flex-start',
-                          fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '0.7rem',
-                          color: featured ? 'rgba(253,250,243,0.9)' : '#594a42',
-                        }}>
-                          <span style={{ color: '#d4af37', flexShrink: 0 }}>✓</span>
-                          <span>{perk}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <button
-                      type="button"
-                      onClick={e => { e.stopPropagation(); setSelectedPlanId(plan.id); scrollToSignup(); }}
-                      style={{
-                        width: '100%', padding: '0.95rem', borderRadius: '10px', cursor: 'pointer',
-                        fontWeight: 700, fontSize: '0.95rem', border: 'none',
-                        // Filled foil with dark cocoa text on every card — an
-                        // outlined variant here was too faint to read.
-                        background: '#d4af37', color: '#3c2a21',
-                      }}
-                    >
-                      Escolher {plan.name}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </section>
 
       {/* ------------------------------------------------------ WHY SUBSCRIBE */}
       <StripedBackground tone="dark" bandHeight={80} style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 1.5rem' }}>
@@ -551,11 +635,11 @@ export default function SubscriptionPage() {
       </StripedBackground>
 
           {/* Phones only: the plans were five screens down, so the price rides along instead. */}
-      {plans.length > 0 && (
+      {bestDeal && (
         <MobileBuyBar
-          kicker="Assinatura · a partir de"
-          price={formatBRL(Math.min(...plans.map(p => sizePrice(p, 2))))}
-          note="por caixa"
+          kicker="1 caixa por semana · a partir de"
+          price={formatBRL(bestDeal.price)}
+          note={bestDeal.pct > 0 ? `por caixa · ${bestDeal.pct}% off` : 'por caixa'}
           label="Ver planos"
           targetId="#planos"
         />
