@@ -221,8 +221,17 @@ export default function Navigation() {
           <img src="/logo-gold.webp" alt="The Tropical Bakery Logo" style={{ height: '62px', width: 'auto', maxWidth: '100%', objectFit: 'contain' }} />
         </Link>
 
-        {/* Desktop Menu & Cart */}
-        <div className="hidden xl:flex items-center" style={{ alignItems: 'center' }}>
+        {/* Desktop: logo | the menu, centred on the page | account and cart. */}
+        <style>{`
+          @media (min-width: 1280px) {
+            .nav-inner { display: grid !important; grid-template-columns: 1fr auto 1fr; column-gap: 1rem; }
+            .nav-inner > .logo-pill { justify-self: start; }
+            .nav-desk { display: contents !important; }
+            .nav-desk > .nav-links > :first-child { margin-left: 0 !important; }
+          }
+        `}</style>
+        <div className="hidden xl:flex items-center nav-desk" style={{ alignItems: 'center' }}>
+          <div className="nav-links" style={{ display: 'flex', alignItems: 'center', justifySelf: 'center' }}>
           {/* Caixa de Degustação / Eventos: open on hover, or on a click (tablets have no hover). */}
           {groups.map((group) => {
             const active = group.links.some(l => l.path === pathname);
@@ -447,7 +456,9 @@ export default function Navigation() {
               </div>
             )}
           </div>
+          </div>
 
+          <div className="nav-actions" style={{ display: 'flex', alignItems: 'center', justifySelf: 'end' }}>
           <InstagramLink size={20} style={{ marginLeft: GAP, color: '#594a42', minWidth: 32, minHeight: 32 }} />
 
           <AccountMenu />
@@ -463,6 +474,7 @@ export default function Navigation() {
               </span>
             )}
           </button>
+          </div>
         </div>
 
         {/* Mobile Menu Toggle & Cart */}

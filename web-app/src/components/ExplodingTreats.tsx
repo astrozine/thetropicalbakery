@@ -6,6 +6,9 @@ import Link from 'next/link';
 import BoxesLeftBadge from '@/components/BoxesLeftBadge';
 import HeroLiveBoxes, { type HeroBox } from '@/components/HeroLiveBoxes';
 
+/** Desktop-collage photos that are not in `treats` (keyed like treat ids, for the lightbox). */
+const EXTRA_PHOTOS: Record<string, string> = { left: '/box3.jpg', right: '/box1.jpg', seal: '/treats/media_1789712777199.jpg' };
+
 /** `liveBoxes`: every box that can be ordered now, listed in the hero card ("À venda agora"). */
 export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { boxesLeft?: number | null; liveBoxes?: HeroBox[] }) {
   const cta = liveBoxes.length > 1 ? 'Ver as caixas' : 'Garanta a Sua Caixa';
@@ -149,37 +152,78 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
     );
   }
 
-  // Desktop layout — unchanged spring animation
-  return (
-    <div className="relative flex items-center justify-center" style={{ width: '100%', padding: '2rem 0' }}>
-
-      {treats.map((treat) => {
-        const layout = treat.desktop;
-        return (
+  /**
+   * Desktop: one composed collage on each side, mirrored — a big photo of the box, a treat print tucked
+   * behind its top corner and another overlapping its bottom corner, all in white photo-print frames
+   * that drift slowly. Placed in their own columns so they never run into the card in the middle.
+   */
+  const collage = (side: 'left' | 'right') => {
+    const s = side === 'left' ? 1 : -1; // mirror rotations
+    const outer = side === 'left' ? 'left' : 'right';
+    const inner = side === 'left' ? 'right' : 'left';
+    // Right side: the kraft lid with the gold seal, not treats[3] (that is the same box as box1.jpg).
+    const [back, front] = side === 'left' ? [treats[0], treats[2]] : [treats[1], { id: 'seal', src: EXTRA_PHOTOS.seal }];
+    const prints: { id: string; src: string; pos: React.CSSProperties; rotate: number; z: number; aspect: string; float: number }[] = [
+      { id: back.id, src: back.src, pos: { top: '0%', [inner]: '0%', width: '42%' }, rotate: 9 * s, z: 0, aspect: '1', float: 7 },
+      { id: side, src: EXTRA_PHOTOS[side], pos: { top: '9%', [outer]: '4%', width: '70%' }, rotate: -4 * s, z: 1, aspect: '4/5', float: 9 },
+      { id: front.id, src: front.src, pos: { bottom: '0%', [inner]: '2%', width: '48%' }, rotate: 7 * s, z: 2, aspect: '1', float: 6 },
+    ];
+    return (
+      <div className="hero-collage" style={{ position: 'relative', width: 'min(100%, 440px)', aspectRatio: '4/5', justifySelf: side === 'left' ? 'end' : 'start' }}>
+        {prints.map((p, i) => (
           <motion.div
-            key={treat.id}
-            className="absolute z-0"
-            initial={{ opacity: 0, x: 0, y: 0, scale: 0, rotate: 0 }}
-            animate={{ opacity: 1, x: layout.x, y: layout.y, scale: layout.scale, rotate: treat.rotate }}
-            transition={{ type: 'spring', stiffness: 50, damping: 15, delay: parseInt(treat.id) * 0.1, duration: 1.5 }}
+            key={p.id}
+            style={{ position: 'absolute', zIndex: p.z, ...p.pos }}
+            initial={{ opacity: 0, x: 120 * s, scale: 0.85, rotate: 0 }}
+            animate={{ opacity: 1, x: 0, scale: 1, rotate: p.rotate }}
+            transition={{ type: 'spring', stiffness: 55, damping: 16, delay: 0.15 + i * 0.12 }}
           >
-            <motion.img
-              layoutId={`treat-${treat.id}`}
-              onClick={() => setSelectedId(treat.id)}
-              src={treat.src}
-              alt="Treat"
-              className="rounded-lg"
+            <motion.div
+              animate={{ y: [0, -9, 0] }}
+              transition={{ duration: p.float, repeat: Infinity, ease: 'easeInOut', delay: i * 0.8 }}
+              whileHover={{ scale: 1.04, rotate: -p.rotate / 2 }}
+              onClick={() => setSelectedId(p.id)}
               style={{
-                width: '200px',
-                objectFit: 'cover',
-                cursor: 'pointer',
-                boxShadow: '0 15px 35px -5px rgba(60,42,33,0.3), 0 5px 15px -5px rgba(60,42,33,0.2), 0 0 0 1px rgba(255,255,255,0.4)'
+                cursor: 'pointer', background: '#fffdf8', padding: '9px', borderRadius: '20px',
+                boxShadow: '0 30px 60px -18px rgba(60,42,33,0.45), 0 10px 22px -10px rgba(60,42,33,0.3), inset 0 0 0 1px rgba(212,175,55,0.25)',
               }}
-              whileHover={{ scale: 1.05 }}
-            />
+            >
+              <img src={p.src} alt="Caixa de Degustação The Tropical Bakery" style={{ display: 'block', width: '100%', aspectRatio: p.aspect, objectFit: 'cover', borderRadius: '13px' }} />
+            </motion.div>
           </motion.div>
-        );
-      })}
+        ))}
+        {side === 'right' && (
+          <motion.div
+            aria-hidden
+            initial={{ opacity: 0, scale: 0.6, rotate: -30 }}
+            animate={{ opacity: 1, scale: 1, rotate: -12 }}
+            transition={{ type: 'spring', stiffness: 80, damping: 12, delay: 0.7 }}
+            style={{
+              position: 'absolute', zIndex: 3, left: '-4%', bottom: '30%', width: 'clamp(76px, 5.5vw, 100px)', aspectRatio: '1', borderRadius: '50%',
+              background: 'radial-gradient(circle at 30% 25%, #f3dc8a, #d4af37 55%, #a6832b)',
+              boxShadow: '0 12px 26px -8px rgba(60,42,33,0.5), inset 0 0 0 3px rgba(253,250,243,0.55)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+              color: '#3c2a21', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.1, fontSize: 'clamp(0.5rem, 0.42vw, 0.64rem)', letterSpacing: '0.08em',
+            }}
+          >
+            <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>🌴</span>
+            Feito à mão<br />em Itamambuca
+          </motion.div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="hero-grid" style={{ width: '100%', maxWidth: '1560px', margin: '0 auto', padding: '2rem clamp(1rem, 3vw, 3rem)', display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto minmax(0,1fr)', alignItems: 'center', gap: 'clamp(1.5rem, 4vw, 4.5rem)' }}>
+      <style>{`
+        @media (max-width: 1279px) {
+          .hero-grid { grid-template-columns: 1fr !important; justify-items: center; }
+          .hero-collage { display: none; }
+        }
+      `}</style>
+
+      {collage('left')}
 
       {/* Main Content (Logo + CTA) */}
       <div className="relative z-10 flex flex-col items-center pointer-events-none">
@@ -227,6 +271,8 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
         </motion.div>
       </div>
 
+      {collage('right')}
+
       {/* Lightbox Modal */}
       <AnimatePresence>
         {selectedId && (
@@ -240,8 +286,7 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
             <div className="absolute inset-0 z-[-1]" onClick={() => setSelectedId(null)} style={{ backdropFilter: 'blur(25px)' }} />
             <button onClick={() => setSelectedId(null)} className="absolute top-8 right-8 text-white text-4xl" style={{ background: 'none', border: 'none', cursor: 'pointer', mixBlendMode: 'difference', zIndex: 100000 }}>✕</button>
             <motion.img
-              layoutId={`treat-${selectedId}`}
-              src={treats.find(t => t.id === selectedId)?.src}
+              src={EXTRA_PHOTOS[selectedId] ?? treats.find(t => t.id === selectedId)?.src}
               alt="Treat Detail"
               className="rounded-lg relative z-10"
               style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', boxShadow: '0 30px 60px -15px rgba(0,0,0,0.5)' }}
