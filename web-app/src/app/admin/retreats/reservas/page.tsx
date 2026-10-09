@@ -435,7 +435,7 @@ export default function RetreatReservations() {
               items: [
                 <>O site só oferece noites livres, e cada retiro salvo bloqueia o Airbnb sozinho</>,
                 <>O Airbnb relê a cada ~2 horas. Repita para cada um dos 4 quartos</>,
-                <>No Booking.com: <i>Tarifas e disponibilidade → Sincronizar calendários</i></>,
+                <><b>Booking.com e VRBO também:</b> o link de cada um vai numa linha nova da caixa preta, e o nosso link vai em “importar calendário” lá</>,
               ],
             },
           ].map((step, i) => (

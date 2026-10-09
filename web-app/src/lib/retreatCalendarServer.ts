@@ -12,8 +12,10 @@ const HORIZON_DAYS = 540;
 
 /**
  * The nights an .ics file marks as taken. An event 10 -> 13 takes the nights 10, 11 and 12.
- * `reserved` = a guest ("Reserved" on Airbnb); `blocked` = everything else ("Airbnb (Not available)", Booking's
- * "CLOSED"): days closed by hand or by a linked listing. The difference matters for A Casa Toda (see effectiveBusy).
+ * `blocked` = Airbnb's "Airbnb (Not available)": days closed by hand, or by a linked listing (Airbnb closes A Casa
+ * Toda whenever one suite is booked). Everything else counts as `reserved`: Airbnb's "Reserved", and whatever
+ * Booking.com ("CLOSED - Not available") and VRBO send, since their feeds don't say whether it is a guest. Better to
+ * close a suite for a block on the house than to sell it under a whole-house guest (see effectiveBusy).
  */
 export function parseIcsNights(ics: string): { reserved: string[]; blocked: string[] } {
   const lines = ics.replace(/\r?\n[ \t]/g, '').split(/\r?\n/); // unfold continued lines
@@ -33,7 +35,7 @@ export function parseIcsNights(ics: string): { reserved: string[]; blocked: stri
       inEvent = false;
       if (!start) continue;
       const stop = end && end > start ? end : addDays(start, 1);
-      const into = /reserv/i.test(summary) ? reserved : blocked;
+      const into = /airbnb\s*\(not available\)/i.test(summary) ? blocked : reserved;
       for (let d = start < from ? from : start; d < stop && d <= to; d = addDays(d, 1)) into.add(d);
     }
   }
