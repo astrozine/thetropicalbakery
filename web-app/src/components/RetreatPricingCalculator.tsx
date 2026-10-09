@@ -63,7 +63,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
   const [immersionFee, setImmersionFee] = useState(IMMERSION_FEE_PER_GUEST_PER_NIGHT);
   const [depositPct, setDepositPct] = useState(DEPOSIT_PERCENT);
   const [coursePrice, setCoursePrice] = useState<Record<string, number>>(FALLBACK_COURSE_PRICE);
-  const [busyData, setBusyData] = useState<{ ical: NightsByRoom; booked: NightsByRoom; connected: boolean } | null>(null);
+  const [busyData, setBusyData] = useState<{ ical: NightsByRoom; blocked?: NightsByRoom; booked: NightsByRoom; connected: boolean } | null>(null);
   const [arrival, setArrival] = useState<string | null>(null);
   const [monthOffset, setMonthOffset] = useState(0);
   const [showPlan, setShowPlan] = useState(false);
@@ -111,7 +111,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
   const room = rooms.find(r => r.id === roomId) || rooms[0];
   const cappedGuests = Math.min(guests, room.max_guests);
   const busy = useMemo(
-    () => (busyData ? effectiveBusy(rooms.map(r => r.id), busyData.ical, busyData.booked) : null),
+    () => (busyData ? effectiveBusy(rooms.map(r => r.id), busyData.ical, busyData.booked, busyData.blocked) : null),
     [busyData, rooms],
   );
   const roomBusy = busy?.[room.id];

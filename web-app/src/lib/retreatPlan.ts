@@ -95,13 +95,23 @@ export const HOUSE_ID = 'house';
 
 export type NightsByRoom = Record<string, string[]>;
 
-/** Nights a room cannot be sold, from Airbnb/Booking (ical) and our own retreat reservations (booked). */
-export function effectiveBusy(roomIds: string[], ical: NightsByRoom, booked: NightsByRoom): Record<string, Set<string>> {
-  const own = (id: string) => [...(ical[id] ?? []), ...(booked[id] ?? [])];
+/**
+ * Nights a room cannot be sold.
+ *   ical    = a guest's reservation on Airbnb ("Reserved")
+ *   blocked = the platform's "Not available" days (closed by hand, or blocked by a linked listing)
+ *   booked  = our own retreat reservations
+ *
+ * Any suite taken means the whole house can't be sold. The other way round, only a REAL booking of the house blocks
+ * the suites: Airbnb marks A Casa Toda "Not available" whenever one suite is booked, and passing that back to the
+ * suites would make one kitnet guest close the whole building.
+ */
+export function effectiveBusy(roomIds: string[], ical: NightsByRoom, booked: NightsByRoom, blocked: NightsByRoom = {}): Record<string, Set<string>> {
+  const own = (id: string) => [...(ical[id] ?? []), ...(blocked[id] ?? []), ...(booked[id] ?? [])];
+  const houseSold = [...(ical[HOUSE_ID] ?? []), ...(booked[HOUSE_ID] ?? [])];
   const suites = roomIds.filter(id => id !== HOUSE_ID);
   const out: Record<string, Set<string>> = {};
   for (const id of roomIds) {
-    out[id] = new Set(id === HOUSE_ID ? [...own(HOUSE_ID), ...suites.flatMap(own)] : [...own(id), ...own(HOUSE_ID)]);
+    out[id] = new Set(id === HOUSE_ID ? [...own(HOUSE_ID), ...suites.flatMap(own)] : [...own(id), ...houseSold]);
   }
   return out;
 }

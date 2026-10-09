@@ -44,7 +44,16 @@ const ROOM_STYLE: Record<string, { color: string; emoji: string; airbnb: string;
   small_suite: { color: '#d9822b', emoji: '🌴', airbnb: 'Practical Surf & Beach Kitnet', airbnbId: '873138853997998343' },
 };
 const roomStyle = (id: string) => ROOM_STYLE[id] ?? { color: '#7f8c8d', emoji: '🛏️', airbnb: '', airbnbId: '' };
-const COLORS = { airbnb: '#b0b7bf', linked: '#dfe3e7', reservado: '#f1c84b', confirmado: '#3f8f5a' };
+const COLORS = { free: '#dff3e5', guest: '#5f6b78', closed: '#b9c0c8', linked: 'repeating-linear-gradient(135deg, #d5dade 0 4px, #f1f3f5 4px 8px)', reservado: '#f1c84b', confirmado: '#3f8f5a' };
+type CellKind = keyof typeof COLORS;
+const LEGEND: { kind: CellKind; title: string; text: string }[] = [
+  { kind: 'free', title: 'Livre', text: 'dá para vender um retiro: toque no dia' },
+  { kind: 'guest', title: 'Hóspede do Airbnb / Booking', text: 'alguém já reservou esse quarto' },
+  { kind: 'closed', title: 'Fechado', text: 'dia bloqueado no Airbnb' },
+  { kind: 'linked', title: 'Preso a outro quarto', text: 'a casa toda está alugada, ou (na linha da casa) uma suíte está ocupada' },
+  { kind: 'reservado', title: 'Retiro reservado', text: 'ainda sem sinal' },
+  { kind: 'confirmado', title: 'Retiro com sinal pago', text: 'confirmado' },
+];
 const br = (iso: string) => `${iso.slice(8)}/${iso.slice(5, 7)}`;
 const waNumber = (v: string | null) => { const d = (v || '').replace(/\D/g, ''); return d ? (d.length <= 11 ? `55${d}` : d) : ''; };
 
@@ -54,7 +63,7 @@ export default function RetreatReservations() {
   const [rooms, setRooms] = useState<RetreatRoom[]>([]);
   const [cal, setCal] = useState<CalRow[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [busyData, setBusyData] = useState<{ ical: NightsByRoom; booked: NightsByRoom } | null>(null);
+  const [busyData, setBusyData] = useState<{ ical: NightsByRoom; blocked?: NightsByRoom; booked: NightsByRoom } | null>(null);
   const [missing, setMissing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [monthOffset, setMonthOffset] = useState(0);
@@ -96,17 +105,24 @@ export default function RetreatReservations() {
     getSiteSetting('retreat_immersion_fee_per_guest_per_night', IMMERSION_FEE_PER_GUEST_PER_NIGHT).then(setFee);
   }, [load]);
 
-  const busy = useMemo(() => (busyData ? effectiveBusy(rooms.map(r => r.id), busyData.ical, busyData.booked) : {}), [busyData, rooms]);
+  const busy = useMemo(() => (busyData ? effectiveBusy(rooms.map(r => r.id), busyData.ical, busyData.booked, busyData.blocked) : {}), [busyData, rooms]);
 
-  /** What one day of one room is, for the grid. */
-  const cellOf = (roomId: string, d: string): { kind: keyof typeof COLORS | 'free'; booking?: Booking } => {
-    const linkedIds = roomId === HOUSE_ID ? rooms.map(r => r.id) : [roomId, HOUSE_ID];
-    const own = bookings.find(b => b.status !== 'cancelado' && b.room_id === roomId && d >= b.check_in && d < b.check_out);
-    if (own) return { kind: own.status === 'confirmado' ? 'confirmado' : 'reservado', booking: own };
-    if (busyData?.ical[roomId]?.includes(d)) return { kind: 'airbnb' };
-    const viaLink = bookings.find(b => b.status !== 'cancelado' && linkedIds.includes(b.room_id) && d >= b.check_in && d < b.check_out);
-    if (viaLink || busy[roomId]?.has(d)) return { kind: 'linked', booking: viaLink };
-    return { kind: 'free' };
+  /** What one day of one room is, for the grid, and why (the tooltip). */
+  const cellOf = (roomId: string, d: string): { kind: CellKind; why: string; booking?: Booking } => {
+    const active = bookings.filter(b => b.status !== 'cancelado' && d >= b.check_in && d < b.check_out);
+    const own = active.find(b => b.room_id === roomId);
+    if (own) return { kind: own.status === 'confirmado' ? 'confirmado' : 'reservado', why: `Retiro: ${own.guest_name}`, booking: own };
+    if (busyData?.ical[roomId]?.includes(d)) return { kind: 'guest', why: 'Hóspede do Airbnb / Booking' };
+    if (roomId === HOUSE_ID) {
+      const suite = rooms.find(r => r.id !== HOUSE_ID && (busyData?.ical[r.id]?.includes(d) || busyData?.blocked?.[r.id]?.includes(d) || active.some(b => b.room_id === r.id)));
+      if (suite) return { kind: 'linked', why: `A casa toda não dá: ${suite.name} está ocupada`, booking: active.find(b => b.room_id === suite.id) };
+      if (busyData?.blocked?.[HOUSE_ID]?.includes(d)) return { kind: 'closed', why: 'Fechado no Airbnb' };
+    } else {
+      const houseRetreat = active.find(b => b.room_id === HOUSE_ID);
+      if (houseRetreat || busyData?.ical[HOUSE_ID]?.includes(d)) return { kind: 'linked', why: 'A casa toda está alugada', booking: houseRetreat };
+      if (busyData?.blocked?.[roomId]?.includes(d)) return { kind: 'closed', why: 'Fechado no Airbnb' };
+    }
+    return busy[roomId]?.has(d) ? { kind: 'closed', why: 'Ocupado' } : { kind: 'free', why: 'Livre: toque para reservar um retiro' };
   };
 
   // Month grid
@@ -131,7 +147,7 @@ export default function RetreatReservations() {
     setSaving(true);
     // Read Airbnb again right before saving: the grid may be a few minutes old.
     const fresh = await fetch('/api/retreats/availability', { cache: 'no-store' }).then(r => r.json()).catch(() => null);
-    const nowBusy = fresh && !fresh.error ? effectiveBusy(rooms.map(r => r.id), fresh.ical, fresh.booked) : busy;
+    const nowBusy = fresh && !fresh.error ? effectiveBusy(rooms.map(r => r.id), fresh.ical, fresh.booked, fresh.blocked) : busy;
     if (!isFree(nowBusy[form.room_id], form.check_in, form.nights)) {
       const clash = nightsOf(form.check_in, form.nights).filter(n => nowBusy[form.room_id]?.has(n)).map(br).join(', ');
       setSaving(false);
@@ -233,8 +249,12 @@ export default function RetreatReservations() {
           <strong style={{ fontSize: '1.15rem' }}>{MONTHS[month]} {year}</strong>
           <button type="button" style={chip(false)} onClick={() => setMonthOffset(m => m + 1)}>›</button>
         </div>
+        <p style={{ margin: '0 0 0.9rem', padding: '0.7rem 0.9rem', background: '#f4f8fb', borderRadius: '10px', color: '#34495e', fontSize: '0.9rem', lineHeight: 1.55 }}>
+          <b>Cada quarto se vende separado.</b> Um casal na Standard Suite só precisa que a Standard Suite esteja livre.
+          {' '}<b>A Casa Toda</b> só fica livre quando os três quartos estão livres. Os dias com <b style={{ color: '#2e7d4f' }}>+</b> são os que você pode vender.
+        </p>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ borderCollapse: 'separate', borderSpacing: '2px', fontSize: '0.75rem' }}>
+          <table style={{ borderCollapse: 'separate', borderSpacing: '3px', fontSize: '0.75rem' }}>
             <thead>
               <tr>
                 <th style={{ textAlign: 'left', minWidth: '120px' }} />
@@ -247,7 +267,12 @@ export default function RetreatReservations() {
             <tbody>
               {rooms.map(r => (
                 <tr key={r.id}>
-                  <td style={{ fontWeight: 700, paddingRight: '0.5rem', whiteSpace: 'nowrap', borderLeft: `6px solid ${roomStyle(r.id).color}`, paddingLeft: '0.5rem' }}>{roomStyle(r.id).emoji} {r.name}</td>
+                  <td style={{ fontWeight: 700, paddingRight: '0.6rem', whiteSpace: 'nowrap', borderLeft: `6px solid ${roomStyle(r.id).color}`, paddingLeft: '0.5rem', lineHeight: 1.25 }}>
+                    {roomStyle(r.id).emoji} {r.name}
+                    <div style={{ fontWeight: 600, fontSize: '0.72rem', color: '#2e7d4f' }}>
+                      {days.filter(d => d >= todayBR() && cellOf(r.id, d).kind === 'free').length} noites livres
+                    </div>
+                  </td>
                   {days.map(d => {
                     const c = cellOf(r.id, d);
                     const past = d < todayBR();
@@ -257,13 +282,16 @@ export default function RetreatReservations() {
                           type="button"
                           disabled={past || (c.kind !== 'free' && !c.booking)}
                           onClick={() => c.kind === 'free' ? openForm(r.id, d) : c.booking && document.getElementById(`b-${c.booking.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                          title={c.kind === 'free' ? 'Livre: reservar' : c.kind === 'airbnb' ? 'Airbnb / Booking' : c.booking ? `${c.booking.guest_name} (${c.booking.status})` : 'Ocupado (casa toda / suíte)'}
+                          title={`${br(d)} · ${c.why}`}
                           style={{
-                            width: '26px', height: '30px', border: 'none', borderRadius: '5px', padding: 0,
-                            background: c.kind === 'free' ? (past ? '#f6f6f6' : '#eef8f0') : COLORS[c.kind],
-                            cursor: past ? 'default' : 'pointer', opacity: past ? 0.5 : 1,
+                            width: '28px', height: '32px', border: c.kind === 'free' && !past ? '1px solid #9fd4ae' : 'none', borderRadius: '6px', padding: 0,
+                            background: past ? '#f3f3f3' : COLORS[c.kind],
+                            color: '#2e7d4f', fontWeight: 900, fontSize: '1rem', lineHeight: 1,
+                            cursor: past ? 'default' : c.kind === 'free' || c.booking ? 'pointer' : 'default', opacity: past ? 0.45 : 1,
                           }}
-                        />
+                        >
+                          {c.kind === 'free' && !past ? '+' : ''}
+                        </button>
                       </td>
                     );
                   })}
@@ -272,9 +300,12 @@ export default function RetreatReservations() {
             </tbody>
           </table>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', fontSize: '0.8rem', marginTop: '0.75rem', color: '#555' }}>
-          {[['#eef8f0', 'Livre'], [COLORS.airbnb, 'Airbnb / Booking'], [COLORS.linked, 'Ocupado pela casa toda ou por uma suíte'], [COLORS.reservado, 'Retiro reservado (sem sinal)'], [COLORS.confirmado, 'Retiro com sinal pago']].map(([c, t]) => (
-            <span key={t}><span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: 3, background: c, marginRight: 5, verticalAlign: 'middle', border: '1px solid #ddd' }} />{t}</span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '0.6rem 1.2rem', fontSize: '0.82rem', marginTop: '1rem', color: '#555' }}>
+          {LEGEND.map(l => (
+            <div key={l.kind} style={{ display: 'flex', gap: '0.55rem', alignItems: 'flex-start' }}>
+              <span style={{ flex: '0 0 auto', width: 22, height: 22, borderRadius: 5, background: COLORS[l.kind], border: l.kind === 'free' ? '1px solid #9fd4ae' : '1px solid #ddd', color: '#2e7d4f', fontWeight: 900, textAlign: 'center', lineHeight: '20px' }}>{l.kind === 'free' ? '+' : ''}</span>
+              <span><b style={{ color: '#2c3e50' }}>{l.title}</b><br />{l.text}</span>
+            </div>
           ))}
         </div>
       </div>
