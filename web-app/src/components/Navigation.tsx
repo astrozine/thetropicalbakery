@@ -77,24 +77,7 @@ export default function Navigation() {
     }
   };
 
-  // The logo is the way home, so there is no "Início" link. The boxes and the events
-  // each fold into one menu so the bar stays on one line with the logo beside it.
-  const groups: { id: string; name: string; links: { name: string; path: string; highlight?: boolean; sub?: string }[] }[] = [
-    { id: 'caixa', name: 'Caixa de Degustação', links: [
-      { name: 'Caixa da Semana', path: '/caixas' },
-      // The weekly subscription is the core of the business, so it keeps the foil treatment.
-      { name: 'Assinatura de Caixa', path: '/assinatura', highlight: true, sub: 'caixa toda semana' },
-    ] },
-    { id: 'eventos', name: 'Eventos', links: [
-      { name: 'Brunch Social', path: '/brunch' },
-      { name: 'Menu de Eventos', path: '/menu' },
-    ] },
-  ];
-  const [openGroup, setOpenGroup] = useState<string | null>(null);
-  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true });
-
   const links: { name: string; path: string; highlight?: boolean; sub?: string }[] = [
-    { name: 'Retiros', path: '/retreats' },
     { name: 'Chef Dolly', path: '/dolly' },
     { name: 'E-book', path: '/sweet-escape/pt' },
   ];
@@ -107,6 +90,26 @@ export default function Navigation() {
     { name: 'Capacitação Profissional', path: '/cursos/capacitacao-profissional' },
     { name: 'Saúde e Bem-Estar', path: '/cursos/saude-bem-estar' },
   ].filter(l => l.path === '/cursos' || courseIsShown(shownCourses, l.path.slice('/cursos/'.length)));
+
+  // The logo is the way home, so there is no "Início" link. The boxes, the events and the
+  // courses + retreats each fold into one menu so the bar stays on one line with the logo beside it.
+  const groups: { id: string; name: string; links: { name: string; path: string; highlight?: boolean; sub?: string }[] }[] = [
+    { id: 'caixa', name: 'Caixa de Degustação', links: [
+      { name: 'Caixa da Semana', path: '/caixas' },
+      // The weekly subscription is the core of the business, so it keeps the foil treatment.
+      { name: 'Assinatura de Caixa', path: '/assinatura', highlight: true, sub: 'caixa toda semana' },
+    ] },
+    { id: 'eventos', name: 'Eventos', links: [
+      { name: 'Brunch Social', path: '/brunch' },
+      { name: 'Menu de Eventos', path: '/menu' },
+    ] },
+    { id: 'cursos', name: 'Cursos e Retiros', links: [
+      { name: 'Retiros', path: '/retreats' },
+      ...cursosLinks,
+    ] },
+  ];
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true });
 
   const b2bLinks = [
     { name: 'Todas as Parcerias', path: '/b2b', highlight: true },
@@ -150,10 +153,8 @@ export default function Navigation() {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isRetreatsDropdownOpen, setIsRetreatsDropdownOpen] = useState(false);
-  const [isCursosDropdownOpen, setIsCursosDropdownOpen] = useState(false);
 
   // Mobile Accordion States
-  const [mobileCursosOpen, setMobileCursosOpen] = useState(false);
   const [mobileB2bOpen, setMobileB2bOpen] = useState(false);
 
   // The floating pills sit ON TOP of the page, so while you read they cover the
@@ -308,61 +309,6 @@ export default function Navigation() {
               {link.sub && <span style={SUB_STYLE}>{link.sub}</span>}
             </Link>
           ))}
-
-          {/* Cursos Dropdown */}
-          <div 
-            style={{ position: 'relative', marginLeft: GAP, cursor: 'pointer' }}
-            onMouseEnter={() => setIsCursosDropdownOpen(true)}
-            onMouseLeave={() => setIsCursosDropdownOpen(false)}
-          >
-            <span style={{
-              color: '#3c2a21',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: TOP_SIZE,
-              whiteSpace: 'nowrap',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              Cursos ▾
-            </span>
-            {isCursosDropdownOpen && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                background: 'rgba(253,250,243,0.95)',
-                backdropFilter: 'blur(10px)',
-                minWidth: '200px',
-                padding: '1rem 0',
-                borderRadius: '8px',
-                boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem'
-              }}>
-                {cursosLinks.map((link) => (
-                  <Link key={link.path} href={link.path} style={{
-                    padding: '0.5rem 1.5rem',
-                    color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
-                    textDecoration: 'none',
-                    fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
-                    fontSize: '0.9rem',
-                    textTransform: 'uppercase',
-                    ...(link.highlight ? {
-                      background: '#d4af37',
-                      borderRadius: '6px',
-                      margin: '0 0.75rem',
-                      padding: '0.5rem 0.75rem',
-                    } : {}),
-                  }}>
-                    {link.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
 
           {/* Custom Language Switcher — each language name must stay in its own
               language regardless of the page's current translation, otherwise a
@@ -643,53 +589,6 @@ export default function Navigation() {
               </Link>
             ))}
 
-            {/* Cursos Section Header */}
-            <button 
-              onClick={() => setMobileCursosOpen(!mobileCursosOpen)}
-              style={{ 
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '1.5rem 0 0.5rem 0', 
-                fontWeight: 'bold', 
-                color: '#3c2a21', 
-                fontSize: '0.85rem',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                opacity: 0.8,
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left'
-              }}>
-              CURSOS <span>{mobileCursosOpen ? '▲' : '▼'}</span>
-            </button>
-            {mobileCursosOpen && cursosLinks.map((link) => (
-              <Link 
-                key={link.path} 
-                href={link.path} 
-                onClick={closeMenu}
-                style={{
-                  display: 'block',
-                  padding: '0.8rem 0 0.8rem 1rem',
-                  textDecoration: 'none',
-                  color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
-                  fontWeight: link.highlight || pathname === link.path ? 'bold' : '400',
-                  fontSize: '1.1rem',
-                  borderBottom: link.highlight ? 'none' : '1px solid rgba(0,0,0,0.04)',
-                  animation: 'fadeIn 0.2s ease-out',
-                  ...(link.highlight ? {
-                    background: '#d4af37',
-                    borderRadius: '8px',
-                    margin: '0.3rem 0',
-                    padding: '0.8rem 1rem',
-                  } : {}),
-                }}
-              >
-                {link.name}
-              </Link>
-            ))}
-            
             {/* B2B Section Header */}
             <button 
               onClick={() => setMobileB2bOpen(!mobileB2bOpen)}
