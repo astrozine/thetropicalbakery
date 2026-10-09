@@ -17,7 +17,7 @@ Supabase → **Storage** → `ebooks` → **Upload file** → pick all four from
 | `sweet-escape-es.pdf` | Español | buyers who pick Español |
 | `sweet-escape-nl.pdf` | Nederlands | buyers who pick Nederlands |
 
-The names must match exactly. Each is about 38 MB (Supabase refuses files over 50 MB). If a language's file is
+The names must match exactly. Each is about 41 MB (Supabase refuses files over 50 MB). If a language's file is
 missing, its buyers get the English book instead of an error. To change a book later, upload the new PDF with the
 same name (tick "overwrite"). Don't use `EBOOK SWEET ESCAPE.pdf` (151 MB) or the old `sweet-escape.pdf`.
 

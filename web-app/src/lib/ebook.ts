@@ -14,7 +14,7 @@ export const EBOOK = {
   priceBRL: 47,
   /** What English readers see. We still CHARGE priceBRL (card and PayPal convert for them), so keep this near priceBRL / BRL_PER_USD. */
   priceUSD: 9,
-  pages: 72,
+  pages: 80,
   /** Private Supabase Storage bucket and file (migration_34). Uploaded by hand, see SETUP_ebook.md. */
   bucket: 'ebooks',
   pagePath: '/sweet-escape',
