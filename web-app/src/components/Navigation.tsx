@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import AccountMenu from '@/components/AccountMenu';
 import { INSTAGRAM_HANDLE, InstagramIcon } from '@/components/InstagramLink';
-import { STORE_INSTAGRAM_URL } from '@/lib/siteContact';
+import { DOLLY_INSTAGRAM_HANDLE, DOLLY_INSTAGRAM_URL, STORE_INSTAGRAM_URL } from '@/lib/siteContact';
 import { SUB_STYLE } from '@/components/ClubeInvite';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
@@ -140,6 +140,7 @@ export default function Navigation() {
     { id: 'dolly', name: 'Chef Dolly', links: [
       { name: 'Conheça a Dolly', path: '/dolly' },
       { name: 'Instagram', path: STORE_INSTAGRAM_URL, sub: INSTAGRAM_HANDLE, external: true },
+      { name: 'Instagram da Dolly', path: DOLLY_INSTAGRAM_URL, sub: DOLLY_INSTAGRAM_HANDLE, external: true },
     ] },
   ];
   const [openGroup, setOpenGroup] = useState<string | null>(null);

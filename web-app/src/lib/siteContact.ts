@@ -3,6 +3,9 @@
 export const STORE_WHATSAPP = '5511932119196';
 export const STORE_WHATSAPP_DISPLAY = '+55 11 93211-9196';
 export const STORE_INSTAGRAM_URL = 'https://www.instagram.com/_thetropicalbakery_/';
+/** Dolly's own Instagram (her personal account, next to the bakery's in the Chef Dolly menu). */
+export const DOLLY_INSTAGRAM_HANDLE = '@dollybingbing';
+export const DOLLY_INSTAGRAM_URL = 'https://www.instagram.com/dollybingbing/';
 
 /** Dolly's Substack, "Sunbaked Letters" (written in English). */
 export const SUBSTACK_URL = 'https://substack.com/@thetropicalbakery?r=5uip7u';
