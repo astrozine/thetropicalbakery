@@ -11,7 +11,7 @@ import { trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
 import { useEbookPayment } from '@/components/ebook/useEbookPayment';
 import { PERK_COPY } from '@/lib/bookPerk';
-import { PayPicker, PixBox, bookPrice, shownPrice, toPath, usePayMethods } from './FunnelPay';
+import { PayPicker, PixBox, bookPrice, payMethodFor, shownPrice, toPath, usePayMethods } from './FunnelPay';
 import '@/components/ebook/sweetEscape.css';
 import './funnel.css';
 
@@ -41,7 +41,7 @@ export default function FreeRecipesThanks() {
   const [ref, setRef] = useState(q.get('ref') || '');
   const [k, setK] = useState(q.get('k') || '');
   const pay = useEbookPayment(ref, k);
-  const { methods, method, setMethod, wallet, setWallet } = usePayMethods(lang);
+  const { methods, method, setMethod, wallet, foreign, setWallet } = usePayMethods(lang);
   const [declined, setDeclined] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -71,7 +71,7 @@ export default function FreeRecipesThanks() {
       const r = await fetch('/api/free-recipes/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ id, payMethod: method }),
+        body: JSON.stringify({ id, payMethod: payMethodFor(method, wallet) }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || c.form.errGeneric);
@@ -169,10 +169,10 @@ export default function FreeRecipesThanks() {
                 </ul>
                 {id && lead?.found ? (
                   <div className="se-form">
-                    <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} setWallet={setWallet} legend={c.bump.pay} name="fr-method" />
+                    <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} foreign={foreign} setWallet={setWallet} legend={c.bump.pay} name="fr-method" />
                     {error && <p className="se-error" role="alert">{error}</p>}
                     <button type="button" className="se-btn se-btn--primary se-btn--big" disabled={busy} onClick={buy}>
-                      {busy ? c.form.busy : fill(t.otoCta, { price: bookPrice(method) })}
+                      {busy ? c.form.busy : fill(t.otoCta, { price: bookPrice(method, undefined, wallet) })}
                     </button>
                   </div>
                 ) : (

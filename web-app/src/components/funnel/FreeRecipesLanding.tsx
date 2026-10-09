@@ -7,7 +7,7 @@ import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
 import { FUNNEL, FUNNEL_COPY, SEGMENTS, freeCover, type Segment } from '@/lib/funnel';
 import { trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
-import { PayPicker, PixBox, bookPrice, shownPrice, toPath, usePayMethods } from './FunnelPay';
+import { PayPicker, PixBox, bookPrice, payMethodFor, shownPrice, toPath, usePayMethods } from './FunnelPay';
 import '@/components/ebook/sweetEscape.css';
 import './funnel.css';
 
@@ -28,7 +28,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
   const c = FUNNEL_COPY[lang];
   const f = c.form;
   const book = EBOOK_COPY[lang].recipes;
-  const { methods, method, setMethod, wallet, setWallet } = usePayMethods(lang);
+  const { methods, method, setMethod, wallet, foreign, setWallet } = usePayMethods(lang);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -80,7 +80,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
       const r = await fetch('/api/free-recipes/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ name, email, lang, segment, ...utm.current, bump: bump ? { payMethod: method } : null }),
+        body: JSON.stringify({ name, email, lang, segment, ...utm.current, bump: bump ? { payMethod: payMethodFor(method, wallet) } : null }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || f.errGeneric);
@@ -99,7 +99,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
     }
   };
 
-  const price = bump ? bookPrice(method) : shownPrice(wallet);
+  const price = bump ? bookPrice(method, undefined, wallet) : shownPrice(wallet);
   const full = shownPrice(wallet);
 
   return (
@@ -188,7 +188,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
                     <img src={`${IMG}/${lang}/cover.webp`} alt="Sweet Escape" loading="lazy" />
                     <p>{rich(fill(c.bump.text, { pages: EBOOK.pages, price: shownPrice(wallet) }))}</p>
                   </div>
-                  {bump && <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} setWallet={setWallet} legend={c.bump.pay} name="fr-method" />}
+                  {bump && <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} foreign={foreign} setWallet={setWallet} legend={c.bump.pay} name="fr-method" />}
                 </div>
 
                 {error && <p className="se-error" role="alert">{error}</p>}

@@ -6,7 +6,7 @@ import MobileBuyBar from '@/components/MobileBuyBar';
 import RainbowJourney from './RainbowJourney';
 import EbookBuyBox from './EbookBuyBox';
 import { EditionNotice, EnglishNotice, LangBar, rich, useGoogleTranslated } from './EbookLang';
-import { BAKERY_TREAT_PRICE_BRL, BRL_PER_USD, EBOOK, RECIPES, TOTAL_TREATS } from '@/lib/ebook';
+import { BAKERY_TREAT_PRICE_BRL, BRL_PER_EUR, BRL_PER_USD, EBOOK, RECIPES, TOTAL_TREATS, stripeMoney } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import { useBookWallet } from './BookPay';
@@ -36,14 +36,15 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
   // On the English page, a visitor whose browser translated it (French, German, Italian...) gets the English edition:
   // tell them so in their language. Everyone else is told which editions exist.
   const foreign = translated;
-  // Prices follow the buyer's wallet, not the page's language (BookPay): the R$ / US$ switch in the form moves them all.
+  // Prices follow the buyer's wallet, not the page's language (BookPay): the R$ / US$ / € switch in the form moves them all.
   const { wallet } = useBookWallet(lang);
-  const dollars = wallet === 'usd';
+  const abroad = wallet !== 'brl';
   const reais = `R$ ${EBOOK.priceBRL}`;
-  const price = dollars ? `US$ ${EBOOK.priceUSD}` : reais;
-  const eachUsd = Math.round(BAKERY_TREAT_PRICE_BRL / BRL_PER_USD);
-  const each = dollars ? `US$ ${eachUsd}` : brl(BAKERY_TREAT_PRICE_BRL);
-  const bakeryValue = dollars ? `US$ ${(TOTAL_TREATS * eachUsd).toLocaleString('en-US')}` : brl(TOTAL_TREATS * BAKERY_TREAT_PRICE_BRL);
+  const price = wallet === 'eur' ? stripeMoney(EBOOK.priceEUR, 'eur') : abroad ? stripeMoney(EBOOK.priceUSD, 'usd') : reais;
+  const eachAbroad = Math.round(BAKERY_TREAT_PRICE_BRL / (wallet === 'eur' ? BRL_PER_EUR : BRL_PER_USD));
+  const abroadMoney = (n: number) => stripeMoney(n.toLocaleString('en-US'), wallet === 'eur' ? 'eur' : 'usd');
+  const each = abroad ? abroadMoney(eachAbroad) : brl(BAKERY_TREAT_PRICE_BRL);
+  const bakeryValue = abroad ? abroadMoney(TOTAL_TREATS * eachAbroad) : brl(TOTAL_TREATS * BAKERY_TREAT_PRICE_BRL);
   const v = { price, reais, pages: EBOOK.pages, n: TOTAL_TREATS, each, usd: EBOOK.priceUSD };
 
   useEffect(() => {

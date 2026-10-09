@@ -1,10 +1,10 @@
 import 'server-only';
 import crypto from 'node:crypto';
 import { findOrder, markOrderPaid, siteUrl, type PayableOrder } from './server';
-import { EBOOK, usdForBRL } from '@/lib/ebook';
+import { EBOOK, stripeAmountFor, type StripeCurrency } from '@/lib/ebook';
 
 /**
- * Stripe Checkout, for card payments from anywhere in the world: the e-book (in US dollars) and every order from
+ * Stripe Checkout, for card payments from anywhere in the world: the e-book (in US dollars or euros) and every order from
  * /checkout, the boxes and the Menu de Eventos (in reais, the amount the server priced; the buyer's bank converts).
  *
  * No SDK: two plain REST calls. Same rules as Mercado Pago and PayPal in this folder:
@@ -66,8 +66,9 @@ export interface StripeCheckoutInput {
   lang: string;
   /** The thank-you page, already carrying ?ref=…&k=…&lang=… */
   returnUrl: string;
-  /** Dollars to charge, from BOOK_OFFERS on the server (defaults to the full price). */
-  usd?: number;
+  /** What to charge, from BOOK_OFFERS on the server (defaults to the full price in dollars). */
+  currency?: StripeCurrency;
+  amount?: number;
 }
 
 /** Creates the Stripe payment page for an e-book order and returns the address to send the buyer to. */
@@ -80,8 +81,8 @@ export async function createStripeCheckout(o: StripeCheckoutInput): Promise<stri
     body: form({
       mode: 'payment',
       'line_items[0][quantity]': '1',
-      'line_items[0][price_data][currency]': 'usd',
-      'line_items[0][price_data][unit_amount]': String((o.usd ?? EBOOK.priceUSD) * 100),
+      'line_items[0][price_data][currency]': o.currency ?? 'usd',
+      'line_items[0][price_data][unit_amount]': String(Math.round((o.amount ?? EBOOK.priceUSD) * 100)),
       'line_items[0][price_data][product_data][name]': `${EBOOK.title} e-book (PDF)`,
       'line_items[0][price_data][product_data][description]': 'The Tropical Bakery · instant download',
       client_reference_id: o.reference,
@@ -162,8 +163,9 @@ export async function confirmStripeSession(sessionId: string): Promise<{ ok: boo
   if (!order) return { ok: false, status, reference };
 
   if (status === 'paid') {
-    // An e-book order's dollars follow the BRL price stored on it (full or welcome, lib/ebook.ts BOOK_OFFERS).
-    const want = ebook ? { currency: 'usd', amount: usdForBRL(order.total) * 100 } : { currency: 'brl', amount: Math.round(order.total * 100) };
+    // An e-book order's dollars or euros follow the BRL price stored on it (full or welcome, lib/ebook.ts BOOK_OFFERS).
+    const cur: StripeCurrency = session.currency === 'eur' ? 'eur' : 'usd';
+    const want = ebook ? { currency: cur, amount: Math.round(stripeAmountFor(order.total, cur) * 100) } : { currency: 'brl', amount: Math.round(order.total * 100) };
     if (session.currency !== want.currency || session.amount_total !== want.amount) {
       console.error(`Stripe amount mismatch on ${reference}: ${session.amount_total} ${session.currency}`);
       return { ok: false, status: 'amount_mismatch', reference };

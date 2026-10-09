@@ -5,7 +5,7 @@ import { createMercadoPagoCheckout, mercadoPagoConfigured } from './mercadopago'
 import { createPayPalCheckout, paypalConfigured } from './paypal';
 import { createStripeCheckout, stripeConfigured } from './stripe';
 import { OrderError } from './order';
-import { BOOK_FILES, BOOK_OFFERS, EBOOK, downloadName, isBookLang, type BookLang, type BookOffer } from '@/lib/ebook';
+import { BOOK_FILES, BOOK_OFFERS, EBOOK, STRIPE_EUR, downloadName, isBookLang, stripeMoney, type BookLang, type BookOffer, type StripeCurrency } from '@/lib/ebook';
 import { generatePixData } from '@/utils/pix';
 import { sendEbookOrderReceived, sendEbookPaid } from '@/lib/email/ebookReceipts';
 import { isEbookLang, type EbookLang } from '@/lib/ebookCopy';
@@ -107,6 +107,8 @@ export interface CreatedEbookOrder {
   offer: BookOffer;
   /** What this order charges in dollars if paid through Stripe. */
   usd: number;
+  /** The currency Stripe charges it in ('stripe-eur' from the browser = euros). */
+  currency: StripeCurrency;
   pix?: { payload: string; base64: string };
 }
 
@@ -131,9 +133,11 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
   // 'stripe' charges US dollars (EBOOK.priceUSD); everything else charges reais (EBOOK.priceBRL). The order's
   // total_price is always the BRL list price so the admin's numbers stay in one currency; the dollars are noted
   // in items_summary and verified against Stripe itself (lib/payments/stripe.ts).
-  const method = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : input.payMethod === 'stripe' ? 'stripe' : 'pix';
+  const method = input.payMethod === 'card' ? 'mercadopago' : input.payMethod === 'paypal' ? 'paypal' : input.payMethod === 'stripe' || input.payMethod === STRIPE_EUR ? 'stripe' : 'pix';
+  const currency: StripeCurrency = input.payMethod === STRIPE_EUR ? 'eur' : 'usd';
   const offer: BookOffer = offerExpiry(input.offer) ? 'welcome' : 'full';
   const { brl: total, usd } = BOOK_OFFERS[offer];
+  const charged = stripeMoney(BOOK_OFFERS[offer][currency], currency);
   const reference = `EBK${Date.now()}${Math.random().toString(36).slice(2, 8).toUpperCase()}`.substring(0, 25);
   const today = new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
 
@@ -155,7 +159,7 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
     fulfillment: 'digital',
     user_id: userId,
     delivery_fee: 0,
-    items_summary: `1x ${EBOOK.lineName}${offer === 'welcome' ? ' · preço de boas-vindas' : ''}${method === 'stripe' ? ` · US$ ${usd} (Stripe)` : ''}`,
+    items_summary: `1x ${EBOOK.lineName}${offer === 'welcome' ? ' · preço de boas-vindas' : ''}${method === 'stripe' ? ` · ${charged} (Stripe)` : ''}`,
   };
 
   // Newest columns first, then fall back, so a missing migration never loses a sale. `order_type` has only
@@ -177,18 +181,18 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
   const pix = method === 'pix' ? await generatePixData({ value: total, transactionId: reference }) : undefined;
 
   try {
-    await sendEbookOrderReceived(db, { reference, customerName: name, customerEmail: email, total, method, pixPayload: pix?.payload ?? null, key: ebookKey(reference), lang, book });
+    await sendEbookOrderReceived(db, { reference, customerName: name, customerEmail: email, total, method, pixPayload: pix?.payload ?? null, key: ebookKey(reference), lang, book, charged: method === 'stripe' ? charged : undefined });
   } catch (e) {
     console.error('createEbookOrder: receipt e-mail failed (order is saved):', e);
   }
 
-  return { reference, key: ebookKey(reference), total, method, lang, book, offer, usd, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
+  return { reference, key: ebookKey(reference), total, method, lang, book, offer, usd, currency, ...(pix ? { pix: { payload: pix.payload, base64: pix.base64 } } : {}) };
 }
 
 /** Why this way of paying cannot be used right now (its keys are not in Vercel), or null if it can. */
 export function unavailableMethod(payMethod: unknown): string | null {
   if (payMethod === 'card' && !mercadoPagoConfigured()) return 'Card payments are not switched on yet. Please use Pix.';
-  if (payMethod === 'stripe' && !stripeConfigured()) return 'Card payments are not switched on yet. Please use Pix.';
+  if ((payMethod === 'stripe' || payMethod === STRIPE_EUR) && !stripeConfigured()) return 'Card payments are not switched on yet. Please use Pix.';
   if (payMethod === 'paypal' && !paypalConfigured()) return 'PayPal is not switched on yet. Please use Pix or card.';
   return null;
 }
@@ -201,7 +205,7 @@ export async function ebookCheckoutUrl(order: CreatedEbookOrder, email: string, 
   const saved = await findOrder(order.reference);
   if (!saved) throw new Error('order vanished after saving');
   const opts = { returnUrl, title: `${EBOOK.title} e-book (PDF) · The Tropical Bakery` };
-  if (order.method === 'stripe') return createStripeCheckout({ reference: order.reference, email: email.trim(), lang: order.lang, returnUrl, usd: order.usd });
+  if (order.method === 'stripe') return createStripeCheckout({ reference: order.reference, email: email.trim(), lang: order.lang, returnUrl, currency: order.currency, amount: BOOK_OFFERS[order.offer][order.currency] });
   if (order.method === 'mercadopago') return createMercadoPagoCheckout(saved, opts);
   return createPayPalCheckout(saved, { ...opts, locale: order.lang === 'pt' ? 'pt-BR' : order.lang === 'es' ? 'es-ES' : order.lang === 'nl' ? 'nl-NL' : 'en-US' });
 }
@@ -268,5 +272,7 @@ export async function sendPaidEmailForOrder(row: Record<string, unknown>) {
     lang: langFromAddress(row.delivery_address), book: bookFromAddress(row.delivery_address),
     customerName: String(row.customer_name ?? ''), customerEmail: (row.customer_email as string | null) ?? null,
     total: Number(row.total_price ?? 0), method: String(row.payment_provider ?? ''),
+    // Stripe orders note what they charged ("· € 9 (Stripe)"), so the receipt says euros or dollars correctly.
+    charged: /· ((?:US\$|€) [\d.]+) \(Stripe\)/.exec(String(row.items_summary ?? ''))?.[1],
   });
 }

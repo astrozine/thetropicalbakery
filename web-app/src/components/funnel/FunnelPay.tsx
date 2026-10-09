@@ -13,7 +13,7 @@ import { rich } from '@/components/ebook/EbookLang';
 
 // Which ways to pay are on, the R$ / US$ switch and the picker live with the book's own form (BookPay), so the funnel
 // and the sales page always offer the same choices.
-export { usePayMethods, PayPicker, priceFor as bookPrice, priceIn as shownPrice } from '@/components/ebook/BookPay';
+export { usePayMethods, PayPicker, payMethodFor, priceFor as bookPrice, priceIn as shownPrice } from '@/components/ebook/BookPay';
 export type { PayMethod, Wallet } from '@/components/ebook/BookPay';
 
 export function PixBox({ lang, payload, base64, email, next, nextLabel }: {

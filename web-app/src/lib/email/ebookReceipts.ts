@@ -26,10 +26,12 @@ export interface EbookReceipt {
   lang?: EbookLang;
   /** Which language of the book they bought. */
   book?: EbookLang;
+  /** What Stripe charges, as a person reads it (US$ 9, € 9). */
+  charged?: string;
 }
 
 /** What they were actually charged: dollars for Stripe, reais for everything else. */
-const money = (o: EbookReceipt) => (o.method === 'stripe' ? `US$ ${usdForBRL(o.total)}` : formatBRL(o.total));
+const money = (o: EbookReceipt) => (o.method === 'stripe' ? o.charged ?? `US$ ${usdForBRL(o.total)}` : formatBRL(o.total));
 
 const hello = (template: string, name: string) => {
   const first = (name || '').trim().split(' ')[0];

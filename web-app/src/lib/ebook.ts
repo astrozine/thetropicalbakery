@@ -12,8 +12,10 @@ export const EBOOK = {
   lineName: 'E-book Sweet Escape (PDF)',
   author: 'Dolly',
   priceBRL: 47,
-  /** What English readers see. We still CHARGE priceBRL (card and PayPal convert for them), so keep this near priceBRL / BRL_PER_USD. */
+  /** What Stripe charges in dollars (everyone abroad but Europe). Card and PayPal still charge priceBRL and convert. */
   priceUSD: 9,
+  /** What Stripe charges in euros (Dutch, Italian, French and German readers; Spanish readers pay in dollars). */
+  priceEUR: 9,
   pages: 80,
   /** Private Supabase Storage bucket and file (migration_34). Uploaded by hand, see SETUP_ebook.md. */
   bucket: 'ebooks',
@@ -27,14 +29,27 @@ export const EBOOK = {
  * lib/payments/ebook.ts offerToken). The server picks the row; the browser only shows it.
  */
 export const BOOK_OFFERS = {
-  full: { brl: EBOOK.priceBRL, usd: EBOOK.priceUSD },
-  welcome: { brl: 27, usd: 5 },
+  full: { brl: EBOOK.priceBRL, usd: EBOOK.priceUSD, eur: EBOOK.priceEUR },
+  welcome: { brl: 27, usd: 5, eur: 5 },
 } as const;
+
+/** The two currencies Stripe charges the book in. */
+export type StripeCurrency = 'usd' | 'eur';
+/** The payMethod the browser sends for Stripe in euros ('stripe' alone is dollars). */
+export const STRIPE_EUR = 'stripe-eur';
 export type BookOffer = keyof typeof BOOK_OFFERS;
 
 /** What Stripe should have charged in dollars for an order stored at this BRL total (every offer has its own pair). */
-export const usdForBRL = (totalBRL: number): number =>
-  Object.values(BOOK_OFFERS).find(o => Math.abs(o.brl - totalBRL) < 0.01)?.usd ?? EBOOK.priceUSD;
+export const usdForBRL = (totalBRL: number): number => stripeAmountFor(totalBRL, 'usd');
+
+/** What Stripe should have charged, in dollars or euros, for an order stored at this BRL total. */
+export const stripeAmountFor = (totalBRL: number, currency: StripeCurrency): number => {
+  const offer = Object.values(BOOK_OFFERS).find(o => Math.abs(o.brl - totalBRL) < 0.01) ?? BOOK_OFFERS.full;
+  return offer[currency];
+};
+
+/** How a Stripe charge reads to a person: US$ 9, € 9. */
+export const stripeMoney = (amount: number | string, currency: StripeCurrency) => (currency === 'eur' ? `€ ${amount}` : `US$ ${amount}`);
 
 /**
  * One PDF per language in the private bucket. The book a buyer gets is the language they chose; any other language
@@ -50,8 +65,9 @@ export type BookLang = keyof typeof BOOK_FILES;
 export const isBookLang = (v: unknown): v is BookLang => typeof v === 'string' && v in BOOK_FILES;
 export const downloadName = (lang: BookLang) => `Sweet Escape - The Tropical Bakery (${lang}).pdf`;
 
-/** Rough exchange rate, only for showing dollar amounts to English readers (never used to charge anything). */
+/** Rough exchange rates, only for showing what the bakery's treats cost abroad (never used to charge anything). */
 export const BRL_PER_USD = 5.2;
+export const BRL_PER_EUR = 6.1;
 
 /** One store price for a treat, used only to show what a batch would cost if bought ready-made. */
 export const BAKERY_TREAT_PRICE_BRL = 25;

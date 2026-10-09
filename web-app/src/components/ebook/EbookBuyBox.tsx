@@ -6,7 +6,7 @@ import { BOOK_OFFERS, EBOOK } from '@/lib/ebook';
 import { EBOOK_COPY, EBOOK_LANGS, LANG_LABEL, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import { EnglishNotice, rich } from './EbookLang';
-import { PayPicker, priceFor, usePayMethods } from './BookPay';
+import { PayPicker, payMethodFor, priceFor, usePayMethods } from './BookPay';
 
 interface PixResult { reference: string; key: string; payload: string; base64: string }
 
@@ -24,12 +24,12 @@ export default function EbookBuyBox({ lang = 'en', translated = false, offer }: 
 }) {
   const c = EBOOK_COPY[lang];
   const f = c.form;
-  // Stripe charges US dollars; Pix, Mercado Pago and PayPal charge reais. The button always shows what the chosen way charges.
+  // Stripe charges dollars or euros; Pix, Mercado Pago and PayPal charge reais. The button always shows what the chosen way charges.
   const prices = BOOK_OFFERS[offer ? 'welcome' : 'full'];
   const reais = `R$ ${prices.brl}`;
 
   // The R$ / US$ switch and the ways to pay in each (BookPay): the same picker as the free-recipes pages.
-  const { methods, method, setMethod, wallet, setWallet } = usePayMethods(lang);
+  const { methods, method, setMethod, wallet, foreign, setWallet } = usePayMethods(lang);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
@@ -41,7 +41,7 @@ export default function EbookBuyBox({ lang = 'en', translated = false, offer }: 
   const [error, setError] = useState('');
   const [pix, setPix] = useState<PixResult | null>(null);
   const [copied, setCopied] = useState(false);
-  const price = priceFor(method, prices);
+  const price = priceFor(method, prices, wallet);
 
   useEffect(() => {
     // Signed in? Fill in what we know and link the order to their account.
@@ -67,7 +67,7 @@ export default function EbookBuyBox({ lang = 'en', translated = false, offer }: 
       const r = await fetch('/api/ebook/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ name, email, whatsapp, payMethod: method, lang, book, offer }),
+        body: JSON.stringify({ name, email, whatsapp, payMethod: payMethodFor(method, wallet), lang, book, offer }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || f.errGeneric);
@@ -126,7 +126,7 @@ export default function EbookBuyBox({ lang = 'en', translated = false, offer }: 
         ))}
       </fieldset>
 
-      <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} setWallet={setWallet} legend={f.payLegend} prices={prices} />
+      <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} foreign={foreign} setWallet={setWallet} legend={f.payLegend} prices={prices} />
 
       {needsEnglishTick && <EnglishNotice lang={lang} />}
       {needsEnglishTick && (
