@@ -5,6 +5,7 @@ import ZoomableImage from '@/components/ZoomableImage';
 import MobileBuyBar from '@/components/MobileBuyBar';
 import RainbowJourney from './RainbowJourney';
 import EbookBuyBox from './EbookBuyBox';
+import AmazonEditions from './AmazonEditions';
 import { EditionNotice, EnglishNotice, LangBar, rich, useGoogleTranslated } from './EbookLang';
 import { BAKERY_TREAT_PRICE_BRL, BRL_PER_EUR, BRL_PER_USD, EBOOK, RECIPES, TOTAL_TREATS, stripeMoney } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
@@ -240,6 +241,9 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
             </div>
             <EbookBuyBox lang={lang} translated={translated} />
           </div>
+        </div>
+        <div className="se-wrap">
+          <AmazonEditions lang={lang} cover={`${IMG}/${lang}/cover.webp`} />
         </div>
       </section>
 

@@ -95,3 +95,24 @@ export const RECIPES: EbookRecipe[] = [
 
 /** Everything a single run through the book makes. */
 export const TOTAL_TREATS = RECIPES.reduce((n, r) => n + r.makesCount, 0);
+
+/**
+ * The Amazon editions (KDP): Kindle, paperback and hardcover, one listing per language on its own store. The PDF
+ * from the site stays the main offer; the sales page shows these as a quiet "also on Amazon" row under the order
+ * card. Paste each product link (amazon.com.br/dp/...) into its slot; an empty slot opens a search for the book on
+ * that store instead. A language with no entry shows no row.
+ */
+export type AmazonFormat = 'kindle' | 'paperback' | 'hardcover';
+export const AMAZON_FORMATS: AmazonFormat[] = ['kindle', 'paperback', 'hardcover'];
+
+export const AMAZON_EDITIONS: Partial<Record<BookLang, { store: string; search: string; links: Partial<Record<AmazonFormat, string>> }>> = {
+  en: { store: 'amazon.com', search: 'Sweet Escape The Tropical Bakery', links: {} },
+  pt: { store: 'amazon.com.br', search: 'Sweet Escape The Tropical Bakery', links: {} },
+};
+
+/** Where a format's button goes: its product page, or a search on the right store until the link is pasted above. */
+export const amazonLink = (lang: BookLang, format: AmazonFormat): string | null => {
+  const ed = AMAZON_EDITIONS[lang];
+  if (!ed) return null;
+  return ed.links[format] || `https://www.${ed.store}/s?k=${encodeURIComponent(ed.search)}`;
+};

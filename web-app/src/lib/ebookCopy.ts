@@ -47,6 +47,8 @@ export interface EbookCopy {
   story: { kicker: string; title: string; paragraphs: string[]; sign: string; photoAlt: string };
   offer: { kicker: string; title: string; stack: { what: string; detail: string; bonus?: boolean }[]; promiseDays: string; promiseTitle: string; promiseText: string; coverAlt: string; usd: string };
   faq: { kicker: string; title: string; items: { q: string; a: string }[] };
+  /** The Kindle and print editions on Amazon (lib/ebook AMAZON_EDITIONS). Only languages with an Amazon listing have it. */
+  amazon?: { kicker: string; title: string; formats: Record<'kindle' | 'paperback' | 'hardcover', { name: string; detail: string }>; cta: string; note: string };
   final: { line: string; title1: string; script: string; title2: string; ps: string };
   buyBar: { kicker: string; note: string; label: string };
   form: {
@@ -176,6 +178,7 @@ const EN: EbookCopy = {
     items: [
       { q: 'Which languages is the book in?', a: 'English, Português (Brazil), Español and Nederlands, fully translated with every recipe and photo. Choose your language when you order. Readers of any other language get the English edition: simple, friendly English, with measurements in cups and spoons and oven temperatures in °C and °F. This page is also available in Portuguese, Spanish and Dutch.' },
       { q: 'How do I get it?', a: 'It’s a PDF. After paying by card or PayPal your download opens straight away, and a personal link arrives by e-mail. With Pix (Brazil), Dolly confirms the payment by hand, usually within a few hours, and the same link unlocks itself.' },
+      { q: 'Is there a Kindle or printed edition?', a: 'Yes. Sweet Escape is on Amazon as a Kindle e-book, a paperback and a hardcover: the links are just under the order form. The PDF on this page comes straight from us, opens on any phone, tablet or computer, and has the full-size photos.' },
       { q: 'Do I need special equipment?', a: 'No. A blender or food processor, a few silicone molds or a tray, and a freezer. Most treats are raw: you blend, press, and let the freezer do the work. Only the muffins and the taco cookies need an oven.' },
       { q: 'Is it really without refined sugar?', a: 'Every recipe is sweetened with dates, raisins and fruit. The one exception is the chocolate shell on Day 7: the book shows you how to choose a dark chocolate without refined sugar, because most shop-bought ones contain some.' },
       { q: 'Is it vegan? Gluten-free?', a: '100% plant-based, no dairy, no eggs, and no wheat flour. Some recipes use oats: pick certified gluten-free oats if you need to.' },
@@ -183,6 +186,15 @@ const EN: EbookCopy = {
       { q: 'I’m a beginner. Will I manage?', a: 'Yes. Rule #4 is literally “work smart, not hard”. Start with Day 3, the Red Berry Bliss Balls: no oven, ten minutes, and little hands can roll them.' },
       { q: 'What if I don’t love it?', a: 'Write to us within 7 days and we refund every centavo. No forms, no hard feelings.' },
     ],
+  },
+  amazon: {
+    kicker: 'Also on Amazon', title: 'Rather hold it in your hands? The same 7 recipes, on Kindle or in print.',
+    formats: {
+      kindle: { name: 'Kindle', detail: 'on any Kindle or the free app' },
+      paperback: { name: 'Paperback', detail: 'printed and shipped by Amazon' },
+      hardcover: { name: 'Hardcover', detail: 'a keepsake, and a lovely gift' },
+    },
+    cta: 'Amazon', note: 'Ordering the PDF above? It comes straight from Dolly, in minutes, with the full-size photos.',
   },
   final: {
     line: 'Seven colors. Seven creations. Seven little reasons to fall in love with plants all over again.',
@@ -346,6 +358,7 @@ const PT: EbookCopy = {
     items: [
       { q: 'Em quais idiomas está o livro?', a: 'Em português do Brasil, com todas as receitas e fotos traduzidas. Também existe em English, Español e Nederlands: você escolhe o idioma no pedido. Quem lê outro idioma recebe a edição em inglês (um inglês simples e amigável, com medidas em xícaras e forno em °C).' },
       { q: 'Como eu recebo?', a: 'É um PDF. Pagando no cartão, o download abre na hora e um link pessoal chega por e-mail. No Pix, a Dolly confirma o pagamento à mão, normalmente em poucas horas, e o mesmo link se libera sozinho.' },
+      { q: 'Tem versão Kindle ou impressa?', a: 'Tem. O Sweet Escape está na Amazon em Kindle, capa comum e capa dura: os links ficam logo abaixo do formulário de pedido. O PDF desta página vem direto da gente, abre em qualquer celular, tablet ou computador, e tem as fotos em tamanho grande.' },
       { q: 'Preciso de algum equipamento especial?', a: 'Não. Um liquidificador ou processador, algumas forminhas de silicone ou uma assadeira, e um freezer. A maioria dos doces é crua: você bate, aperta e o freezer faz o resto. Só os muffins e os biscoitos de taco vão ao forno.' },
       { q: 'É mesmo sem açúcar refinado?', a: 'Toda receita é adoçada com tâmaras, uvas-passas e frutas. A única exceção é a casquinha de chocolate do Dia 7: o livro ensina a escolher um chocolate amargo sem açúcar refinado, porque a maioria dos de mercado tem um pouco.' },
       { q: 'É vegano? Sem glúten?', a: '100% vegetal, sem leite, sem ovo e sem farinha de trigo. Algumas receitas levam aveia: use aveia certificada sem glúten se precisar.' },
@@ -353,6 +366,15 @@ const PT: EbookCopy = {
       { q: 'Sou iniciante. Vou conseguir?', a: 'Vai. A Regra nº 4 é literalmente “trabalhe com inteligência, não com esforço”. Comece pelo Dia 3, as Red Berry Bliss Balls: sem forno, dez minutos, e mãozinhas conseguem enrolar.' },
       { q: 'E se eu não gostar?', a: 'Escreva pra gente em até 7 dias e devolvemos cada centavo. Sem formulário, sem ressentimento.' },
     ],
+  },
+  amazon: {
+    kicker: 'Também na Amazon', title: 'Prefere o livro nas mãos? As mesmas 7 receitas, no Kindle ou impressas.',
+    formats: {
+      kindle: { name: 'Kindle', detail: 'em qualquer Kindle ou no app grátis' },
+      paperback: { name: 'Capa comum', detail: 'impresso e entregue pela Amazon' },
+      hardcover: { name: 'Capa dura', detail: 'para guardar, ou dar de presente' },
+    },
+    cta: 'Amazon', note: 'Vai de PDF aqui em cima? Ele chega direto da Dolly, em minutos, com as fotos em tamanho grande.',
   },
   final: {
     line: 'Sete cores. Sete criações. Sete pequenos motivos para se apaixonar de novo pelas plantas.',

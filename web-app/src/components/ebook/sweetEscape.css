@@ -350,3 +350,30 @@
 /* ══ R$ / US$: the wallet switch above the ways to pay (BookPay) ══ */
 .se-wallet { grid-template-columns: repeat(2, 1fr); }
 .se-wallet b { font-size: 1.05rem; }
+
+/* ══ ALSO ON AMAZON: a quiet row under the order card (Kindle, paperback, hardcover) ══ */
+.se-amz { margin: 3rem auto 0; max-width: 980px; text-align: center; }
+.se-amz__kicker { display: flex; align-items: center; gap: 1rem; margin: 0 0 0.5rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--se-gold); }
+.se-amz__kicker::before, .se-amz__kicker::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5)); }
+.se-amz__kicker::after { background: linear-gradient(90deg, rgba(212, 175, 55, 0.5), transparent); }
+.se-amz__title { margin: 0 auto 1.25rem; max-width: 520px; font-size: 0.95rem; line-height: 1.5; color: rgba(255, 255, 255, 0.75); }
+.se-amz__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.se-amz__item { display: flex; align-items: center; gap: 0.9rem; min-height: 76px; padding: 0.7rem 1rem; border-radius: 14px; text-align: left; text-decoration: none; color: #fff; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease; }
+.se-amz__item:hover, .se-amz__item:focus-visible { background: rgba(212, 175, 55, 0.12); border-color: rgba(212, 175, 55, 0.55); transform: translateY(-2px); }
+.se-amz__text { flex: 1; display: grid; gap: 0.1rem; min-width: 0; }
+.se-amz__text b { font-size: 0.98rem; }
+.se-amz__text small { font-size: 0.8rem; color: rgba(255, 255, 255, 0.62); line-height: 1.35; }
+.se-amz__go { flex: 0 0 auto; font-size: 0.78rem; font-weight: 700; color: #ffd08a; white-space: nowrap; }
+.se-amz__note { margin: 1rem auto 0; max-width: 520px; font-size: 0.8rem; line-height: 1.5; color: rgba(255, 255, 255, 0.55); }
+
+/* The cover, held three ways. */
+.se-amz__cover { flex: 0 0 46px; display: flex; justify-content: center; line-height: 0; }
+.se-amz__cover img { display: block; width: 38px; }
+.se-amz__cover--kindle { padding: 4px 4px 9px; border-radius: 6px; background: #0d0d0d; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 6px 14px rgba(0, 0, 0, 0.45); }
+.se-amz__cover--kindle img { width: 100%; border-radius: 1px; }
+.se-amz__cover--paperback img { border-radius: 1px 3px 3px 1px; box-shadow: 3px 5px 10px rgba(0, 0, 0, 0.45); }
+.se-amz__cover--hardcover img { width: 42px; border-radius: 2px 4px 4px 2px; border-left: 5px solid #2a1a12; box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.25), 5px 7px 14px rgba(0, 0, 0, 0.5); }
+
+@media (min-width: 900px) {
+  .se-amz__list { grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+}
