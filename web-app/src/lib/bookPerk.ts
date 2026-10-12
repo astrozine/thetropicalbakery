@@ -39,6 +39,10 @@ export const PERK_COPY: Record<EbookLang, { title: string; text: string }> = {
     title: 'Je lezerscadeau: 15% korting',
     text: 'Omdat je Sweet Escape kocht, krijg je 15% korting op je eerste bestelling van iets anders uit mijn keuken: een Proefdoos, een brunch, een cursus, een retraite of lekkernijen voor je event. Geen code nodig: gebruik hetzelfde e-mailadres en de korting staat in je totaal.',
   },
+  de: {
+    title: 'Dein Lesergeschenk: 15 % Rabatt',
+    text: 'Weil du Sweet Escape gekauft hast, bekommst du 15 % Rabatt auf deine erste Bestellung von etwas anderem aus meiner Küche: eine Probierbox, einen Brunch, einen Kurs, ein Retreat oder Leckereien für dein Event. Kein Code nötig: Nutze einfach dieselbe E-Mail-Adresse, und der Rabatt erscheint in deiner Summe.',
+  },
 };
 
 const paidStatus = (status: string | null) => String(status ?? '').toUpperCase() === 'PAID';

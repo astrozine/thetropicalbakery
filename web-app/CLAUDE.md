@@ -236,7 +236,7 @@ Bars) for an e-mail. Built 2026-10-07; guide for Andrew with the ad copy: `SETUP
 `migration_43_free_recipes_funnel.sql` (`funnel_leads`, admin-only; the site writes it with the service key).
 
 - **Every fact in `src/lib/funnel.ts`** (paths, segments, interests → local offers, the e-mail SEQUENCE, page copy in
-  en/pt/es/nl). **Prices only in `src/lib/ebook.ts` `BOOK_OFFERS`** (`full` 47/9, `welcome` 27/5). Stripe's charge and its
+  en/pt/es/nl/de; German at `/free-recipes/de` and `/sweet-escape/de`). **Prices only in `src/lib/ebook.ts` `BOOK_OFFERS`** (`full` 47/9, `welcome` 27/5). Stripe's charge and its
   verification both read the dollars from the order's BRL total (`usdForBRL`), so a new offer needs a distinct BRL price.
 - **Steps:** opt-in with "where are you?" (local / visiting / away) and an order bump (the book at full price) →
   `/free-recipes/obrigado` (PDF download, the book's payment status or a one-time offer, the local "what would you love?"

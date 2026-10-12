@@ -8,8 +8,8 @@ import { FUNNEL, freePdf } from '@/lib/funnel';
 
 /**
  * "Here are your 2 recipes": sent the moment someone signs up on the free-recipes page. Transactional (topic
- * `pedido`, they just asked for it), once per address: signing up twice does not mail the PDF twice. In the four
- * languages the PDF comes in; Spanish and Dutch wear the English frame. The sequence that follows is marketing and
+ * `pedido`, they just asked for it), once per address: signing up twice does not mail the PDF twice. In the five
+ * languages the PDF comes in; Spanish, Dutch and German wear the English frame. The sequence that follows is marketing and
  * goes through sendCampaign (lib/email/funnelCampaigns.ts).
  */
 
@@ -62,13 +62,25 @@ const COPY: Record<EbookLang, { subject: string; preheader: string; heading: str
     ps: 'P.S. Lekker? Het hele boek heeft nog vijf kleuren, één voor elke dag van de week: {book} ({price}).',
     note: 'Liefs, Dolly · Itamambuca-strand, Brazilië',
   },
+  de: {
+    subject: 'Deine 2 Gratis-Rezepte von Dolly 🍓',
+    preheader: 'Spritzige Rote-Beeren-Bliss-Balls und Erdnuss-Banoffee-Schnitten, ganz ohne Ofen.',
+    heading: 'Hier sind deine Rezepte',
+    hi: 'Hallo {name}!',
+    text: 'Danke, dass du mit mir backst. Hier ist mein kleines Geschenk: zwei meiner Lieblingsrezepte aus Sweet Escape, beide ohne Ofen und ohne raffinierten Zucker.',
+    inside: 'Drin',
+    recipes: ['Spritzige Rote-Beeren-Bliss-Balls (für 12–14 Stück)', 'Erdnuss-Banoffee-Schnitten (für 8–10 Stück)'],
+    cta: 'Meine Rezepte herunterladen',
+    ps: 'P.S. Haben sie dir geschmeckt? Das ganze Buch hat noch fünf Farben mehr, eine für jeden Tag der Woche: {book} ({price}).',
+    note: 'Alles Liebe, Dolly · Strand von Itamambuca, Brasilien',
+  },
 };
 
 export async function sendFreeRecipes(db: SupabaseClient, o: { email: string; firstName: string; lang: EbookLang }) {
   const email = o.email.trim().toLowerCase();
   if (!email.includes('@')) return;
   const c = COPY[o.lang];
-  const price = o.lang === 'pt' ? `R$ ${BOOK_OFFERS.full.brl}` : `US$ ${BOOK_OFFERS.full.usd}`;
+  const price = o.lang === 'pt' ? `R$ ${BOOK_OFFERS.full.brl}` : o.lang === 'de' ? `€ ${BOOK_OFFERS.full.eur}` : `US$ ${BOOK_OFFERS.full.usd}`;
   const book = `${SITE_URL}${LANG_PATH[o.lang]}?utm_source=email&utm_medium=funil&utm_campaign=receitas-d0`;
   const hello = o.firstName
     ? `<p style="color:#3c2a21;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:17px;font-weight:bold;margin:0 0 12px;">${fill(c.hi, { name: o.firstName.replace(/[<>&"]/g, '') })}</p>`

@@ -9,7 +9,7 @@ export function funnelMetadata(lang: EbookLang): Metadata {
   return {
     title: c.title,
     description: c.description,
-    alternates: { canonical: p[lang], languages: { en: p.en, pt: p.pt, es: p.es, nl: p.nl, 'x-default': p.en } },
+    alternates: { canonical: p[lang], languages: { en: p.en, pt: p.pt, es: p.es, nl: p.nl, de: p.de, 'x-default': p.en } },
     openGraph: {
       title: c.title,
       description: c.description,

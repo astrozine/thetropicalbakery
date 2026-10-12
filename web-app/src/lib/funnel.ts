@@ -4,7 +4,7 @@
  * around Ubatuba / Paraty, the local ladder (box, subscription, course, brunch, events menu) → an e-mail sequence
  * that ends in a 48-hour welcome price (the downsell).
  *
- * Every fact the pages, the server and the e-mails share, plus the page words in the four languages the PDFs come
+ * Every fact the pages, the server and the e-mails share, plus the page words in the five languages the PDFs come
  * in. Pure data, no imports beyond types and the book's own facts, so client pages and the server read it alike.
  * Prices live in lib/ebook.ts (BOOK_OFFERS); never write one here.
  */
@@ -14,7 +14,7 @@ import type { ContactTag } from './emailTopics';
 
 export const FUNNEL = {
   /** The landing page per language. /receitas is the Portuguese one (the short address for Brazilian ads). */
-  pagePath: { en: '/free-recipes', pt: '/receitas', es: '/free-recipes/es', nl: '/free-recipes/nl' } as Record<EbookLang, string>,
+  pagePath: { en: '/free-recipes', pt: '/receitas', es: '/free-recipes/es', nl: '/free-recipes/nl', de: '/free-recipes/de' } as Record<EbookLang, string>,
   thanksPath: '/free-recipes/obrigado',
   /** The welcome-price page the downsell e-mail links to (?t=<offer token>). */
   offerPath: '/free-recipes/oferta',
@@ -509,4 +509,110 @@ const NL: FunnelCopy = {
   },
 };
 
-export const FUNNEL_COPY: Record<EbookLang, FunnelCopy> = { en: EN, pt: PT, es: ES, nl: NL };
+/** German (for amazon.de's big vegan crowd): the German book's recipe names, "weizenfrei", never "glutenfrei". */
+const DE: FunnelCopy = {
+  meta: {
+    title: '2 kostenlose Rezepte von Dolly | The Tropical Bakery',
+    description: 'Spritzige Rote-Beeren-Bliss-Balls und Erdnuss-Banoffee-Schnitten: zwei Desserts ohne Ofen und ohne raffinierten Zucker, gratis aus Dollys Buch Sweet Escape. Sofort als PDF.',
+    ogLocale: 'de_DE',
+  },
+  hero: {
+    eyebrow: 'Gratis · 2 Rezepte aus meinem Buch Sweet Escape',
+    title: '2 Desserts, bei denen keiner glaubt, dass sie',
+    em: 'gesund sind',
+    lead: 'Zwei der sieben Rezepte aus meinem Buch **Sweet Escape**, geschenkt: **Spritzige Rote-Beeren-Bliss-Balls** und **Erdnuss-Banoffee-Schnitten** in drei Schichten. Ohne Ofen, ohne raffinierten Zucker, ohne Weizenmehl. Nur Obst, Nüsse und Datteln.',
+    ticks: ['Ohne Ofen, 20 Minuten Arbeit', 'Vegan, ohne raffinierten Zucker, weizenfrei', 'Sofort als PDF, auf Deutsch'],
+    badge: 'GRATIS', badgeOf: 'von 7 Rezepten', paidTag: '7 Rezepte · {price}',
+  },
+  strip: { label: '**2 der 7** Rezepte aus Sweet Escape', worth: 'Das Buch kostet **{price}**. Diese zwei schenke ich dir.', free: 'Gratis',
+  },
+  form: {
+    title: 'Wohin darf ich sie schicken?',
+    name: 'Vorname',
+    email: 'E-Mail',
+    where: 'Wo bist du?',
+    segments: { local: 'Ubatuba / Paraty und Umgebung', visiting: 'Ich komme bald zu Besuch', away: 'Woanders' },
+    submit: 'Schick mir die 2 Rezepte',
+    submitBump: 'Rezepte + das ganze Buch schicken · {price}',
+    busy: 'Wird gesendet…',
+    fine: 'Gratis. Eine E-Mail mit deinen Rezepten, danach ab und zu ein paar Zeilen aus meiner Küche. Abmelden geht jederzeit.',
+    errName: 'Verrat mir deinen Vornamen, damit ich weiß, für wen ich backe.',
+    errEmail: 'Diese E-Mail-Adresse sieht nicht richtig aus: Dorthin kommen deine Rezepte.',
+    errWhere: 'Wähl aus, wo du bist (dann schicke ich dir das Passende).',
+    errGeneric: 'Da ist etwas schiefgelaufen. Bitte versuch es gleich noch einmal.',
+  },
+  bump: {
+    tag: 'Einmaliges Angebot',
+    title: 'Ja! Ich will auch die anderen 5 Rezepte',
+    text: 'Nimm das **komplette Sweet Escape** (7 Farben, 7 Rezepte, {pages} Seiten) zu deinen Gratis-Rezepten dazu, für **{price}**. Sofort als PDF, 7 Tage Geld-zurück-Versprechen.',
+    pay: 'Wie du das Buch bezahlst',
+  },
+  recipes: {
+    kicker: 'Gratis in deinem PDF',
+    title: 'Deine 2 Gratis-Rezepte',
+    items: [
+      { name: 'Spritzige Rote-Beeren-Bliss-Balls', note: 'Tag 3 · Rot · für 12–14 Stück', line: 'Kirschen, Erdbeeren und Datteln, gewälzt in knuspriger Himbeere. Kinder rollen sie gern mit.' },
+      { name: 'Erdnuss-Banoffee-Schnitten', note: 'Tag 6 · Karamell · für 8–10 Stück', line: 'Erdnussboden, Bananen-Cashew-Creme, Dattelkaramell obendrauf. Brasilianische Paçoca trifft britisches Banoffee.' },
+    ],
+  },
+  rest: { kicker: 'Schon verliebt?', title: 'Im Buch warten noch 5 Leckereien', text: 'Sweet Escape hat eine Leckerei für jeden Tag der Woche, jede in einer anderen Farbe. Nimm alle 7 zu deinen Gratis-Rezepten dazu, für **{price}**: Setz einfach das Häkchen im Formular.', cta: 'Ja, ich will alle 7' },
+  dolly: {
+    kicker: 'Hallo, ich bin Dolly',
+    title: 'Süßes, das dir guttut',
+    text: 'Ich bin eine belgische Köchin, die die Stadt gegen den Strand von Itamambuca in Brasilien getauscht hat. In meiner Dschungelküche mache ich Desserts aus ganzen Früchten, Nüssen und Datteln, nichts Raffiniertes, und ich verspreche dir: Du vermisst nichts.',
+    sign: 'Alles Liebe,',
+  },
+  final: { title: 'Deine zwei Rezepte sind nur einen Tipp entfernt', cta: 'Gratis-Rezepte holen' },
+  thanks: {
+    checking: 'Einen Moment…',
+    title: 'Sie gehören dir{name}! 🎉',
+    text: 'Ich habe sie auch an **{email}** geschickt. Du musst nicht warten, lade sie gleich hier herunter:',
+    download: 'Meine 2 Rezepte herunterladen (PDF)',
+    spam: 'Keine E-Mail? Schau unter Werbung oder Spam nach und verschieb sie in deinen Posteingang, damit meine nächsten Zeilen ankommen.',
+    unknownTitle: 'Wir finden deine Anmeldung nicht',
+    unknownText: 'Der Link ist vielleicht unvollständig. Melde dich noch einmal an: Das dauert zehn Sekunden.',
+    back: 'Gratis-Rezepte holen',
+    bookTitle: 'Dein komplettes Sweet Escape',
+    bookWait: 'Wir warten auf die Zahlung… diese Seite aktualisiert sich von selbst (eine Pix-Zahlung wird von Hand bestätigt, meist innerhalb weniger Stunden).',
+    bookPaid: 'Bezahlt! Alle 7 Rezepte gehören dir.',
+    bookDownload: 'Sweet Escape herunterladen',
+    otoKicker: 'Warte! Noch eine Sache, bevor du loslegst',
+    otoTitle: 'Mach alle 7 Farben komplett',
+    otoText: 'Du hast Rot und Karamell. Das ganze Buch bringt die anderen fünf dazu, eine für jeden Tag der Woche, plus das Warum hinter jeder Zutat, damit du eigene erfinden kannst.',
+    otoMissing: 'Warten noch auf dich:',
+    otoPromise: 'Sofort als PDF · 7 Tage Geld-zurück-Versprechen',
+    otoPerk: '🎁 Extra für dich: Mit dem Buch bekommst du 15 % Rabatt auf deine erste Probierbox, deinen ersten Brunch, Kurs oder deine erste Event-Bestellung.',
+    otoCta: 'Das ganze Buch dazu · {price}',
+    otoNo: 'Nein danke, die 2 Rezepte reichen mir erst mal',
+    otoDeclined: 'Kein Problem! Das Buch findest du jederzeit auf thetropicalbakery.com/sweet-escape/de.',
+    nearKicker: 'Du bist ganz in der Nähe meiner Küche!',
+    nearTitle: { local: 'Probier sie zuerst, von mir gemacht', visiting: 'Kommst du nach Ubatuba oder Paraty? Probier das Original' },
+    nearQuestion: 'Worüber würdest du dich am meisten freuen?',
+    interests: {
+      box: { label: 'Dollys Leckereien probieren', title: 'Die Probierbox', text: 'Eine Kraftpapier-Box mit den Leckereien der Woche, von Hand gemacht und rund um Ubatuba geliefert. Finde deinen Liebling und back ihn dann selbst.', cta: 'Die Box der Woche ansehen', second: 'Jede Woche? Schau dir das Abo an' },
+      brunch: { label: 'Ein Brunch mit Freundinnen', title: 'Brunch Tropical', text: 'Tee, gesunde Leckereien und echte Gespräche, mit mir als Gastgeberin. Kleine Gruppe, schöne Orte.', cta: 'Den nächsten Brunch ansehen' },
+      course: { label: 'Lernen mit Dolly', title: 'Praxiskurse', text: 'Mach diese und viele mehr an meinem Tisch, in einer kleinen Gruppe, und nimm das Wissen mit nach Hause.', cta: 'Die Kurse ansehen' },
+      events: { label: 'Leckereien für mein Event', title: 'Das Event-Menü', text: 'Bliss Balls, Banoffee-Schnitten und mehr pro Tablett, für Feiern, Hochzeiten, Retreats und Hotels.', cta: 'Das Event-Menü ansehen' },
+    },
+    another: 'Etwas anderes',
+    awayKicker: 'Falls du mal nach Brasilien kommst',
+    awayTitle: 'Meine Küche liegt am Strand von Itamambuca',
+    awayText: 'Zwischen São Paulo und Rio. Retreats, Kurse und Brunches finden genau hier statt, direkt am Meer.',
+    shareTitle: 'Kennst du jemanden, der sich darüber freut?',
+    shareText: 'Schick ihnen die Gratis-Rezepte. Kostet nichts und versüßt ihnen die Woche.',
+    shareButton: 'Auf WhatsApp teilen',
+    shareMessage: 'Dolly von The Tropical Bakery verschenkt 2 Rezepte: ohne Ofen, ohne raffinierten Zucker 🍓 {url}',
+  },
+  offer: {
+    kicker: 'Nur für alle, die mit mir backen',
+    title: 'Das komplette Sweet Escape für {price}',
+    text: 'Danke, dass du mit mir backst. Zur Begrüßung kostet das ganze Buch (alle 7 Farben) **{price}** statt {full}.',
+    until: 'Dieser Preis endet am {date}.',
+    was: 'statt {full}',
+    expiredTitle: 'Dieser Willkommenspreis ist vorbei',
+    expiredText: 'Das Buch gibt es weiterhin, zum normalen Preis, mit demselben 7-Tage-Versprechen.',
+    expiredCta: 'Sweet Escape ansehen',
+  },
+};
+
+export const FUNNEL_COPY: Record<EbookLang, FunnelCopy> = { en: EN, pt: PT, es: ES, nl: NL, de: DE };

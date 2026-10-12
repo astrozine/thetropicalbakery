@@ -102,6 +102,7 @@ const WALLET_COPY: Record<EbookLang, { legend: string; brlNote: string; cardNote
   pt: { legend: 'Pagar em', brlNote: 'Pix · cartão brasileiro', cardNote: 'Cartão internacional' },
   es: { legend: 'Pagar en', brlNote: 'Pix · tarjeta brasileña', cardNote: 'Cualquier tarjeta · Apple Pay' },
   nl: { legend: 'Betalen in', brlNote: 'Pix · Braziliaanse kaart', cardNote: 'Elke kaart · Apple Pay' },
+  de: { legend: 'Bezahlen in', brlNote: 'Pix · brasilianische Karte', cardNote: 'Jede Karte · Apple Pay' },
 };
 const FLAG: Record<Wallet, string> = { brl: '🇧🇷', usd: '🌎', eur: '🇪🇺' };
 

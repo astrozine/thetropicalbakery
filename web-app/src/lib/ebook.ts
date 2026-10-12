@@ -60,6 +60,7 @@ export const BOOK_FILES = {
   pt: 'sweet-escape-pt-br.pdf',
   es: 'sweet-escape-es.pdf',
   nl: 'sweet-escape-nl.pdf',
+  de: 'sweet-escape-de.pdf',
 } as const;
 export type BookLang = keyof typeof BOOK_FILES;
 export const isBookLang = (v: unknown): v is BookLang => typeof v === 'string' && v in BOOK_FILES;

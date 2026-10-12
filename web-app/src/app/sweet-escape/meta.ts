@@ -9,7 +9,7 @@ export function ebookMetadata(lang: EbookLang): Metadata {
     description: c.description,
     alternates: {
       canonical: LANG_PATH[lang],
-      languages: { en: LANG_PATH.en, pt: LANG_PATH.pt, es: LANG_PATH.es, nl: LANG_PATH.nl, 'x-default': LANG_PATH.en },
+      languages: { en: LANG_PATH.en, pt: LANG_PATH.pt, es: LANG_PATH.es, nl: LANG_PATH.nl, de: LANG_PATH.de, 'x-default': LANG_PATH.en },
     },
     openGraph: {
       title: c.ogTitle,

@@ -137,6 +137,7 @@ export default function AdminFreeRecipesPage() {
   const links = [
     { label: 'Anúncio em português (Meta)', url: `${site}${FUNNEL.pagePath.pt}?utm_source=meta&utm_campaign=receitas-pt` },
     { label: 'Anúncio em inglês (Meta)', url: `${site}${FUNNEL.pagePath.en}?utm_source=meta&utm_campaign=recipes-en` },
+    { label: 'Anúncio em alemão (Meta, Alemanha/Áustria/Suíça)', url: `${site}${FUNNEL.pagePath.de}?utm_source=meta&utm_campaign=rezepte-de` },
     { label: 'Link da bio do Instagram', url: `${site}${FUNNEL.pagePath.pt}?utm_source=instagram&utm_campaign=bio` },
     { label: 'Post / story orgânico', url: `${site}${FUNNEL.pagePath.pt}?utm_source=instagram&utm_campaign=post` },
   ];

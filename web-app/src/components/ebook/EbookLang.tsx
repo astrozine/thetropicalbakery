@@ -81,7 +81,7 @@ export function LangBar({ lang }: { lang: EbookLang }) {
     if (lang !== 'en') return;
     try { if (sessionStorage.getItem('se-lang-dismissed')) return; } catch { /* private mode */ }
     const nav = (navigator.language || '').slice(0, 2);
-    if (nav === 'pt' || nav === 'es' || nav === 'nl') setSuggest(nav);
+    if (nav === 'pt' || nav === 'es' || nav === 'nl' || nav === 'de') setSuggest(nav);
   }, [lang]);
 
   const dismiss = () => {

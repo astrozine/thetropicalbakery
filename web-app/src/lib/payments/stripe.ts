@@ -58,7 +58,7 @@ const headers = (secret: string) => ({
 const form = (o: Record<string, string>) => new URLSearchParams(o).toString();
 
 /** The languages Stripe's payment page speaks that we also write. */
-const STRIPE_LOCALE: Record<string, string> = { en: 'en', pt: 'pt-BR', es: 'es', nl: 'nl' };
+const STRIPE_LOCALE: Record<string, string> = { en: 'en', pt: 'pt-BR', es: 'es', nl: 'nl', de: 'de' };
 
 export interface StripeCheckoutInput {
   reference: string;

@@ -42,7 +42,7 @@ export default function WelcomeOffer({ lang, token, expiresAt }: { lang: EbookLa
     );
   }
 
-  const date = new Date(expiresAt).toLocaleDateString(pt ? 'pt-BR' : lang === 'es' ? 'es-ES' : lang === 'nl' ? 'nl-NL' : 'en-US', {
+  const date = new Date(expiresAt).toLocaleDateString(pt ? 'pt-BR' : lang === 'es' ? 'es-ES' : lang === 'nl' ? 'nl-NL' : lang === 'de' ? 'de-DE' : 'en-US', {
     timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'long',
   });
 

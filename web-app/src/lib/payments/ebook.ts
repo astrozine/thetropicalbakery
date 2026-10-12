@@ -28,7 +28,7 @@ export interface EbookOrderInput {
   payMethod?: string;
   /** Which version of the page they bought from: the e-mails and download page follow it. */
   lang?: string;
-  /** Which language of the book they want: en, pt, es or nl (anything else is the English edition). */
+  /** Which language of the book they want: en, pt, es, nl or de (anything else is the English edition). */
   book?: string;
   /** A welcome-price link from the free-recipes e-mails (offerToken). Anything invalid or expired = full price. */
   offer?: string;
@@ -85,7 +85,7 @@ export function thanksUrl(site: string, reference: string, lang: EbookLang = 'en
  */
 const ADDRESS = 'E-BOOK · entrega digital por e-mail';
 export const ebookAddress = (lang: EbookLang, book: BookLang) => `${ADDRESS} · ${lang} · ${book}`;
-const TAIL = /·\s*(en|pt|es|nl)\s*(?:·\s*(en|pt|es|nl)\s*)?$/;
+const TAIL = /·\s*(en|pt|es|nl|de)\s*(?:·\s*(en|pt|es|nl|de)\s*)?$/;
 export const langFromAddress = (address: unknown): EbookLang => {
   const m = TAIL.exec(String(address ?? ''));
   return m && isEbookLang(m[1]) ? m[1] : 'en';
@@ -207,7 +207,7 @@ export async function ebookCheckoutUrl(order: CreatedEbookOrder, email: string, 
   const opts = { returnUrl, title: `${EBOOK.title} e-book (PDF) · The Tropical Bakery` };
   if (order.method === 'stripe') return createStripeCheckout({ reference: order.reference, email: email.trim(), lang: order.lang, returnUrl, currency: order.currency, amount: BOOK_OFFERS[order.offer][order.currency] });
   if (order.method === 'mercadopago') return createMercadoPagoCheckout(saved, opts);
-  return createPayPalCheckout(saved, { ...opts, locale: order.lang === 'pt' ? 'pt-BR' : order.lang === 'es' ? 'es-ES' : order.lang === 'nl' ? 'nl-NL' : 'en-US' });
+  return createPayPalCheckout(saved, { ...opts, locale: order.lang === 'pt' ? 'pt-BR' : order.lang === 'es' ? 'es-ES' : order.lang === 'nl' ? 'nl-NL' : order.lang === 'de' ? 'de-DE' : 'en-US' });
 }
 
 export interface EbookAccess {

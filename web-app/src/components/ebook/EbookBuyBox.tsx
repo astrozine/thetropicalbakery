@@ -13,7 +13,7 @@ interface PixResult { reference: string; key: string; payload: string; base64: s
 /**
  * The order form inside the price card. Name + e-mail (where the book goes), WhatsApp optional, and how to
  * pay. The server prices it; card and PayPal leave for their own page, Pix shows its QR right here.
- * The book comes in four languages: the buyer's own is pre-selected. Anyone about to get the English edition while
+ * The book comes in five languages: the buyer's own is pre-selected. Anyone about to get the English edition while
  * reading in another language (the page, or the browser's translation of it) must confirm they know it is English.
  */
 export default function EbookBuyBox({ lang = 'en', translated = false, offer }: {
