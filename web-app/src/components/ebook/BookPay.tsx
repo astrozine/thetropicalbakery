@@ -13,7 +13,7 @@ import { useGoogleTranslated } from './EbookLang';
  *   Brazilian time zone -> reais. Reading in Dutch, Italian, French or German (our page, or Google's translation)
  *   -> euros. Everyone else, Spanish readers included -> dollars. Google Translate switching the page flips it live.
  * - The switch offers two: reais, and the visitor's foreign currency (euros for European readers, otherwise dollars).
- *   A tap wins over the guess, is remembered in this browser, and every price on the page (hero, the math, the price
+ *   A tap wins over the guess, is remembered in this browser, and every price on the page (hero, the price
  *   card, the sticky bar) moves with it at once.
  * - Display only. The SERVER prices the order from the method: Stripe charges BOOK_OFFERS .usd (or .eur when the
  *   browser sends 'stripe-eur'), everything else .brl.

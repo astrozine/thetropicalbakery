@@ -7,14 +7,13 @@ import RainbowJourney from './RainbowJourney';
 import EbookBuyBox from './EbookBuyBox';
 import AmazonEditions, { AmazonBadge } from './AmazonEditions';
 import { EditionNotice, EnglishNotice, LangBar, rich, useGoogleTranslated } from './EbookLang';
-import { BAKERY_TREAT_PRICE_BRL, BRL_PER_EUR, BRL_PER_USD, EBOOK, RECIPES, TOTAL_TREATS, stripeMoney } from '@/lib/ebook';
+import { EBOOK, RECIPES, TOTAL_TREATS, stripeMoney } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import { useBookWallet } from './BookPay';
 import './sweetEscape.css';
 
 const IMG = '/ebook/sweet-escape';
-const brl = (n: number) => `R$ ${n.toLocaleString('pt-BR')}`;
 
 const BLOCK_ICONS = ['🥥', '🌴', '🌾', '✨', '🍓', '🌈'];
 const PAGES = ['contents', 'page-rule', 'page-opener', 'page-recipe', 'page-why', 'page-benefits', 'page-purple', 'page-story'];
@@ -42,11 +41,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
   const abroad = wallet !== 'brl';
   const reais = `R$ ${EBOOK.priceBRL}`;
   const price = wallet === 'eur' ? stripeMoney(EBOOK.priceEUR, 'eur') : abroad ? stripeMoney(EBOOK.priceUSD, 'usd') : reais;
-  const eachAbroad = Math.round(BAKERY_TREAT_PRICE_BRL / (wallet === 'eur' ? BRL_PER_EUR : BRL_PER_USD));
-  const abroadMoney = (n: number) => stripeMoney(n.toLocaleString('en-US'), wallet === 'eur' ? 'eur' : 'usd');
-  const each = abroad ? abroadMoney(eachAbroad) : brl(BAKERY_TREAT_PRICE_BRL);
-  const bakeryValue = abroad ? abroadMoney(TOTAL_TREATS * eachAbroad) : brl(TOTAL_TREATS * BAKERY_TREAT_PRICE_BRL);
-  const v = { price, reais, pages: EBOOK.pages, n: TOTAL_TREATS, each, usd: EBOOK.priceUSD };
+  const v = { price, reais, pages: EBOOK.pages, n: TOTAL_TREATS, usd: EBOOK.priceUSD };
 
   useEffect(() => {
     trackMeta('ViewContent', { value: EBOOK.priceBRL, content_name: EBOOK.id, content_type: 'product' });
@@ -172,20 +167,6 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
               {c.family.checks.map(t => <li key={t}>{t}</li>)}
             </ul>
           </div>
-        </div>
-      </section>
-
-      {/* ══ THE MATH ══ */}
-      <section className="se-sec se-sec--math">
-        <div className="se-wrap se-narrow se-center">
-          <p className="se-kicker">{c.math.kicker}</p>
-          <h2 className="se-h2">{fill(c.math.title, v)}</h2>
-          <div className="se-math">
-            <div><b>{TOTAL_TREATS}</b><span>{c.math.treats}</span></div>
-            <div><b>{bakeryValue}</b><span>{fill(c.math.bakery, v)}</span></div>
-            <div className="is-hot"><b>{price}</b><span>{c.math.book}</span></div>
-          </div>
-          <p className="se-small">{c.math.small}</p>
         </div>
       </section>
 

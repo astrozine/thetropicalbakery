@@ -7,7 +7,7 @@
  * INTO Portuguese at all, and a machine-translated sales page reads cheap. French and Italian
  * still go through Google from the language bar on the English page.
  *
- * Markup in strings: **bold**, *italic*. Placeholders: {price} {pages} {n} {value} {each} {email} {name}.
+ * Markup in strings: **bold**, *italic*. Placeholders: {price} {pages} {n} {value} {email} {name}.
  * Recipe NAMES stay in English in every language: that is what the reader will find in the book.
  * Pure data, no imports beyond types: the server e-mails read it too.
  */
@@ -42,7 +42,6 @@ export interface EbookCopy {
   learn: { kicker: string; title: string; lead: string; blocks: { title: string; text: string }[] };
   peek: { kicker: string; title: string; lead: string; alts: string[] };
   family: { kicker: string; title: string; lead: string; checks: string[] };
-  math: { kicker: string; title: string; treats: string; bakery: string; book: string; small: string };
   story: { kicker: string; title: string; paragraphs: string[]; sign: string; photoAlt: string };
   offer: { kicker: string; title: string; stack: { what: string; detail: string; bonus?: boolean }[]; promiseDays: string; promiseTitle: string; promiseText: string; coverAlt: string; usd: string };
   faq: { kicker: string; title: string; items: { q: string; a: string }[] };
@@ -150,11 +149,6 @@ const EN: EbookCopy = {
       'Birthday-worthy desserts, with no dairy, eggs or white sugar in the bowl',
       'Make a batch on Sunday and the freezer does the rest of the week',
     ],
-  },
-  math: {
-    kicker: 'Do the math', title: 'One book. About {n} treats.', treats: 'treats from one round of all 7 recipes',
-    bakery: 'what they’d cost from our bakery at ~{each} each', book: 'for the book you can cook from forever',
-    small: 'Ingredients not included, of course. But you already know where the supermarket is.',
   },
   story: {
     kicker: 'Meet Dolly', title: 'From the ballet stage to a jungle kitchen',
@@ -333,11 +327,6 @@ const PT: EbookCopy = {
       'Faça uma fornada no domingo e o freezer cuida do resto da semana',
     ],
   },
-  math: {
-    kicker: 'Faça as contas', title: 'Um livro. Uns {n} doces.', treats: 'doces numa rodada das 7 receitas',
-    bakery: 'o que custariam na nossa confeitaria, a ~{each} cada', book: 'pelo livro que você usa para sempre',
-    small: 'Ingredientes não inclusos, claro. Mas você já sabe onde fica o mercado.',
-  },
   story: {
     kicker: 'Conheça a Dolly', title: 'Do palco do balé a uma cozinha na mata',
     paragraphs: [
@@ -514,11 +503,6 @@ const ES: EbookCopy = {
       'Postres dignos de cumpleaños, sin lácteos, huevo ni azúcar blanco en el bol',
       'Prepara una tanda el domingo y el congelador se encarga del resto de la semana',
     ],
-  },
-  math: {
-    kicker: 'Haz las cuentas', title: 'Un libro. Unos {n} dulces.', treats: 'dulces en una ronda de las 7 recetas',
-    bakery: 'lo que costarían en nuestra pastelería, a ~{each} cada uno', book: 'por el libro que usarás siempre',
-    small: 'Ingredientes no incluidos, claro. Pero ya sabes dónde está el supermercado.',
   },
   story: {
     kicker: 'Conoce a Dolly', title: 'Del escenario del ballet a una cocina en la selva',
@@ -697,11 +681,6 @@ const NL: EbookCopy = {
       'Desserts die een verjaardag waardig zijn, zonder zuivel, eieren of witte suiker in de kom',
       'Maak zondag een portie en de vriezer doet de rest van de week',
     ],
-  },
-  math: {
-    kicker: 'Reken maar mee', title: 'Eén boek. Zo’n {n} traktaties.', treats: 'traktaties uit één ronde van alle 7 recepten',
-    bakery: 'wat ze bij onze bakkerij zouden kosten, tegen ~{each} per stuk', book: 'voor het boek waar je altijd uit kunt koken',
-    small: 'Ingrediënten niet inbegrepen, natuurlijk. Maar je weet waar de supermarkt is.',
   },
   story: {
     kicker: 'Maak kennis met Dolly', title: 'Van het balletpodium naar een jungle-keuken',
@@ -885,11 +864,6 @@ const DE: EbookCopy = {
       'Desserts, die eines Geburtstags würdig sind, ohne Milch, Eier oder weißen Zucker in der Schüssel',
       'Mach sonntags eine Portion, und den Rest der Woche erledigt das Gefrierfach',
     ],
-  },
-  math: {
-    kicker: 'Rechne mal nach', title: 'Ein Buch. Rund {n} Leckereien.', treats: 'Leckereien aus einer Runde aller 7 Rezepte',
-    bakery: 'was sie in unserer Bäckerei kosten würden, bei ca. {each} pro Stück', book: 'für das Buch, aus dem du für immer kochst',
-    small: 'Zutaten natürlich nicht inklusive. Aber wo der Supermarkt ist, weißt du ja.',
   },
   story: {
     kicker: 'Das ist Dolly', title: 'Von der Ballettbühne in eine Dschungelküche',

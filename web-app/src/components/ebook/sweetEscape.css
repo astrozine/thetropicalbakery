@@ -143,13 +143,6 @@
 .se-checks li::before { content: '✓'; position: absolute; left: 0; top: 0.05rem; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: #27b35a; color: #fff; font-size: 0.8rem; font-weight: 700; display: grid; place-items: center; }
 
 /* ══ MATH ══ */
-.se-sec--math { background: var(--se-cream); }
-.se-math { display: grid; gap: 0.8rem; margin: 1.5rem 0 0; }
-.se-math div { padding: 1.2rem; background: #fff; border-radius: 16px; border: 1px solid #ecd9bb; }
-.se-math b { display: block; font-family: var(--font-heading); font-size: 2rem; line-height: 1.1; color: var(--se-cocoa); }
-.se-math span { font-size: 0.92rem; color: #6b564a; }
-.se-math .is-hot { background: var(--se-orange); border-color: var(--se-orange); }
-.se-math .is-hot b, .se-math .is-hot span { color: #fff; }
 
 /* ══ STORY ══ */
 .se-sec--story { background: var(--se-paper); }
@@ -259,7 +252,6 @@
   .se-pains { grid-template-columns: repeat(3, 1fr); }
   .se-pains p { flex-direction: column; }
   .se-blocks { grid-template-columns: repeat(2, 1fr); }
-  .se-math { grid-template-columns: repeat(3, 1fr); }
   .se-page { flex-basis: 40%; }
   .se-br { display: inline; }
   .se-next__grid { grid-template-columns: repeat(3, 1fr); }
