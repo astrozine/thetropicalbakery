@@ -5,7 +5,7 @@ import ZoomableImage from '@/components/ZoomableImage';
 import MobileBuyBar from '@/components/MobileBuyBar';
 import RainbowJourney from './RainbowJourney';
 import EbookBuyBox from './EbookBuyBox';
-import AmazonEditions from './AmazonEditions';
+import AmazonEditions, { AmazonBadge } from './AmazonEditions';
 import { EditionNotice, EnglishNotice, LangBar, rich, useGoogleTranslated } from './EbookLang';
 import { BAKERY_TREAT_PRICE_BRL, BRL_PER_EUR, BRL_PER_USD, EBOOK, RECIPES, TOTAL_TREATS, stripeMoney } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
@@ -77,6 +77,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
                 {c.hero.ticks.map(t => <li key={t}>{fill(t, v)}</li>)}
                 <li className="se-hero__en">📖 {foreign ? c.english.badge : c.edition.badge}</li>
               </ul>
+              <AmazonBadge lang={lang} />
             </div>
           </div>
 
@@ -207,6 +208,9 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
 
       {/* ══ THE OFFER ══ */}
       <section className="se-sec se-sec--offer" id="buy">
+        <div className="se-wrap">
+          <AmazonEditions lang={lang} img={IMG} price={price} />
+        </div>
         <div className="se-wrap se-offer">
           <div className="se-offer__stack">
             <p className="se-kicker se-kicker--light">{c.offer.kicker}</p>
@@ -228,7 +232,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
             </div>
           </div>
 
-          <div className="se-card">
+          <div className="se-card" id="order">
             <div className="se-card__head">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={`${IMG}/${lang}/cover.webp`} alt={c.offer.coverAlt} />
@@ -241,9 +245,6 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
             </div>
             <EbookBuyBox lang={lang} translated={translated} />
           </div>
-        </div>
-        <div className="se-wrap">
-          <AmazonEditions lang={lang} img={IMG} />
         </div>
       </section>
 

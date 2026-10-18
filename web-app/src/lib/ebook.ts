@@ -125,6 +125,19 @@ export const AMAZON_EDITIONS: Partial<Record<BookLang, AmazonEdition>> = {
   de: { edition: 'en', store: 'amazon.de' },
 };
 
+/** List prices on amazon.com (USD), as seen 18 Oct 2026. Shown only where the button goes to amazon.com; other stores
+ * price in their own currency, so their cards just say "on Amazon". Update when the KDP prices change. */
+const AMAZON_USD: Partial<Record<BookLang, Record<AmazonFormat, number>>> = {
+  en: { kindle: 8.99, paperback: 22.99, hardcover: 32.99 },
+  pt: { kindle: 8.00, paperback: 22.99, hardcover: 32.99 },
+};
+
+export const amazonPrice = (lang: BookLang, format: AmazonFormat): string | null => {
+  const ed = AMAZON_EDITIONS[lang];
+  const usd = ed && AMAZON_USD[ed.edition]?.[format];
+  return usd && (ed.storeFor?.[format] ?? ed.store) === 'amazon.com' ? `US$ ${usd.toFixed(2)}` : null;
+};
+
 /** The product page of a format, on the store that ships to that page's readers. */
 export const amazonLink = (lang: BookLang, format: AmazonFormat): string | null => {
   const ed = AMAZON_EDITIONS[lang];

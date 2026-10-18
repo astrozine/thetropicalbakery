@@ -351,21 +351,45 @@
 .se-wallet { grid-template-columns: repeat(2, 1fr); }
 .se-wallet b { font-size: 1.05rem; }
 
-/* ══ ALSO ON AMAZON: a quiet row under the order card (Kindle, paperback, hardcover) ══ */
-.se-amz { margin: 3rem auto 0; max-width: 980px; text-align: center; }
-.se-amz__kicker { display: flex; align-items: center; gap: 1rem; margin: 0 0 0.5rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--se-gold); }
-.se-amz__kicker::before, .se-amz__kicker::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5)); }
-.se-amz__kicker::after { background: linear-gradient(90deg, rgba(212, 175, 55, 0.5), transparent); }
-.se-amz__title { margin: 0 auto 1.25rem; max-width: 520px; font-size: 0.95rem; line-height: 1.5; color: rgba(255, 255, 255, 0.75); }
-.se-amz__edition { display: inline-block; margin: -0.5rem auto 1.1rem; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.78rem; color: #ffd08a; background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); }
-.se-amz__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
-.se-amz__item { display: flex; align-items: center; gap: 0.9rem; min-height: 76px; padding: 0.7rem 1rem; border-radius: 14px; text-align: left; text-decoration: none; color: #fff; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease; }
-.se-amz__item:hover, .se-amz__item:focus-visible { background: rgba(212, 175, 55, 0.12); border-color: rgba(212, 175, 55, 0.55); transform: translateY(-2px); }
-.se-amz__text { flex: 1; display: grid; gap: 0.1rem; min-width: 0; }
-.se-amz__text b { font-size: 0.98rem; }
-.se-amz__text small { font-size: 0.8rem; color: rgba(255, 255, 255, 0.62); line-height: 1.35; }
-.se-amz__go { flex: 0 0 auto; font-size: 0.78rem; font-weight: 700; color: #ffd08a; white-space: nowrap; }
-.se-amz__note { margin: 1rem auto 0; max-width: 520px; font-size: 0.8rem; line-height: 1.5; color: rgba(255, 255, 255, 0.55); }
+/* ══ CHOOSE YOUR EDITION: the PDF (best value) beside Kindle, paperback and hardcover on Amazon ══ */
+.se-ed { margin: 0 0 3rem; scroll-margin-top: 80px; }
+.se-ed .se-h2 { margin-bottom: 1.4rem; }
+.se-ed__grid { display: grid; gap: 1rem; }
+.se-ed__pdf { position: relative; display: grid; gap: 0.9rem; padding: 1.5rem 1.2rem 1.2rem; border-radius: 20px; text-decoration: none; color: var(--se-cocoa); background: var(--se-paper); border: 3px solid var(--se-orange); box-shadow: 0 24px 50px rgba(0, 0, 0, 0.4); transition: transform 0.2s ease; }
+.se-ed__pdf:hover { transform: translateY(-3px); }
+.se-ed__tag { position: absolute; top: -0.85rem; left: 1.2rem; padding: 0.3rem 0.85rem; border-radius: 999px; background: var(--se-gold); color: #2a1a12; font-size: 0.74rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3); }
+.se-ed__pdfhead { display: flex; align-items: center; gap: 1rem; }
+.se-ed__name { display: block; font-family: var(--font-heading); font-size: 1.12rem; line-height: 1.25; }
+.se-ed__price { display: block; margin-top: 0.2rem; font-family: var(--font-heading); font-size: 2.1rem; font-weight: 800; line-height: 1; color: var(--se-orange); }
+.se-ed__perks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; font-size: 0.9rem; line-height: 1.4; }
+.se-ed__perks li { padding-left: 1.5rem; position: relative; }
+.se-ed__perks li::before { content: '✓'; position: absolute; left: 0; color: #1f8a4c; font-weight: 800; }
+.se-ed__go { justify-self: stretch; text-align: center; }
+.se-ed__cover { flex: 0 0 auto; display: flex; justify-content: center; line-height: 0; }
+.se-ed__cover img { display: block; width: 40px; }
+.se-ed__cover--pdf img { width: 70px; border-radius: 3px; box-shadow: 4px 8px 18px rgba(0, 0, 0, 0.35); }
+
+.se-ed__amz { display: grid; gap: 0.6rem; align-content: start; }
+.se-ed__item { position: relative; display: flex; align-items: center; gap: 0.9rem; padding: 0.85rem 1rem; border-radius: 16px; text-decoration: none; color: #fff; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.16); transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease; }
+.se-ed__item:hover, .se-ed__item:focus-visible { background: rgba(212, 175, 55, 0.14); border-color: rgba(212, 175, 55, 0.6); transform: translateY(-2px); }
+.se-ed__text { flex: 1; display: grid; gap: 0.1rem; min-width: 0; }
+.se-ed__text b { font-size: 1rem; }
+.se-ed__amzprice { font-weight: 800; color: #ffd08a; font-size: 0.95rem; }
+.se-ed__text small { font-size: 0.78rem; color: rgba(255, 255, 255, 0.62); line-height: 1.35; }
+.se-ed__amzgo { flex: 0 0 auto; padding: 0.45rem 0.75rem; border-radius: 999px; font-size: 0.76rem; font-weight: 800; color: #1a1209; background: #ffb547; white-space: nowrap; }
+.se-ed__gift { position: absolute; top: -0.6rem; right: 0.9rem; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.68rem; font-weight: 800; color: #fff; background: #b8323e; }
+.se-ed__edition { margin: 0.2rem 0 0; font-size: 0.8rem; line-height: 1.5; color: #ffd08a; }
+.se-card { scroll-margin-top: 80px; }
+
+/* Hero: "also on Amazon" (trust), jumps to the picker. */
+.se-amzbadge { display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 1rem; padding: 0.45rem 0.9rem 0.45rem 0.5rem; border-radius: 999px; text-decoration: none; color: #fff; font-size: 0.82rem; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); }
+.se-amzbadge:hover { border-color: #ffb547; }
+.se-amzbadge__logo { padding: 0.15rem 0.55rem 0.25rem; border-radius: 999px; background: #fff; color: #111; font-weight: 800; font-size: 0.85rem; letter-spacing: -0.3px; border-bottom: 2px solid #ff9900; }
+
+@media (min-width: 900px) {
+  .se-ed__grid { grid-template-columns: 1fr 1.15fr; gap: 1.5rem; align-items: stretch; }
+  .se-ed__pdf { padding: 1.8rem 1.6rem 1.5rem; }
+}
 
 /* The cover, held three ways. */
 .se-amz__cover { flex: 0 0 46px; display: flex; justify-content: center; line-height: 0; }
@@ -375,6 +399,4 @@
 .se-amz__cover--paperback img { border-radius: 1px 3px 3px 1px; box-shadow: 3px 5px 10px rgba(0, 0, 0, 0.45); }
 .se-amz__cover--hardcover img { width: 42px; border-radius: 2px 4px 4px 2px; border-left: 5px solid #2a1a12; box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.25), 5px 7px 14px rgba(0, 0, 0, 0.5); }
 
-@media (min-width: 900px) {
-  .se-amz__list { grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
-}
+.se-ed__cover.se-amz__cover--kindle { width: 48px; }
