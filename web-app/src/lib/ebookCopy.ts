@@ -357,7 +357,7 @@ const PT: EbookCopy = {
     items: [
       { q: 'Em quais idiomas está o livro?', a: 'Em português do Brasil, com todas as receitas e fotos traduzidas. Também existe em English, Español, Nederlands e Deutsch: você escolhe o idioma no pedido. Quem lê outro idioma recebe a edição em inglês (um inglês simples e amigável, com medidas em xícaras e forno em °C).' },
       { q: 'Como eu recebo?', a: 'É um PDF. Pagando no cartão, o download abre na hora e um link pessoal chega por e-mail. No Pix, a Dolly confirma o pagamento à mão, normalmente em poucas horas, e o mesmo link se libera sozinho.' },
-      { q: 'Tem versão Kindle ou impressa?', a: 'Na Amazon, por enquanto, só a edição em inglês: Kindle (na Amazon Brasil), capa comum e capa dura (na amazon.com, que envia para o Brasil). Os links ficam logo abaixo do formulário de pedido. Em português, o livro existe só aqui: o PDF vem direto da gente, abre em qualquer celular, tablet ou computador, e tem as fotos em tamanho grande.' },
+      { q: 'Tem versão Kindle ou impressa?', a: 'Tem. O Sweet Escape em português está na Amazon: Kindle na Amazon Brasil, capa comum e capa dura na amazon.com (que envia para o Brasil). Os links ficam logo abaixo do formulário de pedido. O PDF desta página vem direto da gente, abre em qualquer celular, tablet ou computador, e tem as fotos em tamanho grande.' },
       { q: 'Preciso de algum equipamento especial?', a: 'Não. Um liquidificador ou processador, algumas forminhas de silicone ou uma assadeira, e um freezer. A maioria dos doces é crua: você bate, aperta e o freezer faz o resto. Só os muffins e os biscoitos de taco vão ao forno.' },
       { q: 'É mesmo sem açúcar refinado?', a: 'Toda receita é adoçada com tâmaras, uvas-passas e frutas. A única exceção é a casquinha de chocolate do Dia 7: o livro ensina a escolher um chocolate amargo sem açúcar refinado, porque a maioria dos de mercado tem um pouco.' },
       { q: 'É vegano? Sem glúten?', a: '100% vegetal, sem leite, sem ovo e sem farinha de trigo. Algumas receitas levam aveia: use aveia certificada sem glúten se precisar.' },
@@ -368,7 +368,6 @@ const PT: EbookCopy = {
   },
   amazon: {
     kicker: 'Também na Amazon', title: 'Prefere o livro nas mãos? As mesmas 7 receitas, no Kindle ou impressas.',
-    edition: 'Na Amazon, por enquanto, só em inglês. Em português, só aqui no site.',
     formats: {
       kindle: { name: 'Kindle', detail: 'em qualquer Kindle ou no app grátis' },
       paperback: { name: 'Capa comum', detail: 'impresso e enviado pela amazon.com' },

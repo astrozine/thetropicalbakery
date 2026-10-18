@@ -101,34 +101,33 @@ export const TOTAL_TREATS = RECIPES.reduce((n, r) => n + r.makesCount, 0);
  * The Amazon editions (KDP): Kindle, paperback and hardcover. The PDF from the site stays the main offer; the sales
  * page shows these as a quiet "also on Amazon" row under the order card.
  *
- * KDP makes one listing per language, and so far only the ENGLISH edition is live (hardcover ASIN B0HMZRBBCM, ISBN
- * 979-8161823712, published 12 Oct 2026). The same ASINs work on every Amazon store, so each page points its readers
- * to the store that ships to them: Germany and the Netherlands get their own Amazon (KDP prints there), Spanish
- * readers (mostly Argentina) and Brazil use amazon.com for print, since KDP doesn't print in Brazil. `edition` says
- * which language the Amazon book is in; when it isn't the page's language, the row says so and shows that cover.
- * When a translated KDP edition goes live, set its `edition` to the page language and paste its links.
- * An empty link slot opens a search filtered to that format (Kindle store / books) instead.
+ * Two editions are live (published 12-14 Oct 2026): English and Portuguese, each with its own product IDs (ASINs).
+ * An ASIN is the same on every Amazon store, so each page sends its readers to the store that ships to them:
+ * Germany and the Netherlands to their own Amazon (KDP prints there), Spanish readers (mostly Argentina) to
+ * amazon.com, Brazil to amazon.com.br for Kindle and amazon.com for print (KDP doesn't print in Brazil).
+ * `edition` is the language of the Amazon book; when it isn't the page's language, the row says so and shows that
+ * cover. When a Spanish, Dutch or German KDP edition goes live, add its ASINs and point that page at it.
  */
 export type AmazonFormat = 'kindle' | 'paperback' | 'hardcover';
 export const AMAZON_FORMATS: AmazonFormat[] = ['kindle', 'paperback', 'hardcover'];
 
-type AmazonEdition = { edition: BookLang; store: string; storeFor?: Partial<Record<AmazonFormat, string>>; links: Partial<Record<AmazonFormat, string>> };
-const AMAZON_SEARCH: Partial<Record<BookLang, string>> = { en: 'Sweet Escape 7 Colors 7 Recipes Elisabeth Van Dam' };
-const EN_HARDCOVER = 'B0HMZRBBCM';
-
-export const AMAZON_EDITIONS: Partial<Record<BookLang, AmazonEdition>> = {
-  en: { edition: 'en', store: 'amazon.com', links: { hardcover: `https://www.amazon.com/dp/${EN_HARDCOVER}` } },
-  de: { edition: 'en', store: 'amazon.de', links: { hardcover: `https://www.amazon.de/dp/${EN_HARDCOVER}` } },
-  nl: { edition: 'en', store: 'amazon.nl', links: { hardcover: `https://www.amazon.nl/dp/${EN_HARDCOVER}` } },
-  es: { edition: 'en', store: 'amazon.com', links: { hardcover: `https://www.amazon.com/dp/${EN_HARDCOVER}` } },
-  pt: { edition: 'en', store: 'amazon.com.br', storeFor: { paperback: 'amazon.com', hardcover: 'amazon.com' }, links: { hardcover: `https://www.amazon.com/dp/${EN_HARDCOVER}` } },
+const AMAZON_ASINS: Partial<Record<BookLang, Record<AmazonFormat, string>>> = {
+  en: { kindle: 'B0HMZ9ZQT8', paperback: 'B0HMZSHMFB', hardcover: 'B0HMZRBBCM' },
+  pt: { kindle: 'B0HMZ7TC25', paperback: 'B0HN2KQZNS', hardcover: 'B0HN2GZFF7' },
 };
 
-/** Where a format's button goes: its product page, or a format-filtered search on the right store until the link is pasted above. */
+type AmazonEdition = { edition: BookLang; store: string; storeFor?: Partial<Record<AmazonFormat, string>> };
+export const AMAZON_EDITIONS: Partial<Record<BookLang, AmazonEdition>> = {
+  en: { edition: 'en', store: 'amazon.com' },
+  pt: { edition: 'pt', store: 'amazon.com.br', storeFor: { paperback: 'amazon.com', hardcover: 'amazon.com' } },
+  es: { edition: 'en', store: 'amazon.com' },
+  nl: { edition: 'en', store: 'amazon.nl' },
+  de: { edition: 'en', store: 'amazon.de' },
+};
+
+/** The product page of a format, on the store that ships to that page's readers. */
 export const amazonLink = (lang: BookLang, format: AmazonFormat): string | null => {
   const ed = AMAZON_EDITIONS[lang];
-  if (!ed) return null;
-  if (ed.links[format]) return ed.links[format]!;
-  const dept = format === 'kindle' ? 'digital-text' : 'stripbooks';
-  return `https://www.${ed.storeFor?.[format] ?? ed.store}/s?k=${encodeURIComponent(AMAZON_SEARCH[ed.edition] ?? '')}&i=${dept}`;
+  const asin = ed && AMAZON_ASINS[ed.edition]?.[format];
+  return asin ? `https://www.${ed.storeFor?.[format] ?? ed.store}/dp/${asin}` : null;
 };
