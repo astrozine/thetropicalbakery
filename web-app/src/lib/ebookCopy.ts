@@ -46,8 +46,8 @@ export interface EbookCopy {
   story: { kicker: string; title: string; paragraphs: string[]; sign: string; photoAlt: string };
   offer: { kicker: string; title: string; stack: { what: string; detail: string; bonus?: boolean }[]; promiseDays: string; promiseTitle: string; promiseText: string; coverAlt: string; usd: string };
   faq: { kicker: string; title: string; items: { q: string; a: string }[] };
-  /** The Kindle and print editions on Amazon (lib/ebook AMAZON_EDITIONS). Only languages with an Amazon listing have it. */
-  amazon?: { kicker: string; title: string; formats: Record<'kindle' | 'paperback' | 'hardcover', { name: string; detail: string }>; cta: string; note: string };
+  /** The Kindle and print editions on Amazon (lib/ebook AMAZON_EDITIONS). `edition` is shown when Amazon only has the book in another language. */
+  amazon?: { kicker: string; title: string; edition?: string; formats: Record<'kindle' | 'paperback' | 'hardcover', { name: string; detail: string }>; cta: string; note: string };
   final: { line: string; title1: string; script: string; title2: string; ps: string };
   buyBar: { kicker: string; note: string; label: string };
   form: {
@@ -357,7 +357,7 @@ const PT: EbookCopy = {
     items: [
       { q: 'Em quais idiomas está o livro?', a: 'Em português do Brasil, com todas as receitas e fotos traduzidas. Também existe em English, Español, Nederlands e Deutsch: você escolhe o idioma no pedido. Quem lê outro idioma recebe a edição em inglês (um inglês simples e amigável, com medidas em xícaras e forno em °C).' },
       { q: 'Como eu recebo?', a: 'É um PDF. Pagando no cartão, o download abre na hora e um link pessoal chega por e-mail. No Pix, a Dolly confirma o pagamento à mão, normalmente em poucas horas, e o mesmo link se libera sozinho.' },
-      { q: 'Tem versão Kindle ou impressa?', a: 'Tem. O Sweet Escape está na Amazon em Kindle, capa comum e capa dura: os links ficam logo abaixo do formulário de pedido. O PDF desta página vem direto da gente, abre em qualquer celular, tablet ou computador, e tem as fotos em tamanho grande.' },
+      { q: 'Tem versão Kindle ou impressa?', a: 'Na Amazon, por enquanto, só a edição em inglês: Kindle (na Amazon Brasil), capa comum e capa dura (na amazon.com, que envia para o Brasil). Os links ficam logo abaixo do formulário de pedido. Em português, o livro existe só aqui: o PDF vem direto da gente, abre em qualquer celular, tablet ou computador, e tem as fotos em tamanho grande.' },
       { q: 'Preciso de algum equipamento especial?', a: 'Não. Um liquidificador ou processador, algumas forminhas de silicone ou uma assadeira, e um freezer. A maioria dos doces é crua: você bate, aperta e o freezer faz o resto. Só os muffins e os biscoitos de taco vão ao forno.' },
       { q: 'É mesmo sem açúcar refinado?', a: 'Toda receita é adoçada com tâmaras, uvas-passas e frutas. A única exceção é a casquinha de chocolate do Dia 7: o livro ensina a escolher um chocolate amargo sem açúcar refinado, porque a maioria dos de mercado tem um pouco.' },
       { q: 'É vegano? Sem glúten?', a: '100% vegetal, sem leite, sem ovo e sem farinha de trigo. Algumas receitas levam aveia: use aveia certificada sem glúten se precisar.' },
@@ -368,9 +368,10 @@ const PT: EbookCopy = {
   },
   amazon: {
     kicker: 'Também na Amazon', title: 'Prefere o livro nas mãos? As mesmas 7 receitas, no Kindle ou impressas.',
+    edition: 'Na Amazon, por enquanto, só em inglês. Em português, só aqui no site.',
     formats: {
       kindle: { name: 'Kindle', detail: 'em qualquer Kindle ou no app grátis' },
-      paperback: { name: 'Capa comum', detail: 'impresso e entregue pela Amazon' },
+      paperback: { name: 'Capa comum', detail: 'impresso e enviado pela amazon.com' },
       hardcover: { name: 'Capa dura', detail: 'para guardar, ou dar de presente' },
     },
     cta: 'Amazon', note: 'Vai de PDF aqui em cima? Ele chega direto da Dolly, em minutos, com as fotos em tamanho grande.',
@@ -537,6 +538,7 @@ const ES: EbookCopy = {
     items: [
       { q: '¿En qué idiomas está el libro?', a: 'En español, con todas las recetas y fotos traducidas. También existe en English, Português, Nederlands y Deutsch: eliges el idioma al pedir. Quien lee otro idioma recibe la edición en inglés (un inglés sencillo y cercano, con medidas en tazas y horno en °C y °F).' },
       { q: '¿Cómo lo recibo?', a: 'Es un PDF. Pagando con tarjeta o PayPal, la descarga se abre al momento y te llega un enlace personal por e-mail. Con Pix (Brasil), Dolly confirma el pago a mano, normalmente en pocas horas, y el mismo enlace se desbloquea solo.' },
+      { q: '¿Hay edición Kindle o impresa?', a: 'En Amazon, por ahora, solo la edición en inglés: Kindle, tapa blanda y tapa dura (los enlaces están justo debajo del formulario de pedido). En español, el libro existe solo aquí: el PDF te llega directo de nosotros, abre en cualquier celular, tablet o computadora, y tiene las fotos a tamaño completo.' },
       { q: '¿Necesito algún equipo especial?', a: 'No. Una licuadora o procesador, unos moldes de silicona o una bandeja, y un congelador. La mayoría de los dulces son crudos: licuas, presionas y el congelador hace el resto. Solo los muffins y las galletas taco van al horno.' },
       { q: '¿De verdad es sin azúcar refinado?', a: 'Cada receta se endulza con dátiles, pasas y fruta. La única excepción es la capa de chocolate del Día 7: el libro te enseña a elegir un chocolate negro sin azúcar refinado, porque la mayoría de los del súper llevan un poco.' },
       { q: '¿Es vegano? ¿Sin gluten?', a: '100% vegetal, sin lácteos, sin huevo y sin harina de trigo. Algunas recetas llevan avena: usa avena certificada sin gluten si lo necesitas.' },
@@ -544,6 +546,16 @@ const ES: EbookCopy = {
       { q: 'Soy principiante. ¿Podré hacerlo?', a: 'Sí. La Regla n.º 4 es literalmente “trabaja con inteligencia, no con esfuerzo”. Empieza por el Día 3, las Red Berry Bliss Balls: sin horno, diez minutos, y las manos pequeñas pueden formarlas.' },
       { q: '¿Y si no me gusta?', a: 'Escríbenos en 7 días y te devolvemos hasta el último céntimo. Sin formularios, sin rencores.' },
     ],
+  },
+  amazon: {
+    kicker: 'También en Amazon', title: '¿Lo prefieres en tus manos? Las mismas 7 recetas, en Kindle o impresas.',
+    edition: 'En Amazon, por ahora, solo en inglés. En español, solo aquí.',
+    formats: {
+      kindle: { name: 'Kindle', detail: 'en cualquier Kindle o en la app gratis' },
+      paperback: { name: 'Tapa blanda', detail: 'impreso y enviado por Amazon' },
+      hardcover: { name: 'Tapa dura', detail: 'para guardar, o para regalar' },
+    },
+    cta: 'Amazon', note: '¿Pides el PDF en español aquí arriba? Te llega directo de Dolly, en minutos, con las fotos a tamaño completo.',
   },
   final: {
     line: 'Siete colores. Siete creaciones. Siete pequeñas razones para volver a enamorarte de las plantas.',
@@ -707,6 +719,7 @@ const NL: EbookCopy = {
     items: [
       { q: 'In welke talen is het boek?', a: 'In het Nederlands, English, Português (Brazilië), Español en Deutsch, volledig vertaald met recepten en foto’s. Kies je taal bij het bestellen. Wie een andere taal leest, krijgt de Engelse editie: eenvoudig, vriendelijk Engels met maten in cups en lepels en ovenstanden in °C en °F.' },
       { q: 'Hoe krijg ik het?', a: 'Het is een PDF. Na betaling met kaart of PayPal opent je download meteen en komt er een persoonlijke link per e-mail. Met Pix (Brazilië) bevestigt Dolly de betaling met de hand, meestal binnen enkele uren, en dezelfde link ontgrendelt zichzelf.' },
+      { q: 'Is er een Kindle- of gedrukte editie?', a: 'Op Amazon voorlopig alleen de Engelse editie: Kindle, paperback en hardcover op amazon.nl (de links staan net onder het bestelformulier). In het Nederlands bestaat het boek alleen hier: de PDF komt rechtstreeks van ons, opent op elke telefoon, tablet of computer, en heeft de foto’s op volle grootte.' },
       { q: 'Heb ik speciale apparatuur nodig?', a: 'Nee. Een blender of keukenmachine, een paar siliconen vormpjes of een bakplaat, en een vriezer. De meeste traktaties zijn rauw: je mixt, drukt aan en de vriezer doet de rest. Alleen de muffins en de taco-koekjes gaan in de oven.' },
       { q: 'Is het echt zonder geraffineerde suiker?', a: 'Elk recept wordt gezoet met dadels, rozijnen en fruit. De enige uitzondering is het chocoladelaagje van Dag 7: het boek leert je een pure chocolade zonder geraffineerde suiker te kiezen, want de meeste uit de winkel bevatten wat.' },
       { q: 'Is het vegan? Glutenvrij?', a: '100% plantaardig, zonder zuivel, zonder eieren en zonder tarwemeel. Sommige recepten gebruiken haver: kies gecertificeerd glutenvrije haver als je dat nodig hebt.' },
@@ -714,6 +727,16 @@ const NL: EbookCopy = {
       { q: 'Ik ben beginner. Lukt dat?', a: 'Ja. Regel nr. 4 is letterlijk “werk slim, niet hard”. Begin met Dag 3, de Frisse Rode Bessen Bliss Balls: geen oven, tien minuten, en kleine handjes kunnen ze rollen.' },
       { q: 'En als ik er niet blij mee ben?', a: 'Schrijf ons binnen 7 dagen en je krijgt elke cent terug. Geen formulieren, geen hard feelings.' },
     ],
+  },
+  amazon: {
+    kicker: 'Ook op Amazon', title: 'Liever een boek in je handen? Dezelfde 7 recepten, op Kindle of gedrukt.',
+    edition: 'Op Amazon voorlopig alleen in het Engels. In het Nederlands alleen hier.',
+    formats: {
+      kindle: { name: 'Kindle', detail: 'op elke Kindle of in de gratis app' },
+      paperback: { name: 'Paperback', detail: 'gedrukt en verzonden door Amazon' },
+      hardcover: { name: 'Hardcover', detail: 'om te bewaren, of om cadeau te geven' },
+    },
+    cta: 'Amazon', note: 'Bestel je hierboven de Nederlandse PDF? Die komt rechtstreeks van Dolly, binnen een paar minuten, met de foto’s op volle grootte.',
   },
   final: {
     line: 'Zeven kleuren. Zeven creaties. Zeven kleine redenen om opnieuw verliefd te worden op planten.',
@@ -882,6 +905,7 @@ const DE: EbookCopy = {
     items: [
       { q: 'In welchen Sprachen gibt es das Buch?', a: 'Auf Deutsch, English, Português (Brasilien), Español und Nederlands, komplett übersetzt mit allen Rezepten und Fotos. Die deutsche Ausgabe hat alle Mengen in Gramm (die Tassenangabe steht in Klammern) und die Temperaturen in °C. Du wählst die Sprache beim Bestellen.' },
       { q: 'Wie bekomme ich es?', a: 'Es ist ein PDF. Nach der Zahlung per Karte oder PayPal startet dein Download sofort, und ein persönlicher Link kommt per E-Mail. Mit Pix (Brasilien) bestätigt Dolly die Zahlung von Hand, meist innerhalb weniger Stunden, und derselbe Link schaltet sich von selbst frei.' },
+      { q: 'Gibt es eine Kindle- oder Druckausgabe?', a: 'Auf Amazon vorerst nur die englische Ausgabe: Kindle, Taschenbuch und gebundene Ausgabe auf amazon.de (die Links stehen direkt unter dem Bestellformular). Auf Deutsch gibt es das Buch nur hier: Das PDF kommt direkt von uns, öffnet sich auf jedem Handy, Tablet oder Computer und hat die Fotos in voller Größe.' },
       { q: 'Brauche ich besondere Geräte?', a: 'Nein. Einen Mixer oder eine Küchenmaschine, ein paar Silikonförmchen oder ein Blech und ein Gefrierfach. Die meisten Leckereien sind roh: Du mixt, drückst an, und das Gefrierfach erledigt den Rest. Nur die Muffins und die Taco-Kekse kommen in den Ofen.' },
       { q: 'Ist es wirklich ohne raffinierten Zucker?', a: 'Jedes Rezept wird mit Datteln, Rosinen und Früchten gesüßt. Die einzige Ausnahme ist die Schokohülle an Tag 7: Das Buch zeigt dir, wie du eine dunkle Schokolade ohne raffinierten Zucker findest, denn die meisten aus dem Supermarkt enthalten etwas.' },
       { q: 'Ist es vegan? Und ohne Gluten?', a: '100 % pflanzlich, ohne Milch, ohne Eier und ohne Weizenmehl. Glutenfrei versprechen wir nicht: Einige Rezepte enthalten Haferflocken, nimm zertifiziert glutenfreie, wenn du sie brauchst.' },
@@ -889,6 +913,16 @@ const DE: EbookCopy = {
       { q: 'Ich fange gerade erst an. Schaffe ich das?', a: 'Ja. Regel Nr. 4 lautet sinngemäß „clever arbeiten statt hart“. Fang mit Tag 3 an, den Spritzigen Rote-Beeren-Bliss-Balls: kein Ofen, zehn Minuten, und kleine Hände können sie rollen.' },
       { q: 'Und wenn es mir nicht gefällt?', a: 'Schreib uns innerhalb von 7 Tagen, und du bekommst jeden Cent zurück. Ohne Formular, ohne Groll.' },
     ],
+  },
+  amazon: {
+    kicker: 'Auch auf Amazon', title: 'Lieber ein Buch in der Hand? Dieselben 7 Rezepte, auf dem Kindle oder gedruckt.',
+    edition: 'Auf Amazon vorerst nur auf Englisch. Auf Deutsch nur hier.',
+    formats: {
+      kindle: { name: 'Kindle', detail: 'auf jedem Kindle oder in der kostenlosen App' },
+      paperback: { name: 'Taschenbuch', detail: 'gedruckt und versandt von Amazon' },
+      hardcover: { name: 'Gebundene Ausgabe', detail: 'zum Aufbewahren oder Verschenken' },
+    },
+    cta: 'Amazon', note: 'Bestellst du oben das deutsche PDF? Es kommt direkt von Dolly, in wenigen Minuten, mit den Fotos in voller Größe.',
   },
   final: {
     line: 'Sieben Farben. Sieben Kreationen. Sieben kleine Gründe, sich neu in Pflanzen zu verlieben.',

@@ -243,7 +243,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
           </div>
         </div>
         <div className="se-wrap">
-          <AmazonEditions lang={lang} cover={`${IMG}/${lang}/cover.webp`} />
+          <AmazonEditions lang={lang} img={IMG} />
         </div>
       </section>
 
