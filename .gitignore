@@ -21,3 +21,5 @@
 proton-recovery-phrase.pdf
 *recovery-phrase*
 *.key
+
+.claude/settings.local.json
