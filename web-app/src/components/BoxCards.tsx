@@ -47,7 +47,7 @@ export function BoxCards({ boxes, prices, heading, sub, onPick }: {
         .bxc-meta { font-size: 0.85rem; color: #594a42; }
         .bxc-go { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: #d4af37; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
       `}</style>
-      <p className="bxc-kicker">{boxes.length === 1 ? 'Mais uma caixa à venda' : `Mais ${boxes.length} caixas à venda`}</p>
+      <p className="bxc-kicker" data-sign="🎁">{boxes.length === 1 ? 'Mais uma caixa à venda' : `Mais ${boxes.length} caixas à venda`}</p>
       <h2 className="bxc-h">{heading}</h2>
       {sub && <p style={{ textAlign: 'center', color: '#594a42', margin: '-0.5rem auto 1.25rem', maxWidth: '560px', lineHeight: 1.6 }}>{sub}</p>}
       <div className="bxc-grid">

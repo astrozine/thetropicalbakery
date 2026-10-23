@@ -176,7 +176,7 @@ export default async function Home() {
       <section id="menu" className="menu-section" style={{ padding: '12rem 2rem', background: '#fdfaf3' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <ScrollReveal>
-            <h2 className="section-title">Destaques Anteriores</h2>
+            <h2 className="section-title" data-sign-top="⭐">Destaques Anteriores</h2>
             <p className="text-center" style={{ marginBottom: '3rem', color: '#594a42', fontSize: '1.1rem' }}>Um gostinho do que você pode encontrar na sua caixa surpresa!</p>
           </ScrollReveal>
           

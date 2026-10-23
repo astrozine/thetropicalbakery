@@ -77,7 +77,7 @@ export function OriginStory() {
     <section className="bb-story" aria-labelledby="bb-story-title">
       <div className="bb-story__inner">
         <div className="bb-story__flags"><Flags size={30} /></div>
-        <span className="bb-story__kicker">Da Bélgica para a Mata Atlântica</span>
+        <span className="bb-story__kicker" data-sign="🌿">Da Bélgica para a Mata Atlântica</span>
         <h2 id="bb-story-title" className="bb-story__title">
           Maestria belga. Natureza brasileira.<br /><span>Um resultado deslumbrante.</span>
         </h2>

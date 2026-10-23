@@ -43,7 +43,7 @@ export default function RainbowJourney({ lang = 'en' }: { lang?: EbookLang }) {
       aria-label={c.journey.title}
     >
       <div className="se-wrap">
-        <p className="se-kicker se-kicker--ink">{c.journey.kicker}</p>
+        <p className="se-kicker se-kicker--ink" data-sign="🌈">{c.journey.kicker}</p>
         <h2 className="se-h2 se-journey__h2">{c.journey.title}</h2>
         <p className="se-journey__lead">{c.journey.lead}</p>
 

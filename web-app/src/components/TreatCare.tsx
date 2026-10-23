@@ -40,13 +40,13 @@ export function TreatCarePage({ locale = 'pt' }: { locale?: 'pt' | 'en' }) {
           <p style={{ color: body, lineHeight: 1.8, maxWidth: '600px', margin: '0 auto' }}>{c.intro}</p>
         </div>
 
-        <h2 style={h2}>{c.storeTitle}</h2>
+        <h2 data-sign="❄️" style={h2}>{c.storeTitle}</h2>
         <Steps steps={c.store} />
 
-        <h2 style={h2}>{c.serveTitle}</h2>
+        <h2 data-sign="🍽️" style={h2}>{c.serveTitle}</h2>
         <Steps steps={c.serve} />
 
-        <h2 style={h2}>{c.ingredientsTitle}</h2>
+        <h2 data-sign="🌿" style={h2}>{c.ingredientsTitle}</h2>
         <div style={{ background: '#fbf6ee', border: '1px dashed #d8c7ad', borderRadius: '18px', padding: '1.2rem 1.3rem' }}>
           {locale === 'en' ? (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '0.45rem' }}>

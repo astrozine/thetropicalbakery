@@ -151,7 +151,7 @@ export default function MenuPage() {
       {/* Gallery / Events Menu Section */}
       <section id="portfolio" className="menu-detailed" style={{ padding: 'clamp(2rem, 6vw, 5rem) 2rem' }}>
         <div className="menu-detailed-head">
-          <span className="menu-detailed-kicker">Busca detalhada</span>
+          <span className="menu-detailed-kicker" data-sign="🔍">Busca detalhada</span>
           <h2>Todos os doces, com filtros</h2>
           <p>
             Precisa evitar um alérgeno ou procurar por ingrediente? Aqui está o catálogo inteiro,
@@ -329,7 +329,7 @@ export default function MenuPage() {
           <SquiggleArrows />
           <EventQuoteDecor />
           <div style={{ position: 'relative', zIndex: 11, background: 'rgba(253,250,243,0.96)', border: '1px solid rgba(212,175,55,0.45)', borderRadius: '22px', padding: 'clamp(1.25rem, 4vw, 2rem)', boxShadow: '0 12px 34px rgba(60,42,33,0.12)', color: '#3c2a21' }}>
-            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.4rem, 4.5vw, 1.9rem)', lineHeight: 1.15, marginBottom: '0.5rem', textAlign: 'center' }}>
+            <h2 data-sign-top="💬" style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.4rem, 4.5vw, 1.9rem)', lineHeight: 1.15, marginBottom: '0.5rem', textAlign: 'center' }}>
               Quer ajuda para montar o seu evento?
             </h2>
             <p style={{ color: '#594a42', lineHeight: 1.65, textAlign: 'center', fontSize: '0.98rem', marginBottom: '1.25rem' }}>

@@ -406,7 +406,7 @@ export default function CheckoutPage() {
           {/* RIGHT: SUMMARY */}
           <div style={{ flex: '1 1 350px' }}>
             <div className="liquid-glass-card" style={{ padding: '2rem', position: 'sticky', top: '8rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(212,175,55,0.3)', fontFamily: 'var(--font-heading)' }}>Resumo do Pedido</h2>
+              <h2 data-sign="🛍️" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(212,175,55,0.3)', fontFamily: 'var(--font-heading)' }}>Resumo do Pedido</h2>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '40vh', overflowY: 'auto' }}>
                 {shown.map(item => (
@@ -453,7 +453,7 @@ export default function CheckoutPage() {
           <div style={{ flex: '2 1 500px' }}>
             {step === 1 ? (
               <form onSubmit={handleCheckout} className="liquid-glass-card" style={{ padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem)' }}>
-                <h2 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '2rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>{isPickup ? 'Informações de Retirada' : 'Informações de Entrega'}</h2>
+                <h2 data-sign={isPickup ? '🏡' : '🚚'} style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '2rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>{isPickup ? 'Informações de Retirada' : 'Informações de Entrega'}</h2>
 
                 <div style={{ marginBottom: '1.5rem' }}>
                   <LoginPanel />
@@ -598,7 +598,7 @@ export default function CheckoutPage() {
               </form>
             ) : (
               <div className="liquid-glass-card" style={{ padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem)', textAlign: 'center' }}>
-                <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>Pagamento Pix</h2>
+                <h2 data-sign="💳" style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>Pagamento Pix</h2>
                 <p style={{ color: 'var(--color-text)', marginBottom: '1.5rem', fontSize: '1.1rem' }}>
                   {placed?.saved === false
                     ? 'Não conseguimos registrar o pedido automaticamente. Faça o Pix e nos chame no WhatsApp para confirmar.'

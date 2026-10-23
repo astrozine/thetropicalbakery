@@ -30,7 +30,7 @@ export default function TropicalTrail({ done, local }: Props) {
     <section className="acct-trail" aria-label="Sua trilha tropical">
       <div className="acct-trail-head">
         <div>
-          <p className="acct-kicker">Sua trilha tropical</p>
+          <p className="acct-kicker" data-sign="🧭">Sua trilha tropical</p>
           <h2 className="acct-h2">
             {nextIdx === -1 ? 'Você já viveu a Tropical inteira 🌴' : 'Seu próximo passo com a gente'}
           </h2>

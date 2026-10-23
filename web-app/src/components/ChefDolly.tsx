@@ -128,7 +128,7 @@ export default function ChefDolly() {
       <section className="cd-cast">
         <div className="cd-wrap">
           <ScrollReveal>
-            <span className="cd-kicker">O elenco</span>
+            <span className="cd-kicker" data-sign="🎭">O elenco</span>
             <h2 className="cd-h2">Os papéis de uma vida só</h2>
             <p className="cd-sub">
               Antes da bancada vieram o palco, a barra e a matéria. Nada disso ficou para trás — tudo virou ingrediente.
@@ -311,7 +311,7 @@ export default function ChefDolly() {
       <section className="cd-gallery">
         <div className="cd-wrap">
           <ScrollReveal>
-            <span className="cd-kicker">A exposição</span>
+            <span className="cd-kicker" data-sign="🎨">A exposição</span>
             <h2 className="cd-h2">Esculturas comestíveis</h2>
             <p className="cd-sub">
               A escultora nunca largou a matéria. Só trocou o barro por cacau, fruta e flor — e passou a

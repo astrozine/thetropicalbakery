@@ -257,7 +257,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
                 <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, marginBottom: '1rem', display: 'block' }}>
                   {texts.experience.subtitle}
                 </span>
-                <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', lineHeight: '1.15', marginBottom: '1.5rem' }}>
+                <h2 data-sign="✨" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', lineHeight: '1.15', marginBottom: '1.5rem' }}>
                   {texts.experience.title}
                 </h2>
                 <p style={{ fontSize: '1.1rem', lineHeight: '2', color: '#594a42', marginBottom: '2rem' }}>
@@ -291,7 +291,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           <ZoomableImage src="/menu-items/Screenshot_20260518_122444_Gallery.jpg" alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
           <ZoomableImage src="/menu-items/20260209_172647.jpg"                    alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
         </div>
-        <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', marginBottom: '1rem' }}>
+        <h2 data-sign-top="🍫" style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', marginBottom: '1rem' }}>
           {texts.foodHero.title}
         </h2>
         <p style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.7)', maxWidth: '600px', margin: '0 auto', lineHeight: '1.8' }}>
@@ -307,7 +307,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
               <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, marginBottom: '1rem', display: 'block' }}>
                 {texts.suites.subtitle}
               </span>
-              <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', lineHeight: '1.15', marginBottom: '1.5rem' }}>
+              <h2 data-sign-top="🏡" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', lineHeight: '1.15', marginBottom: '1.5rem' }}>
                 {texts.suites.title}
               </h2>
               <p style={{ fontSize: '1.15rem', color: '#594a42', lineHeight: '1.8', maxWidth: '700px', margin: '0 auto' }}>
@@ -330,7 +330,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '1rem' }}>
             Reserva Fora do Airbnb
           </span>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', lineHeight: '1.15' }}>
+          <h2 data-sign-top="✈️" style={{ fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', lineHeight: '1.15' }}>
             O Pacote Completo, Não Só a Estadia
           </h2>
         </div>

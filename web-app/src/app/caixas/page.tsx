@@ -405,7 +405,7 @@ function BoxPicker({ boxes, activeId, onPick, priceOf, subOf }: {
         @media (prefers-reduced-motion: reduce) { .bxp-t.is-nudge { animation: none; } .bxp-note path { animation: none; stroke-dashoffset: 0; } }
       `}</style>
       <p className="bxp-k">✨ Esta semana tem {count} caixas</p>
-      <h2 className="bxp-h">Escolha a sua (ou leve {boxes.length === 2 ? 'as duas' : 'mais de uma'})</h2>
+      <h2 className="bxp-h" data-sign="👇">Escolha a sua (ou leve {boxes.length === 2 ? 'as duas' : 'mais de uma'})</h2>
       <p className="bxp-s">Vão juntas no mesmo pedido e na mesma entrega.</p>
       <div className="bxp-stage">
         {two && (

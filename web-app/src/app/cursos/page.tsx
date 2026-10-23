@@ -67,7 +67,7 @@ export default function CursosPage() {
       {/* Why it's different */}
       <section className="crs-section">
         <div className="crs-wrap" style={{ textAlign: 'center' }}>
-          <span className="crs-eyebrow">Mais do que uma aula de confeitaria</span>
+          <span className="crs-eyebrow" data-sign="✨">Mais do que uma aula de confeitaria</span>
           <h2 className="crs-h2">Você aprende a mágica, não só a receita</h2>
           <p className="crs-lead" style={{ margin: '0 auto 2.5rem' }}>
             A Dolly veio da Bélgica, a terra do chocolate, para a Mata Atlântica. Ela criou um jeito próprio de fazer
@@ -91,7 +91,7 @@ export default function CursosPage() {
       {/* The courses */}
       <section id="cursos-list" className="crs-section crs-section-soft">
         <div className="crs-wrap">
-          <span className="crs-eyebrow">Escolha a sua porta de entrada</span>
+          <span className="crs-eyebrow" data-sign="🚪">Escolha a sua porta de entrada</span>
           <h2 className="crs-h2">Os cursos</h2>
           {courses === null ? (
             <p style={{ color: '#7a6a61' }}>Carregando cursos…</p>

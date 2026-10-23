@@ -22,7 +22,7 @@ export default function StampCard({ paidBoxes }: { paidBoxes: number | null }) {
     <section className="acct-stamps" aria-label="Cartão fidelidade">
       <div className="acct-stamps-head">
         <div>
-          <p className="acct-kicker">Cartão fidelidade</p>
+          <p className="acct-kicker" data-sign="🎟️">Cartão fidelidade</p>
           <h2 className="acct-h2">Cada caixa, um carimbo</h2>
         </div>
         <span className="acct-stamps-count" aria-label={`${onCard} de ${STAMPS_PER_REWARD} carimbos`}>

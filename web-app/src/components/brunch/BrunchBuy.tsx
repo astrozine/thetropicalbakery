@@ -118,7 +118,7 @@ export default function BrunchBuy({ event, avail, onChange }: { event: BrunchEve
   if (done?.kind === 'pix') {
     return (
       <aside className="bn-buy bn-pix" id="garantir">
-        <p className="bn-kicker">Seu lugar está guardado</p>
+        <p className="bn-kicker" data-sign="✅">Seu lugar está guardado</p>
         <h3 className="bn-h3">Falta só o Pix de {formatBRL(done.total)}</h3>
         <p className="bn-muted">Guardamos o seu lugar por {HOLD_HOURS.pix} horas. Quando o Pix cair, a Dolly confirma e você entra no grupo.</p>
         <img src={done.base64} alt="QR code do Pix" width={220} height={220} />

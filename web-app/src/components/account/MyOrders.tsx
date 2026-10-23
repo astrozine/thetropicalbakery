@@ -19,7 +19,7 @@ export default function MyOrders({ orders }: { orders: JourneyOrder[] }) {
   if (orders.length === 0) return null;
   return (
     <section aria-label="Histórico de pedidos" className="acct-orders">
-      <h2 className="acct-h2" style={{ marginBottom: '1rem' }}>Seus pedidos</h2>
+      <h2 className="acct-h2" data-sign="📦" style={{ marginBottom: '1rem' }}>Seus pedidos</h2>
       <ul>
         {orders.map(o => {
           const d = new Date(o.requested_date ? `${o.requested_date}T00:00:00` : o.created_at);

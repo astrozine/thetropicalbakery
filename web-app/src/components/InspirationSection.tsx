@@ -87,7 +87,7 @@ export function InspirationSection() {
           <span style={{ color: '#a6832b', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '1rem' }}>
             Inspiração por trás da nossa dieta e do nosso pensamento
           </span>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: '#3c2a21', lineHeight: 1.15, marginBottom: '1.25rem' }}>
+          <h2 data-sign-top="🌱" style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: '#3c2a21', lineHeight: 1.15, marginBottom: '1.25rem' }}>
             Por que a gente come (e cozinha) assim
           </h2>
           <p style={{ color: '#594a42', fontSize: '1.08rem', lineHeight: 1.85, maxWidth: '720px', margin: '0 auto' }}>

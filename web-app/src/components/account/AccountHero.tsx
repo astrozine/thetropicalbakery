@@ -77,7 +77,7 @@ export default function AccountHero({ firstName, avatarUrl, level, next, toNext,
           <span className="acct-avatar-badge" title={`Nível ${level.name}`}>{level.emoji}</span>
         </div>
 
-        <p className="acct-eyebrow">Clube Tropical · Nível {level.name}</p>
+        <p className="acct-eyebrow" data-sign="⭐">Clube Tropical · Nível {level.name}</p>
         <h1 className="acct-hello notranslate" translate="no">{firstName ? `Oi, ${firstName}!` : 'Bem-vindo(a)!'}</h1>
         <p className="acct-hero-sub">
           {level.blurb}

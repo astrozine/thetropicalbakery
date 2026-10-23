@@ -70,7 +70,7 @@ export default function GlobalMenuTeaser({ inPage = false }: { inPage?: boolean 
 
   return (
     <section className="events-teaser">
-      <span className="events-teaser__eyebrow">{texts.subtitle}</span>
+      <span className="events-teaser__eyebrow" data-sign="🍰">{texts.subtitle}</span>
       <h2 className="events-teaser__title">{texts.title}</h2>
       <p className="events-teaser__text">{texts.description}</p>
 

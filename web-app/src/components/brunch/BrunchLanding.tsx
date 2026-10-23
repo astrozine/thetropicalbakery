@@ -88,7 +88,7 @@ export default function BrunchLanding() {
       {/* ============================================================== agenda */}
       <section id="agenda" className="bn-section" style={{ scrollMarginTop: 80 }}>
         <div className="bn-wrap">
-          <p className="bn-kicker">Agenda</p>
+          <p className="bn-kicker" data-sign="📅">Agenda</p>
           <h2 className="bn-h2">Próximos brunches</h2>
           <p className="bn-lead">Cada encontro tem um tema, um lugar e poucos lugares. Quando acaba, acaba: o próximo abre primeiro para quem já é do Círculo.</p>
 
@@ -121,7 +121,7 @@ export default function BrunchLanding() {
       {/* ======================================================= how it works */}
       <section id="como" className="bn-section" style={{ background: '#fff', scrollMarginTop: 80 }}>
         <div className="bn-wrap">
-          <p className="bn-kicker">Como é um brunch</p>
+          <p className="bn-kicker" data-sign="🥞">Como é um brunch</p>
           <h2 className="bn-h2">Quatro momentos, uma manhã inteira</h2>
           <div className="bn-moments">
             {MOMENTS.map((m, i) => (
@@ -138,7 +138,7 @@ export default function BrunchLanding() {
       <section className="bn-section">
         <div className="bn-wrap" style={{ display: 'grid', gap: '2rem' }}>
           <div>
-            <p className="bn-kicker">No seu ingresso</p>
+            <p className="bn-kicker" data-sign="🎟️">No seu ingresso</p>
             <h2 className="bn-h2">Tudo o que vem junto</h2>
             <ul className="bn-stack">
               {DEFAULT_INCLUDES.map(i => <li key={i}>{i}</li>)}
@@ -147,7 +147,7 @@ export default function BrunchLanding() {
             </ul>
           </div>
           <div>
-            <p className="bn-kicker">Círculo Tropical</p>
+            <p className="bn-kicker" data-sign="🌸">Círculo Tropical</p>
             <h2 className="bn-h2">Quem vem a um brunch, ganha</h2>
             <div className="bn-perks">
               {CIRCLE_PERKS.map(p => (
@@ -169,14 +169,14 @@ export default function BrunchLanding() {
             <span className="bn-host__sig">Sua anfitriã ✨</span>
           </div>
           <div>
-            <p className="bn-kicker">Quem recebe</p>
+            <p className="bn-kicker" data-sign="👩‍🍳">Quem recebe</p>
             <h2 className="bn-h2">A Dolly abre a mesa</h2>
             <p className="bn-lead">
               Elisabeth “Dolly” Van Dam: artista belga, bailarina, escultora, mãe e hoje chef em Itamambuca, onde fundou
               a The Tropical Bakery. Ela transformou o que ama num trabalho de saúde e bem-estar, e sabe o caminho.
               No brunch ela apresenta cada pessoa, puxa a conversa e continua com vocês no grupo depois.
             </p>
-            <p className="bn-kicker" style={{ marginTop: '1.5rem' }}>Para quem é</p>
+            <p className="bn-kicker" data-sign="💛" style={{ marginTop: '1.5rem' }}>Para quem é</p>
             <div className="bn-who">
               {WHO.map(w => <span key={w} className="bn-chip" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', borderColor: 'rgba(255,255,255,0.25)' }}>{w}</span>)}
             </div>
@@ -187,7 +187,7 @@ export default function BrunchLanding() {
       {/* ============================================================ venues */}
       <section className="bn-section">
         <div className="bn-wrap">
-          <p className="bn-kicker">Onde acontece</p>
+          <p className="bn-kicker" data-sign="📍">Onde acontece</p>
           <h2 className="bn-h2">Um lugar lindo diferente a cada vez</h2>
           <p className="bn-lead">Às vezes na nossa casa, às vezes numa pousada, numa praia ou num espaço com música ao vivo e pop-ups de marcas locais.</p>
           <div className="bn-venues">
@@ -215,7 +215,7 @@ export default function BrunchLanding() {
       {past.length > 0 && (
         <section className="bn-section" style={{ background: '#fff' }}>
           <div className="bn-wrap">
-            <p className="bn-kicker">Já aconteceu</p>
+            <p className="bn-kicker" data-sign="📸">Já aconteceu</p>
             <h2 className="bn-h2">Brunches anteriores</h2>
             <div className="bn-agenda">{past.map(e => <BrunchEventCard key={e.id} event={e} avail={avail[e.id]} />)}</div>
           </div>
@@ -225,7 +225,7 @@ export default function BrunchLanding() {
       {/* =============================================================== faq */}
       <section className="bn-section">
         <div className="bn-wrap" style={{ maxWidth: 820 }}>
-          <p className="bn-kicker">Perguntas</p>
+          <p className="bn-kicker" data-sign="❓">Perguntas</p>
           <h2 className="bn-h2">Antes de garantir o seu lugar</h2>
           <div className="bn-faq">
             {FAQ.map(f => <details key={f.q}><summary>{f.q}</summary><p>{f.a}</p></details>)}

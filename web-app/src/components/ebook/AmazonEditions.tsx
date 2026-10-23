@@ -37,7 +37,7 @@ export default function AmazonEditions({ lang, img, price }: { lang: EbookLang; 
 
   return (
     <div className="se-ed" id="editions">
-      <p className="se-kicker se-kicker--light">{a.kicker}</p>
+      <p className="se-kicker se-kicker--light" data-sign="📚" data-sign-dark>{a.kicker}</p>
       <h2 className="se-h2 se-h2--light">{a.title}</h2>
       <div className="se-ed__grid">
         <a href="#order" onClick={jump('order')} className="se-ed__pdf">

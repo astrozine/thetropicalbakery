@@ -79,7 +79,7 @@ export default function NoBoxNotice({ variant = 'page', photos = [] }: { variant
         <span style={{ display: 'inline-block', color: '#a6832b', letterSpacing: '0.18em', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.75rem' }}>
           Caixa de Degustação
         </span>
-        <h2 style={{ fontFamily: 'var(--font-heading)', color: '#3c2a21', fontSize: 'clamp(1.4rem, 5vw, 2rem)', lineHeight: 1.2, margin: '0 auto 0.9rem', maxWidth: '560px' }}>
+        <h2 data-sign-top="⏳" style={{ fontFamily: 'var(--font-heading)', color: '#3c2a21', fontSize: 'clamp(1.4rem, 5vw, 2rem)', lineHeight: 1.2, margin: '0 auto 0.9rem', maxWidth: '560px' }}>
           {HEADING}
         </h2>
         <p style={{ color: '#594a42', lineHeight: 1.75, maxWidth: '520px', margin: '0 auto 1.75rem', fontSize: '1rem' }}>

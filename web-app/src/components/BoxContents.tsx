@@ -31,7 +31,7 @@ export default function BoxContents({ items }: { items: BoxItem[] }) {
           <span style={{ color: '#a6832b', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.9rem' }}>
             Nesta edição
           </span>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.8rem, 4.5vw, 3rem)', color: '#3c2a21', lineHeight: 1.15, marginBottom: '0.9rem' }}>
+          <h2 data-sign="🍫" style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.8rem, 4.5vw, 3rem)', color: '#3c2a21', lineHeight: 1.15, marginBottom: '0.9rem' }}>
             O que vem na caixa
           </h2>
           <p style={{ color: '#594a42', lineHeight: 1.8, maxWidth: '560px', margin: '0 auto' }}>

@@ -78,8 +78,8 @@ export default function MyPickups() {
 
   return (
     <section style={{ marginBottom: '2rem' }} aria-label="Minhas retiradas">
-      <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', color: 'var(--color-primary)', marginBottom: '1rem' }}>
-        🛍️ Minha retirada
+      <h2 data-sign="🛍️" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', color: 'var(--color-primary)', marginBottom: '1rem' }}>
+        Minha retirada
       </h2>
       <div style={{ display: 'grid', gap: '1rem' }}>
         {orders.map(o => {

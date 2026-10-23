@@ -217,7 +217,7 @@ export default function SubscriptionPage() {
       <section style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 1.5rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <ScrollReveal>
-            <h2 style={{
+            <h2 data-sign-top="🧭" style={{
               fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
               color: 'var(--color-primary)', textAlign: 'center', marginBottom: '0.6rem',
             }}>
@@ -289,7 +289,7 @@ export default function SubscriptionPage() {
       {/* ---------------------------------------------------------------- PLANS */}
       <section id="planos" style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 0' }}>
         <div style={{ maxWidth: '1150px', margin: '0 auto', padding: '0 1.5rem' }}>
-          <h2 style={{
+          <h2 data-sign-top="💰" style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
             color: 'var(--color-primary)', textAlign: 'center', marginBottom: '0.75rem',
           }}>
@@ -472,7 +472,7 @@ export default function SubscriptionPage() {
         <div style={{ maxWidth: '640px', margin: '0 auto' }}>
           <TreatFlank contentWidth={640}>
           <ScrollReveal>
-            <h2 style={{
+            <h2 data-sign-top="📅" style={{
               fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.7rem, 4.5vw, 2.4rem)',
               color: 'var(--color-primary)', textAlign: 'center', marginBottom: '0.6rem',
             }}>
@@ -501,7 +501,7 @@ export default function SubscriptionPage() {
             />
           </div>
           <div style={{ flex: '1 1 320px' }}>
-            <h2 style={{
+            <h2 data-sign="🍫" style={{
               fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.8rem, 4.5vw, 2.6rem)',
               color: 'var(--color-primary)', marginBottom: '1.75rem',
             }}>
@@ -525,7 +525,7 @@ export default function SubscriptionPage() {
       {/* ------------------------------------------------------ WHY SUBSCRIBE */}
       <StripedBackground tone="dark" bandHeight={80} style={{ padding: 'clamp(2.25rem, 9vw, 7rem) 1.5rem' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <h2 style={{
+          <h2 data-sign-top="💛" data-sign-dark style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
             color: '#fdfaf3', textAlign: 'center', marginBottom: '3.5rem',
           }}>
@@ -565,7 +565,7 @@ export default function SubscriptionPage() {
       {/* --------------------------------------------------------------- FAQ */}
       <section style={{ padding: '0 1.5rem clamp(2.25rem, 9vw, 7rem)' }}>
         <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-          <h2 style={{
+          <h2 data-sign-top="❓" style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.7rem, 4.5vw, 2.5rem)',
             color: 'var(--color-primary)', textAlign: 'center', marginBottom: '2.5rem',
           }}>

@@ -100,7 +100,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
       {/* ══ THE PROBLEM ══ */}
       <section className="se-sec se-sec--cream">
         <div className="se-wrap se-narrow">
-          <p className="se-kicker">{c.problem.kicker}</p>
+          <p className="se-kicker" data-sign="🤔">{c.problem.kicker}</p>
           <h2 className="se-h2">{c.problem.title1} <br className="se-br" />{c.problem.title2}</h2>
           <div className="se-pains">
             {c.problem.pains.map((p, n) => <p key={n}><span>{PAIN_ICONS[n]}</span>{p}</p>)}
@@ -116,7 +116,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
       <section className="se-sec se-sec--cream">
         <div className="se-wrap">
           <div className="se-narrow se-center">
-            <p className="se-kicker">{c.learn.kicker}</p>
+            <p className="se-kicker" data-sign="📝">{c.learn.kicker}</p>
             <h2 className="se-h2">{c.learn.title}</h2>
             <p className="se-lead">{rich(c.learn.lead)}</p>
           </div>
@@ -136,7 +136,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
       <section className="se-sec se-sec--peek">
         <div className="se-wrap">
           <div className="se-narrow se-center">
-            <p className="se-kicker se-kicker--light">{c.peek.kicker}</p>
+            <p className="se-kicker se-kicker--light" data-sign="👀" data-sign-dark>{c.peek.kicker}</p>
             <h2 className="se-h2 se-h2--light">{fill(c.peek.title, v)}</h2>
             <p className="se-lead se-lead--light">{c.peek.lead}</p>
           </div>
@@ -160,7 +160,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
             <img className="se-family__b" src={`${IMG}/chocolate-cut.webp`} alt="" loading="lazy" />
           </div>
           <div>
-            <p className="se-kicker">{c.family.kicker}</p>
+            <p className="se-kicker" data-sign="🏡">{c.family.kicker}</p>
             <h2 className="se-h2">{c.family.title}</h2>
             <p className="se-lead">{rich(c.family.lead)}</p>
             <ul className="se-checks">
@@ -179,7 +179,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
             <span className="se-story__tag">Dolly · The Tropical Bakery</span>
           </div>
           <div className="se-story__text">
-            <p className="se-kicker">{c.story.kicker}</p>
+            <p className="se-kicker" data-sign="📖">{c.story.kicker}</p>
             <h2 className="se-h2">{c.story.title}</h2>
             {c.story.paragraphs.map((p, n) => <p key={n}>{rich(p)}</p>)}
             <p className="se-sign">{c.story.sign} <span className="se-script notranslate" translate="no">Dolly</span></p>
@@ -194,7 +194,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
         </div>
         <div className="se-wrap se-offer">
           <div className="se-offer__stack">
-            <p className="se-kicker se-kicker--light">{c.offer.kicker}</p>
+            <p className="se-kicker se-kicker--light" data-sign="🎁" data-sign-dark>{c.offer.kicker}</p>
             <h2 className="se-h2 se-h2--light">{c.offer.title}</h2>
             <ul className="se-stack">
               {c.offer.stack.map(s => (
@@ -232,7 +232,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
       {/* ══ FAQ ══ */}
       <section className="se-sec se-sec--cream">
         <div className="se-wrap se-narrow">
-          <p className="se-kicker se-center">{c.faq.kicker}</p>
+          <p className="se-kicker se-center" data-sign="❓">{c.faq.kicker}</p>
           <h2 className="se-h2 se-center">{c.faq.title}</h2>
           <div className="se-faq">
             {c.faq.items.map((f, n) => (

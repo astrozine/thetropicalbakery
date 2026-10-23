@@ -142,7 +142,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
       {/* Order details */}
       <div style={{ flex: '1 1 380px', minWidth: '260px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         <div>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '0.75rem' }}>{presale ? 'Encomende Sua Caixa' : 'Peça Sua Caixa'}</h2>
+          <h2 data-sign="🛒" style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '0.75rem' }}>{presale ? 'Encomende Sua Caixa' : 'Peça Sua Caixa'}</h2>
           {presale ? (
             <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: 1.6 }}>
               Feita sob encomenda: a Dolly assa só as caixas que foram pedidas, então a sua sai do forno

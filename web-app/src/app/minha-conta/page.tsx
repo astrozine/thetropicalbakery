@@ -422,7 +422,7 @@ export default function MyAccountPage() {
                   <span>{pct}%</span>
                 </div>
                 <div>
-                  <p className="acct-kicker">Seu perfil de sabor</p>
+                  <p className="acct-kicker" data-sign="🍓">Seu perfil de sabor</p>
                   <h2 className="acct-h3">
                     {pct === 100 ? 'A Dolly já sabe tudo 🎉' : 'Quanto mais completo, mais a caixa é a sua cara'}
                   </h2>
@@ -442,7 +442,7 @@ export default function MyAccountPage() {
             </section>
 
             <section className="acct-card acct-share acct-o-share" aria-label="Indique a Tropical">
-              <p className="acct-kicker">Espalhe o sabor</p>
+              <p className="acct-kicker" data-sign="💛">Espalhe o sabor</p>
               <h2 className="acct-h3">Tem alguém que merece um doce? 💛</h2>
               <p className="acct-muted">Mande a Tropical para quem você ama, ou surpreenda com uma caixa de presente.</p>
               <div className="acct-share-row">
@@ -467,7 +467,7 @@ export default function MyAccountPage() {
           ) : (
             <div className="acct-empty">
               <p className="acct-empty-emoji" aria-hidden>📦</p>
-              <h2 className="acct-h2">{journey ? 'Nenhum pedido ainda' : 'Seus pedidos aparecem aqui'}</h2>
+              <h2 className="acct-h2" data-sign="📦">{journey ? 'Nenhum pedido ainda' : 'Seus pedidos aparecem aqui'}</h2>
               <p className="acct-muted">
                 {journey
                   ? 'Sua primeira caixa ganha o primeiro carimbo do cartão fidelidade.'
@@ -482,7 +482,7 @@ export default function MyAccountPage() {
         <div role="tabpanel" hidden={tab !== 'perfil'} className="acct-panel-narrow">
           <form onSubmit={handleSave}>
             <div className="acct-perfil-head">
-              <h2 className="acct-h2">Seu perfil de sabor</h2>
+              <h2 className="acct-h2" data-sign="🍓">Seu perfil de sabor</h2>
               <p className="acct-muted">
                 Tudo aqui é preenchido sozinho nos seus pedidos e na sua assinatura, e a cozinha confere antes de montar a sua caixa.
               </p>

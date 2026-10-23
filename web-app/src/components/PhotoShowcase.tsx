@@ -17,7 +17,7 @@ export default function PhotoShowcase() {
       />
       <div aria-hidden className="photo-showcase__shade" />
       <div className="photo-showcase__card">
-        <span className="photo-showcase__eyebrow">Feito à mão em Itamambuca</span>
+        <span className="photo-showcase__eyebrow" data-sign="🎁">Feito à mão em Itamambuca</span>
         <h2 className="photo-showcase__title">Cada caixa chega embrulhada como um presente</h2>
         <p className="photo-showcase__text">
           Doces veganos e sem trigo, na nossa caixa kraft. Uma criação nova a cada semana.

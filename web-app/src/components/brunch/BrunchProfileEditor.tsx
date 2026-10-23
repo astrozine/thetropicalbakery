@@ -110,7 +110,7 @@ export default function BrunchProfileEditor({ userId, initial, fallbackName, onS
 
   return (
     <form className="bn-card" onSubmit={save}>
-      <p className="bn-kicker">Seu cartão no brunch</p>
+      <p className="bn-kicker" data-sign="🏷️">Seu cartão no brunch</p>
       <h3 className="bn-h3" style={{ marginBottom: '0.9rem' }}>É assim que as outras pessoas te veem</h3>
 
       <div className="bn-photo-pick">

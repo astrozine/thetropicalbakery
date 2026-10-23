@@ -93,7 +93,7 @@ export default function MySubscription() {
             <p style={{ color: 'rgba(253,250,243,0.75)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.2rem' }}>
               Sua assinatura
             </p>
-            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: '#fdfaf3' }}>
+            <h2 data-sign="🗓️" data-sign-dark style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: '#fdfaf3' }}>
               {sub.plan?.name || 'Caixa de Degustação'}
             </h2>
           </div>

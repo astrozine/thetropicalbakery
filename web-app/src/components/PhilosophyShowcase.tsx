@@ -211,7 +211,7 @@ export default function PhilosophyShowcase({ featuredImage }: { featuredImage: s
             }}>
               Itamambuca · Mata Atlântica
             </span>
-            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.3rem, 6.5vw, 4.4rem)', lineHeight: 1.05, color: '#fdfaf3', marginBottom: '1.4rem' }}>
+            <h2 data-sign-top="🌱" data-sign-dark style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.3rem, 6.5vw, 4.4rem)', lineHeight: 1.05, color: '#fdfaf3', marginBottom: '1.4rem' }}>
               Nossa Filosofia
             </h2>
             <p style={{ fontSize: 'clamp(1.05rem, 2.4vw, 1.3rem)', lineHeight: 1.7, color: 'rgba(253,250,243,0.9)' }}>

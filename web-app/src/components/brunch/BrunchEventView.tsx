@@ -80,14 +80,14 @@ export default function BrunchEventView({ slug }: { slug: string }) {
           <div>
             {(event.theme || event.description) && (
               <section className="bn-block">
-                <p className="bn-kicker">A conversa</p>
+                <p className="bn-kicker" data-sign="💬">A conversa</p>
                 {event.theme && <h2 className="bn-h2">{event.theme}</h2>}
                 {event.description && event.description.split(/\n\s*\n/).map((p, i) => <p key={i} className="bn-lead" style={{ marginBottom: '1rem' }}>{p}</p>)}
               </section>
             )}
 
             <section className="bn-block">
-              <p className="bn-kicker">No seu ingresso</p>
+              <p className="bn-kicker" data-sign="🎟️">No seu ingresso</p>
               <h2 className="bn-h2">Tudo o que vem junto</h2>
               <ul className="bn-stack">
                 {includes.map(i => <li key={i}>{i}</li>)}
@@ -98,13 +98,13 @@ export default function BrunchEventView({ slug }: { slug: string }) {
 
             {event.extras.length > 0 && (
               <section className="bn-block">
-                <p className="bn-kicker">E mais</p>
+                <p className="bn-kicker" data-sign="✨">E mais</p>
                 <div className="bn-who">{event.extras.map(x => <span key={x} className="bn-chip bn-chip--gold">{x}</span>)}</div>
               </section>
             )}
 
             <section className="bn-block">
-              <p className="bn-kicker">Onde</p>
+              <p className="bn-kicker" data-sign="📍">Onde</p>
               <div className="bn-card bn-venue-card">
                 {event.venue_photo && <img src={event.venue_photo} alt={event.venue_name || v.label} />}
                 <div>
@@ -118,7 +118,7 @@ export default function BrunchEventView({ slug }: { slug: string }) {
 
             {(hosts.length > 0 || others.length > 0) && (
               <section className="bn-block">
-                <p className="bn-kicker">Quem faz junto</p>
+                <p className="bn-kicker" data-sign="🤝">Quem faz junto</p>
                 <div className="bn-sponsors">
                   {[...hosts, ...others].map(s => {
                     const Tag = s.url ? 'a' : 'div';
@@ -135,13 +135,13 @@ export default function BrunchEventView({ slug }: { slug: string }) {
 
             {event.gallery.length > 0 && (
               <section className="bn-block">
-                <p className="bn-kicker">Fotos</p>
+                <p className="bn-kicker" data-sign="📸">Fotos</p>
                 <div className="bn-gallery">{event.gallery.map(src => <img key={src} src={src} alt="" loading="lazy" />)}</div>
               </section>
             )}
 
             <section className="bn-block">
-              <p className="bn-kicker">Quem recebe</p>
+              <p className="bn-kicker" data-sign="👩‍🍳">Quem recebe</p>
               <div className="bn-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <span className="bn-ava" style={{ width: 72, height: 72 }}><img src={HOST.photo} alt="Dolly" /></span>
                 <div>
@@ -153,7 +153,7 @@ export default function BrunchEventView({ slug }: { slug: string }) {
             </section>
 
             <section className="bn-block">
-              <p className="bn-kicker">Círculo Tropical</p>
+              <p className="bn-kicker" data-sign="🌸">Círculo Tropical</p>
               <h2 className="bn-h2">Quem vem a um brunch, ganha</h2>
               <div className="bn-perks">
                 {CIRCLE_PERKS.map(p => (
