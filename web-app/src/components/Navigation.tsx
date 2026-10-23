@@ -138,8 +138,10 @@ export default function Navigation() {
       { name: 'Planejar meu Retiro', path: '/retreats#pacote', icon: '✈️', feature: true, sub: 'hospedagem + cursos, num só pacote' },
       ...cursosLinks,
     ] },
-    // The free 2-recipe sampler (/receitas) is the door into Sweet Escape, the full 7-day book.
+    // The free 2-recipe sampler (/receitas) is the door into Sweet Escape, the full 7-day book; the craving app
+    // (/vontade) is the free tool next to it.
     { id: 'ebook', name: 'E-book', links: [
+      { name: 'App Bateu Vontade?', path: '/vontade', icon: '🆘', sub: 'docinho em 5 min, grátis' },
       { name: '2 Receitas Grátis', path: '/receitas', icon: '📝' },
       { name: 'Livro Completo', path: '/sweet-escape/pt', icon: '📖', highlight: true, sub: '7 dias, 7 doces' },
     ] },

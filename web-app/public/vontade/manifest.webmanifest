@@ -1,0 +1,15 @@
+{
+  "name": "Bateu Vontade? · The Tropical Bakery",
+  "short_name": "Bateu Vontade",
+  "description": "Um docinho de verdade em 2 a 5 minutos, sem açúcar refinado.",
+  "start_url": "/vontade?utm_source=app-instalado",
+  "scope": "/vontade",
+  "display": "standalone",
+  "background_color": "#fdfaf3",
+  "theme_color": "#fdfaf3",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/vontade/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/vontade/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
