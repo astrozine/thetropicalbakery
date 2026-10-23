@@ -22,7 +22,20 @@ const HAND_TRANSLATED_EN: Record<string, string> = {
   '/b2b/barcos': '/en/b2b/boats',
 };
 
-type NavLink = { name: string; path: string; highlight?: boolean; feature?: boolean; sub?: string; external?: boolean };
+type NavLink = { name: string; path: string; icon?: string; highlight?: boolean; feature?: boolean; sub?: string; external?: boolean };
+
+/** The little embossed tile in front of each menu entry: pale grey, lit from above, pressed into the paper. */
+function IconTile({ size, children }: { size: number; children: React.ReactNode }) {
+  return (
+    <span aria-hidden style={{
+      width: size, height: size, flexShrink: 0, borderRadius: size * 0.3,
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.5, lineHeight: 1,
+      background: 'linear-gradient(145deg, #fdfcfa 0%, #ebe7e0 100%)',
+      boxShadow: 'inset 0 1px 0 #fff, inset 0 -1px 2px rgba(60,42,33,0.12), 0 1px 2px rgba(60,42,33,0.14), 0 0 0 1px rgba(60,42,33,0.07)',
+      color: '#3c2a21',
+    }}>{children}</span>
+  );
+}
 
 // The "plan your trip" button: forest green with a gold edge, so it reads as the way in for travellers
 // without competing with the gold "highlight" link beside it.
@@ -32,16 +45,15 @@ const FEATURE_STYLE: React.CSSProperties = {
 };
 
 /** A menu entry: a page on the site, or (external) somewhere else, opened in a new tab so the shop stays open. */
-function NavItem({ link, style, onClick, children }: { link: NavLink; style: React.CSSProperties; onClick?: () => void; children: React.ReactNode }) {
-  if (!link.external) return <Link href={link.path} onClick={onClick} style={style}>{children}</Link>;
-  return (
-    <a href={link.path} target="_blank" rel="noopener noreferrer" onClick={onClick} className="notranslate" translate="no" style={style}>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-        <InstagramIcon size={18} />
-        <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>{children}</span>
-      </span>
-    </a>
+function NavItem({ link, style, onClick, tile = 30, children }: { link: NavLink; style: React.CSSProperties; onClick?: () => void; tile?: number; children: React.ReactNode }) {
+  const row = (
+    <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <IconTile size={tile}>{link.external ? <InstagramIcon size={tile * 0.55} /> : link.icon}</IconTile>
+      <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>{children}</span>
+    </span>
   );
+  if (!link.external) return <Link href={link.path} onClick={onClick} style={style}>{row}</Link>;
+  return <a href={link.path} target="_blank" rel="noopener noreferrer" onClick={onClick} className="notranslate" translate="no" style={style}>{row}</a>;
 }
 
 export default function Navigation() {
@@ -115,38 +127,38 @@ export default function Navigation() {
   // A course Dolly has hidden in the admin ("em preparo") leaves this menu too.
   const shownCourses = useShownCourses();
   const cursosLinks = [
-    { name: 'Todos os Cursos', path: '/cursos', highlight: true },
-    { name: 'Turismo Gastronômico', path: '/cursos/turismo-gastronomico' },
-    { name: 'Capacitação Profissional', path: '/cursos/capacitacao-profissional' },
-    { name: 'Saúde e Bem-Estar', path: '/cursos/saude-bem-estar' },
+    { name: 'Todos os Cursos', path: '/cursos', icon: '🎓', highlight: true },
+    { name: 'Turismo Gastronômico', path: '/cursos/turismo-gastronomico', icon: '🗺️' },
+    { name: 'Capacitação Profissional', path: '/cursos/capacitacao-profissional', icon: '🥇' },
+    { name: 'Saúde e Bem-Estar', path: '/cursos/saude-bem-estar', icon: '🧘' },
   ].filter(l => l.path === '/cursos' || courseIsShown(shownCourses, l.path.slice('/cursos/'.length)));
 
   // The logo is the way home, so there is no "Início" link. The boxes, the events and the
   // courses + retreats each fold into one menu so the bar stays on one line with the logo beside it.
   const groups: { id: string; name: string; links: NavLink[] }[] = [
     { id: 'caixa', name: 'Caixa de Degustação', links: [
-      { name: 'Caixa da Semana', path: '/caixas' },
+      { name: 'Caixa da Semana', path: '/caixas', icon: '🎁' },
       // The weekly subscription is the core of the business, so it keeps the foil treatment.
-      { name: 'Assinatura de Caixa', path: '/assinatura', highlight: true, sub: 'caixa toda semana' },
+      { name: 'Assinatura de Caixa', path: '/assinatura', icon: '🗓️', highlight: true, sub: 'caixa toda semana' },
     ] },
     { id: 'eventos', name: 'Eventos', links: [
-      { name: 'Brunch Social', path: '/brunch' },
-      { name: 'Menu de Eventos', path: '/menu' },
+      { name: 'Brunch Social', path: '/brunch', icon: '🥞' },
+      { name: 'Menu de Eventos', path: '/menu', icon: '🍰' },
     ] },
     { id: 'cursos', name: 'Cursos e Retiros', links: [
       // People travelling in plan the stay and pick their courses in one place: the package builder on /retreats.
-      { name: '✈️ Planejar meu Retiro', path: '/retreats#pacote', feature: true, sub: 'hospedagem + cursos, num só pacote' },
+      { name: 'Planejar meu Retiro', path: '/retreats#pacote', icon: '✈️', feature: true, sub: 'hospedagem + cursos, num só pacote' },
       ...cursosLinks,
     ] },
     // The free 2-recipe sampler (/receitas) is the door into Sweet Escape, the full 7-day book.
     { id: 'ebook', name: 'E-book', links: [
-      { name: '2 Receitas Grátis', path: '/receitas' },
-      { name: 'Livro Completo', path: '/sweet-escape/pt', highlight: true, sub: '7 dias, 7 doces' },
+      { name: '2 Receitas Grátis', path: '/receitas', icon: '📝' },
+      { name: 'Livro Completo', path: '/sweet-escape/pt', icon: '📖', highlight: true, sub: '7 dias, 7 doces' },
     ] },
     // Dolly's page first, her Instagram second and inside the menu: the feed is one deliberate tap away (new tab),
     // not a bare icon in the bar that takes people off the site before they have seen it.
     { id: 'dolly', name: 'Chef Dolly', links: [
-      { name: 'Conheça a Dolly', path: '/dolly' },
+      { name: 'Conheça a Dolly', path: '/dolly', icon: '👩‍🍳' },
       { name: 'Instagram', path: STORE_INSTAGRAM_URL, sub: INSTAGRAM_HANDLE, external: true },
       { name: 'Instagram da Dolly', path: DOLLY_INSTAGRAM_URL, sub: DOLLY_INSTAGRAM_HANDLE, external: true },
       { name: 'The Family of the Future', path: FAMILY_INSTAGRAM_URL, sub: FAMILY_INSTAGRAM_HANDLE, external: true },
@@ -155,20 +167,20 @@ export default function Navigation() {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true, ebook: true });
 
-  const b2bLinks = [
-    { name: 'Todas as Parcerias', path: '/b2b', highlight: true },
-    { name: 'Hotéis', path: '/b2b/hotels' },
-    { name: 'Pousadas', path: '/b2b/pousadas' },
-    { name: 'Airbnbs', path: '/b2b/airbnbs' },
-    { name: 'Restaurantes', path: '/b2b/restaurants' },
-    { name: 'Padarias', path: '/b2b/bakeries' },
-    { name: 'Barcos e Marinas', path: '/b2b/barcos' },
-    { name: 'Yoga, Academias e Spas', path: '/b2b/bem-estar' },
-    { name: 'Travel Managers', path: '/b2b/travel-managers' },
-    { name: 'Afiliados', path: '/b2b/affiliates' },
+  const b2bLinks: NavLink[] = [
+    { name: 'Todas as Parcerias', path: '/b2b', icon: '🤝', highlight: true },
+    { name: 'Hotéis', path: '/b2b/hotels', icon: '🏨' },
+    { name: 'Pousadas', path: '/b2b/pousadas', icon: '🏡' },
+    { name: 'Airbnbs', path: '/b2b/airbnbs', icon: '🔑' },
+    { name: 'Restaurantes', path: '/b2b/restaurants', icon: '🍽️' },
+    { name: 'Padarias', path: '/b2b/bakeries', icon: '🥐' },
+    { name: 'Barcos e Marinas', path: '/b2b/barcos', icon: '⛵' },
+    { name: 'Yoga, Academias e Spas', path: '/b2b/bem-estar', icon: '🪷' },
+    { name: 'Travel Managers', path: '/b2b/travel-managers', icon: '🧳' },
+    { name: 'Afiliados', path: '/b2b/affiliates', icon: '🔗' },
     // Not a B2B account, but it belongs in the same "ways to partner with us"
     // menu — and this is where a job seeker would naturally look first.
-    { name: 'Trabalhe Conosco', path: '/trabalhe-conosco' },
+    { name: 'Trabalhe Conosco', path: '/trabalhe-conosco', icon: '💼' },
   ];
 
   const retreatLangs = [
@@ -391,9 +403,10 @@ export default function Navigation() {
             </span>
             {isDropdownOpen && (
               <div style={{
+                // Anchored on the right: Parcerias is the last menu, so a left-anchored list ran off the screen.
                 position: 'absolute',
                 top: '100%',
-                left: 0,
+                right: 0,
                 background: 'rgba(253,250,243,0.95)',
                 backdropFilter: 'blur(10px)',
                 minWidth: '200px',
@@ -405,13 +418,14 @@ export default function Navigation() {
                 gap: '0.5rem'
               }}>
                 {b2bLinks.map((link) => (
-                  <Link key={link.path} href={link.path} style={{
+                  <NavItem key={link.path} link={link} style={{
                     padding: '0.5rem 1.5rem',
                     color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
                     textDecoration: 'none',
                     fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
                     fontSize: '0.9rem',
                     textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
                     ...(link.highlight ? {
                       background: '#d4af37',
                       borderRadius: '6px',
@@ -420,7 +434,7 @@ export default function Navigation() {
                     } : {}),
                   }}>
                     {link.name}
-                  </Link>
+                  </NavItem>
                 ))}
               </div>
             )}
@@ -563,6 +577,7 @@ export default function Navigation() {
                     key={link.path}
                     link={link}
                     onClick={closeMenu}
+                    tile={34}
                     style={{
                       display: 'block',
                       padding: '0.8rem 0 0.8rem 1rem',
@@ -606,10 +621,11 @@ export default function Navigation() {
               PARCERIAS <span>{mobileB2bOpen ? '▲' : '▼'}</span>
             </button>
             {mobileB2bOpen && b2bLinks.map((link) => (
-              <Link 
-                key={link.path} 
-                href={link.path} 
+              <NavItem
+                key={link.path}
+                link={link}
                 onClick={closeMenu}
+                tile={34}
                 style={{
                   display: 'block',
                   padding: '0.8rem 0 0.8rem 1rem',
@@ -628,7 +644,7 @@ export default function Navigation() {
                 }}
               >
                 {link.name}
-              </Link>
+              </NavItem>
             ))}
             
             {/* Language Section Header — kept untranslated, same reason as desktop */}
