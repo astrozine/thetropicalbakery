@@ -169,7 +169,7 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
       { id: front.id, src: front.src, pos: { bottom: '0%', [inner]: '2%', width: '48%' }, rotate: 7 * s, z: 2, aspect: '1', float: 6 },
     ];
     return (
-      <div className="hero-collage" style={{ position: 'relative', width: 'min(100%, 440px)', aspectRatio: '4/5', justifySelf: side === 'left' ? 'end' : 'start' }}>
+      <div className="hero-collage" style={{ position: 'relative', width: 'min(100%, 440px)', aspectRatio: '4/5', justifySelf: side === 'left' ? 'end' : 'start', alignSelf: 'start', marginTop: '110px' }}>
         {prints.map((p, i) => (
           <motion.div
             key={p.id}
@@ -225,12 +225,13 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
 
       {collage('left')}
 
-      {/* Main Content (Logo + CTA) */}
+      {/* Main Content (Logo + CTA): the logo is a seal pinned over the card's top edge, so the logo and
+          the card read as one block and the side collages line up with the card instead of sitting low. */}
       <div className="relative z-10 flex flex-col items-center pointer-events-none">
         <motion.img
           src="/hero-logo-transparent.png"
           alt="The Tropical Bakery Logo"
-          style={{ maxWidth: '250px', width: '90%', filter: 'drop-shadow(0 0 30px rgba(253,250,243,0.9))', marginBottom: '1.5rem' }}
+          style={{ width: '150px', position: 'relative', zIndex: 2, filter: 'drop-shadow(0 14px 18px rgba(60,42,33,0.28))', marginBottom: '-64px' }}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1 }}
@@ -244,7 +245,7 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
             backdropFilter: 'blur(16px)',
             border: '1px solid rgba(212,175,55,0.4)',
             borderRadius: '22px',
-            padding: '2rem 2.5rem',
+            padding: 'calc(64px + 1.25rem) 2.5rem 2rem',
             // Wider when two boxes sit side by side, so their photos are big enough to want.
             maxWidth: liveBoxes.length > 1 ? '600px' : '480px',
             textAlign: 'center',
