@@ -46,7 +46,7 @@ export async function sendBrunchReserved(db: SupabaseClient, o: Who & { referenc
     paragraphs(isPix
       ? `Seu lugar no brunch "${o.event.title}" está guardado por ${HOLD_HOURS.pix} horas. Assim que o Pix cair, a gente confirma e te manda a entrada no grupo.`
       : 'Seu lugar está guardado enquanto o pagamento confirma, o que costuma levar poucos minutos.') +
-    kicker('Seu ingresso') +
+    kicker('Seu ingresso', '🎟️') +
     orderTable([
       { label: `Brunch Tropical: ${o.event.title}`, amount: formatBRL(o.total) },
       { label: 'Total', amount: formatBRL(o.total), strong: true },
@@ -68,15 +68,15 @@ export async function sendBrunchConfirmed(db: SupabaseClient, o: Who & { referen
   const body =
     (first(o.name) ? greeting(first(o.name)) : '') +
     paragraphs(`Você está dentro! Seu lugar no brunch "${o.event.title}" está garantido e a Dolly já está te esperando no grupo.`) +
-    kicker('Quando e onde') +
+    kicker('Quando e onde', '📍') +
     paragraphs(`${fmtWhen(o.event)}\n${where(o.event)}\n\nO endereço exato está na sua sala do brunch.`) +
     `<p style="margin:0 0 18px;"><a href="${esc(calendarLink(o.event))}" style="color:#a6832b;font-weight:bold;">📅 Colocar na minha agenda</a></p>` +
-    kicker('Antes do brunch') +
+    kicker('Antes do brunch', '📝') +
     bulletList([
       'Monte o seu cartão: uma foto, um emoji, o que você faz e com o que pode ajudar. É assim que as pessoas te acham na mesa.',
       'Diga oi no grupo. A Dolly abre a conversa e apresenta todo mundo.',
     ]) +
-    kicker('Agora você é do Círculo Tropical') +
+    kicker('Agora você é do Círculo Tropical', '🌸') +
     bulletList(CIRCLE_PERKS.map(p => `${p.emoji} ${p.title}: ${p.text}`));
 
   await send(db, o.email, `brunch-confirmed:${o.reference ?? `${o.event.id}:${o.email.toLowerCase()}`}`, `Você está dentro ✨ ${o.event.title}`, {

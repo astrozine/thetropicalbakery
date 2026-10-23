@@ -221,6 +221,7 @@ export async function sendCampaign(db: SupabaseClient, req: SendRequest): Promis
     const layout: LayoutOptions = {
       ...content,
       theme: campaign.theme,
+      icon: campaign.emoji,
       lang,
       body: (firstName ? greeting(firstName, lang) : '') + personal + content.body,
       ...(topic.transactional ? {} : { prefsUrl, unsubscribeUrl, reason: lang === 'en' && campaign.reasonEn ? campaign.reasonEn : campaign.reason }),

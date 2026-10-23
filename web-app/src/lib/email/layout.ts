@@ -24,6 +24,8 @@ const SAND = '#f3ead8';
 const LINE = '#eadfca';
 const TEXT = '#594a42';
 const MUTED = '#a89a90';
+const TILE = '#f1eee8';
+const TILE_LINE = '#e2dcd2';
 
 const HEADING_FONT = `'Unbounded','Outfit',Helvetica,Arial,sans-serif`;
 const BODY_FONT = `'Outfit',Helvetica,Arial,sans-serif`;
@@ -58,6 +60,8 @@ export type EmailTheme = 'caixa' | 'assinatura' | 'eventos' | 'cursos' | 'retiro
 
 interface ThemeDef {
   kicker: string;
+  /** The signpost tile above the heading: one simple emoji that says what the e-mail is about. */
+  icon: string;
   heroAlt: string;
   stripTitle: string;
   strip: { img: string; caption: string; alt: string; path: string }[];
@@ -65,7 +69,7 @@ interface ThemeDef {
 
 const THEMES: Record<EmailTheme, ThemeDef> = {
   caixa: {
-    kicker: 'Caixa de Degustação',
+    kicker: 'Caixa de Degustação', icon: '🎁',
     heroAlt: 'Caixa de Degustação aberta, com doces veganos',
     stripTitle: 'Saído da nossa cozinha',
     strip: [
@@ -75,7 +79,7 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
     ],
   },
   assinatura: {
-    kicker: 'Sua assinatura',
+    kicker: 'Sua assinatura', icon: '🗓️',
     heroAlt: 'Caixa de Degustação com doces da semana',
     stripTitle: 'O que anda saindo do forno',
     strip: [
@@ -85,7 +89,7 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
     ],
   },
   eventos: {
-    kicker: 'Menu de Eventos',
+    kicker: 'Menu de Eventos', icon: '🍰',
     heroAlt: 'Convidados provando doces numa festa tropical',
     stripTitle: 'Mesas que a gente já montou',
     strip: [
@@ -95,7 +99,7 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
     ],
   },
   cursos: {
-    kicker: 'Cursos em Itamambuca',
+    kicker: 'Cursos em Itamambuca', icon: '🎓',
     heroAlt: 'Aula prática de confeitaria',
     stripTitle: 'O que se aprende na bancada',
     strip: [
@@ -105,7 +109,7 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
     ],
   },
   retiros: {
-    kicker: 'Retiros em Itamambuca',
+    kicker: 'Retiros em Itamambuca', icon: '🌴',
     heroAlt: 'Praia de Itamambuca vista do alto',
     stripTitle: 'Pertinho da casa',
     strip: [
@@ -115,7 +119,7 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
     ],
   },
   parcerias: {
-    kicker: 'Parcerias',
+    kicker: 'Parcerias', icon: '🤝',
     heroAlt: 'Café da manhã de hotel com vista para o mar',
     stripTitle: 'Onde nossos doces já moram',
     strip: [
@@ -125,7 +129,7 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
     ],
   },
   equipe: {
-    kicker: 'Trabalhe com a gente',
+    kicker: 'Trabalhe com a gente', icon: '💼',
     heroAlt: 'Vitrine da padaria',
     stripTitle: 'O dia a dia na cozinha',
     strip: [
@@ -135,7 +139,7 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
     ],
   },
   brunch: {
-    kicker: 'Brunch Tropical',
+    kicker: 'Brunch Tropical', icon: '🥞',
     heroAlt: 'Mulheres rindo em volta de uma mesa de brunch tropical com doces e chá',
     stripTitle: 'Como é um brunch com a Dolly',
     strip: [
@@ -145,7 +149,7 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
     ],
   },
   novidades: {
-    kicker: 'Carta da padaria',
+    kicker: 'Carta da padaria', icon: '💌',
     heroAlt: 'Mesa de doces tropicais',
     stripTitle: 'Da nossa mesa',
     strip: [
@@ -160,7 +164,25 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
 export interface EmailFact {
   num: string;
   label: string;
+  /** Optional emoji shown above the number. */
+  icon?: string;
 }
+
+/**
+ * The site's signpost in e-mail form: an emoji on a pale grey embossed tile. A one-cell table so Outlook
+ * keeps the size; the shadow is a bonus where it renders, the border carries the shape where it doesn't.
+ */
+export const iconTile = (emoji: string, size = 56, align: 'center' | 'left' = 'center') =>
+  `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="${align}" style="margin:${align === 'center' ? '0 auto' : '0'};">` +
+  `<tr><td width="${size}" height="${size}" align="center" valign="middle" bgcolor="${TILE}" ` +
+  `style="width:${size}px;height:${size}px;background:${TILE};background-image:linear-gradient(145deg,#fdfcfa 0%,#ebe7e0 100%);border:1px solid ${TILE_LINE};border-radius:${Math.round(size * 0.3)}px;` +
+  `box-shadow:inset 0 1px 0 #ffffff,0 2px 4px rgba(60,42,33,0.12);font-size:${Math.round(size * 0.52)}px;line-height:${size}px;text-align:center;mso-line-height-rule:exactly;">${emoji}</td></tr></table>`;
+
+/** The same tile at text size, inline before a label. */
+const inlineTile = (emoji: string) =>
+  `<span style="display:inline-block;width:30px;height:30px;line-height:30px;text-align:center;vertical-align:middle;margin:0 9px 0 0;` +
+  `background:${TILE};background-image:linear-gradient(145deg,#fdfcfa 0%,#ebe7e0 100%);border:1px solid ${TILE_LINE};border-radius:9px;` +
+  `font-size:16px;letter-spacing:0;text-transform:none;">${emoji}</span>`;
 
 export interface LayoutOptions {
   /** Hidden line Gmail shows next to the subject. */
@@ -176,6 +198,8 @@ export interface LayoutOptions {
   facts?: EmailFact[];
   /** Picks the photo, kicker and photo strip. Defaults to 'novidades'. */
   theme?: EmailTheme;
+  /** The emoji in the tile above the heading, when this e-mail needs a different one from its theme (📖 on an e-book receipt). */
+  icon?: string;
   /** Where images load from. The admin preview passes its own origin so new images show before deploy. */
   assetBase?: string;
   /** Manage-preferences link; omitted for transactional mail. */
@@ -218,9 +242,9 @@ export const bulletList = (items: string[]) =>
 export const greeting = (firstName: string, lang: EmailLang = 'pt') =>
   `<p style="color:${COCOA};font-family:${BODY_FONT};font-size:17px;font-weight:bold;margin:0 0 12px;">${UI[lang].hi}, ${esc(firstName)}!</p>`;
 
-/** Small gold uppercase label above a list or section, the same one the site uses. */
-export const kicker = (text: string) =>
-  `<p style="color:${GOLD_DEEP};font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;margin:8px 0 10px;">${esc(text)}</p>`;
+/** Small gold uppercase label above a list or section, the same one the site uses. With an emoji, it gets the signpost tile. */
+export const kicker = (text: string, icon?: string) =>
+  `<p style="color:${GOLD_DEEP};font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;margin:${icon ? '14px' : '8px'} 0 10px;">${icon ? inlineTile(icon) : ''}${esc(text)}</p>`;
 
 export interface OrderLine {
   label: string;
@@ -272,18 +296,18 @@ const THEMES_EN: Partial<Record<EmailTheme, Partial<ThemeDef>>> = {
 };
 
 const FOOTER_LINKS_EN: { label: string; path: string }[] = [
-  { label: 'Sweet Escape', path: '/sweet-escape' },
-  { label: 'Tasting Box', path: '/caixas' },
-  { label: 'Events Menu', path: '/menu' },
-  { label: 'Retreats', path: '/retreats' },
+  { label: '📖 Sweet Escape', path: '/sweet-escape' },
+  { label: '🎁 Tasting Box', path: '/caixas' },
+  { label: '🍰 Events Menu', path: '/menu' },
+  { label: '🌴 Retreats', path: '/retreats' },
 ];
 
 const FOOTER_LINKS: { label: string; path: string }[] = [
-  { label: 'Caixa de Degustação', path: '/caixas' },
-  { label: 'Assinatura', path: '/assinatura' },
-  { label: 'Menu de Eventos', path: '/menu' },
-  { label: 'Cursos', path: '/cursos' },
-  { label: 'Retiros', path: '/retreats' },
+  { label: '🎁 Caixa de Degustação', path: '/caixas' },
+  { label: '🗓️ Assinatura', path: '/assinatura' },
+  { label: '🍰 Menu de Eventos', path: '/menu' },
+  { label: '🎓 Cursos', path: '/cursos' },
+  { label: '🌴 Retiros', path: '/retreats' },
 ];
 
 const img = (base: string, name: string, ext = 'jpg') => `${base}/email/${name}.${ext}`;
@@ -296,6 +320,7 @@ function factsRow(facts: EmailFact[]): string {
     <td class="tb-fact" width="${w}%" valign="top" style="padding:0 4px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td class="tb-fact-in" height="96" valign="middle" bgcolor="${SAND}" style="height:96px;background:${SAND};border:1px solid ${LINE};border-radius:14px;padding:12px 10px;text-align:center;">
+          ${f.icon ? `<div style="font-size:24px;line-height:1;margin:0 0 6px;">${f.icon}</div>` : ''}
           <div class="tb-fact-num${f.num.length > 7 ? " tb-fact-num--long" : ""}" style="font-family:${HEADING_FONT};font-weight:700;font-size:${f.num.length > 7 ? 16 : 22}px;line-height:1.15;color:${GOLD_DEEP};">${esc(f.num)}</div>
           <div class="tb-fact-lbl" style="font-family:${BODY_FONT};font-size:12px;line-height:1.4;color:${TEXT};margin-top:6px;">${esc(f.label)}</div>
         </td></tr>
@@ -411,6 +436,7 @@ export function renderEmail(o: LayoutOptions): string {
             </td></tr>
             <tr><td height="4" bgcolor="${GOLD}" style="background:${GOLD};line-height:4px;font-size:0;">&nbsp;</td></tr>
             <tr><td class="tb-card" style="padding:32px 36px 34px;">
+              <div style="margin:0 0 14px;">${iconTile(o.icon || theme.icon)}</div>
               <p style="text-align:center;font-family:${BODY_FONT};font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;color:${GOLD_DEEP};margin:0 0 12px;">&#10022;&nbsp; ${esc(theme.kicker)} &nbsp;&#10022;</p>
               <h1 class="tb-h1" style="font-family:${HEADING_FONT};font-weight:700;color:${COCOA};font-size:27px;line-height:1.22;margin:0 0 22px;text-align:center;letter-spacing:-0.3px;">${esc(o.heading)}</h1>
               ${o.body}

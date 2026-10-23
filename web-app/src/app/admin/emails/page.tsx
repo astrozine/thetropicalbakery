@@ -156,6 +156,7 @@ export default function AdminEmailsPage() {
     return renderEmail({
       ...content,
       theme: campaign.theme,
+      icon: campaign.emoji,
       // Images from this server, so a photo added to public/email/ shows here before it is deployed.
       assetBase: typeof window !== 'undefined' ? window.location.origin : SITE_URL,
       body: greeting('Dolly') + content.body,

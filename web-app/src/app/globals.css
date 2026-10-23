@@ -1308,3 +1308,38 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .announce-bar { animation-duration: 6s; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SIGNPOSTS — a simple emoji in a pale grey embossed tile, so a visitor sees at a
+   glance where they are and what each part is for. Same tile as the menu (IconTile).
+     <p className="xx-kicker" data-sign="🎁">…</p>   tile beside a small label
+     <h2 data-sign-top="📦">…</h2>                   bigger tile centred above a heading
+     <h2 data-sign-top="📦" data-sign-start>…</h2>   …lined up with left-aligned text
+   ════════════════════════════════════════════════════════════════════════════ */
+:root {
+  --sign-bg: linear-gradient(145deg, #fdfcfa 0%, #ebe7e0 100%);
+  --sign-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px rgba(60,42,33,0.12), 0 1px 2px rgba(60,42,33,0.14), 0 0 0 1px rgba(60,42,33,0.07);
+}
+[data-sign]::before,
+[data-sign-top]::before {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  background: var(--sign-bg); box-shadow: var(--sign-shadow);
+  font-style: normal; font-weight: normal; letter-spacing: 0; text-transform: none; line-height: 1; color: #3c2a21;
+}
+[data-sign]::before {
+  content: attr(data-sign);
+  width: 2.4rem; height: 2.4rem; border-radius: 0.72rem; font-size: 1.25rem;
+  margin-right: 0.65rem; vertical-align: middle;
+}
+[data-sign-top]::before {
+  content: attr(data-sign-top);
+  display: flex; width: 3.6rem; height: 3.6rem; border-radius: 1.1rem; font-size: 1.9rem;
+  margin: 0 auto 0.9rem;
+}
+[data-sign-top][data-sign-start]::before { margin-left: 0; }
+/* On a dark band the tile keeps its light paper look; only the outline gets a touch stronger. */
+[data-sign-dark]::before { box-shadow: var(--sign-shadow), 0 0 0 1px rgba(212,175,55,0.35); }
+@media (max-width: 767px) {
+  [data-sign]::before { width: 2.15rem; height: 2.15rem; font-size: 1.1rem; }
+  [data-sign-top]::before { width: 3.1rem; height: 3.1rem; font-size: 1.6rem; margin-bottom: 0.7rem; }
+}

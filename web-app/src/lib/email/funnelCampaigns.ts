@@ -57,7 +57,7 @@ export const FUNNEL_CAMPAIGNS: Campaign[] = [
           heading: 'Bora para a cozinha?',
           body:
             paragraphs('Ontem você recebeu as minhas duas receitas. Se ainda não fez nenhuma, comece pelas Bliss Balls: não vão ao forno, levam 20 minutos e as crianças adoram enrolar.') +
-            kicker('Três truques da minha cozinha') +
+            kicker('Três truques da minha cozinha', '💡') +
             bulletList([
               'Tâmara macia é o segredo. Se estiverem secas, deixe 10 minutos em água morna e escorra bem.',
               'Molhe as mãos para enrolar as bolinhas: a massa não gruda e elas ficam lisinhas.',
@@ -72,7 +72,7 @@ export const FUNNEL_CAMPAIGNS: Campaign[] = [
           heading: 'Ready to bake?',
           body:
             paragraphs('Yesterday you got my two recipes. If you haven’t made one yet, start with the Bliss Balls: no oven, 20 minutes, and kids love rolling them.') +
-            kicker('Three tricks from my kitchen') +
+            kicker('Three tricks from my kitchen', '💡') +
             bulletList([
               'Soft dates are the secret. If yours are dry, soak them in warm water for 10 minutes and drain well.',
               'Wet your hands to roll the balls: the dough won’t stick and they come out smooth.',
@@ -98,7 +98,7 @@ export const FUNNEL_CAMPAIGNS: Campaign[] = [
           heading: 'Você tem 2 cores. Faltam 5.',
           body:
             paragraphs('O Vermelho e o Caramelo vieram do meu livro Sweet Escape: 7 Cores, 7 Receitas. Eu montei o livro como uma semana: cada dia uma cor, cada cor um doce que cuida de você.') +
-            kicker('Ainda esperando por você') +
+            kicker('Ainda esperando por você', '📖') +
             bulletList(missing(v)) +
             paragraphs(`Além das receitas, o livro explica o porquê de cada ingrediente, para você começar a inventar os seus. Uma rodada pelo livro rende uns ${TOTAL_TREATS} doces.\n\nO livro completo custa ${full(v)}, em PDF na hora, com garantia de 7 dias.`),
           cta: { label: 'Ver o Sweet Escape', href: bookPage(v, 'receitas-d3') },
@@ -109,7 +109,7 @@ export const FUNNEL_CAMPAIGNS: Campaign[] = [
           heading: 'You have 2 colors. 5 to go.',
           body:
             paragraphs('Red and Caramel come from my book Sweet Escape: 7 Colors, 7 Recipes. I built it like a week: every day a color, every color a treat that loves you back.') +
-            kicker('Still waiting for you') +
+            kicker('Still waiting for you', '📖') +
             bulletList(missing(v)) +
             paragraphs(`Besides the recipes, the book explains the why behind every ingredient, so you can start inventing your own. One run through the book makes about ${TOTAL_TREATS} treats.\n\nThe full book is ${full(v)}, an instant PDF with a 7-day money-back promise.`),
           cta: { label: 'See Sweet Escape', href: bookPage(v, 'receitas-d3') },

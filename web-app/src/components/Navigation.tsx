@@ -12,6 +12,7 @@ import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
 import { clearGoogleTranslate } from '@/lib/googleTranslate';
 import { FUNNEL } from '@/lib/funnel';
+import IconTile from '@/components/IconTile';
 
 // Desktop menu (xl and up): one line at 1280px, roomier on bigger screens.
 const GAP = 'clamp(0.7rem, 1.1vw, 1.5rem)';
@@ -23,19 +24,6 @@ const HAND_TRANSLATED_EN: Record<string, string> = {
 };
 
 type NavLink = { name: string; path: string; icon?: string; highlight?: boolean; feature?: boolean; sub?: string; external?: boolean };
-
-/** The little embossed tile in front of each menu entry: pale grey, lit from above, pressed into the paper. */
-function IconTile({ size, children }: { size: number; children: React.ReactNode }) {
-  return (
-    <span aria-hidden style={{
-      width: size, height: size, flexShrink: 0, borderRadius: size * 0.3,
-      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.5, lineHeight: 1,
-      background: 'linear-gradient(145deg, #fdfcfa 0%, #ebe7e0 100%)',
-      boxShadow: 'inset 0 1px 0 #fff, inset 0 -1px 2px rgba(60,42,33,0.12), 0 1px 2px rgba(60,42,33,0.14), 0 0 0 1px rgba(60,42,33,0.07)',
-      color: '#3c2a21',
-    }}>{children}</span>
-  );
-}
 
 // The "plan your trip" button: forest green with a gold edge, so it reads as the way in for travellers
 // without competing with the gold "highlight" link beside it.

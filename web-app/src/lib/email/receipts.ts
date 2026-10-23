@@ -123,7 +123,7 @@ export async function sendOrderReceived(db: SupabaseClient, order: ReceiptOrder)
         ? 'Recebemos o seu pedido e guardamos ele para você. Falta só o Pix cair — assim que cair, a gente confirma aqui e no WhatsApp.'
         : 'Recebemos o seu pedido! Estamos só esperando a confirmação do pagamento, que costuma levar alguns minutos.',
     ) +
-    kicker('Seu pedido') +
+    kicker('Seu pedido', '🛍️') +
     amounts(order) +
     (isPix && order.pixPayload ? copyBox('Pix copia e cola', order.pixPayload) : '') +
     (where ? paragraphs(where) : '');
@@ -153,11 +153,11 @@ export async function sendOrderPaid(db: SupabaseClient, order: ReceiptOrder) {
         ? 'Quando estiver pronto a gente te avisa no WhatsApp para você vir buscar.'
         : 'A Dolly faz tudo à mão, fresco, o mais perto possível do dia da entrega.'),
     ) +
-    kicker('O que você pediu') +
+    kicker('O que você pediu', '🛍️') +
     amounts(order) +
     (where ? paragraphs(where) : '') +
     // How to keep the treats (src/lib/treatCare.ts): this is the e-mail everyone who paid gets.
-    (spot ? '' : kicker('Quando a caixa chegar') + paragraphs(`${CARE_SHORT}
+    (spot ? '' : kicker('Quando a caixa chegar', '❄️') + paragraphs(`${CARE_SHORT}
 
 Todos os cuidados: ${SITE_URL}${CARE_PATH}`));
 

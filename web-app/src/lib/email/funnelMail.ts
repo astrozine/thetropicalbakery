@@ -90,10 +90,10 @@ export async function sendFreeRecipes(db: SupabaseClient, o: { email: string; fi
       email, token: '', messageKey: `${FUNNEL.source}:pdf`, subject: c.subject, topic: 'pedido', template: 'receitas-d0', transactional: true,
       layout: {
         lang: o.lang === 'pt' ? 'pt' : 'en',
-        theme: 'novidades',
+        theme: 'novidades', icon: '📝',
         preheader: c.preheader,
         heading: c.heading,
-        body: hello + paragraphs(c.text) + kicker(c.inside) + bulletList(c.recipes) + paragraphs(fill(c.ps, { book, price })),
+        body: hello + paragraphs(c.text) + kicker(c.inside, '📝') + bulletList(c.recipes) + paragraphs(fill(c.ps, { book, price })),
         cta: { label: c.cta, href: `${SITE_URL}${freePdf(o.lang)}` },
         note: c.note,
       },

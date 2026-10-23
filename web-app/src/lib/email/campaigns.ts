@@ -160,7 +160,7 @@ export const CAMPAIGNS: Campaign[] = [
       heading: v.title,
       body:
         paragraphs(v.intro || 'A edição desta semana já está pronta para reserva.') +
-        (listFrom(v.treats).length ? kicker('O que vem dentro') + bulletList(listFrom(v.treats)) : ''),
+        (listFrom(v.treats).length ? kicker('O que vem dentro', '🍫') + bulletList(listFrom(v.treats)) : ''),
       facts: [
         ...(v.quantity ? [{ num: v.quantity, label: 'caixas nesta edição' }] : []),
         { num: '100%', label: 'vegano' },
@@ -245,7 +245,7 @@ export const CAMPAIGNS: Campaign[] = [
           `A Dolly já está preparando a sua caixa da semana. Ela sai fresquinha e chega em ${prettyDate(v.date)}.\n\n` +
           'Na caixa de 2 você escolhe os seus favoritos, e na de 6 escolhe os 2 extras: é só entrar em Minha Conta. Se preferir, toque no dado e a Dolly escolhe por você.',
         ) + (v.preview ? paragraphs(v.preview) : '') +
-        kicker('Quando a caixa chegar') + paragraphs(`${CARE_SHORT}
+        kicker('Quando a caixa chegar', '❄️') + paragraphs(`${CARE_SHORT}
 
 Todos os cuidados: ${url(CARE_PATH)}`),
       facts: [{ num: shortDate(v.date), label: weekday(v.date) || 'dia da entrega' }, { num: 'Fresca', label: 'do forno direto para a sua porta' }],
@@ -425,7 +425,7 @@ Todos os cuidados: ${url(CARE_PATH)}`),
     id: 'brunch-new',
     theme: 'brunch',
     name: 'Brunch novo na agenda',
-    emoji: '🥂',
+    emoji: '🥞',
     topic: 'brunch',
     description: 'Anuncia um brunch novo: tema, data, lugar e quantos lugares existem. Também sai pelo botão "Anunciar" em Admin › Brunch.',
     reason: 'Você recebe este e-mail porque está na lista da Tropical Bakery e não pediu para parar de receber os brunches.',
@@ -446,7 +446,7 @@ Todos os cuidados: ${url(CARE_PATH)}`),
       body:
         paragraphs(v.theme || 'Uma manhã de chá, doces saudáveis e conversa boa sobre saúde, bem-estar e como viver disso.') +
         paragraphs(`${v.when}${v.where ? `\n${v.where}` : ''}`) +
-        kicker('No seu ingresso') +
+        kicker('No seu ingresso', '🎟️') +
         bulletList([
           'Mesa de doces saudáveis da Dolly e chás da estação',
           'Roda de conversa com mulheres que vivem de saúde e bem-estar',
@@ -572,7 +572,7 @@ Todos os cuidados: ${url(CARE_PATH)}`),
         heading: 'O grupo está conversando',
         body:
           (v.newcomers ? paragraphs(`Chegou gente nova: ${v.newcomers}. Dê as boas-vindas!`) : '') +
-          (lines.length ? kicker('Últimas mensagens') + bulletList(lines) : paragraphs('Tem conversa nova esperando por você.')),
+          (lines.length ? kicker('Últimas mensagens', '💬') + bulletList(lines) : paragraphs('Tem conversa nova esperando por você.')),
         cta: { label: 'Responder no grupo', href: url(`/brunch/sala/${v.slug}`) },
       };
     },
@@ -601,7 +601,7 @@ Todos os cuidados: ${url(CARE_PATH)}`),
       body:
         paragraphs('Foi lindo ter você à mesa. O grupo do brunch continua aberto: troque contatos, mande aquela indicação que você prometeu, poste as fotos.') +
         (v.creditUntil
-          ? kicker('O seu crédito') + paragraphs(`O valor do seu ingresso${v.credit ? ` (R$ ${v.credit})` : ''} vira desconto na sua primeira mensalidade da assinatura Anual da Caixa de Degustação, se você assinar até ${v.creditUntil}. É só tocar em "Usar meu crédito" em Minha Conta.`)
+          ? kicker('O seu crédito', '💳') + paragraphs(`O valor do seu ingresso${v.credit ? ` (R$ ${v.credit})` : ''} vira desconto na sua primeira mensalidade da assinatura Anual da Caixa de Degustação, se você assinar até ${v.creditUntil}. É só tocar em "Usar meu crédito" em Minha Conta.`)
           : ''),
       cta: { label: 'Voltar para o grupo', href: url(`/brunch/sala/${v.slug}`) },
       note: 'Os próximos brunches abrem antes para quem já é do Círculo Tropical.',

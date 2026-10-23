@@ -59,7 +59,7 @@ export async function sendEbookOrderReceived(db: SupabaseClient, o: EbookReceipt
   const body =
     hello(m.hi, o.customerName) +
     paragraphs(fill(isPix ? m.receivedPix : m.receivedCard, v)) +
-    kicker(m.yourOrder) +
+    kicker(m.yourOrder, '🛍️') +
     orderTable([{ label: `${EBOOK.lineName} · ${LANG_LABEL[o.book ?? 'en']}`, amount: money(o) }, { label: 'Total', amount: money(o), strong: true }]) +
     (isPix && o.pixPayload ? copyBox('Pix copia e cola', o.pixPayload) : '');
 
@@ -69,7 +69,7 @@ export async function sendEbookOrderReceived(db: SupabaseClient, o: EbookReceipt
     body,
     cta: { label: m.myPage, href: link(o) },
     note: fill(m.receivedNote, v),
-    theme: 'novidades',
+    theme: 'novidades', icon: '📖',
   });
 }
 
@@ -79,13 +79,13 @@ export async function sendEbookPaid(db: SupabaseClient, o: EbookReceipt) {
   const body =
     hello(m.hi, o.customerName) +
     paragraphs(m.paidText) +
-    kicker(m.edition) +
+    kicker(m.edition, '📖') +
     paragraphs(`📖 ${LANG_LABEL[o.book ?? 'en']}`) +
-    kicker(m.whereToStart) +
+    kicker(m.whereToStart, '🧭') +
     bulletList(m.tips) +
     paragraphs(m.paidLink) +
     // The reader's gift (lib/bookPerk.ts): 15% off their first purchase of anything else.
-    kicker(`🎁 ${PERK_COPY[o.lang ?? 'en'].title}`) +
+    kicker(PERK_COPY[o.lang ?? 'en'].title, '🎁') +
     paragraphs(PERK_COPY[o.lang ?? 'en'].text);
 
   await send(db, o, `ebook-paid:${o.reference}`, m.paidSubject, {
@@ -94,6 +94,6 @@ export async function sendEbookPaid(db: SupabaseClient, o: EbookReceipt) {
     body,
     cta: { label: m.paidCta, href: link(o) },
     note: fill(m.paidNote, v),
-    theme: 'novidades',
+    theme: 'novidades', icon: '📖',
   });
 }
