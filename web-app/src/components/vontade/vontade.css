@@ -170,6 +170,21 @@ body:has(.va-shell) .announce-bar, body:has(.va-shell) .mobile-header-nav { disp
 .va-perks { list-style: none; padding: 0; margin: 0 0 1rem; display: flex; flex-direction: column; gap: 0.7rem; }
 .va-perks li { display: flex; align-items: center; gap: 0.8rem; font-size: 0.98rem; line-height: 1.4; }
 
+/* Dolly's photo: a band across the top of the card, edge to edge. */
+.va-photo { display: block; overflow: hidden; aspect-ratio: 16 / 10; background: rgba(0,0,0,0.08); }
+.va-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.va-recipe .va-photo, .va-view__head .va-photo { width: calc(100% + 2.4rem); margin: -1.4rem -1.2rem 0.9rem; border-radius: 24px 24px 0 0; }
+.va-tile .va-photo { width: calc(100% + 1.8rem); margin: -0.9rem -0.9rem auto; border-radius: 18px 18px 0 0; aspect-ratio: 4 / 3; }
+.va-recipe, .va-view__head, .va-tile { overflow: hidden; }
+
+/* The rules behind every recipe. */
+.va-rules { text-align: left; margin: -0.4rem 0 0.5rem; font-size: 0.9rem; line-height: 1.5; }
+.va-rules summary { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; cursor: pointer; list-style: none; font-weight: 700; color: #6b7f3a; }
+.va-rules summary::-webkit-details-marker { display: none; }
+.va-rules ul { list-style: none; padding: 0; margin: 0.2rem 0 0.6rem; display: grid; gap: 0.5rem; }
+.va-rules li { display: flex; gap: 0.55rem; background: #fff; border: 1px solid var(--va-line); border-radius: 12px; padding: 0.6rem 0.75rem; }
+.va-rules p { color: var(--va-muted); font-size: 0.8rem; margin: 0; }
+
 /* Tab bar. */
 .va-tabs {
   display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--va-line); background: #fff;

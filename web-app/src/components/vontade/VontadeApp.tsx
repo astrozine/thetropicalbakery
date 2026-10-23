@@ -9,8 +9,9 @@ import { trackMeta } from '@/lib/metaPixel';
 import LoginPanel from '@/components/LoginPanel';
 import IconTile from '@/components/IconTile';
 import {
-  CRAVINGS, TIMES, PANTRY, RESCUES, FREE_COUNT, STORE_KEY,
-  emptyStore, isTropicalPlus, lastSevenDays, missingFor, pantryLabel, rankRescues, streak, todayISO,
+  CRAVINGS, TIMES, PANTRY, RESCUES, GUIDELINES, STORE_KEY,
+  emptyStore, freeCount, isTropicalPlus, lastSevenDays, missingFor, pantryLabel, rankRescues, rescueFromRow, streak, todayISO,
+  type RecipeCard, type RecipeRow,
   type Craving, type Rescue, type TimeBudget, type VontadeStore,
 } from '@/lib/vontade';
 import './vontade.css';
@@ -55,6 +56,31 @@ function useTropicalPlus() {
   return { ...state, signedIn: !!user };
 }
 
+/**
+ * The recipes Dolly published in /admin/app-receitas (migration 48). Every card comes from app_recipe_cards(); the
+ * full recipe only when the table lets this person read it (free, or Tropical+), so a locked one never reaches the
+ * phone. Until migration 48 runs: the built-in launch set, unlocked by the same Tropical+ rule in the browser.
+ */
+function useRescues(signedInId: string | null) {
+  const [state, setState] = useState<{ list: Rescue[]; fromDb: boolean }>({ list: RESCUES, fromDb: false });
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data: cards, error } = await supabase.rpc('app_recipe_cards');
+      if (error || !Array.isArray(cards) || cards.length === 0) return;
+      const { data: rows } = await supabase.from('app_recipes').select('*').eq('published', true);
+      const full = new Map(((rows || []) as RecipeRow[]).map(r => [r.slug, r]));
+      const list = (cards as RecipeCard[]).map(c => {
+        const row = full.get(c.slug);
+        return row ? rescueFromRow(row) : rescueFromRow(c, true);
+      });
+      if (alive) setState({ list, fromDb: true });
+    })().catch(() => {});
+    return () => { alive = false; };
+  }, [signedInId]);
+  return state;
+}
+
 const Lock = () => (
   <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden><path fill="currentColor" d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1Zm2 0h6V7a3 3 0 0 0-6 0v3Z" /></svg>
 );
@@ -85,8 +111,11 @@ export default function VontadeApp() {
     trackMeta('ViewContent', { content_name: 'app-vontade', content_type: 'product', value: 0 });
   }, []);
 
-  const unlocked = useCallback((r: Rescue) => r.free || plus.plus, [plus.plus]);
-  const ranked = useMemo(() => (craving && time ? rankRescues(craving, time, pantry) : []), [craving, time, pantry]);
+  const { user } = useAuth();
+  const { list, fromDb } = useRescues(user?.id ?? null);
+  const unlocked = useCallback((r: Rescue) => (fromDb ? !r.locked : r.free || plus.plus), [fromDb, plus.plus]);
+  const ranked = useMemo(() => (craving && time ? rankRescues(list, craving, time, pantry) : []), [list, craving, time, pantry]);
+  const free = freeCount(list);
   const open_ = ranked.filter(unlocked);
   const current = open_.length ? open_[pick % open_.length] : null;
   // The better recipe behind the lock, shown at the moment the craving is strongest.
@@ -115,7 +144,7 @@ export default function VontadeApp() {
 
   const share = async () => {
     const n = store.wins.length;
-    const text = `Bateu vontade de doce e eu venci ${n === 1 ? 'pela primeira vez' : `${n} vezes`} com o app da The Tropical Bakery 🌴 Receitas em 2 a 5 minutos, sem açúcar refinado:`;
+    const text = `Bateu vontade de doce e eu venci ${n === 1 ? 'pela primeira vez' : `${n} vezes`} com o app da The Tropical Bakery 🌴 Docinhos em 2 a 5 minutos, só com fruta, castanha e semente:`;
     try {
       if (navigator.share) { await navigator.share({ title: 'Bateu Vontade?', text, url: SHARE_URL }); return; }
       await navigator.clipboard.writeText(`${text} ${SHARE_URL}`);
@@ -148,7 +177,8 @@ export default function VontadeApp() {
               <div className="va-home">
                 <p className="va-kicker">Bateu aquela vontade de doce?</p>
                 <h1 className="va-h1">A gente resolve em <em>3 toques</em>.</h1>
-                <p className="va-lead">Um docinho de verdade em 2 a 5 minutos, com o que você tem em casa. Vegano, sem glúten, sem açúcar refinado.</p>
+                <p className="va-lead">Um docinho de verdade em 2 a 5 minutos, com o que você tem em casa. Sem sal, sem óleo, sem açúcar: o doce vem da fruta.</p>
+                <Guidelines />
                 <button className="va-sos" onClick={() => setStep('craving')}>
                   <span className="va-sos__ring" aria-hidden />
                   <span className="va-sos__emoji" aria-hidden>🍫</span>
@@ -244,7 +274,7 @@ export default function VontadeApp() {
                 <div className="va-confetti" aria-hidden>{['🌴', '🍫', '🥭', '🥥', '✨', '🌺', '🍌', '✨'].map((e, i) => <span key={i} style={{ '--i': i } as React.CSSProperties}>{e}</span>)}</div>
                 <p className="va-kicker">Vontade vencida!</p>
                 <h1 className="va-h1">{store.wins.length === 1 ? 'Sua primeira vitória.' : `${store.wins.length} vitórias.`}</h1>
-                <p className="va-lead">{days > 1 ? `${days} dias seguidos escolhendo um doce que faz bem.` : 'Doce de verdade, sem culpa e sem açúcar refinado. Amanhã tem mais.'}</p>
+                <p className="va-lead">{days > 1 ? `${days} dias seguidos escolhendo um doce que faz bem.` : 'Doce de verdade, sem culpa: só fruta, castanha e semente. Amanhã tem mais.'}</p>
                 <div className="va-actions">
                   <button className="va-cta" onClick={share}>Contar para uma amiga 💛</button>
                   <button className="va-ghost" onClick={() => setStep('home')}>Voltar ao início</button>
@@ -261,12 +291,13 @@ export default function VontadeApp() {
         ) : tab === 'receitas' ? (
           <section className="va-screen">
             <p className="va-kicker">Receitas de resgate</p>
-            <h1 className="va-h1">{RESCUES.length} docinhos, todos em minutos.</h1>
-            <p className="va-lead">{plus.plus ? 'Você tem todas. Bom proveito!' : `${FREE_COUNT} grátis para sempre. As outras ${RESCUES.length - FREE_COUNT} vêm com o Tropical+.`}</p>
+            <h1 className="va-h1">{list.length} docinhos, todos em minutos.</h1>
+            <p className="va-lead">{list.every(unlocked) ? 'Você tem todas. Bom proveito!' : `${free} grátis para sempre. As outras ${list.length - free} vêm com o Tropical+.`}</p>
             <div className="va-lib">
-              {RESCUES.map(r => unlocked(r) ? (
+              {list.map(r => unlocked(r) ? (
                 <button key={r.id} className="va-tile" style={{ background: r.hex, color: r.ink }} onClick={() => setOpen(r)}>
-                  <span className="va-tile__emoji" aria-hidden>{r.emoji}</span><strong>{r.name}</strong><small>{timeLabel(r)}</small>
+                  {r.photo ? <Photo src={r.photo} /> : <span className="va-tile__emoji" aria-hidden>{r.emoji}</span>}
+                  <strong>{r.name}</strong><small>{timeLabel(r)}</small>
                 </button>
               ) : (
                 <button key={r.id} className="va-tile va-tile--locked" onClick={() => go('plus')}>
@@ -276,7 +307,7 @@ export default function VontadeApp() {
             </div>
           </section>
         ) : (
-          <PlusScreen plus={plus} />
+          <PlusScreen plus={plus} total={list.length} free={free} />
         )}
       </div>
 
@@ -307,9 +338,9 @@ function RecipeCard({ r, pantry, onOpen }: { r: Rescue; pantry: string[]; onOpen
   const missing = pantry.length ? missingFor(r, pantry) : [];
   return (
     <button className="va-recipe" style={{ background: r.hex, color: r.ink }} onClick={onOpen}>
-      <span className="va-recipe__emoji" aria-hidden>{r.emoji}</span>
+      {r.photo ? <Photo src={r.photo} /> : <span className="va-recipe__emoji" aria-hidden>{r.emoji}</span>}
       <strong>{r.name}</strong>
-      <span className="va-meta"><span>⏱️ {timeLabel(r)}</span><span>🌱 vegano</span></span>
+      <span className="va-meta"><span>⏱️ {timeLabel(r)}</span><span>🌱 só fruta e castanha</span></span>
       {missing.length > 0 && <small>Falta: {missing.map(pantryLabel).join(', ')}</small>}
     </button>
   );
@@ -323,9 +354,9 @@ function RecipeView({ r, pantry, onBack, onWin }: { r: Rescue; pantry: string[];
     <article className="va-screen va-view">
       <button className="va-back" onClick={onBack}>‹ Voltar</button>
       <div className="va-view__head" style={{ background: r.hex, color: r.ink }}>
-        <span className="va-recipe__emoji" aria-hidden>{r.emoji}</span>
+        {r.photo ? <Photo src={r.photo} /> : <span className="va-recipe__emoji" aria-hidden>{r.emoji}</span>}
         <h1>{r.name}</h1>
-        <span className="va-meta"><span>⏱️ {timeLabel(r)}</span><span>🌱 vegano</span><span>sem glúten</span></span>
+        <span className="va-meta"><span>⏱️ {timeLabel(r)}</span><span>🌱 vegano</span><span>sem glúten</span><span>sem sal, óleo e açúcar</span></span>
       </div>
       {contains.length > 0 && <p className="va-contains">Contém: {contains.map(a => `${a.emoji} ${a.label}`).join(' · ')}</p>}
       {missing.length > 0 && <p className="va-contains">Falta em casa: {missing.map(pantryLabel).join(', ')}</p>}
@@ -347,6 +378,22 @@ function RecipeView({ r, pantry, onBack, onWin }: { r: Rescue; pantry: string[];
   );
 }
 
+/** Dolly's photo of a recipe, as a band across the top of its colored card. */
+function Photo({ src }: { src: string }) {
+  return <span className="va-photo" aria-hidden><img src={src} alt="" loading="lazy" /></span>;
+}
+
+/** "Como são as receitas": the rules behind every recipe, one tap away (credits Fuhrman and Goldhamer, no link implied). */
+function Guidelines() {
+  return (
+    <details className="va-rules">
+      <summary>🍓 {GUIDELINES.title} <span aria-hidden>▾</span></summary>
+      <ul>{GUIDELINES.rules.map(g => <li key={g.text}><span aria-hidden>{g.emoji}</span>{g.text}</li>)}</ul>
+      <p>{GUIDELINES.credit}</p>
+    </details>
+  );
+}
+
 function LetDollyBake() {
   return (
     <Link href="/caixas?utm_source=app-vontade" className="va-card va-next">
@@ -357,9 +404,9 @@ function LetDollyBake() {
   );
 }
 
-function PlusScreen({ plus }: { plus: ReturnType<typeof useTropicalPlus> }) {
+function PlusScreen({ plus, total, free }: { plus: ReturnType<typeof useTropicalPlus>; total: number; free: number }) {
   const perks = [
-    { emoji: '📖', text: `Todas as ${RESCUES.length} receitas de resgate (${RESCUES.length - FREE_COUNT} só para Tropical+)` },
+    { emoji: '📖', text: `Todas as ${total} receitas de resgate (${total - free} só para Tropical+)` },
     { emoji: '🎯', text: 'A melhor receita para a sua vontade, sempre, não só as grátis' },
     { emoji: '🌴', text: 'Vem junto com o Clube Tropical: selos, níveis e mimos da Dolly' },
   ];

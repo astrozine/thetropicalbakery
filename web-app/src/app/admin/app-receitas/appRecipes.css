@@ -1,0 +1,69 @@
+/* /admin/app-receitas: the recipes of the "Bateu Vontade?" app. Sits on top of the bx- styles (caixas.css) and the
+   crm- pills; everything here is prefixed ar-. */
+
+/* ---- list ---- */
+/* Two cards per row on a phone: a full-width square per recipe made the list endless. */
+.ar-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+@media (max-width: 600px) {
+  .ar-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem 0.75rem; }
+  .ar-grid .ar-tile__emoji { font-size: 2.8rem; }
+  .ar-grid .bx-listing__badge { top: 8px; left: 8px; font-size: 0.75rem; padding: 0.25rem 0.55rem; }
+  .ar-grid .bx-tile__actions { gap: 0.6rem; font-size: 0.9rem; }
+  .ar-grid .ar-order { margin-left: 0; }
+}
+.ar-tile__photo { border: 0; padding: 0; cursor: pointer; display: grid; place-items: center; width: 100%; }
+/* The card's text color is for the emoji over a dark color; the white badge keeps dark text. */
+.ar-tile__photo .bx-listing__badge { color: var(--bx-ink); }
+.ar-tile__emoji { font-size: 4rem; line-height: 1; transition: transform 0.3s; }
+.ar-tile:hover .ar-tile__emoji { transform: scale(1.08); }
+.ar-tile .bx-chip { justify-self: start; line-height: 1.35; }
+.ar-order { margin-left: auto; display: inline-flex; gap: 0.3rem; }
+.ar-order button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--bx-line); background: #fff; cursor: pointer; font-weight: 700; }
+.ar-order button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.ar-rulecard summary { display: grid; gap: 0.2rem; cursor: pointer; list-style: none; }
+.ar-rulecard summary::-webkit-details-marker { display: none; }
+.ar-rulecard ul, .ar-rules ul { list-style: none; padding: 0; margin: 1rem 0 0.75rem; display: grid; gap: 0.5rem; }
+.ar-rulecard li { display: flex; gap: 0.6rem; line-height: 1.5; }
+
+/* ---- editor ---- */
+.ar-emojis { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.ar-emoji { width: 52px; height: 52px; border-radius: 14px; border: 2px solid var(--bx-line); background: #fff; font-size: 1.6rem; cursor: pointer; }
+.ar-emoji.is-on { border-color: var(--bx-ink); box-shadow: 0 0 0 1px var(--bx-ink); background: #fcfaf7; }
+.ar-emoji-input { width: 6.5rem; text-align: center; padding: 0.8rem 0.6rem; }
+
+.ar-swatches { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+.ar-swatch { width: 56px; height: 56px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1px var(--bx-line); cursor: pointer; font-weight: 800; font-size: 1.2rem; }
+.ar-swatch.is-on { box-shadow: 0 0 0 3px var(--bx-ink); }
+
+.ar-lines { display: grid; gap: 0.6rem; }
+.ar-line { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: 0.5rem; align-items: start; }
+.ar-line__n { width: 2rem; height: 2rem; margin-top: 0.7rem; border-radius: 50%; background: var(--bx-soft); display: grid; place-items: center; font-weight: 800; font-size: 0.85rem; color: var(--bx-muted); }
+.ar-line textarea { resize: vertical; line-height: 1.45; }
+.ar-line__tools { display: flex; gap: 0.25rem; margin-top: 0.35rem; }
+.ar-line__tools button { width: 36px; height: 44px; border-radius: 10px; border: 1px solid var(--bx-line); background: #fff; cursor: pointer; color: var(--bx-muted); font-weight: 700; }
+.ar-line__tools button:disabled { opacity: 0.3; cursor: not-allowed; }
+.ar-line__tools button:last-child:hover { color: #c0392b; border-color: #c0392b; }
+@media (max-width: 520px) {
+  .ar-line { grid-template-columns: minmax(0, 1fr) auto; }
+  .ar-line__n { display: none; }
+  .ar-line__tools { flex-direction: column; margin-top: 0; }
+  .ar-line__tools button { height: 32px; }
+}
+
+.ar-check { margin-top: 1.25rem; display: grid; gap: 0.6rem; }
+.ar-check p { margin: 0; border-radius: 12px; padding: 0.75rem 1rem; line-height: 1.5; overflow-wrap: anywhere; }
+.ar-check__err { background: #fdecea; border: 1px solid #f3c4bf; color: #8a2a20; }
+.ar-check__err span { color: #5c3a35; }
+.ar-check__warn { background: #fff7e8; border: 1px solid #f3d19c; color: #7a4a00; }
+.ar-rules summary { cursor: pointer; font-weight: 700; color: var(--bx-muted); min-height: 44px; display: flex; align-items: center; }
+.ar-rules li { line-height: 1.5; }
+.ar-ok { margin: 1.25rem 0; background: #ecf7f0; border: 1px solid #c3e6cf; color: #1e6b3c; border-radius: 12px; padding: 0.75rem 1rem; font-weight: 700; }
+
+.ar-preview { display: grid; gap: 0.35rem; justify-items: start; border-radius: 24px; padding: 1.4rem 1.2rem; max-width: 26rem; overflow: hidden; box-shadow: 0 10px 24px rgba(60,42,33,0.18); }
+.ar-preview strong { font-size: 1.35rem; line-height: 1.2; }
+.ar-preview__emoji { font-size: 3.4rem; line-height: 1; margin-bottom: 0.3rem; }
+.ar-preview__photo { display: block; width: calc(100% + 2.4rem); margin: -1.4rem -1.2rem 0.8rem; aspect-ratio: 16 / 10; overflow: hidden; }
+.ar-preview__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ar-preview__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; font-size: 0.85rem; }
+.ar-preview__meta span { background: rgba(255,255,255,0.22); padding: 0.2rem 0.6rem; border-radius: 999px; }

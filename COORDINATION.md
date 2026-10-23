@@ -77,7 +77,7 @@ Read the screenshot yourself. Do not report that something "looks good" unless y
 - Numbered SQL files in `web-app/` (`migration_NN_*.sql`), idempotent, ending with a verification `SELECT`. Andrew runs them by
   pasting into the Supabase SQL editor. **Tell him the file name and the order relative to the deploy.**
 - Two migrations share a number: 18 (card payments and inquiry message) and 19 (dietary profiles and treat photo paths).
-  Use the next free number (currently **48**) and check `ls web-app/migration_*.sql` first.
+  Use the next free number (currently **49**) and check `ls web-app/migration_*.sql` first.
 - New tables need explicit `GRANT`s (see `web-app/CLAUDE.md`).
 - Code that needs a new column must still work when the migration has not run yet (fall back, and show a plain hint).
 - The `orders` table was first made for lead forms and has a `NOT NULL` column `order_type`
@@ -195,6 +195,13 @@ Verified live, 2026-09-26:
   Order receipts (`src/lib/email/receipts.ts`) need none of that setup and go out as soon as the code deploys — the first
   transactional mail the site has ever sent. If you touch `createOrder` or `markOrderPaid`, keep the receipt call inside its
   try/catch: an e-mail failure must never fail a saved or paid order.
+
+- **App "Bateu Vontade?" (written 2026-10-23, `migration_48_app_recipes.sql` NOT run yet).** Free craving-rescue app at `/vontade`;
+  Dolly edits its recipes in `/admin/app-receitas` (table `app_recipes`). Free recipes are public; Tropical+ ones are readable in full
+  only by `is_tropical_plus()` (active subscription or a paid box) and admins, everyone else gets the card from `app_recipe_cards()`.
+  Every recipe follows `GUIDELINES` in `src/lib/vontade.ts` (Fuhrman nutritarian + Goldhamer SOS-free, strictly: no salt, oil or ANY
+  sweetener, coconut sugar included), stricter than the bakery's own treats; `checkGuidelines()` warns in the editor. Credit both, never
+  imply a link. The launch recipes in `RESCUES` seed the table (`tools/vontade-seed.mjs`) and are the app's fallback until 48 runs.
 
 Not built yet (ask Andrew before starting): the cookie
 consent banner and privacy-policy update that must come **before** installing any ad pixel (LGPD); the Google / Meta pixel itself.

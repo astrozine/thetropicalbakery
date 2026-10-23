@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import VontadeApp from '@/components/vontade/VontadeApp';
 
 const TITLE = 'Bateu Vontade? · The Tropical Bakery';
-const DESCRIPTION = 'Bateu vontade de doce? Em 3 toques, um docinho de verdade em 2 a 5 minutos, com o que você tem em casa. Vegano, sem glúten, sem açúcar refinado. Grátis.';
+const DESCRIPTION = 'Bateu vontade de doce? Em 3 toques, um docinho de verdade em 2 a 5 minutos, com o que você tem em casa. Sem sal, sem óleo, sem açúcar: o doce vem da fruta. Grátis.';
 
 export const metadata: Metadata = {
   title: TITLE,
