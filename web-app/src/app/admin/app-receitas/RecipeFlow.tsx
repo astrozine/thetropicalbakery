@@ -30,7 +30,11 @@ const PANTRY_WORDS: Record<string, RegExp> = {
   'banana-congelada': /banana[^,]*congelad/, banana: /banana(?![^,]*congelad)/, 'frutas-vermelhas': /frutas? vermelhas|morango|mirtilo|amora|framboesa/,
   'manga-congelada': /manga[^,]*congelad/, manga: /manga(?![^,]*congelad)/, maracuja: /maracuja/, maca: /\bmaca\b/, abacate: /abacate/,
   tamara: /tamara/, cacau: /cacau/, castanhas: /castanha|caju|nozes|amendoa/, 'pasta-amendoim': /pasta de amendoim/,
-  sementes: /semente|girassol|abobora/, chia: /chia|linhaca/, coco: /\bcoco\b/, 'leite-vegetal': /leite vegetal|leite de/,
+  amendoim: /(?<!pasta de )amendoim/, sementes: /semente|girassol|abobora/, chia: /chia|linhaca/, coco: /\bcoco\b/,
+  'leite-vegetal': /leite vegetal|leite de/, limao: /limao/, cupuacu: /cupuacu/, cogumelo: /cogumelo|shimeji|shiitake/,
+  'alho-cebola': /\balho\b|cebola/, tomate: /tomate/, pepino: /pepino/, cenoura: /cenoura/, batata: /batata/,
+  'grao-de-bico': /grao-de-bico|grao de bico/, feijao: /feijao/, aveia: /aveia/, 'milho-pipoca': /pipoca/,
+  levedura: /levedura/, 'agua-gas': /agua com gas/,
 };
 const fold = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const suggestNeeds = (lines: string[]) => {

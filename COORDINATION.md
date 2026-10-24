@@ -202,6 +202,10 @@ Verified live, 2026-09-26:
   Every recipe follows `GUIDELINES` in `src/lib/vontade.ts` (Fuhrman nutritarian + Goldhamer SOS-free, strictly: no salt, oil or ANY
   sweetener, coconut sugar included), stricter than the bakery's own treats; `checkGuidelines()` warns in the editor. Credit both, never
   imply a link. The launch recipes in `RESCUES` seed the table (`tools/vontade-seed.mjs`) and are the app's fallback until 48 runs.
+  Since 2026-10-23 it covers EVERY craving (10: four sweet + salgadinho, umami, queijo, frito, refri, pão e massa), 28 recipes. Each
+  craving has a free guide (`GUIDES`) and a Tropical+ plan in `src/lib/vontadePlans.ts` (server-only), served by `/api/vontade/plan`:
+  full to members, outline + first phase to everyone else. Never import vontadePlans from client code. G-BOMBS day tracker on the
+  phone (localStorage), crossed with the cravings log.
 
 Not built yet (ask Andrew before starting): the cookie
 consent banner and privacy-policy update that must come **before** installing any ad pixel (LGPD); the Google / Meta pixel itself.
