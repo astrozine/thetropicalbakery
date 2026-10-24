@@ -23,7 +23,40 @@ const HAND_TRANSLATED_EN: Record<string, string> = {
   '/b2b/barcos': '/en/b2b/boats',
 };
 
-type NavLink = { name: string; path: string; icon?: string; highlight?: boolean; feature?: boolean; sub?: string; external?: boolean };
+type NavLink = {
+  name: string; path: string; icon?: string; highlight?: boolean; feature?: boolean; sub?: string; external?: boolean;
+  /** Hand-written subtitle per language (pt, en, es, it, fr, de, nl), shown instead of Google's translation of `sub`. */
+  subByLang?: Record<string, string>;
+  /** A brand name (an app): never translated. */
+  brand?: boolean;
+};
+
+/**
+ * The Apps menu says what the apps are for in each of the site's languages, written by hand: Google Translate turns a
+ * tagline like this into something stiff. The idea in every language: fun, helpful tools that get you into the rhythm
+ * of healthy, real-food eating, and keep you there. The apps themselves are in Portuguese for now.
+ */
+const APPS_COPY = {
+  intro: {
+    pt: 'Ferramentas divertidas para você engrenar na comida de verdade e não largar mais.',
+    en: 'Fun little tools that get you into healthy eating, and keep you there.',
+    es: 'Herramientas divertidas para engancharte a comer sano, y no soltarlo.',
+    it: 'Strumenti divertenti per prendere il ritmo del mangiare sano, e non perderlo.',
+    fr: 'Des outils ludiques pour prendre le pli du manger sain, et le garder.',
+    de: 'Spielerische Helfer, mit denen gesundes Essen zur Gewohnheit wird.',
+    nl: 'Speelse hulpjes om gezond eten vol te houden, en er plezier in te hebben.',
+  } as Record<string, string>,
+  vontade: {
+    pt: 'toda vontade tem uma troca · grátis',
+    en: 'a healthy swap for every craving · free',
+    es: 'un cambio sano para cada antojo · gratis',
+    it: 'uno scambio sano per ogni voglia · gratis',
+    fr: 'une parade saine à chaque envie · gratuit',
+    de: 'ein gesunder Tausch für jeden Heißhunger · gratis',
+    nl: 'een gezonde ruil voor elke trek · gratis',
+  } as Record<string, string>,
+};
+const MENU_LANGS = ['pt', 'en', 'es', 'it', 'fr', 'de', 'nl'];
 
 // The "plan your trip" button: forest green with a gold edge, so it reads as the way in for travellers
 // without competing with the gold "highlight" link beside it.
@@ -123,7 +156,7 @@ export default function Navigation() {
 
   // The logo is the way home, so there is no "Início" link. The boxes, the events and the
   // courses + retreats each fold into one menu so the bar stays on one line with the logo beside it.
-  const groups: { id: string; name: string; links: NavLink[] }[] = [
+  const groups: { id: string; name: string; intro?: Record<string, string>; links: NavLink[] }[] = [
     { id: 'caixa', name: 'Caixa de Degustação', links: [
       { name: 'Caixa da Semana', path: '/caixas', icon: '🎁' },
       // The weekly subscription is the core of the business, so it keeps the foil treatment.
@@ -138,10 +171,12 @@ export default function Navigation() {
       { name: 'Planejar meu Retiro', path: '/retreats#pacote', icon: '✈️', feature: true, sub: 'hospedagem + cursos, num só pacote' },
       ...cursosLinks,
     ] },
-    // The free 2-recipe sampler (/receitas) is the door into Sweet Escape, the full 7-day book; the craving app
-    // (/vontade) is the free tool next to it.
+    // Apps: their own little shelf (fun, helpful tools for eating well), not a side door of the book. Room for more.
+    { id: 'apps', name: 'Apps', intro: APPS_COPY.intro, links: [
+      { name: 'Bateu Vontade?', path: '/vontade', icon: '🥊', brand: true, sub: APPS_COPY.vontade.pt, subByLang: APPS_COPY.vontade },
+    ] },
+    // The free 2-recipe sampler (/receitas) is the door into Sweet Escape, the full 7-day book.
     { id: 'ebook', name: 'E-book', links: [
-      { name: 'App Bateu Vontade?', path: '/vontade', icon: '🆘', sub: 'docinho em 5 min, grátis' },
       { name: '2 Receitas Grátis', path: '/receitas', icon: '📝' },
       { name: 'Livro Completo', path: '/sweet-escape/pt', icon: '📖', highlight: true, sub: '7 dias, 7 doces' },
     ] },
@@ -155,7 +190,35 @@ export default function Navigation() {
     ] },
   ];
   const [openGroup, setOpenGroup] = useState<string | null>(null);
-  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true, ebook: true });
+  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true, apps: true, ebook: true });
+
+  // Which language the page is showing (Google Translate's cookie, or a hand-written English page), so the
+  // hand-written menu lines match it. Google flips <html lang> when it translates, so watch that to re-read.
+  const [menuLang, setMenuLang] = useState('pt');
+  useEffect(() => {
+    const read = () => {
+      const m = /googtrans=\/[^/;]*\/([a-z]{2})/.exec(document.cookie);
+      // No Google Translate cookie = the page as written: Portuguese, or a hand-written English page under /en.
+      const l = m?.[1] || (pathname.startsWith('/en') ? 'en' : 'pt');
+      setMenuLang(MENU_LANGS.includes(l) ? l : 'en');
+    };
+    read();
+    const obs = new MutationObserver(read);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+    return () => obs.disconnect();
+  }, [pathname]);
+  const groupIntro = (intro: Record<string, string> | undefined, style: React.CSSProperties) =>
+    intro ? <span className="notranslate" translate="no" style={style}>{intro[menuLang] ?? intro.pt}</span> : null;
+  const linkText = (link: NavLink, subStyle: React.CSSProperties) => (
+    <>
+      {link.brand ? <span className="notranslate" translate="no">{link.name}</span> : link.name}
+      {link.sub && (
+        <span className={link.subByLang ? 'notranslate' : undefined} translate={link.subByLang ? 'no' : undefined} style={subStyle}>
+          {link.subByLang?.[menuLang] ?? link.sub}
+        </span>
+      )}
+    </>
+  );
 
   const b2bLinks: NavLink[] = [
     { name: 'Todas as Parcerias', path: '/b2b', icon: '🤝', highlight: true },
@@ -310,6 +373,7 @@ export default function Navigation() {
                     minWidth: '230px', padding: '1rem 0', borderRadius: '8px', boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
                     display: 'flex', flexDirection: 'column', gap: '0.5rem',
                   }}>
+                    {groupIntro(group.intro, { padding: '0 1.5rem 0.4rem', maxWidth: '260px', fontSize: '0.8rem', lineHeight: 1.4, color: '#8a7a6d', whiteSpace: 'normal' })}
                     {group.links.map((link) => (
                       <NavItem key={link.path} link={link} onClick={() => setOpenGroup(null)} style={{
                         padding: '0.5rem 1.5rem',
@@ -325,8 +389,7 @@ export default function Navigation() {
                         } : {}),
                         ...(link.feature ? { ...FEATURE_STYLE, borderRadius: '8px', margin: '0 0.75rem 0.25rem', padding: '0.7rem 0.9rem' } : {}),
                       }}>
-                        {link.name}
-                        {link.sub && <span style={{ ...SUB_STYLE, textAlign: 'left' }}>{link.sub}</span>}
+                        {linkText(link, { ...SUB_STYLE, textAlign: 'left' })}
                       </NavItem>
                     ))}
                   </div>
@@ -562,6 +625,7 @@ export default function Navigation() {
                   }}>
                   {group.name} <span>{mobileGroupsOpen[group.id] ? '▲' : '▼'}</span>
                 </button>
+                {mobileGroupsOpen[group.id] && groupIntro(group.intro, { display: 'block', padding: '0.2rem 0 0.4rem', fontSize: '0.9rem', lineHeight: 1.4, color: '#8a7a6d' })}
                 {mobileGroupsOpen[group.id] && group.links.map((link) => (
                   <NavItem
                     key={link.path}
@@ -581,8 +645,7 @@ export default function Navigation() {
                       ...(link.feature ? { ...FEATURE_STYLE, borderRadius: '8px', margin: '0.3rem 0', padding: '0.9rem 1rem' } : {}),
                     }}
                   >
-                    {link.name}
-                    {link.sub && <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, opacity: 0.85 }}>{link.sub}</span>}
+                    {linkText(link, { display: 'block', fontSize: '0.8rem', fontWeight: 500, opacity: 0.85 })}
                   </NavItem>
                 ))}
               </div>
