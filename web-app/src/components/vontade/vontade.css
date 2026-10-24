@@ -541,83 +541,185 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
   .va-shell *, .va-shell *::before, .va-shell *::after { animation: none !important; transition: none !important; }
 }
 
-/* ---------------------------------------------------------------- tablet and desktop
- * Not the phone stretched: the layout of the big habit apps on the web.
- *   900px+   left sidebar (brand + big nav) and the main column; the top bar keeps only the stats.
- *   1200px+  a right rail with the day at a glance (stats, G-BOMBS, week, Tropical+), so the home's own copies hide.
- * The home becomes a two-column hero (Dolly talking | the punching bag, bigger), and the sign-up sheet becomes a
- * centered dialog with Dolly's photo beside it. */
-.va-tabs__brand, .va-rail, .va-sheet__photo { display: none; }
+/* ---------------------------------------------------------------- the arena (the home)
+ * Phones: the familiar stack (title, Dolly, the bag). From 900px: a fight screen on a TV (see below). */
+.va-arena { display: flex; flex-direction: column; }
+.va-arena__title { order: 1; }
+.va-arena__dialog { order: 2; }
+.va-arena__stage { order: 3; position: relative; }
+.va-hud, .va-hud__sound, .va-arena__ropes, .va-arena__press { display: none; }
+.va-tabs__brand, .va-sheet__photo { display: none; }
 
+/* ---------------------------------------------------------------- desktop: a video game on a TV
+ * Not a website: game night. Dark arena colors on every screen; the left sidebar is the game menu (the selected
+ * item glows gold); the home is a fight screen (fighting-game bars, round and streak, an arcade title, spotlights,
+ * ring ropes and a mat, scanlines, the bag big, "press space", Dolly in a story-mode dialog box); the craving tiles
+ * light up like a character-select screen. Bungee (--va-arcade) is the arcade lettering. */
 @media (min-width: 900px) {
   .va-shell {
-    display: grid; grid-template-columns: 252px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
-    grid-template-areas: 'nav top' 'nav main';
-    background: radial-gradient(60% 50% at 30% 0%, #fff0c8 0%, transparent 60%), radial-gradient(50% 50% at 100% 100%, #e3f6ea 0%, transparent 60%), var(--va-bg);
+    --va-bg: #140d24; --va-surface: #231a38; --va-ink: #f6efff; --va-muted: #b6a9cf;
+    --va-line: #33284d; --va-line-d: #4a3b6b; --va-soft: #2c2244; --va-green-l: #173a2a; --va-green-d: #5ad38a; --va-gold: #ffc93c;
+    display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); grid-template-areas: 'nav main';
+    background:
+      radial-gradient(55% 40% at 55% -5%, rgba(255, 200, 90, 0.16), transparent 60%),
+      radial-gradient(40% 40% at 100% 100%, rgba(39, 179, 90, 0.1), transparent 60%),
+      linear-gradient(#1a1030, #0e0819);
   }
-  .va-top { grid-area: top; justify-content: flex-end; padding: 0.8rem 32px; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
-  .va-top .va-brand { display: none; }
+  .va-top { display: none; }
   .va-scroll { grid-area: main; }
+  .va-tip { background: #3a2f12; color: #ffe9a8; }
+  .va-chip[aria-pressed='true'], .va-chip[aria-selected='true'] { background: #0f3347; border-color: #1cb0f6; color: #8fdcff; }
+  .va-blur { text-shadow: 0 0 8px rgba(245, 236, 224, 0.45); }
+  .va-card--light { background: #fffaf0; color: #3c2a21; border-color: #ede4d3; }
+  .va-same { color: var(--va-ink); }
 
+  /* The game menu. */
   .va-tabs {
-    grid-area: nav; display: flex; flex-direction: column; justify-content: flex-start; gap: 0.45rem;
-    padding: 1.4rem 14px; border-top: 0; border-right: 2px solid var(--va-line); background: var(--va-surface);
+    grid-area: nav; display: flex; flex-direction: column; justify-content: flex-start; gap: 0.6rem; padding: 1.6rem 16px;
+    border: 0; border-right: 2px solid rgba(255, 255, 255, 0.06); background: linear-gradient(#1f1536, #140d24);
     backdrop-filter: none; -webkit-backdrop-filter: none;
   }
-  .va-tabs__brand { display: flex; align-items: center; gap: 0.6rem; padding: 0.2rem 0.6rem 1.4rem; text-decoration: none; color: inherit; }
-  .va-tabs__brand img { width: 40px; height: 40px; object-fit: contain; }
+  .va-tabs__brand { display: flex; align-items: center; gap: 0.6rem; padding: 0.2rem 0.5rem 1.6rem; text-decoration: none; color: #fff; }
+  .va-tabs__brand img { width: 42px; height: 42px; object-fit: contain; }
   .va-tabs__brand span { display: flex; flex-direction: column; line-height: 1.15; }
-  .va-tabs__brand strong { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.01em; }
-  .va-tabs__brand small { font-size: 0.75rem; font-weight: 700; color: var(--va-muted); }
+  .va-tabs__brand strong { font-family: var(--va-arcade, inherit); font-weight: 400; font-size: 1.05rem; letter-spacing: 0.02em; color: #ffd84d; }
+  .va-tabs__brand small { font-size: 0.74rem; font-weight: 700; color: #b6a9cf; }
   .va-tabs button {
-    flex-direction: row; justify-content: flex-start; gap: 0.9rem; min-height: 58px; padding: 0 1rem;
-    font-size: 0.95rem; letter-spacing: 0.07em; text-transform: uppercase;
+    flex-direction: row; justify-content: flex-start; gap: 0.9rem; min-height: 62px; padding: 0 1rem; border-radius: 16px; border: 2px solid transparent;
+    font-size: 0.98rem; letter-spacing: 0.08em; text-transform: uppercase; color: #b6a9cf; transition: background 0.15s, transform 0.15s;
   }
-  .va-tabs button:hover:not([aria-current]) { background: var(--va-soft); }
-  .va-tabs__icon { font-size: 1.75rem; }
+  .va-tabs button:hover:not([aria-current]) { background: rgba(255, 255, 255, 0.06); color: #fff; transform: translateX(3px); }
+  .va-tabs button[aria-current] {
+    background: linear-gradient(#ffd84d, #ffb800); color: #3b2400; border-color: #fff1b3;
+    box-shadow: 0 5px 0 #c98a00, 0 0 26px rgba(255, 200, 60, 0.35);
+  }
+  .va-tabs__icon { font-size: 1.8rem; filter: none; opacity: 1; }
+  .va-tabs button[aria-current] .va-tabs__icon { transform: scale(1.1); }
 
-  .va-screen { max-width: 48rem; padding: 1.2rem 32px 3rem; }
-  .va-dock { margin-inline: -32px; padding-inline: 32px; margin-bottom: -3rem; }
+  .va-screen { max-width: 66rem; padding: 1.6rem 36px 3rem; }
+  .va-dock { margin-inline: -36px; padding-inline: 36px; margin-bottom: -3rem; background: linear-gradient(to top, #110a1f 70%, transparent); }
   .va-title { font-size: 2.6rem; }
 
-  .va-hero2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 1rem 2rem; text-align: left; }
-  .va-hero2__talk .va-title { font-size: 3.2rem; }
-  .va-hero2__bag { text-align: center; }
-  .va-hero2 .va-ring { zoom: 1.12; }
+  /* Character select. */
+  .va-grid, .va-guides, .va-lib { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .va-choice:hover, .va-gcard:hover, .va-tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 0 var(--edge), 0 0 0 3px #fff, 0 0 34px color-mix(in srgb, var(--c) 70%, transparent);
+  }
+  .va-choice, .va-gcard, .va-tile { transition: transform 0.15s, box-shadow 0.15s; }
 
-  .va-grid { grid-template-columns: repeat(3, 1fr); }
-  .va-lib, .va-guides { grid-template-columns: repeat(3, 1fr); }
-  .va-rail__stats { display: flex; justify-content: space-between; }
+  /* ---- The fight screen. */
+  .va-home { text-align: left; }
+  .va-arena {
+    position: relative; display: grid; grid-template-areas: 'hud' 'title' 'stage' 'dialog'; grid-template-rows: auto auto 1fr auto;
+    margin: 0.4rem 10px 1.6rem; border-radius: 30px; overflow: hidden; min-height: min(820px, calc(100vh - 3.5rem));
+    background:
+      radial-gradient(30% 60% at 50% 8%, rgba(255, 240, 190, 0.32), transparent 70%),
+      radial-gradient(70% 50% at 50% 115%, rgba(232, 54, 79, 0.3), transparent 70%),
+      linear-gradient(#2c1754 0%, #1b0f36 55%, #120a24 100%);
+    box-shadow: 0 0 0 10px #0a0613, 0 0 0 13px #3a2c5c, 0 30px 70px rgba(0, 0, 0, 0.55), inset 0 0 140px rgba(0, 0, 0, 0.65);
+  }
+  /* The mat, in perspective. */
+  .va-arena::before {
+    content: ''; position: absolute; left: -12%; right: -12%; bottom: -2%; height: 36%; z-index: 0;
+    background: linear-gradient(#3a7bf0, #1d47a8 70%, #163a8c); transform: perspective(520px) rotateX(58deg); transform-origin: 50% 100%;
+    box-shadow: inset 0 14px 0 rgba(255, 255, 255, 0.22);
+  }
+  /* The TV: scanlines and a soft vignette over everything. */
+  .va-arena::after {
+    content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none;
+    background: repeating-linear-gradient(rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.35) 100%);
+  }
+  .va-arena > * { position: relative; z-index: 2; }
+
+  .va-hud { grid-area: hud; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1.4rem; padding: 1.3rem 1.8rem 0.2rem; }
+  .va-hud__side { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+  .va-hud__side--foe { justify-content: flex-end; }
+  .va-hud__side > img { border-radius: 14px; border: 3px solid #fff; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4); object-fit: cover; }
+  .va-hud__info { flex: 1; display: flex; flex-direction: column; gap: 0.3rem; max-width: 320px; min-width: 0; }
+  .va-hud__side--foe .va-hud__info { align-items: flex-end; text-align: right; }
+  .va-hud__info b { font-family: var(--va-arcade, inherit); font-weight: 400; font-size: 1.1rem; color: #fff; letter-spacing: 0.03em; text-shadow: 0 3px 0 rgba(0, 0, 0, 0.45); }
+  .va-hud__info small { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.09em; color: #c9bde6; }
+  .va-hud__bar {
+    display: flex; width: 100%; height: 22px; overflow: hidden; background: #0a0613; border: 3px solid #fff; border-radius: 5px;
+    transform: skewX(-18deg); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4);
+  }
+  .va-hud__bar i { display: block; height: 100%; transition: width 0.9s var(--va-bounce); box-shadow: inset 0 5px 0 rgba(255, 255, 255, 0.35); }
+  .va-hud__bar--you i { background: linear-gradient(90deg, #ffd84d, #9cf07a 40%, #27b35a); }
+  .va-hud__bar--foe { justify-content: flex-end; }
+  .va-hud__bar--foe i { background: linear-gradient(90deg, #e8364f, #ff8a5c); }
+  .va-hud__foe { display: flex; flex-shrink: 0; }
+  .va-hud__foe img { width: 48px; height: 48px; filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.35)); }
+  .va-hud__foe img + img { margin-left: -14px; }
+  .va-hud__mid { display: flex; flex-direction: column; align-items: center; color: #fff; line-height: 1; }
+  .va-hud__mid small { font-family: var(--va-arcade, inherit); font-size: 0.72rem; letter-spacing: 0.25em; color: #ffc93c; text-transform: uppercase; }
+  .va-hud__mid b { font-family: var(--va-arcade, inherit); font-weight: 400; font-size: 2.6rem; text-shadow: 0 4px 0 #b01a37, 0 0 24px rgba(255, 120, 120, 0.4); margin: 0.15rem 0; }
+  .va-hud__mid span { font-size: 0.95rem; font-weight: 900; }
+  .va-hud__sound {
+    display: grid; place-items: center; position: absolute; right: 1.4rem; top: 9.2rem; z-index: 5; width: 46px; height: 46px; border-radius: 14px; cursor: pointer;
+    font-size: 1.25rem; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.25); color: #fff;
+  }
+  .va-hud__sound:hover { background: rgba(255, 255, 255, 0.18); }
+
+  .va-arena__title { grid-area: title; text-align: center; margin-top: 0.6rem; }
+  .va-arena__title .va-kicker { color: #ffc93c; margin-bottom: 0.2rem; }
+  .va-arena__title .va-title {
+    font-family: var(--va-arcade, inherit); font-weight: 400; font-size: clamp(2.6rem, 4.6vw, 4rem); letter-spacing: 0.01em; color: #ffd84d;
+    text-shadow: 0 5px 0 #e8364f, 0 10px 0 #4a0d22, 0 0 46px rgba(255, 200, 60, 0.45); transform: rotate(-2deg); margin: 0.1rem 0 0;
+  }
+
+  .va-arena__stage { grid-area: stage; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .va-arena .va-ring { zoom: 1.4; margin: 0 auto; transform: none; width: 24rem; }
+  .va-arena .va-ring.is-ko { animation: va-stage-tv 0.35s ease-out 0.12s; }
+  @keyframes va-stage-tv { 0%, 100% { transform: none; } 25% { transform: translate(-6px, 2px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-2px); } }
+  .va-arena .va-ring::after { background: radial-gradient(rgba(0, 0, 0, 0.45), transparent 70%); }
+  .va-arena .va-ring__cap { display: none; }
+  .va-arena__ropes { display: block; position: absolute; left: 4%; right: 4%; top: 30%; z-index: -1; }
+  .va-arena__ropes i { display: block; height: 8px; margin-bottom: 34px; border-radius: 4px; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35); }
+  .va-arena__ropes i:nth-child(1) { background: linear-gradient(#ff7b8f, #c41d3a); }
+  .va-arena__ropes i:nth-child(2) { background: linear-gradient(#ffffff, #cfc6e6); }
+  .va-arena__ropes i:nth-child(3) { background: linear-gradient(#6ea0ff, #2952c4); }
+  .va-arena__ropes::before, .va-arena__ropes::after {
+    content: ''; position: absolute; top: -26px; width: 18px; height: 150px; border-radius: 6px;
+    background: linear-gradient(90deg, #8d86a3, #e9e5f5 45%, #8d86a3); box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+  }
+  .va-arena__ropes::before { left: 0; }
+  .va-arena__ropes::after { right: 0; }
+  .va-arena__press {
+    display: block; margin: 0.2rem 0 1.2rem; font-family: var(--va-arcade, inherit); font-size: 1rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #fff; text-shadow: 0 3px 0 rgba(0, 0, 0, 0.55); animation: va-blink 1.1s steps(1) infinite;
+  }
+  @keyframes va-blink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: 0.15; } }
+
+  .va-arena__dialog {
+    grid-area: dialog; margin: 0 1.8rem 1.8rem; padding: 1rem 1.3rem 0.5rem; border-radius: 18px;
+    background: rgba(12, 7, 24, 0.86); border: 3px solid #fff; box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45), 0 0 0 7px rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .va-arena__dialog .dc { margin: 0 0 0.5rem; }
+  .va-arena__dialog .dc__name { font-family: var(--va-arcade, inherit); font-weight: 400; color: #ffc93c; letter-spacing: 0.06em; font-size: 0.9rem; }
+  .va-arena__dialog .dc__avatar img { width: 64px; height: 64px; border-radius: 16px; }
+  .va-arena__dialog .dc__col { flex-direction: row; flex-wrap: wrap; align-items: flex-start; }
+  .va-arena__dialog .dc__name { flex-basis: 100%; }
+
+  /* The day under the arena. */
+  .va-day { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.2rem; margin: 0 10px; align-items: start; }
+  .va-day .va-card:first-child { margin-top: 0; }
+  .va-day > div > .va-card:first-child { margin-top: 0; }
+  .va-guest__perks { margin: 0 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; color: var(--va-ink); }
 
   /* The sign-up: a centered dialog, Dolly's photo on the left. */
   .va-shell .va-sheet { justify-content: center; align-items: center; padding: 24px; }
   .va-sheet .va-sheet__panel {
     display: grid; grid-template-columns: 300px minmax(0, 1fr); max-width: 54rem; max-height: calc(100% - 48px);
     padding: 0; border-radius: 28px; overflow: hidden; animation: va-dialog 0.45s var(--va-bounce);
+    border: 3px solid #fff; box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.08), 0 30px 80px rgba(0, 0, 0, 0.6);
   }
   .va-sheet .va-sheet__grip { display: none; }
   .va-sheet .va-sheet__photo { display: block; width: 100%; height: 100%; object-fit: cover; }
   .va-sheet__body { padding: 1.6rem 1.8rem 1.4rem; overflow-y: auto; }
 }
 @keyframes va-dialog { from { opacity: 0; transform: translateY(24px) scale(0.96); } to { opacity: 1; transform: none; } }
-
-@media (min-width: 1200px) {
-  .va-shell { grid-template-columns: 252px minmax(0, 1fr) 360px; grid-template-rows: minmax(0, 1fr); grid-template-areas: 'nav main rail'; }
-  .va-top { display: none; }
-  .va-narrow-only { display: none; }
-  .va-screen { padding-top: 2.2rem; }
-  .va-rail { grid-area: rail; display: flex; flex-direction: column; overflow-y: auto; padding: 1.4rem 28px 2rem 4px; }
-  .va-rail__stats { display: flex; justify-content: space-between; padding: 0.2rem 0.2rem 0.2rem; }
-  .va-rail__stats .va-stat { font-size: 1.05rem; }
-  .va-rail__plus, .va-rail__invite { display: flex; flex-direction: column; gap: 0.55rem; text-align: left; }
-  .va-rail__plus img, .va-rail__invite img { width: 100%; aspect-ratio: 16 / 11; object-fit: cover; object-position: 50% 30%; border-radius: 14px; }
-  .va-rail__plus strong, .va-rail__invite > strong { font-size: 1.02rem; font-weight: 900; }
-  .va-rail__plus small { display: block; font-size: 0.86rem; color: var(--va-muted); font-weight: 600; margin-top: 0.15rem; }
-  .va-rail__invite .va-perks { margin: 0.2rem 0 0.4rem; gap: 0.55rem; }
-  .va-rail__invite .va-perks li { font-size: 0.9rem; }
-  .va-rail .va-rules { margin-top: 1rem; }
-}
-
 
 /* ---------------------------------------------------------------- dark */
 @media (prefers-color-scheme: dark) {
@@ -629,9 +731,6 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
   .va-chip[aria-pressed='true'], .va-chip[aria-selected='true'], .va-tabs button[aria-current] { background: #0f3347; border-color: #1cb0f6; color: #8fdcff; }
   .va-blur { text-shadow: 0 0 8px rgba(245,236,224,0.45); }
   .va-card--light { background: #fffaf0; color: #3c2a21; border-color: #ede4d3; }
-  @media (min-width: 900px) {
-    .va-shell { background: radial-gradient(70% 50% at 20% 0%, #2b2110 0%, transparent 60%), radial-gradient(60% 50% at 90% 100%, #10291a 0%, transparent 60%), var(--va-bg); }
-  }
 }
 
 /* ---------------------------------------------------------------- loading */
@@ -654,3 +753,7 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 .va-sheet__login { padding: 0.4rem; margin-top: 0.4rem; }
 @keyframes va-up { from { transform: translateY(100%); } to { transform: none; } }
 @keyframes va-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Dolly's name above her chat follows the screen (dark arena, dark mode); her bubbles stay light with dark text. */
+.va-shell .dc__name { color: var(--va-ink); }
+.va-shell .dc__msg { color: #3c2a21; }

@@ -302,21 +302,17 @@ export default function VontadeApp() {
           <section className="va-screen" key={step}>
             {step === 'home' && (
               <div className="va-home">
-                <div className="va-hero2">
-                  <div className="va-hero2__talk">
-                    <p className="va-kicker">{greeting()} 🌴</p>
-                    <h1 className="va-title">Bateu vontade?</h1>
-                    <DollyChat lines={homeLines(days, ticked.length, store.wins.length, firstName)} />
-                  </div>
-                  <div className="va-hero2__bag">
-                    <PunchBag onHit={() => setStep('craving')} />
-                    <p className="va-ring__cap">Quando a vontade bate, bate forte. <strong>Toque no saco e revide!</strong></p>
+                <Arena
+                  name={firstName} energy={ticked.length} foe={Math.max(0, 100 - weekWins * 20)} streak={days} round={store.wins.length + 1}
+                  lines={homeLines(days, ticked.length, store.wins.length, firstName)} onHit={() => setStep('craving')}
+                />
+                <div className="va-day">
+                  {gbCard}
+                  <div>
+                    {weekCard}
+                    <Insight store={store} onGuide={c => { buzz(); setGuide(c); scrollTop(); }} />
                   </div>
                 </div>
-
-                <div className="va-narrow-only">{gbCard}</div>
-                <Insight store={store} onGuide={c => { buzz(); setGuide(c); scrollTop(); }} />
-                <div className="va-narrow-only">{weekCard}</div>
                 <InstallHint />
                 <Guidelines />
               </div>
@@ -481,24 +477,6 @@ export default function VontadeApp() {
         ))}
       </nav>
 
-      {/* Desktop only: the day at a glance, like the right column of the big habit apps. */}
-      <aside className="va-rail" aria-label="O seu dia">
-        <div className="va-rail__stats">
-          <span className="va-stat" data-on={days > 0 || undefined}><span aria-hidden>🔥</span>{days}</span>
-          <span className="va-stat va-stat--green" data-on={ticked.length > 0 || undefined}><span aria-hidden>🥬</span>{ticked.length}/6</span>
-          <span className="va-stat" data-on={store.wins.length > 0 || undefined}><span aria-hidden>🏆</span>{store.wins.length}</span>
-          {access.plus && <span className="va-stat va-stat--plus"><span aria-hidden>🌴</span>+</span>}
-        </div>
-        {gbCard}
-        {weekCard}
-        {!access.plus && (
-          <button className="va-card va-rail__plus" onClick={() => go('plus')}>
-            <img src="/vontade/dolly-spatula.webp" alt="" loading="lazy" />
-            <span><strong>Vencer de vez, com o plano completo</strong><small>Todos os planos e receitas. {formatPrice(APP_PLUS.brl)}, uma vez só.</small></span>
-          </button>
-        )}
-        <Guidelines />
-      </aside>
     </div>
   );
 }
@@ -534,18 +512,12 @@ function GuestApp() {
       </header>
       <div className="va-scroll">
         <section className="va-screen va-home">
-          <div className="va-hero2">
-            <div className="va-hero2__talk">
-              <p className="va-kicker">{greeting()} 🌴</p>
-              <h1 className="va-title">Bateu vontade?</h1>
-              <DollyChat lines={['Oi! Eu sou a Dolly 👋', 'Doce, sal, fritura, queijo, refri: toda vontade tem uma troca feita de planta.', 'Tá com raiva da vontade? Bate no saco. 🥊']} />
-            </div>
-            <div className="va-hero2__bag">
-              <PunchBag faded onHit={() => open('hit')} />
-              <p className="va-ring__cap">Quando a vontade bate, bate forte. <strong>Toque no saco e revide!</strong></p>
-            </div>
-          </div>
-          <ul className="va-perks va-guest__perks va-narrow-only">{free.map(p => <li key={p.text}><IconTile size={40}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
+          <Arena
+            name="" energy={0} foe={100} streak={0} round={1} faded
+            lines={['Oi! Eu sou a Dolly 👋', 'Doce, sal, fritura, queijo, refri: toda vontade tem uma troca feita de planta.', 'Tá com raiva da vontade? Bate no saco. 🥊']}
+            onHit={() => open('hit')}
+          />
+          <ul className="va-perks va-guest__perks">{free.map(p => <li key={p.text}><IconTile size={40}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
         </section>
       </div>
       <nav className="va-tabs" aria-label="App">
@@ -557,14 +529,6 @@ function GuestApp() {
         ))}
       </nav>
 
-      <aside className="va-rail" aria-label="Crie a sua conta">
-        <div className="va-card va-rail__invite">
-          <img src="/vontade/dolly-offer.webp" alt="Dolly oferecendo docinhos no jardim" loading="lazy" />
-          <strong>Tudo grátis, com a sua conta</strong>
-          <ul className="va-perks">{free.map(p => <li key={p.text}><IconTile size={36}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
-          <button className="va-btn" onClick={() => open('tab')}>Criar conta grátis</button>
-        </div>
-      </aside>
 
       {sheet && (
         <div className="va-sheet" role="dialog" aria-modal="true" aria-label="Crie a sua conta grátis">
@@ -584,6 +548,100 @@ function GuestApp() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+const SOUND_KEY = 'tb-vontade-sound';
+
+/** A punch, synthesized (no audio file to license): a low thump with a short slap of noise on top. */
+function punchSound() {
+  try {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AC) return;
+    const ctx = new AC();
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(170, t);
+    o.frequency.exponentialRampToValueAtTime(42, t + 0.2);
+    g.gain.setValueAtTime(0.9, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+    o.connect(g).connect(ctx.destination);
+    o.start(t); o.stop(t + 0.3);
+    const len = Math.floor(ctx.sampleRate * 0.09);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    const n = ctx.createBufferSource(), f = ctx.createBiquadFilter(), ng = ctx.createGain();
+    n.buffer = buf; f.type = 'lowpass'; f.frequency.value = 2400; ng.gain.value = 0.55;
+    n.connect(f).connect(ng).connect(ctx.destination);
+    n.start(t);
+    window.setTimeout(() => ctx.close().catch(() => {}), 700);
+  } catch { /* no sound, no problem */ }
+}
+
+/**
+ * The home as a fight screen. On a phone it's the stack people know (title, Dolly, the bag). From 900px it's a
+ * game on a TV: a dark arena under spotlights with ring ropes and a mat, fighting-game bars on top (YOU: energy =
+ * today's G-BOMBS; THE CRAVING: life drops 20 points per win this week), the round and the streak in the middle,
+ * an arcade title, the bag big, "click or press space", and Dolly in a story-mode dialog box at the bottom.
+ * The punch has a sound (on by default with a mouse, off on touch screens; the speaker button remembers).
+ */
+function Arena({ name, energy, foe, streak, round, lines, faded, onHit }: {
+  name: string; energy: number; foe: number; streak: number; round: number; lines: string[]; faded?: boolean; onHit: () => void;
+}) {
+  const [sound, setSound] = useState(false);
+  useEffect(() => {
+    let on = !window.matchMedia('(pointer: coarse)').matches;
+    try { const v = localStorage.getItem(SOUND_KEY); if (v) on = v === '1'; } catch { /* default */ }
+    setSound(on);
+  }, []);
+  const toggle = () => {
+    const next = !sound;
+    setSound(next);
+    try { localStorage.setItem(SOUND_KEY, next ? '1' : '0'); } catch { /* still toggles */ }
+  };
+  return (
+    <div className={`va-arena${faded ? ' va-arena--guest' : ''}`}>
+      <div className="va-hud" aria-hidden>
+        <div className="va-hud__side">
+          <img src="/vontade/dolly-avatar.webp" alt="" width={44} height={44} />
+          <div className="va-hud__info">
+            <b>{name ? name.toUpperCase() : 'VOCÊ'}</b>
+            <span className="va-hud__bar va-hud__bar--you"><i style={{ width: `${(energy / 6) * 100}%` }} /></span>
+            <small>Energia · G-BOMBS {energy}/6</small>
+          </div>
+        </div>
+        <div className="va-hud__mid">
+          <small>Round</small>
+          <b>{round}</b>
+          <span>🔥 {streak}</span>
+        </div>
+        <div className="va-hud__side va-hud__side--foe">
+          <div className="va-hud__info">
+            <b>A VONTADE</b>
+            <span className="va-hud__bar va-hud__bar--foe"><i style={{ width: `${foe}%` }} /></span>
+            <small>Vida {foe}%</small>
+          </div>
+          <span className="va-hud__foe"><img src="/vontade/fx/burger.webp" alt="" /><img src="/vontade/fx/shake.webp" alt="" /></span>
+        </div>
+      </div>
+      <button className="va-hud__sound" onClick={toggle} aria-label={sound ? 'Tirar o som' : 'Ligar o som'} aria-pressed={sound}>{sound ? '🔊' : '🔇'}</button>
+
+      <div className="va-arena__title">
+        <p className="va-kicker">{greeting()} 🌴</p>
+        <h1 className="va-title">Bateu vontade?</h1>
+      </div>
+      <div className="va-arena__dialog">
+        <DollyChat lines={lines} />
+      </div>
+      <div className="va-arena__stage">
+        <span className="va-arena__ropes" aria-hidden><i /><i /><i /></span>
+        <PunchBag faded={faded} sound={sound} hotkey onHit={onHit} />
+        <p className="va-ring__cap">Quando a vontade bate, bate forte. <strong>Toque no saco e revide!</strong></p>
+        <p className="va-arena__press" aria-hidden>Clique no saco · ou aperte espaço</p>
+      </div>
     </div>
   );
 }
@@ -918,14 +976,29 @@ function DollyPhoto({ src, small, children }: { src: string; small?: boolean; ch
  * the bag squashes, POW) and opens the questions. The frustration is the point: you're allowed to be mad at it.
  * Art: Microsoft Fluent Emoji 3D (MIT, public/vontade/fx/LICENSE-fluent-emoji.txt); the bag is drawn in CSS to match.
  */
-function PunchBag({ onHit, faded }: { onHit: () => void; faded?: boolean }) {
+function PunchBag({ onHit, faded, sound, hotkey }: { onHit: () => void; faded?: boolean; sound?: boolean; hotkey?: boolean }) {
   const [ko, setKo] = useState(false);
-  const hit = () => {
+  const hit = useCallback(() => {
     if (ko) return;
     try { navigator.vibrate?.([25, 40, 35]); } catch { /* not supported */ }
+    if (sound) window.setTimeout(punchSound, 140);
     setKo(true);
     window.setTimeout(() => { setKo(false); onHit(); }, 700);
-  };
+  }, [ko, sound, onHit]);
+  // The space bar (or Enter) throws the punch, like a game; never while typing somewhere.
+  useEffect(() => {
+    if (!hotkey) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== ' ' && e.key !== 'Enter') return;
+      const el = document.activeElement as HTMLElement | null;
+      if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(el.tagName))) return;
+      if (document.querySelector('.va-sheet')) return;
+      e.preventDefault();
+      hit();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [hotkey, hit]);
   return (
     <div className={`va-ring${ko ? ' is-ko' : ''}${faded && !ko ? ' va-ring--faded' : ''}`}>
       <span className="va-ring__beam" aria-hidden />
