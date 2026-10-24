@@ -107,71 +107,104 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 @keyframes va-pulse { from { transform: scale(0.94); opacity: 1; } to { transform: scale(1.16); opacity: 0; } }
 
 /*
- * The punching bag (the SOS button). One 3.2 s loop: the burger glove jabs from the left at 18%, the bag swings
- * away; the milkshake glove jabs from the right at 63%, the bag swings back. Tapping = .is-ko: both gloves slam,
- * the bag shakes, POW. Fixed 24rem stage so the gloves always reach the bag.
+ * The punching bag (the SOS button). The fighters are Fluent Emoji 3D art (burger, soda, glove, collision), so the
+ * bag is drawn in the same language: no outlines, soft studio light from the top left, a contact shadow below.
+ *
+ * Motion follows the animation basics, not a slide: each jab has anticipation (the glove pulls back), a fast
+ * strike, a held impact (the bag squashes and swings away) and follow-through. One 3.4 s loop: burger at ~20%,
+ * soda at ~65%. A tap (.is-ko): both strike at once, the bag squashes hard, the stage shakes, the burst pops.
+ * Fixed 24rem stage so the gloves always reach the bag.
  */
 .va-ring {
-  position: relative; height: 300px; width: calc(100% + 32px); max-width: 24rem; margin: 0.4rem 0 0.2rem 50%;
+  position: relative; height: 300px; width: calc(100% + 32px); max-width: 24rem; margin: 0.2rem 0 0 50%;
   transform: translateX(-50%); overflow: hidden;
 }
-.va-ring__beam { position: absolute; top: 0; left: 50%; width: 96px; height: 12px; margin-left: -48px; border-radius: 6px; background: #5a3421; box-shadow: 0 3px 0 #3c2a21; }
+.va-ring__beam {
+  position: absolute; top: 0; left: 50%; width: 110px; height: 14px; margin-left: -55px; border-radius: 7px;
+  background: linear-gradient(#8a5a3c, #5a3421); box-shadow: 0 4px 8px rgba(60,42,33,0.25);
+}
+/* Contact shadow on the floor, moving with the bag. */
+.va-ring::after {
+  content: ''; position: absolute; left: 50%; bottom: 18px; width: 120px; height: 16px; margin-left: -60px; border-radius: 50%;
+  background: radial-gradient(rgba(60,42,33,0.28), transparent 70%); animation: va-floor 3.4s ease-in-out infinite;
+}
 .va-bag {
-  position: absolute; left: 50%; top: 8px; width: 128px; margin-left: -64px; padding: 0; border: 0; background: none; cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; transform-origin: 50% 0; animation: va-sway 3.2s ease-in-out infinite;
+  position: absolute; left: 50%; top: 10px; width: 124px; margin-left: -62px; padding: 0; border: 0; background: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; transform-origin: 50% 0; animation: va-sway 3.4s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
 }
-.va-bag__chain { width: 7px; height: 38px; border-radius: 4px; background: repeating-linear-gradient(#8f857c 0 7px, #d4ccc3 7px 11px); }
+.va-bag__chain { width: 6px; height: 34px; border-radius: 3px; background: repeating-linear-gradient(#a49a90 0 6px, #e2dbd3 6px 10px); }
 .va-bag__body {
-  position: relative; width: 128px; height: 196px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem;
-  border-radius: 44px 44px 56px 56px / 30px 30px 46px 46px; border: 4px solid #6b0f1a; color: #fff;
-  background: radial-gradient(circle at 32% 24%, #ff8296, #e8364f 48%, #a51b30);
-  box-shadow: inset -12px -14px 0 rgba(0,0,0,0.14), 0 16px 24px rgba(165,27,48,0.3);
+  position: relative; width: 124px; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;
+  border-radius: 46px 46px 58px 58px / 34px 34px 52px 52px; color: #fff; transform-origin: 50% 0;
+  background:
+    radial-gradient(70% 45% at 30% 18%, rgba(255,255,255,0.55), transparent 60%),
+    radial-gradient(120% 90% at 70% 100%, rgba(120,10,30,0.55), transparent 55%),
+    linear-gradient(100deg, #ff6f86 0%, #f0405b 40%, #d42645 75%, #b01a37 100%);
+  box-shadow: inset 0 -10px 18px rgba(120,10,30,0.35), inset 8px 0 14px rgba(255,255,255,0.18), 0 18px 28px rgba(176,26,55,0.28);
 }
-.va-bag__band { position: absolute; left: -4px; right: -4px; height: 13px; background: #3c2a21; border-radius: 3px; }
-.va-bag__band--top { top: 24px; }
-.va-bag__band--bot { bottom: 30px; }
-.va-bag strong { font-size: 2.3rem; font-weight: 900; letter-spacing: 0.04em; line-height: 1; text-shadow: 0 3px 0 #6b0f1a; }
-.va-bag small { font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
-.va-bag:active .va-bag__body { filter: brightness(0.95); }
+.va-bag__band {
+  position: absolute; left: 0; right: 0; height: 14px;
+  background: linear-gradient(#6a4430, #3c2a21); box-shadow: 0 2px 3px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.va-bag__band--top { top: 26px; }
+.va-bag__band--bot { bottom: 34px; }
+.va-bag strong { font-size: 2.2rem; font-weight: 900; letter-spacing: 0.05em; line-height: 1; text-shadow: 0 2px 6px rgba(120,10,30,0.45); }
+.va-bag small { font-size: 0.74rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.95; }
 
-.va-glove { position: absolute; top: 132px; width: 128px; pointer-events: none; animation: 3.2s ease-in-out infinite; }
-.va-glove svg { display: block; width: 100%; filter: drop-shadow(0 6px 0 rgba(0,0,0,0.14)); }
-.va-glove--l { left: -14px; animation-name: va-jab-l; }
-.va-glove--r { right: -14px; animation-name: va-jab-r; }
-.va-glove--r svg { transform: scaleX(-1); }
-.va-glove__food { position: absolute; top: 22px; font-size: 1.9rem; line-height: 1; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.2)); }
-.va-glove--l .va-glove__food { left: 64px; }
-.va-glove--r .va-glove__food { right: 64px; }
-@keyframes va-jab-l { 0%, 12% { transform: none; } 18% { transform: translateX(30px) rotate(-5deg) scale(1.05); } 27%, 100% { transform: none; } }
-@keyframes va-jab-r { 0%, 57% { transform: none; } 63% { transform: translateX(-30px) rotate(5deg) scale(1.05); } 72%, 100% { transform: none; } }
+/* The fighters: food behind, glove in front, the whole pair jabs. */
+.va-fighter { position: absolute; top: 112px; width: 140px; height: 140px; pointer-events: none; animation: 3.4s ease-in-out infinite; }
+.va-fighter--l { left: -22px; animation-name: va-jab-l; }
+.va-fighter--r { right: -22px; animation-name: va-jab-r; }
+.va-fighter__food { position: absolute; top: 0; width: 84px; height: 84px; z-index: 0; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.18)); }
+.va-fighter--l .va-fighter__food { left: 0; transform: rotate(-8deg); }
+.va-fighter--r .va-fighter__food { right: 6px; transform: rotate(8deg); }
+.va-fighter__glove { position: absolute; top: 52px; width: 84px; height: 84px; z-index: 1; filter: drop-shadow(0 8px 10px rgba(0,0,0,0.2)); }
+.va-fighter--l .va-fighter__glove { right: 0; }
+.va-fighter--r .va-fighter__glove { left: 0; transform: scaleX(-1); }
+@keyframes va-jab-l {
+  0%, 10% { transform: none; }
+  15% { transform: translateX(-12px) rotate(4deg); }
+  19% { transform: translateX(46px) rotate(-6deg) scale(1.08); }
+  23% { transform: translateX(40px) rotate(-4deg); }
+  33%, 100% { transform: none; }
+}
+@keyframes va-jab-r {
+  0%, 55% { transform: none; }
+  60% { transform: translateX(12px) rotate(-4deg); }
+  64% { transform: translateX(-46px) rotate(6deg) scale(1.08); }
+  68% { transform: translateX(-40px) rotate(4deg); }
+  78%, 100% { transform: none; }
+}
 @keyframes va-sway {
-  0%, 16% { transform: rotate(0); } 22% { transform: rotate(-9deg); } 30% { transform: rotate(5deg); } 38% { transform: rotate(-2deg); } 45%, 61% { transform: rotate(0); }
-  67% { transform: rotate(9deg); } 75% { transform: rotate(-5deg); } 83% { transform: rotate(2deg); } 90%, 100% { transform: rotate(0); }
+  0%, 18% { transform: rotate(0); } 21% { transform: rotate(-10deg); } 29% { transform: rotate(6deg); } 37% { transform: rotate(-3deg); } 45% { transform: rotate(1deg); } 50%, 63% { transform: rotate(0); }
+  66% { transform: rotate(10deg); } 74% { transform: rotate(-6deg); } 82% { transform: rotate(3deg); } 90% { transform: rotate(-1deg); } 95%, 100% { transform: rotate(0); }
 }
-.is-ko .va-glove--l { animation: va-ko-l 0.6s var(--va-bounce) forwards; }
-.is-ko .va-glove--r { animation: va-ko-r 0.6s var(--va-bounce) forwards; }
-.is-ko .va-bag { animation: va-shake 0.6s ease-out; }
-@keyframes va-ko-l { 0% { transform: none; } 35% { transform: translateX(40px) rotate(-8deg) scale(1.12); } 100% { transform: translateX(-30px); } }
-@keyframes va-ko-r { 0% { transform: none; } 35% { transform: translateX(-40px) rotate(8deg) scale(1.12); } 100% { transform: translateX(30px); } }
-@keyframes va-shake { 0% { transform: none; } 20% { transform: rotate(4deg) scale(1.06, 0.94); } 40% { transform: rotate(-4deg); } 60% { transform: rotate(3deg); } 80% { transform: rotate(-1deg); } 100% { transform: none; } }
-.va-pow {
-  position: absolute; left: 50%; top: 92px; margin-left: -70px; width: 140px; text-align: center; pointer-events: none; opacity: 0;
-  font-size: 2.6rem; font-weight: 900; font-style: italic; color: #ffd400; letter-spacing: 0.02em;
-  -webkit-text-stroke: 2px #3c2a21; text-shadow: 0 4px 0 #3c2a21;
-}
-.is-ko .va-pow { animation: va-powpop 0.6s var(--va-bounce) forwards; }
-@keyframes va-powpop { 0% { opacity: 0; transform: scale(0) rotate(-25deg); } 50% { opacity: 1; transform: scale(1.35) rotate(-8deg); } 100% { opacity: 1; transform: scale(1) rotate(-8deg); } }
+@keyframes va-floor { 0%, 18%, 50%, 63%, 95%, 100% { transform: none; } 21% { transform: translateX(18px) scaleX(0.85); } 66% { transform: translateX(-18px) scaleX(0.85); } }
+/* Squash on each idle hit. */
+.va-bag__body { animation: va-squash 3.4s ease-in-out infinite; }
+@keyframes va-squash { 0%, 18%, 26%, 63%, 71%, 100% { transform: none; } 20%, 65% { transform: scale(0.94, 1.03); } }
+
+.is-ko .va-fighter--l { animation: va-ko-l 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards; }
+.is-ko .va-fighter--r { animation: va-ko-r 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards; }
+.is-ko .va-bag { animation: va-shake 0.7s ease-out; }
+.is-ko .va-bag__body { animation: va-ko-squash 0.7s ease-out; }
+.is-ko { animation: va-stage 0.35s ease-out 0.12s; }
+@keyframes va-ko-l { 0% { transform: none; } 18% { transform: translateX(-16px) rotate(6deg); } 36% { transform: translateX(54px) rotate(-8deg) scale(1.14); } 100% { transform: translateX(-60px) rotate(-14deg); opacity: 0.85; } }
+@keyframes va-ko-r { 0% { transform: none; } 18% { transform: translateX(16px) rotate(-6deg); } 36% { transform: translateX(-54px) rotate(8deg) scale(1.14); } 100% { transform: translateX(60px) rotate(14deg); opacity: 0.85; } }
+@keyframes va-shake { 0% { transform: none; } 30% { transform: rotate(3deg); } 45% { transform: rotate(-3deg); } 60% { transform: rotate(2deg); } 80% { transform: rotate(-1deg); } 100% { transform: none; } }
+@keyframes va-ko-squash { 0%, 25% { transform: none; } 36% { transform: scale(0.86, 1.06); } 55% { transform: scale(1.05, 0.97); } 75% { transform: scale(0.98, 1.01); } 100% { transform: none; } }
+@keyframes va-stage { 0%, 100% { transform: translateX(-50%); } 25% { transform: translateX(calc(-50% - 5px)) translateY(2px); } 50% { transform: translateX(calc(-50% + 5px)); } 75% { transform: translateX(calc(-50% - 2px)); } }
+
+.va-pow { position: absolute; left: 50%; top: 70px; width: 170px; height: 170px; margin-left: -85px; pointer-events: none; opacity: 0; display: grid; place-items: center; }
+.va-pow img { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.2)); }
+.va-pow b { position: relative; font-size: 2.1rem; font-weight: 900; font-style: italic; color: #fff; letter-spacing: 0.02em; text-shadow: 0 3px 0 #b01a37, 0 0 12px rgba(120,10,30,0.5); transform: rotate(-8deg); }
+.is-ko .va-pow { animation: va-powpop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards; }
+@keyframes va-powpop { 0% { opacity: 0; transform: scale(0.2) rotate(-30deg); } 55% { opacity: 1; transform: scale(1.15) rotate(-6deg); } 100% { opacity: 1; transform: scale(1) rotate(-6deg); } }
 .va-ring__cap { margin: 0 auto 0.4rem; max-width: 22rem; font-size: 0.95rem; font-weight: 700; color: var(--va-muted); }
 .va-ring__cap strong { color: var(--va-red); font-weight: 900; }
 
-/* Dolly, the coach: her face and a speech bubble, or her real photo with a caption. */
-.va-dolly { display: flex; align-items: flex-end; gap: 0.6rem; text-align: left; margin: 0.5rem 0 1rem; }
-.va-dolly img { flex-shrink: 0; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 3px 0 var(--va-line-d); }
-.va-dolly__bubble {
-  margin: 0; padding: 0.7rem 0.95rem; border-radius: 18px 18px 18px 4px; background: var(--va-surface); border: 2px solid var(--va-line-d);
-  box-shadow: 0 3px 0 var(--va-line-d); font-size: 0.96rem; line-height: 1.45; font-weight: 700; animation: va-in 0.45s var(--va-bounce);
-}
-.va-dolly--sm .va-dolly__bubble { font-size: 0.88rem; }
+/* Dolly's real photo with a caption. Her chat bubbles are DollyChat (components/dollyChat.css). */
 .va-dolly-photo {
   margin: 0.4rem auto 1rem; max-width: 17rem; overflow: hidden; text-align: left; border-radius: 24px;
   background: var(--va-surface); border: 2px solid var(--va-line); box-shadow: 0 5px 0 var(--va-line); animation: va-boing 0.7s var(--va-bounce);
@@ -532,3 +565,10 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
     .va-shell { background: radial-gradient(70% 50% at 20% 0%, #2b2110 0%, transparent 60%), radial-gradient(60% 50% at 90% 100%, #10291a 0%, transparent 60%), var(--va-bg); }
   }
 }
+
+/* ---------------------------------------------------------------- the door (sign in first) */
+.va-splash { align-items: center; justify-content: center; }
+.va-splash img { border-radius: 50%; animation: va-boing 0.9s var(--va-bounce) infinite alternate; }
+.va-welcome { text-align: left; }
+.va-welcome__login { padding: 0.4rem; }
+.va-welcome__perks { margin-top: 1.4rem; }
