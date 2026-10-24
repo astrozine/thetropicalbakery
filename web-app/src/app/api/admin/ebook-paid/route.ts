@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { supabaseAdmin } from '@/lib/payments/server';
 import { ebookAccess, sendPaidEmailForOrder } from '@/lib/payments/ebook';
 import { isBrunchReference, onBrunchOrderPaid } from '@/lib/payments/brunch';
+import { isAppPlusReference, onAppPlusPaid } from '@/lib/payments/appPlus';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +32,13 @@ export async function POST(req: NextRequest) {
       const { data: inbox } = await supabaseAdmin().from('inbox_status').select('status').eq('source_table', 'orders').eq('source_id', order.id).maybeSingle();
       if (!inbox || inbox.status === 'new' || inbox.status === 'cancelled') return NextResponse.json({ ok: true, sent: false, why: 'not confirmed yet' });
       await onBrunchOrderPaid(order);
+      return NextResponse.json({ ok: true, sent: true });
+    }
+    // The app's Tropical+ paid by Pix: confirming it is what unlocks it (is_tropical_plus); send "it's unlocked".
+    if (order && isAppPlusReference(order.pix_transaction_id)) {
+      const { data: inbox } = await supabaseAdmin().from('inbox_status').select('status').eq('source_table', 'orders').eq('source_id', order.id).maybeSingle();
+      if (!inbox || inbox.status === 'new' || inbox.status === 'cancelled') return NextResponse.json({ ok: true, sent: false, why: 'not confirmed yet' });
+      await onAppPlusPaid(order);
       return NextResponse.json({ ok: true, sent: true });
     }
     if (!order || !/^EBK/.test(String(order.pix_transaction_id ?? ''))) return NextResponse.json({ ok: true, sent: false, why: 'not an e-book order' });

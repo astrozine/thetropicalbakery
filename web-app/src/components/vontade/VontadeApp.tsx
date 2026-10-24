@@ -9,7 +9,7 @@ import { trackMeta } from '@/lib/metaPixel';
 import LoginPanel from '@/components/LoginPanel';
 import IconTile from '@/components/IconTile';
 import {
-  CRAVINGS, CRAVING_GROUPS, TIMES, RESCUES, GUIDELINES, GUIDES, GBOMBS, DENSITY, EFFORT_LABEL, STORE_KEY,
+  APP_PLUS, CRAVINGS, CRAVING_GROUPS, TIMES, RESCUES, GUIDELINES, GUIDES, GBOMBS, DENSITY, EFFORT_LABEL, STORE_KEY,
   cravingOf, densityInsight, emptyStore, freeCount, isTropicalPlus, lastSevenDays, missingFor, pantryFor, pantryLabel,
   rankRescues, rescueFromRow, streak, todayISO, topCraving,
   type RecipeCard, type RecipeRow, type CravingPlan,
@@ -44,28 +44,39 @@ function writeStore(s: VontadeStore) {
   try { window.localStorage.setItem(STORE_KEY, JSON.stringify(trimmed)); } catch { /* private window: the app still works */ }
 }
 
-/** Tropical+ = signed in and in the Clube (a paid box) or subscribed. The same two reads Minha Conta makes. */
-function useTropicalPlus() {
+/**
+ * What this person has: Tropical+ (bought in the app, or a thank-you for box buyers and subscribers: all decided by
+ * is_tropical_plus(), migration 49) and their gifted plan (app_free_plan). `refresh` re-reads after a purchase.
+ */
+function useAccess() {
   const { user, loading } = useAuth();
-  const [state, setState] = useState<{ checked: boolean; plus: boolean; paidBoxes: number }>({ checked: false, plus: false, paidBoxes: 0 });
+  const [tick, setTick] = useState(0);
+  const [state, setState] = useState<{ checked: boolean; plus: boolean; gift: Craving | null }>({ checked: false, plus: false, gift: null });
   useEffect(() => {
     if (loading) return;
-    if (!user) { setState({ checked: true, plus: false, paidBoxes: 0 }); return; }
+    if (!user) { setState({ checked: true, plus: false, gift: null }); return; }
     let alive = true;
     (async () => {
-      const [{ data: j }, { data: subs }] = await Promise.all([
-        supabase.rpc('my_journey'),
-        supabase.from('subscriptions').select('status').order('created_at', { ascending: false }).limit(5),
-      ]);
-      if (!alive) return;
-      const paidBoxes = Number((j as { paid_boxes?: number } | null)?.paid_boxes ?? 0);
-      const subscriber = (subs || []).some(s => s.status && s.status !== 'cancelled');
-      setState({ checked: true, plus: isTropicalPlus(paidBoxes, subscriber), paidBoxes });
-    })().catch(() => { if (alive) setState({ checked: true, plus: false, paidBoxes: 0 }); });
+      let plus = false;
+      const { data: rpc, error } = await supabase.rpc('is_tropical_plus');
+      if (!error) plus = rpc === true;
+      else {
+        // Before migration 48/49: the two reads Minha Conta makes.
+        const [{ data: j }, { data: subs }] = await Promise.all([
+          supabase.rpc('my_journey'),
+          supabase.from('subscriptions').select('status').order('created_at', { ascending: false }).limit(5),
+        ]);
+        plus = isTropicalPlus(Number((j as { paid_boxes?: number } | null)?.paid_boxes ?? 0), (subs || []).some(s => s.status && s.status !== 'cancelled'));
+      }
+      const { data: g } = await supabase.from('app_free_plan').select('craving').eq('user_id', user.id).maybeSingle();
+      if (alive) setState({ checked: true, plus, gift: (g?.craving as Craving | undefined) ?? null });
+    })().catch(() => { if (alive) setState({ checked: true, plus: false, gift: null }); });
     return () => { alive = false; };
-  }, [user, loading]);
-  return { ...state, signedIn: !!user };
+  }, [user, loading, tick]);
+  const refresh = useCallback(() => setTick(t => t + 1), []);
+  return { ...state, signedIn: !!user, refresh };
 }
+type Access = ReturnType<typeof useAccess>;
 
 /**
  * The recipes Dolly published in /admin/app-receitas (migration 48). Every card comes from app_recipe_cards(); the
@@ -93,7 +104,7 @@ function useRescues(signedInId: string | null) {
 }
 
 /** One craving's plan from /api/vontade/plan: whole for Tropical+, the outline for everyone else. */
-function usePlan(c: Craving, signedInId: string | null) {
+function usePlan(c: Craving, signedInId: string | null, again: unknown) {
   const [state, setState] = useState<{ loading: boolean; plan: CravingPlan | null }>({ loading: true, plan: null });
   useEffect(() => {
     let alive = true;
@@ -106,7 +117,7 @@ function usePlan(c: Craving, signedInId: string | null) {
       if (alive) setState({ loading: false, plan: j.plan ?? null });
     })().catch(() => { if (alive) setState({ loading: false, plan: null }); });
     return () => { alive = false; };
-  }, [c, signedInId]);
+  }, [c, signedInId, again]);
   return state;
 }
 
@@ -133,7 +144,7 @@ function greeting(d = new Date()) {
  * full plan. Data and rules: lib/vontade.ts; plans: lib/vontadePlans.ts via /api/vontade/plan.
  */
 export default function VontadeApp() {
-  const plus = useTropicalPlus();
+  const access = useAccess();
   const [tab, setTab] = useState<Tab>('hoje');
   const [step, setStep] = useState<Step>('home');
   const [craving, setCraving] = useState<Craving | null>(null);
@@ -146,6 +157,8 @@ export default function VontadeApp() {
   const [filter, setFilter] = useState<Craving | 'todas'>('todas');
   const [shared, setShared] = useState('');
 
+  const [paidNote, setPaidNote] = useState('');
+
   useEffect(() => {
     const s = readStore();
     setStore(s);
@@ -153,15 +166,36 @@ export default function VontadeApp() {
     trackMeta('ViewContent', { content_name: 'app-vontade', content_type: 'product', value: 0 });
   }, []);
 
+  // Back from the card page (Mercado Pago): ask Mercado Pago itself what happened, then re-read the access.
+  const { refresh } = access;
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const ref = q.get('pago');
+    if (!ref) return;
+    const paymentId = q.get('payment_id') || q.get('collection_id');
+    window.history.replaceState(null, '', '/vontade');
+    setTab('plus');
+    if (!paymentId || q.get('result') === 'failure') { setPaidNote('O pagamento não foi concluído. Pode tentar de novo quando quiser, ou pagar por Pix.'); return; }
+    fetch('/api/pay/mercadopago/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payment_id: paymentId }) })
+      .then(r => r.json())
+      .then(j => {
+        setPaidNote(j.ok ? 'Pagamento confirmado. Obrigada! 🌴' : 'Estamos esperando o Mercado Pago confirmar. Assim que confirmar, libera sozinho e você recebe um e-mail.');
+        refresh();
+      })
+      .catch(() => setPaidNote('Estamos esperando a confirmação do pagamento. Você recebe um e-mail assim que liberar.'));
+  }, [refresh]);
+
   const { user } = useAuth();
   const { list, fromDb } = useRescues(user?.id ?? null);
-  const unlocked = useCallback((r: Rescue) => (fromDb ? !r.locked : r.free || plus.plus), [fromDb, plus.plus]);
+  const unlocked = useCallback((r: Rescue) => (fromDb ? !r.locked : r.free || access.plus), [fromDb, access.plus]);
   const ranked = useMemo(() => (craving && time ? rankRescues(list, craving, time, pantry) : []), [list, craving, time, pantry]);
   const free = freeCount(list);
   const open_ = ranked.filter(unlocked);
   const current = open_.length ? open_[pick % open_.length] : null;
-  // The better recipe behind the lock, shown at the moment the craving is strongest.
-  const betterLocked = !plus.plus ? (current ? ranked.slice(0, ranked.indexOf(current)).find(r => !unlocked(r)) : null) ?? ranked.find(r => !unlocked(r) && r !== current) : null;
+  // Mid-craving we only help: no locks, no offers. The one exception is honest information: when the same craving
+  // keeps coming back, say so, and point to its (free) guide.
+  const weekAgo = (() => { const d = new Date(); d.setDate(d.getDate() - 6); return todayISO(d); })();
+  const repeats = craving ? store.log.filter(l => l.c === craving && l.d >= weekAgo).length : 0;
 
   const save = (next: VontadeStore) => { setStore(next); writeStore(next); };
   const scrollTop = () => document.querySelector('.va-scroll')?.scrollTo({ top: 0 });
@@ -222,9 +256,8 @@ export default function VontadeApp() {
         <div className="va-stats">
           <span className="va-stat" data-on={days > 0 || undefined} title="Dias seguidos"><span aria-hidden>🔥</span>{days}</span>
           <span className="va-stat va-stat--green" data-on={ticked.length > 0 || undefined} title="G-BOMBS de hoje"><span aria-hidden>🥬</span>{ticked.length}/6</span>
-          {plus.plus
-            ? <span className="va-stat va-stat--plus" title="Tropical+"><span aria-hidden>🌴</span>+</span>
-            : <button className="va-stat va-stat--lock" onClick={() => go('plus')} aria-label="Tropical+"><Lock /> +</button>}
+          <span className="va-stat" data-on={store.wins.length > 0 || undefined} title="Vontades vencidas"><span aria-hidden>🏆</span>{store.wins.length}</span>
+          {access.plus && <span className="va-stat va-stat--plus" title="Tropical+"><span aria-hidden>🌴</span>+</span>}
         </div>
       </header>
 
@@ -232,7 +265,7 @@ export default function VontadeApp() {
         {open ? (
           <RecipeView r={open} pantry={pantry} onBack={() => setOpen(null)} onWin={win} />
         ) : guide ? (
-          <GuideView c={guide} list={list} unlocked={unlocked} userId={user?.id ?? null}
+          <GuideView c={guide} list={list} unlocked={unlocked} userId={user?.id ?? null} access={access}
             onBack={() => setGuide(null)} onRecipe={r => (unlocked(r) ? setOpen(r) : go('plus'))} onNow={() => chooseCraving(guide)} onPlus={() => go('plus')} />
         ) : tab === 'hoje' ? (
           <section className="va-screen" key={step}>
@@ -335,15 +368,11 @@ export default function VontadeApp() {
                 ) : (
                   <SwapList c={craving} />
                 )}
-                {betterLocked && (
-                  <button className="va-locked" onClick={() => go('plus')}>
-                    <span className="va-locked__emoji" aria-hidden>{betterLocked.emoji}</span>
-                    <span><small><Lock /> A Dolly tem uma ainda melhor para você</small><strong>{betterLocked.name}</strong><small>Libere com Tropical+ ›</small></span>
-                  </button>
-                )}
                 <button className="va-card va-next" onClick={() => { buzz(); setGuide(craving); scrollTop(); }}>
                   <IconTile size={46}>{cv.emoji}</IconTile>
-                  <span><strong>Vencer essa vontade de vez</strong><small>O que ela procura, quanto tempo leva e o plano semana a semana</small></span>
+                  {repeats >= 3
+                    ? <span><strong>{repeats}ª vez nesta semana: {cv.label.toLowerCase()}</strong><small>Quando ela volta assim, tem motivo. Veja o que ela procura e como fazer ela parar de voltar.</small></span>
+                    : <span><strong>Vencer essa vontade de vez</strong><small>O que ela procura, quanto tempo leva e o plano semana a semana</small></span>}
                   <span aria-hidden className="va-row__go">›</span>
                 </button>
                 <LetDollyBake />
@@ -362,6 +391,7 @@ export default function VontadeApp() {
                   <button className="va-btn va-btn--ghost" onClick={() => setStep('home')}>Voltar ao início</button>
                 </div>
                 {shared && <p className="va-note" role="status">{shared}</p>}
+                {craving && <WinOffer c={craving} access={access} onGuide={() => { buzz(); setGuide(craving); scrollTop(); }} onPlus={() => go('plus')} />}
                 <Link href="/receitas?utm_source=app-vontade" className="va-card va-next">
                   <IconTile size={46}>🎁</IconTile>
                   <span><strong>Ganhe 2 receitas completas de festa</strong><small>Do livro Sweet Escape da Dolly, grátis no seu e-mail</small></span>
@@ -410,7 +440,7 @@ export default function VontadeApp() {
             </div>
           </section>
         ) : (
-          <PlusScreen plus={plus} total={list.length} free={free} />
+          <PlusScreen access={access} total={list.length} free={free} note={paidNote} />
         )}
       </div>
 
@@ -531,15 +561,35 @@ function SwapList({ c }: { c: Craving }) {
 }
 
 /** One craving, the whole portal page: free guide on top, the Tropical+ plan below it. */
-function GuideView({ c, list, unlocked, userId, onBack, onRecipe, onNow, onPlus }: {
-  c: Craving; list: Rescue[]; unlocked: (r: Rescue) => boolean; userId: string | null;
+function GuideView({ c, list, unlocked, userId, access, onBack, onRecipe, onNow, onPlus }: {
+  c: Craving; list: Rescue[]; unlocked: (r: Rescue) => boolean; userId: string | null; access: Access;
   onBack: () => void; onRecipe: (r: Rescue) => void; onNow: () => void; onPlus: () => void;
 }) {
   const cv = cravingOf(c)!;
   const g = GUIDES[c];
   const ally = GBOMBS.find(b => b.id === g.gbomb);
   const recipes = list.filter(r => r.cravings.includes(c)).sort((a, b) => Number(unlocked(b)) - Number(unlocked(a)));
-  const { loading, plan } = usePlan(c, userId);
+  const { loading, plan } = usePlan(c, userId, `${access.gift}:${access.plus}`);
+  const [claiming, setClaiming] = useState(false);
+  const [claimErr, setClaimErr] = useState('');
+
+  /** The one gifted plan: this craving's, chosen by the person. */
+  const claim = async () => {
+    buzz();
+    setClaiming(true); setClaimErr('');
+    try {
+      const { data } = await supabase.auth.getSession();
+      const res = await fetch('/api/vontade/plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {}) },
+        body: JSON.stringify({ c }),
+      });
+      const j = await res.json();
+      if (!res.ok) setClaimErr(j.error || 'Não deu certo agora. Tente de novo.');
+      access.refresh();
+    } catch { setClaimErr('Sem conexão agora. Tente de novo.'); }
+    setClaiming(false);
+  };
   return (
     <article className="va-screen va-guide">
       <button className="va-back" onClick={onBack}>‹ Voltar</button>
@@ -604,12 +654,37 @@ function GuideView({ c, list, unlocked, userId, onBack, onRecipe, onNow, onPlus 
             {plan.daily && <p className="va-ally"><span aria-hidden>🥬</span> {plan.daily}</p>}
           </div>
           {plan.careful && <p className="va-fine va-careful">⚕️ {plan.careful}</p>}
-          {!plan.full && (
-            <button className="va-unlock" onClick={onPlus}>
-              <span className="va-unlock__icon" aria-hidden>🌴</span>
-              <span><strong>Libere o plano completo</strong><small>Todas as fases, as armadilhas e todas as receitas. Vem com o Tropical+.</small></span>
-              <span aria-hidden className="va-row__go">›</span>
-            </button>
+          {plan.full && access.gift === c && !access.plus && (
+            <p className="va-note">🎁 Este é o seu plano de presente. É seu para sempre.</p>
+          )}
+          {!plan.full && access.checked && (
+            !access.signedIn ? (
+              <div className="va-gift">
+                <span className="va-gift__icon" aria-hidden>🎁</span>
+                <strong>O seu primeiro plano é presente</strong>
+                <p>Entre (é grátis) e escolha uma vontade: o plano dela abre inteiro, para sempre. Sem cartão, sem compromisso.</p>
+                <div className="va-card--light va-gift__login">
+                  <LoginPanel message="Entre para ganhar o seu plano" subMessage="Com Google, Facebook ou e-mail. Seus dados ficam só com a gente." />
+                </div>
+              </div>
+            ) : !access.gift ? (
+              <div className="va-gift">
+                <span className="va-gift__icon" aria-hidden>🎁</span>
+                <strong>Quer o plano de {cv.label.toLowerCase()} de presente?</strong>
+                <p>Você pode escolher um plano, inteiro e para sempre, sem pagar nada. Escolha a vontade que mais pesa para você.</p>
+                <button className="va-btn" onClick={claim} disabled={claiming}>{claiming ? 'Abrindo…' : `Quero este de presente 🎁`}</button>
+                {claimErr && <p className="va-fine" role="alert">{claimErr}</p>}
+              </div>
+            ) : (
+              <button className="va-unlock" onClick={onPlus}>
+                <span className="va-unlock__icon" aria-hidden>🌴</span>
+                <span>
+                  <strong>Todos os planos, por {formatPrice(APP_PLUS.brl)}</strong>
+                  <small>Você já tem o de {cravingOf(access.gift)?.label.toLowerCase()}. O Tropical+ abre este e todos os outros, mais todas as receitas. Uma vez só.</small>
+                </span>
+                <span aria-hidden className="va-row__go">›</span>
+              </button>
+            )
           )}
         </>
       )}
@@ -710,51 +785,161 @@ function LetDollyBake() {
   );
 }
 
-function PlusScreen({ plus, total, free }: { plus: ReturnType<typeof useTropicalPlus>; total: number; free: number }) {
-  const perks = [
-    { emoji: '🗺️', text: `O plano completo de cada uma das ${CRAVINGS.length} vontades, fase por fase` },
-    { emoji: '🪤', text: 'As armadilhas de cada vontade e o que fazer em cada uma' },
-    { emoji: '📖', text: `Todas as ${total} receitas de resgate (${total - free} só para Tropical+)` },
-    { emoji: '🎯', text: 'A melhor receita para a sua vontade, sempre, não só as grátis' },
-    { emoji: '🌴', text: 'Vem junto com o Clube Tropical: selos, níveis e mimos da Dolly' },
+const formatPrice = (n: number) => `R$ ${n.toFixed(2).replace('.', ',')}`;
+const OFFER_KEY = 'tb-vontade-offer';
+
+/**
+ * After a win, the one place the app brings up money, and only gently: at most once a day, and the first thing it
+ * offers is the free gifted plan for the craving just beaten. Only someone who already has their gift sees a price.
+ */
+function WinOffer({ c, access, onGuide, onPlus }: { c: Craving; access: Access; onGuide: () => void; onPlus: () => void }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(OFFER_KEY) === todayISO()) return;
+      localStorage.setItem(OFFER_KEY, todayISO());
+    } catch { /* private window: show it, it is once per visit anyway */ }
+    setShow(true);
+  }, []);
+  if (!show || access.plus || !access.checked) return null;
+  const cv = cravingOf(c)!;
+  const hasGift = !!access.gift;
+  const otherGift = hasGift && access.gift !== c;
+  return (
+    <div className="va-offer">
+      <button className="va-offer__x" onClick={() => setShow(false)} aria-label="Fechar">×</button>
+      <p className="va-kicker">Próximo passo</p>
+      <strong>Você venceu hoje. Quer que essa vontade pare de voltar?</strong>
+      <p>{otherGift
+        ? `O plano de ${cv.label.toLowerCase()} mostra fase por fase como o paladar muda, e o que fazer em cada armadilha. Ele vem com o Tropical+: ${formatPrice(APP_PLUS.brl)}, uma vez só.`
+        : hasGift
+          ? 'O seu plano de presente é justamente desta vontade. Siga a próxima fase.'
+          : `O plano de ${cv.label.toLowerCase()} mostra fase por fase como o paladar muda. O seu primeiro plano é presente: escolha este, se for o que mais pesa.`}</p>
+      <button className="va-btn" onClick={otherGift ? onPlus : onGuide}>
+        {otherGift ? 'Ver o Tropical+' : hasGift ? 'Abrir o meu plano' : 'Ganhar o plano de presente 🎁'}
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Tropical+: what stays free forever (said first, plainly), what it adds, one honest price, and the payment right
+ * here (Pix or card), on the account so it never gets lost.
+ */
+function PlusScreen({ access, total, free, note }: { access: Access; total: number; free: number; note: string }) {
+  const [card, setCard] = useState(false);
+  const [busy, setBusy] = useState<'' | 'pix' | 'card'>('');
+  const [err, setErr] = useState('');
+  const [pix, setPix] = useState<{ reference: string; payload: string; base64: string } | null>(null);
+  const [copied, setCopied] = useState(false);
+  const { refresh, plus } = access;
+
+  useEffect(() => {
+    fetch('/api/pay/methods').then(r => r.json()).then(j => setCard(!!j.card)).catch(() => {});
+  }, []);
+  // Waiting on a Pix: look again every 20 seconds; it unlocks the moment Dolly confirms it.
+  useEffect(() => {
+    if (!pix || plus) return;
+    const t = window.setInterval(refresh, 20000);
+    return () => window.clearInterval(t);
+  }, [pix, plus, refresh]);
+
+  const buy = async (payMethod: 'pix' | 'card') => {
+    buzz();
+    setBusy(payMethod); setErr('');
+    try {
+      const { data } = await supabase.auth.getSession();
+      const res = await fetch('/api/vontade/buy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {}) },
+        body: JSON.stringify({ payMethod }),
+      });
+      const j = await res.json();
+      if (!res.ok) { setErr(j.error || 'Não deu certo agora. Tente de novo.'); setBusy(''); return; }
+      trackMeta('InitiateCheckout', { content_name: 'app-vontade-plus', value: APP_PLUS.brl, currency: 'BRL' });
+      if (j.url) { window.location.href = j.url; return; }
+      if (j.pix) setPix({ reference: j.reference, payload: j.pix.payload, base64: j.pix.base64 });
+    } catch { setErr('Sem conexão agora. Tente de novo.'); }
+    setBusy('');
+  };
+
+  const copy = async () => {
+    if (!pix) return;
+    try { await navigator.clipboard.writeText(pix.payload); setCopied(true); } catch { /* the code is on screen to copy by hand */ }
+  };
+
+  const freeForever = [
+    'O socorro na hora da vontade, quantas vezes quiser',
+    'Pelo menos uma receita para cada vontade',
+    'O guia de cada vontade: o que ela procura, as trocas e a verdade sobre o tempo',
+    'O G-BOMBS do dia, a sua sequência e os seus números',
+    'Um plano completo de presente, à sua escolha',
   ];
+  const adds = [
+    { emoji: '🗺️', text: `O plano completo de todas as ${CRAVINGS.length} vontades, fase por fase` },
+    { emoji: '🪤', text: 'As armadilhas de cada vontade e o que fazer em cada uma' },
+    { emoji: '📖', text: `Todas as ${total} receitas (${total - free} a mais que no grátis)` },
+    { emoji: '💛', text: 'E você ajuda uma cozinha pequena a continuar fazendo isso' },
+  ];
+
+  if (plus) {
+    return (
+      <section className="va-screen">
+        {note && <p className="va-note" role="status">{note}</p>}
+        <div className="va-medal" aria-hidden>🌴</div>
+        <p className="va-kicker">Tropical+</p>
+        <h1 className="va-title">Tudo liberado.</h1>
+        <p className="va-lead">Todos os planos e todas as receitas são seus, para sempre. Obrigada por apoiar a cozinha da Dolly.</p>
+        <Link href="/minha-conta" className="va-card va-next">
+          <IconTile size={46}>👤</IconTile>
+          <span><strong>Minha conta</strong><small>Seus pedidos e o Clube Tropical</small></span>
+          <span aria-hidden className="va-row__go">›</span>
+        </Link>
+      </section>
+    );
+  }
+
   return (
     <section className="va-screen">
+      {note && <p className="va-note" role="status">{note}</p>}
       <p className="va-kicker">Tropical+</p>
-      {plus.plus ? (
-        <>
-          <div className="va-medal" aria-hidden>🌴</div>
-          <h1 className="va-title">Você é Tropical+</h1>
-          <p className="va-lead">Todos os planos e todas as receitas estão liberados. Obrigada por fazer parte da família.</p>
-          <Link href="/minha-conta" className="va-card va-next">
-            <IconTile size={46}>🎟️</IconTile>
-            <span><strong>Seu Clube Tropical</strong><small>Selos, nível e próximos pedidos</small></span>
-            <span aria-hidden className="va-row__go">›</span>
-          </Link>
-        </>
-      ) : (
-        <>
-          <h1 className="va-title">Vencer de vez, com o plano completo.</h1>
-          <p className="va-lead">O app ajuda de graça na hora da vontade. O Tropical+ é o caminho para ela parar de mandar em você. Não se paga à parte: vem com qualquer caixa comprada ou com a assinatura.</p>
-          <ul className="va-perks">{perks.map(p => <li key={p.text}><IconTile size={40}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
-          <div className="va-actions">
-            <Link href="/caixas?utm_source=app-vontade" className="va-btn">Quero a minha caixa 📦</Link>
-            <Link href="/assinatura?utm_source=app-vontade" className="va-btn va-btn--ghost">Ver a assinatura</Link>
+      <h1 className="va-title">O app ajuda de graça. O Tropical+ é para vencer de vez.</h1>
+      <p className="va-lead">Sem pegadinha: o que é grátis continua grátis para sempre, com ou sem você comprar.</p>
+
+      <div className="va-card">
+        <p className="va-kicker">Grátis, para sempre</p>
+        <ul className="va-checks">{freeForever.map(t => <li key={t}>{t}</li>)}</ul>
+      </div>
+
+      <div className="va-card va-compare--plus">
+        <p className="va-kicker">O Tropical+ acrescenta</p>
+        <ul className="va-perks">{adds.map(p => <li key={p.text}><IconTile size={40}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
+        <div className="va-price">
+          <strong>{formatPrice(APP_PLUS.brl)}</strong>
+          <span>{APP_PLUS.promise}</span>
+        </div>
+
+        {pix ? (
+          <div className="va-pix">
+            <p><strong>Pague com o Pix</strong> e o Tropical+ libera aqui sozinho assim que a Dolly confirmar. Você também recebe um e-mail.</p>
+            <img src={pix.base64} alt="QR code do Pix" width={200} height={200} />
+            <button className="va-btn va-btn--ghost" onClick={copy}>{copied ? 'Código copiado ✓' : 'Copiar o Pix copia e cola'}</button>
+            <p className="va-fine">Pedido {pix.reference}</p>
           </div>
-          {!plus.checked ? null : !plus.signedIn ? (
-            <div className="va-card va-card--light">
-              <LoginPanel message="Já comprou uma caixa? Entre para liberar" subMessage="Use o mesmo e-mail ou WhatsApp do seu pedido." />
-            </div>
-          ) : (
-            <p className="va-note">Sua conta está conectada, mas ainda não encontramos uma caixa paga nela. Assim que a primeira for confirmada, tudo libera aqui.</p>
-          )}
-          <Link href="/receitas?utm_source=app-vontade" className="va-card va-next">
-            <IconTile size={46}>🎁</IconTile>
-            <span><strong>Mora longe? Comece pelo livro</strong><small>2 receitas completas do Sweet Escape, grátis no e-mail</small></span>
-            <span aria-hidden className="va-row__go">›</span>
-          </Link>
-        </>
-      )}
+        ) : !access.checked ? null : !access.signedIn ? (
+          <div className="va-card--light va-gift__login">
+            <LoginPanel message="Entre para o Tropical+ ficar na sua conta" subMessage="Assim ele nunca se perde, em qualquer celular." />
+          </div>
+        ) : (
+          <div className="va-actions">
+            <button className="va-btn" onClick={() => buy('pix')} disabled={!!busy}>{busy === 'pix' ? 'Gerando o Pix…' : 'Pagar com Pix'}</button>
+            {card && <button className="va-btn va-btn--ghost" onClick={() => buy('card')} disabled={!!busy}>{busy === 'card' ? 'Abrindo…' : 'Pagar com cartão'}</button>}
+            {err && <p className="va-fine" role="alert">{err}</p>}
+          </div>
+        )}
+      </div>
+
+      <p className="va-fine va-center">Já é cliente da caixa ou assinante? O Tropical+ já vem incluído como agradecimento: é só entrar com a mesma conta.</p>
     </section>
   );
 }

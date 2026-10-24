@@ -121,6 +121,13 @@ async function sendPaidReceipt(orderId: string) {
     return;
   }
 
+  // The app's Tropical+: nothing to deliver, just "it's unlocked".
+  if (data.order_kind === 'app' || /^APP/.test(String(data.pix_transaction_id ?? ''))) {
+    const { onAppPlusPaid } = await import('./appPlus');
+    await onAppPlusPaid(data);
+    return;
+  }
+
   const address = String(data.delivery_address ?? '');
   await sendOrderPaid(db, {
     reference: String(data.pix_transaction_id ?? ''),

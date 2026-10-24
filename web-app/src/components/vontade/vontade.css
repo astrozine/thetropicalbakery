@@ -348,6 +348,40 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 .va-skeleton { height: 12rem; background: linear-gradient(90deg, var(--va-soft) 25%, var(--va-surface) 50%, var(--va-soft) 75%) 0 0 / 200% 100%; animation: va-shimmer 1.2s linear infinite; }
 @keyframes va-shimmer { to { background-position: -200% 0; } }
 
+/* ---------------------------------------------------------------- gift, offer, Tropical+ */
+.va-gift {
+  margin-top: 1rem; padding: 1.2rem 1.1rem; border-radius: 22px; text-align: center;
+  background: linear-gradient(160deg, #fff0f6, #ffe3ef); color: #4a1530; border: 2px solid #ffb6d3; box-shadow: 0 5px 0 #f48fb8;
+}
+.va-gift__icon { display: block; font-size: 2.8rem; line-height: 1; margin-bottom: 0.4rem; animation: va-wiggle 3.5s ease-in-out infinite; }
+.va-gift strong { display: block; font-size: 1.15rem; font-weight: 900; margin-bottom: 0.35rem; }
+.va-gift p { margin: 0 0 0.9rem; font-size: 0.95rem; line-height: 1.5; font-weight: 600; }
+.va-gift__login { border-radius: 18px; padding: 0.4rem; background: #fffaf0; color: #3c2a21; text-align: left; }
+
+.va-offer {
+  position: relative; margin-top: 1.2rem; padding: 1.1rem; border-radius: 22px; text-align: left;
+  background: var(--va-surface); border: 2px solid var(--va-gold); box-shadow: 0 5px 0 #d4a017;
+}
+.va-offer strong { display: block; font-size: 1.08rem; font-weight: 900; margin: 0 2rem 0.35rem 0; }
+.va-offer p:not(.va-kicker) { margin: 0 0 0.9rem; font-size: 0.94rem; line-height: 1.5; font-weight: 600; color: var(--va-muted); }
+.va-offer__x { position: absolute; top: 6px; right: 6px; width: 44px; height: 44px; border: 0; background: none; font-size: 1.6rem; color: var(--va-muted); cursor: pointer; }
+
+.va-checks { list-style: none; margin: 0.3rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+.va-checks li { position: relative; padding-left: 1.9rem; font-size: 0.96rem; line-height: 1.4; font-weight: 700; }
+.va-checks li::before {
+  content: '✓'; position: absolute; left: 0; top: 0; width: 1.35rem; height: 1.35rem; border-radius: 50%;
+  background: var(--va-green); color: #fff; font-size: 0.78rem; font-weight: 900; display: grid; place-items: center;
+}
+.va-compare--plus { border-color: var(--va-gold); box-shadow: 0 4px 0 #d4a017; }
+.va-price { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; margin: 0.4rem 0 0.9rem; text-align: center; }
+.va-price strong { font-size: 2.3rem; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
+.va-price span { font-size: 0.86rem; font-weight: 800; color: var(--va-muted); }
+.va-pix { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; text-align: center; }
+.va-pix p { margin: 0; font-size: 0.94rem; line-height: 1.5; font-weight: 600; }
+.va-pix img { border-radius: 16px; background: #fff; padding: 8px; border: 2px solid var(--va-line); }
+.va-center { text-align: center; margin-top: 1.2rem; }
+.va-btn:disabled { opacity: 0.6; cursor: default; }
+
 /* ---------------------------------------------------------------- library */
 .va-filter { display: flex; gap: 0.5rem; overflow-x: auto; margin: 0 -16px 1rem; padding: 0 16px 6px; scrollbar-width: none; }
 .va-filter::-webkit-scrollbar { display: none; }

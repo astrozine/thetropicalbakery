@@ -774,8 +774,19 @@ export function rankRescues(list: Rescue[], craving: Craving, time: TimeBudget, 
   return [...pool].sort((a, b) => score(b) - score(a));
 }
 
-/** Tropical+ is not sold on its own: it comes with the Clube Tropical (a paid box) or the subscription. */
+/** The bakery's own customers (a paid box or the subscription) get Tropical+ as a thank-you. */
 export const isTropicalPlus = (paidBoxes: number, subscriber: boolean) => subscriber || paidBoxes >= 1;
+
+/**
+ * Tropical+ of the app, sold on its own (migration 49): one payment, lifetime, tied to the account. The price lives
+ * here only; the server charges it (lib/payments/appPlus.ts). The free app must stay genuinely useful on its own:
+ * the offer appears only after the person got value (a win, the free guide, their gifted plan), never mid-craving.
+ */
+export const APP_PLUS = {
+  brl: 19.9,
+  name: 'Tropical+ do app Bateu Vontade?',
+  promise: 'Pagamento único. Sem assinatura, sem renovação, para sempre.',
+} as const;
 
 /** The app's own memory on the phone (localStorage): wins and the last answers. Never personal data. */
 export const STORE_KEY = 'tb-vontade-v1';
