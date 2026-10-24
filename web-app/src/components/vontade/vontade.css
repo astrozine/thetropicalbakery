@@ -566,9 +566,23 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
   }
 }
 
-/* ---------------------------------------------------------------- the door (sign in first) */
+/* ---------------------------------------------------------------- loading */
 .va-splash { align-items: center; justify-content: center; }
 .va-splash img { border-radius: 50%; animation: va-boing 0.9s var(--va-bounce) infinite alternate; }
-.va-welcome { text-align: left; }
-.va-welcome__login { padding: 0.4rem; }
-.va-welcome__perks { margin-top: 1.4rem; }
+
+/* ---------------------------------------------------------------- guests: entertainment first, then the sign-up */
+/* The bag waits faded; the hit itself is in full color (the class drops while it plays). */
+.va-ring--faded .va-bag, .va-ring--faded .va-fighter { opacity: 0.5; filter: saturate(0.45); transition: opacity 0.2s, filter 0.2s; }
+.va-ring--faded .va-bag:hover { opacity: 0.75; }
+.va-guest__perks { text-align: left; margin-top: 1.2rem; }
+.va-sheet { position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column; justify-content: flex-end; }
+.va-sheet__backdrop { position: absolute; inset: 0; border: 0; background: rgba(30,20,15,0.45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); animation: va-fade 0.25s ease-out; cursor: pointer; }
+.va-sheet__panel {
+  position: relative; width: 100%; max-width: 32rem; max-height: 92%; margin: 0 auto; overflow-y: auto;
+  padding: 0.6rem 16px calc(1.2rem + env(safe-area-inset-bottom)); border-radius: 26px 26px 0 0;
+  background: var(--va-bg); box-shadow: 0 -10px 30px rgba(0,0,0,0.2); animation: va-up 0.45s var(--va-bounce);
+}
+.va-sheet__grip { display: block; width: 44px; height: 5px; margin: 0 auto 0.6rem; border-radius: 3px; background: var(--va-line-d); }
+.va-sheet__login { padding: 0.4rem; margin-top: 0.4rem; }
+@keyframes va-up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes va-fade { from { opacity: 0; } to { opacity: 1; } }

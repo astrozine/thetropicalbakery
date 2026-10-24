@@ -187,6 +187,15 @@ export default function VontadeApp() {
   }, [refresh]);
 
   const { user, loading: authLoading } = useAuth();
+  // Signed in from the guest sheet: they had just hit the bag, so pick up right there, at the first question.
+  useEffect(() => {
+    if (!user) return;
+    try {
+      if (sessionStorage.getItem(NEXT_KEY) !== 'craving') return;
+      sessionStorage.removeItem(NEXT_KEY);
+    } catch { return; }
+    setTab('hoje'); setStep('craving');
+  }, [user]);
   const { list, fromDb } = useRescues(user?.id ?? null);
   const unlocked = useCallback((r: Rescue) => (fromDb ? !r.locked : r.free || access.plus), [fromDb, access.plus]);
   const ranked = useMemo(() => (craving && time ? rankRescues(list, craving, time, pantry) : []), [list, craving, time, pantry]);
@@ -250,7 +259,7 @@ export default function VontadeApp() {
 
   // The app is for members of the site: a free account first, always (Andrew, 2026-10-23).
   if (authLoading) return <div className="va-shell va-splash"><img src="/vontade/dolly-avatar.webp" alt="" width={72} height={72} /></div>;
-  if (!user) return <Welcome />;
+  if (!user) return <GuestApp />;
 
   return (
     <div className="va-shell">
@@ -465,18 +474,25 @@ export default function VontadeApp() {
   );
 }
 
+const NEXT_KEY = 'tb-vontade-next';
+
 /**
- * The door of the app: nobody uses it without a free account on the site. Dolly says why (her wins, streak and
- * gifted plan stay with them, on any phone), the page lists everything that's free, and sign-in is one tap.
- * LoginPanel brings them back to /vontade, signed in.
+ * What someone who isn't signed in gets: the real home, entertainment first. Dolly says hi and the punching bag is
+ * there, faded, the burger and the soda still jabbing. Hitting it plays the whole POW, and only then Dolly's chat
+ * slides up with the free sign-up ("essa doeu, hein?"). Any other tab opens the same sheet. After signing in they
+ * land right in the first question (NEXT_KEY), so the sign-up leads into the experience instead of guarding it.
  */
-function Welcome() {
+function GuestApp() {
+  const [sheet, setSheet] = useState<'' | 'hit' | 'tab'>('');
+  const open = (why: 'hit' | 'tab') => {
+    try { sessionStorage.setItem(NEXT_KEY, why === 'hit' ? 'craving' : 'home'); } catch { /* still fine */ }
+    setSheet(why);
+  };
   const free = [
-    { emoji: '🥊', text: 'Socorro na hora da vontade: doce, sal, fritura, queijo, refri' },
-    { emoji: '🌱', text: 'A troca certa, feita de planta inteira, em 2 a 5 minutos' },
-    { emoji: '🧭', text: 'O guia honesto de cada vontade' },
-    { emoji: '🥬', text: 'O seu G-BOMBS do dia, sequência e vitórias' },
-    { emoji: '🎁', text: 'Um plano completo de presente, à sua escolha' },
+    { emoji: '🥊', text: 'Socorro na hora: doce, sal, fritura, queijo, refri' },
+    { emoji: '🌱', text: 'A troca certa, feita de planta, em 2 a 5 minutos' },
+    { emoji: '🥬', text: 'G-BOMBS do dia, sequência e vitórias' },
+    { emoji: '🎁', text: 'Um plano completo de presente' },
   ];
   return (
     <div className="va-shell">
@@ -485,23 +501,41 @@ function Welcome() {
           <img src="/hero-logo-transparent.png" alt="" width={32} height={32} />
           <strong>Bateu Vontade?</strong>
         </Link>
+        <button className="va-btn va-btn--ghost va-btn--sm" onClick={() => open('tab')}>Entrar</button>
       </header>
       <div className="va-scroll">
-        <section className="va-screen va-welcome">
-          <p className="va-kicker">Grátis · by The Tropical Bakery</p>
-          <h1 className="va-title">Toda vontade tem troca.</h1>
-          <DollyChat lines={[
-            'Oi! Eu sou a Dolly 👋',
-            'Antes da gente começar, crie a sua conta grátis aqui no site.',
-            'Assim as suas vitórias, a sua sequência e o seu plano de presente ficam salvos com você, em qualquer celular. Leva 10 segundos.',
-          ]} />
-          <div className="va-card va-card--light va-welcome__login">
-            <LoginPanel message="Crie a sua conta grátis" subMessage="Com Google ou Facebook é um toque. Ou receba um link no e-mail." />
-          </div>
-          <ul className="va-perks va-welcome__perks">{free.map(p => <li key={p.text}><IconTile size={40}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
-          <p className="va-fine va-center">Sem cartão, sem cobrança. Seus dados ficam só com a gente.</p>
+        <section className="va-screen va-home">
+          <p className="va-kicker">{greeting()} 🌴</p>
+          <h1 className="va-title">Bateu vontade?</h1>
+          <DollyChat lines={['Oi! Eu sou a Dolly 👋', 'Doce, sal, fritura, queijo, refri: toda vontade tem uma troca feita de planta.', 'Tá com raiva da vontade? Bate no saco. 🥊']} />
+          <PunchBag faded onHit={() => open('hit')} />
+          <p className="va-ring__cap">Quando a vontade bate, bate forte. <strong>Toque no saco e revide!</strong></p>
+          <ul className="va-perks va-guest__perks">{free.map(p => <li key={p.text}><IconTile size={40}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
         </section>
       </div>
+      <nav className="va-tabs" aria-label="App">
+        {([['🏠', 'Hoje'], ['🧭', 'Vontades'], ['📖', 'Receitas'], ['🌴', 'Tropical+']] as const).map(([emoji, label], i) => (
+          <button key={label} aria-current={i === 0 || undefined} onClick={() => (i === 0 ? null : open('tab'))}>
+            <span className="va-tabs__icon" aria-hidden>{emoji}</span>{label}
+          </button>
+        ))}
+      </nav>
+
+      {sheet && (
+        <div className="va-sheet" role="dialog" aria-modal="true" aria-label="Crie a sua conta grátis">
+          <button className="va-sheet__backdrop" aria-label="Fechar" onClick={() => setSheet('')} />
+          <div className="va-sheet__panel">
+            <span className="va-sheet__grip" aria-hidden />
+            <DollyChat key={sheet} lines={sheet === 'hit'
+              ? ['Essa doeu, hein? 😅', 'Agora deixa comigo: eu te mostro a troca certa em 3 toques.', 'Só crie a sua conta grátis antes, pra eu guardar as suas vitórias. Leva 10 segundos.']
+              : ['Opa! Isso fica dentro da sua conta. 🙂', 'Crie a sua conta grátis e é tudo seu: as trocas, os guias e o seu plano de presente.']} />
+            <div className="va-card va-card--light va-sheet__login">
+              <LoginPanel message="Crie a sua conta grátis" subMessage="Com Google ou Facebook é um toque. Ou receba um link no e-mail." />
+            </div>
+            <p className="va-fine va-center">Sem cartão, sem cobrança. Seus dados ficam só com a gente.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -826,7 +860,7 @@ function DollyPhoto({ src, small, children }: { src: string; small?: boolean; ch
  * the bag squashes, POW) and opens the questions. The frustration is the point: you're allowed to be mad at it.
  * Art: Microsoft Fluent Emoji 3D (MIT, public/vontade/fx/LICENSE-fluent-emoji.txt); the bag is drawn in CSS to match.
  */
-function PunchBag({ onHit }: { onHit: () => void }) {
+function PunchBag({ onHit, faded }: { onHit: () => void; faded?: boolean }) {
   const [ko, setKo] = useState(false);
   const hit = () => {
     if (ko) return;
@@ -835,7 +869,7 @@ function PunchBag({ onHit }: { onHit: () => void }) {
     window.setTimeout(() => { setKo(false); onHit(); }, 700);
   };
   return (
-    <div className={`va-ring${ko ? ' is-ko' : ''}`}>
+    <div className={`va-ring${ko ? ' is-ko' : ''}${faded && !ko ? ' va-ring--faded' : ''}`}>
       <span className="va-ring__beam" aria-hidden />
       <span className="va-fighter va-fighter--l" aria-hidden>
         <img className="va-fighter__food" src="/vontade/fx/burger.webp" alt="" />
