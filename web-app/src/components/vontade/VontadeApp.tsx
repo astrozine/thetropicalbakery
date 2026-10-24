@@ -273,12 +273,9 @@ export default function VontadeApp() {
               <div className="va-home">
                 <p className="va-kicker">{greeting()} 🌴</p>
                 <h1 className="va-title">Bateu vontade?</h1>
-                <p className="va-lead">Doce, sal, fritura, queijo, refri: toda vontade tem uma troca de verdade, feita de planta inteira, pronta em minutos.</p>
-                <button className="va-sos" onClick={() => { buzz(); setStep('craving'); }}>
-                  <span className="va-sos__ring" aria-hidden />
-                  <span className="va-sos__emoji" aria-hidden>🆘</span>
-                  <span>Bateu agora!</span>
-                </button>
+                <Dolly>{homeLine(days, ticked.length, store.wins.length)}</Dolly>
+                <PunchBag onHit={() => setStep('craving')} />
+                <p className="va-ring__cap">Quando a vontade bate, bate forte. <strong>Toque no saco e revide!</strong></p>
 
                 <GbombsCard ticked={ticked} onToggle={toggleGb} />
                 <Insight store={store} onGuide={c => { buzz(); setGuide(c); scrollTop(); }} />
@@ -353,6 +350,7 @@ export default function VontadeApp() {
             {step === 'result' && craving && g && cv && (
               <div className="va-result">
                 <button className="va-back" onClick={() => setStep('pantry')}>‹ Voltar</button>
+                <Dolly>Faz essa comigo. Se faltar alguma coisa, improvisa: o que importa é a troca.</Dolly>
                 <div className="va-same" style={cssVars({ '--c': cv.hex })}>
                   <small>O mesmo prazer, dentro da fibra</small>
                   <strong>{g.principle}</strong>
@@ -382,7 +380,7 @@ export default function VontadeApp() {
             {step === 'won' && (
               <div className="va-won">
                 <div className="va-confetti" aria-hidden>{['🌴', '🍋', '🥭', '🍄', '✨', '🌺', '🥑', '✨'].map((e, i) => <span key={i} style={cssVars({ '--i': String(i) })}>{e}</span>)}</div>
-                <div className="va-medal" aria-hidden>🏆</div>
+                <DollyPhoto src="/vontade/dolly-tray.webp">Isso! Mais uma vencida. Tô orgulhosa de você. 🌴</DollyPhoto>
                 <p className="va-kicker">Vontade vencida!</p>
                 <h1 className="va-title">{store.wins.length === 1 ? 'Sua primeira vitória.' : `${store.wins.length} vitórias.`}</h1>
                 <p className="va-lead">{days > 1 ? `${days} dias seguidos escolhendo o que faz bem.` : 'O mesmo prazer, só de planta. Amanhã tem mais.'}</p>
@@ -605,6 +603,7 @@ function GuideView({ c, list, unlocked, userId, access, onBack, onRecipe, onNow,
       <SwapList c={c} />
 
       <h2 className="va-h2"><IconTile size={30}>🤝</IconTile> Sem enrolação</h2>
+      <Dolly>Vou ser sincera com você: não é mágica, mas funciona. Olha quanto tempo costuma levar.</Dolly>
       <div className="va-card va-honest">
         <div className="va-honest__row">
           <span><small>Dificuldade</small><strong>{EFFORT_LABEL[g.effort]}</strong></span>
@@ -660,7 +659,7 @@ function GuideView({ c, list, unlocked, userId, access, onBack, onRecipe, onNow,
           {!plan.full && access.checked && (
             !access.signedIn ? (
               <div className="va-gift">
-                <span className="va-gift__icon" aria-hidden>🎁</span>
+                <DollyPhoto src="/vontade/dolly-offer.webp" small>Um presente meu pra você 🎁</DollyPhoto>
                 <strong>O seu primeiro plano é presente</strong>
                 <p>Entre (é grátis) e escolha uma vontade: o plano dela abre inteiro, para sempre. Sem cartão, sem compromisso.</p>
                 <div className="va-card--light va-gift__login">
@@ -669,7 +668,7 @@ function GuideView({ c, list, unlocked, userId, access, onBack, onRecipe, onNow,
               </div>
             ) : !access.gift ? (
               <div className="va-gift">
-                <span className="va-gift__icon" aria-hidden>🎁</span>
+                <DollyPhoto src="/vontade/dolly-offer.webp" small>Um presente meu pra você 🎁</DollyPhoto>
                 <strong>Quer o plano de {cv.label.toLowerCase()} de presente?</strong>
                 <p>Você pode escolher um plano, inteiro e para sempre, sem pagar nada. Escolha a vontade que mais pesa para você.</p>
                 <button className="va-btn" onClick={claim} disabled={claiming}>{claiming ? 'Abrindo…' : `Quero este de presente 🎁`}</button>
@@ -753,10 +752,85 @@ function RecipeView({ r, pantry, onBack, onWin }: { r: Rescue; pantry: string[];
       </ol>
       {r.tip && <p className="va-tip"><strong>Dica:</strong> {r.tip}</p>}
       <div className="va-dock">
+        <Dolly small>Você consegue! Marca os passos aí e depois me conta como ficou.</Dolly>
         <button className="va-btn" onClick={onWin}>Venci a vontade! 🎉</button>
       </div>
     </article>
   );
+}
+
+/**
+ * Dolly is the app's coach (the role the owl plays in the game-like habit apps): her face and a speech bubble on
+ * the screens where a person needs a push, her real photos offering treats at the moments that deserve one.
+ * She only says encouraging, true things: never a story about herself that she did not tell.
+ */
+function Dolly({ children, small }: { children: React.ReactNode; small?: boolean }) {
+  return (
+    <div className={`va-dolly${small ? ' va-dolly--sm' : ''}`}>
+      <img src="/vontade/dolly-avatar.webp" alt="Dolly" width={small ? 44 : 56} height={small ? 44 : 56} />
+      <p className="va-dolly__bubble">{children}</p>
+    </div>
+  );
+}
+
+function DollyPhoto({ src, small, children }: { src: string; small?: boolean; children: React.ReactNode }) {
+  return (
+    <figure className={`va-dolly-photo${small ? ' va-dolly-photo--sm' : ''}`}>
+      <img src={src} alt="Dolly oferecendo docinhos no jardim" loading="lazy" />
+      <figcaption><strong>Dolly</strong>{children}</figcaption>
+    </figure>
+  );
+}
+
+/** A cartoon boxing glove, fist pointing right (the right-hand one is mirrored in CSS). */
+const Glove = () => (
+  <svg viewBox="0 0 150 112" aria-hidden>
+    <rect x="4" y="30" width="42" height="54" rx="12" fill="#fff" stroke="#3c2a21" strokeWidth="5" />
+    <path d="M14 44h22M14 56h22M14 68h22" stroke="#c9c0b4" strokeWidth="4" strokeLinecap="round" />
+    <ellipse cx="94" cy="54" rx="52" ry="46" fill="#e8364f" stroke="#6b0f1a" strokeWidth="5" />
+    <ellipse cx="72" cy="92" rx="28" ry="14" fill="#c4213a" stroke="#6b0f1a" strokeWidth="5" />
+    <ellipse cx="104" cy="28" rx="26" ry="9" fill="#fff" opacity="0.4" />
+  </svg>
+);
+
+/**
+ * The SOS button is a punching bag: "bateu vontade" literally means the craving hit you. Two gloves, a burger and a
+ * milkshake, jab at it from the edges of the screen while it waits; tapping it hits back (both gloves slam, POW!)
+ * and opens the questions. The frustration is the point: you're allowed to be mad at the craving.
+ */
+function PunchBag({ onHit }: { onHit: () => void }) {
+  const [ko, setKo] = useState(false);
+  const hit = () => {
+    if (ko) return;
+    try { navigator.vibrate?.([25, 40, 35]); } catch { /* not supported */ }
+    setKo(true);
+    window.setTimeout(() => { setKo(false); onHit(); }, 650);
+  };
+  return (
+    <div className={`va-ring${ko ? ' is-ko' : ''}`}>
+      <span className="va-ring__beam" aria-hidden />
+      <span className="va-glove va-glove--l" aria-hidden><Glove /><span className="va-glove__food">🍔</span></span>
+      <button className="va-bag" onClick={hit} aria-label="Bateu vontade! Pedir socorro">
+        <span className="va-bag__chain" aria-hidden />
+        <span className="va-bag__body">
+          <span className="va-bag__band va-bag__band--top" aria-hidden />
+          <strong>SOS</strong>
+          <small>Bateu vontade!</small>
+          <span className="va-bag__band va-bag__band--bot" aria-hidden />
+        </span>
+      </button>
+      <span className="va-glove va-glove--r" aria-hidden><Glove /><span className="va-glove__food">🥤</span></span>
+      <span className="va-pow" aria-hidden>POW!</span>
+    </div>
+  );
+}
+
+/** What Dolly says on the home screen: the streak first, then a dense day, then the welcome. */
+function homeLine(days: number, gb: number, wins: number) {
+  if (days >= 2) return `${days} dias seguidos! Tô muito orgulhosa de você. Bateu vontade? Vem que a gente resolve.`;
+  if (gb >= 4) return 'Que dia denso! Com esse prato, a vontade vai ter trabalho para aparecer.';
+  if (wins > 0) return 'Que bom te ver de novo! Doce, salgado ou fritura: toque no botão e a gente acha a troca.';
+  return 'Oi, eu sou a Dolly! Doce, sal, fritura, queijo, refri: toda vontade tem uma troca feita de planta. Em 3 toques eu te mostro.';
 }
 
 /** Dolly's photo of a recipe, as a band across the top of its colored card. */
@@ -904,7 +978,9 @@ function PlusScreen({ access, total, free, note }: { access: Access; total: numb
       {note && <p className="va-note" role="status">{note}</p>}
       <p className="va-kicker">Tropical+</p>
       <h1 className="va-title">O app ajuda de graça. O Tropical+ é para vencer de vez.</h1>
-      <p className="va-lead">Sem pegadinha: o que é grátis continua grátis para sempre, com ou sem você comprar.</p>
+      <DollyPhoto src="/vontade/dolly-spatula.webp">
+        O que é grátis continua grátis, para sempre, com ou sem você comprar. O Tropical+ é para quem quer ir mais fundo, e ajuda a minha cozinha a continuar.
+      </DollyPhoto>
 
       <div className="va-card">
         <p className="va-kicker">Grátis, para sempre</p>

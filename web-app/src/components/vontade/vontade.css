@@ -106,6 +106,82 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 .va-sos__ring { position: absolute; inset: -12px; border-radius: 50%; border: 4px solid rgba(232,54,79,0.3); animation: va-pulse 2.2s ease-out infinite; }
 @keyframes va-pulse { from { transform: scale(0.94); opacity: 1; } to { transform: scale(1.16); opacity: 0; } }
 
+/*
+ * The punching bag (the SOS button). One 3.2 s loop: the burger glove jabs from the left at 18%, the bag swings
+ * away; the milkshake glove jabs from the right at 63%, the bag swings back. Tapping = .is-ko: both gloves slam,
+ * the bag shakes, POW. Fixed 24rem stage so the gloves always reach the bag.
+ */
+.va-ring {
+  position: relative; height: 300px; width: calc(100% + 32px); max-width: 24rem; margin: 0.4rem 0 0.2rem 50%;
+  transform: translateX(-50%); overflow: hidden;
+}
+.va-ring__beam { position: absolute; top: 0; left: 50%; width: 96px; height: 12px; margin-left: -48px; border-radius: 6px; background: #5a3421; box-shadow: 0 3px 0 #3c2a21; }
+.va-bag {
+  position: absolute; left: 50%; top: 8px; width: 128px; margin-left: -64px; padding: 0; border: 0; background: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; transform-origin: 50% 0; animation: va-sway 3.2s ease-in-out infinite;
+}
+.va-bag__chain { width: 7px; height: 38px; border-radius: 4px; background: repeating-linear-gradient(#8f857c 0 7px, #d4ccc3 7px 11px); }
+.va-bag__body {
+  position: relative; width: 128px; height: 196px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem;
+  border-radius: 44px 44px 56px 56px / 30px 30px 46px 46px; border: 4px solid #6b0f1a; color: #fff;
+  background: radial-gradient(circle at 32% 24%, #ff8296, #e8364f 48%, #a51b30);
+  box-shadow: inset -12px -14px 0 rgba(0,0,0,0.14), 0 16px 24px rgba(165,27,48,0.3);
+}
+.va-bag__band { position: absolute; left: -4px; right: -4px; height: 13px; background: #3c2a21; border-radius: 3px; }
+.va-bag__band--top { top: 24px; }
+.va-bag__band--bot { bottom: 30px; }
+.va-bag strong { font-size: 2.3rem; font-weight: 900; letter-spacing: 0.04em; line-height: 1; text-shadow: 0 3px 0 #6b0f1a; }
+.va-bag small { font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
+.va-bag:active .va-bag__body { filter: brightness(0.95); }
+
+.va-glove { position: absolute; top: 132px; width: 128px; pointer-events: none; animation: 3.2s ease-in-out infinite; }
+.va-glove svg { display: block; width: 100%; filter: drop-shadow(0 6px 0 rgba(0,0,0,0.14)); }
+.va-glove--l { left: -14px; animation-name: va-jab-l; }
+.va-glove--r { right: -14px; animation-name: va-jab-r; }
+.va-glove--r svg { transform: scaleX(-1); }
+.va-glove__food { position: absolute; top: 22px; font-size: 1.9rem; line-height: 1; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.2)); }
+.va-glove--l .va-glove__food { left: 64px; }
+.va-glove--r .va-glove__food { right: 64px; }
+@keyframes va-jab-l { 0%, 12% { transform: none; } 18% { transform: translateX(30px) rotate(-5deg) scale(1.05); } 27%, 100% { transform: none; } }
+@keyframes va-jab-r { 0%, 57% { transform: none; } 63% { transform: translateX(-30px) rotate(5deg) scale(1.05); } 72%, 100% { transform: none; } }
+@keyframes va-sway {
+  0%, 16% { transform: rotate(0); } 22% { transform: rotate(-9deg); } 30% { transform: rotate(5deg); } 38% { transform: rotate(-2deg); } 45%, 61% { transform: rotate(0); }
+  67% { transform: rotate(9deg); } 75% { transform: rotate(-5deg); } 83% { transform: rotate(2deg); } 90%, 100% { transform: rotate(0); }
+}
+.is-ko .va-glove--l { animation: va-ko-l 0.6s var(--va-bounce) forwards; }
+.is-ko .va-glove--r { animation: va-ko-r 0.6s var(--va-bounce) forwards; }
+.is-ko .va-bag { animation: va-shake 0.6s ease-out; }
+@keyframes va-ko-l { 0% { transform: none; } 35% { transform: translateX(40px) rotate(-8deg) scale(1.12); } 100% { transform: translateX(-30px); } }
+@keyframes va-ko-r { 0% { transform: none; } 35% { transform: translateX(-40px) rotate(8deg) scale(1.12); } 100% { transform: translateX(30px); } }
+@keyframes va-shake { 0% { transform: none; } 20% { transform: rotate(4deg) scale(1.06, 0.94); } 40% { transform: rotate(-4deg); } 60% { transform: rotate(3deg); } 80% { transform: rotate(-1deg); } 100% { transform: none; } }
+.va-pow {
+  position: absolute; left: 50%; top: 92px; margin-left: -70px; width: 140px; text-align: center; pointer-events: none; opacity: 0;
+  font-size: 2.6rem; font-weight: 900; font-style: italic; color: #ffd400; letter-spacing: 0.02em;
+  -webkit-text-stroke: 2px #3c2a21; text-shadow: 0 4px 0 #3c2a21;
+}
+.is-ko .va-pow { animation: va-powpop 0.6s var(--va-bounce) forwards; }
+@keyframes va-powpop { 0% { opacity: 0; transform: scale(0) rotate(-25deg); } 50% { opacity: 1; transform: scale(1.35) rotate(-8deg); } 100% { opacity: 1; transform: scale(1) rotate(-8deg); } }
+.va-ring__cap { margin: 0 auto 0.4rem; max-width: 22rem; font-size: 0.95rem; font-weight: 700; color: var(--va-muted); }
+.va-ring__cap strong { color: var(--va-red); font-weight: 900; }
+
+/* Dolly, the coach: her face and a speech bubble, or her real photo with a caption. */
+.va-dolly { display: flex; align-items: flex-end; gap: 0.6rem; text-align: left; margin: 0.5rem 0 1rem; }
+.va-dolly img { flex-shrink: 0; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 3px 0 var(--va-line-d); }
+.va-dolly__bubble {
+  margin: 0; padding: 0.7rem 0.95rem; border-radius: 18px 18px 18px 4px; background: var(--va-surface); border: 2px solid var(--va-line-d);
+  box-shadow: 0 3px 0 var(--va-line-d); font-size: 0.96rem; line-height: 1.45; font-weight: 700; animation: va-in 0.45s var(--va-bounce);
+}
+.va-dolly--sm .va-dolly__bubble { font-size: 0.88rem; }
+.va-dolly-photo {
+  margin: 0.4rem auto 1rem; max-width: 17rem; overflow: hidden; text-align: left; border-radius: 24px;
+  background: var(--va-surface); border: 2px solid var(--va-line); box-shadow: 0 5px 0 var(--va-line); animation: va-boing 0.7s var(--va-bounce);
+}
+.va-dolly-photo img { display: block; width: 100%; aspect-ratio: 8 / 9; object-fit: cover; }
+.va-dolly-photo figcaption { padding: 0.75rem 0.95rem 0.85rem; font-size: 0.95rem; line-height: 1.45; font-weight: 700; color: var(--va-ink); }
+.va-dolly-photo figcaption strong { display: block; font-size: 0.74rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.09em; color: var(--va-gold); }
+.va-dolly-photo--sm { max-width: 12rem; }
+.va-dolly-photo--sm img { aspect-ratio: 1; }
+
 /* Progress bars: thick, rounded, with the glossy stripe on top. */
 .va-bar { display: block; height: 16px; border-radius: 999px; background: var(--va-soft); overflow: hidden; }
 .va-bar i, .va-progress i {
