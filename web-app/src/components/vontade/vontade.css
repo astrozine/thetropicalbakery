@@ -541,15 +541,83 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
   .va-shell *, .va-shell *::before, .va-shell *::after { animation: none !important; transition: none !important; }
 }
 
-/* ---------------------------------------------------------------- tablet and desktop */
-@media (min-width: 760px) {
-  .va-shell { background: radial-gradient(70% 50% at 20% 0%, #fff0c8 0%, transparent 60%), radial-gradient(60% 50% at 90% 100%, #e3f6ea 0%, transparent 60%), var(--va-bg); }
-  .va-top { padding-inline: max(16px, calc((100% - 32rem) / 2 + 16px)); }
-  .va-tabs { width: min(32rem, calc(100% - 32px)); margin: 0 auto 14px; border: 2px solid var(--va-line); border-radius: 24px; box-shadow: 0 4px 0 var(--va-line); }
-  .va-screen { padding-top: 2rem; }
+/* ---------------------------------------------------------------- tablet and desktop
+ * Not the phone stretched: the layout of the big habit apps on the web.
+ *   900px+   left sidebar (brand + big nav) and the main column; the top bar keeps only the stats.
+ *   1200px+  a right rail with the day at a glance (stats, G-BOMBS, week, Tropical+), so the home's own copies hide.
+ * The home becomes a two-column hero (Dolly talking | the punching bag, bigger), and the sign-up sheet becomes a
+ * centered dialog with Dolly's photo beside it. */
+.va-tabs__brand, .va-rail, .va-sheet__photo { display: none; }
+
+@media (min-width: 900px) {
+  .va-shell {
+    display: grid; grid-template-columns: 252px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: 'nav top' 'nav main';
+    background: radial-gradient(60% 50% at 30% 0%, #fff0c8 0%, transparent 60%), radial-gradient(50% 50% at 100% 100%, #e3f6ea 0%, transparent 60%), var(--va-bg);
+  }
+  .va-top { grid-area: top; justify-content: flex-end; padding: 0.8rem 32px; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .va-top .va-brand { display: none; }
+  .va-scroll { grid-area: main; }
+
+  .va-tabs {
+    grid-area: nav; display: flex; flex-direction: column; justify-content: flex-start; gap: 0.45rem;
+    padding: 1.4rem 14px; border-top: 0; border-right: 2px solid var(--va-line); background: var(--va-surface);
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+  }
+  .va-tabs__brand { display: flex; align-items: center; gap: 0.6rem; padding: 0.2rem 0.6rem 1.4rem; text-decoration: none; color: inherit; }
+  .va-tabs__brand img { width: 40px; height: 40px; object-fit: contain; }
+  .va-tabs__brand span { display: flex; flex-direction: column; line-height: 1.15; }
+  .va-tabs__brand strong { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.01em; }
+  .va-tabs__brand small { font-size: 0.75rem; font-weight: 700; color: var(--va-muted); }
+  .va-tabs button {
+    flex-direction: row; justify-content: flex-start; gap: 0.9rem; min-height: 58px; padding: 0 1rem;
+    font-size: 0.95rem; letter-spacing: 0.07em; text-transform: uppercase;
+  }
+  .va-tabs button:hover:not([aria-current]) { background: var(--va-soft); }
+  .va-tabs__icon { font-size: 1.75rem; }
+
+  .va-screen { max-width: 48rem; padding: 1.2rem 32px 3rem; }
+  .va-dock { margin-inline: -32px; padding-inline: 32px; margin-bottom: -3rem; }
+  .va-title { font-size: 2.6rem; }
+
+  .va-hero2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 1rem 2rem; text-align: left; }
+  .va-hero2__talk .va-title { font-size: 3.2rem; }
+  .va-hero2__bag { text-align: center; }
+  .va-hero2 .va-ring { zoom: 1.12; }
+
+  .va-grid { grid-template-columns: repeat(3, 1fr); }
   .va-lib, .va-guides { grid-template-columns: repeat(3, 1fr); }
-  .va-grid { grid-template-columns: repeat(2, 1fr); }
+  .va-rail__stats { display: flex; justify-content: space-between; }
+
+  /* The sign-up: a centered dialog, Dolly's photo on the left. */
+  .va-shell .va-sheet { justify-content: center; align-items: center; padding: 24px; }
+  .va-sheet .va-sheet__panel {
+    display: grid; grid-template-columns: 300px minmax(0, 1fr); max-width: 54rem; max-height: calc(100% - 48px);
+    padding: 0; border-radius: 28px; overflow: hidden; animation: va-dialog 0.45s var(--va-bounce);
+  }
+  .va-sheet .va-sheet__grip { display: none; }
+  .va-sheet .va-sheet__photo { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .va-sheet__body { padding: 1.6rem 1.8rem 1.4rem; overflow-y: auto; }
 }
+@keyframes va-dialog { from { opacity: 0; transform: translateY(24px) scale(0.96); } to { opacity: 1; transform: none; } }
+
+@media (min-width: 1200px) {
+  .va-shell { grid-template-columns: 252px minmax(0, 1fr) 360px; grid-template-rows: minmax(0, 1fr); grid-template-areas: 'nav main rail'; }
+  .va-top { display: none; }
+  .va-narrow-only { display: none; }
+  .va-screen { padding-top: 2.2rem; }
+  .va-rail { grid-area: rail; display: flex; flex-direction: column; overflow-y: auto; padding: 1.4rem 28px 2rem 4px; }
+  .va-rail__stats { display: flex; justify-content: space-between; padding: 0.2rem 0.2rem 0.2rem; }
+  .va-rail__stats .va-stat { font-size: 1.05rem; }
+  .va-rail__plus, .va-rail__invite { display: flex; flex-direction: column; gap: 0.55rem; text-align: left; }
+  .va-rail__plus img, .va-rail__invite img { width: 100%; aspect-ratio: 16 / 11; object-fit: cover; object-position: 50% 30%; border-radius: 14px; }
+  .va-rail__plus strong, .va-rail__invite > strong { font-size: 1.02rem; font-weight: 900; }
+  .va-rail__plus small { display: block; font-size: 0.86rem; color: var(--va-muted); font-weight: 600; margin-top: 0.15rem; }
+  .va-rail__invite .va-perks { margin: 0.2rem 0 0.4rem; gap: 0.55rem; }
+  .va-rail__invite .va-perks li { font-size: 0.9rem; }
+  .va-rail .va-rules { margin-top: 1rem; }
+}
+
 
 /* ---------------------------------------------------------------- dark */
 @media (prefers-color-scheme: dark) {
@@ -561,7 +629,7 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
   .va-chip[aria-pressed='true'], .va-chip[aria-selected='true'], .va-tabs button[aria-current] { background: #0f3347; border-color: #1cb0f6; color: #8fdcff; }
   .va-blur { text-shadow: 0 0 8px rgba(245,236,224,0.45); }
   .va-card--light { background: #fffaf0; color: #3c2a21; border-color: #ede4d3; }
-  @media (min-width: 760px) {
+  @media (min-width: 900px) {
     .va-shell { background: radial-gradient(70% 50% at 20% 0%, #2b2110 0%, transparent 60%), radial-gradient(60% 50% at 90% 100%, #10291a 0%, transparent 60%), var(--va-bg); }
   }
 }

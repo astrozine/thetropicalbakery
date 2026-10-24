@@ -254,6 +254,22 @@ export default function VontadeApp() {
   const days = streak(store.wins);
   const weekWins = week.reduce((n, d) => n + d.count, 0);
   const g = craving ? GUIDES[craving] : null;
+  const gbCard = <GbombsCard ticked={ticked} onToggle={toggleGb} />;
+  const weekCard = (
+    <div className="va-card va-week">
+      <div className="va-week__head">
+        <span><IconTile size={30}>🔥</IconTile> {days > 0 ? `${days} ${days === 1 ? 'dia' : 'dias'} seguidos` : 'Comece sua sequência hoje'}</span>
+        <strong>{weekWins} {weekWins === 1 ? 'vitória' : 'vitórias'} na semana</strong>
+      </div>
+      <ol className="va-dots">
+        {week.map(d => (
+          <li key={d.iso} data-on={d.count > 0 || undefined} data-today={d.iso === today || undefined}>
+            <span>{d.count > 0 ? '✓' : ''}</span><small>{d.label}</small>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
   const cv = craving ? cravingOf(craving) : null;
   const firstName = String(user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? '').trim().split(' ')[0];
 
@@ -286,28 +302,21 @@ export default function VontadeApp() {
           <section className="va-screen" key={step}>
             {step === 'home' && (
               <div className="va-home">
-                <p className="va-kicker">{greeting()} 🌴</p>
-                <h1 className="va-title">Bateu vontade?</h1>
-                <DollyChat lines={homeLines(days, ticked.length, store.wins.length, firstName)} />
-                <PunchBag onHit={() => setStep('craving')} />
-                <p className="va-ring__cap">Quando a vontade bate, bate forte. <strong>Toque no saco e revide!</strong></p>
-
-                <GbombsCard ticked={ticked} onToggle={toggleGb} />
-                <Insight store={store} onGuide={c => { buzz(); setGuide(c); scrollTop(); }} />
-
-                <div className="va-card va-week">
-                  <div className="va-week__head">
-                    <span><IconTile size={30}>🔥</IconTile> {days > 0 ? `${days} ${days === 1 ? 'dia' : 'dias'} seguidos` : 'Comece sua sequência hoje'}</span>
-                    <strong>{weekWins} {weekWins === 1 ? 'vitória' : 'vitórias'} na semana</strong>
+                <div className="va-hero2">
+                  <div className="va-hero2__talk">
+                    <p className="va-kicker">{greeting()} 🌴</p>
+                    <h1 className="va-title">Bateu vontade?</h1>
+                    <DollyChat lines={homeLines(days, ticked.length, store.wins.length, firstName)} />
                   </div>
-                  <ol className="va-dots">
-                    {week.map(d => (
-                      <li key={d.iso} data-on={d.count > 0 || undefined} data-today={d.iso === today || undefined}>
-                        <span>{d.count > 0 ? '✓' : ''}</span><small>{d.label}</small>
-                      </li>
-                    ))}
-                  </ol>
+                  <div className="va-hero2__bag">
+                    <PunchBag onHit={() => setStep('craving')} />
+                    <p className="va-ring__cap">Quando a vontade bate, bate forte. <strong>Toque no saco e revide!</strong></p>
+                  </div>
                 </div>
+
+                <div className="va-narrow-only">{gbCard}</div>
+                <Insight store={store} onGuide={c => { buzz(); setGuide(c); scrollTop(); }} />
+                <div className="va-narrow-only">{weekCard}</div>
                 <InstallHint />
                 <Guidelines />
               </div>
@@ -459,6 +468,7 @@ export default function VontadeApp() {
       </div>
 
       <nav className="va-tabs" aria-label="App">
+        <SideBrand />
         {([
           ['hoje', '🏠', 'Hoje'],
           ['vontades', '🧭', 'Vontades'],
@@ -470,6 +480,25 @@ export default function VontadeApp() {
           </button>
         ))}
       </nav>
+
+      {/* Desktop only: the day at a glance, like the right column of the big habit apps. */}
+      <aside className="va-rail" aria-label="O seu dia">
+        <div className="va-rail__stats">
+          <span className="va-stat" data-on={days > 0 || undefined}><span aria-hidden>🔥</span>{days}</span>
+          <span className="va-stat va-stat--green" data-on={ticked.length > 0 || undefined}><span aria-hidden>🥬</span>{ticked.length}/6</span>
+          <span className="va-stat" data-on={store.wins.length > 0 || undefined}><span aria-hidden>🏆</span>{store.wins.length}</span>
+          {access.plus && <span className="va-stat va-stat--plus"><span aria-hidden>🌴</span>+</span>}
+        </div>
+        {gbCard}
+        {weekCard}
+        {!access.plus && (
+          <button className="va-card va-rail__plus" onClick={() => go('plus')}>
+            <img src="/vontade/dolly-spatula.webp" alt="" loading="lazy" />
+            <span><strong>Vencer de vez, com o plano completo</strong><small>Todos os planos e receitas. {formatPrice(APP_PLUS.brl)}, uma vez só.</small></span>
+          </button>
+        )}
+        <Guidelines />
+      </aside>
     </div>
   );
 }
@@ -505,15 +534,22 @@ function GuestApp() {
       </header>
       <div className="va-scroll">
         <section className="va-screen va-home">
-          <p className="va-kicker">{greeting()} 🌴</p>
-          <h1 className="va-title">Bateu vontade?</h1>
-          <DollyChat lines={['Oi! Eu sou a Dolly 👋', 'Doce, sal, fritura, queijo, refri: toda vontade tem uma troca feita de planta.', 'Tá com raiva da vontade? Bate no saco. 🥊']} />
-          <PunchBag faded onHit={() => open('hit')} />
-          <p className="va-ring__cap">Quando a vontade bate, bate forte. <strong>Toque no saco e revide!</strong></p>
-          <ul className="va-perks va-guest__perks">{free.map(p => <li key={p.text}><IconTile size={40}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
+          <div className="va-hero2">
+            <div className="va-hero2__talk">
+              <p className="va-kicker">{greeting()} 🌴</p>
+              <h1 className="va-title">Bateu vontade?</h1>
+              <DollyChat lines={['Oi! Eu sou a Dolly 👋', 'Doce, sal, fritura, queijo, refri: toda vontade tem uma troca feita de planta.', 'Tá com raiva da vontade? Bate no saco. 🥊']} />
+            </div>
+            <div className="va-hero2__bag">
+              <PunchBag faded onHit={() => open('hit')} />
+              <p className="va-ring__cap">Quando a vontade bate, bate forte. <strong>Toque no saco e revide!</strong></p>
+            </div>
+          </div>
+          <ul className="va-perks va-guest__perks va-narrow-only">{free.map(p => <li key={p.text}><IconTile size={40}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
         </section>
       </div>
       <nav className="va-tabs" aria-label="App">
+        <SideBrand />
         {([['🏠', 'Hoje'], ['🧭', 'Vontades'], ['📖', 'Receitas'], ['🌴', 'Tropical+']] as const).map(([emoji, label], i) => (
           <button key={label} aria-current={i === 0 || undefined} onClick={() => (i === 0 ? null : open('tab'))}>
             <span className="va-tabs__icon" aria-hidden>{emoji}</span>{label}
@@ -521,11 +557,22 @@ function GuestApp() {
         ))}
       </nav>
 
+      <aside className="va-rail" aria-label="Crie a sua conta">
+        <div className="va-card va-rail__invite">
+          <img src="/vontade/dolly-offer.webp" alt="Dolly oferecendo docinhos no jardim" loading="lazy" />
+          <strong>Tudo grátis, com a sua conta</strong>
+          <ul className="va-perks">{free.map(p => <li key={p.text}><IconTile size={36}>{p.emoji}</IconTile><span>{p.text}</span></li>)}</ul>
+          <button className="va-btn" onClick={() => open('tab')}>Criar conta grátis</button>
+        </div>
+      </aside>
+
       {sheet && (
         <div className="va-sheet" role="dialog" aria-modal="true" aria-label="Crie a sua conta grátis">
           <button className="va-sheet__backdrop" aria-label="Fechar" onClick={() => setSheet('')} />
           <div className="va-sheet__panel">
             <span className="va-sheet__grip" aria-hidden />
+            <img className="va-sheet__photo" src="/vontade/dolly-tray.webp" alt="Dolly oferecendo docinhos no jardim" />
+            <div className="va-sheet__body">
             <DollyChat key={sheet} lines={sheet === 'hit'
               ? ['Essa doeu, hein? 😅', 'Agora deixa comigo: eu te mostro a troca certa em 3 toques.', 'Só crie a sua conta grátis antes, pra eu guardar as suas vitórias. Leva 10 segundos.']
               : ['Opa! Isso fica dentro da sua conta. 🙂', 'Crie a sua conta grátis e é tudo seu: as trocas, os guias e o seu plano de presente.']} />
@@ -533,10 +580,21 @@ function GuestApp() {
               <LoginPanel message="Crie a sua conta grátis" subMessage="Com Google ou Facebook é um toque. Ou receba um link no e-mail." />
             </div>
             <p className="va-fine va-center">Sem cartão, sem cobrança. Seus dados ficam só com a gente.</p>
+            </div>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+/** The brand at the top of the desktop sidebar (on phones the top bar carries it). */
+function SideBrand() {
+  return (
+    <Link href="/" className="va-tabs__brand" aria-label="The Tropical Bakery: voltar ao site">
+      <img src="/hero-logo-transparent.png" alt="" width={40} height={40} />
+      <span><strong>Bateu Vontade?</strong><small>by The Tropical Bakery</small></span>
+    </Link>
   );
 }
 
