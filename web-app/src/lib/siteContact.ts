@@ -10,6 +10,9 @@ export const DOLLY_INSTAGRAM_URL = 'https://www.instagram.com/dollybingbing/';
 export const FAMILY_INSTAGRAM_HANDLE = '@thefamilyofthefuture';
 export const FAMILY_INSTAGRAM_URL = 'https://www.instagram.com/thefamilyofthefuture/';
 
+/** Dolly's free 30-minute Food Healing call (the same link the e-book uses). */
+export const DOLLY_CALENDLY_URL = 'https://calendly.com/elisabeth-vandam/30min';
+
 /** Dolly's Substack, "Sunbaked Letters" (written in English). */
 export const SUBSTACK_URL = 'https://substack.com/@thetropicalbakery?r=5uip7u';
 

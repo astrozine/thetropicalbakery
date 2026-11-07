@@ -184,6 +184,8 @@ export default function Navigation() {
     // not a bare icon in the bar that takes people off the site before they have seen it.
     { id: 'dolly', name: 'Chef Dolly', links: [
       { name: 'Conheça a Dolly', path: '/dolly', icon: '👩‍🍳' },
+      // Her food coaching (the Food Healing Studio), with the free 30-minute call.
+      { name: 'Food Coaching', path: '/coaching', icon: '🌱', highlight: true, sub: 'The Daily Tropical Reset' },
       { name: 'Instagram', path: STORE_INSTAGRAM_URL, sub: INSTAGRAM_HANDLE, external: true },
       { name: 'Instagram da Dolly', path: DOLLY_INSTAGRAM_URL, sub: DOLLY_INSTAGRAM_HANDLE, external: true },
       { name: 'The Family of the Future', path: FAMILY_INSTAGRAM_URL, sub: FAMILY_INSTAGRAM_HANDLE, external: true },
