@@ -96,36 +96,59 @@ function BookCall({ label, className, where }: { label: string; className?: stri
 export default function CoachingLanding() {
   return (
     <main className="fc">
-      {/* ── HERO: her treats floating over the Mata Atlântica, like /retreats ── */}
+      {/* ── HERO: Dolly up front, the people she cooks for around her, over the Mata Atlântica ── */}
       <section className="fc-hero">
         <div className="fc-hero__bg" />
-        <div className="fc-hero__photos" aria-hidden>
-          <img className="fc-ph fc-ph--a" src="/coaching/treat-raspberry.webp" alt="" />
-          <img className="fc-ph fc-ph--b" src="/coaching/pantry-sweet.webp" alt="" />
-          <img className="fc-ph fc-ph--c" src="/coaching/treat-golden.webp" alt="" />
-          <img className="fc-ph fc-ph--d" src="/coaching/treat-lime.webp" alt="" />
-        </div>
-        <div className="fc-hero__content">
-          <span className="fc-hero__kicker">Food Healing Studio · com a Food Coach Dolly</span>
-          <h1 className="fc-hero__title">The Daily<br />Tropical Reset</h1>
-          <p className="fc-hero__text">
-            Um Marie Kondo dos seus hábitos alimentares e da sua despensa. Porque comer bem começa pelo que entra em casa.
-          </p>
-          <BookCall label="Agendar minha conversa grátis" className="btn btn-secondary fc-hero__cta" where="topo" />
-          <p className="fc-hero__note">30 minutos · online · sem compromisso</p>
-          <span className="fc-hero__gift"><span aria-hidden>🎁</span> E-book Sweet Escape de presente</span>
+        <div className="fc-hero__inner">
+          <div className="fc-hero__stage">
+            <figure className="fc-hero__dolly">
+              <img src="/coaching/dolly-hero.webp" alt="Dolly com uma bandeja dos seus doces, no jardim em Itamambuca" />
+              <figcaption className="fc-hero__tag">
+                <b>Dolly Van Dam</b>
+                <span>Food Coach · Food Healing Studio</span>
+              </figcaption>
+            </figure>
+            <img className="fc-pol fc-pol--talk" src="/coaching/people-talk.webp" alt="Amigas rindo à mesa com doces e chá" />
+            <img className="fc-pol fc-pol--studio" src="/coaching/people-studio.webp" alt="Mulheres provando doces saudáveis depois da aula" />
+            <img className="fc-pol fc-pol--treat" src="/coaching/treat-raspberry.webp" alt="Bliss balls de frutas vermelhas" />
+          </div>
+          <div className="fc-hero__content">
+            <span className="fc-hero__kicker">Food Healing Studio · com a Food Coach Dolly</span>
+            <h1 className="fc-hero__title">The Daily<br />Tropical Reset</h1>
+            <p className="fc-hero__text">
+              Um Marie Kondo dos seus hábitos alimentares e da sua despensa. Porque comer bem começa pelo que entra em casa.
+            </p>
+            <div className="fc-hero__hi">
+              <img src="/coaching/dolly-face.webp" alt="" />
+              <p>“Oi, eu sou a Dolly. Vamos arrumar a sua relação com a comida juntas, um passo de cada vez.”</p>
+            </div>
+            <BookCall label="Agendar minha conversa grátis" className="btn btn-secondary fc-hero__cta" where="topo" />
+            <p className="fc-hero__note">30 minutos · online · sem compromisso</p>
+            <span className="fc-hero__gift"><span aria-hidden>🎁</span> E-book Sweet Escape de presente</span>
+          </div>
         </div>
       </section>
 
-      {/* ── The feeling: her own words from the e-book and the studio pages ── */}
+      {/* ── The feeling: her own words from the e-book, on photos of the women it is for ── */}
       <section className="fc-sec fc-feel">
         <ScrollReveal>
           <p className="fc-feel__lead">Talvez você esteja cansada de tanta neura com comida.</p>
-          <ul className="fc-feel__list">
-            <li>Você quer alimentar melhor a sua família.</li>
-            <li>Você quer saúde sem obsessão.</li>
-            <li>Você quer uma alimentação que traga equilíbrio, não sobrecarga.</li>
-          </ul>
+        </ScrollReveal>
+        <div className="fc-feel__grid">
+          {[
+            { img: '/coaching/people-table.webp', alt: 'Mulheres à mesa dividindo doces e frutas', text: 'Você quer alimentar melhor a sua família.' },
+            { img: '/coaching/people-garden.webp', alt: 'Amigas num brunch no jardim', text: 'Você quer saúde sem obsessão.' },
+            { img: '/coaching/people-street.webp', alt: 'Amigas na calçada dividindo uma caixa de doces saudáveis', text: 'Você quer equilíbrio, não sobrecarga.' },
+          ].map((p, i) => (
+            <ScrollReveal key={p.text} delay={i * 0.08}>
+              <figure className="fc-feel__card">
+                <img src={p.img} alt={p.alt} loading="lazy" />
+                <figcaption>{p.text}</figcaption>
+              </figure>
+            </ScrollReveal>
+          ))}
+        </div>
+        <ScrollReveal>
           <h2 className="fc-feel__q">E se a comida finalmente parecesse <em>segura</em>?</h2>
           <p className="fc-feel__not">Não confusa. Não restritiva. Não algo que controla você.</p>
         </ScrollReveal>
@@ -253,7 +276,7 @@ export default function CoachingLanding() {
       </section>
 
       {/* ── The separate 2-week package ── */}
-      <section className="fc-sec fc-sos">
+      <section id="sos" className="fc-sec fc-sos">
         <ScrollReveal>
           <div className="fc-sos__card">
             <span className="fc-sos__badge">Pacote à parte · 14 dias</span>
@@ -281,7 +304,7 @@ export default function CoachingLanding() {
       <section className="fc-sec fc-dolly">
         <div className="fc-dolly__wrap">
           <ScrollReveal>
-            <img className="fc-dolly__photo" src="/dolly/dolly-portrait.jpg" alt="Dolly Van Dam" loading="lazy" />
+            <img className="fc-dolly__photo" src="/coaching/dolly-spatula.webp" alt="Dolly Van Dam com a espátula e uma bandeja de doces" loading="lazy" />
           </ScrollReveal>
           <ScrollReveal>
             <p className="fc-kicker" data-sign="👩‍🍳">Sua Food Coach</p>
@@ -300,7 +323,7 @@ export default function CoachingLanding() {
       </section>
 
       {/* ── Gifts + the way in ── */}
-      <section className="fc-final">
+      <section id="conversa" className="fc-final">
         <div className="fc-final__bg" />
         <ScrollReveal>
           <div className="fc-final__inner">
@@ -361,26 +384,38 @@ const CSS = `
 .fc-intro--light { color: rgba(253,250,243,0.85); }
 
 /* Hero */
-.fc-hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #16201a; }
-.fc-hero__bg { position: absolute; inset: 0; background: url("/dolly/hero-mata.webp") center / cover; filter: brightness(0.4) saturate(1.1); transform: scale(1.05); }
-.fc-hero__photos { position: absolute; inset: 0; pointer-events: none; }
-.fc-ph { position: absolute; object-fit: cover; border-radius: 18px; box-shadow: 0 26px 50px rgba(0,0,0,0.55); border: 5px solid #fdfaf3; }
-.fc-ph--a { top: 13%; left: 7%; width: clamp(150px, 19vw, 270px); aspect-ratio: 3 / 4; transform: rotate(-7deg); }
-.fc-ph--b { bottom: 10%; left: 13%; width: clamp(110px, 12vw, 170px); aspect-ratio: 9 / 16; transform: rotate(6deg); }
-.fc-ph--c { top: 14%; right: 8%; width: clamp(150px, 18vw, 260px); aspect-ratio: 3 / 4; transform: rotate(8deg); }
-.fc-ph--d { bottom: 9%; right: 14%; width: clamp(110px, 12vw, 170px); aspect-ratio: 9 / 14; transform: rotate(-5deg); }
-.fc-hero__content { position: relative; z-index: 2; text-align: center; padding: 6rem 1.5rem 4rem; max-width: 720px; display: flex; flex-direction: column; align-items: center; }
+.fc-hero { position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; background: #16201a; }
+.fc-hero__bg { position: absolute; inset: 0; background: url("/dolly/hero-mata.webp") center / cover; filter: brightness(0.38) saturate(1.1); transform: scale(1.05); }
+.fc-hero__inner { position: relative; z-index: 2; width: 100%; max-width: 1240px; margin: 0 auto; padding: 7rem 2rem 4.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+/* Dolly in an arched frame, with the people she cooks for pinned around her like photos on a fridge. */
+.fc-hero__stage { position: relative; width: min(100%, 470px); justify-self: center; padding: 2.5rem 3.5rem 3.5rem; }
+.fc-hero__dolly { position: relative; margin: 0; z-index: 2; }
+.fc-hero__dolly img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: center 20%; border-radius: 999px 999px 26px 26px; border: 6px solid #fdfaf3; box-shadow: 0 34px 70px rgba(0,0,0,0.55); }
+.fc-hero__tag { position: absolute; left: 50%; bottom: -1.4rem; transform: translateX(-50%) rotate(-2deg); background: #fdfaf3; border: 1px solid rgba(212,175,55,0.7); border-radius: 14px; padding: 0.6rem 1.2rem; text-align: center; white-space: nowrap; box-shadow: 0 14px 30px rgba(0,0,0,0.4); }
+.fc-hero__tag b { display: block; font-family: var(--font-heading); color: #3c2a21; font-size: 1rem; }
+.fc-hero__tag span { font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase; color: #b8921f; font-weight: 700; }
+.fc-pol { position: absolute; z-index: 3; object-fit: cover; border: 5px solid #fdfaf3; border-radius: 16px; box-shadow: 0 22px 44px rgba(0,0,0,0.5); }
+.fc-pol--talk { top: 0; left: -1rem; width: 40%; aspect-ratio: 1; transform: rotate(-8deg); }
+.fc-pol--studio { bottom: 3.5rem; right: -1.5rem; width: 38%; aspect-ratio: 4 / 5; transform: rotate(7deg); }
+.fc-pol--treat { top: 1.5rem; right: 0; width: 25%; aspect-ratio: 1; border-radius: 50%; transform: rotate(6deg); }
+.fc-hero__content { text-align: left; display: flex; flex-direction: column; align-items: flex-start; }
+.fc-hero__hi { display: flex; gap: 0.8rem; align-items: center; background: rgba(253,250,243,0.1); border: 1px solid rgba(212,175,55,0.35); border-radius: 18px; padding: 0.7rem 1rem 0.7rem 0.7rem; margin: 0 0 1.6rem; max-width: 500px; backdrop-filter: blur(4px); }
+.fc-hero__hi img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid #d4af37; flex-shrink: 0; }
+.fc-hero__hi p { margin: 0; color: #fdfaf3; font-style: italic; font-size: 0.95rem; line-height: 1.5; }
 .fc-hero__kicker { color: #d4af37; letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; font-weight: 700; padding-bottom: 0.55rem; border-bottom: 1px solid rgba(212,175,55,0.45); margin-bottom: 1.4rem; }
 .fc-hero__title { font-family: var(--font-heading); color: #fff; font-size: clamp(2.2rem, 7vw, 5.2rem); line-height: 1.08; margin: 0 0 1.3rem; text-shadow: 0 4px 30px rgba(0,0,0,0.5); }
-.fc-hero__text { color: rgba(255,255,255,0.88); font-size: clamp(1.02rem, 2.3vw, 1.3rem); line-height: 1.75; font-weight: 300; max-width: 560px; margin: 0 0 2.2rem; }
+.fc-hero__text { color: rgba(255,255,255,0.88); font-size: clamp(1.02rem, 2vw, 1.25rem); line-height: 1.75; font-weight: 300; max-width: 540px; margin: 0 0 1.6rem; }
 .fc-hero__cta { padding: 1rem 2.4rem; font-size: 1.05rem; letter-spacing: 1px; }
 .fc-hero__note { color: rgba(255,255,255,0.7); font-size: 0.85rem; margin: 0.8rem 0 1.2rem; }
 .fc-hero__gift { display: inline-flex; gap: 0.5rem; align-items: center; background: rgba(253,250,243,0.96); color: #3c2a21; border: 1px solid rgba(212,175,55,0.7); border-radius: 999px; padding: 0.5rem 1.1rem; font-size: 0.88rem; font-weight: 600; box-shadow: 0 10px 24px rgba(0,0,0,0.35); }
 
 /* The feeling */
-.fc-feel { text-align: center; max-width: 760px; }
-.fc-feel__lead { font-family: var(--font-heading); font-size: clamp(1.15rem, 2.6vw, 1.6rem); color: #3c2a21; margin: 0 0 1.2rem; }
-.fc-feel__list { list-style: none; padding: 0; margin: 0 0 2.4rem; color: #594a42; line-height: 1.9; font-size: 1.05rem; }
+.fc-feel { text-align: center; }
+.fc-feel__lead { font-family: var(--font-heading); font-size: clamp(1.15rem, 2.6vw, 1.6rem); color: #3c2a21; margin: 0 0 2rem; }
+.fc-feel__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin: 0 0 3rem; }
+.fc-feel__card { position: relative; margin: 0; border-radius: 24px; overflow: hidden; box-shadow: 0 24px 50px -24px rgba(60,42,33,0.55); }
+.fc-feel__card img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.fc-feel__card figcaption { position: absolute; inset: auto 0 0 0; padding: 3.5rem 1.2rem 1.2rem; background: linear-gradient(to top, rgba(30,20,15,0.85), transparent); color: #fff; font-family: var(--font-heading); font-size: 1rem; line-height: 1.35; text-align: left; }
 .fc-feel__q { font-family: var(--font-heading); font-size: clamp(1.6rem, 4.4vw, 2.8rem); line-height: 1.2; color: #2e4432; margin: 0 0 1rem; }
 .fc-feel__q em { font-style: normal; color: #b8921f; }
 .fc-feel__not { color: #8a6a3c; font-style: italic; font-size: 1.1rem; margin: 0; }
@@ -479,15 +514,20 @@ const CSS = `
 
 /* Phones: the photos get their own little collage above the words, so nothing covers the text. */
 @media (max-width: 767px) {
-  .fc-hero { display: block; min-height: 0; padding: 5.5rem 0 3rem; }
-  .fc-hero__photos { position: relative; inset: auto; height: 230px; width: min(92%, 420px); margin: 0 auto 0.5rem; }
-  .fc-ph { border-width: 4px; border-radius: 14px; }
-  .fc-ph--a { top: 0; left: 4%; width: 38%; }
-  .fc-ph--c { top: 10px; right: 4%; left: auto; width: 38%; }
-  .fc-ph--b { bottom: 0; left: 36%; width: 25%; z-index: 2; }
-  .fc-ph--d { display: none; }
-  .fc-hero__content { padding: 1rem 1.25rem 0; }
+  .fc-hero { display: block; min-height: 0; }
+  .fc-hero__inner { grid-template-columns: 1fr; gap: 2.2rem; padding: 6rem 1.25rem 3rem; }
+  .fc-hero__stage { width: min(100%, 360px); padding: 1.5rem 2.6rem 2.4rem; }
+  .fc-pol { border-width: 4px; border-radius: 12px; }
+  .fc-pol--talk { left: -0.25rem; }
+  .fc-pol--studio { right: -0.5rem; bottom: 2.6rem; }
+  .fc-hero__tag { padding: 0.5rem 1rem; }
+  .fc-hero__tag b { font-size: 0.9rem; }
+  .fc-hero__tag span { font-size: 0.62rem; letter-spacing: 1px; }
+  .fc-hero__content { text-align: center; align-items: center; }
+  .fc-hero__hi { text-align: left; }
   .fc-hero__kicker { font-size: 0.7rem; letter-spacing: 2px; }
+  .fc-feel__grid { grid-template-columns: 1fr; gap: 1rem; max-width: 380px; margin-left: auto; margin-right: auto; }
+  .fc-feel__card img { aspect-ratio: 4 / 3; }
   .fc-hero__cta { width: 100%; max-width: 340px; padding: 1rem 1.2rem; }
   .fc-pantry__grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
   .fc-block figcaption { padding: 0.85rem 0.8rem 1rem; }

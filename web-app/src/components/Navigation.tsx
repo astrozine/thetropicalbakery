@@ -171,6 +171,12 @@ export default function Navigation() {
       { name: 'Planejar meu Retiro', path: '/retreats#pacote', icon: '✈️', feature: true, sub: 'hospedagem + cursos, num só pacote' },
       ...cursosLinks,
     ] },
+    // Dolly's food coaching (her Food Healing Studio): its own place in the bar, the free call one tap away.
+    { id: 'coaching', name: 'Coaching', links: [
+      { name: 'The Daily Tropical Reset', path: '/coaching', icon: '🌱', highlight: true, brand: true, sub: 'food coaching com a Dolly' },
+      { name: 'Reset SOS em 2 semanas', path: '/coaching#sos', icon: '💧', sub: 'sem sal e sem óleo' },
+      { name: 'Conversa grátis de 30 min', path: '/coaching#conversa', icon: '☎️' },
+    ] },
     // Apps: their own little shelf (fun, helpful tools for eating well), not a side door of the book. Room for more.
     { id: 'apps', name: 'Apps', intro: APPS_COPY.intro, links: [
       { name: 'Bateu Vontade?', path: '/vontade', icon: '🥊', brand: true, sub: APPS_COPY.vontade.pt, subByLang: APPS_COPY.vontade },
@@ -184,15 +190,13 @@ export default function Navigation() {
     // not a bare icon in the bar that takes people off the site before they have seen it.
     { id: 'dolly', name: 'Chef Dolly', links: [
       { name: 'Conheça a Dolly', path: '/dolly', icon: '👩‍🍳' },
-      // Her food coaching (the Food Healing Studio), with the free 30-minute call.
-      { name: 'Food Coaching', path: '/coaching', icon: '🌱', highlight: true, sub: 'The Daily Tropical Reset' },
       { name: 'Instagram', path: STORE_INSTAGRAM_URL, sub: INSTAGRAM_HANDLE, external: true },
       { name: 'Instagram da Dolly', path: DOLLY_INSTAGRAM_URL, sub: DOLLY_INSTAGRAM_HANDLE, external: true },
       { name: 'The Family of the Future', path: FAMILY_INSTAGRAM_URL, sub: FAMILY_INSTAGRAM_HANDLE, external: true },
     ] },
   ];
   const [openGroup, setOpenGroup] = useState<string | null>(null);
-  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true, apps: true, ebook: true });
+  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true, coaching: true, apps: true, ebook: true });
 
   // Which language the page is showing (Google Translate's cookie, or a hand-written English page), so the
   // hand-written menu lines match it. Google flips <html lang> when it translates, so watch that to re-read.
