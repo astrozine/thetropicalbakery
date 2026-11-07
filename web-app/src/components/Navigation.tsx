@@ -12,6 +12,7 @@ import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
 import { clearGoogleTranslate } from '@/lib/googleTranslate';
 import { FUNNEL } from '@/lib/funnel';
+import { COACHING_PATH, isCoachingLang } from '@/lib/coachingCopy';
 import IconTile from '@/components/IconTile';
 
 // Desktop menu (xl and up): one line at 1280px, roomier on bigger screens.
@@ -115,6 +116,17 @@ export default function Navigation() {
       if (!isEbookLang(langCode)) document.cookie = `googtrans=/en/${langCode}; path=/;`;
       const target = FUNNEL.pagePath[isEbookLang(langCode) ? langCode : 'en'];
       if (target === pathname && isEbookLang(langCode)) window.location.reload();
+      else window.location.href = target;
+      return;
+    }
+    // The coaching page is hand-written in Portuguese, English, Spanish and Dutch; other languages translate the
+    // English one, starting from Google's cookie so it opens already translated.
+    const coachingPages = Object.values(COACHING_PATH);
+    if (pathname && coachingPages.includes(pathname)) {
+      clearGoogleTranslate();
+      if (!isCoachingLang(langCode)) document.cookie = `googtrans=/en/${langCode}; path=/;`;
+      const target = COACHING_PATH[isCoachingLang(langCode) ? langCode : 'en'];
+      if (target === pathname) window.location.reload();
       else window.location.href = target;
       return;
     }

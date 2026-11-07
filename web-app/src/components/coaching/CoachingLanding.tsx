@@ -6,125 +6,107 @@ import ScrollReveal from '@/components/ScrollReveal';
 import IconTile from '@/components/IconTile';
 import WhatsAppGate from '@/components/WhatsAppGate';
 import { trackMeta } from '@/lib/metaPixel';
+import { clearGoogleTranslate } from '@/lib/googleTranslate';
 import { DOLLY_CALENDLY_URL, STORE_WHATSAPP } from '@/lib/siteContact';
+import { COACHING_COPY, COACHING_LANGS, COACHING_LANG_LABEL, COACHING_PATH, type CoachingLang } from '@/lib/coachingCopy';
 
 /*
  * The words come from Dolly herself: her Paradise Pantry guide (the six building blocks, where she shops, the
- * "Food Healing Studio" pages) and the Food Healing ad inside Sweet Escape. Prices are not on the page on purpose:
- * every plan is made to measure and Dolly gives the price on the free call.
+ * "Food Healing Studio" pages) and the Food Healing ad inside Sweet Escape, written by hand in four languages in
+ * src/lib/coachingCopy.ts. Prices are not on the page on purpose: every plan is made to measure and Dolly gives the
+ * price on the free call.
  */
 
-const WA_RESET = `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent('Olá, Dolly! Quero saber mais sobre o The Daily Tropical Reset.')}`;
-const WA_SOS = `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent('Olá, Dolly! Quero saber mais sobre o Reset SOS: sem sal e sem óleo em 2 semanas.')}`;
-
-/** Marie Kondo, for food: look at everything, thank and let go, give each thing its place. */
-const KONDO = [
-  { icon: '👀', title: 'Olhar tudo, sem julgamento', text: 'Sua rotina, seus horários, suas comidas favoritas, suas vontades e cada prateleira da despensa. Nada de culpa: a gente só olha.' },
-  { icon: '🙏', title: 'Agradecer e deixar ir', text: 'O que não te nutre sai de casa com carinho, e cada coisa que sai ganha uma troca gostosa. Você não perde nada: você troca.' },
-  { icon: '🫙', title: 'Dar um lugar a cada coisa', text: 'Potes de vidro, básicos sempre à mão e uma semana que se organiza sozinha. Fica só o que nutre e o que te faz feliz.' },
-];
-
-const STEPS = [
-  { icon: '☎️', title: 'Conversa grátis de 30 minutos', text: 'A gente se conhece, você me conta onde está e aonde quer chegar. Sem compromisso.' },
-  { icon: '🔍', title: 'Raio-X da sua rotina', text: 'Como você come hoje, seus pratos favoritos e as suas vontades. Para cada vontade, uma alternativa que você vai amar.' },
-  { icon: '🧺', title: 'Destralhe da despensa', text: 'O que fica, o que sai e o que entra no lugar. Sua despensa vira um lugar que te ajuda, não que te sabota.' },
-  { icon: '🛒', title: 'Compras sem confusão', text: 'Como montar a sua despensa saudável: o hortifruti primeiro, a cerealista depois, os rótulos que importam e a lista dos G-BOMBS.' },
-  { icon: '🗓️', title: 'Seu plano semanal completo', text: 'Cardápio da semana inteira, meal-prep de domingo e os básicos do dia a dia, para nunca ficar sem saber o que comer.' },
-  { icon: '👨‍👩‍👧', title: 'A família junto', text: 'Pratos que a casa toda come, crianças crescendo com uma energia calma em volta da comida e um ritmo que cabe na vida real.' },
-];
-
-const INCLUDES = [
-  'Análise da sua rotina, comidas favoritas e vontades',
-  'Alternativas saudáveis para cada vontade',
-  'Planos de refeição semanais completos',
-  'Como virar plant-based do jeito certo, sem deficiências',
-  'Comer nutritariano e SOS free: sem sal, sem óleo, sem açúcar refinado',
-  'Como fazer as compras e montar a despensa saudável',
-  'Os G-BOMBS todos os dias, sem pensar',
-  'Meal-prep e os básicos diários',
-  'Como levar tudo isso para a família e as refeições em casa',
-  'Passo a passo, no seu ritmo: sem sofrimento e sem tudo-ou-nada',
-];
-
-/** Dr. Joel Fuhrman's G-BOMBS: the foods that protect the most, every day. */
+const KONDO_ICONS = ['👀', '🙏', '🫙'];
+const STEP_ICONS = ['☎️', '🔍', '🧺', '🛒', '🗓️', '👨‍👩‍👧'];
+const FEEL_IMGS = ['/coaching/people-table.webp', '/coaching/people-garden.webp', '/coaching/people-street.webp'];
+/** Dr. Joel Fuhrman's G-BOMBS: the foods that protect the most, every day. The acronym stays in English everywhere. */
 const GBOMBS = [
-  { icon: '🥬', en: 'Greens', pt: 'Folhas verdes' },
-  { icon: '🫘', en: 'Beans', pt: 'Feijões e grãos' },
-  { icon: '🧅', en: 'Onions', pt: 'Cebola e alho' },
-  { icon: '🍄', en: 'Mushrooms', pt: 'Cogumelos' },
-  { icon: '🫐', en: 'Berries', pt: 'Frutas vermelhas' },
-  { icon: '🌰', en: 'Seeds', pt: 'Sementes e castanhas' },
+  { icon: '🥬', en: 'Greens' }, { icon: '🫘', en: 'Beans' }, { icon: '🧅', en: 'Onions' },
+  { icon: '🍄', en: 'Mushrooms' }, { icon: '🫐', en: 'Berries' }, { icon: '🌰', en: 'Seeds' },
 ];
-
 /** The six building blocks from Paradise Pantry, with the illustrations from the guide. */
-const PANTRY = [
-  { img: '/coaching/pantry-fats.webp', title: 'Gorduras boas e proteínas', text: 'Amêndoas, castanhas, chia, linhaça, cânhamo, coco, tofu.' },
-  { img: '/coaching/pantry-sweet.webp', title: 'Doçura natural', text: 'Tâmaras, figos secos, damascos, banana, manga, maçã.' },
-  { img: '/coaching/pantry-structure.webp', title: 'Base sem trigo', text: 'Aveia, farinha de amêndoas, de trigo-sarraceno, de coco.' },
-  { img: '/coaching/pantry-flavors.webp', title: 'Sabores e especiarias', text: 'Frutas frescas, cacau, baunilha, canela, cravo, gengibre.' },
-  { img: '/coaching/pantry-toppings.webp', title: 'Coberturas e texturas', text: 'Nibs de cacau, coco tostado, sementes, frutas liofilizadas.' },
-  { img: '/coaching/pantry-color.webp', title: 'Cor e vibe', text: 'Beterraba, cúrcuma, espirulina, matcha, açaí, mirtilo.' },
-];
+const PANTRY_IMGS = ['fats', 'sweet', 'structure', 'flavors', 'toppings', 'color'].map(n => `/coaching/pantry-${n}.webp`);
+const SHOP_ICONS = ['🥭', '🌾', '🫙'];
+const SOS_ICONS = ['💧', '🌿'];
+const GIFT_ICONS = ['☎️', '📖'];
 
-const SOS_WEEKS = [
-  { icon: '💧', title: 'Semana 1 · sem óleo', text: 'Refogar na água ou no caldo, assar sem untar, molhos cremosos de castanha e abacate. A gordura vem inteira, da planta.' },
-  { icon: '🌿', title: 'Semana 2 · sem sal', text: 'Ervas, limão, especiarias, alho e o umami dos cogumelos. Em poucas semanas o paladar acorda e a comida volta a ter gosto de comida.' },
-];
+const wa = (text: string) => `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(text)}`;
 
-const FAQ = [
-  { q: 'É online?', a: 'Sim. A conversa e os encontros são por vídeo, então dá para fazer de qualquer lugar. Quem está perto de Ubatuba pode combinar com a Dolly um encontro presencial.' },
-  { q: 'Preciso virar vegana de uma vez?', a: 'Não. O Reset é passo a passo, no seu ritmo, sem tudo-ou-nada. Você começa pelo que é mais fácil para você e a gente vai trocando o resto com calma.' },
-  { q: 'Funciona com marido e filhos que não querem mudar?', a: 'É exatamente por isso que existe a parte da família: pratos que todo mundo come, sem cozinhar duas vezes e sem briga na mesa.' },
-  { q: 'Quanto custa?', a: 'Cada plano é feito sob medida. Na conversa grátis de 30 minutos a Dolly entende o que você precisa e te mostra as opções e o valor, sem pressão.' },
-  { q: 'Substitui o meu médico ou nutricionista?', a: 'Não. O coaching é educação alimentar e mudança de hábitos. Se você tem uma condição de saúde ou toma remédios, continue com o seu médico e conte a ele sobre as mudanças.' },
-];
-
-function BookCall({ label, className, where }: { label: string; className?: string; where: string }) {
+function BookCall({ label, className, where, lang }: { label: string; className?: string; where: string; lang: CoachingLang }) {
   return (
     <a
       href={DOLLY_CALENDLY_URL}
       target="_blank"
       rel="noopener noreferrer"
       className={className}
-      onClick={() => trackMeta('Schedule', { content_name: `Coaching: conversa grátis (${where})` })}
+      onClick={() => trackMeta('Schedule', { content_name: `Coaching: conversa grátis (${where}, ${lang})` })}
     >
       {label}
     </a>
   );
 }
 
-export default function CoachingLanding() {
+/**
+ * PT · EN · ES · NL, each a hand-written page. Google Translate's cookie is cleared on the way, or it would go on
+ * "translating" the page someone just picked into whatever language they had chosen in the menu before.
+ */
+function LangSwitch({ lang, label, dark }: { lang: CoachingLang; label: string; dark?: boolean }) {
   return (
-    <main className="fc">
+    <nav className={`fc-lang${dark ? ' fc-lang--dark' : ''} notranslate`} translate="no" aria-label={label}>
+      <span className="fc-lang__globe" aria-hidden>🌐</span>
+      {COACHING_LANGS.map(l => (
+        <a
+          key={l}
+          href={COACHING_PATH[l]}
+          hrefLang={l}
+          lang={l}
+          title={COACHING_LANG_LABEL[l]}
+          aria-current={l === lang ? 'page' : undefined}
+          className={l === lang ? 'is-on' : undefined}
+          onClick={e => { e.preventDefault(); if (l === lang) return; clearGoogleTranslate(); window.location.href = COACHING_PATH[l]; }}
+        >
+          {l.toUpperCase()}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
+export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }) {
+  const t = COACHING_COPY[lang];
+  // The WhatsApp sign-up speaks Portuguese, English and Spanish; Dutch readers get English.
+  const gateLocale = lang === 'nl' ? 'en' : lang;
+  return (
+    <main className="fc" lang={lang}>
       {/* ── HERO: Dolly up front, the people she cooks for around her, over the Mata Atlântica ── */}
       <section className="fc-hero">
         <div className="fc-hero__bg" />
         <div className="fc-hero__inner">
           <div className="fc-hero__stage">
             <figure className="fc-hero__dolly">
-              <img src="/coaching/dolly-hero.webp" alt="Dolly com uma bandeja dos seus doces, no jardim em Itamambuca" />
+              <img src="/coaching/dolly-hero.webp" alt={t.hero.dollyAlt} />
               <figcaption className="fc-hero__tag">
                 <b>Dolly Van Dam</b>
-                <span>Food Coach · Food Healing Studio</span>
+                <span>{t.hero.tag}</span>
               </figcaption>
             </figure>
-            <img className="fc-pol fc-pol--talk" src="/coaching/people-talk.webp" alt="Amigas rindo à mesa com doces e chá" />
-            <img className="fc-pol fc-pol--studio" src="/coaching/people-studio.webp" alt="Mulheres provando doces saudáveis depois da aula" />
-            <img className="fc-pol fc-pol--treat" src="/coaching/treat-raspberry.webp" alt="Bliss balls de frutas vermelhas" />
+            <img className="fc-pol fc-pol--talk" src="/coaching/people-talk.webp" alt={t.hero.talkAlt} />
+            <img className="fc-pol fc-pol--studio" src="/coaching/people-studio.webp" alt={t.hero.studioAlt} />
+            <img className="fc-pol fc-pol--treat" src="/coaching/treat-raspberry.webp" alt={t.hero.treatAlt} />
           </div>
           <div className="fc-hero__content">
-            <span className="fc-hero__kicker">Food Healing Studio · com a Food Coach Dolly</span>
-            <h1 className="fc-hero__title">The Daily<br />Tropical Reset</h1>
-            <p className="fc-hero__text">
-              Um Marie Kondo dos seus hábitos alimentares e da sua despensa. Porque comer bem começa pelo que entra em casa.
-            </p>
+            <LangSwitch lang={lang} label={t.langLabel} dark />
+            <span className="fc-hero__kicker">{t.hero.kicker}</span>
+            <h1 className="fc-hero__title notranslate" translate="no">The Daily<br />Tropical Reset</h1>
+            <p className="fc-hero__text">{t.hero.text}</p>
             <div className="fc-hero__hi">
               <img src="/coaching/dolly-face.webp" alt="" />
-              <p>“Oi, eu sou a Dolly. Vamos arrumar a sua relação com a comida juntas, um passo de cada vez.”</p>
+              <p>{t.hero.hi}</p>
             </div>
-            <BookCall label="Agendar minha conversa grátis" className="btn btn-secondary fc-hero__cta" where="topo" />
-            <p className="fc-hero__note">30 minutos · online · sem compromisso</p>
-            <span className="fc-hero__gift"><span aria-hidden>🎁</span> E-book Sweet Escape de presente</span>
+            <BookCall label={t.hero.cta} className="btn btn-secondary fc-hero__cta" where="topo" lang={lang} />
+            <p className="fc-hero__note">{t.hero.note}</p>
+            <span className="fc-hero__gift"><span aria-hidden>🎁</span> {t.hero.gift}</span>
           </div>
         </div>
       </section>
@@ -132,43 +114,36 @@ export default function CoachingLanding() {
       {/* ── The feeling: her own words from the e-book, on photos of the women it is for ── */}
       <section className="fc-sec fc-feel">
         <ScrollReveal>
-          <p className="fc-feel__lead">Talvez você esteja cansada de tanta neura com comida.</p>
+          <p className="fc-feel__lead">{t.feel.lead}</p>
         </ScrollReveal>
         <div className="fc-feel__grid">
-          {[
-            { img: '/coaching/people-table.webp', alt: 'Mulheres à mesa dividindo doces e frutas', text: 'Você quer alimentar melhor a sua família.' },
-            { img: '/coaching/people-garden.webp', alt: 'Amigas num brunch no jardim', text: 'Você quer saúde sem obsessão.' },
-            { img: '/coaching/people-street.webp', alt: 'Amigas na calçada dividindo uma caixa de doces saudáveis', text: 'Você quer equilíbrio, não sobrecarga.' },
-          ].map((p, i) => (
+          {t.feel.cards.map((p, i) => (
             <ScrollReveal key={p.text} delay={i * 0.08}>
               <figure className="fc-feel__card">
-                <img src={p.img} alt={p.alt} loading="lazy" />
+                <img src={FEEL_IMGS[i]} alt={p.alt} loading="lazy" />
                 <figcaption>{p.text}</figcaption>
               </figure>
             </ScrollReveal>
           ))}
         </div>
         <ScrollReveal>
-          <h2 className="fc-feel__q">E se a comida finalmente parecesse <em>segura</em>?</h2>
-          <p className="fc-feel__not">Não confusa. Não restritiva. Não algo que controla você.</p>
+          <h2 className="fc-feel__q">{t.feel.q[0]}<em>{t.feel.q[1]}</em>{t.feel.q[2]}</h2>
+          <p className="fc-feel__not">{t.feel.not}</p>
         </ScrollReveal>
       </section>
 
       {/* ── Marie Kondo, for food ── */}
       <section className="fc-sec fc-kondo">
         <ScrollReveal>
-          <p className="fc-kicker" data-sign="✨">O método</p>
-          <h2 className="fc-h2">Fica só o que nutre e o que te faz feliz</h2>
-          <p className="fc-intro">
-            Comer bem começa no carrinho do mercado, não na força de vontade. Se não está em casa, você não come. Então a
-            gente arruma a sua vida alimentar como quem arruma um armário: com calma, com carinho e por categoria.
-          </p>
+          <p className="fc-kicker" data-sign="✨">{t.kondo.kicker}</p>
+          <h2 className="fc-h2">{t.kondo.title}</h2>
+          <p className="fc-intro">{t.kondo.intro}</p>
         </ScrollReveal>
         <div className="fc-kondo__grid">
-          {KONDO.map((k, i) => (
+          {t.kondo.items.map((k, i) => (
             <ScrollReveal key={k.title} delay={i * 0.08}>
               <div className="fc-card">
-                <IconTile size={52}>{k.icon}</IconTile>
+                <IconTile size={52}>{KONDO_ICONS[i]}</IconTile>
                 <h3>{k.title}</h3>
                 <p>{k.text}</p>
               </div>
@@ -180,16 +155,16 @@ export default function CoachingLanding() {
       {/* ── Step by step ── */}
       <section className="fc-sec fc-steps">
         <ScrollReveal>
-          <p className="fc-kicker" data-sign="🪜">Como funciona</p>
-          <h2 className="fc-h2">Passo a passo, sem sofrimento</h2>
+          <p className="fc-kicker" data-sign="🪜">{t.steps.kicker}</p>
+          <h2 className="fc-h2">{t.steps.title}</h2>
         </ScrollReveal>
         <ol className="fc-steps__list">
-          {STEPS.map((s, i) => (
+          {t.steps.items.map((s, i) => (
             <li key={s.title}>
               <ScrollReveal delay={i * 0.05}>
                 <div className="fc-step">
                   <span className="fc-step__n">{i + 1}</span>
-                  <IconTile size={46}>{s.icon}</IconTile>
+                  <IconTile size={46}>{STEP_ICONS[i]}</IconTile>
                   <div>
                     <h3>{s.title}</h3>
                     <p>{s.text}</p>
@@ -204,18 +179,15 @@ export default function CoachingLanding() {
       {/* ── Paradise Pantry: a real slice of her guide ── */}
       <section className="fc-sec fc-pantry">
         <ScrollReveal>
-          <p className="fc-kicker" data-sign="🧺">Paradise Pantry</p>
-          <h2 className="fc-h2">Eu compro ingredientes, não produtos</h2>
-          <p className="fc-intro">
-            Se cresce da terra, tem fibra e ainda parece com o que era, tem lugar no meu carrinho. Monte a sua despensa em
-            volta destes seis blocos e você nunca mais vai ficar perdida no mercado. Você simplesmente reconhece o que pertence.
-          </p>
+          <p className="fc-kicker" data-sign="🧺">{t.pantry.kicker}</p>
+          <h2 className="fc-h2">{t.pantry.title}</h2>
+          <p className="fc-intro">{t.pantry.intro}</p>
         </ScrollReveal>
         <div className="fc-pantry__grid">
-          {PANTRY.map((p, i) => (
+          {t.pantry.blocks.map((p, i) => (
             <ScrollReveal key={p.title} delay={(i % 3) * 0.06}>
               <figure className="fc-block">
-                <img src={p.img} alt={p.title} loading="lazy" />
+                <img src={PANTRY_IMGS[i]} alt={p.title} loading="lazy" />
                 <figcaption>
                   <span className="fc-block__n">{i + 1}</span>
                   <b>{p.title}</b>
@@ -227,31 +199,28 @@ export default function CoachingLanding() {
         </div>
         <ScrollReveal>
           <div className="fc-shop">
-            <div><IconTile size={42}>🥭</IconTile><p><b>1º o hortifruti.</b> Frutas da estação, folhas, legumes coloridos e ervas frescas. O fresco não é acompanhamento, é a base.</p></div>
-            <div><IconTile size={42}>🌾</IconTile><p><b>2º a cerealista.</b> A granel, na quantidade certa, com menos embalagem e mais qualidade.</p></div>
-            <div><IconTile size={42}>🫙</IconTile><p><b>Em casa, potes de vidro.</b> Uma despensa bonita, sem tóxicos, onde tudo fica à vista.</p></div>
+            {t.pantry.shop.map((s, i) => (
+              <div key={s.lead}><IconTile size={42}>{SHOP_ICONS[i]}</IconTile><p><b>{s.lead}</b> {s.text}</p></div>
+            ))}
           </div>
-          <p className="fc-pantry__more">O guia completo Paradise Pantry vem com o seu coaching.</p>
+          <p className="fc-pantry__more">{t.pantry.more}</p>
         </ScrollReveal>
       </section>
 
       {/* ── Nutritarian, SOS free, G-BOMBS ── */}
       <section className="fc-sec fc-gb">
         <ScrollReveal>
-          <p className="fc-kicker fc-kicker--light" data-sign="💚">Nutritariano e SOS free</p>
-          <h2 className="fc-h2 fc-h2--light">O máximo de nutrientes em cada garfada</h2>
-          <p className="fc-intro fc-intro--light">
-            Nutritariano é escolher os alimentos com mais vitaminas, minerais, fibras e antioxidantes por caloria. SOS free é
-            sem sal, sem óleo e sem açúcar refinado. E todo dia entram no prato os G-BOMBS, os alimentos que mais protegem:
-          </p>
+          <p className="fc-kicker fc-kicker--light" data-sign="💚">{t.gb.kicker}</p>
+          <h2 className="fc-h2 fc-h2--light">{t.gb.title}</h2>
+          <p className="fc-intro fc-intro--light">{t.gb.intro}</p>
         </ScrollReveal>
         <div className="fc-gb__grid">
           {GBOMBS.map((g, i) => (
             <ScrollReveal key={g.en} delay={i * 0.05}>
               <div className="fc-gb__item">
                 <IconTile size={56}>{g.icon}</IconTile>
-                <b><span className="fc-gb__letter">{g.en[0]}</span>{g.en.slice(1)}</b>
-                <span>{g.pt}</span>
+                <b className="notranslate" translate="no"><span className="fc-gb__letter">{g.en[0]}</span>{g.en.slice(1)}</b>
+                <span>{t.gb.names[i]}</span>
               </div>
             </ScrollReveal>
           ))}
@@ -262,15 +231,15 @@ export default function CoachingLanding() {
       <section className="fc-sec fc-inc">
         <div className="fc-inc__wrap">
           <ScrollReveal>
-            <img className="fc-inc__photo" src="/coaching/treat-cheesecake.webp" alt="Cheesecake da Dolly com calda de frutas vermelhas" loading="lazy" />
+            <img className="fc-inc__photo" src="/coaching/treat-cheesecake.webp" alt={t.inc.photoAlt} loading="lazy" />
           </ScrollReveal>
           <ScrollReveal>
-            <p className="fc-kicker" data-sign="📋">No seu Reset</p>
-            <h2 className="fc-h2 fc-h2--start">Tudo o que a gente constrói junto</h2>
+            <p className="fc-kicker" data-sign="📋">{t.inc.kicker}</p>
+            <h2 className="fc-h2 fc-h2--start">{t.inc.title}</h2>
             <ul className="fc-inc__list">
-              {INCLUDES.map(t => <li key={t}>{t}</li>)}
+              {t.inc.items.map(item => <li key={item}>{item}</li>)}
             </ul>
-            <p className="fc-inc__end">E o mais importante: estabilidade por dentro. Porque quando a comida parece segura, todo o resto fica mais leve.</p>
+            <p className="fc-inc__end">{t.inc.end}</p>
           </ScrollReveal>
         </div>
       </section>
@@ -279,22 +248,19 @@ export default function CoachingLanding() {
       <section id="sos" className="fc-sec fc-sos">
         <ScrollReveal>
           <div className="fc-sos__card">
-            <span className="fc-sos__badge">Pacote à parte · 14 dias</span>
-            <h2 className="fc-h2 fc-h2--start">Reset SOS: sem sal e sem óleo em 2 semanas</h2>
-            <p className="fc-sos__lead">
-              Para quem quer dar um passo só, bem dado. Duas semanas guiadas, com lista de compras, cardápio dia a dia e a
-              Dolly acompanhando você.
-            </p>
+            <span className="fc-sos__badge">{t.sos.badge}</span>
+            <h2 className="fc-h2 fc-h2--start">{t.sos.title}</h2>
+            <p className="fc-sos__lead">{t.sos.lead}</p>
             <div className="fc-sos__weeks">
-              {SOS_WEEKS.map(w => (
+              {t.sos.weeks.map((w, i) => (
                 <div key={w.title} className="fc-sos__week">
-                  <IconTile size={44}>{w.icon}</IconTile>
+                  <IconTile size={44}>{SOS_ICONS[i]}</IconTile>
                   <div><b>{w.title}</b><p>{w.text}</p></div>
                 </div>
               ))}
             </div>
-            <WhatsAppGate href={WA_SOS} topic="Coaching: Reset SOS 2 semanas" tags={['cursos']} className="btn btn-primary fc-sos__cta">
-              Quero o Reset SOS
+            <WhatsAppGate href={wa(t.whatsapp.sos)} topic={`Coaching: Reset SOS 2 semanas (${lang})`} tags={['cursos']} locale={gateLocale} className="btn btn-primary fc-sos__cta">
+              {t.sos.cta}
             </WhatsAppGate>
           </div>
         </ScrollReveal>
@@ -304,20 +270,14 @@ export default function CoachingLanding() {
       <section className="fc-sec fc-dolly">
         <div className="fc-dolly__wrap">
           <ScrollReveal>
-            <img className="fc-dolly__photo" src="/coaching/dolly-spatula.webp" alt="Dolly Van Dam com a espátula e uma bandeja de doces" loading="lazy" />
+            <img className="fc-dolly__photo" src="/coaching/dolly-spatula.webp" alt={t.dolly.photoAlt} loading="lazy" />
           </ScrollReveal>
           <ScrollReveal>
-            <p className="fc-kicker" data-sign="👩‍🍳">Sua Food Coach</p>
-            <h2 className="fc-h2 fc-h2--start">Eu também já tive medo de comer</h2>
-            <p>
-              Como bailarina profissional, aprendi a controlar cada caloria, cada mordida, as formas do meu corpo. Isso me
-              desconectou do prazer de comer. Aos poucos eu me curei, e você também vai se curar.
-            </p>
-            <p>
-              Hoje eu vivo na Mata Atlântica, em Itamambuca, e cozinho tudo do zero, só com plantas. A comida não precisa ser
-              temida nem proibida: ela pode ser prazerosa e gentil ao mesmo tempo.
-            </p>
-            <Link href="/dolly" className="fc-link">Conheça a história da Dolly →</Link>
+            <p className="fc-kicker" data-sign="👩‍🍳">{t.dolly.kicker}</p>
+            <h2 className="fc-h2 fc-h2--start">{t.dolly.title}</h2>
+            <p>{t.dolly.p1}</p>
+            <p>{t.dolly.p2}</p>
+            <Link href="/dolly" className="fc-link">{t.dolly.link}</Link>
           </ScrollReveal>
         </div>
       </section>
@@ -327,25 +287,22 @@ export default function CoachingLanding() {
         <div className="fc-final__bg" />
         <ScrollReveal>
           <div className="fc-final__inner">
-            <p className="fc-final__kicker">Entre no estúdio</p>
-            <h2 className="fc-final__title">Comece com dois presentes</h2>
+            <p className="fc-final__kicker">{t.final.kicker}</p>
+            <h2 className="fc-final__title">{t.final.title}</h2>
             <div className="fc-gifts">
-              <div className="fc-gift">
-                <IconTile size={54}>☎️</IconTile>
-                <b>Conversa grátis de 30 minutos</b>
-                <span>Online, com a Dolly. A gente olha a sua rotina e o primeiro passo.</span>
-              </div>
-              <div className="fc-gift">
-                <IconTile size={54}>📖</IconTile>
-                <b>E-book Sweet Escape</b>
-                <span>7 cores, 7 doces plant-based sem açúcar refinado, de presente para você.</span>
-              </div>
+              {t.final.gifts.map((g, i) => (
+                <div key={g.title} className="fc-gift">
+                  <IconTile size={54}>{GIFT_ICONS[i]}</IconTile>
+                  <b>{g.title}</b>
+                  <span>{g.text}</span>
+                </div>
+              ))}
             </div>
-            <BookCall label="Agendar minha conversa grátis" className="btn btn-secondary fc-final__cta" where="final" />
+            <BookCall label={t.final.cta} className="btn btn-secondary fc-final__cta" where="final" lang={lang} />
             <p className="fc-final__or">
-              Prefere conversar antes?{' '}
-              <WhatsAppGate href={WA_RESET} topic="Coaching: The Daily Tropical Reset" tags={['cursos']} className="fc-final__wa">
-                Fale com a Dolly no WhatsApp
+              {t.final.or}{' '}
+              <WhatsAppGate href={wa(t.whatsapp.reset)} topic={`Coaching: The Daily Tropical Reset (${lang})`} tags={['cursos']} locale={gateLocale} className="fc-final__wa">
+                {t.final.wa}
               </WhatsAppGate>
             </p>
           </div>
@@ -354,16 +311,17 @@ export default function CoachingLanding() {
 
       {/* ── FAQ ── */}
       <section className="fc-sec fc-faq">
-        <p className="fc-kicker" data-sign="💬">Dúvidas</p>
-        <h2 className="fc-h2">Bom saber</h2>
+        <p className="fc-kicker" data-sign="💬">{t.faq.kicker}</p>
+        <h2 className="fc-h2">{t.faq.title}</h2>
         <div className="fc-faq__list">
-          {FAQ.map(f => (
+          {t.faq.items.map(f => (
             <details key={f.q}>
               <summary>{f.q}</summary>
               <p>{f.a}</p>
             </details>
           ))}
         </div>
+        <div className="fc-faq__lang"><LangSwitch lang={lang} label={t.langLabel} /></div>
       </section>
 
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
@@ -504,6 +462,17 @@ const CSS = `
 .fc-faq details { background: #fff; border: 1px solid rgba(60,42,33,0.1); border-radius: 16px; padding: 1rem 1.2rem; }
 .fc-faq summary { cursor: pointer; font-weight: 700; color: #3c2a21; }
 .fc-faq details p { margin: 0.7rem 0 0; color: #594a42; line-height: 1.65; }
+
+/* Language switch: PT · EN · ES · NL */
+.fc-lang { display: inline-flex; align-items: center; gap: 0.2rem; padding: 0.25rem; border-radius: 999px; background: #fff; border: 1px solid rgba(60,42,33,0.12); margin: 0 0 1.4rem; }
+.fc-lang__globe { font-size: 0.95rem; padding: 0 0.35rem 0 0.45rem; }
+.fc-lang a { min-width: 2.6rem; padding: 0.42rem 0.7rem; border-radius: 999px; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; color: #3c2a21; text-decoration: none; }
+.fc-lang a:hover { background: rgba(212,175,55,0.15); }
+.fc-lang a.is-on { background: #d4af37; color: #3c2a21; }
+.fc-lang--dark { background: rgba(253,250,243,0.1); border-color: rgba(212,175,55,0.45); backdrop-filter: blur(4px); }
+.fc-lang--dark a { color: #fdfaf3; }
+.fc-lang--dark a.is-on { color: #3c2a21; }
+.fc-faq__lang { display: flex; justify-content: center; margin-top: 2.5rem; }
 
 /* Tablets */
 @media (max-width: 900px) {
