@@ -18,7 +18,7 @@ export function coachingMetadata(lang: CoachingLang): Metadata {
       description: t.ogDescription,
       url: COACHING_PATH[lang],
       locale: OG_LOCALE[lang],
-      images: [{ url: '/coaching/treat-raspberry.webp', width: 900, height: 1200, alt: t.ogAlt }],
+      images: [{ url: '/coaching/dolly-hero.webp', width: 1000, height: 1333, alt: t.ogAlt }],
     },
   };
 }

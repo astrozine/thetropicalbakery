@@ -11,20 +11,23 @@ import { DOLLY_CALENDLY_URL, STORE_WHATSAPP } from '@/lib/siteContact';
 import { COACHING_COPY, COACHING_LANGS, COACHING_LANG_LABEL, COACHING_PATH, type CoachingLang } from '@/lib/coachingCopy';
 
 /*
- * The words come from Dolly herself: her Paradise Pantry guide (the six building blocks, where she shops, the
- * "Food Healing Studio" pages) and the Food Healing ad inside Sweet Escape, written by hand in four languages in
- * src/lib/coachingCopy.ts. Prices are not on the page on purpose: every plan is made to measure and Dolly gives the
- * price on the free call.
+ * The words come from Dolly herself: her Paradise Pantry guide (her basket question, the six building blocks, where
+ * she shops, the "Food Healing Studio" pages) and the Food Healing ad inside Sweet Escape, written by hand in four
+ * languages in src/lib/coachingCopy.ts. The page is about her whole way of eating, breakfast to dinner, told under her
+ * own names only (see the note at the top of coachingCopy.ts), and it is written for women who may carry shame about
+ * their weight, so there is no scale, no number and no before-and-after anywhere on it. Prices are not on the page
+ * on purpose: every plan is made to measure and Dolly gives the price on the free call.
  */
 
+const SAFE_ICONS = ['⚖️', '🔢', '📸', '🤍'];
 const KONDO_ICONS = ['👀', '🙏', '🫙'];
+const WAY_ICONS = ['🌱', '🍋', '🥗'];
+/** The seven colors of the plate (Dolly's own frame, from the seven colors of Sweet Escape), one icon each. */
+const COLOR_ICONS = ['🥬', '🍅', '🍆', '🥕', '🍌', '🧄', '🫘'];
+const COLOR_DOTS = ['#4f8a3a', '#d33a3a', '#6b3c8f', '#e67e22', '#e9c23a', '#f3ede0', '#8a5a2b'];
+const DAY_ICONS = ['🌅', '🥗', '🍲', '🍓'];
 const STEP_ICONS = ['☎️', '🔍', '🧺', '🛒', '🗓️', '👨‍👩‍👧'];
 const FEEL_IMGS = ['/coaching/people-table.webp', '/coaching/people-garden.webp', '/coaching/people-street.webp'];
-/** Dr. Joel Fuhrman's G-BOMBS: the foods that protect the most, every day. The acronym stays in English everywhere. */
-const GBOMBS = [
-  { icon: '🥬', en: 'Greens' }, { icon: '🫘', en: 'Beans' }, { icon: '🧅', en: 'Onions' },
-  { icon: '🍄', en: 'Mushrooms' }, { icon: '🫐', en: 'Berries' }, { icon: '🌰', en: 'Seeds' },
-];
 /** The six building blocks from Paradise Pantry, with the illustrations from the guide. */
 const PANTRY_IMGS = ['fats', 'sweet', 'structure', 'flavors', 'toppings', 'color'].map(n => `/coaching/pantry-${n}.webp`);
 const SHOP_ICONS = ['🥭', '🌾', '🫙'];
@@ -93,7 +96,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
             </figure>
             <img className="fc-pol fc-pol--talk" src="/coaching/people-talk.webp" alt={t.hero.talkAlt} />
             <img className="fc-pol fc-pol--studio" src="/coaching/people-studio.webp" alt={t.hero.studioAlt} />
-            <img className="fc-pol fc-pol--treat" src="/coaching/treat-raspberry.webp" alt={t.hero.treatAlt} />
+            <img className="fc-pol fc-pol--table" src="/brunch/brunch-jardim.webp" alt={t.hero.tableAlt} />
           </div>
           <div className="fc-hero__content">
             <LangSwitch lang={lang} label={t.langLabel} dark />
@@ -132,6 +135,26 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
         </ScrollReveal>
       </section>
 
+      {/* ── The promise: no scale, no counting, no before-and-after, no guilt ── */}
+      <section className="fc-sec fc-safe">
+        <ScrollReveal>
+          <div className="fc-safe__card">
+            <p className="fc-kicker" data-sign="🤍">{t.safe.kicker}</p>
+            <h2 className="fc-h2">{t.safe.title}</h2>
+            <p className="fc-intro">{t.safe.intro}</p>
+            <div className="fc-safe__grid">
+              {t.safe.items.map((s, i) => (
+                <div key={s.title} className="fc-safe__item">
+                  <IconTile size={50}>{SAFE_ICONS[i]}</IconTile>
+                  <div><b>{s.title}</b><p>{s.text}</p></div>
+                </div>
+              ))}
+            </div>
+            <p className="fc-safe__end">{t.safe.end}</p>
+          </div>
+        </ScrollReveal>
+      </section>
+
       {/* ── Marie Kondo, for food ── */}
       <section className="fc-sec fc-kondo">
         <ScrollReveal>
@@ -150,6 +173,66 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
             </ScrollReveal>
           ))}
         </div>
+      </section>
+
+      {/* ── Dolly's way: her three rules, then the seven colors of the plate ── */}
+      <section className="fc-sec fc-way">
+        <ScrollReveal>
+          <p className="fc-kicker fc-kicker--light" data-sign="🌿">{t.way.kicker}</p>
+          <h2 className="fc-h2 fc-h2--light">{t.way.title}</h2>
+          <p className="fc-intro fc-intro--light">{t.way.intro}</p>
+        </ScrollReveal>
+        <div className="fc-way__grid">
+          {t.way.items.map((w, i) => (
+            <ScrollReveal key={w.title} delay={i * 0.08}>
+              <div className="fc-way__card">
+                <span className="fc-way__n">{i + 1}</span>
+                <IconTile size={54}>{WAY_ICONS[i]}</IconTile>
+                <h3>{w.title}</h3>
+                <p>{w.text}</p>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+        <ScrollReveal>
+          <div className="fc-colors">
+            <p className="fc-kicker fc-kicker--light" data-sign="🎨">{t.colors.kicker}</p>
+            <h3 className="fc-colors__title">{t.colors.title}</h3>
+            <p className="fc-intro fc-intro--light fc-colors__intro">{t.colors.intro}</p>
+            <div className="fc-colors__grid">
+              {t.colors.items.map((c, i) => (
+                <div key={c.name} className="fc-colors__item">
+                  <IconTile size={52}>{COLOR_ICONS[i]}</IconTile>
+                  <b><span className="fc-colors__dot" style={{ background: COLOR_DOTS[i] }} aria-hidden />{c.name}</b>
+                  <span>{c.foods}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* ── A day in the Reset: breakfast, lunch, dinner and the sweet ── */}
+      <section className="fc-sec fc-day">
+        <ScrollReveal>
+          <p className="fc-kicker" data-sign="🍽️">{t.day.kicker}</p>
+          <h2 className="fc-h2">{t.day.title}</h2>
+          <p className="fc-intro">{t.day.intro}</p>
+        </ScrollReveal>
+        <div className="fc-day__grid">
+          {t.day.items.map((d, i) => (
+            <ScrollReveal key={d.title} delay={i * 0.07}>
+              <div className="fc-card fc-day__card">
+                <IconTile size={52}>{DAY_ICONS[i]}</IconTile>
+                <h3>{d.title}</h3>
+                <p>{d.text}</p>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+        <ScrollReveal>
+          <p className="fc-day__note">{t.day.note}</p>
+        </ScrollReveal>
       </section>
 
       {/* ── Step by step ── */}
@@ -207,31 +290,11 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
         </ScrollReveal>
       </section>
 
-      {/* ── Nutritarian, SOS free, G-BOMBS ── */}
-      <section className="fc-sec fc-gb">
-        <ScrollReveal>
-          <p className="fc-kicker fc-kicker--light" data-sign="💚">{t.gb.kicker}</p>
-          <h2 className="fc-h2 fc-h2--light">{t.gb.title}</h2>
-          <p className="fc-intro fc-intro--light">{t.gb.intro}</p>
-        </ScrollReveal>
-        <div className="fc-gb__grid">
-          {GBOMBS.map((g, i) => (
-            <ScrollReveal key={g.en} delay={i * 0.05}>
-              <div className="fc-gb__item">
-                <IconTile size={56}>{g.icon}</IconTile>
-                <b className="notranslate" translate="no"><span className="fc-gb__letter">{g.en[0]}</span>{g.en.slice(1)}</b>
-                <span>{t.gb.names[i]}</span>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </section>
-
       {/* ── Everything that's inside ── */}
       <section className="fc-sec fc-inc">
         <div className="fc-inc__wrap">
           <ScrollReveal>
-            <img className="fc-inc__photo" src="/coaching/treat-cheesecake.webp" alt={t.inc.photoAlt} loading="lazy" />
+            <img className="fc-inc__photo" src="/brunch/brunch-mesa.webp" alt={t.inc.photoAlt} loading="lazy" />
           </ScrollReveal>
           <ScrollReveal>
             <p className="fc-kicker" data-sign="📋">{t.inc.kicker}</p>
@@ -277,6 +340,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
             <h2 className="fc-h2 fc-h2--start">{t.dolly.title}</h2>
             <p>{t.dolly.p1}</p>
             <p>{t.dolly.p2}</p>
+            <p className="fc-dolly__p3">{t.dolly.p3}</p>
             <Link href="/dolly" className="fc-link">{t.dolly.link}</Link>
           </ScrollReveal>
         </div>
@@ -355,7 +419,7 @@ const CSS = `
 .fc-pol { position: absolute; z-index: 3; object-fit: cover; border: 5px solid #fdfaf3; border-radius: 16px; box-shadow: 0 22px 44px rgba(0,0,0,0.5); }
 .fc-pol--talk { top: 0; left: -1rem; width: 40%; aspect-ratio: 1; transform: rotate(-8deg); }
 .fc-pol--studio { bottom: 3.5rem; right: -1.5rem; width: 38%; aspect-ratio: 4 / 5; transform: rotate(7deg); }
-.fc-pol--treat { top: 1.5rem; right: 0; width: 25%; aspect-ratio: 1; border-radius: 50%; transform: rotate(6deg); }
+.fc-pol--table { top: 1.5rem; right: 0; width: 25%; aspect-ratio: 1; border-radius: 50%; transform: rotate(6deg); object-position: 50% 62%; }
 .fc-hero__content { text-align: left; display: flex; flex-direction: column; align-items: flex-start; }
 .fc-hero__hi { display: flex; gap: 0.8rem; align-items: center; background: rgba(253,250,243,0.1); border: 1px solid rgba(212,175,55,0.35); border-radius: 18px; padding: 0.7rem 1rem 0.7rem 0.7rem; margin: 0 0 1.6rem; max-width: 500px; backdrop-filter: blur(4px); }
 .fc-hero__hi img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid #d4af37; flex-shrink: 0; }
@@ -377,6 +441,16 @@ const CSS = `
 .fc-feel__q { font-family: var(--font-heading); font-size: clamp(1.6rem, 4.4vw, 2.8rem); line-height: 1.2; color: #2e4432; margin: 0 0 1rem; }
 .fc-feel__q em { font-style: normal; color: #b8921f; }
 .fc-feel__not { color: #8a6a3c; font-style: italic; font-size: 1.1rem; margin: 0; }
+
+/* The promise: a soft card, four quiet points, no numbers anywhere */
+.fc-safe { max-width: 980px; padding-top: 0; }
+.fc-safe__card { background: #fdfaf3; border: 1px solid rgba(212,175,55,0.45); border-radius: 30px; padding: clamp(1.8rem, 4vw, 3rem); box-shadow: 0 30px 60px -34px rgba(60,42,33,0.45); }
+.fc-safe .fc-intro { margin-bottom: 1.8rem; }
+.fc-safe__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.fc-safe__item { display: flex; gap: 0.9rem; align-items: flex-start; background: #fff; border-radius: 18px; padding: 1.1rem; border: 1px solid rgba(60,42,33,0.06); }
+.fc-safe__item b { font-family: var(--font-heading); font-size: 1rem; color: #2e4432; }
+.fc-safe__item p { margin: 0.3rem 0 0; color: #594a42; line-height: 1.6; font-size: 0.95rem; }
+.fc-safe__end { text-align: center; font-family: var(--font-heading); color: #3c2a21; font-size: 1.1rem; margin: 1.8rem 0 0; }
 
 /* Cards */
 .fc-kondo__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
@@ -406,14 +480,28 @@ const CSS = `
 .fc-shop p { margin: 0; line-height: 1.55; color: #3c2a21; font-size: 0.95rem; }
 .fc-pantry__more { text-align: center; margin: 1.6rem 0 0; color: #8a6a3c; font-weight: 600; }
 
-/* G-BOMBS */
-.fc-gb { max-width: none; background: linear-gradient(160deg, #2e4432 0%, #22342a 100%); }
-.fc-gb > * { max-width: 1000px; margin-left: auto; margin-right: auto; }
-.fc-gb__grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.9rem; }
-.fc-gb__item { text-align: center; background: rgba(253,250,243,0.06); border: 1px solid rgba(212,175,55,0.3); border-radius: 18px; padding: 1.2rem 0.6rem; display: grid; justify-items: center; gap: 0.45rem; height: 100%; }
-.fc-gb__item b { color: #fdfaf3; font-family: var(--font-heading); font-size: 0.95rem; margin-top: 0.3rem; }
-.fc-gb__letter { color: #e7c75a; font-size: 1.25rem; }
-.fc-gb__item > span { color: rgba(253,250,243,0.75); font-size: 0.85rem; }
+/* Dolly's way: three rules on the dark green, then the seven colors */
+.fc-way { max-width: none; background: linear-gradient(160deg, #2e4432 0%, #22342a 100%); }
+.fc-way > * { max-width: 1040px; margin-left: auto; margin-right: auto; }
+.fc-way__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+.fc-way__card { position: relative; height: 100%; background: rgba(253,250,243,0.07); border: 1px solid rgba(212,175,55,0.35); border-radius: 22px; padding: 1.8rem 1.4rem 1.6rem; }
+.fc-way__n { position: absolute; top: -0.7rem; left: 1.2rem; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: #d4af37; color: #3c2a21; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+.fc-way__card h3 { font-family: var(--font-heading); font-size: 1.08rem; line-height: 1.3; color: #fdfaf3; margin: 1rem 0 0.55rem; }
+.fc-way__card p { margin: 0; color: rgba(253,250,243,0.8); line-height: 1.65; font-size: 0.96rem; }
+.fc-colors { margin-top: 3.2rem; padding-top: 2.6rem; border-top: 1px solid rgba(212,175,55,0.25); }
+.fc-colors__title { font-family: var(--font-heading); text-align: center; color: #fdfaf3; font-size: clamp(1.3rem, 3vw, 2rem); margin: 0 0 0.9rem; }
+.fc-colors__intro { margin-bottom: 1.8rem; }
+.fc-colors__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.75rem; }
+.fc-colors__item { text-align: center; background: rgba(253,250,243,0.06); border: 1px solid rgba(212,175,55,0.3); border-radius: 18px; padding: 1.1rem 0.5rem; display: grid; justify-items: center; gap: 0.4rem; height: 100%; }
+.fc-colors__item b { color: #fdfaf3; font-family: var(--font-heading); font-size: 0.92rem; margin-top: 0.25rem; display: inline-flex; align-items: center; gap: 0.4rem; }
+.fc-colors__dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; display: inline-block; border: 1px solid rgba(253,250,243,0.5); }
+.fc-colors__item > span { color: rgba(253,250,243,0.72); font-size: 0.78rem; line-height: 1.4; }
+
+/* A day in the Reset */
+.fc-day { max-width: 1100px; }
+.fc-day__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; }
+.fc-day__card { background: #f8f3e8; border-color: rgba(212,175,55,0.35); }
+.fc-day__note { text-align: center; color: #8a6a3c; font-style: italic; margin: 1.6rem 0 0; }
 
 /* Includes */
 .fc-inc__wrap { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: clamp(1.5rem, 5vw, 4rem); align-items: center; }
@@ -440,11 +528,12 @@ const CSS = `
 .fc-dolly__photo { width: 100%; border-radius: 26px; transform: rotate(2deg); box-shadow: 0 30px 60px -20px rgba(60,42,33,0.5); border: 6px solid #fff; }
 .fc-dolly .fc-kicker { justify-content: flex-start; }
 .fc-dolly p { line-height: 1.75; color: #594a42; }
+.fc-dolly__p3 { font-family: var(--font-heading); color: #2e4432; font-size: 1.08rem; }
 .fc-link { color: #2e4432; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
 
 /* Final */
 .fc-final { position: relative; padding: clamp(4rem, 9vw, 7rem) 1.25rem; overflow: hidden; background: #2a1d16; text-align: center; }
-.fc-final__bg { position: absolute; inset: 0; background: url("/coaching/treat-chocolate.webp") center / cover; filter: brightness(0.3) blur(2px); transform: scale(1.08); }
+.fc-final__bg { position: absolute; inset: 0; background: url("/dolly/hero-mata.webp") center / cover; filter: brightness(0.3) blur(2px); transform: scale(1.08); }
 .fc-final__inner { position: relative; max-width: 760px; margin: 0 auto; }
 .fc-final__kicker { color: #d4af37; letter-spacing: 4px; text-transform: uppercase; font-size: 0.82rem; font-weight: 700; margin: 0 0 0.8rem; }
 .fc-final__title { font-family: var(--font-heading); color: #fff; font-size: clamp(1.6rem, 4.4vw, 2.8rem); margin: 0 0 2rem; }
@@ -477,7 +566,9 @@ const CSS = `
 /* Tablets */
 @media (max-width: 900px) {
   .fc-pantry__grid { grid-template-columns: repeat(2, 1fr); }
-  .fc-gb__grid { grid-template-columns: repeat(3, 1fr); }
+  .fc-colors__grid { grid-template-columns: repeat(4, 1fr); }
+  .fc-way__grid { grid-template-columns: 1fr; max-width: 560px; margin: 0 auto; }
+  .fc-day__grid { grid-template-columns: 1fr 1fr; }
   .fc-shop { grid-template-columns: 1fr; }
 }
 
@@ -502,7 +593,9 @@ const CSS = `
   .fc-block figcaption { padding: 0.85rem 0.8rem 1rem; }
   .fc-block b { font-size: 0.85rem; }
   .fc-block span { font-size: 0.8rem; }
-  .fc-gb__grid { grid-template-columns: repeat(2, 1fr); }
+  .fc-colors__grid { grid-template-columns: repeat(2, 1fr); }
+  .fc-safe__grid, .fc-day__grid { grid-template-columns: 1fr; }
+  .fc-safe__card { border-radius: 22px; }
   .fc-inc__wrap, .fc-dolly__wrap { grid-template-columns: 1fr; }
   .fc-inc__photo, .fc-dolly__photo { max-width: 300px; margin: 0 auto; display: block; }
   .fc-h2--start { text-align: center; }

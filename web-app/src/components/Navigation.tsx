@@ -185,8 +185,8 @@ export default function Navigation() {
     ] },
     // Dolly's food coaching (her Food Healing Studio): its own place in the bar, the free call one tap away.
     { id: 'coaching', name: 'Coaching', links: [
-      { name: 'The Daily Tropical Reset', path: '/coaching', icon: '🌱', highlight: true, brand: true, sub: 'food coaching com a Dolly' },
-      { name: 'Reset SOS em 2 semanas', path: '/coaching#sos', icon: '💧', sub: 'sem sal e sem óleo' },
+      { name: 'The Daily Tropical Reset', path: '/coaching', icon: '🌱', highlight: true, brand: true, sub: 'sua alimentação inteira, com a Dolly' },
+      { name: 'Reset do Paladar · 14 dias', path: '/coaching#sos', icon: '💧', sub: 'sem sal e sem óleo' },
       { name: 'Conversa grátis de 30 min', path: '/coaching#conversa', icon: '☎️' },
     ] },
     // Apps: their own little shelf (fun, helpful tools for eating well), not a side door of the book. Room for more.
