@@ -30,6 +30,7 @@ const STEP_ICONS = ['☎️', '🔍', '🧺', '🛒', '🗓️', '👨‍👩‍
 const FEEL_IMGS = ['/coaching/people-table.webp', '/coaching/people-garden.webp', '/coaching/people-street.webp'];
 /** The six building blocks from Paradise Pantry, with the illustrations from the guide. */
 const PANTRY_IMGS = ['fats', 'sweet', 'structure', 'flavors', 'toppings', 'color'].map(n => `/coaching/pantry-${n}.webp`);
+const DAILY_ICONS = ['🥬', '☀️'];
 const SHOP_ICONS = ['🥭', '🌾', '🫙'];
 const SOS_ICONS = ['💧', '🌿'];
 const GIFT_ICONS = ['☎️', '📖'];
@@ -266,6 +267,19 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
           <h2 className="fc-h2">{t.pantry.title}</h2>
           <p className="fc-intro">{t.pantry.intro}</p>
         </ScrollReveal>
+        {/* The everyday base and the few supplements (Dolly's note: the six blocks below were only ever for sweets). */}
+        <ScrollReveal>
+          <p className="fc-pantry__sub" data-sign="🥗">{t.pantry.daily.kicker}</p>
+          <div className="fc-daily">
+            {t.pantry.daily.items.map((d, i) => (
+              <div key={d.title} className="fc-daily__card">
+                <IconTile size={52}>{DAILY_ICONS[i]}</IconTile>
+                <div><b>{d.title}</b><p>{d.text}</p></div>
+              </div>
+            ))}
+          </div>
+          <p className="fc-pantry__sub" data-sign="🍓">{t.pantry.sweet}</p>
+        </ScrollReveal>
         <div className="fc-pantry__grid">
           {t.pantry.blocks.map((p, i) => (
             <ScrollReveal key={p.title} delay={(i % 3) * 0.06}>
@@ -468,6 +482,12 @@ const CSS = `
 
 /* Pantry */
 .fc-pantry { max-width: 1180px; }
+.fc-pantry__sub { display: flex; align-items: center; justify-content: center; gap: 0.6rem; text-align: center; font-family: var(--font-heading); color: #2e4432; font-size: 1.05rem; margin: 0 auto 1.1rem; max-width: 720px; line-height: 1.4; }
+.fc-pantry__sub::before { content: attr(data-sign); font-size: 1.2rem; }
+.fc-daily { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin: 0 auto 2.4rem; max-width: 980px; }
+.fc-daily__card { display: flex; gap: 1rem; align-items: flex-start; background: #fff; border: 1px solid rgba(60,42,33,0.08); border-radius: 22px; padding: 1.4rem 1.3rem; box-shadow: 0 14px 34px -18px rgba(60,42,33,0.3); }
+.fc-daily__card b { font-family: var(--font-heading); font-size: 1.02rem; color: #2e4432; }
+.fc-daily__card p { margin: 0.35rem 0 0; color: #594a42; line-height: 1.6; font-size: 0.96rem; }
 .fc-pantry__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
 .fc-block { margin: 0; background: #fff; border-radius: 20px; overflow: hidden; border: 1px solid rgba(60,42,33,0.08); height: 100%; display: flex; flex-direction: column; }
 .fc-block img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
@@ -594,7 +614,7 @@ const CSS = `
   .fc-block b { font-size: 0.85rem; }
   .fc-block span { font-size: 0.8rem; }
   .fc-colors__grid { grid-template-columns: repeat(2, 1fr); }
-  .fc-safe__grid, .fc-day__grid { grid-template-columns: 1fr; }
+  .fc-safe__grid, .fc-day__grid, .fc-daily { grid-template-columns: 1fr; }
   .fc-safe__card { border-radius: 22px; }
   .fc-inc__wrap, .fc-dolly__wrap { grid-template-columns: 1fr; }
   .fc-inc__photo, .fc-dolly__photo { max-width: 300px; margin: 0 auto; display: block; }

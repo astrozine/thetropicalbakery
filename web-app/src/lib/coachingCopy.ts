@@ -46,7 +46,10 @@ export interface CoachingCopy {
   day: { kicker: string; title: string; intro: string; items: Item[]; note: string };
   steps: { kicker: string; title: string; items: Item[] };
   pantry: {
-    kicker: string; title: string; intro: string; blocks: Item[];
+    kicker: string; title: string; intro: string;
+    /** Dolly's note (Nov 2026): the six blocks were only for sweets; the everyday kitchen needs its own base block and one for supplements. */
+    daily: { kicker: string; items: Item[] };
+    sweet: string; blocks: Item[];
     shop: { lead: string; text: string }[]; more: string;
   };
   inc: { photoAlt: string; kicker: string; title: string; items: string[]; end: string };
@@ -137,7 +140,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
         { name: 'Laranja', foods: 'Abóbora, cenoura, manga, mamão, batata-doce' },
         { name: 'Amarelo', foods: 'Banana, abacaxi, milho, cúrcuma, limão' },
         { name: 'Branco', foods: 'Alho, cebola, cogumelos, couve-flor, coco' },
-        { name: 'Marrom', foods: 'Feijões, lentilha, grãos inteiros, castanhas, sementes, cacau' },
+        { name: 'Marrom', foods: 'Feijões, lentilha, quinoa, grãos inteiros, castanhas, sementes, cacau' },
       ],
     },
     day: {
@@ -167,7 +170,15 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
     pantry: {
       kicker: 'Paradise Pantry',
       title: 'Eu compro ingredientes, não produtos',
-      intro: 'Se cresce da terra, tem fibra e ainda parece com o que era, tem lugar no meu carrinho. Primeiro a feira, depois a cerealista, e em casa tudo em potes de vidro. E para o cantinho doce da despensa, estes são os meus seis blocos: com eles você faz qualquer doce sem açúcar refinado.',
+      intro: 'Se cresce da terra, tem fibra e ainda parece com o que era, tem lugar no meu carrinho. Primeiro a feira, depois a cerealista, e em casa tudo em potes de vidro. A minha despensa tem duas partes: a base de todo dia e o cantinho doce.',
+      daily: {
+        kicker: 'Para todo dia',
+        items: [
+          { title: 'A base do prato de todo dia', text: 'Folhas escuras, feijões e lentilhas, cebola e alho, cogumelos, frutas vermelhas, sementes e castanhas. E os carboidratos inteiros que sustentam: abóbora, batata-doce, quinoa, arroz integral, aveia.' },
+          { title: 'Os poucos complementos', text: 'Uma alimentação só de plantas pede pouca coisa de fora: B12 sempre, vitamina D conforme o sol que você pega, ômega-3 de algas. Quais e quanto, você confirma com o seu médico.' },
+        ],
+      },
+      sweet: 'Para o cantinho doce: os meus seis blocos, com eles você faz qualquer doce sem açúcar refinado',
       blocks: [
         { title: 'Gorduras boas e proteínas', text: 'Amêndoas, castanhas, chia, linhaça, cânhamo, coco, tofu.' },
         { title: 'Doçura natural', text: 'Tâmaras, figos secos, damascos, banana, manga, maçã.' },
@@ -324,7 +335,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
         { name: 'Orange', foods: 'Pumpkin, carrot, mango, papaya, sweet potato' },
         { name: 'Yellow', foods: 'Banana, pineapple, corn, turmeric, lemon' },
         { name: 'White', foods: 'Garlic, onion, mushrooms, cauliflower, coconut' },
-        { name: 'Brown', foods: 'Beans, lentils, whole grains, nuts, seeds, cacao' },
+        { name: 'Brown', foods: 'Beans, lentils, quinoa, whole grains, nuts, seeds, cacao' },
       ],
     },
     day: {
@@ -354,7 +365,15 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
     pantry: {
       kicker: 'Paradise Pantry',
       title: 'I shop for ingredients, not products',
-      intro: 'If it grows from the earth, carries fiber and still looks like what it was, it belongs in my basket. The produce market first, the bulk store second, and at home everything in glass jars. And for the sweet corner of the pantry, these are my six building blocks: with them you can make any treat without refined sugar.',
+      intro: 'If it grows from the earth, carries fiber and still looks like what it was, it belongs in my basket. The produce market first, the bulk store second, and at home everything in glass jars. My pantry has two parts: the everyday base and the sweet corner.',
+      daily: {
+        kicker: 'For every day',
+        items: [
+          { title: 'The base of the everyday plate', text: 'Dark leafy greens, beans and lentils, onions and garlic, mushrooms, berries, seeds and nuts. And the whole carbohydrates that keep you going: pumpkin, sweet potato, quinoa, brown rice, oats.' },
+          { title: 'The few supplements', text: 'A diet of plants alone asks for very little from outside: B12 always, vitamin D depending on the sun you get, omega-3 from algae. Which ones and how much, you confirm with your doctor.' },
+        ],
+      },
+      sweet: 'For the sweet corner: my six building blocks, with them you can make any treat without refined sugar',
       blocks: [
         { title: 'Healthy fats & proteins', text: 'Almonds, cashews, chia, flax, hemp seeds, coconut, tofu.' },
         { title: 'Natural sweetness', text: 'Medjool dates, dried figs, apricots, banana, mango, apple.' },
@@ -511,7 +530,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
         { name: 'Naranja', foods: 'Calabaza, zanahoria, mango, papaya, boniato' },
         { name: 'Amarillo', foods: 'Plátano, piña, maíz, cúrcuma, limón' },
         { name: 'Blanco', foods: 'Ajo, cebolla, setas, coliflor, coco' },
-        { name: 'Marrón', foods: 'Legumbres, lentejas, granos enteros, frutos secos, semillas, cacao' },
+        { name: 'Marrón', foods: 'Legumbres, lentejas, quinoa, granos enteros, frutos secos, semillas, cacao' },
       ],
     },
     day: {
@@ -541,7 +560,15 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
     pantry: {
       kicker: 'Paradise Pantry',
       title: 'Compro ingredientes, no productos',
-      intro: 'Si crece de la tierra, tiene fibra y todavía se parece a lo que era, tiene lugar en mi cesta. Primero la frutería, después la tienda a granel, y en casa todo en frascos de vidrio. Y para el rincón dulce de la despensa, estos son mis seis bloques: con ellos haces cualquier dulce sin azúcar refinado.',
+      intro: 'Si crece de la tierra, tiene fibra y todavía se parece a lo que era, tiene lugar en mi cesta. Primero la frutería, después la tienda a granel, y en casa todo en frascos de vidrio. Mi despensa tiene dos partes: la base de todos los días y el rincón dulce.',
+      daily: {
+        kicker: 'Para todos los días',
+        items: [
+          { title: 'La base del plato de cada día', text: 'Hojas verdes oscuras, legumbres y lentejas, cebolla y ajo, setas, frutos rojos, semillas y frutos secos. Y los carbohidratos enteros que sostienen: calabaza, boniato, quinoa, arroz integral, avena.' },
+          { title: 'Los pocos complementos', text: 'Una alimentación solo de plantas pide muy poco de fuera: B12 siempre, vitamina D según el sol que tomes, omega-3 de algas. Cuáles y cuánto, lo confirmas con tu médico.' },
+        ],
+      },
+      sweet: 'Para el rincón dulce: mis seis bloques, con ellos haces cualquier dulce sin azúcar refinado',
       blocks: [
         { title: 'Grasas buenas y proteínas', text: 'Almendras, anacardos, chía, lino, cáñamo, coco, tofu.' },
         { title: 'Dulzor natural', text: 'Dátiles, higos secos, orejones, plátano, mango, manzana.' },
@@ -698,7 +725,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
         { name: 'Oranje', foods: 'Pompoen, wortel, mango, papaja, zoete aardappel' },
         { name: 'Geel', foods: 'Banaan, ananas, maïs, kurkuma, citroen' },
         { name: 'Wit', foods: 'Knoflook, ui, paddenstoelen, bloemkool, kokos' },
-        { name: 'Bruin', foods: 'Bonen, linzen, volle granen, noten, zaden, cacao' },
+        { name: 'Bruin', foods: 'Bonen, linzen, quinoa, volle granen, noten, zaden, cacao' },
       ],
     },
     day: {
@@ -728,7 +755,15 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
     pantry: {
       kicker: 'Paradise Pantry',
       title: 'Ik koop ingrediënten, geen producten',
-      intro: 'Als het uit de aarde groeit, vezels heeft en nog lijkt op wat het was, hoort het in mijn mand. Eerst de markt, dan de natuurwinkel, en thuis alles in glazen potten. En voor het zoete hoekje van de voorraadkast zijn dit mijn zes bouwstenen: daarmee maak je elk lekkers zonder geraffineerde suiker.',
+      intro: 'Als het uit de aarde groeit, vezels heeft en nog lijkt op wat het was, hoort het in mijn mand. Eerst de markt, dan de natuurwinkel, en thuis alles in glazen potten. Mijn voorraadkast heeft twee delen: de basis voor elke dag en het zoete hoekje.',
+      daily: {
+        kicker: 'Voor elke dag',
+        items: [
+          { title: 'De basis van het dagelijkse bord', text: 'Donkere bladgroenten, bonen en linzen, ui en knoflook, paddenstoelen, bessen, zaden en noten. En de volle koolhydraten die je op de been houden: pompoen, zoete aardappel, quinoa, zilvervliesrijst, haver.' },
+          { title: 'De paar supplementen', text: 'Eten van alleen planten vraagt heel weinig van buitenaf: B12 altijd, vitamine D afhankelijk van de zon die je krijgt, omega-3 uit algen. Welke en hoeveel, stem je af met je arts.' },
+        ],
+      },
+      sweet: 'Voor het zoete hoekje: mijn zes bouwstenen, daarmee maak je elk lekkers zonder geraffineerde suiker',
       blocks: [
         { title: 'Gezonde vetten & eiwitten', text: 'Amandelen, cashewnoten, chia, lijnzaad, hennepzaad, kokos, tofu.' },
         { title: 'Natuurlijke zoetheid', text: 'Medjoul-dadels, gedroogde vijgen, abrikozen, banaan, mango, appel.' },
