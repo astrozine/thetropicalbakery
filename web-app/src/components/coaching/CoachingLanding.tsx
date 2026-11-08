@@ -25,7 +25,7 @@ const WAY_ICONS = ['🌱', '🍋', '🥗'];
 /** The seven colors of the plate (Dolly's own frame, from the seven colors of Sweet Escape), one icon each. */
 const COLOR_ICONS = ['🥬', '🍅', '🍆', '🥕', '🍌', '🧄', '🫘'];
 const COLOR_DOTS = ['#4f8a3a', '#d33a3a', '#6b3c8f', '#e67e22', '#e9c23a', '#f3ede0', '#8a5a2b'];
-const DAY_ICONS = ['🌅', '🥗', '🍲', '🍓'];
+const DAY_ICONS = ['🌅', '🍌', '🥗', '🥕', '🍲', '🍓'];
 const STEP_ICONS = ['☎️', '🔍', '🧺', '🛒', '🗓️', '👨‍👩‍👧'];
 const FEEL_IMGS = ['/coaching/people-table.webp', '/coaching/people-garden.webp', '/coaching/people-street.webp'];
 /** The six building blocks from Paradise Pantry, with the illustrations from the guide. */
@@ -519,7 +519,7 @@ const CSS = `
 
 /* A day in the Reset */
 .fc-day { max-width: 1100px; }
-.fc-day__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; }
+.fc-day__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
 .fc-day__card { background: #f8f3e8; border-color: rgba(212,175,55,0.35); }
 .fc-day__note { text-align: center; color: #8a6a3c; font-style: italic; margin: 1.6rem 0 0; }
 

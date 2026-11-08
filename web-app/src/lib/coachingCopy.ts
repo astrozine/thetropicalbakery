@@ -6,7 +6,9 @@
  *
  * Two rules for this page:
  *  - It is Dolly's way of eating, told in her own words and under her own names (her basket question, her three
- *    rules, the seven colors from Sweet Escape, the taste reset). No other author's names, labels or acronyms.
+ *    rules, the seven colors from Sweet Escape, the taste reset). No other author's names, labels or acronyms,
+ *    with one exception Dolly asked for (Nov 2026): Marie Kondo, because her method is how Dolly explains decluttering
+ *    your relationship with food.
  *  - It speaks to women who may carry shame about their weight or a history with food, Dolly included. So: no
  *    scale, no numbers, no before-and-after, no "good" and "bad" foods, no weight promises, and never a diagnosis.
  */
@@ -42,7 +44,7 @@ export interface CoachingCopy {
   /** Dolly's three rules, in her words, plus the seven colors of the plate. */
   way: { kicker: string; title: string; intro: string; items: Item[] };
   colors: { kicker: string; title: string; intro: string; items: { name: string; foods: string }[] };
-  /** A day in the Reset: breakfast, lunch, dinner and the sweet. */
+  /** A day in the Reset: breakfast, snack, lunch, snack, dinner and the sweet (six items, lined up with DAY_ICONS). */
   day: { kicker: string; title: string; intro: string; items: Item[]; note: string };
   steps: { kicker: string; title: string; items: Item[] };
   pantry: {
@@ -81,7 +83,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       studioAlt: 'Mulheres provando doces saudáveis depois da aula',
       tableAlt: 'Mesa de brunch no jardim, com frutas tropicais',
       kicker: 'Food Healing Studio · com a Food Coach Dolly',
-      text: 'Coaching de alimentação completa, do café da manhã ao jantar. Não é mais um plano alimentar: é fazer as pazes com a comida e com o seu corpo, comendo só plantas, inteiras, do jeito que a natureza entrega.',
+      text: 'Um Marie Kondo da sua relação com a comida, do café da manhã ao jantar. Não é mais um plano alimentar: é fazer as pazes com a comida e com o seu corpo, comendo só plantas, inteiras, do jeito que a natureza entrega.',
       hi: '“Oi, eu sou a Dolly. Vamos arrumar a sua relação com a comida juntas, um passo de cada vez. Sem balança e sem culpa.”',
       cta: 'Agendar minha conversa grátis',
       note: '30 minutos · online · sem compromisso',
@@ -110,9 +112,9 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       end: 'Quando você para de brigar com o seu corpo e começa a nutri-lo, ele responde. No tempo dele, do jeito dele.',
     },
     kondo: {
-      kicker: 'O método',
+      kicker: 'O método · um Marie Kondo da comida',
       title: 'Fica só o que nutre e o que te faz feliz',
-      intro: 'Comer bem começa no carrinho do mercado, não na força de vontade. Se não está em casa, você não come. Então a gente arruma a sua vida alimentar inteira como quem arruma um armário: com calma, com carinho e por categoria.',
+      intro: 'Sabe a Marie Kondo, que arruma a casa inteira e só deixa ficar o que traz alegria? Eu faço o mesmo com a sua relação com a comida. Comer bem começa no carrinho do mercado, não na força de vontade: se não está em casa, você não come. Então a gente destralha a sua vida alimentar como quem arruma um armário: tira tudo, olha cada peça, agradece e guarda só o que te faz bem. Com calma, com carinho e por categoria.',
       items: [
         { title: 'Olhar tudo, sem julgamento', text: 'Sua rotina, seus horários, suas comidas favoritas, suas vontades e cada prateleira da despensa. Nada de culpa: a gente só olha.' },
         { title: 'Agradecer e deixar ir', text: 'O que não te nutre sai de casa com carinho, e cada coisa que sai ganha uma troca gostosa. Você não perde nada: você troca.' },
@@ -148,9 +150,11 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       title: 'Um dia no Reset',
       intro: 'Para você ver que é comida de verdade, e muita. Um exemplo do que a gente monta junto, com o que tem na sua feira.',
       items: [
-        { title: 'Café da manhã', text: 'Aveia de um dia para o outro com manga, chia e canela, ou uma tigela grande de frutas da estação com sementes e coco.' },
-        { title: 'Almoço', text: 'Um prato cheio de folhas e legumes, feijão ou lentilha, um grão inteiro e um molho cremoso de castanha, tahine ou abacate.' },
-        { title: 'Jantar', text: 'Sopa de legumes, refogado na água com alho e ervas, curry de grão-de-bico com leite de coco caseiro, arroz integral.' },
+        { title: 'O café da manhã', text: 'Aveia de um dia para o outro com manga, chia e canela, ou uma tigela grande de frutas da estação com sementes e coco.' },
+        { title: 'O lanche da manhã', text: 'Uma fruta inteira, como manga, mamão ou banana, com um punhado de castanhas.' },
+        { title: 'O almoço', text: 'Um prato cheio de folhas e legumes, feijão ou lentilha, um grão inteiro e um molho cremoso de castanha, tahine ou abacate.' },
+        { title: 'O lanche da tarde', text: 'Palitos de cenoura e pepino com homus caseiro sem óleo, ou uma bliss ball de tâmara e castanha.' },
+        { title: 'O jantar', text: 'Sopa de legumes, refogado na água com alho e ervas, curry de grão-de-bico com leite de coco caseiro, arroz integral.' },
         { title: 'E o doce', text: 'Uma das sete cores do Sweet Escape, feita de fruta inteira, tâmara e castanha. Sim, tem doce. Doce faz parte da vida.' },
       ],
       note: 'Nada disso é obrigatório. É o seu prato, com os seus sabores, no seu ritmo.',
@@ -276,7 +280,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       studioAlt: 'Women tasting healthy treats after class',
       tableAlt: 'A garden brunch table with tropical fruit',
       kicker: 'Food Healing Studio · with Food Coach Dolly',
-      text: 'Whole-diet food coaching, from breakfast to dinner. Not another meal plan: making peace with food and with your body, eating only plants, whole, the way nature hands them to you.',
+      text: 'A Marie Kondo for your relationship with food, from breakfast to dinner. Not another meal plan: making peace with food and with your body, eating only plants, whole, the way nature hands them to you.',
       hi: '“Hi, I’m Dolly. Let’s tidy up your relationship with food together, one step at a time. No scale and no guilt.”',
       cta: 'Book my free call',
       note: '30 minutes · online · no strings attached',
@@ -305,9 +309,9 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       end: 'When you stop fighting your body and start nourishing it, it answers. In its own time, in its own way.',
     },
     kondo: {
-      kicker: 'The method',
+      kicker: 'The method · a Marie Kondo for food',
       title: 'Keep only what nourishes you and sparks joy',
-      intro: 'Healthy eating starts in the shopping cart, not with willpower. If it isn’t in the house, you don’t eat it. So we tidy your whole food life the way you would tidy a closet: calmly, kindly and by category.',
+      intro: 'You know Marie Kondo, who tidies a whole house and keeps only what sparks joy? I do the same with your relationship with food. Healthy eating starts in the shopping cart, not with willpower: if it isn’t in the house, you don’t eat it. So we declutter your food life the way you would tidy a closet: take everything out, hold each piece, say thank you and keep only what is good for you. Calmly, kindly and by category.',
       items: [
         { title: 'Look at everything, without judgment', text: 'Your routine, your mealtimes, your favorite foods, your cravings and every shelf in the pantry. No guilt: we just look.' },
         { title: 'Say thank you and let go', text: 'What doesn’t nourish you leaves the house kindly, and everything that leaves gets a delicious swap. You don’t lose anything: you trade up.' },
@@ -344,7 +348,9 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       intro: 'So you can see it is real food, and plenty of it. One example of what we build together, from whatever your market has.',
       items: [
         { title: 'Breakfast', text: 'Overnight oats with mango, chia and cinnamon, or a big bowl of seasonal fruit with seeds and coconut.' },
+        { title: 'Morning snack', text: 'A piece of whole fruit, like mango, papaya or banana, with a handful of nuts.' },
         { title: 'Lunch', text: 'A full plate of leaves and vegetables, beans or lentils, a whole grain and a creamy sauce made from nuts, tahini or avocado.' },
+        { title: 'Afternoon snack', text: 'Carrot and cucumber sticks with homemade oil-free hummus, or a date and nut bliss ball.' },
         { title: 'Dinner', text: 'Vegetable soup, a water-sauté with garlic and herbs, chickpea curry with homemade coconut milk, brown rice.' },
         { title: 'And the sweet', text: 'One of the seven colors from Sweet Escape, made from whole fruit, dates and nuts. Yes, there is dessert. Dessert is part of life.' },
       ],
@@ -471,7 +477,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       studioAlt: 'Mujeres probando dulces saludables después de clase',
       tableAlt: 'Mesa de brunch en el jardín con fruta tropical',
       kicker: 'Food Healing Studio · con la Food Coach Dolly',
-      text: 'Coaching de alimentación completa, del desayuno a la cena. No es otro plan de comidas: es hacer las paces con la comida y con tu cuerpo, comiendo solo plantas, enteras, tal como las entrega la naturaleza.',
+      text: 'Un Marie Kondo de tu relación con la comida, del desayuno a la cena. No es otro plan de comidas: es hacer las paces con la comida y con tu cuerpo, comiendo solo plantas, enteras, tal como las entrega la naturaleza.',
       hi: '“Hola, soy Dolly. Ordenemos juntas tu relación con la comida, paso a paso. Sin báscula y sin culpa.”',
       cta: 'Reservar mi llamada gratis',
       note: '30 minutos · online · sin compromiso',
@@ -500,9 +506,9 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       end: 'Cuando dejas de pelear con tu cuerpo y empiezas a nutrirlo, responde. A su tiempo, a su manera.',
     },
     kondo: {
-      kicker: 'El método',
+      kicker: 'El método · un Marie Kondo de la comida',
       title: 'Solo se queda lo que te nutre y te hace feliz',
-      intro: 'Comer bien empieza en el carrito del súper, no en la fuerza de voluntad. Si no está en casa, no te lo comes. Así que ordenamos toda tu vida alimentaria como quien ordena un armario: con calma, con cariño y por categorías.',
+      intro: '¿Conoces a Marie Kondo, que ordena una casa entera y solo deja lo que da alegría? Yo hago lo mismo con tu relación con la comida. Comer bien empieza en el carrito del súper, no en la fuerza de voluntad: si no está en casa, no te lo comes. Así que despejamos tu vida alimentaria como quien ordena un armario: sacamos todo, miramos cada pieza, damos las gracias y guardamos solo lo que te hace bien. Con calma, con cariño y por categorías.',
       items: [
         { title: 'Mirarlo todo, sin juzgar', text: 'Tu rutina, tus horarios, tus comidas favoritas, tus antojos y cada estante de la despensa. Nada de culpa: solo miramos.' },
         { title: 'Agradecer y dejar ir', text: 'Lo que no te nutre sale de casa con cariño, y cada cosa que sale tiene un cambio delicioso. No pierdes nada: lo cambias.' },
@@ -539,7 +545,9 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       intro: 'Para que veas que es comida de verdad, y mucha. Un ejemplo de lo que armamos juntas, con lo que haya en tu mercado.',
       items: [
         { title: 'Desayuno', text: 'Avena remojada de un día para otro con mango, chía y canela, o un bol grande de fruta de temporada con semillas y coco.' },
+        { title: 'Snack de la mañana', text: 'Una fruta entera, como mango, papaya o plátano, con un puñado de frutos secos.' },
         { title: 'Almuerzo', text: 'Un plato lleno de hojas y verduras, legumbres o lentejas, un grano entero y una salsa cremosa de frutos secos, tahini o aguacate.' },
+        { title: 'Merienda', text: 'Palitos de zanahoria y pepino con hummus casero sin aceite, o una bliss ball de dátiles y frutos secos.' },
         { title: 'Cena', text: 'Sopa de verduras, salteado en agua con ajo y hierbas, curry de garbanzos con leche de coco casera, arroz integral.' },
         { title: 'Y el dulce', text: 'Uno de los siete colores de Sweet Escape, hecho con fruta entera, dátiles y frutos secos. Sí, hay postre. El postre es parte de la vida.' },
       ],
@@ -666,7 +674,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       studioAlt: 'Vrouwen die gezonde zoetigheden proeven na de les',
       tableAlt: 'Brunchtafel in de tuin met tropisch fruit',
       kicker: 'Food Healing Studio · met Food Coach Dolly',
-      text: 'Voedingscoaching voor je hele eetpatroon, van ontbijt tot avondeten. Geen zoveelste eetplan: vrede sluiten met eten en met je lichaam, door alleen planten te eten, heel, zoals de natuur ze geeft.',
+      text: 'Een Marie Kondo voor je relatie met eten, van ontbijt tot avondeten. Geen zoveelste eetplan: vrede sluiten met eten en met je lichaam, door alleen planten te eten, heel, zoals de natuur ze geeft.',
       hi: '“Hoi, ik ben Dolly. Laten we samen je relatie met eten opruimen, stap voor stap. Zonder weegschaal en zonder schuldgevoel.”',
       cta: 'Plan mijn gratis gesprek',
       note: '30 minuten · online · vrijblijvend',
@@ -695,9 +703,9 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       end: 'Als je stopt met vechten tegen je lichaam en het begint te voeden, antwoordt het. In zijn eigen tempo, op zijn eigen manier.',
     },
     kondo: {
-      kicker: 'De methode',
+      kicker: 'De methode · een Marie Kondo voor eten',
       title: 'Alleen wat je voedt en blij maakt, blijft',
-      intro: 'Gezond eten begint in je boodschappenkar, niet bij wilskracht. Wat niet in huis is, eet je niet. Dus ruimen we je hele eetleven op zoals je een kast opruimt: rustig, liefdevol en per categorie.',
+      intro: 'Ken je Marie Kondo, die een heel huis opruimt en alleen houdt wat vreugde geeft? Ik doe hetzelfde met jouw relatie met eten. Gezond eten begint in je boodschappenkar, niet bij wilskracht: wat niet in huis is, eet je niet. Dus ruimen we je eetleven op zoals je een kast opruimt: alles eruit, elk stuk in je handen, bedanken en alleen houden wat je goed doet. Rustig, liefdevol en per categorie.',
       items: [
         { title: 'Alles bekijken, zonder oordeel', text: 'Je routine, je eetmomenten, je lievelingseten, je trek en elke plank in de voorraadkast. Geen schuldgevoel: we kijken alleen.' },
         { title: 'Bedanken en loslaten', text: 'Wat je niet voedt, gaat met zorg het huis uit, en voor alles wat gaat komt er een heerlijk alternatief. Je verliest niets: je ruilt.' },
@@ -734,7 +742,9 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       intro: 'Zodat je ziet dat het echt eten is, en veel. Eén voorbeeld van wat we samen bouwen, met wat jouw markt te bieden heeft.',
       items: [
         { title: 'Ontbijt', text: 'Overnight oats met mango, chia en kaneel, of een grote kom seizoensfruit met zaden en kokos.' },
+        { title: 'Tussendoortje ’s ochtends', text: 'Een heel stuk fruit, zoals mango, papaja of banaan, met een handje noten.' },
         { title: 'Lunch', text: 'Een vol bord bladgroenten en groenten, bonen of linzen, een vol graan en een romige saus van noten, tahin of avocado.' },
+        { title: 'Tussendoortje ’s middags', text: 'Wortel- en komkommerstengels met zelfgemaakte hummus zonder olie, of een bliss ball van dadels en noten.' },
         { title: 'Avondeten', text: 'Groentesoep, in water gesmoord met knoflook en kruiden, kikkererwtencurry met zelfgemaakte kokosmelk, zilvervliesrijst.' },
         { title: 'En het zoete', text: 'Een van de zeven kleuren uit Sweet Escape, gemaakt van heel fruit, dadels en noten. Ja, er is een toetje. Een toetje hoort bij het leven.' },
       ],
