@@ -95,6 +95,18 @@ const ROOM_CSS = `
   .room-body{padding:0.25rem 1rem 1.25rem !important}
   .room-actions .btn{flex:1 1 100%;text-align:center;justify-content:center}
 }
+/* Calmer, shorter (2026-11-13): phones keep the compact row (small photo | name | plus) instead of a full-width
+   photo per room, so four closed rooms take about one screen. */
+@media (max-width:640px){
+  .room-head{display:flex;gap:0.85rem;padding:0.75rem 0.9rem;align-items:center}
+  .room-thumb{width:84px;height:64px;aspect-ratio:auto;border-radius:10px}
+  .room-cap,.room-count{display:none}
+  .room-cap-inline{display:inline-block;font-size:0.75rem;margin-bottom:0.25rem}
+  .room-text{padding-left:0}
+  .room-tag{font-size:0.88rem;margin-top:0.2rem}
+  .room-plus{margin:0}
+  .room-open .room-head{padding-top:0.75rem}
+}
 `;
 
 export default function RoomsAccordion({ onInquire }: Props) {

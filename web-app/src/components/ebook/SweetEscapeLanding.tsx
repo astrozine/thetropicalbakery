@@ -15,6 +15,7 @@ import './sweetEscape.css';
 
 const IMG = '/ebook/sweet-escape';
 
+const BLOCK_ICONS = ['🥥', '🌴', '🌾', '✨', '🍓', '🌈'];
 /** The FAQ shows its first few questions; the rest wait behind one quiet fold. */
 const FAQ_SHOWN = 3;
 const MORE_QUESTIONS: Record<EbookLang, string> = { en: 'More questions', pt: 'Mais perguntas', es: 'Más preguntas', nl: 'Meer vragen', de: 'Weitere Fragen' };
@@ -71,7 +72,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
               <BuyButton>{cta}</BuyButton>
               <ul className="se-hero__ticks">
                 {c.hero.ticks.map(t => <li key={t}>{fill(t, v)}</li>)}
-                <li className="se-hero__en">{foreign ? c.english.badge : c.edition.badge}</li>
+                <li className="se-hero__en">📖 {foreign ? c.english.badge : c.edition.badge}</li>
               </ul>
               <AmazonBadge lang={lang} />
             </div>
@@ -130,7 +131,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
             <summary>{c.learn.title}</summary>
             <p>{rich(c.learn.lead)}</p>
             <dl>
-              {c.learn.blocks.map(b => <React.Fragment key={b.title}><dt>{b.title}</dt><dd>{b.text}</dd></React.Fragment>)}
+              {c.learn.blocks.map((b, n) => <React.Fragment key={b.title}><dt><span aria-hidden>{BLOCK_ICONS[n]}</span> {b.title}</dt><dd>{b.text}</dd></React.Fragment>)}
             </dl>
           </details>
         </div>
@@ -190,7 +191,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
                   <p className="se-card__title"><Brand /></p>
                   <p className="se-card__price">{price}</p>
                   <p className="se-card__usd">{fill(c.offer.usd, v)}</p>
-                  <p className="se-card__en">{foreign ? c.english.badge : c.edition.badge}</p>
+                  <p className="se-card__en">📖 {foreign ? c.english.badge : c.edition.badge}</p>
                 </div>
               </div>
               <PdfPerks lang={lang} />

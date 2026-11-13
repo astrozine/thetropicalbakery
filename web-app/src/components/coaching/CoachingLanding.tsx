@@ -52,6 +52,7 @@ function BookCall({ label, className, where, lang }: { label: string; className?
 function LangSwitch({ lang, label, dark }: { lang: CoachingLang; label: string; dark?: boolean }) {
   return (
     <nav className={`fc-lang${dark ? ' fc-lang--dark' : ''} notranslate`} translate="no" aria-label={label}>
+      <span className="fc-lang__globe" aria-hidden>🌐</span>
             {COACHING_LANGS.map(l => (
         <a
           key={l}
@@ -96,7 +97,8 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
             <p className="fc-hero__text">{t.hero.text}</p>
             <p className="fc-hero__hi">{t.hero.hi}</p>
             <BookCall label={t.hero.cta} className="btn btn-secondary fc-hero__cta" where="topo" lang={lang} />
-            <p className="fc-hero__note">{t.hero.note} · {t.hero.gift}</p>
+            <p className="fc-hero__note">{t.hero.note}</p>
+            <span className="fc-hero__gift"><span aria-hidden>🎁</span> {t.hero.gift}</span>
           </div>
         </div>
       </section>
@@ -118,7 +120,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
 
       {/* ── The promise (no scale, no counting, no before-and-after, no guilt) and the Marie Kondo method ── */}
       <section className="fc-sec fc-calm">
-        <p className="fc-kicker">{t.safe.kicker}</p>
+        <p className="fc-kicker" data-sign="🤍">{t.safe.kicker}</p>
         <h2 className="fc-h2">{t.safe.title}</h2>
         <p className="fc-intro">{t.safe.intro}</p>
         <ul className="fc-pills">{t.safe.items.map(s => <li key={s.title}>{s.title}</li>)}</ul>
@@ -129,7 +131,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
         </details>
 
         <div className="fc-rule" />
-        <p className="fc-kicker">{t.kondo.kicker}</p>
+        <p className="fc-kicker" data-sign="✨">{t.kondo.kicker}</p>
         <h2 className="fc-h2">{t.kondo.title}</h2>
         <p className="fc-intro">{t.kondo.intro}</p>
         <details className="fc-more">
@@ -141,7 +143,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
       {/* ── Dolly's way: three rules, the seven colors, and a day in the Reset ── */}
       <section className="fc-band">
         <div className="fc-sec">
-          <p className="fc-kicker fc-kicker--light">{t.way.kicker}</p>
+          <p className="fc-kicker fc-kicker--light" data-sign="🌿">{t.way.kicker}</p>
           <h2 className="fc-h2 fc-h2--light">{t.way.title}</h2>
           <p className="fc-intro fc-intro--light">{t.way.intro}</p>
           <ol className="fc-steps fc-steps--light">
@@ -170,7 +172,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
       </section>
 
       <section className="fc-sec fc-day">
-        <p className="fc-kicker">{t.day.kicker}</p>
+        <p className="fc-kicker" data-sign="🍽️">{t.day.kicker}</p>
         <h2 className="fc-h2">{t.day.title}</h2>
         <p className="fc-intro">{t.day.intro}</p>
         <div className="fc-swipe fc-swipe--cards">
@@ -186,7 +188,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
 
       {/* ── How it works, and a real slice of Paradise Pantry ── */}
       <section className="fc-sec fc-calm">
-        <p className="fc-kicker">{t.steps.kicker}</p>
+        <p className="fc-kicker" data-sign="🪜">{t.steps.kicker}</p>
         <h2 className="fc-h2">{t.steps.title}</h2>
         <ol className="fc-steps">
           {t.steps.items.map(s => (
@@ -200,7 +202,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
         </ol>
 
         <div className="fc-rule" />
-        <p className="fc-kicker">{t.pantry.kicker}</p>
+        <p className="fc-kicker" data-sign="🧺">{t.pantry.kicker}</p>
         <h2 className="fc-h2">{t.pantry.title}</h2>
         <p className="fc-intro">{t.pantry.intro}</p>
         <div className="fc-swipe">
@@ -227,7 +229,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
         <div className="fc-dolly__head">
           <img className="fc-dolly__face" src="/coaching/dolly-spatula.webp" alt={t.dolly.photoAlt} loading="lazy" />
           <div>
-            <p className="fc-kicker fc-kicker--start">{t.dolly.kicker}</p>
+            <p className="fc-kicker fc-kicker--start" data-sign="👩‍🍳">{t.dolly.kicker}</p>
             <h2 className="fc-h2 fc-h2--start">{t.dolly.title}</h2>
           </div>
         </div>
@@ -534,15 +536,9 @@ const CSS = `
 .fc-hero { min-height: 0; }
 .fc-hero__inner { padding-top: 5.5rem; padding-bottom: 3.5rem; }
 .fc-hero__stage { padding: 0 0 2rem; width: min(100%, 380px); }
-.fc-hero__dolly img { border: 0; border-radius: 999px 999px 18px 18px; box-shadow: 0 24px 50px rgba(0,0,0,0.45); }
-.fc-hero__tag { transform: translateX(-50%); border: 0; box-shadow: 0 10px 24px rgba(0,0,0,0.3); }
-.fc-hero__title { text-shadow: none; font-weight: 500; }
 .fc-hero__hi { background: none; border: 0; padding: 0; backdrop-filter: none; font-style: italic; color: rgba(253,250,243,0.8); font-size: 0.98rem; line-height: 1.6; margin: 0 0 1.6rem; display: block; }
-.fc-hero__kicker { border-bottom: 0; padding-bottom: 0; margin-bottom: 1rem; letter-spacing: 0.18em; }
-.fc-kicker { letter-spacing: 0.16em; font-weight: 600; font-size: 0.75rem; }
 .fc-kicker--start { justify-content: flex-start; }
-.fc-h2 { font-weight: 500; }
-.fc-h3 { font-family: var(--font-heading); font-weight: 500; font-size: 1.2rem; text-align: center; margin: 2rem 0 0.9rem; color: var(--color-primary); }
+.fc-h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.2rem; text-align: center; margin: 2rem 0 0.9rem; color: var(--color-primary); }
 .fc-h3--light { color: #fdfaf3; }
 .fc-intro { margin-bottom: 1.4rem; }
 .fc-rule { width: 48px; height: 1px; background: rgba(60,42,33,0.2); margin: 3rem auto; }
@@ -578,13 +574,13 @@ const CSS = `
 .fc-rules { list-style: none; counter-reset: r; padding: 0; margin: 0 auto; max-width: 680px; display: grid; gap: 1.2rem; }
 .fc-rules li { counter-increment: r; display: grid; grid-template-columns: 2.2rem 1fr; column-gap: 0.6rem; color: rgba(253,250,243,0.82); line-height: 1.65; }
 .fc-rules li::before { content: counter(r); grid-row: span 2; font-family: var(--font-heading); font-size: 1.6rem; line-height: 1; color: #e7c75a; }
-.fc-rules b { color: #fdfaf3; font-family: var(--font-heading); font-weight: 500; font-size: 1.1rem; margin-bottom: 0.2rem; }
+.fc-rules b { color: #fdfaf3; font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.2rem; }
 .fc-dots { list-style: none; padding: 0; margin: 0 auto 0.4rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1rem; color: #fdfaf3; font-size: 0.92rem; }
 .fc-dots li { display: inline-flex; align-items: center; gap: 0.4rem; }
 .fc-dots span { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,0.3); }
 
 .fc-swipe--cards .fc-day__card { flex: 0 0 74%; max-width: 280px; background: #fff; border: 1px solid rgba(60,42,33,0.1); border-radius: 16px; padding: 1.1rem 1.2rem; }
-.fc-day__card h3 { font-family: var(--font-heading); font-weight: 500; font-size: 1.1rem; margin: 0 0 0.4rem; color: #3c2a21; }
+.fc-day__card h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; margin: 0 0 0.4rem; color: #3c2a21; }
 .fc-day__card p { margin: 0; font-size: 0.92rem; line-height: 1.6; color: #594a42; }
 
 .fc-steps { list-style: none; counter-reset: st; padding: 0; margin: 0 auto; max-width: 620px; border-top: 1px solid rgba(60,42,33,0.12); }
@@ -608,7 +604,7 @@ const CSS = `
 
 .fc-gifts { list-style: none; padding: 0; margin: 0 auto 2rem; max-width: 520px; display: grid; gap: 0.8rem; text-align: left; }
 .fc-gifts li { display: grid; gap: 0.15rem; padding: 0 0 0.8rem; border-bottom: 1px solid rgba(253,250,243,0.14); color: rgba(253,250,243,0.8); font-size: 0.94rem; line-height: 1.55; }
-.fc-gifts b { color: #fdfaf3; font-family: var(--font-heading); font-weight: 500; font-size: 1.05rem; }
+.fc-gifts b { color: #fdfaf3; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; }
 .fc-final__title { font-weight: 500; }
 .fc-inc { margin-top: 1.5rem; }
 .fc-inc .fc-inc__list { color: rgba(253,250,243,0.85); }
@@ -631,7 +627,7 @@ const CSS = `
 }
 .fc-steps--light { border-color: rgba(253,250,243,0.16); }
 .fc-steps--light li { border-color: rgba(253,250,243,0.16); }
-.fc-steps--light summary { color: #fdfaf3; font-family: var(--font-heading); font-weight: 500; font-size: 1.05rem; }
+.fc-steps--light summary { color: #fdfaf3; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; }
 .fc-steps--light summary::before, .fc-steps--light summary::after { color: #e7c75a; }
 .fc-steps--light p { color: rgba(253,250,243,0.82); }
 .fc-faq .fc-more { background: none; border: 0; padding: 0; margin-top: 0.6rem; }

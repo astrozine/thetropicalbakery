@@ -116,7 +116,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             <div className="rh__card">
               <b className="rh__num">{nearby.beach.num}</b>
               <span className="rh__lbl">{nearby.beach.label}</span>
-              <span className="rh__extra">{nearby.beach.extra}</span>
+              <span className="rh__extra"><span aria-hidden>✦</span> {nearby.beach.extra}</span>
             </div>
           </div>
           <div className="rh__ph rh__ph--island">
@@ -201,13 +201,10 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             .rh__text { line-height: 1.75; margin-bottom: 1.75rem; }
             .rh__cta { padding: 0.95rem 2.25rem; font-size: 1.05rem; letter-spacing: 1.5px; }
           }
-          /* Calmer (2026-11-13): nothing tilted, fewer photos on phones, no heavy text shadow. */
-          .rh__ph--bundt, .rh__ph--cake, .rh__ph--coast, .rh__ph--island { transform: none !important; }
-          .rh__title { text-shadow: none; font-weight: 500; }
-          .rh__ribbon { display: none; }
+          /* Shorter (2026-11-13): phones show one photo above the words instead of a four-photo collage. */
           @media (max-width: 767px) {
             .rh__ph--bundt, .rh__ph--cake, .rh__ph--island { display: none; }
-            .rh__ph--coast { width: 100%; border: 0; padding: 0; background: none; box-shadow: none; }
+            .rh__ph--coast { width: 100%; transform: none; border: 0; padding: 0; background: none; box-shadow: none; }
             .rh__ph--coast img { border-radius: 14px; aspect-ratio: 16 / 10; }
             .rh__ph--coast .rh__card { color: #fdfaf3; }
             .rh__ph--coast .rh__lbl { color: rgba(253,250,243,0.8); }
@@ -261,8 +258,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
                 .rx__num { font-size: 1.45rem; }
                 .rx__lbl { font-size: 0.78rem; }
               }
-              /* Calmer (2026-11-13): phones show just the waterfall, straight, with the distance under it. */
-              .rx__wide { transform: none !important; }
+              /* Shorter (2026-11-13): phones show just the waterfall, with the distance under it. */
               @media (max-width: 767px) {
                 .rx { padding: 1.25rem 1.25rem 0.5rem; background: none; }
                 .rx__stage { aspect-ratio: auto; }
@@ -288,7 +284,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
                 <ul style={{ listStyle: 'none', padding: 0 }}>
                   {texts.experience.bullets.map((item, i) => (
                     <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '1rem', fontSize: '1.05rem', lineHeight: '1.7', color: '#594a42' }}>
-                      <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: '#d4af37', flexShrink: 0, marginTop: '0.7em' }} />
+                      <span style={{ color: '#d4af37', fontSize: '1.2rem', flexShrink: 0 }}>✦</span>
                       {item}
                     </li>
                   ))}
