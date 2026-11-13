@@ -59,6 +59,20 @@ export default function TravelManagersPage() {
         ctaLabel="Falar com o Comercial"
       />
 
+      {/* Shorter on phones (2026-11-13): offers swipe, one photo, treat strip in one row */}
+      <style>{`
+        @media (max-width: 699px) {
+          .tm-offers > div { padding: 1.4rem !important; }
+          .tm-how { padding: 1.5rem !important; }
+          .tm-row { gap: 1.25rem !important; }
+          .tm-photos > :nth-child(2) { display: none !important; }
+          .tm-photos img { height: 200px !important; }
+          .tm-strip { flex-wrap: nowrap !important; justify-content: flex-start !important; overflow-x: auto; scroll-snap-type: x mandatory; padding: 1.5rem 1rem !important; gap: 0.75rem !important; }
+          .tm-strip img { width: 130px !important; height: 130px !important; flex: none; scroll-snap-align: start; }
+          .tm-strip > * { flex: none; }
+        }
+      `}</style>
+
       {/* Everything we offer */}
       <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(3.5rem, 7vw, 5.5rem)', paddingBottom: '1rem' }}>
         <h2 style={{ position: 'relative', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#3c2a21', marginBottom: '1rem' }}>
@@ -67,7 +81,7 @@ export default function TravelManagersPage() {
         <p style={{ textAlign: 'center', color: '#7a6a61', maxWidth: '640px', margin: '0 auto 3rem', lineHeight: 1.8 }}>
           Monte o retiro do seu jeito — combine o que fizer sentido para o seu grupo.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.75rem', marginBottom: '2rem' }}>
+        <div className="tb-rail tm-offers" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.75rem', marginBottom: '2rem' }}>
           {OFFERINGS.map((o, i) => (
             <div key={i} className="liquid-glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column' }}>
               <div style={{ fontSize: '2.4rem', marginBottom: '1rem' }}>{o.icon}</div>
@@ -85,7 +99,7 @@ export default function TravelManagersPage() {
       <section className="container px-4 max-w-6xl mx-auto" style={{ paddingTop: '2rem', paddingBottom: 'clamp(5rem, 10vw, 7.5rem)' }}>
         <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '4rem', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }} className="fade-in">
-            <div className="liquid-glass-card" style={{ padding: '3rem' }}>
+            <div className="liquid-glass-card tm-how" style={{ padding: '3rem' }}>
               <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)', fontWeight: 800 }}>Como Funciona a Parceria?</h2>
               <p style={{ fontSize: '1.05rem', marginBottom: '1.5rem', color: '#594a42', lineHeight: '1.8' }}>
                 Se você é instrutora de yoga, guia turística, ou simplesmente a pessoa que organiza as viagens do seu grupo
@@ -108,7 +122,7 @@ export default function TravelManagersPage() {
             </div>
           </div>
 
-          <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '2rem' }} className="fade-in">
+          <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '2rem' }} className="fade-in tm-photos">
             <ZoomableImage src="/retreats/Room with open ripada door.jpg" alt="Acomodações" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 10px 30px rgba(60,42,33,0.15)' }} />
             <ZoomableImage src="/retreats/Beach shot Itamambuca.webp" alt="Itamambuca Beach" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 10px 30px rgba(60,42,33,0.15)' }} />
           </div>
@@ -117,7 +131,7 @@ export default function TravelManagersPage() {
 
       {/* Treat Gallery Strip */}
       <StripedBackground tone="dark" bandHeight={64}>
-        <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap', padding: '3rem 2rem' }}>
+        <div className="tm-strip" style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap', padding: '3rem 2rem' }}>
           {['/menu-items/Screenshot_20260810_135948_Photos.jpg', '/menu-items/20260620_163438.jpg', '/menu-items/1000231026_3b42196b4ea44c55b3834d9f1bf36302-2_17_2026_8_48_32_AM.webp', '/menu-items/Screenshot_20260708_144013_Gallery.jpg'].map((src, i) => (
             <ZoomableImage key={i} src={src} alt="Criação Tropical" style={{ width: '200px', height: '200px', objectFit: 'cover', borderRadius: '12px', border: '2px solid rgba(212,175,55,0.3)' }} />
           ))}
