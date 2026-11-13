@@ -10,11 +10,11 @@ import { optimizedSrc } from '@/lib/thumbs';
 
 // The boxes Dolly has already made: real photos, shown as a showcase only.
 const BOXES = [
-  { src: '/treats/media_1789712796150.jpg', alt: 'Caixa com doce de frutas vermelhas, bombom de chocolate e cookies' },
   { src: '/treats/media_1789712835955.jpg', alt: 'Doce de frutas vermelhas com coco e bombons na caixa listrada' },
   { src: '/treats/media_1789712814475.jpg', alt: 'Caixa aberta com o selo da The Tropical Bakery' },
   { src: '/treats/media_1789712998942.jpg', alt: 'Caixa de doces com bombom branco e cookies' },
   { src: '/treats/media_1789712777199.jpg', alt: 'Tampa da caixa com o selo dourado da The Tropical Bakery' },
+  { src: '/treats/media_1789712972031.jpg', alt: 'Caixa da The Tropical Bakery vista de cima' },
 ];
 
 // Close-ups that make people hungry.
@@ -36,27 +36,39 @@ const WAYS = [
   { href: '/cursos', img: '/menu-items/20250914_132214.jpg', title: 'Cursos e retiros', text: 'Aprenda a fazer na cozinha dela.' },
 ];
 
-const HERO = '/menu-items/Screenshot_20260401_193246_Edits.jpg';
+// Hero photos are shown no bigger than their real size (the originals are ~1000px phone photos;
+// stretching one across the whole screen made it look pixelated).
+const HERO = [
+  { src: '/treats/media_1789712796150.jpg', alt: 'Caixa da Dolly com doces de frutas vermelhas, chocolate e cookies' },
+  { src: '/menu-items/20250823_121752.jpg', alt: 'Bolinhas de frutas vermelhas com morangos e cerejas' },
+  { src: '/menu-items/Screenshot_20260401_193246_Edits.jpg', alt: 'Calda de chocolate escorrendo sobre torta de menta' },
+  { src: '/menu-items/20260620_163438.jpg', alt: 'Torta rosada com flores brancas' },
+];
 
 export default function Home() {
   return (
     <main className="hm">
       <style>{CSS}</style>
 
-      {/* Hero: one big photo, one line, two buttons */}
+      {/* Hero: one line, two buttons, and four sharp photos (never stretched past their real size) */}
       <section className="hm-hero">
-        <img className="hm-hero__img" src={optimizedSrc(HERO, 1920)} alt="" fetchPriority="high" />
-        <div className="hm-hero__shade" />
         <div className="hm-hero__inner">
-          <p className="hm-kicker hm-kicker--light">Itamambuca · Ubatuba</p>
+          <div className="hm-hero__copy">
+          <p className="hm-kicker">Itamambuca · Ubatuba</p>
           <h1 className="hm-hero__title">Doces que dão <em>água na boca</em>.</h1>
           <p className="hm-hero__text">Veganos, feitos à mão pela Dolly, entre a Mata Atlântica e o mar.</p>
           <ul className="hm-pills">
             <li>100% vegetal</li><li>Sem trigo</li><li>Feito à mão</li>
           </ul>
           <div className="hm-hero__ctas">
-            <a href="#caixas" className="hm-btn hm-btn--gold">Ver os doces</a>
+            <a href="#caixas" className="hm-btn hm-btn--dark">Ver os doces</a>
             <Link href="/receitas" className="hm-btn hm-btn--ghost">Receitas grátis</Link>
+          </div>
+          </div>
+          <div className="hm-hero__photos">
+            {HERO.map((h, i) => (
+              <img key={h.src} src={optimizedSrc(h.src, 640)} alt={h.alt} fetchPriority={i < 2 ? 'high' : undefined} />
+            ))}
           </div>
         </div>
       </section>
@@ -138,19 +150,22 @@ const CSS = `
 .hm-sec--soft { background: #f6eedf; }
 
 /* hero */
-.hm-hero { position: relative; min-height: min(86vh, 760px); display: flex; align-items: flex-end; overflow: hidden; background: #3c2a21; }
-.hm-hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.hm-hero__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(30,20,14,0.05) 25%, rgba(30,20,14,0.82) 100%); }
-.hm-hero__inner { position: relative; width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 1.25rem clamp(2.5rem, 7vw, 4.5rem); }
-.hm-hero__title { margin: 0 0 0.7rem; font-family: var(--font-heading); font-size: clamp(2.4rem, 8vw, 5rem); line-height: 1.02; color: #fdfaf3; max-width: 12ch; text-wrap: balance; }
-.hm-hero__title em { font-style: normal; color: #f4d675; }
-.hm-hero__text { margin: 0 0 1.1rem; max-width: 34ch; color: rgba(253,250,243,0.9); font-size: clamp(1.05rem, 2.4vw, 1.25rem); line-height: 1.5; }
+.hm-hero { background: #fdfaf3; padding: clamp(1.5rem, 5vw, 4rem) 0 clamp(2.5rem, 6vw, 4.5rem); }
+.hm-hero__inner { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; display: grid; gap: 1.75rem; align-items: center; }
+@media (min-width: 900px) { .hm-hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3.5rem; } }
+.hm-hero__title { margin: 0 0 0.7rem; font-family: var(--font-heading); font-size: clamp(2.3rem, 7vw, 4.4rem); line-height: 1.02; color: #3c2a21; text-wrap: balance; }
+.hm-hero__title em { font-style: normal; color: #c9852b; }
+.hm-hero__text { margin: 0 0 1.1rem; max-width: 34ch; color: #594a42; font-size: clamp(1.05rem, 2.4vw, 1.25rem); line-height: 1.5; }
 .hm-pills { list-style: none; display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0 0 1.5rem; padding: 0; }
-.hm-pills li { padding: 0.35rem 0.85rem; border-radius: 999px; background: rgba(253,250,243,0.14); border: 1px solid rgba(253,250,243,0.35); color: #fdfaf3; font-size: 0.85rem; font-weight: 700; backdrop-filter: blur(6px); }
+.hm-pills li { padding: 0.35rem 0.85rem; border-radius: 999px; background: #f6eedf; border: 1px solid #eadfcb; color: #3c2a21; font-size: 0.85rem; font-weight: 700; }
 .hm-hero__ctas { display: flex; flex-wrap: wrap; gap: 0.7rem; }
 .hm-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 1.6rem; border-radius: 999px; font-weight: 800; font-size: 1rem; text-decoration: none; }
-.hm-btn--gold { background: #f4d675; color: #3c2a21; }
-.hm-btn--ghost { border: 1.5px solid rgba(253,250,243,0.8); color: #fdfaf3; }
+.hm-btn--dark { background: #3c2a21; color: #f4d675; }
+.hm-btn--ghost { border: 1.5px solid #3c2a21; color: #3c2a21; }
+.hm-hero__photos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; max-width: 560px; width: 100%; justify-self: center; }
+.hm-hero__photos img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 18px; box-shadow: 0 12px 28px rgba(60,42,33,0.14); }
+.hm-hero__photos img:nth-child(even) { transform: translateY(1.5rem); }
+@media (max-width: 899px) { .hm-hero__photos { order: -1; } .hm-hero__photos img { aspect-ratio: 1; } .hm-hero__photos img:nth-child(even) { transform: none; } }
 
 /* boxes showcase */
 .hm-boxes { display: grid; gap: 0.6rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
