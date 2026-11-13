@@ -99,7 +99,7 @@ const ROOM_CSS = `
 
 export default function RoomsAccordion({ onInquire }: Props) {
   const [rooms, setRooms] = useState<RetreatRoomInfo[]>(RETREAT_ROOMS);
-  const [openId, setOpenId] = useState<string | null>('house');
+  const [openId, setOpenId] = useState<string | null>(null); // all closed: the page is short now (2026-11-13); a tap opens a room
 
   // Photos added in /admin/retreats replace the defaults for that room.
   useEffect(() => {

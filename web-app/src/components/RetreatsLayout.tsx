@@ -116,7 +116,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             <div className="rh__card">
               <b className="rh__num">{nearby.beach.num}</b>
               <span className="rh__lbl">{nearby.beach.label}</span>
-              <span className="rh__extra"><span aria-hidden>✦</span> {nearby.beach.extra}</span>
+              <span className="rh__extra">{nearby.beach.extra}</span>
             </div>
           </div>
           <div className="rh__ph rh__ph--island">
@@ -201,6 +201,19 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             .rh__text { line-height: 1.75; margin-bottom: 1.75rem; }
             .rh__cta { padding: 0.95rem 2.25rem; font-size: 1.05rem; letter-spacing: 1.5px; }
           }
+          /* Calmer (2026-11-13): nothing tilted, fewer photos on phones, no heavy text shadow. */
+          .rh__ph--bundt, .rh__ph--cake, .rh__ph--coast, .rh__ph--island { transform: none !important; }
+          .rh__title { text-shadow: none; font-weight: 500; }
+          .rh__ribbon { display: none; }
+          @media (max-width: 767px) {
+            .rh__ph--bundt, .rh__ph--cake, .rh__ph--island { display: none; }
+            .rh__ph--coast { width: 100%; border: 0; padding: 0; background: none; box-shadow: none; }
+            .rh__ph--coast img { border-radius: 14px; aspect-ratio: 16 / 10; }
+            .rh__ph--coast .rh__card { color: #fdfaf3; }
+            .rh__ph--coast .rh__lbl { color: rgba(253,250,243,0.8); }
+            .rh__ph--coast .rh__num { color: #e7c75a; }
+            .rh__ph--coast .rh__extra { color: rgba(253,250,243,0.7); border-top-color: rgba(253,250,243,0.2); }
+          }
         ` }} />
       </section>
 
@@ -248,6 +261,15 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
                 .rx__num { font-size: 1.45rem; }
                 .rx__lbl { font-size: 0.78rem; }
               }
+              /* Calmer (2026-11-13): phones show just the waterfall, straight, with the distance under it. */
+              .rx__wide { transform: none !important; }
+              @media (max-width: 767px) {
+                .rx { padding: 1.25rem 1.25rem 0.5rem; background: none; }
+                .rx__stage { aspect-ratio: auto; }
+                .rx__arch, .rx__ring { display: none; }
+                .rx__wide { position: relative; right: auto; bottom: auto; width: 100%; border: 0; border-radius: 14px; box-shadow: none; }
+                .rx__card { position: static; margin-top: 0.6rem; }
+              }
             ` }} />
           </div>
           {/* Text side */}
@@ -266,7 +288,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
                 <ul style={{ listStyle: 'none', padding: 0 }}>
                   {texts.experience.bullets.map((item, i) => (
                     <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '1rem', fontSize: '1.05rem', lineHeight: '1.7', color: '#594a42' }}>
-                      <span style={{ color: '#d4af37', fontSize: '1.2rem', flexShrink: 0 }}>✦</span>
+                      <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: '#d4af37', flexShrink: 0, marginTop: '0.7em' }} />
                       {item}
                     </li>
                   ))}
@@ -286,10 +308,10 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           maxWidth: '1200px',
           margin: '0 auto 3rem',
         }}>
-          <ZoomableImage src="/menu-items/Screenshot_20260415_110305_Gallery.jpg" alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
-          <ZoomableImage src="/menu-items/Screenshot_20260401_193246_Edits.jpg"   alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
-          <ZoomableImage src="/menu-items/Screenshot_20260518_122444_Gallery.jpg" alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
-          <ZoomableImage src="/menu-items/20260209_172647.jpg"                    alt="Criações da Tropical Bakery" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
+          <ZoomableImage src="/menu-items/Screenshot_20260415_110305_Gallery.jpg" alt="Criações da Tropical Bakery" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
+          <ZoomableImage src="/menu-items/Screenshot_20260401_193246_Edits.jpg"   alt="Criações da Tropical Bakery" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
+          <ZoomableImage src="/menu-items/Screenshot_20260518_122444_Gallery.jpg" alt="Criações da Tropical Bakery" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
+          <ZoomableImage src="/menu-items/20260209_172647.jpg"                    alt="Criações da Tropical Bakery" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
         </div>
         <h2 data-sign-top="🍫" style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', marginBottom: '1rem' }}>
           {texts.foodHero.title}
@@ -339,7 +361,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
 
       {/* Photo Gallery — cinematic grid */}
       <section style={{ padding: '0' }}>
-        <div style={{
+        <div className="rgal" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gridTemplateRows: 'repeat(2, 250px)',
@@ -379,6 +401,9 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
         </ScrollReveal>
       </section>
 
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 767px) { .rgal { grid-template-rows: repeat(2, 110px) !important; } }
+      ` }} />
       <CrmRegistrationModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
