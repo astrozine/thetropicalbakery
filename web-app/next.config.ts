@@ -28,6 +28,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // The weekly tasting box is not on sale (Andrew, 2026-11-13; see src/lib/boxSale.ts). Its pages stay in the
+  // code; visitors are sent to the box showcase on the home page. Remove these two to bring them back.
+  async redirects() {
+    return [
+      { source: '/caixas', destination: '/#caixas', permanent: false },
+      { source: '/assinatura', destination: '/#caixas', permanent: false },
+    ];
+  },
   async headers() {
     return [
       {

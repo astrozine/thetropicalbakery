@@ -29,11 +29,17 @@ const TREATS = [
   '/menu-items/Screenshot_20260415_110305_Gallery.jpg',
 ];
 
-const WAYS = [
-  { href: '/receitas', img: '/menu-items/20250823_122444.jpg', title: 'Receitas grátis', text: 'Duas receitas da Dolly no seu e-mail.' },
-  { href: '/menu', img: '/menu-items/Screenshot_20260518_122444_Gallery.jpg', title: 'Doces para eventos', text: 'Mesas de doces, festas e presentes.' },
-  { href: '/brunch', img: '/menu-items/20260724_154636.jpg', title: 'Brunch com a Dolly', text: 'Chá, doces e boa conversa.' },
-  { href: '/cursos', img: '/menu-items/20250914_132214.jpg', title: 'Cursos e retiros', text: 'Aprenda a fazer na cozinha dela.' },
+// Quick look at everything on the site, shown right under the hero as a swipe row.
+const OFFERS = [
+  { href: '/receitas', img: '/menu-items/20250823_122444.jpg', title: 'Receitas grátis', text: 'Duas receitas no seu e-mail' },
+  { href: '/sweet-escape/pt', img: '/ebook/sweet-escape/pt/cover.webp', title: 'E-book Sweet Escape', text: 'As receitas da Dolly' },
+  { href: '/menu', img: '/menu-items/Screenshot_20260518_122444_Gallery.jpg', title: 'Doces para eventos', text: 'Festas, mesas e presentes' },
+  { href: '/brunch', img: '/brunch/brunch-mesa.webp', title: 'Brunch com a Dolly', text: 'Uma manhã à mesa' },
+  { href: '/cursos', img: '/menu-items/20250914_132214.jpg', title: 'Cursos', text: 'Aprenda a fazer' },
+  { href: '/retreats', img: '/retreats/Beach shot Itamambuca.webp', title: 'Retiros', text: 'Dias em Itamambuca' },
+  { href: '/coaching', img: '/coaching/dolly-hero.webp', title: 'Coaching', text: 'Comer melhor, com a Dolly' },
+  { href: '/vontade', img: '/vontade/dolly-tray.webp', title: 'App Bateu Vontade', text: 'Doce saudável na hora' },
+  { href: '/b2b', img: '/b2b-hero/treat-3.jpg', title: 'Parcerias', text: 'Para cafés e hotéis' },
 ];
 
 // Hero photos are shown no bigger than their real size (the originals are ~1000px phone photos;
@@ -69,6 +75,22 @@ export default function Home() {
           <div className="hm-hero__photos">
             {HERO.map((h, i) => (
               <img key={h.src} src={optimizedSrc(h.src, 640)} alt={h.alt} fetchPriority={i < 2 ? 'high' : undefined} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Everything on the site at a glance: a short swipe row */}
+      <section className="hm-offers" aria-label="O que tem por aqui">
+        <div className="hm-wrap">
+          <p className="hm-kicker">O que tem por aqui</p>
+          <div className="hm-offers__row">
+            {OFFERS.map(o => (
+              <Link key={o.href} href={o.href} className="hm-offer">
+                <img src={optimizedSrc(o.img, 384)} alt="" loading="lazy" />
+                <b>{o.title}</b>
+                <small>{o.text}</small>
+              </Link>
             ))}
           </div>
         </div>
@@ -119,20 +141,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Where to go next */}
-      <section className="hm-sec hm-sec--soft">
-        <div className="hm-wrap">
-          <h2 className="hm-h2">Quer provar?</h2>
-          <div className="hm-ways">
-            {WAYS.map(w => (
-              <Link key={w.href} href={w.href} className="hm-way">
-                <img src={optimizedSrc(w.img, 640)} alt="" loading="lazy" />
-                <span><b>{w.title}</b><small>{w.text}</small></span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
@@ -154,7 +162,7 @@ const CSS = `
 .hm-hero { background: #fdfaf3; padding: clamp(1.5rem, 5vw, 4rem) 0 clamp(2.5rem, 6vw, 4.5rem); }
 .hm-hero__inner { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; display: grid; gap: 1.75rem; align-items: center; }
 @media (min-width: 900px) { .hm-hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3.5rem; } }
-.hm-hero__logo { display: block; width: clamp(110px, 14vw, 170px); height: auto; margin: 0 0 1.25rem; filter: drop-shadow(0 10px 18px rgba(60,42,33,0.18)); }
+.hm-hero__logo { display: block; width: clamp(110px, 14vw, 170px); height: auto; margin: 0 auto 1.25rem; filter: drop-shadow(0 10px 18px rgba(60,42,33,0.18)); }
 @media (max-width: 899px) { .hm-hero__logo { display: none; } }
 .hm-hero__title { margin: 0 0 0.7rem; font-family: var(--font-heading); font-size: clamp(2.3rem, 7vw, 4.4rem); line-height: 1.02; color: #3c2a21; text-wrap: balance; }
 .hm-hero__title em { font-style: normal; color: #c9852b; }
@@ -195,12 +203,15 @@ const CSS = `
 @media (min-width: 760px) { .hm-dolly { grid-template-columns: 300px minmax(0, 1fr); gap: 3rem; } .hm-dolly img { width: 100%; } }
 .hm-link { font-weight: 800; color: #3c2a21; text-decoration: underline; text-underline-offset: 4px; }
 
-/* ways */
-.hm-ways { display: grid; gap: 0.7rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1.25rem; }
-@media (min-width: 900px) { .hm-ways { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; } }
-.hm-way { display: flex; flex-direction: column; background: #fff; border-radius: 18px; overflow: hidden; text-decoration: none; color: #3c2a21; box-shadow: 0 8px 22px rgba(60,42,33,0.08); }
-.hm-way img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
-.hm-way span { display: grid; gap: 0.2rem; padding: 0.75rem 0.85rem 0.9rem; }
-.hm-way b { font-family: var(--font-heading); font-size: 1rem; line-height: 1.2; }
-.hm-way small { color: #7a6a61; font-size: 0.85rem; line-height: 1.4; }
+/* offers swipe row */
+.hm-offers { background: #fff; padding: 1.25rem 0 1.4rem; border-bottom: 1px solid rgba(60,42,33,0.08); }
+.hm-offers .hm-kicker { margin: 0 0 0.7rem; }
+.hm-offers__row { display: flex; gap: 0.75rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 0.4rem; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.hm-offer { flex: 0 0 132px; scroll-snap-align: start; display: grid; align-content: start; gap: 0.15rem; text-decoration: none; color: #3c2a21; }
+.hm-offer img { width: 132px; height: 132px; object-fit: cover; object-position: center top; border-radius: 16px; margin-bottom: 0.35rem; background: #f3ece0; }
+.hm-offer b { font-family: var(--font-heading); font-size: 0.95rem; line-height: 1.2; }
+.hm-offer small { color: #7a6a61; font-size: 0.78rem; line-height: 1.3; }
+.hm-offer:hover img { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(60,42,33,0.15); }
+.hm-offer img { transition: transform .2s, box-shadow .2s; }
+@media (min-width: 900px) { .hm-offer { flex-basis: 150px; } .hm-offer img { width: 150px; height: 150px; } }
 `;
