@@ -553,7 +553,23 @@ export default function ChefDolly() {
         @media (prefers-reduced-motion: reduce) {
           .cd-hero__bg { transform: none; }
         }
-      ` }} />
+      
+        /* ══ SHORTER ON PHONES (Andrew + Dolly, 2026-11-13): same story, same photos, less scrolling. The cast and the
+           sculptures become swipeable rows; the photos beside the story are smaller. ══ */
+        @media (max-width: 767px) {
+          .cd-act, .cd-gallery, .cd-worlds, .cd-cast, .cd-end { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+          .cd-sub { margin-bottom: 1.5rem; }
+          .cd-cast__grid, .cd-gallery__wall { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 0.8rem; margin: 0 -1.25rem; padding: 0.3rem 1.25rem 0.8rem; scrollbar-width: none; }
+          .cd-cast__grid::-webkit-scrollbar, .cd-gallery__wall::-webkit-scrollbar { display: none; }
+          .cd-cast__grid > *, .cd-gallery__wall > * { flex: 0 0 74%; scroll-snap-align: start; }
+          .cd-gallery__wall > * { flex-basis: 58%; }
+          .cd-cast__card { padding: 2.1rem 1.1rem 1.2rem; }
+          .cd-frame img { aspect-ratio: 16 / 10; }
+          .cd-portrait { max-width: 230px; }
+          .cd-bow { width: 190px; margin-bottom: 1.5rem; }
+          .cd-worlds__medal { display: none; }
+        }
+` }} />
     </main>
   );
 }

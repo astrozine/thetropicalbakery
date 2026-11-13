@@ -46,7 +46,7 @@ export default function OtherCourses({ currentSlug }: { currentSlug: string }) {
           Outros Cursos
         </h3>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+        <div className="tb-rail" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
           {otherCourses.map(course => (
             <Link 
               key={course.slug} 

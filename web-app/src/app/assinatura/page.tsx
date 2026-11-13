@@ -103,6 +103,7 @@ export default function SubscriptionPage() {
   const [selectedPlanId, setSelectedPlanId] = useState('');
   const [loading, setLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [allFaq, setAllFaq] = useState(false);
   const sizePrices = useBoxSizePrices();
   // A plan's price for the 2- and 6-treat box: the plan's usual discount on that size (same sum as the form and the database).
   const basePerBox = Math.max(0, ...plans.map(p => Number(p.price_per_box) || 0));
@@ -146,6 +147,17 @@ export default function SubscriptionPage() {
 
   return (
     <main style={{ background: 'var(--color-background)' }}>
+
+      {/* Shorter on phones (2026-11-13) */}
+      <style>{`
+        @media (max-width: 699px) {
+          .sub-hide-phone { display: none; }
+          .sub-inside-photo img { aspect-ratio: 16 / 10; object-fit: cover; }
+          .sub-inside-list li { margin-bottom: 0.45rem !important; line-height: 1.55 !important; font-size: 0.95rem; }
+          .sub-why > div { background: rgba(253,250,243,0.06); border: 1px solid rgba(212,175,55,0.3); border-radius: 16px; padding: 1.1rem; }
+          [data-sign-top="💛"] { margin-bottom: 1.5rem !important; }
+        }
+      `}</style>
 
       {/* ---------------------------------------------------------------- HERO */}
       <StripedBackground tone="dark" bandHeight={96} image="/textures/copacabana-baker.webp" imagePosition="35% 60%" style={{ paddingTop: 'clamp(4.5rem, 12vw, 10rem)', paddingBottom: 'clamp(2.25rem, 8vw, 7rem)' }}>
@@ -204,7 +216,7 @@ export default function SubscriptionPage() {
             Ver planos e preços
           </button>
 
-          <OriginSeal tone="dark" style={{ marginTop: '2rem' }} />
+          <span className="sub-hide-phone"><OriginSeal tone="dark" style={{ marginTop: '2rem' }} /></span>
 
           <p style={{ fontSize: '0.8rem', color: 'rgba(253,250,243,0.6)', marginTop: '1.5rem' }}>
             Vagas limitadas — tudo é feito em uma cozinha, por uma pessoa.
@@ -262,7 +274,7 @@ export default function SubscriptionPage() {
             </div>
           </ScrollReveal>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2rem' }}>
+          <div className="tb-rail" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2rem' }}>
             {HOW_IT_WORKS.map(s => (
               <ScrollReveal key={s.step}>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
@@ -493,7 +505,7 @@ export default function SubscriptionPage() {
           maxWidth: '1000px', margin: '0 auto', display: 'flex', gap: 'clamp(2rem, 5vw, 4rem)',
           alignItems: 'center', flexWrap: 'wrap',
         }}>
-          <div style={{ flex: '1 1 300px' }}>
+          <div style={{ flex: '1 1 300px' }} className="sub-inside-photo">
             <img
               src="/box1.jpg"
               alt="Caixa de Degustação"
@@ -507,7 +519,7 @@ export default function SubscriptionPage() {
             }}>
               O que vem na caixa
             </h2>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            <ul className="sub-inside-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {INSIDE_THE_BOX.map(item => (
                 <li key={item} style={{
                   display: 'flex', gap: '0.85rem', alignItems: 'flex-start',
@@ -531,7 +543,7 @@ export default function SubscriptionPage() {
           }}>
             Por que assinar em vez de pedir
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '2.5rem' }}>
+          <div className="tb-rail sub-why" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '2.5rem' }}>
             {WHY_SUBSCRIBE.map(item => (
               <div key={item.title}>
                 <div style={{ fontSize: '1.8rem', color: '#d4af37', marginBottom: '0.9rem' }}>{item.icon}</div>
@@ -571,7 +583,7 @@ export default function SubscriptionPage() {
           }}>
             Perguntas frequentes
           </h2>
-          {FAQ.map((item, i) => (
+          {(allFaq ? FAQ : FAQ.slice(0, 3)).map((item, i) => (
             <div key={item.q} style={{ borderBottom: '1px solid #e8e1d7' }}>
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
@@ -595,6 +607,11 @@ export default function SubscriptionPage() {
               )}
             </div>
           ))}
+          {!allFaq && FAQ.length > 3 && (
+            <button type="button" onClick={() => setAllFaq(true)} style={{ display: 'block', margin: '0.75rem auto 0', minHeight: '44px', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, color: 'var(--color-primary)', textDecoration: 'underline', textUnderlineOffset: '4px', fontFamily: 'var(--font-body)', fontSize: '1rem' }}>
+              Mais perguntas
+            </button>
+          )}
         </div>
       </section>
 

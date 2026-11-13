@@ -168,7 +168,17 @@ export default function TodasAsParcerias() {
         </div>
       </section>
 
-      {/* ── Alternating partnership cards ── */}
+      {/* ── Alternating partnership cards ── (compact on phones, 2026-11-13: shorter site) */}
+      <style>{`
+        @media (max-width: 699px) {
+          .b2b-card { gap: 0.9rem !important; padding: 0.9rem !important; border-radius: 22px !important; }
+          .b2b-card__photo { aspect-ratio: 16 / 9 !important; border-radius: 16px !important; }
+          .b2b-card__inset, .b2b-card__tags { display: none !important; }
+          .b2b-card h2 { font-size: 1.45rem !important; margin-bottom: 0.5rem !important; }
+          .b2b-card p { line-height: 1.6 !important; margin-bottom: 0.9rem !important; font-size: 0.95rem !important; }
+          .b2b-card .b2b-index-cta { padding: 0.75rem 1.4rem !important; }
+        }
+      `}</style>
       <section style={{ padding: 'clamp(3rem, 7vw, 5rem) 1.5rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'clamp(1.75rem, 4vw, 2.75rem)' }}>
           {PARTNERSHIPS.map((p, i) => {
@@ -176,6 +186,7 @@ export default function TodasAsParcerias() {
             return (
               <article
                 key={p.slug}
+                className="b2b-card"
                 style={{
                   background: '#fff',
                   border: '1px solid #efe4c8',
@@ -191,7 +202,7 @@ export default function TodasAsParcerias() {
               >
                 {/* Image side */}
                 <div style={{ position: 'relative', direction: 'ltr' }}>
-                  <div style={{
+                  <div className="b2b-card__photo" style={{
                     aspectRatio: '4/3',
                     borderRadius: '24px',
                     overflow: 'hidden',
@@ -205,7 +216,7 @@ export default function TodasAsParcerias() {
                     />
                   </div>
                   {/* Floating treat photo */}
-                  <div style={{
+                  <div className="b2b-card__inset" style={{
                     position: 'absolute',
                     bottom: '-16px',
                     [reversed ? 'left' : 'right']: '-12px',
@@ -254,7 +265,7 @@ export default function TodasAsParcerias() {
                     {p.tagline}
                   </p>
                   {/* Tags */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1.75rem' }}>
+                  <div className="b2b-card__tags" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1.75rem' }}>
                     {p.tags.map(t => (
                       <span key={t} style={{
                         background: '#fdf1d6',

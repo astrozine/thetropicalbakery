@@ -93,9 +93,18 @@ export function WhoAndWhat({ story, whoFor, youLeaveWith, image, imageAlt }: { s
           {image && (
             <div className="crs-intro-photo" role="img" aria-label={imageAlt || ''} style={{ backgroundImage: bg(image, 1080) }} />
           )}
-          <div className="crs-story">{story.map(p => <p key={p.slice(0, 20)}>{p}</p>)}</div>
+          <div className="crs-story">
+            {story.slice(0, 1).map(p => <p key={p.slice(0, 20)}>{p}</p>)}
+            {/* The rest of the story waits behind one tap (2026-11-13: shorter pages). */}
+            {story.length > 1 && (
+              <details className="crs-more">
+                <summary>Ler a história toda</summary>
+                {story.slice(1).map(p => <p key={p.slice(0, 20)}>{p}</p>)}
+              </details>
+            )}
+          </div>
         </div>
-        <div className="crs-two">
+        <div className="crs-two tb-rail">
           <div className="crs-card">
             <h3 className="crs-h3">Para quem é</h3>
             <ul className="crs-list">{whoFor.map(x => <li key={x}>{x}</li>)}</ul>
@@ -209,13 +218,15 @@ export function RainyDay({ text, onEnquire }: { text: string; onEnquire: Enquire
 
 /* ------------------------------------------------------------------ FAQ */
 export function CourseFAQ({ items }: { items: { q: string; a: string }[] }) {
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState<number | null>(null);
+  // First 3 questions show; the rest wait behind one tap (2026-11-13: shorter pages).
+  const [all, setAll] = useState(items.length <= 4);
   return (
     <section className="crs-section crs-section-soft">
       <div className="crs-wrap crs-narrow">
         <h2 className="crs-h2">Perguntas frequentes</h2>
         <div className="crs-faq">
-          {items.map((f, i) => (
+          {(all ? items : items.slice(0, 3)).map((f, i) => (
             <div key={f.q} className={`crs-faq-item${open === i ? ' is-open' : ''}`}>
               <button type="button" aria-expanded={open === i} onClick={() => setOpen(open === i ? null : i)}>
                 <span>{f.q}</span><span aria-hidden className="crs-faq-plus">+</span>
@@ -224,6 +235,7 @@ export function CourseFAQ({ items }: { items: { q: string; a: string }[] }) {
             </div>
           ))}
         </div>
+        {!all && <button type="button" className="crs-faq-more" onClick={() => setAll(true)}>Mais perguntas</button>}
       </div>
     </section>
   );

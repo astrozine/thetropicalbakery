@@ -299,4 +299,20 @@ textarea.bn-input { min-height: 96px; resize: vertical; line-height: 1.55; }
 .bn-menu-pick__item { display: grid; gap: 0.3rem; border: 1px solid var(--bn-line); border-radius: 14px; background: #fff; padding: 0.4rem; font: inherit; font-size: 0.82rem; font-weight: 600; color: var(--bn-cocoa); cursor: pointer; text-align: center; line-height: 1.3; }
 .bn-menu-pick__item img, .bn-menu-pick__ph { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--bn-sand); font-size: 1.8rem; }
 .bn-menu-pick__item small { color: var(--bn-gold-deep); font-size: 0.75rem; }
+
+/* Shorter landing on phones (2026-11-13): side-swipe rows instead of tall stacks */
+@media (max-width: 699px) {
+  .bn-section { padding: 2.5rem 0; }
+  .bn-moments, .bn-perks, .bn-venues, .bn-who { display: flex; flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; gap: 0.75rem; margin-right: -16px; padding-right: 16px; padding-bottom: 0.4rem; scrollbar-width: none; }
+  .bn-moments::-webkit-scrollbar, .bn-perks::-webkit-scrollbar, .bn-venues::-webkit-scrollbar, .bn-who::-webkit-scrollbar { display: none; }
+  .bn-moment, .bn-perk { flex: 0 0 78%; scroll-snap-align: start; }
+  .bn-moment img { aspect-ratio: 16 / 10; }
+  .bn-venue { flex: 0 0 46%; scroll-snap-align: start; }
+  .bn-who > * { flex: none; white-space: nowrap; }
+  .bn-host__photo { width: min(200px, 60%); }
+}
+.bn-faq-more > summary { display: flex; justify-content: center; min-height: 44px; align-items: center; cursor: pointer; list-style: none; font-weight: 700; color: var(--bn-cocoa); text-decoration: underline; text-underline-offset: 4px; margin-top: 0.6rem; }
+.bn-faq-more > summary::-webkit-details-marker { display: none; }
+.bn-faq-more[open] > summary { display: none; }
+.bn-faq-more > .bn-faq { margin-top: 0.6rem; }
 `;

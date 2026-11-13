@@ -5,7 +5,7 @@ import ZoomableImage from '@/components/ZoomableImage';
 import MobileBuyBar from '@/components/MobileBuyBar';
 import RainbowJourney from './RainbowJourney';
 import EbookBuyBox from './EbookBuyBox';
-import AmazonEditions, { AmazonBadge } from './AmazonEditions';
+import AmazonEditions, { AmazonBadge, PdfPerks } from './AmazonEditions';
 import { EditionNotice, EnglishNotice, LangBar, rich, useGoogleTranslated } from './EbookLang';
 import { EBOOK, RECIPES, TOTAL_TREATS, stripeMoney } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
@@ -16,8 +16,10 @@ import './sweetEscape.css';
 const IMG = '/ebook/sweet-escape';
 
 const BLOCK_ICONS = ['🥥', '🌴', '🌾', '✨', '🍓', '🌈'];
+/** The FAQ shows its first few questions; the rest wait behind one quiet fold. */
+const FAQ_SHOWN = 3;
+const MORE_QUESTIONS: Record<EbookLang, string> = { en: 'More questions', pt: 'Mais perguntas', es: 'Más preguntas', nl: 'Meer vragen', de: 'Weitere Fragen' };
 const PAGES = ['contents', 'page-rule', 'page-opener', 'page-recipe', 'page-why', 'page-benefits', 'page-purple', 'page-story'];
-const PAIN_ICONS = ['🛒', '🥦', '🍪'];
 
 /** "Sweet Escape" is a title: never let Google Translate turn it into "Doux Évasion". */
 const Brand = ({ children = 'Sweet Escape' }: { children?: React.ReactNode }) => <span className="notranslate" translate="no">{children}</span>;
@@ -97,113 +99,80 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
         <div className="se-rainbow" aria-hidden>{RECIPES.map(r => <i key={r.day} style={{ background: r.hex }} />)}</div>
       </section>
 
-      {/* ══ THE PROBLEM ══ */}
-      <section className="se-sec se-sec--cream">
-        <div className="se-wrap se-narrow">
-          <p className="se-kicker" data-sign="🤔">{c.problem.kicker}</p>
-          <h2 className="se-h2">{c.problem.title1} <br className="se-br" />{c.problem.title2}</h2>
-          <div className="se-pains">
-            {c.problem.pains.map((p, n) => <p key={n}><span>{PAIN_ICONS[n]}</span>{p}</p>)}
+      {/* ══ THE BIG IDEA + THE SEVEN DAYS + A PEEK INSIDE: one colorful section. The parents list and the six
+          building blocks wait behind "read more" taps. ══ */}
+      <RainbowJourney
+        lang={lang}
+        intro={
+          <div className="se-narrow se-center se-journey__intro">
+            <p className="se-kicker se-kicker--ink" data-sign="🤔">{c.problem.kicker}</p>
+            <h2 className="se-h2 se-journey__h2">{c.problem.title1} <br className="se-br" />{c.problem.title2}</h2>
+            <p className="se-bigline">{rich(c.problem.bigIdea)}</p>
+            <details className="se-more se-more--ink">
+              <summary>{c.family.kicker}</summary>
+              <ul className="se-checks se-checks--soft">
+                {c.family.checks.map(t => <li key={t}>{t}</li>)}
+              </ul>
+            </details>
+            <h3 className="se-journey__sub">{c.journey.title}</h3>
           </div>
-          <p className="se-bigidea">{rich(c.problem.bigIdea)}</p>
-        </div>
-      </section>
-
-      {/* ══ THE SEVEN DAYS ══ */}
-      <RainbowJourney lang={lang} />
-
-      {/* ══ WHAT IT TEACHES ══ */}
-      <section className="se-sec se-sec--cream">
-        <div className="se-wrap">
-          <div className="se-narrow se-center">
-            <p className="se-kicker" data-sign="📝">{c.learn.kicker}</p>
-            <h2 className="se-h2">{c.learn.title}</h2>
-            <p className="se-lead">{rich(c.learn.lead)}</p>
-          </div>
-          <div className="se-blocks">
-            {c.learn.blocks.map((b, n) => (
-              <div key={b.title} className="se-block" style={{ '--c': RECIPES[n].hex } as React.CSSProperties}>
-                <span className="se-block__icon" aria-hidden>{BLOCK_ICONS[n]}</span>
-                <h3>{b.title}</h3>
-                <p>{b.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ PEEK INSIDE ══ */}
-      <section className="se-sec se-sec--peek">
-        <div className="se-wrap">
-          <div className="se-narrow se-center">
-            <p className="se-kicker se-kicker--light" data-sign="👀" data-sign-dark>{c.peek.kicker}</p>
-            <h2 className="se-h2 se-h2--light">{fill(c.peek.title, v)}</h2>
-            <p className="se-lead se-lead--light">{c.peek.lead}</p>
-          </div>
-          <div className="se-pages">
+        }
+      >
+        <div className="se-peek">
+          <h3 className="se-journey__sub">{fill(c.peek.title, v)}</h3>
+          <div className="se-pages se-pages--mini">
             {PAGES.map((p, n) => (
-              <div key={p} className="se-page" style={{ '--r': `${(n % 2 ? 1 : -1) * (1.5 + (n % 3))}deg` } as React.CSSProperties}>
+              <div key={p} className="se-page" style={{ '--r': `${(n % 2 ? 1 : -1) * (1 + (n % 2))}deg` } as React.CSSProperties}>
                 <ZoomableImage src={`${IMG}/${lang}/${p}.webp`} alt={c.peek.alts[n]} thumbWidth={640} loading="lazy" />
               </div>
             ))}
           </div>
+          <details className="se-more se-more--ink">
+            <summary>{c.learn.title}</summary>
+            <p>{rich(c.learn.lead)}</p>
+            <dl>
+              {c.learn.blocks.map((b, n) => <React.Fragment key={b.title}><dt><span aria-hidden>{BLOCK_ICONS[n]}</span> {b.title}</dt><dd>{b.text}</dd></React.Fragment>)}
+            </dl>
+          </details>
         </div>
-      </section>
+      </RainbowJourney>
 
-      {/* ══ FOR FAMILIES ══ */}
-      <section className="se-sec se-sec--cream">
-        <div className="se-wrap se-family">
-          <div className="se-family__photos" aria-hidden>
+      {/* ══ DOLLY: a face and a few lines; the rest of her story one tap away ══ */}
+      <section className="se-sec se-sec--story se-sec--calm">
+        <div className="se-wrap se-narrow">
+          <div className="se-dolly__head">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="se-family__a" src={`${IMG}/red-scatter.webp`} alt="" loading="lazy" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="se-family__b" src={`${IMG}/chocolate-cut.webp`} alt="" loading="lazy" />
+            <img className="se-dolly" src="/dolly/dolly-portrait.jpg" alt={c.story.photoAlt} loading="lazy" />
+            <div>
+              <p className="se-kicker" data-sign="📖">{c.story.kicker}</p>
+              <h2 className="se-h2 se-dolly__title">{c.story.title}</h2>
+            </div>
           </div>
-          <div>
-            <p className="se-kicker" data-sign="🏡">{c.family.kicker}</p>
-            <h2 className="se-h2">{c.family.title}</h2>
-            <p className="se-lead">{rich(c.family.lead)}</p>
-            <ul className="se-checks">
-              {c.family.checks.map(t => <li key={t}>{t}</li>)}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* ══ DOLLY ══ */}
-      <section className="se-sec se-sec--story">
-        <div className="se-wrap se-story">
-          <div className="se-story__photo">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/dolly/dolly-portrait.jpg" alt={c.story.photoAlt} loading="lazy" />
-            <span className="se-story__tag">Dolly · The Tropical Bakery</span>
-          </div>
-          <div className="se-story__text">
-            <p className="se-kicker" data-sign="📖">{c.story.kicker}</p>
-            <h2 className="se-h2">{c.story.title}</h2>
-            {c.story.paragraphs.map((p, n) => <p key={n}>{rich(p)}</p>)}
-            <p className="se-sign">{c.story.sign} <span className="se-script notranslate" translate="no">Dolly</span></p>
-          </div>
+          <p className="se-dolly__line">{rich(c.story.paragraphs[c.story.paragraphs.length - 1])}</p>
+          <details className="se-more">
+            <summary>{c.story.kicker}</summary>
+            {c.story.paragraphs.slice(0, -1).map((p, n) => <p key={n}>{rich(p)}</p>)}
+          </details>
+          <p className="se-sign">{c.story.sign} <span className="se-script notranslate" translate="no">Dolly</span></p>
         </div>
       </section>
 
       {/* ══ THE OFFER ══ */}
-      <section className="se-sec se-sec--offer" id="buy">
-        <div className="se-wrap">
-          <AmazonEditions lang={lang} img={IMG} price={price} />
-        </div>
+      <section className="se-sec se-sec--offer se-sec--calm" id="buy">
         <div className="se-wrap se-offer">
           <div className="se-offer__stack">
-            <p className="se-kicker se-kicker--light" data-sign="🎁" data-sign-dark>{c.offer.kicker}</p>
             <h2 className="se-h2 se-h2--light">{c.offer.title}</h2>
-            <ul className="se-stack">
-              {c.offer.stack.map(s => (
-                <li key={s.what} className={s.bonus ? 'is-bonus' : ''}>
-                  <b>{s.what}</b>
-                  <span>{fill(s.detail, v)}</span>
-                </li>
-              ))}
-            </ul>
+            <details className="se-more se-more--light se-stackfold">
+              <summary>{c.offer.kicker} ({c.offer.stack.length})</summary>
+              <ul className="se-stack se-stack--lite">
+                {c.offer.stack.map(s => (
+                  <li key={s.what} className={s.bonus ? 'is-bonus' : ''}>
+                    <b>{s.what}</b>
+                    <span>{fill(s.detail, v)}</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
             <div className="se-guarantee">
               <span className="se-guarantee__seal" aria-hidden>7<small>{c.offer.promiseDays}</small></span>
               <div>
@@ -213,51 +182,55 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
             </div>
           </div>
 
-          <div className="se-card" id="order">
-            <div className="se-card__head">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${IMG}/${lang}/cover.webp`} alt={c.offer.coverAlt} />
-              <div>
-                <p className="se-card__title"><Brand /></p>
-                <p className="se-card__price">{price}</p>
-                <p className="se-card__usd">{fill(c.offer.usd, v)}</p>
-                <p className="se-card__en">📖 {foreign ? c.english.badge : c.edition.badge}</p>
+          <div className="se-offer__buy">
+            <div className="se-card" id="order">
+              <div className="se-card__head">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={`${IMG}/${lang}/cover.webp`} alt={c.offer.coverAlt} />
+                <div>
+                  <p className="se-card__title"><Brand /></p>
+                  <p className="se-card__price">{price}</p>
+                  <p className="se-card__usd">{fill(c.offer.usd, v)}</p>
+                  <p className="se-card__en">📖 {foreign ? c.english.badge : c.edition.badge}</p>
+                </div>
               </div>
+              <PdfPerks lang={lang} />
+              <EbookBuyBox lang={lang} translated={translated} />
             </div>
-            <EbookBuyBox lang={lang} translated={translated} />
+            <AmazonEditions lang={lang} img={IMG} />
           </div>
         </div>
       </section>
 
       {/* ══ FAQ ══ */}
-      <section className="se-sec se-sec--cream">
+      <section className="se-sec se-sec--cream se-sec--calm">
         <div className="se-wrap se-narrow">
-          <p className="se-kicker se-center" data-sign="❓">{c.faq.kicker}</p>
           <h2 className="se-h2 se-center">{c.faq.title}</h2>
           <div className="se-faq">
-            {c.faq.items.map((f, n) => (
+            {c.faq.items.slice(0, FAQ_SHOWN).map((f, n) => (
               <details key={f.q} open={n === 0 && foreign}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>
               </details>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ══ FINAL CALL ══ */}
-      <section className="se-final">
-        <div className="se-final__photos" aria-hidden>
-          {RECIPES.map(r => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={r.day} src={r.img} alt="" loading="lazy" style={{ borderColor: r.hex }} />
-          ))}
-        </div>
-        <div className="se-wrap se-narrow se-center">
-          <p className="se-final__line">{c.final.line}</p>
-          <h2 className="se-final__title">{c.final.title1} <span className="se-script notranslate" translate="no">{c.final.script}</span> {c.final.title2}</h2>
-          <BuyButton>{cta}</BuyButton>
-          <p className="se-ps">{rich(fill(c.final.ps, v))}</p>
+          {c.faq.items.length > FAQ_SHOWN && (
+            <details className="se-more se-faq__more">
+              <summary>{MORE_QUESTIONS[lang]}</summary>
+              <div className="se-faq">
+                {c.faq.items.slice(FAQ_SHOWN).map(f => (
+                  <details key={f.q}>
+                    <summary>{f.q}</summary>
+                    <p>{f.a}</p>
+                  </details>
+                ))}
+              </div>
+            </details>
+          )}
+          <div className="se-center se-closing">
+            <h2 className="se-final__title">{c.final.title1} <span className="se-script notranslate" translate="no">{c.final.script}</span> {c.final.title2}</h2>
+            <BuyButton>{cta}</BuyButton>
+          </div>
         </div>
       </section>
 

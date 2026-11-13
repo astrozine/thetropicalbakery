@@ -2,8 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import ScrollReveal from '@/components/ScrollReveal';
-import IconTile from '@/components/IconTile';
 import WhatsAppGate from '@/components/WhatsAppGate';
 import { trackMeta } from '@/lib/metaPixel';
 import { clearGoogleTranslate } from '@/lib/googleTranslate';
@@ -19,21 +17,17 @@ import { COACHING_COPY, COACHING_LANGS, COACHING_LANG_LABEL, COACHING_PATH, type
  * on purpose: every plan is made to measure and Dolly gives the price on the free call.
  */
 
-const SAFE_ICONS = ['⚖️', '🔢', '📸', '🤍'];
-const KONDO_ICONS = ['👀', '🙏', '🫙'];
-const WAY_ICONS = ['🌱', '🍋', '🥗'];
-/** The seven colors of the plate (Dolly's own frame, from the seven colors of Sweet Escape), one icon each. */
-const COLOR_ICONS = ['🥬', '🍅', '🍆', '🥕', '🍌', '🧄', '🫘'];
+/** The seven colors of the plate (Dolly's own frame, from the seven colors of Sweet Escape). */
 const COLOR_DOTS = ['#4f8a3a', '#d33a3a', '#6b3c8f', '#e67e22', '#e9c23a', '#f3ede0', '#8a5a2b'];
-const DAY_ICONS = ['🌅', '🍌', '🥗', '🥕', '🍲', '🍓'];
-const STEP_ICONS = ['☎️', '🔍', '🧺', '🛒', '🗓️', '👨‍👩‍👧'];
 const FEEL_IMGS = ['/coaching/people-table.webp', '/coaching/people-garden.webp', '/coaching/people-street.webp'];
 /** The six building blocks from Paradise Pantry, with the illustrations from the guide. */
 const PANTRY_IMGS = ['fats', 'sweet', 'structure', 'flavors', 'toppings', 'color'].map(n => `/coaching/pantry-${n}.webp`);
-const DAILY_ICONS = ['🥬', '☀️'];
-const SHOP_ICONS = ['🥭', '🌾', '🫙'];
-const SOS_ICONS = ['💧', '🌿'];
-const GIFT_ICONS = ['☎️', '📖'];
+/** The page is short now (Nov 2026): longer explanations sit behind these taps. */
+const UI = {
+  more: { pt: 'Ler mais', en: 'Read more', es: 'Leer más', nl: 'Lees meer' } as Record<CoachingLang, string>,
+  moreQ: { pt: 'Mais perguntas', en: 'More questions', es: 'Más preguntas', nl: 'Meer vragen' } as Record<CoachingLang, string>,
+};
+const FAQ_SHOWN = 3;
 
 const wa = (text: string) => `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(text)}`;
 
@@ -59,7 +53,7 @@ function LangSwitch({ lang, label, dark }: { lang: CoachingLang; label: string; 
   return (
     <nav className={`fc-lang${dark ? ' fc-lang--dark' : ''} notranslate`} translate="no" aria-label={label}>
       <span className="fc-lang__globe" aria-hidden>🌐</span>
-      {COACHING_LANGS.map(l => (
+            {COACHING_LANGS.map(l => (
         <a
           key={l}
           href={COACHING_PATH[l]}
@@ -83,7 +77,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
   const gateLocale = lang === 'nl' ? 'en' : lang;
   return (
     <main className="fc" lang={lang}>
-      {/* ── HERO: Dolly up front, the people she cooks for around her, over the Mata Atlântica ── */}
+      {/* ── HERO: Dolly over the Mata Atlântica, one clear next step ── */}
       <section className="fc-hero">
         <div className="fc-hero__bg" />
         <div className="fc-hero__inner">
@@ -95,19 +89,13 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
                 <span>{t.hero.tag}</span>
               </figcaption>
             </figure>
-            <img className="fc-pol fc-pol--talk" src="/coaching/people-talk.webp" alt={t.hero.talkAlt} />
-            <img className="fc-pol fc-pol--studio" src="/coaching/people-studio.webp" alt={t.hero.studioAlt} />
-            <img className="fc-pol fc-pol--table" src="/brunch/brunch-jardim.webp" alt={t.hero.tableAlt} />
           </div>
           <div className="fc-hero__content">
             <LangSwitch lang={lang} label={t.langLabel} dark />
             <span className="fc-hero__kicker">{t.hero.kicker}</span>
             <h1 className="fc-hero__title notranslate" translate="no">The Daily<br />Tropical Reset</h1>
             <p className="fc-hero__text">{t.hero.text}</p>
-            <div className="fc-hero__hi">
-              <img src="/coaching/dolly-face.webp" alt="" />
-              <p>{t.hero.hi}</p>
-            </div>
+            <p className="fc-hero__hi">{t.hero.hi}</p>
             <BookCall label={t.hero.cta} className="btn btn-secondary fc-hero__cta" where="topo" lang={lang} />
             <p className="fc-hero__note">{t.hero.note}</p>
             <span className="fc-hero__gift"><span aria-hidden>🎁</span> {t.hero.gift}</span>
@@ -115,290 +103,209 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
         </div>
       </section>
 
-      {/* ── The feeling: her own words from the e-book, on photos of the women it is for ── */}
+      {/* ── The feeling: her words, on a swipeable row of the women it is for ── */}
       <section className="fc-sec fc-feel">
-        <ScrollReveal>
-          <p className="fc-feel__lead">{t.feel.lead}</p>
-        </ScrollReveal>
-        <div className="fc-feel__grid">
+        <p className="fc-feel__lead">{t.feel.lead}</p>
+        <div className="fc-swipe">
           {t.feel.cards.map((p, i) => (
-            <ScrollReveal key={p.text} delay={i * 0.08}>
-              <figure className="fc-feel__card">
-                <img src={FEEL_IMGS[i]} alt={p.alt} loading="lazy" />
-                <figcaption>{p.text}</figcaption>
-              </figure>
-            </ScrollReveal>
+            <figure key={p.text} className="fc-feel__card">
+              <img src={FEEL_IMGS[i]} alt={p.alt} loading="lazy" />
+              <figcaption>{p.text}</figcaption>
+            </figure>
           ))}
         </div>
-        <ScrollReveal>
-          <h2 className="fc-feel__q">{t.feel.q[0]}<em>{t.feel.q[1]}</em>{t.feel.q[2]}</h2>
-          <p className="fc-feel__not">{t.feel.not}</p>
-        </ScrollReveal>
+        <h2 className="fc-feel__q">{t.feel.q[0]}<em>{t.feel.q[1]}</em>{t.feel.q[2]}</h2>
+        <p className="fc-feel__not">{t.feel.not}</p>
       </section>
 
-      {/* ── The promise: no scale, no counting, no before-and-after, no guilt ── */}
-      <section className="fc-sec fc-safe">
-        <ScrollReveal>
-          <div className="fc-safe__card">
-            <p className="fc-kicker" data-sign="🤍">{t.safe.kicker}</p>
-            <h2 className="fc-h2">{t.safe.title}</h2>
-            <p className="fc-intro">{t.safe.intro}</p>
-            <div className="fc-safe__grid">
-              {t.safe.items.map((s, i) => (
-                <div key={s.title} className="fc-safe__item">
-                  <IconTile size={50}>{SAFE_ICONS[i]}</IconTile>
-                  <div><b>{s.title}</b><p>{s.text}</p></div>
-                </div>
-              ))}
-            </div>
-            <p className="fc-safe__end">{t.safe.end}</p>
-          </div>
-        </ScrollReveal>
+      {/* ── The promise (no scale, no counting, no before-and-after, no guilt) and the Marie Kondo method ── */}
+      <section className="fc-sec fc-calm">
+        <p className="fc-kicker" data-sign="🤍">{t.safe.kicker}</p>
+        <h2 className="fc-h2">{t.safe.title}</h2>
+        <p className="fc-intro">{t.safe.intro}</p>
+        <ul className="fc-pills">{t.safe.items.map(s => <li key={s.title}>{s.title}</li>)}</ul>
+        <details className="fc-more">
+          <summary>{UI.more[lang]}</summary>
+          <dl className="fc-dl">{t.safe.items.map(s => <React.Fragment key={s.title}><dt>{s.title}</dt><dd>{s.text}</dd></React.Fragment>)}</dl>
+          <p>{t.safe.end}</p>
+        </details>
+
+        <div className="fc-rule" />
+        <p className="fc-kicker" data-sign="✨">{t.kondo.kicker}</p>
+        <h2 className="fc-h2">{t.kondo.title}</h2>
+        <p className="fc-intro">{t.kondo.intro}</p>
+        <details className="fc-more">
+          <summary>{UI.more[lang]}</summary>
+          <dl className="fc-dl">{t.kondo.items.map(k => <React.Fragment key={k.title}><dt>{k.title}</dt><dd>{k.text}</dd></React.Fragment>)}</dl>
+        </details>
       </section>
 
-      {/* ── Marie Kondo, for food ── */}
-      <section className="fc-sec fc-kondo">
-        <ScrollReveal>
-          <p className="fc-kicker" data-sign="✨">{t.kondo.kicker}</p>
-          <h2 className="fc-h2">{t.kondo.title}</h2>
-          <p className="fc-intro">{t.kondo.intro}</p>
-        </ScrollReveal>
-        <div className="fc-kondo__grid">
-          {t.kondo.items.map((k, i) => (
-            <ScrollReveal key={k.title} delay={i * 0.08}>
-              <div className="fc-card">
-                <IconTile size={52}>{KONDO_ICONS[i]}</IconTile>
-                <h3>{k.title}</h3>
-                <p>{k.text}</p>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Dolly's way: her three rules, then the seven colors of the plate ── */}
-      <section className="fc-sec fc-way">
-        <ScrollReveal>
+      {/* ── Dolly's way: three rules, the seven colors, and a day in the Reset ── */}
+      <section className="fc-band">
+        <div className="fc-sec">
           <p className="fc-kicker fc-kicker--light" data-sign="🌿">{t.way.kicker}</p>
           <h2 className="fc-h2 fc-h2--light">{t.way.title}</h2>
           <p className="fc-intro fc-intro--light">{t.way.intro}</p>
-        </ScrollReveal>
-        <div className="fc-way__grid">
-          {t.way.items.map((w, i) => (
-            <ScrollReveal key={w.title} delay={i * 0.08}>
-              <div className="fc-way__card">
-                <span className="fc-way__n">{i + 1}</span>
-                <IconTile size={54}>{WAY_ICONS[i]}</IconTile>
-                <h3>{w.title}</h3>
-                <p>{w.text}</p>
-              </div>
-            </ScrollReveal>
-          ))}
+          <ol className="fc-steps fc-steps--light">
+            {t.way.items.map(w => (
+              <li key={w.title}>
+                <details>
+                  <summary>{w.title}</summary>
+                  <p>{w.text}</p>
+                </details>
+              </li>
+            ))}
+          </ol>
+
+          <h3 className="fc-h3 fc-h3--light">{t.colors.title}</h3>
+          <ul className="fc-dots">
+            {t.colors.items.map((c, i) => (
+              <li key={c.name} title={c.foods}><span style={{ background: COLOR_DOTS[i] }} aria-hidden />{c.name}</li>
+            ))}
+          </ul>
+          <details className="fc-more fc-more--light">
+            <summary>{t.colors.kicker}</summary>
+            <p>{t.colors.intro}</p>
+            <dl className="fc-dl">{t.colors.items.map(c => <React.Fragment key={c.name}><dt>{c.name}</dt><dd>{c.foods}</dd></React.Fragment>)}</dl>
+          </details>
         </div>
-        <ScrollReveal>
-          <div className="fc-colors">
-            <p className="fc-kicker fc-kicker--light" data-sign="🎨">{t.colors.kicker}</p>
-            <h3 className="fc-colors__title">{t.colors.title}</h3>
-            <p className="fc-intro fc-intro--light fc-colors__intro">{t.colors.intro}</p>
-            <div className="fc-colors__grid">
-              {t.colors.items.map((c, i) => (
-                <div key={c.name} className="fc-colors__item">
-                  <IconTile size={52}>{COLOR_ICONS[i]}</IconTile>
-                  <b><span className="fc-colors__dot" style={{ background: COLOR_DOTS[i] }} aria-hidden />{c.name}</b>
-                  <span>{c.foods}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </ScrollReveal>
       </section>
 
-      {/* ── A day in the Reset: breakfast, lunch, dinner and the sweet ── */}
       <section className="fc-sec fc-day">
-        <ScrollReveal>
-          <p className="fc-kicker" data-sign="🍽️">{t.day.kicker}</p>
-          <h2 className="fc-h2">{t.day.title}</h2>
-          <p className="fc-intro">{t.day.intro}</p>
-        </ScrollReveal>
-        <div className="fc-day__grid">
-          {t.day.items.map((d, i) => (
-            <ScrollReveal key={d.title} delay={i * 0.07}>
-              <div className="fc-card fc-day__card">
-                <IconTile size={52}>{DAY_ICONS[i]}</IconTile>
-                <h3>{d.title}</h3>
-                <p>{d.text}</p>
-              </div>
-            </ScrollReveal>
+        <p className="fc-kicker" data-sign="🍽️">{t.day.kicker}</p>
+        <h2 className="fc-h2">{t.day.title}</h2>
+        <p className="fc-intro">{t.day.intro}</p>
+        <div className="fc-swipe fc-swipe--cards">
+          {t.day.items.map(d => (
+            <div key={d.title} className="fc-day__card">
+              <h3>{d.title}</h3>
+              <p>{d.text}</p>
+            </div>
           ))}
         </div>
-        <ScrollReveal>
-          <p className="fc-day__note">{t.day.note}</p>
-        </ScrollReveal>
+        <p className="fc-day__note">{t.day.note}</p>
       </section>
 
-      {/* ── Step by step ── */}
-      <section className="fc-sec fc-steps">
-        <ScrollReveal>
-          <p className="fc-kicker" data-sign="🪜">{t.steps.kicker}</p>
-          <h2 className="fc-h2">{t.steps.title}</h2>
-        </ScrollReveal>
-        <ol className="fc-steps__list">
-          {t.steps.items.map((s, i) => (
+      {/* ── How it works, and a real slice of Paradise Pantry ── */}
+      <section className="fc-sec fc-calm">
+        <p className="fc-kicker" data-sign="🪜">{t.steps.kicker}</p>
+        <h2 className="fc-h2">{t.steps.title}</h2>
+        <ol className="fc-steps">
+          {t.steps.items.map(s => (
             <li key={s.title}>
-              <ScrollReveal delay={i * 0.05}>
-                <div className="fc-step">
-                  <span className="fc-step__n">{i + 1}</span>
-                  <IconTile size={46}>{STEP_ICONS[i]}</IconTile>
-                  <div>
-                    <h3>{s.title}</h3>
-                    <p>{s.text}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
+              <details>
+                <summary>{s.title}</summary>
+                <p>{s.text}</p>
+              </details>
             </li>
           ))}
         </ol>
-      </section>
 
-      {/* ── Paradise Pantry: a real slice of her guide ── */}
-      <section className="fc-sec fc-pantry">
-        <ScrollReveal>
-          <p className="fc-kicker" data-sign="🧺">{t.pantry.kicker}</p>
-          <h2 className="fc-h2">{t.pantry.title}</h2>
-          <p className="fc-intro">{t.pantry.intro}</p>
-        </ScrollReveal>
-        {/* The everyday base and the few supplements (Dolly's note: the six blocks below were only ever for sweets). */}
-        <ScrollReveal>
-          <p className="fc-pantry__sub" data-sign="🥗">{t.pantry.daily.kicker}</p>
-          <div className="fc-daily">
-            {t.pantry.daily.items.map((d, i) => (
-              <div key={d.title} className="fc-daily__card">
-                <IconTile size={52}>{DAILY_ICONS[i]}</IconTile>
-                <div><b>{d.title}</b><p>{d.text}</p></div>
-              </div>
-            ))}
-          </div>
-          <p className="fc-pantry__sub" data-sign="🍓">{t.pantry.sweet}</p>
-        </ScrollReveal>
-        <div className="fc-pantry__grid">
-          {t.pantry.blocks.map((p, i) => (
-            <ScrollReveal key={p.title} delay={(i % 3) * 0.06}>
-              <figure className="fc-block">
-                <img src={PANTRY_IMGS[i]} alt={p.title} loading="lazy" />
-                <figcaption>
-                  <span className="fc-block__n">{i + 1}</span>
-                  <b>{p.title}</b>
-                  <span>{p.text}</span>
-                </figcaption>
-              </figure>
-            </ScrollReveal>
+        <div className="fc-rule" />
+        <p className="fc-kicker" data-sign="🧺">{t.pantry.kicker}</p>
+        <h2 className="fc-h2">{t.pantry.title}</h2>
+        <p className="fc-intro">{t.pantry.intro}</p>
+        <div className="fc-swipe">
+          {t.pantry.blocks.map((b, i) => (
+            <figure key={b.title} className="fc-block">
+              <img src={PANTRY_IMGS[i]} alt={b.title} loading="lazy" />
+              <figcaption>{b.title}</figcaption>
+            </figure>
           ))}
         </div>
-        <ScrollReveal>
-          <div className="fc-shop">
-            {t.pantry.shop.map((s, i) => (
-              <div key={s.lead}><IconTile size={42}>{SHOP_ICONS[i]}</IconTile><p><b>{s.lead}</b> {s.text}</p></div>
-            ))}
-          </div>
-          <p className="fc-pantry__more">{t.pantry.more}</p>
-        </ScrollReveal>
+        <details className="fc-more">
+          <summary>{UI.more[lang]}</summary>
+          <h3 className="fc-h3">{t.pantry.daily.kicker}</h3>
+          <dl className="fc-dl">{t.pantry.daily.items.map(d => <React.Fragment key={d.title}><dt>{d.title}</dt><dd>{d.text}</dd></React.Fragment>)}</dl>
+          <h3 className="fc-h3">{t.pantry.sweet}</h3>
+          <dl className="fc-dl">{t.pantry.blocks.map(b => <React.Fragment key={b.title}><dt>{b.title}</dt><dd>{b.text}</dd></React.Fragment>)}</dl>
+          {t.pantry.shop.map(sh => <p key={sh.lead}><b>{sh.lead}</b> {sh.text}</p>)}
+          <p>{t.pantry.more}</p>
+        </details>
       </section>
 
-      {/* ── Everything that's inside ── */}
-      <section className="fc-sec fc-inc">
-        <div className="fc-inc__wrap">
-          <ScrollReveal>
-            <img className="fc-inc__photo" src="/brunch/brunch-mesa.webp" alt={t.inc.photoAlt} loading="lazy" />
-          </ScrollReveal>
-          <ScrollReveal>
-            <p className="fc-kicker" data-sign="📋">{t.inc.kicker}</p>
-            <h2 className="fc-h2 fc-h2--start">{t.inc.title}</h2>
-            <ul className="fc-inc__list">
-              {t.inc.items.map(item => <li key={item}>{item}</li>)}
-            </ul>
-            <p className="fc-inc__end">{t.inc.end}</p>
-          </ScrollReveal>
+      {/* ── Dolly: a face and a few lines; her story is one tap away ── */}
+      <section className="fc-sec fc-dolly">
+        <div className="fc-dolly__head">
+          <img className="fc-dolly__face" src="/coaching/dolly-spatula.webp" alt={t.dolly.photoAlt} loading="lazy" />
+          <div>
+            <p className="fc-kicker fc-kicker--start" data-sign="👩‍🍳">{t.dolly.kicker}</p>
+            <h2 className="fc-h2 fc-h2--start">{t.dolly.title}</h2>
+          </div>
+        </div>
+        <p className="fc-dolly__p3">{t.dolly.p3}</p>
+        <details className="fc-more fc-more--start">
+          <summary>{UI.more[lang]}</summary>
+          <p>{t.dolly.p1}</p>
+          <p>{t.dolly.p2}</p>
+        </details>
+        <Link href="/dolly" className="fc-link">{t.dolly.link}</Link>
+      </section>
+
+      {/* ── The way in: what's included, the two gifts, the free call ── */}
+      <section id="conversa" className="fc-final">
+        <div className="fc-final__bg" />
+        <div className="fc-final__inner">
+          <p className="fc-final__kicker">{t.final.kicker}</p>
+          <h2 className="fc-final__title">{t.final.title}</h2>
+          <ul className="fc-gifts">
+            {t.final.gifts.map(g => <li key={g.title}><b>{g.title}</b><span>{g.text}</span></li>)}
+          </ul>
+          <BookCall label={t.final.cta} className="btn btn-secondary fc-final__cta" where="final" lang={lang} />
+          <p className="fc-final__or">
+            {t.final.or}{' '}
+            <WhatsAppGate href={wa(t.whatsapp.reset)} topic={`Coaching: The Daily Tropical Reset (${lang})`} tags={['cursos']} locale={gateLocale} className="fc-final__wa">
+              {t.final.wa}
+            </WhatsAppGate>
+          </p>
+          <details className="fc-more fc-more--light fc-inc">
+            <summary>{t.inc.title}</summary>
+            <ul className="fc-inc__list">{t.inc.items.map(item => <li key={item}>{item}</li>)}</ul>
+            <p>{t.inc.end}</p>
+          </details>
         </div>
       </section>
 
       {/* ── The separate 2-week package ── */}
       <section id="sos" className="fc-sec fc-sos">
-        <ScrollReveal>
-          <div className="fc-sos__card">
-            <span className="fc-sos__badge">{t.sos.badge}</span>
-            <h2 className="fc-h2 fc-h2--start">{t.sos.title}</h2>
-            <p className="fc-sos__lead">{t.sos.lead}</p>
-            <div className="fc-sos__weeks">
-              {t.sos.weeks.map((w, i) => (
-                <div key={w.title} className="fc-sos__week">
-                  <IconTile size={44}>{SOS_ICONS[i]}</IconTile>
-                  <div><b>{w.title}</b><p>{w.text}</p></div>
-                </div>
-              ))}
-            </div>
-            <WhatsAppGate href={wa(t.whatsapp.sos)} topic={`Coaching: Reset SOS 2 semanas (${lang})`} tags={['cursos']} locale={gateLocale} className="btn btn-primary fc-sos__cta">
-              {t.sos.cta}
-            </WhatsAppGate>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* ── Dolly ── */}
-      <section className="fc-sec fc-dolly">
-        <div className="fc-dolly__wrap">
-          <ScrollReveal>
-            <img className="fc-dolly__photo" src="/coaching/dolly-spatula.webp" alt={t.dolly.photoAlt} loading="lazy" />
-          </ScrollReveal>
-          <ScrollReveal>
-            <p className="fc-kicker" data-sign="👩‍🍳">{t.dolly.kicker}</p>
-            <h2 className="fc-h2 fc-h2--start">{t.dolly.title}</h2>
-            <p>{t.dolly.p1}</p>
-            <p>{t.dolly.p2}</p>
-            <p className="fc-dolly__p3">{t.dolly.p3}</p>
-            <Link href="/dolly" className="fc-link">{t.dolly.link}</Link>
-          </ScrollReveal>
+        <div className="fc-sos__card">
+          <span className="fc-sos__badge">{t.sos.badge}</span>
+          <h2 className="fc-h2 fc-h2--start">{t.sos.title}</h2>
+          <p className="fc-sos__lead">{t.sos.lead}</p>
+          <details className="fc-more fc-more--start">
+            <summary>{UI.more[lang]}</summary>
+            <dl className="fc-dl">{t.sos.weeks.map(w => <React.Fragment key={w.title}><dt>{w.title}</dt><dd>{w.text}</dd></React.Fragment>)}</dl>
+          </details>
+          <WhatsAppGate href={wa(t.whatsapp.sos)} topic={`Coaching: Reset SOS 2 semanas (${lang})`} tags={['cursos']} locale={gateLocale} className="btn btn-primary fc-sos__cta">
+            {t.sos.cta}
+          </WhatsAppGate>
         </div>
       </section>
 
-      {/* ── Gifts + the way in ── */}
-      <section id="conversa" className="fc-final">
-        <div className="fc-final__bg" />
-        <ScrollReveal>
-          <div className="fc-final__inner">
-            <p className="fc-final__kicker">{t.final.kicker}</p>
-            <h2 className="fc-final__title">{t.final.title}</h2>
-            <div className="fc-gifts">
-              {t.final.gifts.map((g, i) => (
-                <div key={g.title} className="fc-gift">
-                  <IconTile size={54}>{GIFT_ICONS[i]}</IconTile>
-                  <b>{g.title}</b>
-                  <span>{g.text}</span>
-                </div>
-              ))}
-            </div>
-            <BookCall label={t.final.cta} className="btn btn-secondary fc-final__cta" where="final" lang={lang} />
-            <p className="fc-final__or">
-              {t.final.or}{' '}
-              <WhatsAppGate href={wa(t.whatsapp.reset)} topic={`Coaching: The Daily Tropical Reset (${lang})`} tags={['cursos']} locale={gateLocale} className="fc-final__wa">
-                {t.final.wa}
-              </WhatsAppGate>
-            </p>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* ── FAQ ── */}
+      {/* ── FAQ: the first questions, the rest behind one tap ── */}
       <section className="fc-sec fc-faq">
-        <p className="fc-kicker" data-sign="💬">{t.faq.kicker}</p>
         <h2 className="fc-h2">{t.faq.title}</h2>
         <div className="fc-faq__list">
-          {t.faq.items.map(f => (
+          {t.faq.items.slice(0, FAQ_SHOWN).map(f => (
             <details key={f.q}>
               <summary>{f.q}</summary>
               <p>{f.a}</p>
             </details>
           ))}
         </div>
+        {t.faq.items.length > FAQ_SHOWN && (
+          <details className="fc-more">
+            <summary>{UI.moreQ[lang]}</summary>
+            <div className="fc-faq__list">
+              {t.faq.items.slice(FAQ_SHOWN).map(f => (
+                <details key={f.q}>
+                  <summary>{f.q}</summary>
+                  <p>{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </details>
+        )}
         <div className="fc-faq__lang"><LangSwitch lang={lang} label={t.langLabel} /></div>
       </section>
 
@@ -624,4 +531,108 @@ const CSS = `
   .fc-sos__cta { width: 100%; justify-content: center; }
   .fc-final__cta { width: 100%; max-width: 340px; }
 }
+
+/* ══ CALMER, SHORTER PAGE (Andrew + Dolly, 2026-11-13): fewer sections, no emoji tiles, nothing tilted. ══ */
+.fc-hero { min-height: 0; }
+.fc-hero__inner { padding-top: 5.5rem; padding-bottom: 3.5rem; }
+.fc-hero__stage { padding: 0 0 2rem; width: min(100%, 380px); }
+.fc-hero__hi { background: none; border: 0; padding: 0; backdrop-filter: none; font-style: italic; color: rgba(253,250,243,0.8); font-size: 0.98rem; line-height: 1.6; margin: 0 0 1.6rem; display: block; }
+.fc-kicker--start { justify-content: flex-start; }
+.fc-h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.2rem; text-align: center; margin: 2rem 0 0.9rem; color: var(--color-primary); }
+.fc-h3--light { color: #fdfaf3; }
+.fc-intro { margin-bottom: 1.4rem; }
+.fc-rule { width: 48px; height: 1px; background: rgba(60,42,33,0.2); margin: 3rem auto; }
+
+.fc-swipe { display: flex; gap: 0.8rem; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -1.25rem 1.6rem; padding: 0.2rem 1.25rem 0.6rem; scrollbar-width: none; }
+.fc-swipe::-webkit-scrollbar { display: none; }
+.fc-swipe > * { scroll-snap-align: start; }
+.fc-feel__card { flex: 0 0 72%; max-width: 300px; margin: 0; }
+.fc-feel__card img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; }
+.fc-feel__card figcaption { position: static; background: none; color: #594a42; padding: 0.6rem 0.1rem 0; font-size: 0.92rem; line-height: 1.5; font-style: italic; }
+.fc-feel__q { margin-top: 0.6rem; }
+
+.fc-pills { list-style: none; padding: 0; margin: 0 auto 0.6rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; max-width: 640px; }
+.fc-pills li { padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid rgba(60,42,33,0.18); font-weight: 600; font-size: 0.92rem; color: #3c2a21; background: #fff; }
+
+.fc-more { max-width: 680px; margin: 0.4rem auto 0; text-align: center; }
+.fc-more[open] { text-align: left; }
+.fc-more > summary { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; cursor: pointer; list-style: none; font-weight: 700; color: #2e4432; text-decoration: underline; text-underline-offset: 4px; }
+.fc-more > summary::-webkit-details-marker { display: none; }
+.fc-more > summary::after { content: '+'; font-size: 1.2rem; text-decoration: none; transition: transform 0.2s ease; }
+.fc-more[open] > summary::after { transform: rotate(45deg); }
+.fc-more p { line-height: 1.75; color: #594a42; }
+.fc-more--light > summary { color: #e7c75a; }
+.fc-more--light p, .fc-more--light dd { color: rgba(253,250,243,0.82); }
+.fc-more--light dt { color: #fdfaf3; }
+.fc-more--start { margin-left: 0; text-align: left; }
+.fc-dl { margin: 0.4rem 0 1rem; display: grid; gap: 0.7rem; }
+.fc-dl dt { font-weight: 700; color: #3c2a21; }
+.fc-dl dd { margin: 0.1rem 0 0; line-height: 1.65; color: #594a42; }
+
+.fc-band { background: #1f3326; }
+.fc-band .fc-sec { padding-top: clamp(3.5rem, 8vw, 5.5rem); padding-bottom: clamp(3.5rem, 8vw, 5.5rem); }
+.fc-rules { list-style: none; counter-reset: r; padding: 0; margin: 0 auto; max-width: 680px; display: grid; gap: 1.2rem; }
+.fc-rules li { counter-increment: r; display: grid; grid-template-columns: 2.2rem 1fr; column-gap: 0.6rem; color: rgba(253,250,243,0.82); line-height: 1.65; }
+.fc-rules li::before { content: counter(r); grid-row: span 2; font-family: var(--font-heading); font-size: 1.6rem; line-height: 1; color: #e7c75a; }
+.fc-rules b { color: #fdfaf3; font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.2rem; }
+.fc-dots { list-style: none; padding: 0; margin: 0 auto 0.4rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1rem; color: #fdfaf3; font-size: 0.92rem; }
+.fc-dots li { display: inline-flex; align-items: center; gap: 0.4rem; }
+.fc-dots span { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,0.3); }
+
+.fc-swipe--cards .fc-day__card { flex: 0 0 74%; max-width: 280px; background: #fff; border: 1px solid rgba(60,42,33,0.1); border-radius: 16px; padding: 1.1rem 1.2rem; }
+.fc-day__card h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; margin: 0 0 0.4rem; color: #3c2a21; }
+.fc-day__card p { margin: 0; font-size: 0.92rem; line-height: 1.6; color: #594a42; }
+
+.fc-steps { list-style: none; counter-reset: st; padding: 0; margin: 0 auto; max-width: 620px; border-top: 1px solid rgba(60,42,33,0.12); }
+.fc-steps li { counter-increment: st; border-bottom: 1px solid rgba(60,42,33,0.12); }
+.fc-steps summary { display: flex; align-items: center; gap: 0.8rem; min-height: 52px; cursor: pointer; list-style: none; font-weight: 600; color: #3c2a21; }
+.fc-steps summary::-webkit-details-marker { display: none; }
+.fc-steps summary::before { content: counter(st); font-family: var(--font-heading); color: #b8921f; width: 1.4rem; }
+.fc-steps summary::after { content: '+'; margin-left: auto; color: #b8921f; font-size: 1.2rem; }
+.fc-steps details[open] summary::after { content: '–'; }
+.fc-steps p { margin: 0 0 1rem 2.2rem; line-height: 1.65; color: #594a42; }
+
+.fc-block { flex: 0 0 42%; max-width: 200px; margin: 0; }
+.fc-block img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; }
+.fc-block figcaption { padding: 0.45rem 0.1rem 0; font-size: 0.88rem; font-weight: 600; color: #3c2a21; }
+
+.fc-dolly__head { display: flex; gap: 1rem; align-items: center; margin-bottom: 0.9rem; }
+.fc-dolly__face { width: 92px; height: 92px; flex-shrink: 0; border-radius: 50%; object-fit: cover; }
+.fc-dolly .fc-h2 { margin: 0; font-size: clamp(1.3rem, 4.6vw, 2rem); }
+.fc-dolly .fc-kicker { margin-bottom: 0.3rem; }
+.fc-dolly { max-width: 760px; }
+
+.fc-gifts { list-style: none; padding: 0; margin: 0 auto 2rem; max-width: 520px; display: grid; gap: 0.8rem; text-align: left; }
+.fc-gifts li { display: grid; gap: 0.15rem; padding: 0 0 0.8rem; border-bottom: 1px solid rgba(253,250,243,0.14); color: rgba(253,250,243,0.8); font-size: 0.94rem; line-height: 1.55; }
+.fc-gifts b { color: #fdfaf3; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; }
+.fc-final__title { font-weight: 500; }
+.fc-inc { margin-top: 1.5rem; }
+.fc-inc .fc-inc__list { color: rgba(253,250,243,0.85); }
+.fc-sos__card { border: 1px solid rgba(60,42,33,0.14); border-radius: 20px; box-shadow: none; }
+.fc-sos__cta { margin-top: 0.6rem; }
+.fc-faq__list { gap: 0.5rem; }
+.fc-faq details { border-radius: 12px; padding: 0.85rem 1.1rem; }
+
+@media (min-width: 768px) {
+  .fc-swipe { justify-content: center; flex-wrap: wrap; overflow: visible; margin: 0 0 1.8rem; padding: 0; }
+  .fc-feel__card { flex: 0 0 calc(33.333% - 0.8rem); }
+  .fc-swipe--cards .fc-day__card { flex: 0 0 calc(33.333% - 0.8rem); max-width: 320px; }
+  .fc-block { flex: 0 0 calc(16.666% - 0.8rem); }
+}
+@media (max-width: 767px) {
+  .fc-hero__inner { padding-top: 5rem; padding-bottom: 2.5rem; gap: 1.6rem; }
+  .fc-hero__stage { width: min(100%, 230px); padding: 0 0 1.6rem; }
+  .fc-sec { padding-top: 2.8rem; padding-bottom: 2.8rem; }
+  .fc-rule { margin: 2.2rem auto; }
+}
+.fc-steps--light { border-color: rgba(253,250,243,0.16); }
+.fc-steps--light li { border-color: rgba(253,250,243,0.16); }
+.fc-steps--light summary { color: #fdfaf3; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; }
+.fc-steps--light summary::before, .fc-steps--light summary::after { color: #e7c75a; }
+.fc-steps--light p { color: rgba(253,250,243,0.82); }
+.fc-faq .fc-more { background: none; border: 0; padding: 0; margin-top: 0.6rem; }
+.fc-faq__list details > summary { list-style: none; display: flex; justify-content: space-between; gap: 1rem; }
+.fc-faq__list details > summary::-webkit-details-marker { display: none; }
+.fc-faq__list details > summary::after { content: '+'; color: #b8921f; font-size: 1.2rem; line-height: 1; }
+.fc-faq__list details[open] > summary::after { content: '–'; }
 `;

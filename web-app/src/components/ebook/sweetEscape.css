@@ -392,3 +392,140 @@
 .se-amz__cover--hardcover img { width: 42px; border-radius: 2px 4px 4px 2px; border-left: 5px solid #2a1a12; box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.25), 5px 7px 14px rgba(0, 0, 0, 0.5); }
 
 .se-ed__cover.se-amz__cover--kindle { width: 48px; }
+
+/* ══ CALMER PAGE (Nov 2026): fewer, quieter sections with more air. Everything the page sold before is still here;
+   the long reading lives behind "read more" folds instead of in the scroll. ══ */
+.se-sec--calm { padding: 3.5rem 0; }
+.se-bigline { font-size: clamp(1.1rem, 2.8vw, 1.35rem); line-height: 1.65; margin: 0 auto 1.8rem; max-width: 620px; }
+.se-bigline b { color: var(--se-orange-deep); }
+.se-checks--soft { text-align: left; max-width: 520px; margin: 0 auto; gap: 0.55rem; font-size: 0.95rem; color: #5b463a; }
+
+.se-learn { margin-top: 1.6rem; }
+.se-learn__title { font-family: var(--font-heading); font-weight: 700; font-size: 1.15rem; color: #fff; margin: 0 0 0.9rem; }
+.se-chips { list-style: none; margin: 0 0 1rem; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+.se-chips li { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: #fff; background: rgba(255, 255, 255, 0.08); border: 1px solid color-mix(in srgb, var(--c) 70%, transparent); }
+
+.se-more { margin: 0 auto 1.2rem; max-width: 600px; text-align: left; }
+.se-more summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; font-weight: 700; color: var(--se-orange-deep); }
+.se-more summary::-webkit-details-marker { display: none; }
+.se-more summary::after { content: '+'; font-size: 1.25rem; transition: transform 0.2s ease; }
+.se-more[open] summary::after { transform: rotate(45deg); }
+.se-more p { line-height: 1.75; color: #4f3c31; margin: 0.4rem 0 0.9rem; }
+.se-more dl { margin: 0; display: grid; gap: 0.6rem; }
+.se-more dt { font-weight: 700; }
+.se-more dd { margin: 0; line-height: 1.6; }
+.se-more--light summary { color: #ffc79f; margin: 0 auto; }
+.se-more--light { text-align: center; }
+.se-more--light[open] { text-align: left; }
+.se-more--light p, .se-more--light dd { color: rgba(255, 255, 255, 0.8); }
+.se-more--light dt { color: #fff; }
+
+.se-dolly { display: block; width: 120px; height: 120px; margin: 0 auto 1.2rem; border-radius: 50%; object-fit: cover; object-position: top; border: 4px solid #fff; box-shadow: 0 14px 30px rgba(60, 42, 33, 0.25); }
+.se-dolly__line { font-size: 1.08rem; line-height: 1.75; color: #4f3c31; margin: 0 auto 0.6rem; max-width: 560px; }
+.se-sec--story .se-sign .se-script { margin-top: 0; }
+
+.se-stack--lite { gap: 0.4rem; }
+.se-stack--lite li { padding: 0.55rem 0.9rem 0.55rem 2.4rem; background: transparent; border-color: rgba(255, 255, 255, 0.08); }
+.se-stack--lite li::before { top: 0.55rem; }
+.se-stack--lite b { font-size: 0.95rem; font-weight: 600; }
+
+.se-card__perks { margin: 0 0 1.1rem; font-size: 0.85rem; color: #4f3c31; }
+
+.se-amzrow { margin-top: 1.4rem; scroll-margin-top: 80px; }
+.se-amzrow__title { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 0.8rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.8); text-align: center; }
+.se-amzrow__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.se-amzrow__item { position: relative; display: grid; justify-items: center; gap: 0.2rem; padding: 0.9rem 0.4rem 0.7rem; border-radius: 14px; text-decoration: none; color: #fff; text-align: center; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14); font-size: 0.85rem; min-height: 44px; }
+.se-amzrow__item:hover, .se-amzrow__item:focus-visible { border-color: rgba(212, 175, 55, 0.6); background: rgba(212, 175, 55, 0.12); }
+.se-amzrow__item .se-ed__cover { margin-bottom: 0.35rem; }
+.se-amzrow__item .se-ed__gift { top: -0.55rem; right: 50%; transform: translateX(50%); white-space: nowrap; font-size: 0.75rem; }
+.se-amzrow__go { font-size: 0.75rem; color: #ffb547; font-weight: 700; }
+
+.se-final--calm { padding: 3.5rem 0; }
+.se-final--calm .se-ps { margin-top: 1.6rem; }
+
+@media (min-width: 900px) {
+  .se-sec--calm { padding: 5rem 0; }
+  .se-final--calm { padding: 5rem 0; }
+}
+.se-faq__more { margin-top: 0.8rem; text-align: center; }
+.se-faq__more[open] { text-align: left; }
+.se-faq__more .se-faq { margin-top: 0.4rem; }
+@media (max-width: 899px) {
+  /* Phones: a smaller book stage and a wider, shorter recipe photo keep the first screens light. */
+  .se-hero__stage { width: min(100%, 290px); }
+  .se-feature__photo img { aspect-ratio: 16 / 11; }
+  .se-journey { padding: 3rem 0; }
+}
+/* The stack reads as one calm list, not seven boxes. */
+.se-stack--lite { gap: 0; margin-bottom: 1.2rem; }
+.se-stack--lite li { padding: 0.45rem 0 0.45rem 1.8rem; border: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); border-radius: 0; background: transparent; }
+.se-stack--lite li::before { left: 0.2rem; top: 0.45rem; }
+.se-stack--lite .is-bonus { background: transparent; border-color: rgba(255, 255, 255, 0.08); }
+.se-stack--lite .is-bonus b { color: #ffd08a; }
+.se-sec--peek.se-sec--calm .se-lead--light { font-size: 0.9rem; margin-bottom: 0; }
+@media (min-width: 900px) {
+  /* The order card and the Amazon row stick together, so the row never slides under the card. */
+  .se-offer__buy { position: sticky; top: 90px; }
+  .se-offer__buy .se-card { position: static; }
+}
+
+/* ══ EVEN CALMER (Andrew, 2026-11-13: "shorter still"): the big idea, the seven days and the peek inside share the
+   colorful section; the parents list, the six building blocks and the offer stack are one tap away. ══ */
+.se-journey__intro { margin-bottom: 0.4rem; }
+.se-journey__intro .se-bigline { margin-bottom: 0.6rem; }
+.se-journey__intro .se-bigline b { color: inherit; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.se-journey__sub { font-family: var(--font-heading); font-weight: 700; font-size: clamp(1.1rem, 3.6vw, 1.5rem); margin: 1.4rem 0 0.8rem; color: var(--ink); text-align: center; }
+.se-more--ink summary { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.se-more--ink { text-align: center; color: var(--ink); }
+.se-more--ink[open] { text-align: left; background: rgba(255, 255, 255, 0.85); color: var(--se-cocoa); border-radius: 16px; padding: 0.4rem 1.1rem 1rem; }
+.se-more--ink[open] summary { color: var(--se-cocoa); }
+.se-more--ink .se-checks--soft { margin-top: 0.3rem; }
+.se-more--ink dt { display: flex; gap: 0.4rem; }
+.se-peek { margin-top: 0.4rem; }
+.se-pages--mini { margin-top: 0.4rem; padding-top: 0.6rem; padding-bottom: 0.8rem; }
+.se-pages--mini .se-page { flex-basis: 38%; max-width: 170px; }
+.se-pages--mini .se-page img { box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3); }
+
+.se-dolly__head { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; }
+.se-dolly__head .se-dolly { flex: 0 0 auto; width: 84px; height: 84px; margin: 0; }
+.se-dolly__head .se-kicker { margin-bottom: 0.3rem; }
+.se-dolly__title { margin: 0; font-size: clamp(1.3rem, 4.6vw, 2rem); }
+.se-sec--story .se-dolly__line { margin: 0 0 0.4rem; max-width: none; }
+.se-sec--story .se-more { margin: 0 0 0.6rem; max-width: none; }
+.se-sec--story .se-sign .se-script { font-size: 2.1rem; }
+
+.se-stackfold { text-align: left; margin: 0 0 1rem; max-width: none; }
+.se-stackfold summary { margin: 0; }
+.se-stackfold .se-stack--lite li { display: grid; gap: 0.1rem; }
+.se-stackfold .se-stack--lite span { font-size: 0.85rem; }
+
+@media (max-width: 899px) {
+  .se-hero__eyebrow { display: none; }
+  .se-hero__stage { width: min(100%, 250px); }
+  .se-hero__grid { padding-bottom: 2.2rem; gap: 1rem; }
+  .se-hero__lead { margin-bottom: 1.1rem; }
+  .se-feature__makes { display: none; }
+  .se-feature__kid { margin: 0.8rem 0 0; }
+  .se-booklang { grid-template-columns: repeat(3, 1fr); }
+  .se-sec--calm { padding: 2.75rem 0; }
+  .se-final--calm { padding: 2.75rem 0; }
+}
+@media (min-width: 900px) {
+  .se-pages--mini { justify-content: center; }
+  .se-pages--mini .se-page { flex: 0 0 calc(12.5% - 1.3rem); max-width: 150px; }
+}
+.se-closing { margin-top: 2.5rem; }
+.se-closing .se-final__title { margin-bottom: 1.2rem; }
+@media (max-width: 899px) {
+  .se-guarantee { padding: 0.75rem; gap: 0.8rem; }
+  .se-guarantee__seal { width: 54px; height: 54px; font-size: 1.3rem; }
+  .se-guarantee p { font-size: 0.85rem; }
+  .se-offer { gap: 1.4rem; }
+}
+@media (max-width: 899px) {
+  .se-feature__kid { display: none; }
+  .se-feature { gap: 0.9rem; padding-bottom: 1rem; }
+  .se-pages--mini .se-page { flex-basis: 31%; }
+  .se-journey__sub { margin-top: 1rem; }
+}
+

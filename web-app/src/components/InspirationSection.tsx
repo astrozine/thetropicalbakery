@@ -78,7 +78,7 @@ function VideoCard({ v }: { v: typeof VIDEOS[number] }) {
 }
 
 export function InspirationSection() {
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
     <section id="inspiracao" style={{ background: '#fdfaf3', padding: 'clamp(2.25rem, 8vw, 7rem) clamp(1rem, 4vw, 2rem)' }}>
@@ -98,7 +98,7 @@ export function InspirationSection() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '3rem' }}>
+        <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '1.5rem' }}>
           {IDEAS.map((idea, i) => {
             const isOpen = open === i;
             return (
@@ -118,7 +118,10 @@ export function InspirationSection() {
           })}
         </div>
 
-        <div style={{ display: 'grid', gap: '1.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', marginBottom: '2.5rem' }}>
+        {/* The two videos and the full note wait behind one tap (2026-11-13: the page got much shorter). */}
+        <details className="insp-more">
+          <summary>Assistir aos vídeos e ler a nota completa</summary>
+        <div style={{ display: 'grid', gap: '1.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', margin: '1.25rem 0 2rem' }}>
           {VIDEOS.map(v => <VideoCard key={v.id} v={v} />)}
         </div>
 
@@ -128,6 +131,16 @@ export function InspirationSection() {
           Dr. Goldhamer. Os vídeos são conteúdo público de terceiros, incorporados do YouTube. Antes de mudar sua alimentação, converse
           com seu médico ou nutricionista, principalmente se você tem alguma condição de saúde.
         </p>
+        </details>
+        <p style={{ textAlign: 'center', color: '#7a6a61', fontSize: '0.85rem', margin: '0.6rem 0 0' }}>
+          Isto é inspiração, não aconselhamento médico. Sem vínculo com o Dr. Fuhrman ou o Dr. Goldhamer.
+        </p>
+        <style>{`
+          .insp-more > summary { display: flex; justify-content: center; align-items: center; gap: 0.4rem; min-height: 44px; cursor: pointer; list-style: none; font-weight: 700; color: #2e4432; text-decoration: underline; text-underline-offset: 4px; }
+          .insp-more > summary::-webkit-details-marker { display: none; }
+          .insp-more > summary::after { content: '+'; font-size: 1.2rem; }
+          .insp-more[open] > summary::after { content: '–'; }
+        `}</style>
       </div>
     </section>
   );

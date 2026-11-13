@@ -176,7 +176,7 @@ export default function CareersPage() {
             Vagas abertas
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.75rem' }}>
+          <div className="tb-rail" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.75rem' }}>
             {ROLES.map(role => (
               <ScrollReveal key={role.id}>
                 <div style={{
@@ -232,7 +232,17 @@ export default function CareersPage() {
       {/* Pay estimator */}
       <section style={{ padding: '0 1.5rem clamp(2rem, 5vw, 3rem)' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-          <PayEstimator />
+          {/* Behind one tap (2026-11-13: shorter pages) */}
+          <details className="tc-pay">
+            <summary>💰 Quanto você ganharia? Ver a estimativa</summary>
+            <PayEstimator />
+          </details>
+          <style>{`
+            .tc-pay > summary { display: flex; justify-content: center; align-items: center; gap: 0.4rem; min-height: 52px; padding: 0.6rem 1.2rem; cursor: pointer; list-style: none; font-weight: 700; color: var(--color-primary); background: #fff; border: 1px solid #e8e1d7; border-radius: 16px; }
+            .tc-pay > summary::-webkit-details-marker { display: none; }
+            .tc-pay > summary::after { content: '+'; color: #d4af37; font-size: 1.3rem; margin-left: 0.3rem; }
+            .tc-pay[open] > summary { display: none; }
+          `}</style>
         </div>
       </section>
 

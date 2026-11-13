@@ -24,6 +24,20 @@ export default function Footer() {
       color: '#fdfaf3',
       padding: '6rem 2rem 3rem'
     }}>
+      {/* Phones: the link lists sit two by two and the padding shrinks, so the footer no longer takes two screens. */}
+      <style>{`
+        @media (max-width: 699px) {
+          .footer { padding: 3rem 1.25rem 2rem !important; }
+          .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 1.5rem 1rem !important; }
+          .footer-grid > .footer-brand, .footer-grid > .footer-contact { grid-column: 1 / -1; }
+          .footer-grid ul { line-height: 1.5 !important; }
+          .footer-grid li a { display: inline-block; padding: 0.35rem 0; }
+          .footer-grid h3 { font-size: 0.85rem; margin-bottom: 0.4rem !important; }
+          .footer-brand > p, .footer-brand > br, .footer-seal, .footer-contact > p { display: none; }
+          .footer-brand { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+          .footer-brand img { height: 44px !important; margin: 0 !important; }
+        }
+      `}</style>
       {/* The bakery photo, desaturated and tinted cocoa so it gives texture without hurting the links. */}
       <div aria-hidden style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -31,11 +45,11 @@ export default function Footer() {
         filter: 'grayscale(1) sepia(0.45) contrast(1.1)',
       }} />
       <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(60,42,33,0.82) 0%, rgba(60,42,33,0.72) 100%)' }} />
-      <div className="container" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
-        <div>
+      <div className="container footer-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+        <div className="footer-brand">
           <img src="/logo.svg" alt="The Tropical Bakery" style={{ height: '60px', marginBottom: '1rem', filter: 'brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(5deg)' }} />
           <p style={{ marginBottom: '1rem', color: '#e8e1d7' }}>Confeitaria saudável de luxo em Ubatuba, pelas mãos da chef belga Elisabeth “Dolly” Van Dam.</p>
-          <OriginSeal tone="dark" style={{ marginBottom: '1.75rem' }} />
+          <span className="footer-seal"><OriginSeal tone="dark" style={{ marginBottom: '1.75rem' }} /></span>
           <br />
           <InstagramLink size={22} showHandle style={{ color: '#e8e1d7', fontSize: '0.95rem', letterSpacing: '0.3px' }} />
         </div>
@@ -63,7 +77,7 @@ export default function Footer() {
             <li><Link href="/b2b/bem-estar" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Yoga, Academias e Spas</Link></li>
           </ul>
         </div>
-        <div>
+        <div className="footer-contact">
           <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Contato</h3>
           <p style={{ lineHeight: 1.7, color: '#e8e1d7', fontSize: '0.92rem' }}>
             Home bakery em Itamambuca, Ubatuba · SP.<br />

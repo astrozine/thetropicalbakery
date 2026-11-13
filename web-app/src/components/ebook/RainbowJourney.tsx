@@ -8,7 +8,7 @@ import { EBOOK_COPY, type EbookLang } from '@/lib/ebookCopy';
  * The seven days, one color at a time. The whole section takes on the color of the day you pick; until
  * the visitor taps, it walks through the rainbow by itself (only while it is on screen).
  */
-export default function RainbowJourney({ lang = 'en' }: { lang?: EbookLang }) {
+export default function RainbowJourney({ lang = 'en', intro, children }: { lang?: EbookLang; intro?: React.ReactNode; children?: React.ReactNode }) {
   const c = EBOOK_COPY[lang];
   const [i, setI] = useState(0);
   const [auto, setAuto] = useState(true);
@@ -43,9 +43,13 @@ export default function RainbowJourney({ lang = 'en' }: { lang?: EbookLang }) {
       aria-label={c.journey.title}
     >
       <div className="se-wrap">
-        <p className="se-kicker se-kicker--ink" data-sign="🌈">{c.journey.kicker}</p>
-        <h2 className="se-h2 se-journey__h2">{c.journey.title}</h2>
-        <p className="se-journey__lead">{c.journey.lead}</p>
+        {intro ?? (
+          <>
+            <p className="se-kicker se-kicker--ink" data-sign="🌈">{c.journey.kicker}</p>
+            <h2 className="se-h2 se-journey__h2">{c.journey.title}</h2>
+            <p className="se-journey__lead">{c.journey.lead}</p>
+          </>
+        )}
 
         <div className="se-days" role="tablist" aria-label={c.journey.tabs}>
           {RECIPES.map((d, n) => (
@@ -86,6 +90,7 @@ export default function RainbowJourney({ lang = 'en' }: { lang?: EbookLang }) {
             <span key={i} />
           </div>
         )}
+        {children}
       </div>
     </section>
   );

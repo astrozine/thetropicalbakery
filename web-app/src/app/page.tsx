@@ -89,7 +89,18 @@ export default async function Home() {
   const announcementLink = getContent('announcement', '');
 
   return (
-    <main>
+    <main className="home-short">
+      {/* Shorter on phones (2026-11-13): the Belgium/Brazil pillars swipe sideways and the photo band is lower. */}
+      <style>{`
+        @media (max-width: 767px) {
+          .home-short .home-short-band { min-height: 0 !important; height: 34vh !important; }
+          .home-short .bb-story { padding-top: 3rem; padding-bottom: 3rem; }
+          .home-short .bb-story__lead { margin-bottom: 1.6rem; }
+          .home-short .bb-story__pillars { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 0.8rem; margin: 0 -1.25rem; padding: 0 1.25rem 0.6rem; scrollbar-width: none; }
+          .home-short .bb-story__pillars::-webkit-scrollbar { display: none; }
+          .home-short .bb-story__pillars > * { flex: 0 0 78%; scroll-snap-align: start; }
+        }
+      `}</style>
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-background"></div>
@@ -133,14 +144,14 @@ export default async function Home() {
       {/* Full-colour photo band: the branded paper and the treats */}
       <PhotoShowcase />
 
-      {/* Parallax Banner 1 */}
+      {/* Parallax Banner 1 (shorter on phones: home-short below) */}
       <section 
-        className="parallax-banner" 
+        className="parallax-banner home-short-band" 
         style={{ backgroundImage: `url(${getContent('home-parallax-1', '/iphone_nano_banana.jpg')})` }} 
       />
 
       {/* Active Box Banner */}
-      <section id="order" style={{ padding: '6rem 2rem', background: '#fdfaf3' }}>
+      <section id="order" style={{ padding: 'clamp(3rem, 7vw, 5rem) 1.25rem', background: '#fdfaf3' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '1100px' }}>
           <ScrollReveal className="text-center">
             {featured.length ? (
@@ -166,14 +177,10 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Parallax Banner 2 */}
-      <section 
-        className="parallax-banner" 
-        style={{ backgroundImage: `url(${getContent('home-parallax-2', '/iphone_passion_fruit.jpg')})` }} 
-      />
+      {/* (A second parallax photo band sat here; taken out 2026-11-13 so the page scrolls less.) */}
 
       {/* Menu/Inspiration Section */}
-      <section id="menu" className="menu-section" style={{ padding: '12rem 2rem', background: '#fdfaf3' }}>
+      <section id="menu" className="menu-section" style={{ padding: 'clamp(3rem, 7vw, 6rem) 1.25rem', background: '#fdfaf3' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <ScrollReveal>
             <h2 className="section-title" data-sign-top="⭐">Destaques Anteriores</h2>
