@@ -468,3 +468,63 @@
   .se-offer__buy { position: sticky; top: 90px; }
   .se-offer__buy .se-card { position: static; }
 }
+
+/* ══ EVEN CALMER (Andrew, 2026-11-13: "shorter still"): the big idea, the seven days and the peek inside share the
+   colorful section; the parents list, the six building blocks and the offer stack are one tap away. ══ */
+.se-journey__intro { margin-bottom: 0.4rem; }
+.se-journey__intro .se-bigline { margin-bottom: 0.6rem; }
+.se-journey__intro .se-bigline b { color: inherit; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.se-journey__sub { font-family: var(--font-heading); font-weight: 700; font-size: clamp(1.1rem, 3.6vw, 1.5rem); margin: 1.4rem 0 0.8rem; color: var(--ink); text-align: center; }
+.se-more--ink summary { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.se-more--ink { text-align: center; color: var(--ink); }
+.se-more--ink[open] { text-align: left; background: rgba(255, 255, 255, 0.85); color: var(--se-cocoa); border-radius: 16px; padding: 0.4rem 1.1rem 1rem; }
+.se-more--ink[open] summary { color: var(--se-cocoa); }
+.se-more--ink .se-checks--soft { margin-top: 0.3rem; }
+.se-more--ink dt { display: flex; gap: 0.4rem; }
+.se-peek { margin-top: 0.4rem; }
+.se-pages--mini { margin-top: 0.4rem; padding-top: 0.6rem; padding-bottom: 0.8rem; }
+.se-pages--mini .se-page { flex-basis: 38%; max-width: 170px; }
+.se-pages--mini .se-page img { box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3); }
+
+.se-dolly__head { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; }
+.se-dolly__head .se-dolly { flex: 0 0 auto; width: 84px; height: 84px; margin: 0; }
+.se-dolly__head .se-kicker { margin-bottom: 0.3rem; }
+.se-dolly__title { margin: 0; font-size: clamp(1.3rem, 4.6vw, 2rem); }
+.se-sec--story .se-dolly__line { margin: 0 0 0.4rem; max-width: none; }
+.se-sec--story .se-more { margin: 0 0 0.6rem; max-width: none; }
+.se-sec--story .se-sign .se-script { font-size: 2.1rem; }
+
+.se-stackfold { text-align: left; margin: 0 0 1rem; max-width: none; }
+.se-stackfold summary { margin: 0; }
+.se-stackfold .se-stack--lite li { display: grid; gap: 0.1rem; }
+.se-stackfold .se-stack--lite span { font-size: 0.85rem; }
+
+@media (max-width: 899px) {
+  .se-hero__eyebrow { display: none; }
+  .se-hero__stage { width: min(100%, 250px); }
+  .se-hero__grid { padding-bottom: 2.2rem; gap: 1rem; }
+  .se-hero__lead { margin-bottom: 1.1rem; }
+  .se-feature__makes { display: none; }
+  .se-feature__kid { margin: 0.8rem 0 0; }
+  .se-booklang { grid-template-columns: repeat(3, 1fr); }
+  .se-sec--calm { padding: 2.75rem 0; }
+  .se-final--calm { padding: 2.75rem 0; }
+}
+@media (min-width: 900px) {
+  .se-pages--mini { justify-content: center; }
+  .se-pages--mini .se-page { flex: 0 0 calc(12.5% - 1.3rem); max-width: 150px; }
+}
+.se-closing { margin-top: 2.5rem; }
+.se-closing .se-final__title { margin-bottom: 1.2rem; }
+@media (max-width: 899px) {
+  .se-guarantee { padding: 0.75rem; gap: 0.8rem; }
+  .se-guarantee__seal { width: 54px; height: 54px; font-size: 1.3rem; }
+  .se-guarantee p { font-size: 0.85rem; }
+  .se-offer { gap: 1.4rem; }
+}
+@media (max-width: 899px) {
+  .se-feature__kid { display: none; }
+  .se-feature { gap: 0.9rem; padding-bottom: 1rem; }
+  .se-pages--mini .se-page { flex-basis: 31%; }
+  .se-journey__sub { margin-top: 1rem; }
+}

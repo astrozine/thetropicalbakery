@@ -17,7 +17,7 @@ const IMG = '/ebook/sweet-escape';
 
 const BLOCK_ICONS = ['🥥', '🌴', '🌾', '✨', '🍓', '🌈'];
 /** The FAQ shows its first few questions; the rest wait behind one quiet fold. */
-const FAQ_SHOWN = 4;
+const FAQ_SHOWN = 3;
 const MORE_QUESTIONS: Record<EbookLang, string> = { en: 'More questions', pt: 'Mais perguntas', es: 'Más preguntas', nl: 'Meer vragen', de: 'Weitere Fragen' };
 const PAGES = ['contents', 'page-rule', 'page-opener', 'page-recipe', 'page-why', 'page-benefits', 'page-purple', 'page-story'];
 
@@ -99,62 +99,55 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
         <div className="se-rainbow" aria-hidden>{RECIPES.map(r => <i key={r.day} style={{ background: r.hex }} />)}</div>
       </section>
 
-      {/* ══ THE PROBLEM + FOR PARENTS: one calm block (the big idea, then what it changes at home) ══ */}
-      <section className="se-sec se-sec--cream se-sec--calm">
-        <div className="se-wrap se-narrow se-center">
-          <p className="se-kicker" data-sign="🤔">{c.problem.kicker}</p>
-          <h2 className="se-h2">{c.problem.title1} <br className="se-br" />{c.problem.title2}</h2>
-          <p className="se-bigline">{rich(c.problem.bigIdea)}</p>
-          <ul className="se-checks se-checks--soft">
-            {c.family.checks.map(t => <li key={t}>{t}</li>)}
-          </ul>
-        </div>
-      </section>
-
-      {/* ══ THE SEVEN DAYS ══ */}
-      <RainbowJourney lang={lang} />
-
-      {/* ══ INSIDE THE BOOK: the pages, and the six building blocks behind every recipe ══ */}
-      <section className="se-sec se-sec--peek se-sec--calm">
-        <div className="se-wrap">
-          <div className="se-narrow se-center">
-            <p className="se-kicker se-kicker--light" data-sign="👀" data-sign-dark>{c.peek.kicker}</p>
-            <h2 className="se-h2 se-h2--light">{fill(c.peek.title, v)}</h2>
-            <p className="se-lead se-lead--light">{c.peek.lead}</p>
+      {/* ══ THE BIG IDEA + THE SEVEN DAYS + A PEEK INSIDE: one colorful section. The parents list and the six
+          building blocks wait behind "read more" taps. ══ */}
+      <RainbowJourney
+        lang={lang}
+        intro={
+          <div className="se-narrow se-center se-journey__intro">
+            <p className="se-kicker se-kicker--ink" data-sign="🤔">{c.problem.kicker}</p>
+            <h2 className="se-h2 se-journey__h2">{c.problem.title1} <br className="se-br" />{c.problem.title2}</h2>
+            <p className="se-bigline">{rich(c.problem.bigIdea)}</p>
+            <details className="se-more se-more--ink">
+              <summary>{c.family.kicker}</summary>
+              <ul className="se-checks se-checks--soft">
+                {c.family.checks.map(t => <li key={t}>{t}</li>)}
+              </ul>
+            </details>
+            <h3 className="se-journey__sub">{c.journey.title}</h3>
           </div>
-          <div className="se-pages">
+        }
+      >
+        <div className="se-peek">
+          <h3 className="se-journey__sub">{fill(c.peek.title, v)}</h3>
+          <div className="se-pages se-pages--mini">
             {PAGES.map((p, n) => (
-              <div key={p} className="se-page" style={{ '--r': `${(n % 2 ? 1 : -1) * (1.5 + (n % 3))}deg` } as React.CSSProperties}>
+              <div key={p} className="se-page" style={{ '--r': `${(n % 2 ? 1 : -1) * (1 + (n % 2))}deg` } as React.CSSProperties}>
                 <ZoomableImage src={`${IMG}/${lang}/${p}.webp`} alt={c.peek.alts[n]} thumbWidth={640} loading="lazy" />
               </div>
             ))}
           </div>
-          <div className="se-narrow se-center se-learn">
-            <ul className="se-chips">
-              {c.learn.blocks.map((b, n) => (
-                <li key={b.title} style={{ '--c': RECIPES[n].hex } as React.CSSProperties} title={b.text}>
-                  <span aria-hidden>{BLOCK_ICONS[n]}</span>{b.title}
-                </li>
-              ))}
-            </ul>
-            <details className="se-more se-more--light">
-              <summary>{c.learn.title}</summary>
-              <p>{rich(c.learn.lead)}</p>
-              <dl>
-                {c.learn.blocks.map(b => <React.Fragment key={b.title}><dt>{b.title}</dt><dd>{b.text}</dd></React.Fragment>)}
-              </dl>
-            </details>
-          </div>
+          <details className="se-more se-more--ink">
+            <summary>{c.learn.title}</summary>
+            <p>{rich(c.learn.lead)}</p>
+            <dl>
+              {c.learn.blocks.map((b, n) => <React.Fragment key={b.title}><dt><span aria-hidden>{BLOCK_ICONS[n]}</span> {b.title}</dt><dd>{b.text}</dd></React.Fragment>)}
+            </dl>
+          </details>
         </div>
-      </section>
+      </RainbowJourney>
 
       {/* ══ DOLLY: a face and a few lines; the rest of her story one tap away ══ */}
       <section className="se-sec se-sec--story se-sec--calm">
-        <div className="se-wrap se-narrow se-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="se-dolly" src="/dolly/dolly-portrait.jpg" alt={c.story.photoAlt} loading="lazy" />
-          <p className="se-kicker" data-sign="📖">{c.story.kicker}</p>
-          <h2 className="se-h2">{c.story.title}</h2>
+        <div className="se-wrap se-narrow">
+          <div className="se-dolly__head">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="se-dolly" src="/dolly/dolly-portrait.jpg" alt={c.story.photoAlt} loading="lazy" />
+            <div>
+              <p className="se-kicker" data-sign="📖">{c.story.kicker}</p>
+              <h2 className="se-h2 se-dolly__title">{c.story.title}</h2>
+            </div>
+          </div>
           <p className="se-dolly__line">{rich(c.story.paragraphs[c.story.paragraphs.length - 1])}</p>
           <details className="se-more">
             <summary>{c.story.kicker}</summary>
@@ -168,15 +161,18 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
       <section className="se-sec se-sec--offer se-sec--calm" id="buy">
         <div className="se-wrap se-offer">
           <div className="se-offer__stack">
-            <p className="se-kicker se-kicker--light" data-sign="🎁" data-sign-dark>{c.offer.kicker}</p>
             <h2 className="se-h2 se-h2--light">{c.offer.title}</h2>
-            <ul className="se-stack se-stack--lite">
-              {c.offer.stack.map(s => (
-                <li key={s.what} className={s.bonus ? 'is-bonus' : ''} title={fill(s.detail, v)}>
-                  <b>{s.what}</b>
-                </li>
-              ))}
-            </ul>
+            <details className="se-more se-more--light se-stackfold">
+              <summary>{c.offer.kicker} ({c.offer.stack.length})</summary>
+              <ul className="se-stack se-stack--lite">
+                {c.offer.stack.map(s => (
+                  <li key={s.what} className={s.bonus ? 'is-bonus' : ''}>
+                    <b>{s.what}</b>
+                    <span>{fill(s.detail, v)}</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
             <div className="se-guarantee">
               <span className="se-guarantee__seal" aria-hidden>7<small>{c.offer.promiseDays}</small></span>
               <div>
@@ -231,14 +227,10 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
               </div>
             </details>
           )}
-        </div>
-      </section>
-
-      {/* ══ FINAL CALL ══ */}
-      <section className="se-final se-final--calm">
-        <div className="se-wrap se-narrow se-center">
-          <h2 className="se-final__title">{c.final.title1} <span className="se-script notranslate" translate="no">{c.final.script}</span> {c.final.title2}</h2>
-          <BuyButton>{cta}</BuyButton>
+          <div className="se-center se-closing">
+            <h2 className="se-final__title">{c.final.title1} <span className="se-script notranslate" translate="no">{c.final.script}</span> {c.final.title2}</h2>
+            <BuyButton>{cta}</BuyButton>
+          </div>
         </div>
       </section>
 

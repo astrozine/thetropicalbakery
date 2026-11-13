@@ -33,6 +33,9 @@ export default function Footer() {
           .footer-grid ul { line-height: 1.5 !important; }
           .footer-grid li a { display: inline-block; padding: 0.35rem 0; }
           .footer-grid h3 { font-size: 0.85rem; margin-bottom: 0.4rem !important; }
+          .footer-brand > p, .footer-brand > br, .footer-seal, .footer-contact > p { display: none; }
+          .footer-brand { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+          .footer-brand img { height: 44px !important; margin: 0 !important; }
         }
       `}</style>
       {/* The bakery photo, desaturated and tinted cocoa so it gives texture without hurting the links. */}
@@ -46,7 +49,7 @@ export default function Footer() {
         <div className="footer-brand">
           <img src="/logo.svg" alt="The Tropical Bakery" style={{ height: '60px', marginBottom: '1rem', filter: 'brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(5deg)' }} />
           <p style={{ marginBottom: '1rem', color: '#e8e1d7' }}>Confeitaria saudável de luxo em Ubatuba, pelas mãos da chef belga Elisabeth “Dolly” Van Dam.</p>
-          <OriginSeal tone="dark" style={{ marginBottom: '1.75rem' }} />
+          <span className="footer-seal"><OriginSeal tone="dark" style={{ marginBottom: '1.75rem' }} /></span>
           <br />
           <InstagramLink size={22} showHandle style={{ color: '#e8e1d7', fontSize: '0.95rem', letterSpacing: '0.3px' }} />
         </div>
