@@ -1195,6 +1195,33 @@ body {
   .crs-section, .crs-magic, .crs-beach { padding-top: 2.25rem !important; padding-bottom: 2.25rem !important; }
 }
 
+/* Shorter still on phones (2026-11-13): pill rows swipe in one line, tighter beach and rain bands */
+@media (max-width: 699px) {
+  .crs-rain { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+  .crs-rain-points { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; margin-left: -1rem; margin-right: -1rem; padding: 0 1rem 0.3rem; }
+  .crs-rain-points::-webkit-scrollbar { display: none; }
+  .crs-rain-points > * { flex: none; white-space: nowrap; }
+  .crs-rain-cloud { display: none; }
+  .crs-ribbon { width: 120px; margin-bottom: 0.5rem; }
+  .crs-beach-list { gap: 0.35rem; margin-bottom: 1.25rem; font-size: 0.9rem; }
+  .crs-beach-list li { padding: 0.45rem 0.8rem; }
+  .crs-footnote { display: none; }
+}
+.crs-more > summary { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; cursor: pointer; list-style: none; font-weight: 700; color: #3c2a21; text-decoration: underline; text-underline-offset: 4px; }
+.crs-more > summary::-webkit-details-marker { display: none; }
+.crs-more > summary::after { content: '+'; font-size: 1.2rem; }
+.crs-more[open] > summary { display: none; }
+@media (max-width: 699px) {
+  .crs-intro { gap: 1rem; margin-bottom: 1.5rem; }
+  .crs-intro-photo { aspect-ratio: 16 / 10; }
+  .crs-story p { font-size: 1rem; line-height: 1.7; }
+  .crs-journey { gap: 0.5rem; }
+  .crs-journey li { display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 0.75rem; row-gap: 0.15rem; padding: 0.9rem 1rem; }
+  .crs-journey-num { width: 34px; height: 34px; font-size: 0.95rem; margin: 0; grid-row: span 2; }
+  .crs-journey span:last-child { font-size: 0.9rem; line-height: 1.5; }
+}
+.crs-faq-more { display: flex; justify-content: center; align-items: center; min-height: 44px; margin: 0.6rem auto 0; background: none; border: none; cursor: pointer; font: inherit; font-weight: 700; color: #3c2a21; text-decoration: underline; text-underline-offset: 4px; }
+
 /* ── /menu: two ways to choose, told apart at a glance ──────────────────────
    The page had two picking areas that looked identical, so it felt like being
    asked the same question twice. Now:
