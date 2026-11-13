@@ -136,7 +136,7 @@ export default function BrunchLanding() {
 
       {/* ======================================================= value stack */}
       <section className="bn-section">
-        <div className="bn-wrap" style={{ display: 'grid', gap: '2rem' }}>
+        <div className="bn-wrap" style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'minmax(0, 1fr)' }}>
           <div>
             <p className="bn-kicker" data-sign="🎟️">No seu ingresso</p>
             <h2 className="bn-h2">Tudo o que vem junto</h2>
@@ -228,8 +228,14 @@ export default function BrunchLanding() {
           <p className="bn-kicker" data-sign="❓">Perguntas</p>
           <h2 className="bn-h2">Antes de garantir o seu lugar</h2>
           <div className="bn-faq">
-            {FAQ.map(f => <details key={f.q}><summary>{f.q}</summary><p>{f.a}</p></details>)}
+            {FAQ.slice(0, 3).map(f => <details key={f.q}><summary>{f.q}</summary><p>{f.a}</p></details>)}
           </div>
+          <details className="bn-faq-more">
+            <summary>Mais perguntas</summary>
+            <div className="bn-faq">
+              {FAQ.slice(3).map(f => <details key={f.q}><summary>{f.q}</summary><p>{f.a}</p></details>)}
+            </div>
+          </details>
           <div className="bn-center" style={{ marginTop: '2rem' }}>
             <a href="#agenda" className="bn-btn bn-btn--gold">Ver as próximas datas</a>
           </div>
