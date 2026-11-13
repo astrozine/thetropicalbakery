@@ -162,7 +162,7 @@ const CSS = `
 .hm-hero { background: #fdfaf3; padding: clamp(1.5rem, 5vw, 4rem) 0 clamp(2.5rem, 6vw, 4.5rem); }
 .hm-hero__inner { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; display: grid; gap: 1.75rem; align-items: center; }
 @media (min-width: 900px) { .hm-hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3.5rem; } }
-.hm-hero__logo { display: block; width: clamp(110px, 14vw, 170px); height: auto; margin: 0 0 1.25rem; filter: drop-shadow(0 10px 18px rgba(60,42,33,0.18)); }
+.hm-hero__logo { display: block; width: clamp(110px, 14vw, 170px); height: auto; margin: 0 auto 1.25rem; filter: drop-shadow(0 10px 18px rgba(60,42,33,0.18)); }
 @media (max-width: 899px) { .hm-hero__logo { display: none; } }
 .hm-hero__title { margin: 0 0 0.7rem; font-family: var(--font-heading); font-size: clamp(2.3rem, 7vw, 4.4rem); line-height: 1.02; color: #3c2a21; text-wrap: balance; }
 .hm-hero__title em { font-style: normal; color: #c9852b; }
