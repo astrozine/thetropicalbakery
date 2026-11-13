@@ -150,3 +150,17 @@
   .fr-card { padding: 1.5rem; }
   .fr-block { padding: 2rem 2.2rem; }
 }
+
+/* Shorter on phones (2026-11-13): the two recipes side by side, the five locked ones in one swipe row */
+@media (max-width: 699px) {
+  .fr-recipes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-top: 1rem; }
+  .fr-recipe img { aspect-ratio: 1; }
+  .fr-recipe > div { padding: 0.7rem 0.75rem 0.85rem !important; }
+  .fr-recipe h3 { font-size: 0.98rem !important; }
+  .fr-recipe p { font-size: 0.82rem !important; line-height: 1.45 !important; }
+  .fr-rest__grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 1rem -16px 1.2rem; padding: 0 16px; gap: 0.6rem; }
+  .fr-rest__grid::-webkit-scrollbar { display: none; }
+  .fr-rest__grid li, .fr-rest__grid li:last-child:nth-child(odd) { flex: 0 0 42%; aspect-ratio: 4 / 5; scroll-snap-align: start; }
+  .fr .se-sec { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+  .fr .se-story__photo { width: min(200px, 60%); margin-left: auto; margin-right: auto; }
+}
