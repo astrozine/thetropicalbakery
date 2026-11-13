@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import Script from 'next/script';
 import "./globals.css";
 import Navigation from "@/components/Navigation";
@@ -14,6 +14,15 @@ import MetaPixel from "@/components/MetaPixel";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+});
+
+// The calmer serif for headings (2026-11-13, "less cheesy"). Loaded here so every page can opt in through
+// var(--font-serif); pages that have not been redone keep their own heading font.
+const fraunces = Fraunces({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
 });
 
 const geistMono = Geist_Mono({
@@ -52,7 +61,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col">
         {/*
