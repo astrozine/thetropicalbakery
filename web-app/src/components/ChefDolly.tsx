@@ -1,4 +1,5 @@
 import React from 'react';
+import { BOX_SALE_ON } from '@/lib/boxSale';
 import Link from 'next/link';
 import ScrollReveal from '@/components/ScrollReveal';
 import ZoomableImage from '@/components/ZoomableImage';
@@ -366,14 +367,29 @@ export default function ChefDolly() {
         <div className="cd-wrap">
           <ScrollReveal delay={0.14}>
             <div className="cd-end__doors">
-              <Link href="/assinatura" className="cd-door cd-door--gold">
-                <b>Assinatura semanal</b>
-                <span>Uma caixa por semana, sempre diferente</span>
-              </Link>
-              <Link href="/caixas" className="cd-door">
-                <b>Caixa de degustação</b>
-                <span>Comece por uma caixa só</span>
-              </Link>
+              {BOX_SALE_ON ? (
+                <>
+                  <Link href="/assinatura" className="cd-door cd-door--gold">
+                    <b>Assinatura semanal</b>
+                    <span>Uma caixa por semana, sempre diferente</span>
+                  </Link>
+                  <Link href="/caixas" className="cd-door">
+                    <b>Caixa de degustação</b>
+                    <span>Comece por uma caixa só</span>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/brunch" className="cd-door cd-door--gold">
+                    <b>Brunch com a Dolly</b>
+                    <span>Chá, doces e boa conversa</span>
+                  </Link>
+                  <Link href="/menu" className="cd-door">
+                    <b>Doces para eventos</b>
+                    <span>Mesas de doces, festas e presentes</span>
+                  </Link>
+                </>
+              )}
               <Link href="/cursos" className="cd-door">
                 <b>Aprenda com a Dolly</b>
                 <span>Cursos e retiros em Itamambuca</span>

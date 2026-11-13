@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { BOX_SALE_ON } from '@/lib/boxSale';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AdminFooter from '@/components/AdminFooter';
@@ -57,8 +58,14 @@ export default function Footer() {
         <div>
           <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Menu</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, lineHeight: '2' }}>
-            <li><Link href="/assinatura" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>Assinatura Semanal</Link></li>
-            <li><Link href="/" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Fazer Pedido</Link></li>
+            {BOX_SALE_ON ? (
+              <>
+                <li><Link href="/assinatura" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>Assinatura Semanal</Link></li>
+                <li><Link href="/" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Fazer Pedido</Link></li>
+              </>
+            ) : (
+              <li><Link href="/menu" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>Doces para Eventos</Link></li>
+            )}
             <li><Link href="/cursos" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Cursos com Dolly</Link></li>
             <li><Link href="/dolly" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Sobre a Dolly</Link></li>
             <li><Link href="/sweet-escape/pt" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>E-book Sweet Escape</Link></li>

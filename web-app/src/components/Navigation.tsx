@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { BOX_SALE_ON } from '@/lib/boxSale';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -168,7 +169,7 @@ export default function Navigation() {
 
   // The logo is the way home, so there is no "Início" link. The boxes, the events and the
   // courses + retreats each fold into one menu so the bar stays on one line with the logo beside it.
-  const groups: { id: string; name: string; intro?: Record<string, string>; links: NavLink[] }[] = [
+  const allGroups: { id: string; name: string; intro?: Record<string, string>; links: NavLink[] }[] = [
     { id: 'caixa', name: 'Caixa de Degustação', links: [
       { name: 'Caixa da Semana', path: '/caixas', icon: '🎁' },
       // The weekly subscription is the core of the business, so it keeps the foil treatment.
@@ -207,6 +208,8 @@ export default function Navigation() {
       { name: 'The Family of the Future', path: FAMILY_INSTAGRAM_URL, sub: FAMILY_INSTAGRAM_HANDLE, external: true },
     ] },
   ];
+  // The box menu stays in the code but is hidden while the weekly box is not on sale (lib/boxSale.ts).
+  const groups = allGroups.filter(g => BOX_SALE_ON || g.id !== 'caixa');
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true, coaching: true, apps: true, ebook: true });
 
