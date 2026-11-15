@@ -7,7 +7,7 @@ import { COURSE_CONTENT, type CourseContent } from '@/lib/courseContent';
  * the kitchen is followed by a day at the waterfall, on the island or in Paraty, and nobody is "in class" all week.
  *
  *   day 1            arrive in the afternoon, welcome tasting
- *   day 2, 4, 6 ...  class with Dolly (morning in the kitchen, lunch made together)
+ *   day 2, 4, 6 ...  class with Dolly (afternoon in the kitchen: 14h, 3 hours; see workshopDates.ts)
  *   day 3, 5, 7 ...  out in the region
  *   last day         breakfast and leave
  *

@@ -9,6 +9,7 @@ import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 import { optimizedSrc } from '@/lib/thumbs';
 import { formatBRL } from '@/lib/deliveryZones';
 import { COURSE_CONTENT, MAGIC_TRICKS, PathId, courseBySlug } from '@/lib/courseContent';
+import { WORKSHOP_START, WORKSHOP_WHEN_LONG, WORKSHOP_WHEN_SHORT, workshopBreakLine } from '@/lib/workshopDates';
 import {
   BeachRetreat, CourseCTA, CourseFAQ, CourseHero, CoursePaths, MagicFlavors, RainyDay,
 } from '@/components/courses/CourseSections';
@@ -25,6 +26,7 @@ interface Course {
 const ALL_PATHS: PathId[] = ['saude', 'negocio', 'consciencia', 'equipe'];
 
 const FAQ = [
+  { q: 'Que dia e a que horas são as aulas?', a: `${WORKSHOP_WHEN_LONG} Você escolhe a data no formulário e a gente confirma.` },
   { q: 'Qual curso é para mim?', a: 'Está de passagem e quer uma experiência? Turismo Gastronômico. Cozinha profissionalmente ou quer fazer disso uma profissão? Capacitação Profissional. Quer mudar a sua alimentação e a da sua casa? Saúde, Sabores e Bem-Estar. Na dúvida, fale com a gente.' },
   { q: 'Preciso ter experiência na cozinha?', a: 'Não. Cada curso começa pela base, e a Dolly acompanha de perto.' },
   { q: 'Os cursos atendem restrições alimentares?', a: 'Tudo é 100% plant-based e sem trigo, adoçado com tâmaras, frutas, açúcar de coco ou rapadura. Se alguma receita usar chocolate vegano industrializado (que vem com açúcar cristal), a gente avisa. Alergias sérias (como alergia a castanhas) devem ser avisadas no formulário, para a gente adaptar.' },
@@ -36,6 +38,9 @@ export default function CursosPage() {
   const [courses, setCourses] = useState<Course[] | null>(null);
   const [dbDown, setDbDown] = useState(false);
   const [enquiry, setEnquiry] = useState<{ interest: string; type: 'curso' | 'retiro' } | null>(null);
+  // Read after the page is on screen, so the visitor's own date decides it (and the server's render matches).
+  const [breakLine, setBreakLine] = useState('');
+  useEffect(() => { setBreakLine(workshopBreakLine()); }, []);
   const book = (interest: string, type: 'curso' | 'retiro' = 'curso') => setEnquiry({ interest, type });
 
   useEffect(() => {
@@ -76,7 +81,7 @@ export default function CursosPage() {
           </p>
           <OriginSeal text="Aprenda a técnica belga com ingredientes brasileiros" style={{ marginBottom: '2rem' }} />
           <div className="crs-rain-points" style={{ maxWidth: '860px' }}>
-            {['🌱 100% plant-based', '🌾 Sem trigo', '🍯 Adoçado com frutas', '🧂 Sem sal e sem óleo', '🌴 Frutas da Mata Atlântica', '👩‍🍳 Mão na massa'].map(t => (
+            {['🌱 100% plant-based', '🌾 Sem trigo', '🍯 Adoçado com frutas', '🧂 Sem sal e sem óleo', '🌴 Frutas da Mata Atlântica', '👩‍🍳 Mão na massa', `🕑 ${WORKSHOP_WHEN_SHORT}`].map(t => (
               <span key={t} style={{ background: '#fff', color: '#3c2a21', border: '1px solid #eadfcb' }}>{t}</span>
             ))}
           </div>
@@ -93,6 +98,9 @@ export default function CursosPage() {
         <div className="crs-wrap">
           <span className="crs-eyebrow" data-sign="🚪">Escolha a sua porta de entrada</span>
           <h2 className="crs-h2">Os cursos</h2>
+          <p className="crs-lead" style={{ marginBottom: '1.5rem' }}>
+            {WORKSHOP_WHEN_LONG}{breakLine ? ` ${breakLine}` : ''}
+          </p>
           {courses === null ? (
             <p style={{ color: '#7a6a61' }}>Carregando cursos…</p>
           ) : list.length === 0 ? (
@@ -131,7 +139,7 @@ export default function CursosPage() {
       <CoursePaths ids={ALL_PATHS} title="Onde um curso com a Dolly pode te levar" />
 
       <BeachRetreat
-        text="Qualquer curso pode virar férias: hospedagem na casa de retiro em Itamambuca, cozinha de manhã, e o resto do dia para o mar, a cachoeira, as trilhas e o pôr do sol. Aprender descansado é aprender melhor."
+        text={`Qualquer curso pode virar férias: hospedagem na casa de retiro em Itamambuca, a manhã livre para o mar, a cachoeira e as trilhas, e a cozinha a partir das ${WORKSHOP_START}. Aprender descansado é aprender melhor.`}
         interest="Curso com hospedagem"
         onEnquire={book}
       />

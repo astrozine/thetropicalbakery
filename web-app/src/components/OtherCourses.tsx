@@ -11,7 +11,7 @@ const coursesData = [
   {
     slug: 'turismo-gastronomico',
     title: 'Turismo Gastronômico',
-    description: 'Imersão de 1 dia em Ubatuba.',
+    description: 'Uma tarde de imersão em Itamambuca.',
     image: '/assets/surfers_retreat_treats_1789884582282.jpg'
   },
   {
