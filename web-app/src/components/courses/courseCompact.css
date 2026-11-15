@@ -47,7 +47,6 @@
 /* ---- the price */
 .cx-price { margin-top: .9rem; padding: .85rem 1rem; border-radius: 16px; background: #3c2a21; color: #fdfaf3; }
 .cx-price strong { font-family: var(--font-heading); font-size: 1.15rem; color: #f0cf6a; }
-.cx-price-brl { margin-left: .5rem; font-size: .92rem; font-weight: 700; color: rgba(253, 250, 243, .85); }
 .cx-price p { margin: .35rem 0 0; font-size: .9rem; line-height: 1.4; color: rgba(253, 250, 243, .9); }
 
 /* ---- Dolly's flavour tricks: small cards, tap to turn */
