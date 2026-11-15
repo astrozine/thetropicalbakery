@@ -9,7 +9,7 @@
  *  - family:  the rainy-day version for the whole family
  */
 
-import { WORKSHOP_HOURS, WORKSHOP_START, WORKSHOP_WHEN_LONG, WORKSHOP_WHEN_SHORT } from '@/lib/workshopDates';
+import { WORKSHOP_START, WORKSHOP_WHEN_LONG, WORKSHOP_WHEN_SHORT } from '@/lib/workshopDates';
 
 /** The same answer on every course page; the hours come from workshopDates.ts. */
 const WORKSHOP_FAQ_ANSWER = `${WORKSHOP_WHEN_LONG} Você escolhe a data no formulário e a gente confirma.`;
@@ -102,12 +102,12 @@ export const COURSE_CONTENT: CourseContent[] = [
   {
     slug: 'capacitacao-profissional',
     title: 'Capacitação Profissional',
-    eyebrow: `Encontros semanais · Aulas de ${WORKSHOP_HOURS} horas, às ${WORKSHOP_START}`,
+    eyebrow: `${WORKSHOP_WHEN_SHORT} · Para cozinheiras e cozinheiros`,
     tagline: 'A técnica que transforma uma boa cozinheira em uma profissional disputada: comida saudável que a família inteira pede de novo.',
     heroImage: '/assets/chef_training_1789884593538.jpg',
     floating: ['/menu-items/20250823_121752.jpg', '/menu-items/Screenshot_20260623_080155_Gallery.jpg', '/menu-items/20250907_143728.jpg'],
     story: [
-      'Uma formação contínua, semana a semana, para cozinheiras e cozinheiros particulares de Itamambuca e região, muitas vezes com o curso pago pelos próprios empregadores. O objetivo é simples: elevar a comida do dia a dia de uma casa ao nível de um restaurante saudável.',
+      'Uma formação aula a aula, nos dias que você escolher, para cozinheiras e cozinheiros particulares de Itamambuca e região, muitas vezes com o curso pago pelos próprios empregadores. O objetivo é simples: elevar a comida do dia a dia de uma casa ao nível de um restaurante saudável.',
       'Aqui se aprende o que não cabe numa receita: planejar uma semana inteira de cardápio sem sal, sem óleo e sem açúcar refinado, substituir ingredientes sem perder o sabor, e usar as combinações mágicas da Dolly para que ninguém da casa sinta falta do que foi tirado.',
     ],
     whoFor: ['Cozinheiras e cozinheiros particulares', 'Empregadores que querem investir na sua equipe de casa', 'Quem cozinha para famílias com restrições (glúten, lactose, diabetes, veganismo)', 'Quem quer transformar o talento em profissão ou em um negócio próprio'],
@@ -116,20 +116,20 @@ export const COURSE_CONTENT: CourseContent[] = [
     magic: m('crocante', 'cremoso', 'textura', 'especiarias'),
     journey: [
       { title: 'Base e diagnóstico', text: 'O que a casa onde você trabalha come, o que precisa mudar, e as restrições de cada pessoa.' },
-      { title: 'Substituições e técnica', text: 'Semana a semana, as trocas que funcionam: sem trigo, sem óleo, sem açúcar refinado, sem perder a graça.' },
+      { title: 'Substituições e técnica', text: 'Aula a aula, as trocas que funcionam: sem trigo, sem óleo, sem açúcar refinado, sem perder a graça.' },
       { title: 'Os truques de sabor', text: 'Crocância sem fritura, cremosidade sem lácteos, doçura sem açúcar: a parte que faz a família pedir bis.' },
       { title: 'Cardápio da semana', text: 'Você monta cardápios completos, com lista de compras e preparo adiantado, para o dia a dia real.' },
     ],
     paths: ['negocio', 'equipe', 'saude'],
     retreatText: 'Vem de outra cidade? Faça a capacitação em formato intensivo, hospedado na casa de retiro em Itamambuca: praia de manhã, cozinha à tarde, e a cabeça descansada para aprender.',
     faq: [
-      { q: 'Que dia e a que horas são as aulas?', a: `${WORKSHOP_FAQ_ANSWER} Na capacitação, o encontro é uma vez por semana, no dia que combinarmos.` },
+      { q: 'Que dia e a que horas são as aulas?', a: `${WORKSHOP_FAQ_ANSWER} Você pode vir em dias seguidos ou espaçar as aulas, como ficar melhor para você.` },
       { q: 'Meu empregador pode pagar?', a: 'Sim, e é o formato mais comum. Na inscrição, diga que é patrocinado e a gente combina com quem vai pagar.' },
       { q: 'Preciso ter experiência?', a: 'Ajuda, mas não é obrigatório. O curso começa pela base e avança no seu ritmo.' },
       { q: 'Isso pode virar trabalho com a Tropical Bakery?', a: 'Pode. Quem se destaca pode ser chamado para eventos, produção ou parcerias. Veja também a página Trabalhe Conosco.' },
     ],
     enquiry: 'Capacitação Profissional para Cozinheiros',
-    // The weekly course, done as an intensive: its four modules in three full class days.
+    // Done as an intensive inside a retreat: its four modules in three class days.
     retreatClasses: 3,
     cta: 'Quero me matricular',
     gallery: ['/menu-items/20250823_121752.jpg', '/menu-items/Screenshot_20260623_080155_Gallery.jpg', '/menu-items/20250907_143728.jpg', '/menu-items/Screenshot_20260415_110305_Gallery.jpg'],
