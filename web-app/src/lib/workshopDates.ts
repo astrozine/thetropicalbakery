@@ -25,17 +25,19 @@ export const WORKSHOP_WHEN_LONG = `As aulas acontecem todos os dias, a partir da
 
 /**
  * What a workshop costs (Andrew, 2026-11-15: the same as Dolly's Airbnb Experience).
- * US dollars per guest, per class. A class needs at least WORKSHOP_MIN_GUESTS and takes up to WORKSHOP_MAX_GUESTS;
+ * Dolly's price is US$ 58 per guest, per class. The site shows it in reais so nobody has to convert
+ * (Andrew, 2026-11-15): US$ 58 at about R$ 5.67 to the dollar, rounded to R$ 330. If the dollar moves a lot,
+ * change WORKSHOP_PRICE_BRL here and every page and the booking form follow. A class needs at least WORKSHOP_MIN_GUESTS and takes up to WORKSHOP_MAX_GUESTS;
  * someone who wants a class alone pays for the minimum.
  */
-export const WORKSHOP_PRICE_USD = 58;
+export const WORKSHOP_PRICE_BRL = 330;
 export const WORKSHOP_MIN_GUESTS = 2;
 export const WORKSHOP_MAX_GUESTS = 12;
-export const WORKSHOP_PRICE_SHORT = `US$ ${WORKSHOP_PRICE_USD} por pessoa`;
+export const WORKSHOP_PRICE_SHORT = `R$ ${WORKSHOP_PRICE_BRL} por pessoa`;
 export const WORKSHOP_GROUP_LINE = `Grupos de ${WORKSHOP_MIN_GUESTS} a ${WORKSHOP_MAX_GUESTS} pessoas. Quer a aula só para você? Dá: você paga as ${WORKSHOP_MIN_GUESTS} vagas.`;
 export const WORKSHOP_PRICE_LONG = `${WORKSHOP_PRICE_SHORT}, por aula. ${WORKSHOP_GROUP_LINE}`;
-/** What the class costs for this many guests, in dollars (one guest pays the minimum). */
-export const workshopTotalUSD = (guests: number) => Math.max(guests, WORKSHOP_MIN_GUESTS) * WORKSHOP_PRICE_USD;
+/** What the class costs for this many guests, in reais (one guest pays the minimum). */
+export const workshopTotalBRL = (guests: number) => Math.max(guests, WORKSHOP_MIN_GUESTS) * WORKSHOP_PRICE_BRL;
 
 /** Today in the visitor's own time zone, as YYYY-MM-DD (what a date field uses). */
 export function todayIso(now: Date = new Date()): string {

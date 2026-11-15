@@ -8,8 +8,8 @@ import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import { SunbakedLettersNote } from '@/components/SunbakedLetters';
 import {
-  WORKSHOP_MAX_GUESTS, WORKSHOP_MIN_GUESTS, WORKSHOP_PRICE_USD,
-  todayIso, workshopMinDate, workshopBreakNote, workshopDateError, workshopTotalUSD,
+  WORKSHOP_MAX_GUESTS, WORKSHOP_MIN_GUESTS, WORKSHOP_PRICE_BRL,
+  todayIso, workshopMinDate, workshopBreakNote, workshopDateError, workshopTotalBRL,
 } from '@/lib/workshopDates';
 
 interface CrmRegistrationModalProps {
@@ -345,8 +345,8 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
   const guests = Number(groupSize);
   const groupNote = !isCourse ? ''
     : guests >= 1 && guests <= WORKSHOP_MAX_GUESTS
-      ? `US$ ${WORKSHOP_PRICE_USD} por pessoa: US$ ${workshopTotalUSD(guests)} para ${guests === 1 ? `1 pessoa (aula particular, paga ${WORKSHOP_MIN_GUESTS} vagas)` : `${guests} pessoas`}.`
-      : `US$ ${WORKSHOP_PRICE_USD} por pessoa. De ${WORKSHOP_MIN_GUESTS} a ${WORKSHOP_MAX_GUESTS} pessoas; sozinho(a), você paga ${WORKSHOP_MIN_GUESTS} vagas.`;
+      ? `R$ ${WORKSHOP_PRICE_BRL} por pessoa: R$ ${workshopTotalBRL(guests).toLocaleString('pt-BR')} para ${guests === 1 ? `1 pessoa (aula particular, paga ${WORKSHOP_MIN_GUESTS} vagas)` : `${guests} pessoas`}.`
+      : `R$ ${WORKSHOP_PRICE_BRL} por pessoa. De ${WORKSHOP_MIN_GUESTS} a ${WORKSHOP_MAX_GUESTS} pessoas; sozinho(a), você paga ${WORKSHOP_MIN_GUESTS} vagas.`;
 
   const detailFields = (
     <>

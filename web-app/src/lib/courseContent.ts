@@ -13,7 +13,7 @@ import { WORKSHOP_PRICE_LONG, WORKSHOP_START, WORKSHOP_WHEN_LONG, WORKSHOP_WHEN_
 
 /** The same answer on every course page; the hours come from workshopDates.ts. */
 /** The same on every course page; the price comes from workshopDates.ts. */
-export const PRICE_FAQ = { q: 'Quanto custa?', a: `${WORKSHOP_PRICE_LONG} Em reais, vale o câmbio do dia.` };
+export const PRICE_FAQ = { q: 'Quanto custa?', a: WORKSHOP_PRICE_LONG };
 
 const WORKSHOP_FAQ_ANSWER = `${WORKSHOP_WHEN_LONG} Você escolhe a data no formulário e a gente confirma.`;
 

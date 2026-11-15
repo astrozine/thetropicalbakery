@@ -6,9 +6,8 @@ import ZoomableImage from '@/components/ZoomableImage';
 import { optimizedSrc } from '@/lib/thumbs';
 import { COURSE_CONTENT, MagicTrick, PATHS, PathId } from '@/lib/courseContent';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
-import { useExchangeRates } from '@/lib/currency';
 import {
-  WORKSHOP_GROUP_LINE, WORKSHOP_HOURS, WORKSHOP_PRICE_SHORT, WORKSHOP_PRICE_USD, WORKSHOP_START, workshopBreakLine,
+  WORKSHOP_GROUP_LINE, WORKSHOP_HOURS, WORKSHOP_PRICE_SHORT, WORKSHOP_START, workshopBreakLine,
 } from '@/lib/workshopDates';
 import './courseCompact.css';
 
@@ -55,20 +54,11 @@ export function CompactHero({ eyebrow, title, tagline, image, cta, onCta, second
   );
 }
 
-/* ------------------------------------------------------------------ the price, with reais beside it */
-/** '≈ R$ 310' for the dollar price, or '' until today's rate is known. Display only. */
-export function useWorkshopBRL(usd: number = WORKSHOP_PRICE_USD): string {
-  const { rates } = useExchangeRates();
-  if (!rates.usd) return '';
-  return `≈ R$ ${Math.round(usd / rates.usd).toLocaleString('pt-BR')}`;
-}
-
+/* ------------------------------------------------------------------ the price */
 export function PriceCard() {
-  const brl = useWorkshopBRL();
   return (
     <div className="cx-price">
       <strong>{WORKSHOP_PRICE_SHORT}</strong>
-      {brl && <span className="cx-price-brl">{brl}</span>}
       <p>{WORKSHOP_GROUP_LINE}</p>
     </div>
   );
