@@ -7,7 +7,10 @@ import { trackMeta } from '@/lib/metaPixel';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import { SunbakedLettersNote } from '@/components/SunbakedLetters';
-import { todayIso, workshopMinDate, workshopBreakNote, workshopDateError } from '@/lib/workshopDates';
+import {
+  WORKSHOP_MAX_GUESTS, WORKSHOP_MIN_GUESTS, WORKSHOP_PRICE_USD,
+  todayIso, workshopMinDate, workshopBreakNote, workshopDateError, workshopTotalUSD,
+} from '@/lib/workshopDates';
 
 interface CrmRegistrationModalProps {
   isOpen: boolean;
@@ -21,7 +24,7 @@ const NARROW_QUERY = '(max-width: 899px)';
 const STEP_TITLES = ['Seus dados', 'Data e ideia', 'Seus interesses'];
 const LAST_STEP = STEP_TITLES.length - 1;
 
-type Errors = Partial<Record<'name' | 'email' | 'whatsapp' | 'date', string>>;
+type Errors = Partial<Record<'name' | 'email' | 'whatsapp' | 'date' | 'group', string>>;
 
 const inputStyle: React.CSSProperties = {
   width: '100%', minWidth: 0, minHeight: 48, padding: '0.8rem', fontSize: '1rem',
@@ -159,6 +162,9 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
     if (s === 1) {
       const dateError = dateProblem(dateStr);
       if (dateError) e.date = dateError;
+      if (interestType === 'curso' && groupSize && (Number(groupSize) < 1 || Number(groupSize) > WORKSHOP_MAX_GUESTS)) {
+        e.group = `Cada aula recebe até ${WORKSHOP_MAX_GUESTS} pessoas. Para um grupo maior, conte na mensagem.`;
+      }
     }
     return e;
   };
@@ -335,6 +341,12 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
   const isCourse = interestType === 'curso';
   const minDate = isCourse ? workshopMinDate() : todayIso();
   const dateNote = isCourse ? workshopBreakNote() : '';
+  // The price moves with the group, so say it as they type (one guest pays the two-guest minimum).
+  const guests = Number(groupSize);
+  const groupNote = !isCourse ? ''
+    : guests >= 1 && guests <= WORKSHOP_MAX_GUESTS
+      ? `US$ ${WORKSHOP_PRICE_USD} por pessoa: US$ ${workshopTotalUSD(guests)} para ${guests === 1 ? `1 pessoa (aula particular, paga ${WORKSHOP_MIN_GUESTS} vagas)` : `${guests} pessoas`}.`
+      : `US$ ${WORKSHOP_PRICE_USD} por pessoa. De ${WORKSHOP_MIN_GUESTS} a ${WORKSHOP_MAX_GUESTS} pessoas; sozinho(a), você paga ${WORKSHOP_MIN_GUESTS} vagas.`;
 
   const detailFields = (
     <>
@@ -357,16 +369,18 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
           style={{ ...inputStyle, ...(errors.date ? { border: invalidBorder } : {}) }}
         />
       </Field>
-      <Field id="crm-group" label="Quantas pessoas?" optional>
+      <Field id="crm-group" label="Quantas pessoas?" optional={!isCourse} hint={groupNote || undefined} error={errors.group}>
         <input
           id="crm-group"
           type="number"
           inputMode="numeric"
           min={1}
-          max={500}
+          max={isCourse ? WORKSHOP_MAX_GUESTS : 500}
           enterKeyHint="next"
+          aria-invalid={errors.group ? true : undefined}
+          aria-describedby={errors.group ? 'crm-group-error' : undefined}
           value={groupSize}
-          onChange={e => setGroupSize(e.target.value)}
+          onChange={e => { setGroupSize(e.target.value); clearError('group'); }}
           placeholder={interestType === 'retiro' ? 'Ex: 8' : 'Ex: 2'}
           style={inputStyle}
         />

@@ -1,18 +1,16 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { OriginSeal } from '@/components/BelgiumBrazil';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import SunbakedLetters from '@/components/SunbakedLetters';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 import { optimizedSrc } from '@/lib/thumbs';
-import { formatBRL } from '@/lib/deliveryZones';
-import { COURSE_CONTENT, MAGIC_TRICKS, PathId, courseBySlug } from '@/lib/courseContent';
-import { WORKSHOP_START, WORKSHOP_WHEN_LONG, WORKSHOP_WHEN_SHORT, workshopBreakLine } from '@/lib/workshopDates';
+import { COURSE_CONTENT, MAGIC_TRICKS, PRICE_FAQ, PathId, courseBySlug } from '@/lib/courseContent';
+import { WORKSHOP_PRICE_SHORT, WORKSHOP_START, WORKSHOP_WHEN_LONG } from '@/lib/workshopDates';
 import {
-  BeachRetreat, CourseCTA, CourseFAQ, CourseHero, CoursePaths, MagicFlavors, RainyDay,
-} from '@/components/courses/CourseSections';
+  CompactCTA, CompactHero, CompactMagic, FaqFolds, PathsFold, PriceCard, PromiseStrip, RainFold, RetreatFold,
+} from '@/components/courses/CourseCompact';
 
 interface Course {
   id: string;
@@ -38,9 +36,6 @@ export default function CursosPage() {
   const [courses, setCourses] = useState<Course[] | null>(null);
   const [dbDown, setDbDown] = useState(false);
   const [enquiry, setEnquiry] = useState<{ interest: string; type: 'curso' | 'retiro' } | null>(null);
-  // Read after the page is on screen, so the visitor's own date decides it (and the server's render matches).
-  const [breakLine, setBreakLine] = useState('');
-  useEffect(() => { setBreakLine(workshopBreakLine()); }, []);
   const book = (interest: string, type: 'curso' | 'retiro' = 'curso') => setEnquiry({ interest, type });
 
   useEffect(() => {
@@ -57,110 +52,89 @@ export default function CursosPage() {
       : COURSE_CONTENT.map(c => ({ slug: c.slug, title: c.title, image: c.heroImage, price: null as number | null, fallback: c.tagline }));
 
   return (
-    <main style={{ background: 'var(--color-background)' }}>
-      <CourseHero
-        eyebrow="Cursos com a Chef Dolly ✦ Itamambuca"
+    <main className="cx-page">
+      <CompactHero
+        eyebrow="Cursos com a Chef Dolly"
         title="Aprenda a fazer o doce que faz bem"
-        tagline="Sobremesas plant-based que enganam o paladar, uma cozinha tropical a poucos passos do mar, e um conhecimento que pode mudar a sua saúde, a sua casa e até a sua carreira."
+        tagline="Uma tarde na cozinha tropical da Dolly, a poucos passos do mar. Você põe a mão na massa e leva as receitas."
         image="/assets/surfers_retreat_treats_1789884582282.jpg"
-        floating={['/menu-items/20250914_132214.jpg', '/menu-items/Screenshot_20260518_122444_Gallery.jpg', '/retreats/Beach shot Itamambuca.webp']}
-        cta="Ver os cursos"
-        onCta={() => document.getElementById('cursos-list')?.scrollIntoView({ behavior: 'smooth' })}
-        secondary={{ label: 'Falar com a Dolly', href: '#fale' }}
+        cta="Agendar minha aula"
+        onCta={() => book('Cursos')}
+        secondary={{ label: 'Ver os cursos ↓', href: '#cursos-list' }}
       />
 
-      {/* Why it's different */}
-      <section className="crs-section">
-        <div className="crs-wrap" style={{ textAlign: 'center' }}>
-          <span className="crs-eyebrow" data-sign="✨">Mais do que uma aula de confeitaria</span>
-          <h2 className="crs-h2">Você aprende a mágica, não só a receita</h2>
-          <p className="crs-lead" style={{ margin: '0 auto 2.5rem' }}>
-            A Dolly veio da Bélgica, a terra do chocolate, para a Mata Atlântica. Ela criou um jeito próprio de fazer
-            doces 100% plant-based e sem trigo, adoçados com frutas, que ninguém consegue acreditar que são saudáveis.
-            Nos cursos, você aprende o porquê de cada ingrediente, para criar as suas próprias receitas pelo resto da vida.
-          </p>
-          <OriginSeal text="Aprenda a técnica belga com ingredientes brasileiros" style={{ marginBottom: '2rem' }} />
-          <div className="crs-rain-points" style={{ maxWidth: '860px' }}>
-            {['🌱 100% plant-based', '🌾 Sem trigo', '🍯 Adoçado com frutas', '🧂 Sem sal e sem óleo', '🌴 Frutas da Mata Atlântica', '👩‍🍳 Mão na massa', `🕑 ${WORKSHOP_WHEN_SHORT}`].map(t => (
-              <span key={t} style={{ background: '#fff', color: '#3c2a21', border: '1px solid #eadfcb' }}>{t}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <MagicFlavors
-        intro="É isso que os alunos levam para casa: o poder de satisfazer qualquer vontade de doce com comida de verdade."
-        tricks={Object.values(MAGIC_TRICKS)}
-      />
+      <PromiseStrip items={['🌱 100% plant-based', '🌾 Sem trigo', '🍯 Adoçado com frutas', '🧂 Sem sal e sem óleo', '👩‍🍳 Mão na massa', '🇧🇪 Técnica belga, frutas do Brasil']} />
 
       {/* The courses */}
-      <section id="cursos-list" className="crs-section crs-section-soft">
-        <div className="crs-wrap">
-          <span className="crs-eyebrow" data-sign="🚪">Escolha a sua porta de entrada</span>
-          <h2 className="crs-h2">Os cursos</h2>
-          <p className="crs-lead" style={{ marginBottom: '1.5rem' }}>
-            {WORKSHOP_WHEN_LONG}{breakLine ? ` ${breakLine}` : ''}
-          </p>
+      <section id="cursos-list" className="cx-sec">
+        <div className="cx-wrap">
+          <span className="cx-eyebrow">Escolha o seu</span>
+          <h2 className="cx-h2">Os cursos</h2>
           {courses === null ? (
-            <p style={{ color: '#7a6a61' }}>Carregando cursos…</p>
+            <p className="cx-p">Carregando cursos…</p>
           ) : list.length === 0 ? (
-            <p style={{ color: '#7a6a61' }}>Novas turmas em preparo. Fale com a gente para saber das próximas datas.</p>
+            <p className="cx-p">Novas turmas em preparo. Fale com a gente para saber das próximas datas.</p>
           ) : (
-            <div className="crs-courses">
+            <div className="cx-courses">
               {list.map(item => {
                 const rich = courseBySlug(item.slug);
                 return (
-                  <article key={item.slug} className="crs-course">
-                    <div className="crs-course-img" style={{ backgroundImage: `url("${optimizedSrc(rich?.heroImage ?? item.image, 750)}")` }}>
-                      {item.price ? <span className="crs-course-price">{formatBRL(item.price)}</span> : null}
-                    </div>
-                    <div className="crs-course-body">
-                      {rich && <span className="crs-course-eyebrow">{rich.eyebrow}</span>}
+                  <article key={item.slug} className="cx-course">
+                    <div className="cx-course-img" style={{ backgroundImage: `url("${optimizedSrc(rich?.heroImage ?? item.image, 750)}")` }} />
+                    <div>
                       <h3>{item.title}</h3>
-                      <p>{rich?.tagline ?? item.fallback}</p>
-                      {rich && (
-                        <div className="crs-course-tags">
-                          {rich.magic.slice(0, 3).map(t => <span key={t.craving}>{t.emoji} {t.craving}</span>)}
-                        </div>
-                      )}
-                      <div className="crs-course-actions">
-                        {rich && <Link href={`/cursos/${item.slug}`} className="crs-btn crs-btn-outline">Conhecer o curso</Link>}
-                        <button type="button" className="crs-btn crs-btn-gold" onClick={() => book(rich?.enquiry ?? item.title)}>Agendar</button>
-                      </div>
+                      <p>{rich?.short ?? item.fallback}</p>
+                      <span className="cx-course-price">{WORKSHOP_PRICE_SHORT}</span>
+                    </div>
+                    <div className="cx-course-actions">
+                      <button type="button" className="cx-btn cx-btn-gold cx-btn-sm" onClick={() => book(rich?.enquiry ?? item.title)}>Agendar</button>
+                      {rich
+                        ? <Link href={`/cursos/${item.slug}`} className="cx-btn cx-btn-line cx-btn-sm">Ver detalhes</Link>
+                        : <span />}
                     </div>
                   </article>
                 );
               })}
             </div>
           )}
+          <PriceCard />
         </div>
       </section>
 
-      <CoursePaths ids={ALL_PATHS} title="Onde um curso com a Dolly pode te levar" />
-
-      <BeachRetreat
-        text={`Qualquer curso pode virar férias: hospedagem na casa de retiro em Itamambuca, a manhã livre para o mar, a cachoeira e as trilhas, e a cozinha a partir das ${WORKSHOP_START}. Aprender descansado é aprender melhor.`}
-        interest="Curso com hospedagem"
-        onEnquire={book}
+      <CompactMagic
+        tricks={Object.values(MAGIC_TRICKS)}
+        text="A boca sente caramelo, crocância e creme. O corpo recebe fruta, castanha e especiaria. É isso que você aprende a fazer."
       />
 
-      <RainyDay
-        text="Chuva na praia não precisa ser dia perdido. Traga a família para a cozinha: crianças, pais e avós fazendo doces juntos, rindo, sujando as mãos de cacau e levando para casa o que prepararam. Adoçado com frutas, então todo mundo pode repetir."
-        onEnquire={book}
-      />
-
-      <CourseFAQ items={FAQ} />
+      <section className="cx-sec">
+        <div className="cx-wrap">
+          <h2 className="cx-h2">Bom saber</h2>
+          <div className="cx-acc">
+            <RetreatFold
+              text={`Qualquer curso pode virar férias: hospedagem na casa de retiro em Itamambuca, a manhã livre para o mar, a cachoeira e as trilhas, e a cozinha a partir das ${WORKSHOP_START}.`}
+              interest="Curso com hospedagem"
+              onEnquire={book}
+            />
+            <RainFold
+              text="Chuva na praia não precisa ser dia perdido. Traga a família para a cozinha: crianças, pais e avós fazendo doces juntos e levando para casa o que prepararam. Adoçado com frutas, então todo mundo pode repetir."
+              onEnquire={book}
+            />
+            <PathsFold ids={ALL_PATHS} />
+            <FaqFolds items={[FAQ[0], PRICE_FAQ, ...FAQ.slice(1)]} />
+          </div>
+        </div>
+      </section>
 
       <div id="fale">
-        <CourseCTA
+        <CompactCTA
           title="Ainda em dúvida?"
-          text="Conte o que você procura: saúde, profissão, férias diferentes ou um programa para a família. A Dolly responde e ajuda a escolher."
+          text="Conte o que você procura. A Dolly responde e ajuda a escolher."
           cta="Falar com a Dolly"
           onCta={() => book('Consultoria Personalizada')}
         />
       </div>
 
-      <section style={{ padding: '4rem 1.5rem' }}>
+      <section className="cx-news">
         <SunbakedLetters />
       </section>
 

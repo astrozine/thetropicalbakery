@@ -1,77 +1,94 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import OtherCourses from '@/components/OtherCourses';
+import React, { useState } from 'react';
 import SunbakedLetters from '@/components/SunbakedLetters';
 import CrmRegistrationModal from '@/components/CrmRegistrationModal';
-import { supabase } from '@/lib/supabase';
-import { formatBRL } from '@/lib/deliveryZones';
-import { courseBySlug } from '@/lib/courseContent';
+import { PRICE_FAQ, courseBySlug } from '@/lib/courseContent';
 import {
-  BeachRetreat, CourseCTA, CourseFAQ, CourseGallery, CourseHero, CourseJourney, CoursePaths, MagicFlavors, RainyDay, WhoAndWhat,
-} from '@/components/courses/CourseSections';
+  CompactCTA, CompactHero, CompactMagic, FaqFolds, Fold, OtherCourseRows, PathsFold, PhotoRow, PriceCard, RainFold, RetreatFold,
+} from '@/components/courses/CourseCompact';
 
 /**
- * One course page: hero, the story, Dolly's magic flavour combinations, how it goes, where it can lead,
- * the beach-retreat and rainy-day versions (when the course has them), questions, and a last call to book.
- * The price comes from Admin > Cursos; everything else from src/lib/courseContent.ts.
+ * One course page, compact (2026-11-15): the hero says what, when and how long; then the short story with what
+ * you leave with, how the afternoon goes, Dolly's flavour tricks, and everything else behind one tap.
+ * The price and the hours come from src/lib/workshopDates.ts; everything else from src/lib/courseContent.ts.
  */
 export default function CoursePage({ slug }: { slug: string }) {
   const c = courseBySlug(slug)!;
-  const [price, setPrice] = useState<number | null>(null);
   const [enquiry, setEnquiry] = useState<{ interest: string; type: 'curso' | 'retiro' } | null>(null);
-
-  useEffect(() => {
-    supabase.from('courses').select('price').eq('slug', slug).maybeSingle().then(({ data }) => {
-      if (data?.price) setPrice(Number(data.price));
-    });
-  }, [slug]);
 
   const book = (interest = c.enquiry, type: 'curso' | 'retiro' = 'curso') => setEnquiry({ interest, type });
 
   return (
-    <main style={{ background: 'var(--color-background)' }}>
-      <CourseHero
-        eyebrow={c.eyebrow}
+    <main className="cx-page">
+      <CompactHero
+        eyebrow="Curso com a Chef Dolly"
         title={c.title}
         tagline={c.tagline}
         image={c.heroImage}
-        floating={c.floating}
-        price={price ? `Investimento: ${formatBRL(price)}` : undefined}
         cta={c.cta}
         onCta={() => book()}
-        secondary={{ label: 'Descobrir a mágica ↓', href: '#magia' }}
       />
 
-      <WhoAndWhat story={c.story} whoFor={c.whoFor} youLeaveWith={c.youLeaveWith} image={c.heroImage} imageAlt={c.title} />
+      <section className="cx-sec">
+        <div className="cx-wrap cx-two">
+          <div>
+            <span className="cx-eyebrow">O curso</span>
+            <p className="cx-p">{c.story[0]}</p>
+            {c.story.length > 1 && (
+              <details className="cx-more">
+                <summary>Ler mais</summary>
+                {c.story.slice(1).map(p => <p key={p.slice(0, 20)} className="cx-p">{p}</p>)}
+              </details>
+            )}
+          </div>
+          <div>
+            <span className="cx-eyebrow">Você sai com</span>
+            <ul className="cx-leave">{c.youLeaveWith.map(x => <li key={x}>{x}</li>)}</ul>
+            <PriceCard />
+          </div>
+        </div>
+      </section>
 
-      <div id="magia">
-        <MagicFlavors intro={c.magicIntro} tricks={c.magic} />
-      </div>
+      <section className="cx-sec cx-sec-soft">
+        <div className="cx-wrap">
+          <span className="cx-eyebrow">Passo a passo</span>
+          <h2 className="cx-h2">Como é a aula</h2>
+          <ol className="cx-steps">
+            {c.journey.map(s => <li key={s.title}><strong>{s.title}</strong>{s.text}</li>)}
+          </ol>
+          <PhotoRow images={c.gallery} />
+        </div>
+      </section>
 
-      <CourseJourney steps={c.journey} />
+      <CompactMagic tricks={c.magic} text={c.magicIntro} />
 
-      <CourseGallery images={c.gallery} />
+      <section className="cx-sec">
+        <div className="cx-wrap">
+          <h2 className="cx-h2">Bom saber</h2>
+          <div className="cx-acc">
+            <Fold emoji="🙋" title="Para quem é">
+              <ul>{c.whoFor.map(x => <li key={x}>{x}</li>)}</ul>
+            </Fold>
+            {c.retreatText && <RetreatFold text={c.retreatText} interest={c.title} onEnquire={book} />}
+            {c.familyText && <RainFold text={c.familyText} onEnquire={book} />}
+            <PathsFold ids={c.paths} />
+            <FaqFolds items={[PRICE_FAQ, ...c.faq]} />
+          </div>
+        </div>
+      </section>
 
-      <CoursePaths ids={c.paths} />
-
-      {c.retreatText && <BeachRetreat text={c.retreatText} interest={c.title} onEnquire={book} />}
-
-      {c.familyText && <RainyDay text={c.familyText} onEnquire={book} />}
-
-      <CourseFAQ items={c.faq} />
-
-      <CourseCTA
+      <CompactCTA
         title="O próximo passo é seu"
-        text="Conte um pouco sobre você no formulário. A Dolly responde pelo WhatsApp para combinar a data e os detalhes."
+        text="Escolha a data no formulário. A Dolly responde pelo WhatsApp para confirmar."
         cta={c.cta}
         onCta={() => book()}
       />
 
-      <OtherCourses currentSlug={slug} />
+      <OtherCourseRows currentSlug={slug} />
 
       {/* For people who are already this deep in: Dolly's newsletter */}
-      <section style={{ padding: '0 1.5rem 4rem', background: '#fdfaf3' }}>
+      <section className="cx-news">
         <SunbakedLetters tone="dark" />
       </section>
 

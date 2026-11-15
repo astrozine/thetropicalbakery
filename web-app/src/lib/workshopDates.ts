@@ -23,6 +23,20 @@ export const WORKSHOP_WHEN_SHORT = `Todos os dias às ${WORKSHOP_START} · ${WOR
 /** A full sentence for FAQs and notes. */
 export const WORKSHOP_WHEN_LONG = `As aulas acontecem todos os dias, a partir das ${WORKSHOP_START}, e duram ${WORKSHOP_HOURS} horas.`;
 
+/**
+ * What a workshop costs (Andrew, 2026-11-15: the same as Dolly's Airbnb Experience).
+ * US dollars per guest, per class. A class needs at least WORKSHOP_MIN_GUESTS and takes up to WORKSHOP_MAX_GUESTS;
+ * someone who wants a class alone pays for the minimum.
+ */
+export const WORKSHOP_PRICE_USD = 58;
+export const WORKSHOP_MIN_GUESTS = 2;
+export const WORKSHOP_MAX_GUESTS = 12;
+export const WORKSHOP_PRICE_SHORT = `US$ ${WORKSHOP_PRICE_USD} por pessoa`;
+export const WORKSHOP_GROUP_LINE = `Grupos de ${WORKSHOP_MIN_GUESTS} a ${WORKSHOP_MAX_GUESTS} pessoas. Quer a aula só para você? Dá: você paga as ${WORKSHOP_MIN_GUESTS} vagas.`;
+export const WORKSHOP_PRICE_LONG = `${WORKSHOP_PRICE_SHORT}, por aula. ${WORKSHOP_GROUP_LINE}`;
+/** What the class costs for this many guests, in dollars (one guest pays the minimum). */
+export const workshopTotalUSD = (guests: number) => Math.max(guests, WORKSHOP_MIN_GUESTS) * WORKSHOP_PRICE_USD;
+
 /** Today in the visitor's own time zone, as YYYY-MM-DD (what a date field uses). */
 export function todayIso(now: Date = new Date()): string {
   return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);

@@ -9,9 +9,12 @@
  *  - family:  the rainy-day version for the whole family
  */
 
-import { WORKSHOP_START, WORKSHOP_WHEN_LONG, WORKSHOP_WHEN_SHORT } from '@/lib/workshopDates';
+import { WORKSHOP_PRICE_LONG, WORKSHOP_START, WORKSHOP_WHEN_LONG, WORKSHOP_WHEN_SHORT } from '@/lib/workshopDates';
 
 /** The same answer on every course page; the hours come from workshopDates.ts. */
+/** The same on every course page; the price comes from workshopDates.ts. */
+export const PRICE_FAQ = { q: 'Quanto custa?', a: `${WORKSHOP_PRICE_LONG} Em reais, vale o câmbio do dia.` };
+
 const WORKSHOP_FAQ_ANSWER = `${WORKSHOP_WHEN_LONG} Você escolhe a data no formulário e a gente confirma.`;
 
 export type PathId = 'saude' | 'negocio' | 'consciencia' | 'equipe';
@@ -29,6 +32,8 @@ export interface CourseContent {
   title: string;
   eyebrow: string;
   tagline: string;
+  /** One punchy line for the course cards and the hero. */
+  short: string;
   heroImage: string;
   floating: string[];
   story: string[];
@@ -67,6 +72,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     slug: 'turismo-gastronomico',
     title: 'Turismo Gastronômico',
     eyebrow: `${WORKSHOP_WHEN_SHORT} · Em Itamambuca`,
+    short: 'Uma tarde na cozinha da Dolly: você faz, prova e leva as receitas.',
     tagline: 'Uma tarde com a Dolly na cozinha tropical, a praia a poucos passos, e sabores que você não acredita que são saudáveis.',
     heroImage: '/assets/surfers_retreat_treats_1789884582282.jpg',
     floating: ['/menu-items/Screenshot_20260412_123155_Edits.jpg', '/menu-items/20260724_154636.jpg', '/retreats/Beach shot Itamambuca.webp'],
@@ -103,6 +109,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     slug: 'capacitacao-profissional',
     title: 'Capacitação Profissional',
     eyebrow: `${WORKSHOP_WHEN_SHORT} · Para cozinheiras e cozinheiros`,
+    short: 'Para quem cozinha profissionalmente: comida saudável que a casa pede de novo.',
     tagline: 'A técnica que transforma uma boa cozinheira em uma profissional disputada: comida saudável que a família inteira pede de novo.',
     heroImage: '/assets/chef_training_1789884593538.jpg',
     floating: ['/menu-items/20250823_121752.jpg', '/menu-items/Screenshot_20260623_080155_Gallery.jpg', '/menu-items/20250907_143728.jpg'],
@@ -138,6 +145,7 @@ export const COURSE_CONTENT: CourseContent[] = [
     slug: 'saude-bem-estar',
     title: 'Saúde, Sabores e Bem-Estar',
     eyebrow: `${WORKSHOP_WHEN_SHORT} · Para cuidar do corpo com prazer`,
+    short: 'Mate a vontade de doce com comida que cuida de você.',
     tagline: 'Pare de brigar com a vontade de doce. Aprenda a satisfazê-la com comida que cuida de você.',
     heroImage: '/menu-items/20260620_163438.jpg',
     floating: ['/menu-items/Screenshot_20260518_122444_Gallery.jpg', '/menu-items/20250907_143728.jpg', '/menu-items/Screenshot_20260818_075043_Gallery.jpg'],
