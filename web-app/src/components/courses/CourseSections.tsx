@@ -176,7 +176,7 @@ export function BeachRetreat({ text, onEnquire, interest }: { text: string; onEn
       <div className="crs-beach-inner">
         <img src="/itamambuca-ribbon.png" alt="Itamambuca" className="crs-ribbon" />
         <span className="crs-eyebrow">Curso + Retiro</span>
-        <h2 className="crs-h2 crs-light">Aprenda de manhã. Mergulhe à tarde.</h2>
+        <h2 className="crs-h2 crs-light">Mergulhe de manhã. Aprenda à tarde.</h2>
         <p className="crs-lead crs-light-soft">{text}</p>
         <ul className="crs-beach-list">
           <li>🌊 Praia de Itamambuca, um dos picos de surf mais bonitos do litoral</li>

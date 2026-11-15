@@ -9,6 +9,11 @@
  *  - family:  the rainy-day version for the whole family
  */
 
+import { WORKSHOP_HOURS, WORKSHOP_START, WORKSHOP_WHEN_LONG, WORKSHOP_WHEN_SHORT } from '@/lib/workshopDates';
+
+/** The same answer on every course page; the hours come from workshopDates.ts. */
+const WORKSHOP_FAQ_ANSWER = `${WORKSHOP_WHEN_LONG} Você escolhe a data no formulário e a gente confirma.`;
+
 export type PathId = 'saude' | 'negocio' | 'consciencia' | 'equipe';
 
 export interface MagicTrick {
@@ -38,7 +43,7 @@ export interface CourseContent {
   faq: { q: string; a: string }[];
   /** What the enquiry form records as the interest. */
   enquiry: string;
-  /** How many class days the course takes inside a retreat (one class every other day; see retreatPlan.ts). */
+  /** How many class days the course takes inside a retreat (one class every other day; see retreatPlan.ts). A class is one afternoon: see workshopDates.ts. */
   retreatClasses: number;
   cta: string;
   gallery: string[];
@@ -61,17 +66,17 @@ export const COURSE_CONTENT: CourseContent[] = [
   {
     slug: 'turismo-gastronomico',
     title: 'Turismo Gastronômico',
-    eyebrow: 'Um dia inteiro · Para quem está em Itamambuca',
-    tagline: 'Um dia com a Dolly na cozinha tropical, a praia a poucos passos, e sabores que você não acredita que são saudáveis.',
+    eyebrow: `${WORKSHOP_WHEN_SHORT} · Em Itamambuca`,
+    tagline: 'Uma tarde com a Dolly na cozinha tropical, a praia a poucos passos, e sabores que você não acredita que são saudáveis.',
     heroImage: '/assets/surfers_retreat_treats_1789884582282.jpg',
     floating: ['/menu-items/Screenshot_20260412_123155_Edits.jpg', '/menu-items/20260724_154636.jpg', '/retreats/Beach shot Itamambuca.webp'],
     story: [
-      'Você veio para Itamambuca pela praia. Leve para casa uma coisa que ninguém mais vai ter: um dia inteiro aprendendo com a Dolly, a chef belga por trás da The Tropical Bakery, a transformar frutas da Mata Atlântica em sobremesas de vitrine, 100% plant-based, sem trigo e adoçadas com frutas.',
+      'Você veio para Itamambuca pela praia. Leve para casa uma coisa que ninguém mais vai ter: uma tarde inteira aprendendo com a Dolly, a chef belga por trás da The Tropical Bakery, a transformar frutas da Mata Atlântica em sobremesas de vitrine, 100% plant-based, sem trigo e adoçadas com frutas.',
       'É mão na massa do começo ao fim, em clima de férias. Você prova, erra, ri, acerta, e sai com as receitas, a técnica e aquela sensação boa de ter aprendido algo que vai usar a vida inteira.',
     ],
     whoFor: ['Turistas e moradores de Itamambuca e Ubatuba', 'Casais, amigos e famílias em busca de uma experiência diferente', 'Quem ama doce e quer comer melhor sem abrir mão do prazer', 'Iniciantes: não precisa saber nada de confeitaria'],
     youLeaveWith: ['As receitas que você preparou, para refazer em casa', 'Os “truques de sabor” da Dolly para enganar a vontade de doce', 'Uma degustação completa das criações da casa', 'Fotos lindas e uma memória de viagem que tem gosto'],
-    magicIntro: 'O ponto alto do dia: provar, de olhos fechados, doces que o seu cérebro jura que são “de verdade”. E depois descobrir como foram feitos.',
+    magicIntro: 'O ponto alto da tarde: provar, de olhos fechados, doces que o seu cérebro jura que são “de verdade”. E depois descobrir como foram feitos.',
     magic: m('caramelo', 'cremoso', 'acidez'),
     journey: [
       { title: 'Boas-vindas tropicais', text: 'Chegada, um café da casa e a história da Tropical Bakery, entre frutas e especiarias.' },
@@ -80,23 +85,24 @@ export const COURSE_CONTENT: CourseContent[] = [
       { title: 'Degustação e fotos', text: 'A mesa posta, tudo o que foi feito do jeito de vitrine, e a hora de provar tudo com calma.' },
     ],
     paths: ['saude', 'consciencia', 'equipe'],
-    retreatText: 'Transforme o dia em férias completas: hospede-se na casa de retiro em Itamambuca, aprenda de manhã e passe a tarde no mar, na cachoeira do Prumirim ou numa trilha até a ilha.',
+    retreatText: `Transforme a aula em férias completas: hospede-se na casa de retiro em Itamambuca, passe a manhã no mar, na cachoeira do Prumirim ou numa trilha, e venha para a cozinha às ${WORKSHOP_START}.`,
     familyText: 'Choveu? O Turismo Gastronômico vira programa de família: crianças e adultos na mesma bancada, cada um fazendo o seu doce, e todo mundo pode repetir.',
     faq: [
-      { q: 'Preciso saber cozinhar?', a: 'Não. O dia foi pensado para iniciantes. A Dolly acompanha cada passo.' },
+      { q: 'Que dia e a que horas são as aulas?', a: WORKSHOP_FAQ_ANSWER },
+      { q: 'Preciso saber cozinhar?', a: 'Não. A aula foi pensada para iniciantes. A Dolly acompanha cada passo.' },
       { q: 'Tem alguma restrição alimentar?', a: 'Tudo é 100% plant-based e sem trigo, adoçado com tâmaras, frutas, açúcar de coco ou rapadura. Se alguma receita usar chocolate vegano industrializado (que vem com açúcar cristal), a gente avisa. Se você tem alergia a castanhas ou outra alergia séria, avise no formulário e a gente adapta.' },
       { q: 'Posso ir com crianças?', a: 'Pode, e é ótimo em dia de chuva. Conte quantas pessoas e as idades no formulário.' },
       { q: 'Dá para combinar com hospedagem?', a: 'Dá. Veja o formato Curso + Retiro abaixo, ou marque essa opção quando falar com a gente.' },
     ],
-    enquiry: 'Turismo Gastronômico (1 Dia)',
+    enquiry: 'Turismo Gastronômico (1 tarde)',
     retreatClasses: 1,
-    cta: 'Reservar meu dia com a Dolly',
+    cta: 'Reservar minha tarde com a Dolly',
     gallery: ['/menu-items/Screenshot_20260412_123155_Edits.jpg', '/menu-items/20260724_154636.jpg', '/menu-items/Screenshot_20260623_080155_Gallery.jpg', '/menu-items/Screenshot_20260810_135948_Photos.jpg'],
   },
   {
     slug: 'capacitacao-profissional',
     title: 'Capacitação Profissional',
-    eyebrow: 'Encontros semanais · Para cozinheiras e cozinheiros',
+    eyebrow: `Encontros semanais · Aulas de ${WORKSHOP_HOURS} horas, às ${WORKSHOP_START}`,
     tagline: 'A técnica que transforma uma boa cozinheira em uma profissional disputada: comida saudável que a família inteira pede de novo.',
     heroImage: '/assets/chef_training_1789884593538.jpg',
     floating: ['/menu-items/20250823_121752.jpg', '/menu-items/Screenshot_20260623_080155_Gallery.jpg', '/menu-items/20250907_143728.jpg'],
@@ -115,8 +121,9 @@ export const COURSE_CONTENT: CourseContent[] = [
       { title: 'Cardápio da semana', text: 'Você monta cardápios completos, com lista de compras e preparo adiantado, para o dia a dia real.' },
     ],
     paths: ['negocio', 'equipe', 'saude'],
-    retreatText: 'Vem de outra cidade? Faça a capacitação em formato intensivo, hospedado na casa de retiro em Itamambuca: cozinha de manhã, praia no fim da tarde, e a cabeça descansada para aprender.',
+    retreatText: 'Vem de outra cidade? Faça a capacitação em formato intensivo, hospedado na casa de retiro em Itamambuca: praia de manhã, cozinha à tarde, e a cabeça descansada para aprender.',
     faq: [
+      { q: 'Que dia e a que horas são as aulas?', a: `${WORKSHOP_FAQ_ANSWER} Na capacitação, o encontro é uma vez por semana, no dia que combinarmos.` },
       { q: 'Meu empregador pode pagar?', a: 'Sim, e é o formato mais comum. Na inscrição, diga que é patrocinado e a gente combina com quem vai pagar.' },
       { q: 'Preciso ter experiência?', a: 'Ajuda, mas não é obrigatório. O curso começa pela base e avança no seu ritmo.' },
       { q: 'Isso pode virar trabalho com a Tropical Bakery?', a: 'Pode. Quem se destaca pode ser chamado para eventos, produção ou parcerias. Veja também a página Trabalhe Conosco.' },
@@ -130,7 +137,7 @@ export const COURSE_CONTENT: CourseContent[] = [
   {
     slug: 'saude-bem-estar',
     title: 'Saúde, Sabores e Bem-Estar',
-    eyebrow: 'Para quem quer cuidar do corpo sem abrir mão do prazer',
+    eyebrow: `${WORKSHOP_WHEN_SHORT} · Para cuidar do corpo com prazer`,
     tagline: 'Pare de brigar com a vontade de doce. Aprenda a satisfazê-la com comida que cuida de você.',
     heroImage: '/menu-items/20260620_163438.jpg',
     floating: ['/menu-items/Screenshot_20260518_122444_Gallery.jpg', '/menu-items/20250907_143728.jpg', '/menu-items/Screenshot_20260818_075043_Gallery.jpg'],
@@ -149,9 +156,10 @@ export const COURSE_CONTENT: CourseContent[] = [
       { title: 'Para a vida real', text: 'Um plano simples para a sua casa, e receitas que cabem na rotina.' },
     ],
     paths: ['saude', 'consciencia', 'negocio'],
-    retreatText: 'Faça do curso um retiro de bem-estar: hospedagem na casa em Itamambuca, cozinha de manhã, e tardes de mar, rio e natureza para o corpo acompanhar o que a cabeça está aprendendo.',
+    retreatText: 'Faça do curso um retiro de bem-estar: hospedagem na casa em Itamambuca, manhãs de mar, rio e natureza, e cozinha à tarde, para o corpo acompanhar o que a cabeça está aprendendo.',
     familyText: 'Em dia de chuva, a versão em família é perfeita: pais e filhos aprendem juntos que doce saudável pode ser o preferido da casa.',
     faq: [
+      { q: 'Que dia e a que horas são as aulas?', a: WORKSHOP_FAQ_ANSWER },
       { q: 'É uma dieta?', a: 'Não. É aprender a cozinhar e a comer de um jeito que dá prazer e faz bem, sem contar calorias.' },
       { q: 'Tenho diabetes / intolerância / alergia. Posso fazer?', a: 'Pode, e é para você. Conte no formulário e a Dolly adapta. O curso não substitui a orientação do seu médico ou nutricionista.' },
       { q: 'Minha família não gosta de comida saudável.', a: 'É justamente o que o curso resolve: receitas que ninguém percebe que são saudáveis.' },

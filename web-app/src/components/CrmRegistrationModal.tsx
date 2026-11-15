@@ -7,6 +7,7 @@ import { trackMeta } from '@/lib/metaPixel';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
 import { SunbakedLettersNote } from '@/components/SunbakedLetters';
+import { todayIso, workshopMinDate, workshopBreakNote, workshopDateError } from '@/lib/workshopDates';
 
 interface CrmRegistrationModalProps {
   isOpen: boolean;
@@ -71,7 +72,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
   onCloseRef.current = onClose;
 
   const availableFocusAreas = interestType === 'curso'
-    ? ['Culinária Vegana', 'Culinária Sem Glúten', 'Substituições Saudáveis (SOS-Free)', 'Receitas Práticas', 'Empreendedorismo na Confeitaria']
+    ? ['Culinária Vegana', 'Culinária Sem Trigo', 'Substituições Saudáveis (SOS-Free)', 'Receitas Práticas', 'Empreendedorismo na Confeitaria']
     : ['Yoga & Meditação', 'Confeitaria Saudável', 'Relaxamento & Natureza', 'Transição para o Veganismo'];
 
   useEffect(() => {
@@ -138,6 +139,13 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
     return cleaned;
   };
 
+  /** Why the chosen date can't be used ('' = fine). Workshops also respect the break in lib/workshopDates.ts. */
+  const dateProblem = (value: string): string => {
+    if (!value) return 'Escolha a data que você prefere.';
+    if (interestType === 'curso') return workshopDateError(value);
+    return value < todayIso() ? 'Essa data já passou. Escolha uma data futura.' : '';
+  };
+
   /** Which fields on a step are missing or wrong. Steps: 0 = you, 1 = the day and idea, 2 = nothing required. */
   const validateStep = (s: number): Errors => {
     const e: Errors = {};
@@ -148,7 +156,10 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
       if (!whatsapp.trim()) e.whatsapp = 'Informe seu WhatsApp com DDD.';
       else if (whatsapp.replace(/\D/g, '').length < 10) e.whatsapp = 'Faltam números: use DDD + número.';
     }
-    if (s === 1 && !dateStr) e.date = 'Escolha a data que você prefere.';
+    if (s === 1) {
+      const dateError = dateProblem(dateStr);
+      if (dateError) e.date = dateError;
+    }
     return e;
   };
 
@@ -321,20 +332,28 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
     </>
   );
 
-  const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const isCourse = interestType === 'curso';
+  const minDate = isCourse ? workshopMinDate() : todayIso();
+  const dateNote = isCourse ? workshopBreakNote() : '';
 
   const detailFields = (
     <>
-      <Field id="crm-date" label="Data Desejada *" error={errors.date}>
+      <Field id="crm-date" label="Data Desejada *" hint={dateNote || undefined} error={errors.date}>
         <input
           id="crm-date"
           type="date"
-          min={today}
+          min={minDate}
           aria-required
           aria-invalid={errors.date ? true : undefined}
           aria-describedby={errors.date ? 'crm-date-error' : undefined}
           value={dateStr}
-          onChange={e => { setDateStr(e.target.value); clearError('date'); }}
+          onChange={e => {
+            const value = e.target.value;
+            setDateStr(value);
+            // Say right away when the day falls in the break, instead of waiting for "send".
+            const problem = value ? dateProblem(value) : '';
+            setErrors(prev => ({ ...prev, date: problem || undefined }));
+          }}
           style={{ ...inputStyle, ...(errors.date ? { border: invalidBorder } : {}) }}
         />
       </Field>
@@ -366,7 +385,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
           onChange={e => setMessage(e.target.value)}
           placeholder={interestType === 'retiro'
             ? 'Ex: um grupo de amigas, 3 noites, queremos yoga de manhã e aula de confeitaria. Alguém é celíaca…'
-            : 'Ex: nunca fiz confeitaria vegana, quero aprender receitas sem glúten para a minha família…'}
+            : 'Ex: nunca fiz confeitaria vegana, quero aprender receitas sem trigo para a minha família…'}
           style={{ ...inputStyle, resize: 'vertical' }}
         />
       </Field>
