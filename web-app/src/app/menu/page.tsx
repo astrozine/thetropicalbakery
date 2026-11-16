@@ -133,6 +133,9 @@ export default function MenuPage() {
               />
             </div>
 
+            <p style={{ margin: '0 0 1rem', fontSize: '0.95rem', color: '#594a42', lineHeight: 1.5 }}>
+              🌴 Entregamos em Itamambuca, Ubatuba e região. Paraty: pedidos a partir de R$ 600.
+            </p>
             <details style={{ marginBottom: '2.5rem', cursor: 'pointer' }}>
               <summary style={{ fontSize: '1.15rem', color: '#594a42', fontWeight: 600, padding: '0.5rem 0', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
                 Ler sobre nossa proposta para eventos...

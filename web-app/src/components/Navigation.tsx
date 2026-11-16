@@ -634,6 +634,13 @@ export default function Navigation() {
             WebkitOverflowScrolling: 'touch',
             padding: '1rem 1.5rem 6rem 1.5rem',
           }}>
+            {/* The delivery area: off the phone header (it got in the way), shown here instead. */}
+            <p style={{
+              margin: '0.5rem 0 0.25rem', padding: '0.7rem 0.9rem', borderRadius: '12px',
+              background: '#3c2a21', color: '#d4af37', fontSize: '0.85rem', lineHeight: 1.4, fontWeight: 600, textAlign: 'center',
+            }}>
+              🌴 Entregamos em Itamambuca, Ubatuba e região. Paraty: pedidos a partir de R$ 600.
+            </p>
             {/* Caixa de Degustação / Eventos — open by default so the subscription is one tap away. */}
             {groups.map((group) => (
               <div key={group.id}>
