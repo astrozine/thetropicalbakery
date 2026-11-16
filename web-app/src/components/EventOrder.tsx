@@ -2,6 +2,7 @@
 
 import React, { useEffect, useId, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { pingAlerts } from '@/lib/pingAlerts';
 import { useCart } from '@/context/CartContext';
 import { STORE_WHATSAPP } from '@/lib/siteContact';
 import { formatBRL } from '@/lib/deliveryZones';
@@ -46,6 +47,7 @@ async function saveLead(v: { name: string; whatsapp: string; date: string; guest
   if (res.error) res = await supabase.from('orders').insert([base]);
   if (res.error) res = await supabase.from('orders').insert([{ customer_name: base.customer_name, customer_whatsapp: digits, order_type: 'EVENTO', items }]);
   if (res.error) console.error('Could not save the quote request:', res.error);
+  else pingAlerts();
   return !res.error;
 }
 

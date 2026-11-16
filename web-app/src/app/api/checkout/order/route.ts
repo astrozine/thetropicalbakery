@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { alertAfterResponse } from '@/lib/email/alerts';
 import { createOrder, OrderError, type OrderInput } from '@/lib/payments/order';
 
 export const dynamic = 'force-dynamic';
@@ -20,6 +21,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const order = await createOrder(body, token);
+    alertAfterResponse();
     return NextResponse.json({ ok: true, ...order });
   } catch (e) {
     if (e instanceof OrderError) return NextResponse.json({ error: e.message }, { status: e.status });

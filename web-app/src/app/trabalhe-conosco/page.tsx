@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { pingAlerts } from '@/lib/pingAlerts';
 import StripedBackground from '@/components/StripedBackground';
 import ScrollReveal from '@/components/ScrollReveal';
 import PayEstimator from '@/components/PayEstimator';
@@ -100,6 +101,7 @@ export default function CareersPage() {
       setError('Não conseguimos enviar sua candidatura. Tente novamente ou fale com a gente no WhatsApp.');
       return;
     }
+    pingAlerts();
     if (form.email) {
       await supabase.rpc('email_contact_upsert', {
         p_email: form.email, p_full_name: form.full_name, p_tags: ['candidato'], p_source: 'candidatura',

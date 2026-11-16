@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { alertAfterResponse } from '@/lib/email/alerts';
 import { OrderError } from '@/lib/payments/order';
 import { siteUrl } from '@/lib/payments/server';
 import { ebookCheckoutUrl, unavailableMethod } from '@/lib/payments/ebook';
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const lead = await createLead(body, bearer(req));
+    alertAfterResponse();
     const thanks = funnelThanksUrl(siteUrl(), lead);
     const book = lead.book;
     if (!book) return NextResponse.json({ ok: true, id: lead.id, thanks });

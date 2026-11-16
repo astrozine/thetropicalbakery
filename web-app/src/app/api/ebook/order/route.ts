@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { alertAfterResponse } from '@/lib/email/alerts';
 import { OrderError } from '@/lib/payments/order';
 import { createEbookOrder, ebookCheckoutUrl, thanksUrl, unavailableMethod, type EbookOrderInput } from '@/lib/payments/ebook';
 import { siteUrl } from '@/lib/payments/server';
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const order = await createEbookOrder(body, token);
+    alertAfterResponse();
     if (order.method === 'pix') return NextResponse.json({ ok: true, ...order });
 
     const url = await ebookCheckoutUrl(order, String(body.email || ''), thanksUrl(siteUrl(), order.reference, order.lang));

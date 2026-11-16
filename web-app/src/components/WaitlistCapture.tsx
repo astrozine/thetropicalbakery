@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { pingAlerts } from '@/lib/pingAlerts';
 import { trackMeta } from '@/lib/metaPixel';
 import { User } from '@supabase/supabase-js';
 
@@ -87,6 +88,7 @@ export default function WaitlistCapture({ theme = 'dark', heading, subheading, p
       setErrorMsg('Ocorreu um erro ao entrar na fila de espera. Tente novamente.');
       console.error(error);
     } else {
+      pingAlerts();
       // Add them to the e-mail list so they hear when the next batch opens.
       await supabase.rpc('email_contact_upsert', {
         p_email: formData.email, p_full_name: formData.name, p_tags: ['cliente'], p_source: 'fila_de_espera',
