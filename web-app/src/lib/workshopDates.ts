@@ -98,3 +98,20 @@ export function workshopDateError(date: string, today: string = todayIso()): str
   }
   return '';
 }
+
+/**
+ * The next OPEN class (a fixed date anyone can join), shown on /aula and promoted in ads.
+ * Andrew, 2026-11-16: a class on Wednesday Nov 18 that people can already sign up for, with no page of its own.
+ * TO ANNOUNCE THE NEXT ONE, change these lines. Once the date has passed, /aula says so and points to /cursos.
+ */
+export const OPEN_CLASS = {
+  date: '2026-11-18',
+  /** 'Quarta, 18 de novembro' */
+  long: 'Quarta, 18 de novembro',
+  /** 'Qua, 18/11' */
+  short: 'Qua, 18/11',
+  /** Spots still open (Andrew, 2026-11-16: 10 in total, 2 taken). Update as people book; 0 shows "Turma lotada". */
+  spotsLeft: 8,
+  /** Andrew, 2026-11-16: the two guests booked so far speak English; the class runs in English and Portuguese. */
+  languages: 'português e inglês',
+};
