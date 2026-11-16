@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
+import { pingAlerts } from '@/lib/pingAlerts';
 import { trackMeta } from '@/lib/metaPixel';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
@@ -223,6 +224,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
       }
 
       if (error) throw error;
+      pingAlerts();
 
       // Interested in courses/retreats -> the matching e-mail list.
       await supabase.rpc('email_contact_upsert', {

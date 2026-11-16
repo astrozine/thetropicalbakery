@@ -4,6 +4,15 @@
 Stage files by name, never `git add -A`, never `git stash`, check `git status` before you commit, and test layouts at a real phone
 size with `tools/phone-check.mjs`.
 
+# Team alerts: "someone just booked"
+
+- Every new row a visitor leaves (course/retreat request, catering quote, order, WhatsApp contact incl. coaching,
+  waiting list, job application, free-recipes sign-up) e-mails the team once: `src/lib/email/alerts.ts`.
+- Forms call `pingAlerts()` (`src/lib/pingAlerts.ts`) after saving; server routes that create orders/leads call
+  `alertAfterResponse()`. The sweep mails rows from the last 15 minutes, deduped through `deliver()`'s
+  `email_sends` claim (`alerta:<table>:<id>`). Recipients: Vercel env `ALERT_EMAILS` (comma separated).
+- A new form that saves to a new table: add the table to `SOURCES` in alerts.ts and ping after the save.
+
 # Supabase migrations: explicit grants for new tables
 
 Supabase stopped auto-granting Data API access to **new** tables in the `public` schema on

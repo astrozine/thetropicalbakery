@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { alertAfterResponse } from '@/lib/email/alerts';
 import { OrderError } from '@/lib/payments/order';
 import { createBrunchOrder, type BrunchOrderInput } from '@/lib/payments/brunch';
 import { findOrder } from '@/lib/payments/server';
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const order = await createBrunchOrder(body, token);
+    alertAfterResponse();
     if (order.result !== 'ok' || order.method === 'pix' || order.method === 'free') return NextResponse.json({ ok: true, ...order });
 
     const saved = await findOrder(order.reference!);

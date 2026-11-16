@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { pingAlerts } from '@/lib/pingAlerts';
 import { trackMeta } from '@/lib/metaPixel';
 import { useAuth, OAuthProvider } from '@/context/AuthContext';
 
@@ -219,6 +220,7 @@ export default function WhatsAppGate({ href, topic, tags = [], locale = 'pt', ch
           signed_in: !!user,
         }]);
         if (err) throw err;
+        pingAlerts();
       } catch (err) {
         // Migration 23 not run yet (or the network blinked): the e-mail list below still keeps them.
         console.error('Could not save contact lead:', err);
