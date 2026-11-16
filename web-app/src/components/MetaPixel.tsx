@@ -15,6 +15,7 @@ export default function MetaPixel() {
   const pathname = usePathname();
   const [consent, setConsent] = useState<Consent>(null);
   const [ready, setReady] = useState(false);
+  const [more, setMore] = useState(false);
 
   // Read after mount so server and first client render match (no localStorage on the server).
   useEffect(() => {
@@ -62,28 +63,45 @@ export default function MetaPixel() {
         border: '1px solid var(--color-secondary)',
         borderRadius: '16px',
         boxShadow: '0 10px 40px rgba(60,42,33,0.25)',
-        padding: '1rem 1.1rem',
+        padding: '0.7rem 0.9rem',
         color: '#594a42',
-        fontSize: '0.9rem',
-        lineHeight: 1.5,
+        fontSize: '0.85rem',
+        lineHeight: 1.45,
       }}
     >
+      {/* Short on purpose (Nov 2026): the full notice covered most of a phone screen and few people answered it,
+          so the pixel saw almost no one. Andrew's full text is one tap away. */}
       <p style={{ margin: 0 }}>
-        🌴 Sejamos sinceros: o algoritmo não está fazendo favor a ninguém. Pra uma cozinha pequena como a da Chef
-        Dolly, chegar até a comunidade vegana nas redes está cada vez mais difícil. Aceitar os cookies da Meta e do Google é um
-        empurrãozinho contra o algoritmo: a gente aparece pra quem vai amar, e você vê menos anúncio aleatório.
-        Só ativamos se você aceitar.{' '}
+        🌴 Sejamos sinceros: o algoritmo não está fazendo favor a ninguém. Aceitar os cookies é um empurrãozinho pra Chef
+        Dolly aparecer pra quem vai amar. Só ativamos se você aceitar.{' '}
+        {more ? null : (
+          <button
+            type="button"
+            onClick={() => setMore(true)}
+            style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-secondary)', fontWeight: 600, cursor: 'pointer', font: 'inherit' }}
+          >
+            Ler mais
+          </button>
+        )}
+        {more ? null : ' · '}
         <Link href="/privacidade" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>
-          Política de Privacidade
+          Privacidade
         </Link>
       </p>
-      <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.8rem', flexWrap: 'wrap' }}>
+      {more ? (
+        <p style={{ margin: '0.5rem 0 0' }}>
+          Pra uma cozinha pequena como a da Chef Dolly, chegar até a comunidade vegana nas redes está cada vez mais difícil.
+          Aceitar os cookies da Meta e do Google é um empurrãozinho contra o algoritmo: a gente aparece pra quem vai amar,
+          e você vê menos anúncio aleatório.
+        </p>
+      ) : null}
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
         <button
           type="button"
           onClick={() => choose('accepted')}
           style={{
-            flex: '1 1 140px',
-            minHeight: '44px',
+            flex: '1 1 0',
+            minHeight: '40px',
             border: 'none',
             borderRadius: '999px',
             background: 'var(--color-primary)',
@@ -98,8 +116,8 @@ export default function MetaPixel() {
           type="button"
           onClick={() => choose('declined')}
           style={{
-            flex: '1 1 140px',
-            minHeight: '44px',
+            flex: '1 1 0',
+            minHeight: '40px',
             border: '1px solid var(--color-primary)',
             borderRadius: '999px',
             background: 'transparent',
