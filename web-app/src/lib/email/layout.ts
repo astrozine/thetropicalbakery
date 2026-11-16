@@ -34,7 +34,8 @@ const BODY_FONT = `'Outfit',Helvetica,Arial,sans-serif`;
  * The shell speaks Portuguese; an e-mail written for an English reader (the free-recipes funnel) passes lang: 'en'
  * and gets the frame in English too. Only the frame's own words live here; the message itself is the caller's.
  */
-export type EmailLang = 'pt' | 'en';
+export type EmailLang = 'pt' | 'en' | 'es' | 'nl' | 'de';
+const isEmailLang = (l: unknown): l is EmailLang => l === 'pt' || l === 'en' || l === 'es' || l === 'nl' || l === 'de';
 
 const UI = {
   pt: {
@@ -52,6 +53,31 @@ const UI = {
     flagsAlt: 'Belgium and Brazil',
     deeper: 'To go deeper:', newsletter: 'Dolly’s newsletter on Substack', inEnglish: '',
     whatsapp: 'Talk to us on WhatsApp', prefs: 'E-mail preferences', unsub: 'Unsubscribe',
+  },
+  // Spanish, Dutch and German readers of the free-recipes funnel (2026-11-16: their e-mails had an English frame).
+  es: {
+    html: 'es', choose: 'Elegir qué e-mails recibir', leave: 'Darse de baja de todo', hi: 'Hola',
+    originKicker: 'Oficio belga &middot; Naturaleza brasileña',
+    origin: 'Recetas de Elisabeth &ldquo;Dolly&rdquo; Van Dam, con cacao, frutos secos y frutas de la Mata Atlántica. Vegano, sin trigo, hecho a mano en la playa de Itamambuca.',
+    flagsAlt: 'Bélgica y Brasil',
+    deeper: 'Para ir más a fondo:', newsletter: 'el newsletter de Dolly en Substack', inEnglish: '(en inglés)',
+    whatsapp: 'Hablar con nosotros por WhatsApp', prefs: 'Preferencias de e-mail', unsub: 'Darse de baja',
+  },
+  nl: {
+    html: 'nl', choose: 'Kies welke e-mails je krijgt', leave: 'Uitschrijven voor alles', hi: 'Hoi',
+    originKicker: 'Belgisch vakmanschap &middot; Braziliaanse natuur',
+    origin: 'Recepten van Elisabeth &ldquo;Dolly&rdquo; Van Dam, met cacao, noten en fruit uit het Atlantisch regenwoud. Vegan, tarwevrij, met de hand gemaakt aan het strand van Itamambuca.',
+    flagsAlt: 'België en Brazilië',
+    deeper: 'Verder lezen:', newsletter: 'Dolly’s nieuwsbrief op Substack', inEnglish: '(in het Engels)',
+    whatsapp: 'Stuur ons een WhatsApp', prefs: 'E-mailvoorkeuren', unsub: 'Uitschrijven',
+  },
+  de: {
+    html: 'de', choose: 'Wähle, welche E-Mails du bekommst', leave: 'Von allem abmelden', hi: 'Hallo',
+    originKicker: 'Belgisches Handwerk &middot; Brasilianische Natur',
+    origin: 'Rezepte von Elisabeth &bdquo;Dolly&ldquo; Van Dam, mit Kakao, Nüssen und Früchten aus dem atlantischen Regenwald. Vegan, weizenfrei, von Hand gemacht am Strand von Itamambuca.',
+    flagsAlt: 'Belgien und Brasilien',
+    deeper: 'Mehr dazu:', newsletter: 'Dollys Newsletter auf Substack', inEnglish: '(auf Englisch)',
+    whatsapp: 'Schreib uns auf WhatsApp', prefs: 'E-Mail-Einstellungen', unsub: 'Abmelden',
   },
 } as const;
 
@@ -290,17 +316,63 @@ const THEMES_EN: Partial<Record<EmailTheme, Partial<ThemeDef>>> = {
     strip: [
       { img: 'tile-mango', caption: 'Tasting Box', alt: 'Vegan mango cheesecake', path: '/caixas' },
       { img: 'tile-event-night', caption: 'Events Menu', alt: 'A tropical dinner at night', path: '/menu' },
-      { img: 'tile-island', caption: 'Retreats', alt: 'Prumirim island from above', path: '/retreats' },
+      { img: 'tile-island', caption: 'Retreats', alt: 'Prumirim island from above', path: '/en/retreats' },
     ],
   },
+};
+
+/** The same, in the other languages the free-recipes funnel writes in. */
+const THEMES_INTL: Record<'es' | 'nl' | 'de', Partial<Record<EmailTheme, Partial<ThemeDef>>>> = {
+  es: { novidades: {
+    kicker: 'Desde la cocina de Dolly', heroAlt: 'Una mesa de dulces tropicales', stripTitle: 'De nuestra mesa',
+    strip: [
+      { img: 'tile-mango', caption: 'Caja de Degustación', alt: 'Cheesecake vegano de mango', path: '/caixas' },
+      { img: 'tile-event-night', caption: 'Menú de Eventos', alt: 'Una cena tropical de noche', path: '/menu' },
+      { img: 'tile-island', caption: 'Retiros', alt: 'La isla de Prumirim desde arriba', path: '/es/retiros' },
+    ],
+  } },
+  nl: { novidades: {
+    kicker: 'Uit Dolly’s keuken', heroAlt: 'Een tafel vol tropisch lekkers', stripTitle: 'Van onze tafel',
+    strip: [
+      { img: 'tile-mango', caption: 'Proefbox', alt: 'Vegan mangocheesecake', path: '/caixas' },
+      { img: 'tile-event-night', caption: 'Evenementenmenu', alt: 'Een tropisch diner bij nacht', path: '/menu' },
+      { img: 'tile-island', caption: 'Retreats', alt: 'Het eiland Prumirim van bovenaf', path: '/en/retreats' },
+    ],
+  } },
+  de: { novidades: {
+    kicker: 'Aus Dollys Küche', heroAlt: 'Ein Tisch voller tropischer Leckereien', stripTitle: 'Von unserem Tisch',
+    strip: [
+      { img: 'tile-mango', caption: 'Probierbox', alt: 'Veganer Mango-Cheesecake', path: '/caixas' },
+      { img: 'tile-event-night', caption: 'Event-Menü', alt: 'Ein tropisches Abendessen', path: '/menu' },
+      { img: 'tile-island', caption: 'Retreats', alt: 'Die Insel Prumirim von oben', path: '/en/retreats' },
+    ],
+  } },
 };
 
 const FOOTER_LINKS_EN: { label: string; path: string }[] = [
   { label: '📖 Sweet Escape', path: '/sweet-escape' },
   { label: '🎁 Tasting Box', path: '/caixas' },
   { label: '🍰 Events Menu', path: '/menu' },
-  { label: '🌴 Retreats', path: '/retreats' },
+  { label: '🌴 Retreats', path: '/en/retreats' },
 ];
+
+const FOOTER_LINKS_INTL: Record<'es' | 'nl' | 'de', { label: string; path: string }[]> = {
+  es: [
+    { label: '📖 Sweet Escape', path: '/sweet-escape/es' },
+    { label: '🍰 Menú de Eventos', path: '/menu' },
+    { label: '🌴 Retiros', path: '/es/retiros' },
+  ],
+  nl: [
+    { label: '📖 Sweet Escape', path: '/sweet-escape/nl' },
+    { label: '🍰 Evenementenmenu', path: '/menu' },
+    { label: '🌴 Retreats', path: '/en/retreats' },
+  ],
+  de: [
+    { label: '📖 Sweet Escape', path: '/sweet-escape/de' },
+    { label: '🍰 Event-Menü', path: '/menu' },
+    { label: '🌴 Retreats', path: '/en/retreats' },
+  ],
+};
 
 const FOOTER_LINKS: { label: string; path: string }[] = [
   { label: '🎁 Caixa de Degustação', path: '/caixas' },
@@ -372,10 +444,11 @@ function originBand(base: string, t: (typeof UI)[EmailLang]): string {
 export function renderEmail(o: LayoutOptions): string {
   const base = (o.assetBase || SITE_URL).replace(/\/$/, '');
   const themeName = o.theme || 'novidades';
-  const lang: EmailLang = o.lang === 'en' ? 'en' : 'pt';
+  const lang: EmailLang = isEmailLang(o.lang) ? o.lang : 'pt';
   const t = UI[lang];
-  const theme: ThemeDef = lang === 'en' ? { ...THEMES[themeName], ...(THEMES_EN[themeName] || {}) } : THEMES[themeName];
-  const footerLinks = lang === 'en' ? FOOTER_LINKS_EN : FOOTER_LINKS;
+  const local = lang === 'pt' ? undefined : lang === 'en' ? THEMES_EN[themeName] : THEMES_INTL[lang][themeName] ?? THEMES_EN[themeName];
+  const theme: ThemeDef = local ? { ...THEMES[themeName], ...local } : THEMES[themeName];
+  const footerLinks = lang === 'pt' ? FOOTER_LINKS : lang === 'en' ? FOOTER_LINKS_EN : FOOTER_LINKS_INTL[lang];
 
   const note = o.note
     ? `<p style="color:${MUTED};font-family:${BODY_FONT};font-size:12px;line-height:1.6;text-align:center;margin:16px 0 0;">${o.note}</p>`
@@ -485,12 +558,12 @@ export function plainTextFallback(o: LayoutOptions): string {
     o.facts?.length ? o.facts.map(f => `${f.num} — ${f.label}`).join('\n') : '',
     o.cta ? `\n${o.cta.label}: ${o.cta.href}` : '',
     '',
-    `Para ir mais fundo: Sunbaked Letters, a newsletter da Dolly no Substack (em inglês): ${SUBSTACK_URL}`,
+    `${UI[isEmailLang(o.lang) ? o.lang : 'pt'].deeper} Sunbaked Letters, ${UI[isEmailLang(o.lang) ? o.lang : 'pt'].newsletter}${UI[isEmailLang(o.lang) ? o.lang : 'pt'].inEnglish ? ' ' + UI[isEmailLang(o.lang) ? o.lang : 'pt'].inEnglish : ''}: ${SUBSTACK_URL}`,
     '',
     `The Tropical Bakery — Itamambuca, Ubatuba/SP`,
     SITE_URL,
-    o.prefsUrl ? `\n${UI[o.lang === 'en' ? 'en' : 'pt'].prefs}: ${o.prefsUrl}` : '',
-    o.unsubscribeUrl ? `${UI[o.lang === 'en' ? 'en' : 'pt'].unsub}: ${o.unsubscribeUrl}` : '',
+    o.prefsUrl ? `\n${UI[isEmailLang(o.lang) ? o.lang : 'pt'].prefs}: ${o.prefsUrl}` : '',
+    o.unsubscribeUrl ? `${UI[isEmailLang(o.lang) ? o.lang : 'pt'].unsub}: ${o.unsubscribeUrl}` : '',
   ]
     .filter(Boolean)
     .join('\n');

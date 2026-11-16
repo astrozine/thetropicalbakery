@@ -8,10 +8,14 @@ import AdminFooter from '@/components/AdminFooter';
 import { STORE_WHATSAPP, STORE_WHATSAPP_DISPLAY, SUBSTACK_URL } from '@/lib/siteContact';
 import { OriginSeal } from '@/components/BelgiumBrazil';
 import InstagramLink from '@/components/InstagramLink';
+import { usePageLang } from '@/lib/usePageLang';
+import { shellHref, shellText } from '@/lib/shellCopy';
 
 export default function Footer() {
   // The back-office has its own slim footer: the public one (photo, columns, newsletter) is far too big there.
   const pathname = usePathname();
+  const lang = usePageLang();
+  const t = (pt: string) => shellText(pt, lang);
   if (pathname?.startsWith('/admin')) return <AdminFooter />;
 
   const handleScrollToTop = () => {
@@ -49,65 +53,67 @@ export default function Footer() {
       <div className="container footer-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
         <div className="footer-brand">
           <img src="/logo.svg" alt="The Tropical Bakery" style={{ height: '60px', marginBottom: '1rem', filter: 'brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(5deg)' }} />
-          <p style={{ marginBottom: '1rem', color: '#e8e1d7' }}>Confeitaria saudável de luxo em Ubatuba, pelas mãos da chef belga Elisabeth “Dolly” Van Dam.</p>
+          <p style={{ marginBottom: '1rem', color: '#e8e1d7' }}>{t('Confeitaria saudável de luxo em Ubatuba, pelas mãos da chef belga Elisabeth “Dolly” Van Dam.')}</p>
           <span className="footer-seal"><OriginSeal tone="dark" style={{ marginBottom: '1.75rem' }} /></span>
           <br />
           <InstagramLink size={22} showHandle style={{ color: '#e8e1d7', fontSize: '0.95rem', letterSpacing: '0.3px' }} />
         </div>
         
         <div>
-          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Menu</h3>
+          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t('Menu')}</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, lineHeight: '2' }}>
             {BOX_SALE_ON ? (
               <>
-                <li><Link href="/assinatura" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>Assinatura Semanal</Link></li>
-                <li><Link href="/" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Fazer Pedido</Link></li>
+                <li><Link href="/assinatura" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>{t('Assinatura Semanal')}</Link></li>
+                <li><Link href="/" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Fazer Pedido')}</Link></li>
               </>
             ) : (
-              <li><Link href="/menu" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>Doces para Eventos</Link></li>
+              <li><Link href="/menu" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>{t('Doces para Eventos')}</Link></li>
             )}
-            <li><Link href="/cursos" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Cursos com Dolly</Link></li>
-            <li><Link href="/dolly" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Sobre a Dolly</Link></li>
-            <li><Link href="/sweet-escape/pt" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>E-book Sweet Escape</Link></li>
-            <li><Link href="/trabalhe-conosco" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Trabalhe Conosco</Link></li>
+            <li><Link href="/cursos" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Cursos com Dolly')}</Link></li>
+            <li><Link href="/dolly" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Sobre a Dolly')}</Link></li>
+            <li><Link href={shellHref('/sweet-escape/pt', lang)} onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('E-book Sweet Escape')}</Link></li>
+            <li><Link href="/trabalhe-conosco" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Trabalhe Conosco')}</Link></li>
           </ul>
         </div>
         <div>
-          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Parcerias</h3>
+          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t('Parcerias')}</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, lineHeight: '2' }}>
-            <li><Link href="/b2b/hotels" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Hotéis</Link></li>
-            <li><Link href="/b2b/pousadas" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Pousadas</Link></li>
-            <li><Link href="/b2b/airbnbs" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Airbnbs</Link></li>
-            <li><Link href="/b2b/restaurants" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Restaurantes</Link></li>
-            <li><Link href="/b2b/bakeries" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Padarias</Link></li>
-            <li><Link href="/b2b/barcos" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Barcos e Marinas</Link></li>
-            <li><Link href="/b2b/bem-estar" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Yoga, Academias e Spas</Link></li>
+            <li><Link href="/b2b/hotels" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Hotéis')}</Link></li>
+            <li><Link href="/b2b/pousadas" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Pousadas')}</Link></li>
+            <li><Link href="/b2b/airbnbs" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Airbnbs')}</Link></li>
+            <li><Link href="/b2b/restaurants" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Restaurantes')}</Link></li>
+            <li><Link href="/b2b/bakeries" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Padarias')}</Link></li>
+            <li><Link href={shellHref('/b2b/barcos', lang)} onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Barcos e Marinas')}</Link></li>
+            <li><Link href="/b2b/bem-estar" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Yoga, Academias e Spas')}</Link></li>
           </ul>
         </div>
         <div className="footer-contact">
-          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Contato</h3>
+          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t('Contato')}</h3>
           <p style={{ lineHeight: 1.7, color: '#e8e1d7', fontSize: '0.92rem' }}>
-            Home bakery em Itamambuca, Ubatuba · SP.<br />
-            Quem escolhe <strong>retirada</strong> recebe o endereço na sua conta assim que o pedido é confirmado.
+            {lang === 'pt' ? (
+              <>Home bakery em Itamambuca, Ubatuba · SP.<br />
+              Quem escolhe <strong>retirada</strong> recebe o endereço na sua conta assim que o pedido é confirmado.</>
+            ) : 'Home bakery in Itamambuca, Ubatuba · SP, Brazil.'}
           </p>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0.75rem 0 0', lineHeight: '2' }}>
             <li><a href={`https://wa.me/${STORE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>WhatsApp {STORE_WHATSAPP_DISPLAY}</a></li>
-            <li><Link href="/minha-conta" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>Minha conta e retiradas</Link></li>
-            <li><a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#e8e1d7', textDecoration: 'none' }}>Sunbaked Letters, a newsletter ↗</a></li>
+            <li><Link href="/minha-conta" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Minha conta e retiradas')}</Link></li>
+            <li><a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Sunbaked Letters, a newsletter ↗')}</a></li>
           </ul>
         </div>
       </div>
       
       <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem', color: '#b2bec3' }}>
         <p style={{ fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-          &copy; {new Date().getFullYear()} The Tropical Bakery. All rights reserved.
+          &copy; {new Date().getFullYear()} The Tropical Bakery. {t('Todos os direitos reservados.')}
         </p>
         <p className="footer-legal" style={{ fontSize: '0.8rem' }}>
-          <Link href="/privacidade" style={{ color: '#b2bec3', textDecoration: 'underline', display: 'inline-block', padding: '0.7rem 0.25rem' }}>Política de Privacidade</Link>
+          <Link href="/privacidade" style={{ color: '#b2bec3', textDecoration: 'underline', display: 'inline-block', padding: '0.7rem 0.25rem' }}>{t('Política de Privacidade')}</Link>
           {' · '}
-          <Link href="/cuidados" style={{ color: '#b2bec3', textDecoration: 'underline', display: 'inline-block', padding: '0.7rem 0.25rem' }}>Cuidados com os doces</Link>
+          <Link href={shellHref('/cuidados', lang)} style={{ color: '#b2bec3', textDecoration: 'underline', display: 'inline-block', padding: '0.7rem 0.25rem' }}>{t('Cuidados com os doces')}</Link>
           {' · '}
-          <Link href="/preferencias" style={{ color: '#b2bec3', textDecoration: 'underline', display: 'inline-block', padding: '0.7rem 0.25rem' }}>Preferências de e-mail</Link>
+          <Link href="/preferencias" style={{ color: '#b2bec3', textDecoration: 'underline', display: 'inline-block', padding: '0.7rem 0.25rem' }}>{t('Preferências de e-mail')}</Link>
         </p>
       </div>
     </footer>

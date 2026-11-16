@@ -140,7 +140,7 @@ export const GUIDELINES = {
     { emoji: '🌻', text: 'Sementes sempre que der: chia, linhaça, girassol, abóbora.' },
     { emoji: '🏷️', text: 'Cacau, pasta de amendoim e leite vegetal só na versão pura, sem açúcar, sal ou óleo no rótulo.' },
     { emoji: '🍋', text: 'O salgado vem da acidez e do aroma: limão, cupuaçu, alho, cebola, ervas, pimenta e cogumelo no lugar do sal.' },
-    { emoji: '🌱', text: 'Tudo vegano e sem glúten, sem farinha branca e sem chocolate industrializado.' },
+    { emoji: '🌱', text: 'Tudo vegano e sem trigo, sem farinha branca e sem chocolate industrializado.' },
   ],
   credit: 'Inspirado no jeito nutritarian do Dr. Joel Fuhrman e no SOS-free (sem sal, óleo e açúcar) do Dr. Alan Goldhamer. Não temos ligação com eles.',
 } as const;

@@ -2,14 +2,47 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { RETREAT_ROOMS, RetreatRoomInfo } from '@/lib/retreatRooms';
+import { RetreatRoomInfo, retreatRoomsFor } from '@/lib/retreatRooms';
 import { optimizedSrc } from '@/lib/thumbs';
 
 interface Props {
   onInquire: (roomName: string) => void;
+  /** English on /en/retreats, Spanish on /es/retiros; Portuguese otherwise. */
+  locale?: 'pt' | 'en' | 'es';
 }
 
-function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
+const COPY = {
+  pt: {
+    photo: (n: number) => `foto ${n}`,
+    prev: 'Foto anterior',
+    next: 'Próxima foto',
+    show: (n: number) => `Ver foto ${n}`,
+    photos: 'fotos',
+    plan: 'Montar meu pacote',
+    airbnb: 'Ver no Airbnb',
+  },
+  en: {
+    photo: (n: number) => `photo ${n}`,
+    prev: 'Previous photo',
+    next: 'Next photo',
+    show: (n: number) => `Show photo ${n}`,
+    photos: 'photos',
+    plan: 'Plan my stay',
+    airbnb: 'View on Airbnb',
+  },
+  es: {
+    photo: (n: number) => `foto ${n}`,
+    prev: 'Foto anterior',
+    next: 'Foto siguiente',
+    show: (n: number) => `Ver foto ${n}`,
+    photos: 'fotos',
+    plan: 'Armar mi paquete',
+    airbnb: 'Ver en Airbnb',
+  },
+};
+type Copy = typeof COPY.pt;
+
+function Gallery({ photos, alt, t }: { photos: string[]; alt: string; t: Copy }) {
   const [i, setI] = useState(0);
   const go = (d: number) => setI(cur => (cur + d + photos.length) % photos.length);
 
@@ -22,7 +55,7 @@ function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
         <img
           key={photos[i]}
           src={optimizedSrc(photos[i], 1080)}
-          alt={`${alt} — foto ${i + 1}`}
+          alt={`${alt} — ${t.photo(i + 1)}`}
           loading="lazy"
           style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
         />
@@ -32,7 +65,7 @@ function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
               <button
                 key={dir}
                 type="button"
-                aria-label={dir === 'prev' ? 'Foto anterior' : 'Próxima foto'}
+                aria-label={dir === 'prev' ? t.prev : t.next}
                 onClick={() => go(dir === 'prev' ? -1 : 1)}
                 style={{ position: 'absolute', top: '50%', [dir === 'prev' ? 'left' : 'right']: '12px', transform: 'translateY(-50%)', width: '42px', height: '42px', borderRadius: '50%', border: 'none', background: 'rgba(253,250,243,0.92)', color: '#3c2a21', fontSize: '1.2rem', cursor: 'pointer', boxShadow: '0 4px 14px rgba(0,0,0,0.3)' }}
               >
@@ -53,7 +86,7 @@ function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
               key={src}
               type="button"
               onClick={() => setI(n)}
-              aria-label={`Ver foto ${n + 1}`}
+              aria-label={t.show(n + 1)}
               style={{ flex: '0 0 auto', width: '84px', height: '64px', borderRadius: '8px', overflow: 'hidden', padding: 0, cursor: 'pointer', border: n === i ? '2px solid #d4af37' : '2px solid transparent', opacity: n === i ? 1 : 0.65 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -109,8 +142,9 @@ const ROOM_CSS = `
 }
 `;
 
-export default function RoomsAccordion({ onInquire }: Props) {
-  const [rooms, setRooms] = useState<RetreatRoomInfo[]>(RETREAT_ROOMS);
+export default function RoomsAccordion({ onInquire, locale = 'pt' }: Props) {
+  const t = COPY[locale] ?? COPY.pt;
+  const [rooms, setRooms] = useState<RetreatRoomInfo[]>(() => retreatRoomsFor(locale));
   const [openId, setOpenId] = useState<string | null>(null); // all closed: the page is short now (2026-11-13); a tap opens a room
 
   // Photos added in /admin/retreats replace the defaults for that room.
@@ -144,7 +178,7 @@ export default function RoomsAccordion({ onInquire }: Props) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={optimizedSrc(room.photos[0], 750)} alt="" loading="lazy" decoding="async" />
                 <span className="room-cap">{room.capacity}</span>
-                <span className="room-count">{room.photos.length} fotos</span>
+                <span className="room-count">{room.photos.length} {t.photos}</span>
               </span>
               <span className="room-text">
                 <span className="room-cap-inline">{room.capacity}</span>
@@ -156,7 +190,7 @@ export default function RoomsAccordion({ onInquire }: Props) {
 
             {open && (
               <div className="room-body" style={{ padding: '0.25rem 1.25rem 1.5rem', display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', alignItems: 'start' }}>
-                <Gallery photos={room.photos} alt={room.name} />
+                <Gallery photos={room.photos} alt={room.name} t={t} />
                 <div>
                   <p style={{ color: '#594a42', lineHeight: 1.85, marginBottom: '1.25rem' }}>{room.description}</p>
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.25rem' }}>
@@ -173,10 +207,10 @@ export default function RoomsAccordion({ onInquire }: Props) {
                   </div>
                   <div className="room-actions" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                     <button type="button" onClick={() => onInquire(room.name)} className="btn btn-primary" style={{ padding: '0.85rem 1.6rem', fontSize: '0.95rem' }}>
-                      Montar meu pacote
+                      {t.plan}
                     </button>
                     <a href={room.airbnbUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.85rem 1.6rem', fontSize: '0.95rem' }}>
-                      Ver no Airbnb
+                      {t.airbnb}
                     </a>
                   </div>
                 </div>

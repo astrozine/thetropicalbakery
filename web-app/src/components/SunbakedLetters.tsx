@@ -45,14 +45,21 @@ export default function SunbakedLetters({ tone = 'light' }: { tone?: 'light' | '
 }
 
 /** One quiet line for confirmation screens. */
-export function SunbakedLettersNote({ dark = false }: { dark?: boolean }) {
+const NOTE_COPY = {
+  pt: { lead: 'Enquanto isso, vá mais fundo com a newsletter da Dolly:', lang: '(em inglês)' },
+  en: { lead: 'In the meantime, go deeper with Dolly’s newsletter:', lang: '' },
+  es: { lead: 'Mientras tanto, profundiza con la newsletter de Dolly:', lang: '(en inglés)' },
+};
+
+export function SunbakedLettersNote({ dark = false, locale = 'pt' }: { dark?: boolean; locale?: 'pt' | 'en' | 'es' }) {
+  const t = NOTE_COPY[locale] ?? NOTE_COPY.pt;
   return (
     <p style={{ fontSize: '0.88rem', lineHeight: 1.7, color: dark ? 'rgba(253,250,243,0.8)' : '#7a6a61', marginTop: '1.5rem' }}>
-      Enquanto isso, vá mais fundo com a newsletter da Dolly:{' '}
+      {t.lead}{' '}
       <a {...linkProps} style={{ color: dark ? '#ffd166' : '#a6832b', fontWeight: 700, textDecoration: 'underline' }}>
         Sunbaked Letters ↗
-      </a>{' '}
-      <span style={{ opacity: 0.8 }}>(em inglês)</span>
+      </a>
+      {t.lang && <>{' '}<span style={{ opacity: 0.8 }}>{t.lang}</span></>}
     </p>
   );
 }

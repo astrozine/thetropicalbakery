@@ -12,6 +12,8 @@ import { SUB_STYLE } from '@/components/ClubeInvite';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
 import { clearGoogleTranslate } from '@/lib/googleTranslate';
+import { usePageLang } from '@/lib/usePageLang';
+import { shellHref, shellText } from '@/lib/shellCopy';
 import { FUNNEL } from '@/lib/funnel';
 import { COACHING_PATH, isCoachingLang } from '@/lib/coachingCopy';
 import IconTile from '@/components/IconTile';
@@ -82,6 +84,9 @@ function NavItem({ link, style, onClick, tile = 30, children }: { link: NavLink;
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  // Pages written by hand in another language get the menu in that language too (lib/shellCopy.ts).
+  const pageL = usePageLang();
+  const tl = (pt: string) => shellText(pt, pageL);
   const { totalItems, setIsCartOpen } = useCart();
 
   // Lock body scroll when menu is open
@@ -209,7 +214,14 @@ export default function Navigation() {
     ] },
   ];
   // The box menu stays in the code but is hidden while the weekly box is not on sale (lib/boxSale.ts).
-  const groups = allGroups.filter(g => BOX_SALE_ON || g.id !== 'caixa');
+  const localize = (l: NavLink): NavLink => pageL === 'pt' ? l : {
+    ...l,
+    name: l.brand || l.external ? l.name : tl(l.name),
+    sub: l.sub && !l.subByLang && !l.external ? tl(l.sub) : l.sub,
+    path: l.external ? l.path : shellHref(l.path, pageL),
+  };
+  const groups = allGroups.filter(g => BOX_SALE_ON || g.id !== 'caixa')
+    .map(g => ({ ...g, name: tl(g.name), links: g.links.map(localize) }));
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true, coaching: true, apps: true, ebook: true });
 
@@ -220,14 +232,14 @@ export default function Navigation() {
     const read = () => {
       const m = /googtrans=\/[^/;]*\/([a-z]{2})/.exec(document.cookie);
       // No Google Translate cookie = the page as written: Portuguese, or a hand-written English page under /en.
-      const l = m?.[1] || (pathname.startsWith('/en') ? 'en' : 'pt');
+      const l = m?.[1] || (pageL !== 'pt' ? pageL : pathname.startsWith('/en') ? 'en' : 'pt');
       setMenuLang(MENU_LANGS.includes(l) ? l : 'en');
     };
     read();
     const obs = new MutationObserver(read);
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
     return () => obs.disconnect();
-  }, [pathname]);
+  }, [pathname, pageL]);
   const groupIntro = (intro: Record<string, string> | undefined, style: React.CSSProperties) =>
     intro ? <span className="notranslate" translate="no" style={style}>{intro[menuLang] ?? intro.pt}</span> : null;
   const linkText = (link: NavLink, subStyle: React.CSSProperties) => (
@@ -255,7 +267,7 @@ export default function Navigation() {
     // Not a B2B account, but it belongs in the same "ways to partner with us"
     // menu — and this is where a job seeker would naturally look first.
     { name: 'Trabalhe Conosco', path: '/trabalhe-conosco', icon: '💼' },
-  ];
+  ].map(localize);
 
   const retreatLangs = [
     { name: '🇧🇷 Português', path: '/retreats' },
@@ -329,7 +341,7 @@ export default function Navigation() {
         fontSize: 'clamp(0.78rem, 2vw, 0.9rem)',
         padding: 'clamp(0.5rem, 1.5vw, 0.8rem)'
       }}>
-        <span>🌴 Entregas exclusivas: Itamambuca, Ubatuba e Região. Paraty: pedidos a partir de R$ 600! 🌴</span>
+        <span>{tl('🌴 Entregas exclusivas: Itamambuca, Ubatuba e Região. Paraty: pedidos a partir de R$ 600! 🌴')}</span>
       </div>
 
       <nav className="mobile-header-nav" data-tucked={tucked && !isOpen ? 'true' : 'false'} style={{
@@ -473,7 +485,7 @@ export default function Navigation() {
               alignItems: 'center',
               gap: '0.5rem'
             }}>
-              Parcerias ▾
+              {tl('Parcerias')} ▾
             </span>
             {isDropdownOpen && (
               <div style={{
@@ -639,7 +651,7 @@ export default function Navigation() {
               margin: '0.5rem 0 0.25rem', padding: '0.7rem 0.9rem', borderRadius: '12px',
               background: '#3c2a21', color: '#d4af37', fontSize: '0.85rem', lineHeight: 1.4, fontWeight: 600, textAlign: 'center',
             }}>
-              🌴 Entregamos em Itamambuca, Ubatuba e região. Paraty: pedidos a partir de R$ 600.
+              {tl('🌴 Entregamos em Itamambuca, Ubatuba e região. Paraty: pedidos a partir de R$ 600.')}
             </p>
             {/* Caixa de Degustação / Eventos — open by default so the subscription is one tap away. */}
             {groups.map((group) => (
@@ -699,7 +711,7 @@ export default function Navigation() {
                 cursor: 'pointer',
                 textAlign: 'left'
               }}>
-              PARCERIAS <span>{mobileB2bOpen ? '▲' : '▼'}</span>
+              {tl('PARCERIAS')} <span>{mobileB2bOpen ? '▲' : '▼'}</span>
             </button>
             {mobileB2bOpen && b2bLinks.map((link) => (
               <NavItem

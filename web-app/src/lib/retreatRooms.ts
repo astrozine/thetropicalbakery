@@ -83,3 +83,111 @@ export const RETREAT_ROOMS: RetreatRoomInfo[] = [
 ];
 
 export const EXPERIENCE_PHOTOS = photos('experience', 6);
+
+/** The words of each room in English (/en/retreats). Photos, links and ids stay those of RETREAT_ROOMS. */
+type RoomCopy = Pick<RetreatRoomInfo, 'name' | 'capacity' | 'tagline' | 'description' | 'highlights' | 'amenities'>;
+
+const ROOM_COPY_EN: Record<string, RoomCopy> = {
+  house: {
+    name: 'The Whole House',
+    capacity: 'Up to 11 guests',
+    tagline: 'All of Salt n’ Paradise, just for your group.',
+    description:
+      'A modern tropical beach house 100 meters from the sea in Itamambuca, with three places to stay: the Penthouse for up to 6, the Master Suite for 3 and the Studio for 2. A garden with banana trees and exotic flowers, a large terrace, a laundry room and an outdoor beach shower. The right place for group retreats, big families and organizers who want the whole house for their experience.',
+    highlights: [
+      'Three places to stay, up to 11 guests',
+      '100 m from the Itamambuca waves',
+      'Garden, terrace and outdoor shower',
+      'Hardwood and open architecture, designed to keep mold away',
+    ],
+    amenities: ['Air conditioning', 'Wi-Fi', 'Free laundry', 'Beach shower', 'Terrace and garden', 'Coffee maker and coffee'],
+  },
+  penthouse: {
+    name: 'Large Room — Penthouse',
+    capacity: 'Up to 6 guests',
+    tagline: 'The largest suite in the house, with a view of the mountains.',
+    description:
+      'Upstairs, a very large suite with a balcony facing the mountains, a vaulted ceiling, big windows, warm lighting and a handmade floor of local wood. Made for families and groups of friends who want to share one space, with privacy and plenty of comfort.',
+    highlights: ['Balcony with a mountain view', 'Vaulted wooden ceiling', 'Room for up to 6 guests', 'Full bathroom'],
+    amenities: ['Air conditioning', 'Wi-Fi', 'Workspace', 'Fridge and microwave', 'Coffee maker and coffee', 'Walk-in closet', 'Extra bed linen'],
+  },
+  big_suite: {
+    name: 'Master Suite — “Salty Waves”',
+    capacity: 'Up to 3 guests',
+    tagline: 'Slatted wooden doors, white walls and calm.',
+    description:
+      'A double bed and a single bed, a private bathroom and its own entrance at the back of the house. Cool, modern and quiet, with a small private outdoor deck, a Nespresso machine, a mini fridge, a microwave and a work desk.',
+    highlights: ['Private entrance', 'Small outdoor deck', 'Private bathroom', 'Air conditioning'],
+    amenities: ['Air conditioning', 'Wi-Fi', 'Nespresso', 'Mini fridge and microwave', 'Work desk', 'Wardrobe', 'Hot shower'],
+  },
+  small_suite: {
+    name: 'Studio — “Tranquil Breeze”',
+    capacity: 'Up to 2 guests',
+    tagline: 'Soft grays and whites, made for couples.',
+    description:
+      'A suite with a double bed, a private bathroom and a small kitchen corner with a sink. Modern and calming, 100 meters from the beach, with a Nespresso machine, soft towels and the option to use the washing machine.',
+    highlights: ['Small kitchen corner', 'Private bathroom', 'Great for couples or solo travelers', '100 m from the beach'],
+    amenities: ['Air conditioning', 'Wi-Fi', 'Nespresso', 'Washing machine', 'Blackout curtains', 'Hot shower'],
+  },
+};
+
+/** The same in Spanish (/es/retiros), with "tú" like the rest of that page. */
+const ROOM_COPY_ES: Record<string, RoomCopy> = {
+  house: {
+    name: 'La Casa Entera',
+    capacity: 'Hasta 11 personas',
+    tagline: 'Todo Salt n’ Paradise, solo para tu grupo.',
+    description:
+      'Una casa de playa tropical y moderna, a 100 metros del mar en Itamambuca, con tres alojamientos: el Ático para hasta 6, la Suite Master para 3 y el Estudio para 2. Jardín con bananos y flores exóticas, terraza amplia, lavandería y ducha de playa al aire libre. El lugar ideal para retiros en grupo, familias grandes y organizadores que quieren la casa entera para su experiencia.',
+    highlights: [
+      'Tres alojamientos, hasta 11 personas',
+      'A 100 m de las olas de Itamambuca',
+      'Jardín, terraza y ducha al aire libre',
+      'Maderas nobles y arquitectura abierta, pensada contra la humedad',
+    ],
+    amenities: ['Aire acondicionado', 'Wi-Fi', 'Lavandería gratis', 'Ducha de playa', 'Terraza y jardín', 'Cafetera y café'],
+  },
+  penthouse: {
+    name: 'Habitación Grande — Ático',
+    capacity: 'Hasta 6 personas',
+    tagline: 'La suite más amplia de la casa, con vista a la montaña.',
+    description:
+      'En el piso de arriba, una suite enorme con balcón hacia las montañas, techo abovedado, ventanas grandes, luz cálida y piso artesanal de madera local. Pensada para familias y grupos de amigos que quieren compartir el mismo espacio, con privacidad y mucha comodidad.',
+    highlights: ['Balcón con vista a la montaña', 'Techo abovedado de madera', 'Espacio para hasta 6 personas', 'Baño completo'],
+    amenities: ['Aire acondicionado', 'Wi-Fi', 'Espacio de trabajo', 'Refrigerador y microondas', 'Cafetera y café', 'Vestidor', 'Ropa de cama extra'],
+  },
+  big_suite: {
+    name: 'Suite Master — “Salty Waves”',
+    capacity: 'Hasta 3 personas',
+    tagline: 'Puertas de listones de madera, paredes blancas y calma.',
+    description:
+      'Una cama doble y una individual, baño privado y entrada propia por la parte de atrás de la casa. Fresca, moderna y silenciosa, con una pequeña terraza privada al aire libre, Nespresso, frigobar, microondas y escritorio.',
+    highlights: ['Entrada privada', 'Pequeña terraza al aire libre', 'Baño privado', 'Aire acondicionado'],
+    amenities: ['Aire acondicionado', 'Wi-Fi', 'Nespresso', 'Frigobar y microondas', 'Escritorio', 'Armario', 'Ducha con agua caliente'],
+  },
+  small_suite: {
+    name: 'Estudio — “Tranquil Breeze”',
+    capacity: 'Hasta 2 personas',
+    tagline: 'Tonos suaves de gris y blanco, ideal para parejas.',
+    description:
+      'Suite con cama doble, baño privado y un rinconcito de cocina con fregadero. Moderna y tranquila, a 100 metros de la playa, con Nespresso, toallas suaves y la opción de usar la lavadora.',
+    highlights: ['Rinconcito de cocina', 'Baño privado', 'Ideal para parejas o viajeros solos', 'A 100 m de la playa'],
+    amenities: ['Aire acondicionado', 'Wi-Fi', 'Nespresso', 'Lavadora', 'Cortinas blackout', 'Ducha con agua caliente'],
+  },
+};
+
+/** The rooms in the visitor's language (Portuguese by default). */
+export function retreatRoomsFor(locale: 'pt' | 'en' | 'es' = 'pt'): RetreatRoomInfo[] {
+  const copy = locale === 'en' ? ROOM_COPY_EN : locale === 'es' ? ROOM_COPY_ES : null;
+  if (!copy) return RETREAT_ROOMS;
+  return RETREAT_ROOMS.map(r => ({ ...r, ...(copy[r.id] ?? {}) }));
+}
+
+/**
+ * Short names for the rooms as the booking calculator lists them. Its names come from the database, in Portuguese,
+ * so English and Spanish visitors get these instead (a room missing here keeps its database name).
+ */
+export const ROOM_SHORT_NAMES: Record<'en' | 'es', Record<string, string>> = {
+  en: { house: 'The Whole House', penthouse: 'Penthouse', big_suite: 'Master Suite', small_suite: 'Standard Suite' },
+  es: { house: 'La Casa Entera', penthouse: 'Ático (Penthouse)', big_suite: 'Suite Master', small_suite: 'Suite Estándar' },
+};

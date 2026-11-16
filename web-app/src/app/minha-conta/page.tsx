@@ -76,7 +76,7 @@ function completeness(
 }
 
 const SHARE_TEXT = encodeURIComponent(
-  'Conheci a The Tropical Bakery: doces veganos e sem glúten, feitos à mão em Itamambuca. Você vai amar 🌴 https://thetropicalbakery.com',
+  'Conheci a The Tropical Bakery: doces veganos e sem trigo, feitos à mão em Itamambuca. Você vai amar 🌴 https://thetropicalbakery.com',
 );
 
 export default function MyAccountPage() {

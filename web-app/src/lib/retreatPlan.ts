@@ -42,38 +42,118 @@ export const RAIN_PLAN = [
   'Massagem, livro e chá na varanda da casa',
 ];
 
+/* ------------------------------------------------------------------ the same plan in English and Spanish (/en/retreats, /es/retiros) */
+
+export type PlanLocale = 'pt' | 'en' | 'es';
+
+const REGION_DAYS_I18N: Record<'en' | 'es', typeof REGION_DAYS> = {
+  en: [
+    { emoji: '💧', title: 'Prumirim Waterfall and Island', text: 'The waterfall pool in the morning, a boat to the island in the afternoon.' },
+    { emoji: '🥾', title: 'Seven Beaches Trail', text: 'A hike through the Atlantic Forest, from one empty beach to the next.' },
+    { emoji: '🏄', title: 'Surf and sea in Itamambuca', text: 'A surf lesson or just the sea, 100 m from the house, and the sunset on the sand.' },
+    { emoji: '🏘️', title: 'Paraty', text: 'The old town, the market and a schooner trip around the islands.' },
+    { emoji: '🌿', title: 'Picinguaba and the Casa da Farinha', text: 'The caiçara village inside the state park, and cassava flour made the old way.' },
+  ],
+  es: [
+    { emoji: '💧', title: 'Cascada e Isla de Prumirim', text: 'La poza de la cascada en la mañana, y en barco hasta la isla en la tarde.' },
+    { emoji: '🥾', title: 'Sendero de las Siete Playas', text: 'Un sendero por la Mata Atlántica, de playa desierta en playa desierta.' },
+    { emoji: '🏄', title: 'Surf y mar en Itamambuca', text: 'Clase de surf o solo el mar, a 100 m de la casa, y el atardecer en la arena.' },
+    { emoji: '🏘️', title: 'Paraty', text: 'El centro histórico, el mercado y un paseo en goleta por las islas.' },
+    { emoji: '🌿', title: 'Picinguaba y la Casa da Farinha', text: 'La aldea caiçara dentro del parque estatal y la harina de yuca hecha como antes.' },
+  ],
+};
+
+const RAIN_PLAN_I18N: Record<'en' | 'es', string[]> = {
+  en: [
+    'A cacao and chocolate tasting, with your eyes closed',
+    'Projeto Tamar and the Ubatuba Aquarium',
+    'An extra family class in the kitchen, for anyone who wants it',
+    'A massage, a book and tea on the veranda',
+  ],
+  es: [
+    'Degustación de cacao y chocolate, con los ojos cerrados',
+    'El Projeto Tamar y el Acuario de Ubatuba',
+    'Una clase extra en familia en la cocina, para quien quiera',
+    'Masaje, un libro y té en la terraza de la casa',
+  ],
+};
+
+/** The course names and their steps, by slug. A course missing here keeps its Portuguese words. */
+const COURSE_I18N: Record<'en' | 'es', Record<string, { title: string; steps: string[] }>> = {
+  en: {
+    'turismo-gastronomico': { title: 'Culinary Tourism', steps: ['Tropical welcome', 'The flavor workshop', 'Hands-on', 'Tasting and photos'] },
+    'capacitacao-profissional': { title: 'Professional Training', steps: ['Basics and assessment', 'Swaps and technique', 'The flavor tricks', 'The week’s menu'] },
+    'saude-bem-estar': { title: 'Health, Flavor and Wellbeing', steps: ['Understanding cravings', 'The right ingredients', 'The magic of flavor', 'For real life'] },
+  },
+  es: {
+    'turismo-gastronomico': { title: 'Turismo Gastronómico', steps: ['Bienvenida tropical', 'El taller de sabores', 'Manos a la masa', 'Degustación y fotos'] },
+    'capacitacao-profissional': { title: 'Capacitación Profesional', steps: ['Base y diagnóstico', 'Sustituciones y técnica', 'Los trucos de sabor', 'El menú de la semana'] },
+    'saude-bem-estar': { title: 'Salud, Sabores y Bienestar', steps: ['Entender el antojo', 'Los ingredientes correctos', 'La magia de los sabores', 'Para la vida real'] },
+  },
+};
+
+/** A course's name in the visitor's language. */
+export const courseTitleFor = (c: Pick<CourseContent, 'slug' | 'title'>, locale: PlanLocale = 'pt') =>
+  (locale === 'pt' ? null : COURSE_I18N[locale][c.slug]?.title) ?? c.title;
+
+/** RAIN_PLAN in the visitor's language. */
+export const rainPlanFor = (locale: PlanLocale = 'pt') => (locale === 'pt' ? RAIN_PLAN : RAIN_PLAN_I18N[locale]);
+
+const PLAN_WORDS = {
+  pt: {
+    classOf: (i: number, n: number) => `aula ${i} de ${n}`,
+    arrive: { title: 'Chegada', text: 'Check-in à tarde e degustação de boas-vindas com a Dolly.' },
+    leave: { title: 'Partida', text: 'Café da manhã e check-out.' },
+  },
+  en: {
+    classOf: (i: number, n: number) => `class ${i} of ${n}`,
+    arrive: { title: 'Arrival', text: 'Check-in in the afternoon and a welcome tasting with Dolly.' },
+    leave: { title: 'Departure', text: 'Breakfast and check-out.' },
+  },
+  es: {
+    classOf: (i: number, n: number) => `clase ${i} de ${n}`,
+    arrive: { title: 'Llegada', text: 'Check-in en la tarde y degustación de bienvenida con Dolly.' },
+    leave: { title: 'Salida', text: 'Desayuno y check-out.' },
+  },
+};
+
 export type DayKind = 'arrive' | 'class' | 'region' | 'free' | 'leave';
 export interface PlanDay { day: number; date?: string; kind: DayKind; title: string; text: string; emoji: string }
 
 /** Each course split into its class days, its journey steps shared out between them. */
-function classDays(courses: CourseContent[]) {
+function classDays(courses: CourseContent[], locale: PlanLocale) {
   return courses.flatMap(c => {
     const n = c.retreatClasses;
     const per = Math.ceil(c.journey.length / n);
+    const words = locale === 'pt' ? undefined : COURSE_I18N[locale][c.slug];
+    const title = courseTitleFor(c, locale);
     return Array.from({ length: n }, (_, i) => ({
-      title: n > 1 ? `${c.title} · aula ${i + 1} de ${n}` : c.title,
-      text: c.journey.slice(i * per, (i + 1) * per).map(j => j.title).join(' · '),
+      title: n > 1 ? `${title} · ${PLAN_WORDS[locale].classOf(i + 1, n)}` : title,
+      text: c.journey.slice(i * per, (i + 1) * per).map((j, k) => words?.steps[i * per + k] ?? j.title).join(' · '),
     }));
   });
 }
 
-export function buildItinerary(slugs: string[], nights: number, checkIn?: string): PlanDay[] {
+/** The day-by-day plan. `locale` only changes the words (Portuguese by default). */
+export function buildItinerary(slugs: string[], nights: number, checkIn?: string, locale: PlanLocale = 'pt'): PlanDay[] {
   const courses = COURSE_CONTENT.filter(c => slugs.includes(c.slug));
-  const classes = classDays(courses);
+  const classes = classDays(courses, locale);
+  const regionDays = locale === 'pt' ? REGION_DAYS : REGION_DAYS_I18N[locale];
+  const words = PLAN_WORDS[locale];
   const days: PlanDay[] = [];
   const at = (i: number) => (checkIn ? addDays(checkIn, i) : undefined);
-  days.push({ day: 1, date: at(0), kind: 'arrive', emoji: '🌴', title: 'Chegada', text: 'Check-in à tarde e degustação de boas-vindas com a Dolly.' });
+  days.push({ day: 1, date: at(0), kind: 'arrive', emoji: '🌴', ...words.arrive });
   let c = 0, r = 0;
   for (let d = 2; d <= nights; d++) {
     const classTurn = d % 2 === 0;
     if (classTurn && c < classes.length) {
       days.push({ day: d, date: at(d - 1), kind: 'class', emoji: '👩‍🍳', ...classes[c++] });
     } else {
-      const place = REGION_DAYS[r++ % REGION_DAYS.length];
+      const place = regionDays[r++ % regionDays.length];
       days.push({ day: d, date: at(d - 1), kind: classes.length ? 'region' : 'free', emoji: place.emoji, title: place.title, text: place.text });
     }
   }
-  days.push({ day: nights + 1, date: at(nights), kind: 'leave', emoji: '☕', title: 'Partida', text: 'Café da manhã e check-out.' });
+  days.push({ day: nights + 1, date: at(nights), kind: 'leave', emoji: '☕', ...words.leave });
   return days;
 }
 
