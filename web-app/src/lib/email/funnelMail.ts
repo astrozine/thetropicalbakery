@@ -89,7 +89,7 @@ export async function sendFreeRecipes(db: SupabaseClient, o: { email: string; fi
     await deliver(db, {
       email, token: '', messageKey: `${FUNNEL.source}:pdf`, subject: c.subject, topic: 'pedido', template: 'receitas-d0', transactional: true,
       layout: {
-        lang: o.lang === 'pt' ? 'pt' : 'en',
+        lang: o.lang,
         theme: 'novidades', icon: '📝',
         preheader: c.preheader,
         heading: c.heading,

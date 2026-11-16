@@ -39,6 +39,64 @@ const actionStyle: React.CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
+/** The panel's own words. Portuguese is the default; the retreat pages pass English or Spanish. */
+const COPY = {
+  pt: {
+    message: 'Entre e não digite seus dados de novo',
+    subMessage: 'Seu nome, WhatsApp e endereço ficam salvos para o próximo pedido.',
+    or: 'ou',
+    phoneTab: 'Celular',
+    emailTab: 'E-mail',
+    sending: 'Enviando...',
+    sendCode: 'Enviar código',
+    codeSent: 'Enviamos um código de 6 dígitos por SMS para',
+    checking: 'Conferindo...',
+    signIn: 'Entrar',
+    otherNumber: 'Usar outro número',
+    emailPlaceholder: 'seu@email.com',
+    sendLink: 'Enviar link',
+    linkSent: '✅ Pronto! Abra seu e-mail e clique no link para entrar. Você volta direto para esta página.',
+    agree: 'Ao entrar, você concorda com nossa',
+    privacy: 'Política de Privacidade',
+  },
+  en: {
+    message: 'Sign in and skip the typing',
+    subMessage: 'Your name and WhatsApp stay saved for next time.',
+    or: 'or',
+    phoneTab: 'Phone',
+    emailTab: 'E-mail',
+    sending: 'Sending...',
+    sendCode: 'Send code',
+    codeSent: 'We sent a 6-digit code by SMS to',
+    checking: 'Checking...',
+    signIn: 'Sign in',
+    otherNumber: 'Use another number',
+    emailPlaceholder: 'you@email.com',
+    sendLink: 'Send link',
+    linkSent: '✅ Done! Open your e-mail and click the link to sign in. You’ll come straight back to this page.',
+    agree: 'By signing in, you agree to our',
+    privacy: 'Privacy Policy',
+  },
+  es: {
+    message: 'Entra y no escribas tus datos de nuevo',
+    subMessage: 'Tu nombre y tu WhatsApp quedan guardados para la próxima vez.',
+    or: 'o',
+    phoneTab: 'Celular',
+    emailTab: 'E-mail',
+    sending: 'Enviando...',
+    sendCode: 'Enviar código',
+    codeSent: 'Te enviamos un código de 6 dígitos por SMS a',
+    checking: 'Verificando...',
+    signIn: 'Entrar',
+    otherNumber: 'Usar otro número',
+    emailPlaceholder: 'tu@email.com',
+    sendLink: 'Enviar enlace',
+    linkSent: '✅ ¡Listo! Abre tu e-mail y haz clic en el enlace para entrar. Vuelves directo a esta página.',
+    agree: 'Al entrar, aceptas nuestra',
+    privacy: 'Política de Privacidad',
+  },
+};
+
 interface LoginPanelProps {
   /** Headline above the options. */
   message?: string;
@@ -49,6 +107,8 @@ interface LoginPanelProps {
    * or link just moves to the next step, so the whole flow can be seen.
    */
   demo?: boolean;
+  /** The panel's language (Portuguese by default). */
+  locale?: 'pt' | 'en' | 'es';
 }
 
 /**
@@ -60,10 +120,12 @@ interface LoginPanelProps {
  * nothing at all once someone is signed in.
  */
 export default function LoginPanel({
-  message = 'Entre e não digite seus dados de novo',
-  subMessage = 'Seu nome, WhatsApp e endereço ficam salvos para o próximo pedido.',
+  message,
+  subMessage,
   demo = false,
+  locale = 'pt',
 }: LoginPanelProps) {
+  const t = COPY[locale] ?? COPY.pt;
   const {
     user, availableMethods,
     signInWithProvider, sendEmailLink, sendPhoneCode, verifyPhoneCode,
@@ -130,10 +192,10 @@ export default function LoginPanel({
       />
 
       <p style={{ fontSize: '1rem', color: '#3c2a21', fontWeight: 700, marginBottom: '0.35rem' }}>
-        {message}
+        {message ?? t.message}
       </p>
       <p style={{ fontSize: '0.85rem', color: '#7a6a61', marginBottom: '1.25rem' }}>
-        {subMessage}
+        {subMessage ?? t.subMessage}
       </p>
 
       {oauthMethods.length > 0 && (
@@ -174,14 +236,14 @@ export default function LoginPanel({
       {oauthMethods.length > 0 && (hasPhone || hasEmail) && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1.25rem 0 1rem' }}>
           <span style={{ flex: 1, height: '1px', background: '#e8e1d7' }} />
-          <span style={{ fontSize: '0.75rem', color: '#a89a90', textTransform: 'uppercase', letterSpacing: '1px' }}>ou</span>
+          <span style={{ fontSize: '0.75rem', color: '#a89a90', textTransform: 'uppercase', letterSpacing: '1px' }}>{t.or}</span>
           <span style={{ flex: 1, height: '1px', background: '#e8e1d7' }} />
         </div>
       )}
 
       {hasPhone && hasEmail && (
         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '1rem' }}>
-          {([['phone', 'Celular'], ['email', 'E-mail']] as const).map(([key, label]) => (
+          {([['phone', t.phoneTab], ['email', t.emailTab]] as const).map(([key, label]) => (
             <button
               key={key}
               type="button"
@@ -219,13 +281,13 @@ export default function LoginPanel({
                 style={{ ...inputStyle, flex: '1 1 160px', width: 'auto' }}
               />
               <button type="button" disabled={busy} onClick={submitPhone} style={actionStyle}>
-                {busy ? 'Enviando...' : 'Enviar código'}
+                {busy ? t.sending : t.sendCode}
               </button>
             </div>
           ) : (
             <>
               <p style={{ fontSize: '0.85rem', color: '#594a42', marginBottom: '0.6rem' }}>
-                Enviamos um código de 6 dígitos por SMS para{' '}
+                {t.codeSent}{' '}
                 <strong className="notranslate" translate="no">{formatBrazilianPhone(phone)}</strong>.
               </p>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -241,7 +303,7 @@ export default function LoginPanel({
                   style={{ ...inputStyle, flex: '1 1 120px', width: 'auto', letterSpacing: '0.3em', textAlign: 'center' }}
                 />
                 <button type="button" disabled={busy} onClick={submitCode} style={actionStyle}>
-                  {busy ? 'Conferindo...' : 'Entrar'}
+                  {busy ? t.checking : t.signIn}
                 </button>
               </div>
               <button
@@ -249,7 +311,7 @@ export default function LoginPanel({
                 onClick={() => { setCodeSent(false); setCode(''); setError(''); }}
                 style={{ background: 'none', border: 'none', padding: '0.5rem 0 0', color: '#7a6a61', fontSize: '0.8rem', textDecoration: 'underline', cursor: 'pointer' }}
               >
-                Usar outro número
+                {t.otherNumber}
               </button>
             </>
           )}
@@ -263,19 +325,19 @@ export default function LoginPanel({
               <input
                 type="email"
                 autoComplete="email"
-                placeholder="seu@email.com"
+                placeholder={t.emailPlaceholder}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 onKeyDown={onEnter(submitEmail)}
                 style={{ ...inputStyle, flex: '1 1 180px', width: 'auto' }}
               />
               <button type="button" disabled={busy} onClick={submitEmail} style={actionStyle}>
-                {busy ? 'Enviando...' : 'Enviar link'}
+                {busy ? t.sending : t.sendLink}
               </button>
             </div>
           ) : (
             <p style={{ fontSize: '0.9rem', color: '#2e4432', background: 'rgba(46,68,50,0.08)', padding: '0.85rem 1rem', borderRadius: '8px' }}>
-              ✅ Pronto! Abra seu e-mail e clique no link para entrar. Você volta direto para esta página.
+              {t.linkSent}
             </p>
           )}
         </div>
@@ -288,9 +350,9 @@ export default function LoginPanel({
       )}
 
       <p className="login-fineprint" style={{ fontSize: '0.75rem', color: '#a89a90', marginTop: '1rem' }}>
-        Ao entrar, você concorda com nossa{' '}
+        {t.agree}{' '}
         <Link href="/privacidade" style={{ color: '#a89a90', textDecoration: 'underline' }}>
-          Política de Privacidade
+          {t.privacy}
         </Link>.
       </p>
     </div>

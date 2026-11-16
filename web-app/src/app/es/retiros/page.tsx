@@ -11,7 +11,7 @@ export default function RetirosSpanishPage() {
       cta: 'Reserva tu Retiro',
     },
     experience: {
-      subtitle: 'La Experiência',
+      subtitle: 'La Experiencia',
       title: 'Reconecta con la Naturaleza y la Comida',
       description: 'Nuestros retiros están diseñados para reconectarte con la comida de una manera curativa y deliciosa. Aprenderás de forma práctica cómo preparar postres lujosos que nutren el cuerpo.',
       bullets: [

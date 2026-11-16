@@ -12,7 +12,7 @@ import { InspirationSection } from '@/components/InspirationSection';
 import { supabase } from '@/lib/supabase';
 
 export interface RetreatsLayoutProps {
-  /** English/Spanish visitors get an approximate USD/EUR line under the retreat calculator's total. */
+  /** The language of every section on the page (Portuguese by default). English/Spanish visitors also get an approximate USD/EUR line under the retreat calculator's total. */
   locale?: 'pt' | 'en' | 'es';
   texts: {
     whatsappMessage: string;
@@ -68,8 +68,55 @@ const NEARBY = {
   },
 } as const;
 
+/** The page's own words that don't come in through `texts`: image descriptions, the package heading, the phone bar. */
+const PAGE_COPY = {
+  pt: {
+    altCoast: 'Praia de Itamambuca vista do alto',
+    altIsland: 'Ilha do Prumirim',
+    altWoman: 'Mulher relaxando na piscina natural da Cachoeira do Prumirim',
+    altWaterfall: 'Cachoeira do Prumirim, Ubatuba',
+    altTreats: 'Criações da Tropical Bakery',
+    packageEyebrow: 'Reserva Fora do Airbnb',
+    packageTitle: 'O Pacote Completo, Não Só a Estadia',
+    heroInterest: 'Retiro Tropical',
+    finalInterest: 'Retiro Geral',
+    barPrice: 'Monte seu pacote',
+    barNote: 'estadia + cursos + comida',
+    barLabel: 'Ver preços',
+  },
+  en: {
+    altCoast: 'Itamambuca beach from above',
+    altIsland: 'Prumirim Island',
+    altWoman: 'A woman relaxing in the natural pool at Prumirim Waterfall',
+    altWaterfall: 'Prumirim Waterfall, Ubatuba',
+    altTreats: 'Treats from The Tropical Bakery',
+    packageEyebrow: 'Booking Outside Airbnb',
+    packageTitle: 'The Whole Package, Not Just the Stay',
+    heroInterest: 'Tropical Retreat',
+    finalInterest: 'General Retreat',
+    barPrice: 'Build your package',
+    barNote: 'stay + courses + food',
+    barLabel: 'See prices',
+  },
+  es: {
+    altCoast: 'La playa de Itamambuca vista desde arriba',
+    altIsland: 'Isla de Prumirim',
+    altWoman: 'Mujer relajándose en la piscina natural de la Cascada de Prumirim',
+    altWaterfall: 'Cascada de Prumirim, Ubatuba',
+    altTreats: 'Creaciones de The Tropical Bakery',
+    packageEyebrow: 'Reserva Fuera de Airbnb',
+    packageTitle: 'El Paquete Completo, No Solo la Estadía',
+    heroInterest: 'Retiro Tropical',
+    finalInterest: 'Retiro General',
+    barPrice: 'Arma tu paquete',
+    barNote: 'estadía + cursos + comida',
+    barLabel: 'Ver precios',
+  },
+};
+
 export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutProps) {
   const nearby = NEARBY[locale];
+  const copy = PAGE_COPY[locale] ?? PAGE_COPY.pt;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInterest, setSelectedInterest] = useState('');
   const [roomImages, setRoomImages] = useState<{ [key: string]: string }>({
@@ -112,7 +159,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           <ZoomableImage className="rh__ph rh__ph--bundt" src="/menu-items/1000215018.jpg" alt="Tropical Treats" />
           <ZoomableImage className="rh__ph rh__ph--cake" src="/menu-items/Screenshot_20260513_114809_Edits.jpg" alt="Tropical Treats" />
           <div className="rh__ph rh__ph--coast">
-            <img src="/retreats/real-itamambuca-coast.jpg" alt="Praia de Itamambuca vista do alto" />
+            <img src="/retreats/real-itamambuca-coast.jpg" alt={copy.altCoast} />
             <div className="rh__card">
               <b className="rh__num">{nearby.beach.num}</b>
               <span className="rh__lbl">{nearby.beach.label}</span>
@@ -120,7 +167,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             </div>
           </div>
           <div className="rh__ph rh__ph--island">
-            <img src="/retreats/real-prumirim-island.jpg" alt="Ilha do Prumirim" />
+            <img src="/retreats/real-prumirim-island.jpg" alt={copy.altIsland} />
             <div className="rh__card rh__card--right">
               <b className="rh__num">{nearby.island.num}</b>
               <span className="rh__lbl">{nearby.island.label}</span>
@@ -145,7 +192,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             {texts.hero.description}
           </p>
           <button
-            onClick={() => { setSelectedInterest(typeof texts.hero.title === 'string' ? texts.hero.title : 'Retiro Tropical'); setIsModalOpen(true); }}
+            onClick={() => { setSelectedInterest(typeof texts.hero.title === 'string' ? texts.hero.title : copy.heroInterest); setIsModalOpen(true); }}
             className="btn btn-secondary rh__cta"
           >
             {texts.hero.cta}
@@ -226,10 +273,10 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             <div className="rx__stage">
               <div className="rx__ring" aria-hidden />
               <div className="rx__arch">
-                <img src="/retreats/prumirim-woman.jpg" alt="Mulher relaxando na piscina natural da Cachoeira do Prumirim" loading="lazy" />
+                <img src="/retreats/prumirim-woman.jpg" alt={copy.altWoman} loading="lazy" />
               </div>
               <div className="rx__wide">
-                <img src="/retreats/real-cachoeira.jpg" alt="Cachoeira do Prumirim, Ubatuba" loading="lazy" />
+                <img src="/retreats/real-cachoeira.jpg" alt={copy.altWaterfall} loading="lazy" />
               </div>
               <div className="rx__card">
                 <b className="rx__num">{nearby.waterfall.num}</b>
@@ -304,10 +351,10 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           maxWidth: '1200px',
           margin: '0 auto 3rem',
         }}>
-          <ZoomableImage src="/menu-items/Screenshot_20260415_110305_Gallery.jpg" alt="Criações da Tropical Bakery" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
-          <ZoomableImage src="/menu-items/Screenshot_20260401_193246_Edits.jpg"   alt="Criações da Tropical Bakery" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
-          <ZoomableImage src="/menu-items/Screenshot_20260518_122444_Gallery.jpg" alt="Criações da Tropical Bakery" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
-          <ZoomableImage src="/menu-items/20260209_172647.jpg"                    alt="Criações da Tropical Bakery" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
+          <ZoomableImage src="/menu-items/Screenshot_20260415_110305_Gallery.jpg" alt={copy.altTreats} style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
+          <ZoomableImage src="/menu-items/Screenshot_20260401_193246_Edits.jpg"   alt={copy.altTreats} style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
+          <ZoomableImage src="/menu-items/Screenshot_20260518_122444_Gallery.jpg" alt={copy.altTreats} style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
+          <ZoomableImage src="/menu-items/20260209_172647.jpg"                    alt={copy.altTreats} style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
         </div>
         <h2 data-sign-top="🍫" style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', marginBottom: '1rem' }}>
           {texts.foodHero.title}
@@ -334,22 +381,22 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             </div>
           </ScrollReveal>
 
-          <RoomsAccordion onInquire={(name) => { setSelectedInterest(name); setIsModalOpen(true); }} />
+          <RoomsAccordion locale={locale} onInquire={(name) => { setSelectedInterest(name); setIsModalOpen(true); }} />
         </div>
       </section>
 
-      <RetreatTracks onInquire={(interest) => { setSelectedInterest(interest); setIsModalOpen(true); }} />
+      <RetreatTracks locale={locale} onInquire={(interest) => { setSelectedInterest(interest); setIsModalOpen(true); }} />
 
-      <InspirationSection />
+      <InspirationSection locale={locale} />
 
       {/* Pricing Calculator */}
       <section style={{ padding: 'clamp(2.25rem, 8vw, 6rem) 1.5rem', background: 'linear-gradient(180deg, #2e4432 0%, #3c2a21 100%)' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '1rem' }}>
-            Reserva Fora do Airbnb
+            {copy.packageEyebrow}
           </span>
           <h2 data-sign-top="✈️" style={{ fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', lineHeight: '1.15' }}>
-            O Pacote Completo, Não Só a Estadia
+            {copy.packageTitle}
           </h2>
         </div>
         <div id="pacote"><RetreatPricingCalculator whatsappNumber={WHATSAPP_NUMBER} locale={locale} /></div>
@@ -388,7 +435,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             {texts.finalCta.description}
           </p>
           <button 
-            onClick={() => { setSelectedInterest('Retiro Geral'); setIsModalOpen(true); }}
+            onClick={() => { setSelectedInterest(copy.finalInterest); setIsModalOpen(true); }}
             className="btn btn-secondary" 
             style={{ padding: '1.2rem 3.5rem', fontSize: '1.1rem', letterSpacing: '2px' }}
           >
@@ -405,14 +452,15 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
         onClose={() => setIsModalOpen(false)}
         interestType="retiro"
         specificInterest={selectedInterest}
+        locale={locale}
       />
       {/* Phones only: the package builder sat fourteen screens down, so the way
           in rides along instead. */}
       <MobileBuyBar
         kicker="Itamambuca"
-        price="Monte seu pacote"
-        note="estadia + cursos + comida"
-        label="Ver preços"
+        price={copy.barPrice}
+        note={copy.barNote}
+        label={copy.barLabel}
         targetId="#pacote"
       />
 

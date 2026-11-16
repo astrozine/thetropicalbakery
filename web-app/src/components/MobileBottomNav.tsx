@@ -6,10 +6,13 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { ClubeModal } from '@/components/ClubeInvite';
+import { usePageLang } from '@/lib/usePageLang';
+import { shellHref, shellText } from '@/lib/shellCopy';
 
 export default function MobileBottomNav() {
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
+  const lang = usePageLang();
   const { totalItems, setIsCartOpen } = useCart();
   const { user } = useAuth();
   const [clubeOpen, setClubeOpen] = useState(false);
@@ -46,12 +49,12 @@ export default function MobileBottomNav() {
 
   if (!isMobile) return null;
 
-  const navItems = [
+  const navItems = ([
     { name: 'Início', path: '/', icon: '🏠' },
     { name: 'Cardápio', path: '/menu', icon: '🍰' },
     { name: 'Cursos', path: '/cursos', icon: '🎓' },
     { name: 'Retiros', path: '/retreats', icon: '🌴' },
-  ];
+  ]).map(i => ({ ...i, name: shellText(i.name, lang), path: shellHref(i.path, lang) }));
 
   return (
     <div style={{
@@ -113,12 +116,12 @@ export default function MobileBottomNav() {
       {user ? (
         <Link href="/minha-conta" style={{ ...tabStyle, color: pathname === '/minha-conta' ? '#d4af37' : '#887d77' }}>
           <span style={{ fontSize: '1.5rem' }}>🎟️</span>
-          <span style={tabLabel}>Conta</span>
+          <span style={tabLabel}>{shellText('Conta', lang)}</span>
         </Link>
       ) : (
         <button type="button" onClick={() => setClubeOpen(true)} style={{ ...tabStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#8a6d1f' }}>
           <span style={{ fontSize: '1.5rem' }}>🎟️</span>
-          <span style={{ ...tabLabel, fontWeight: 700 }}>Clube</span>
+          <span style={{ ...tabLabel, fontWeight: 700 }}>{shellText('Clube', lang)}</span>
         </button>
       )}
       <ClubeModal open={clubeOpen} onClose={closeClube} />

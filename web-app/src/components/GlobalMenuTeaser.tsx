@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { thumb } from '@/lib/thumbs';
+import { usePageLang } from '@/lib/usePageLang';
+import { shellText } from '@/lib/shellCopy';
 
 /**
  * Pages where the events strip earns its place: people browsing, and events are a natural next
@@ -23,6 +25,8 @@ const SHOW_ON = (path: string) =>
 export default function GlobalMenuTeaser({ inPage = false }: { inPage?: boolean }) {
   const pathname = usePathname() || '';
   const isSpanish = pathname.startsWith('/es');
+  const lang = usePageLang();
+  const t = (pt: string) => shellText(pt, lang);
   // /es/retreats and /en/retreats follow the same rule as /retreats.
   const bare = pathname.replace(/^\/(es|en)(?=\/|$)/, '') || '/';
 
@@ -60,13 +64,12 @@ export default function GlobalMenuTeaser({ inPage = false }: { inPage?: boolean 
   const loop = Array.from({ length: Math.max(teaserItems.length, Math.ceil(8 / teaserItems.length) * teaserItems.length) }, (_, i) => teaserItems[i % teaserItems.length]);
 
   const texts = {
-    subtitle: isSpanish ? "Descubre Nuestras Creaciones" : "Descubra Nossas Criações",
-    title: isSpanish ? "Para Eventos y Momentos Especiales" : "Para Eventos e Momentos Especiais",
-    description: isSpanish
-      ? "Mira lo que ya hemos servido en nuestras Cajas Sorpresa y planea tu próximo evento."
-      : "Veja o que já servimos em nossas Caixas Surpresa e planeje seu próximo evento.",
-    btn: isSpanish ? "Ver Menú Completo" : "Ver Menu Completo",
+    subtitle: t('Descubra Nossas Criações'),
+    title: t('Para Eventos e Momentos Especiais'),
+    description: t('Veja o que já servimos em nossas Caixas Surpresa e planeje seu próximo evento.'),
+    btn: t('Ver Menu Completo'),
   };
+
 
   return (
     <section className="events-teaser">

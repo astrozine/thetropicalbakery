@@ -8,9 +8,10 @@ import { getSiteSetting } from '@/lib/siteSettings';
 import { useExchangeRates, formatForeign } from '@/lib/currency';
 import WhatsAppGate from '@/components/WhatsAppGate';
 import { COURSE_CONTENT } from '@/lib/courseContent';
+import { ROOM_SHORT_NAMES } from '@/lib/retreatRooms';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import {
-  RAIN_PLAN, addDays, buildItinerary, classesOf, effectiveBusy, isFree, minNightsForClasses, nightsForClasses, todayBR,
+  addDays, buildItinerary, classesOf, courseTitleFor, effectiveBusy, isFree, minNightsForClasses, nightsForClasses, rainPlanFor, todayBR,
   type NightsByRoom,
 } from '@/lib/retreatPlan';
 
@@ -25,12 +26,172 @@ const DEPOSIT_PERCENT = 30;
 /** Earliest arrival: two days out, so there is time to shop and prepare the kitchen. */
 const LEAD_DAYS = 2;
 
-const WEEK = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-const MONTHS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-const WEEKDAY_SHORT = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
-const prettyDate = (iso: string) => {
-  const d = new Date(`${iso}T12:00:00Z`);
-  return `${WEEKDAY_SHORT[d.getUTCDay()]}, ${d.getUTCDate()} ${MONTHS[d.getUTCMonth()].slice(0, 3)}`;
+type Locale = 'pt' | 'en' | 'es';
+
+/** Every word the calculator shows, per language. The prices stay in reais in all of them. */
+const COPY = {
+  pt: {
+    week: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+    months: ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
+    weekdays: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
+    date: (wd: string, day: number, month: string) => `${wd}, ${day} ${month.slice(0, 3)}`,
+    title: 'Monte Seu Pacote',
+    intro: <>Uma aula com a Dolly a cada dois dias, e no dia seguinte a região: cachoeira, ilha, trilha, Paraty.
+        Escolha os cursos e a gente monta o tamanho certo da estadia.</>,
+    courses: '1 · Cursos',
+    coursesSoft: '(escolha quantos quiser)',
+    classes: (n: number) => (n > 1 ? 'aulas' : 'aula'),
+    seeCourses: 'Ver o que cada curso ensina →',
+    where: '2 · Onde dormir',
+    upTo: (n: number) => `· até ${n}`,
+    guests: '3 · Pessoas',
+    nights: '4 · Noites',
+    nightsSoft: (k: number, n: number) => `(${k} ${k > 1 ? 'aulas' : 'aula'} → ${n} noites)`,
+    arrival: '5 · Chegada',
+    arrivalSoft: '(toque no dia em que você chega)',
+    prevMonth: 'Mês anterior',
+    nextMonth: 'Próximo mês',
+    taken: 'Ocupado',
+    arriveHere: 'Chegar neste dia',
+    noFit: (n: number) => `Não cabem ${n} noites a partir deste dia`,
+    canArrive: 'dá para chegar',
+    takenLegend: 'ocupado',
+    connected: ' · calendário ligado ao Airbnb da casa',
+    notConnected: ' · a disponibilidade final a gente confirma no WhatsApp',
+    seePlan: (days: number) => `Ver o roteiro dia a dia (${days} dias)`,
+    day: (n: number) => `Dia ${n}`,
+    rainTitle: '☔ Choveu?',
+    rainText: 'A cozinha é coberta: a aula vem para o dia de chuva e o passeio vai para o dia seguinte. Se chover no último passeio:',
+    roomLine: (room: string, n: number) => `${room} (${n} noites)`,
+    toConfirm: 'a confirmar',
+    hospitality: 'Hospitalidade Tropical: café, refeições plant-based e dias na região',
+    people: (g: number) => `${g}p`,
+    nightsShort: (n: number) => `${n}n`,
+    approx: '(aproximado)',
+    deposit: (pct: number) => `Sinal para garantir as datas (${pct}%)`,
+    perPerson: 'por pessoa',
+    rest: 'o restante até 30 dias antes da chegada',
+    bookDates: 'Reservar Estas Datas pelo WhatsApp',
+    confirm: 'Confirmar Pelo WhatsApp',
+    noRate: 'Diária de referência ainda não cadastrada para esta acomodação — confirme o valor exato pelo WhatsApp.',
+    message: (m: { room: string; dates: string | null; nights: number; guests: number; courses: string; total: string; pct: number; deposit: string }) =>
+      `Olá! Quero reservar um Retiro:\n` +
+      `- Suíte: ${m.room}\n` +
+      `- Datas: ${m.dates ?? 'a definir'} (${m.nights} noites)\n` +
+      `- Pessoas: ${m.guests}\n` +
+      `- Cursos: ${m.courses || 'nenhum'}\n` +
+      `- Estimativa: ${m.total} (sinal de ${m.pct}%: ${m.deposit})\n` +
+      `Podem me confirmar?`,
+    dateRange: (a: string, b: string) => `${a} a ${b}`,
+  },
+  en: {
+    week: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+    months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    date: (wd: string, day: number, month: string) => `${wd}, ${month.slice(0, 3)} ${day}`,
+    title: 'Build Your Package',
+    intro: <>A class with Dolly every other day, and the day after, the region: waterfall, island, trail, Paraty.
+        Pick your courses and we’ll work out the right length for your stay.</>,
+    courses: '1 · Courses',
+    coursesSoft: '(pick as many as you like)',
+    classes: (n: number) => (n > 1 ? 'classes' : 'class'),
+    seeCourses: 'See what each course teaches →',
+    where: '2 · Where to stay',
+    upTo: (n: number) => `· up to ${n}`,
+    guests: '3 · Guests',
+    nights: '4 · Nights',
+    nightsSoft: (k: number, n: number) => `(${k} ${k > 1 ? 'classes' : 'class'} → ${n} nights)`,
+    arrival: '5 · Arrival',
+    arrivalSoft: '(tap the day you arrive)',
+    prevMonth: 'Previous month',
+    nextMonth: 'Next month',
+    taken: 'Booked',
+    arriveHere: 'Arrive on this day',
+    noFit: (n: number) => `${n} nights don’t fit from this day`,
+    canArrive: 'you can arrive',
+    takenLegend: 'booked',
+    connected: ' · calendar linked to the house’s Airbnb',
+    notConnected: ' · we confirm final availability on WhatsApp',
+    seePlan: (days: number) => `See the day-by-day plan (${days} days)`,
+    day: (n: number) => `Day ${n}`,
+    rainTitle: '☔ Rain?',
+    rainText: 'The kitchen is covered: the class moves to the rainy day and the outing moves to the next day. If it rains on the last outing:',
+    roomLine: (room: string, n: number) => `${room} (${n} nights)`,
+    toConfirm: 'to be confirmed',
+    hospitality: 'Tropical Hospitality: breakfast, plant-based meals and days out in the region',
+    people: (g: number) => `${g} ${g === 1 ? 'guest' : 'guests'}`,
+    nightsShort: (n: number) => `${n} nights`,
+    approx: '(approximate)',
+    deposit: (pct: number) => `Deposit to hold your dates (${pct}%)`,
+    perPerson: 'per person',
+    rest: 'the rest up to 30 days before you arrive',
+    bookDates: 'Book These Dates on WhatsApp',
+    confirm: 'Confirm on WhatsApp',
+    noRate: 'No reference nightly rate set for this room yet — confirm the exact price on WhatsApp.',
+    message: (m: { room: string; dates: string | null; nights: number; guests: number; courses: string; total: string; pct: number; deposit: string }) =>
+      `Hello! I’d like to book a retreat:\n` +
+      `- Room: ${m.room}\n` +
+      `- Dates: ${m.dates ?? 'to be decided'} (${m.nights} nights)\n` +
+      `- Guests: ${m.guests}\n` +
+      `- Courses: ${m.courses || 'none'}\n` +
+      `- Estimate: ${m.total} (${m.pct}% deposit: ${m.deposit})\n` +
+      `Could you confirm?`,
+    dateRange: (a: string, b: string) => `${a} to ${b}`,
+  },
+  es: {
+    week: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
+    months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+    weekdays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+    date: (wd: string, day: number, month: string) => `${wd}, ${day} ${month.slice(0, 3)}`,
+    title: 'Arma tu Paquete',
+    intro: <>Una clase con Dolly cada dos días, y al día siguiente la región: cascada, isla, sendero, Paraty.
+        Elige los cursos y armamos la estadía del largo justo.</>,
+    courses: '1 · Cursos',
+    coursesSoft: '(elige los que quieras)',
+    classes: (n: number) => (n > 1 ? 'clases' : 'clase'),
+    seeCourses: 'Ver qué enseña cada curso →',
+    where: '2 · Dónde dormir',
+    upTo: (n: number) => `· hasta ${n}`,
+    guests: '3 · Personas',
+    nights: '4 · Noches',
+    nightsSoft: (k: number, n: number) => `(${k} ${k > 1 ? 'clases' : 'clase'} → ${n} noches)`,
+    arrival: '5 · Llegada',
+    arrivalSoft: '(toca el día en que llegas)',
+    prevMonth: 'Mes anterior',
+    nextMonth: 'Mes siguiente',
+    taken: 'Ocupado',
+    arriveHere: 'Llegar este día',
+    noFit: (n: number) => `No caben ${n} noches desde este día`,
+    canArrive: 'puedes llegar',
+    takenLegend: 'ocupado',
+    connected: ' · calendario conectado al Airbnb de la casa',
+    notConnected: ' · la disponibilidad final la confirmamos por WhatsApp',
+    seePlan: (days: number) => `Ver el itinerario día a día (${days} días)`,
+    day: (n: number) => `Día ${n}`,
+    rainTitle: '☔ ¿Llovió?',
+    rainText: 'La cocina es techada: la clase pasa al día de lluvia y el paseo pasa al día siguiente. Si llueve en el último paseo:',
+    roomLine: (room: string, n: number) => `${room} (${n} noches)`,
+    toConfirm: 'por confirmar',
+    hospitality: 'Hospitalidad Tropical: desayuno, comidas plant-based y días en la región',
+    people: (g: number) => `${g} ${g === 1 ? 'persona' : 'personas'}`,
+    nightsShort: (n: number) => `${n} noches`,
+    approx: '(aproximado)',
+    deposit: (pct: number) => `Anticipo para asegurar las fechas (${pct}%)`,
+    perPerson: 'por persona',
+    rest: 'el resto hasta 30 días antes de la llegada',
+    bookDates: 'Reservar Estas Fechas por WhatsApp',
+    confirm: 'Confirmar por WhatsApp',
+    noRate: 'Todavía no hay una tarifa de referencia por noche para este alojamiento — confirma el valor exacto por WhatsApp.',
+    message: (m: { room: string; dates: string | null; nights: number; guests: number; courses: string; total: string; pct: number; deposit: string }) =>
+      `¡Hola! Quiero reservar un retiro:\n` +
+      `- Alojamiento: ${m.room}\n` +
+      `- Fechas: ${m.dates ?? 'por definir'} (${m.nights} noches)\n` +
+      `- Personas: ${m.guests}\n` +
+      `- Cursos: ${m.courses || 'ninguno'}\n` +
+      `- Estimación: ${m.total} (anticipo del ${m.pct}%: ${m.deposit})\n` +
+      `¿Me pueden confirmar?`,
+    dateRange: (a: string, b: string) => `${a} al ${b}`,
+  },
 };
 
 const chipStyle = (on: boolean, disabled = false): React.CSSProperties => ({
@@ -51,11 +212,19 @@ const line: React.CSSProperties = { display: 'flex', justifyContent: 'space-betw
 
 interface Props {
   whatsappNumber: string;
-  /** English/Spanish visitors get an approximate USD/EUR line under the total. */
-  locale?: 'pt' | 'en' | 'es';
+  /** The language of every word (Portuguese by default). English/Spanish visitors also get an approximate USD/EUR line under the total. */
+  locale?: Locale;
 }
 
 export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt' }: Props) {
+  const t = COPY[locale] ?? COPY.pt;
+  const prettyDate = (iso: string) => {
+    const d = new Date(`${iso}T12:00:00Z`);
+    return t.date(t.weekdays[d.getUTCDay()], d.getUTCDate(), t.months[d.getUTCMonth()]);
+  };
+  // The room names come from the database in Portuguese; other languages get their own (unknown rooms keep theirs).
+  const roomName = (r: RetreatRoom) => (locale === 'pt' ? r.name : ROOM_SHORT_NAMES[locale][r.id] ?? r.name);
+  const courseTitle = (c: { slug: string; title: string }) => courseTitleFor(c, locale);
   const [rooms, setRooms] = useState<RetreatRoom[]>(DEFAULT_ROOMS);
   const [roomId, setRoomId] = useState('penthouse');
   const [nights, setNights] = useState(3);
@@ -133,7 +302,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
   const foreignRate = foreignCurrency === 'USD' ? rates.usd : foreignCurrency === 'EUR' ? rates.eur : null;
   const foreignLine = foreignCurrency ? formatForeign(total, foreignRate, foreignCurrency) : '';
   const checkOut = checkIn ? addDays(checkIn, nights) : null;
-  const plan = buildItinerary(pickedSlugs, nights, checkIn ?? undefined);
+  const plan = buildItinerary(pickedSlugs, nights, checkIn ?? undefined, locale);
 
   // The month grid
   const base = new Date(`${todayBR().slice(0, 7)}-01T00:00:00Z`);
@@ -147,50 +316,50 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
   ];
   const inStay = (d: string) => !!checkIn && d >= checkIn && d < (checkOut as string);
 
-  const message = encodeURIComponent(
-    `Olá! Quero reservar um Retiro:\n` +
-    `- Suíte: ${room.name}\n` +
-    `- Datas: ${checkIn ? `${prettyDate(checkIn)} a ${prettyDate(checkOut as string)}` : 'a definir'} (${nights} noites)\n` +
-    `- Pessoas: ${cappedGuests}\n` +
-    `- Cursos: ${pickedCourses.length ? pickedCourses.map(c => c.title).join(', ') : 'nenhum'}\n` +
-    `- Estimativa: ${formatBRL(total)} (sinal de ${depositPct}%: ${formatBRL(deposit)})\n` +
-    `Podem me confirmar?`
-  );
+  const message = encodeURIComponent(t.message({
+    room: roomName(room),
+    dates: checkIn ? t.dateRange(prettyDate(checkIn), prettyDate(checkOut as string)) : null,
+    nights,
+    guests: cappedGuests,
+    courses: pickedCourses.map(courseTitle).join(', '),
+    total: formatBRL(total),
+    pct: depositPct,
+    deposit: formatBRL(deposit),
+  }));
 
   return (
     <div style={{ maxWidth: '680px', margin: '0 auto', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(212,175,55,0.35)', borderRadius: '20px', padding: 'clamp(1.25rem, 4vw, 2.5rem)', backdropFilter: 'blur(6px)' }}>
       <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', color: '#fdfaf3', marginBottom: '0.5rem', textAlign: 'center' }}>
-        Monte Seu Pacote
+        {t.title}
       </h3>
       <p style={{ color: 'rgba(253,250,243,0.7)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '2rem', lineHeight: 1.7 }}>
-        Uma aula com a Dolly a cada dois dias, e no dia seguinte a região: cachoeira, ilha, trilha, Paraty.
-        Escolha os cursos e a gente monta o tamanho certo da estadia.
+        {t.intro}
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem', marginBottom: '1.75rem' }}>
         {courseOptions.length > 0 && (
           <div>
-            <p style={stepLabel}>1 · Cursos <span style={soft}>(escolha quantos quiser)</span></p>
+            <p style={stepLabel}>{t.courses} <span style={soft}>{t.coursesSoft}</span></p>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {courseOptions.map(c => (
                 <button key={c.slug} type="button" aria-pressed={courseSlugs.includes(c.slug)} onClick={() => toggleCourse(c.slug)} style={chipStyle(courseSlugs.includes(c.slug))}>
-                  {courseSlugs.includes(c.slug) ? '✓ ' : '+ '}{c.title}
-                  <span style={{ opacity: 0.65, fontWeight: 500 }}> · {c.retreatClasses} {c.retreatClasses > 1 ? 'aulas' : 'aula'}</span>
+                  {courseSlugs.includes(c.slug) ? '✓ ' : '+ '}{courseTitle(c)}
+                  <span style={{ opacity: 0.65, fontWeight: 500 }}> · {c.retreatClasses} {t.classes(c.retreatClasses)}</span>
                 </button>
               ))}
             </div>
             <a href="/cursos" style={{ display: 'inline-block', marginTop: '0.6rem', fontSize: '0.82rem', color: '#d4af37', textDecoration: 'underline' }}>
-              Ver o que cada curso ensina →
+              {t.seeCourses}
             </a>
           </div>
         )}
 
         <div>
-          <p style={stepLabel}>2 · Onde dormir</p>
+          <p style={stepLabel}>{t.where}</p>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             {rooms.map(r => (
               <button key={r.id} type="button" onClick={() => setRoomId(r.id)} style={chipStyle(roomId === r.id)}>
-                {r.name} <span style={{ opacity: 0.65, fontWeight: 500 }}>· até {r.max_guests}</span>
+                {roomName(r)} <span style={{ opacity: 0.65, fontWeight: 500 }}>{t.upTo(r.max_guests)}</span>
               </button>
             ))}
           </div>
@@ -198,7 +367,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
 
         <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 200px' }}>
-            <p style={stepLabel}>3 · Pessoas</p>
+            <p style={stepLabel}>{t.guests}</p>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {Array.from({ length: room.max_guests }, (_, i) => i + 1).map(g => (
                 <button key={g} type="button" onClick={() => setGuests(g)} style={chipStyle(cappedGuests === g)}>{g}</button>
@@ -206,7 +375,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
             </div>
           </div>
           <div style={{ flex: '1 1 200px' }}>
-            <p style={stepLabel}>4 · Noites {classes > 0 && <span style={soft}>({classes} {classes > 1 ? 'aulas' : 'aula'} → {nightsForClasses(classes)} noites)</span>}</p>
+            <p style={stepLabel}>{t.nights} {classes > 0 && <span style={soft}>{t.nightsSoft(classes, nightsForClasses(classes))}</span>}</p>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {nightOptions.map(n => (
                 <button key={n} type="button" onClick={() => setNights(n)} style={chipStyle(nights === n)}>
@@ -218,15 +387,15 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
         </div>
 
         <div>
-          <p style={stepLabel}>5 · Chegada <span style={soft}>{checkIn ? `${prettyDate(checkIn)} → ${prettyDate(checkOut as string)}` : '(toque no dia em que você chega)'}</span></p>
+          <p style={stepLabel}>{t.arrival} <span style={soft}>{checkIn ? `${prettyDate(checkIn)} → ${prettyDate(checkOut as string)}` : t.arrivalSoft}</span></p>
           <div style={{ background: 'rgba(0,0,0,0.18)', borderRadius: '14px', padding: '0.9rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem', color: '#fdfaf3' }}>
-              <button type="button" aria-label="Mês anterior" disabled={monthOffset === 0} onClick={() => setMonthOffset(m => m - 1)} style={{ ...chipStyle(false, monthOffset === 0), padding: '0.3rem 0.8rem' }}>‹</button>
-              <strong style={{ textTransform: 'capitalize' }}>{MONTHS[month]} {year}</strong>
-              <button type="button" aria-label="Próximo mês" disabled={monthOffset >= 14} onClick={() => setMonthOffset(m => m + 1)} style={{ ...chipStyle(false, monthOffset >= 14), padding: '0.3rem 0.8rem' }}>›</button>
+              <button type="button" aria-label={t.prevMonth} disabled={monthOffset === 0} onClick={() => setMonthOffset(m => m - 1)} style={{ ...chipStyle(false, monthOffset === 0), padding: '0.3rem 0.8rem' }}>‹</button>
+              <strong style={{ textTransform: 'capitalize' }}>{t.months[month]} {year}</strong>
+              <button type="button" aria-label={t.nextMonth} disabled={monthOffset >= 14} onClick={() => setMonthOffset(m => m + 1)} style={{ ...chipStyle(false, monthOffset >= 14), padding: '0.3rem 0.8rem' }}>›</button>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', textAlign: 'center' }}>
-              {WEEK.map((w, i) => <span key={i} style={{ fontSize: '0.7rem', color: 'rgba(253,250,243,0.5)', paddingBottom: '0.2rem' }}>{w}</span>)}
+              {t.week.map((w, i) => <span key={i} style={{ fontSize: '0.7rem', color: 'rgba(253,250,243,0.5)', paddingBottom: '0.2rem' }}>{w}</span>)}
               {cells.map((d, i) => {
                 if (!d) return <span key={i} />;
                 const ok = canArrive(d);
@@ -235,7 +404,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
                 return (
                   <button
                     key={d} type="button" disabled={!ok} onClick={() => setArrival(d)}
-                    title={taken ? 'Ocupado' : ok ? 'Chegar neste dia' : `Não cabem ${nights} noites a partir deste dia`}
+                    title={taken ? t.taken : ok ? t.arriveHere : t.noFit(nights)}
                     style={{
                       aspectRatio: '1', minHeight: '34px', borderRadius: '8px', fontSize: '0.85rem', border: '1px solid',
                       borderColor: picked ? '#d4af37' : 'transparent',
@@ -250,11 +419,9 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
               })}
             </div>
             <p style={{ fontSize: '0.75rem', color: 'rgba(253,250,243,0.55)', marginTop: '0.6rem', lineHeight: 1.5 }}>
-              <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 3, background: 'rgba(46,68,50,0.85)', marginRight: 5 }} />dá para chegar
-              <span style={{ marginLeft: 12, textDecoration: 'line-through' }}>12</span> ocupado
-              {busyData?.connected
-                ? ' · calendário ligado ao Airbnb da casa'
-                : ' · a disponibilidade final a gente confirma no WhatsApp'}
+              <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: 3, background: 'rgba(46,68,50,0.85)', marginRight: 5 }} />{t.canArrive}
+              <span style={{ marginLeft: 12, textDecoration: 'line-through' }}>12</span> {t.takenLegend}
+              {busyData?.connected ? t.connected : t.notConnected}
             </p>
           </div>
         </div>
@@ -263,7 +430,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
       {/* The itinerary, day by day */}
       <div style={{ marginBottom: '1.5rem' }}>
         <button type="button" onClick={() => setShowPlan(s => !s)} style={{ ...chipStyle(showPlan), width: '100%', textAlign: 'left', borderRadius: '12px' }}>
-          {showPlan ? '▾' : '▸'} Ver o roteiro dia a dia ({nights + 1} dias)
+          {showPlan ? '▾' : '▸'} {t.seePlan(nights + 1)}
         </button>
         {showPlan && (
           <div style={{ marginTop: '0.75rem', display: 'grid', gap: '0.5rem' }}>
@@ -272,15 +439,14 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
                 <span style={{ fontSize: '1.3rem', lineHeight: 1 }}>{d.emoji}</span>
                 <div>
                   <div style={{ color: '#fdfaf3', fontWeight: 700, fontSize: '0.9rem' }}>
-                    Dia {d.day}{d.date ? ` · ${prettyDate(d.date)}` : ''} · {d.title}
+                    {t.day(d.day)}{d.date ? ` · ${prettyDate(d.date)}` : ''} · {d.title}
                   </div>
                   <div style={{ color: 'rgba(253,250,243,0.7)', fontSize: '0.82rem', lineHeight: 1.5 }}>{d.text}</div>
                 </div>
               </div>
             ))}
             <div style={{ padding: '0.75rem', borderRadius: '10px', border: '1px dashed rgba(212,175,55,0.5)', color: 'rgba(253,250,243,0.8)', fontSize: '0.82rem', lineHeight: 1.6 }}>
-              <strong style={{ color: '#fdfaf3' }}>☔ Choveu?</strong> A cozinha é coberta: a aula vem para o dia de chuva e o passeio vai para o
-              dia seguinte. Se chover no último passeio: {RAIN_PLAN.join(' · ')}.
+              <strong style={{ color: '#fdfaf3' }}>{t.rainTitle}</strong> {t.rainText} {rainPlanFor(locale).join(' · ')}.
             </div>
           </div>
         )}
@@ -288,16 +454,16 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
 
       <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '14px', padding: '1.5rem', marginBottom: '1.5rem' }}>
         <div style={line}>
-          <span>{room.name} ({nights} noites)</span>
-          <span>{room.airbnb_nightly_rate ? formatBRL(quote.roomSubtotal) : 'a confirmar'}</span>
+          <span>{t.roomLine(roomName(room), nights)}</span>
+          <span>{room.airbnb_nightly_rate ? formatBRL(quote.roomSubtotal) : t.toConfirm}</span>
         </div>
         <div style={line}>
-          <span>Hospitalidade Tropical: café, refeições plant-based e dias na região ({cappedGuests}p × {nights}n × {formatBRL(immersionFee)})</span>
+          <span>{t.hospitality} ({t.people(cappedGuests)} × {t.nightsShort(nights)} × {formatBRL(immersionFee)})</span>
           <span>{formatBRL(quote.immersionSubtotal)}</span>
         </div>
         {pickedCourses.map(c => (
           <div key={c.slug} style={line}>
-            <span>{c.title} ({cappedGuests}p × {formatBRL(coursePrice[c.slug] ?? 0)})</span>
+            <span>{courseTitle(c)} ({t.people(cappedGuests)} × {formatBRL(coursePrice[c.slug] ?? 0)})</span>
             <span>{formatBRL((coursePrice[c.slug] ?? 0) * cappedGuests)}</span>
           </div>
         ))}
@@ -307,15 +473,15 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
         </div>
         {foreignLine && (
           <div style={{ textAlign: 'right', color: 'rgba(253,250,243,0.6)', fontSize: '0.82rem', marginTop: '0.3rem' }}>
-            {foreignLine} <span style={{ opacity: 0.7 }}>(aproximado)</span>
+            {foreignLine} <span style={{ opacity: 0.7 }}>{t.approx}</span>
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d4af37', fontSize: '0.92rem', marginTop: '0.75rem', fontWeight: 700 }}>
-          <span>Sinal para garantir as datas ({depositPct}%)</span>
+          <span>{t.deposit(depositPct)}</span>
           <span>{formatBRL(deposit)}</span>
         </div>
         <div style={{ color: 'rgba(253,250,243,0.55)', fontSize: '0.78rem', marginTop: '0.3rem' }}>
-          {cappedGuests > 0 && <>{formatBRL(total / cappedGuests)} por pessoa · </>}o restante até 30 dias antes da chegada
+          {cappedGuests > 0 && <>{formatBRL(total / cappedGuests)} {t.perPerson} · </>}{t.rest}
         </div>
       </div>
 
@@ -327,12 +493,12 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
         className="btn btn-secondary"
         style={{ width: '100%', textAlign: 'center', display: 'block', padding: '1rem', fontSize: '1.05rem' }}
       >
-        {checkIn ? 'Reservar Estas Datas pelo WhatsApp' : 'Confirmar Pelo WhatsApp'}
+        {checkIn ? t.bookDates : t.confirm}
       </WhatsAppGate>
 
       {room.airbnb_nightly_rate === 0 && (
         <p style={{ fontSize: '0.75rem', color: 'rgba(253,250,243,0.5)', marginTop: '1rem', textAlign: 'center' }}>
-          Diária de referência ainda não cadastrada para esta acomodação — confirme o valor exato pelo WhatsApp.
+          {t.noRate}
         </p>
       )}
     </div>

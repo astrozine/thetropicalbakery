@@ -18,12 +18,181 @@ interface CrmRegistrationModalProps {
   onClose: () => void;
   interestType: 'curso' | 'retiro';
   specificInterest: string;
+  /** The language of the form (Portuguese by default). What gets saved stays the same in every language. */
+  locale?: 'pt' | 'en' | 'es';
 }
 
 /** Below this width the form becomes a full-screen, three-step flow; above it, the two-column card. */
 const NARROW_QUERY = '(max-width: 899px)';
-const STEP_TITLES = ['Seus dados', 'Data e ideia', 'Seus interesses'];
-const LAST_STEP = STEP_TITLES.length - 1;
+const LAST_STEP = 2;
+
+/** The focus areas are saved in Portuguese (the admin reads them); these are only the words shown. */
+const FOCUS_AREAS = {
+  curso: ['Culinária Vegana', 'Culinária Sem Trigo', 'Substituições Saudáveis (SOS-Free)', 'Receitas Práticas', 'Empreendedorismo na Confeitaria'],
+  retiro: ['Yoga & Meditação', 'Confeitaria Saudável', 'Relaxamento & Natureza', 'Transição para o Veganismo'],
+};
+const FOCUS_LABELS: Record<'en' | 'es', Record<string, string>> = {
+  en: {
+    'Culinária Vegana': 'Vegan Cooking',
+    'Culinária Sem Trigo': 'Wheat-Free Cooking',
+    'Substituições Saudáveis (SOS-Free)': 'Healthy Swaps (SOS-Free)',
+    'Receitas Práticas': 'Everyday Recipes',
+    'Empreendedorismo na Confeitaria': 'Starting a Baking Business',
+    'Yoga & Meditação': 'Yoga & Meditation',
+    'Confeitaria Saudável': 'Healthy Baking',
+    'Relaxamento & Natureza': 'Rest & Nature',
+    'Transição para o Veganismo': 'Moving Toward Veganism',
+  },
+  es: {
+    'Culinária Vegana': 'Cocina Vegana',
+    'Culinária Sem Trigo': 'Cocina Sin Trigo',
+    'Substituições Saudáveis (SOS-Free)': 'Sustituciones Saludables (SOS-Free)',
+    'Receitas Práticas': 'Recetas Prácticas',
+    'Empreendedorismo na Confeitaria': 'Emprender en Pastelería',
+    'Yoga & Meditação': 'Yoga y Meditación',
+    'Confeitaria Saudável': 'Pastelería Saludable',
+    'Relaxamento & Natureza': 'Relajación y Naturaleza',
+    'Transição para o Veganismo': 'Transición al Veganismo',
+  },
+};
+
+const COPY = {
+  pt: {
+    steps: ['Seus dados', 'Data e ideia', 'Seus interesses'],
+    optional: '(opcional)',
+    dateMissing: 'Escolha a data que você prefere.',
+    datePast: 'Essa data já passou. Escolha uma data futura.',
+    nameMissing: 'Conte seu nome.',
+    emailMissing: 'Informe seu e-mail.',
+    emailBad: 'Esse e-mail parece incompleto.',
+    phoneMissing: 'Informe seu WhatsApp com DDD.',
+    phoneShort: 'Faltam números: use DDD + número.',
+    groupTooBig: (max: number) => `Cada aula recebe até ${max} pessoas. Para um grupo maior, conte na mensagem.`,
+    sendError: 'Ocorreu um erro ao enviar sua reserva. Tente novamente.',
+    intro: (interest: string) => <>Insira seus dados abaixo. Nossa equipe entrará em contato para confirmar a disponibilidade da data e alinhar os detalhes da sua experiência <b>{interest}</b>.</>,
+    loginToggle: 'Já tenho conta: entrar e preencher sozinho',
+    nameLabel: 'Nome Completo *',
+    namePlaceholder: 'Seu nome',
+    emailLabel: 'E-mail *',
+    emailPlaceholder: 'seu@email.com',
+    phoneLabel: 'WhatsApp (DDD + Número) *',
+    phonePlaceholder: 'Ex: 11999999999',
+    priceNote: (price: number, total: string, guests: number, min: number) =>
+      `R$ ${price} por pessoa: R$ ${total} para ${guests === 1 ? `1 pessoa (aula particular, paga ${min} vagas)` : `${guests} pessoas`}.`,
+    priceRange: (price: number, min: number, max: number) => `R$ ${price} por pessoa. De ${min} a ${max} pessoas; sozinho(a), você paga ${min} vagas.`,
+    dateLabel: 'Data Desejada *',
+    groupLabel: 'Quantas pessoas?',
+    groupPlaceholder: (n: number) => `Ex: ${n}`,
+    messageLabel: 'Conte o que você imagina',
+    messageHint: 'Quanto mais a gente souber, melhor conseguimos preparar a sua experiência.',
+    messageRetreat: 'Ex: um grupo de amigas, 3 noites, queremos yoga de manhã e aula de confeitaria. Alguém é celíaca…',
+    messageCourse: 'Ex: nunca fiz confeitaria vegana, quero aprender receitas sem trigo para a minha família…',
+    focusTitle: 'Áreas de Foco (Opcional)',
+    focusIntro: 'Selecione os temas que você tem mais interesse para que possamos personalizar sua experiência.',
+    privacy: 'Suas informações estão seguras conosco e serão usadas apenas para organizar seu evento.',
+    close: 'Fechar',
+    eyebrow: 'RESERVA EXCLUSIVA',
+    titleCourse: 'Agendar Curso',
+    titleRetreat: 'Agendar Retiro',
+    stepOf: (n: number, total: number) => `Passo ${n} de ${total}`,
+    successTitle: 'Reserva Recebida!',
+    successText: 'Você receberá uma mensagem no WhatsApp com os detalhes da sua reserva.',
+    back: '← Voltar',
+    sending: 'Processando...',
+    next: 'Continuar →',
+    submit: 'Fazer Reserva',
+  },
+  en: {
+    steps: ['Your details', 'Date and idea', 'Your interests'],
+    optional: '(optional)',
+    dateMissing: 'Pick the date you’d like.',
+    datePast: 'That date has passed. Please pick a future date.',
+    nameMissing: 'Tell us your name.',
+    emailMissing: 'Enter your e-mail.',
+    emailBad: 'That e-mail looks incomplete.',
+    phoneMissing: 'Enter your WhatsApp number, with country and area code.',
+    phoneShort: 'Some digits are missing: include the country and area code.',
+    groupTooBig: (max: number) => `Each class takes up to ${max} people. For a bigger group, tell us in the message.`,
+    sendError: 'Something went wrong sending your request. Please try again.',
+    intro: (interest: string) => <>Leave your details below. Our team will get in touch to confirm the date is available and go over the details of your experience: <b>{interest}</b>.</>,
+    loginToggle: 'I have an account: sign in and fill this in for me',
+    nameLabel: 'Full Name *',
+    namePlaceholder: 'Your name',
+    emailLabel: 'E-mail *',
+    emailPlaceholder: 'you@email.com',
+    phoneLabel: 'WhatsApp (country code + number) *',
+    phonePlaceholder: 'e.g. +44 7700 900123',
+    priceNote: (price: number, total: string, guests: number, min: number) =>
+      `R$ ${price} per person: R$ ${total} for ${guests === 1 ? `1 person (a private class, paid as ${min} places)` : `${guests} people`}.`,
+    priceRange: (price: number, min: number, max: number) => `R$ ${price} per person. From ${min} to ${max} people; on your own, you pay for ${min} places.`,
+    dateLabel: 'Preferred Date *',
+    groupLabel: 'How many people?',
+    groupPlaceholder: (n: number) => `e.g. ${n}`,
+    messageLabel: 'Tell us what you have in mind',
+    messageHint: 'The more we know, the better we can prepare your experience.',
+    messageRetreat: 'e.g. a group of friends, 3 nights, we’d like yoga in the morning and a baking class. One of us is celiac…',
+    messageCourse: 'e.g. I’ve never done vegan baking, and I want to learn wheat-free recipes for my family…',
+    focusTitle: 'Areas of Focus (Optional)',
+    focusIntro: 'Choose the topics that interest you most, so we can shape your experience around them.',
+    privacy: 'Your information is safe with us and will only be used to organize your experience.',
+    close: 'Close',
+    eyebrow: 'EXCLUSIVE BOOKING',
+    titleCourse: 'Book a Course',
+    titleRetreat: 'Book a Retreat',
+    stepOf: (n: number, total: number) => `Step ${n} of ${total}`,
+    successTitle: 'Request Received!',
+    successText: 'You’ll get a WhatsApp message with the details of your booking.',
+    back: '← Back',
+    sending: 'Sending...',
+    next: 'Continue →',
+    submit: 'Send Request',
+  },
+  es: {
+    steps: ['Tus datos', 'Fecha e idea', 'Tus intereses'],
+    optional: '(opcional)',
+    dateMissing: 'Elige la fecha que prefieres.',
+    datePast: 'Esa fecha ya pasó. Elige una fecha futura.',
+    nameMissing: 'Dinos tu nombre.',
+    emailMissing: 'Escribe tu e-mail.',
+    emailBad: 'Ese e-mail parece incompleto.',
+    phoneMissing: 'Escribe tu WhatsApp con código de país y de área.',
+    phoneShort: 'Faltan números: incluye el código de país y de área.',
+    groupTooBig: (max: number) => `Cada clase recibe hasta ${max} personas. Para un grupo más grande, cuéntanos en el mensaje.`,
+    sendError: 'Hubo un error al enviar tu reserva. Inténtalo de nuevo.',
+    intro: (interest: string) => <>Escribe tus datos abajo. Nuestro equipo se pondrá en contacto para confirmar la disponibilidad de la fecha y coordinar los detalles de tu experiencia: <b>{interest}</b>.</>,
+    loginToggle: 'Ya tengo cuenta: entrar y completar automáticamente',
+    nameLabel: 'Nombre Completo *',
+    namePlaceholder: 'Tu nombre',
+    emailLabel: 'E-mail *',
+    emailPlaceholder: 'tu@email.com',
+    phoneLabel: 'WhatsApp (código de país + número) *',
+    phonePlaceholder: 'Ej: +54 9 11 1234 5678',
+    priceNote: (price: number, total: string, guests: number, min: number) =>
+      `R$ ${price} por persona: R$ ${total} para ${guests === 1 ? `1 persona (clase particular, paga ${min} lugares)` : `${guests} personas`}.`,
+    priceRange: (price: number, min: number, max: number) => `R$ ${price} por persona. De ${min} a ${max} personas; si vienes solo(a), pagas ${min} lugares.`,
+    dateLabel: 'Fecha Deseada *',
+    groupLabel: '¿Cuántas personas?',
+    groupPlaceholder: (n: number) => `Ej: ${n}`,
+    messageLabel: 'Cuéntanos qué te imaginas',
+    messageHint: 'Mientras más sepamos, mejor podremos preparar tu experiencia.',
+    messageRetreat: 'Ej: un grupo de amigas, 3 noches, queremos yoga en la mañana y una clase de pastelería. Una es celíaca…',
+    messageCourse: 'Ej: nunca hice pastelería vegana, quiero aprender recetas sin trigo para mi familia…',
+    focusTitle: 'Áreas de Enfoque (Opcional)',
+    focusIntro: 'Selecciona los temas que más te interesan para que podamos personalizar tu experiencia.',
+    privacy: 'Tu información está segura con nosotros y solo se usará para organizar tu experiencia.',
+    close: 'Cerrar',
+    eyebrow: 'RESERVA EXCLUSIVA',
+    titleCourse: 'Agendar Curso',
+    titleRetreat: 'Agendar Retiro',
+    stepOf: (n: number, total: number) => `Paso ${n} de ${total}`,
+    successTitle: '¡Reserva Recibida!',
+    successText: 'Recibirás un mensaje por WhatsApp con los detalles de tu reserva.',
+    back: '← Volver',
+    sending: 'Procesando...',
+    next: 'Continuar →',
+    submit: 'Hacer Reserva',
+  },
+};
 
 type Errors = Partial<Record<'name' | 'email' | 'whatsapp' | 'date' | 'group', string>>;
 
@@ -34,13 +203,13 @@ const inputStyle: React.CSSProperties = {
 const invalidBorder = '1px solid #c0392b';
 
 /** Label + control + hint/error. A plain function (not a component defined inside the modal) so inputs keep focus while typing. */
-function Field({ id, label, optional, hint, error, children }: {
-  id: string; label: string; optional?: boolean; hint?: string; error?: string; children: React.ReactNode;
+function Field({ id, label, optional, optionalText = '(opcional)', hint, error, children }: {
+  id: string; label: string; optional?: boolean; optionalText?: string; hint?: string; error?: string; children: React.ReactNode;
 }) {
   return (
     <div>
       <label htmlFor={id} style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: '#594a42', marginBottom: '0.4rem' }}>
-        {label}{optional && <span style={{ fontWeight: 400, color: '#7a6a61' }}> (opcional)</span>}
+        {label}{optional && <span style={{ fontWeight: 400, color: '#7a6a61' }}> {optionalText}</span>}
       </label>
       {children}
       {error ? (
@@ -52,7 +221,9 @@ function Field({ id, label, optional, hint, error, children }: {
   );
 }
 
-export default function CrmRegistrationModal({ isOpen, onClose, interestType, specificInterest }: CrmRegistrationModalProps) {
+export default function CrmRegistrationModal({ isOpen, onClose, interestType, specificInterest, locale = 'pt' }: CrmRegistrationModalProps) {
+  const t = COPY[locale] ?? COPY.pt;
+  const focusLabel = (area: string) => (locale === 'pt' ? area : FOCUS_LABELS[locale]?.[area] ?? area);
   const { user, profile, availableMethods } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -75,9 +246,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
-  const availableFocusAreas = interestType === 'curso'
-    ? ['Culinária Vegana', 'Culinária Sem Trigo', 'Substituições Saudáveis (SOS-Free)', 'Receitas Práticas', 'Empreendedorismo na Confeitaria']
-    : ['Yoga & Meditação', 'Confeitaria Saudável', 'Relaxamento & Natureza', 'Transição para o Veganismo'];
+  const availableFocusAreas = interestType === 'curso' ? FOCUS_AREAS.curso : FOCUS_AREAS.retiro;
 
   useEffect(() => {
     if (profile) {
@@ -145,26 +314,26 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
 
   /** Why the chosen date can't be used ('' = fine). Workshops also respect the break in lib/workshopDates.ts. */
   const dateProblem = (value: string): string => {
-    if (!value) return 'Escolha a data que você prefere.';
+    if (!value) return t.dateMissing;
     if (interestType === 'curso') return workshopDateError(value);
-    return value < todayIso() ? 'Essa data já passou. Escolha uma data futura.' : '';
+    return value < todayIso() ? t.datePast : '';
   };
 
   /** Which fields on a step are missing or wrong. Steps: 0 = you, 1 = the day and idea, 2 = nothing required. */
   const validateStep = (s: number): Errors => {
     const e: Errors = {};
     if (s === 0) {
-      if (!name.trim()) e.name = 'Conte seu nome.';
-      if (!email.trim()) e.email = 'Informe seu e-mail.';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = 'Esse e-mail parece incompleto.';
-      if (!whatsapp.trim()) e.whatsapp = 'Informe seu WhatsApp com DDD.';
-      else if (whatsapp.replace(/\D/g, '').length < 10) e.whatsapp = 'Faltam números: use DDD + número.';
+      if (!name.trim()) e.name = t.nameMissing;
+      if (!email.trim()) e.email = t.emailMissing;
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = t.emailBad;
+      if (!whatsapp.trim()) e.whatsapp = t.phoneMissing;
+      else if (whatsapp.replace(/\D/g, '').length < 10) e.whatsapp = t.phoneShort;
     }
     if (s === 1) {
       const dateError = dateProblem(dateStr);
       if (dateError) e.date = dateError;
       if (interestType === 'curso' && groupSize && (Number(groupSize) < 1 || Number(groupSize) > WORKSHOP_MAX_GUESTS)) {
-        e.group = `Cada aula recebe até ${WORKSHOP_MAX_GUESTS} pessoas. Para um grupo maior, conte na mensagem.`;
+        e.group = t.groupTooBig(WORKSHOP_MAX_GUESTS);
       }
     }
     return e;
@@ -254,7 +423,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
 
     } catch (err: any) {
       console.error(err);
-      setErrorMsg('Ocorreu um erro ao enviar sua reserva. Tente novamente.');
+      setErrorMsg(t.sendError);
       setStatus('error');
     }
   };
@@ -263,9 +432,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
 
   const canLogin = !user && availableMethods.length > 0;
 
-  const introText = (
-    <>Insira seus dados abaixo. Nossa equipe entrará em contato para confirmar a disponibilidade da data e alinhar os detalhes da sua experiência <b>{specificInterest}</b>.</>
-  );
+  const introText = t.intro(specificInterest);
 
   const loginBlock = narrow ? (
     // Signing in only saves typing, so on a phone it folds away until asked for.
@@ -278,19 +445,19 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
           aria-controls="crm-login-panel"
           onClick={() => setLoginOpen(o => !o)}
         >
-          <span>Já tenho conta: entrar e preencher sozinho</span>
+          <span>{t.loginToggle}</span>
           <span aria-hidden style={{ transition: 'transform 0.2s', transform: loginOpen ? 'rotate(180deg)' : 'none' }}>▾</span>
         </button>
-        {loginOpen && <div id="crm-login-panel" style={{ marginTop: '0.75rem' }}><LoginPanel /></div>}
+        {loginOpen && <div id="crm-login-panel" style={{ marginTop: '0.75rem' }}><LoginPanel locale={locale} /></div>}
       </div>
     )
   ) : (
-    <LoginPanel />
+    <LoginPanel locale={locale} />
   );
 
   const personFields = (
     <>
-      <Field id="crm-name" label="Nome Completo *" error={errors.name}>
+      <Field id="crm-name" label={t.nameLabel} error={errors.name}>
         <input
           id="crm-name"
           type="text"
@@ -301,11 +468,11 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
           aria-describedby={errors.name ? 'crm-name-error' : undefined}
           value={name}
           onChange={e => { setName(e.target.value); clearError('name'); }}
-          placeholder="Seu nome"
+          placeholder={t.namePlaceholder}
           style={{ ...inputStyle, ...(errors.name ? { border: invalidBorder } : {}) }}
         />
       </Field>
-      <Field id="crm-email" label="E-mail *" error={errors.email}>
+      <Field id="crm-email" label={t.emailLabel} error={errors.email}>
         <input
           id="crm-email"
           type="email"
@@ -317,11 +484,11 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
           aria-describedby={errors.email ? 'crm-email-error' : undefined}
           value={email}
           onChange={e => { setEmail(e.target.value); clearError('email'); }}
-          placeholder="seu@email.com"
+          placeholder={t.emailPlaceholder}
           style={{ ...inputStyle, ...(errors.email ? { border: invalidBorder } : {}) }}
         />
       </Field>
-      <Field id="crm-whatsapp" label="WhatsApp (DDD + Número) *" error={errors.whatsapp}>
+      <Field id="crm-whatsapp" label={t.phoneLabel} error={errors.whatsapp}>
         <input
           id="crm-whatsapp"
           type="tel"
@@ -333,7 +500,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
           aria-describedby={errors.whatsapp ? 'crm-whatsapp-error' : undefined}
           value={whatsapp}
           onChange={e => { setWhatsapp(e.target.value); clearError('whatsapp'); }}
-          placeholder="Ex: 11999999999"
+          placeholder={t.phonePlaceholder}
           style={{ ...inputStyle, ...(errors.whatsapp ? { border: invalidBorder } : {}) }}
         />
       </Field>
@@ -347,12 +514,12 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
   const guests = Number(groupSize);
   const groupNote = !isCourse ? ''
     : guests >= 1 && guests <= WORKSHOP_MAX_GUESTS
-      ? `R$ ${WORKSHOP_PRICE_BRL} por pessoa: R$ ${workshopTotalBRL(guests).toLocaleString('pt-BR')} para ${guests === 1 ? `1 pessoa (aula particular, paga ${WORKSHOP_MIN_GUESTS} vagas)` : `${guests} pessoas`}.`
-      : `R$ ${WORKSHOP_PRICE_BRL} por pessoa. De ${WORKSHOP_MIN_GUESTS} a ${WORKSHOP_MAX_GUESTS} pessoas; sozinho(a), você paga ${WORKSHOP_MIN_GUESTS} vagas.`;
+      ? t.priceNote(WORKSHOP_PRICE_BRL, workshopTotalBRL(guests).toLocaleString('pt-BR'), guests, WORKSHOP_MIN_GUESTS)
+      : t.priceRange(WORKSHOP_PRICE_BRL, WORKSHOP_MIN_GUESTS, WORKSHOP_MAX_GUESTS);
 
   const detailFields = (
     <>
-      <Field id="crm-date" label="Data Desejada *" hint={dateNote || undefined} error={errors.date}>
+      <Field id="crm-date" label={t.dateLabel} hint={dateNote || undefined} error={errors.date}>
         <input
           id="crm-date"
           type="date"
@@ -371,7 +538,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
           style={{ ...inputStyle, ...(errors.date ? { border: invalidBorder } : {}) }}
         />
       </Field>
-      <Field id="crm-group" label="Quantas pessoas?" optional={!isCourse} hint={groupNote || undefined} error={errors.group}>
+      <Field id="crm-group" label={t.groupLabel} optional={!isCourse} optionalText={t.optional} hint={groupNote || undefined} error={errors.group}>
         <input
           id="crm-group"
           type="number"
@@ -383,15 +550,16 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
           aria-describedby={errors.group ? 'crm-group-error' : undefined}
           value={groupSize}
           onChange={e => { setGroupSize(e.target.value); clearError('group'); }}
-          placeholder={interestType === 'retiro' ? 'Ex: 8' : 'Ex: 2'}
+          placeholder={t.groupPlaceholder(interestType === 'retiro' ? 8 : 2)}
           style={inputStyle}
         />
       </Field>
       <Field
         id="crm-message"
-        label="Conte o que você imagina"
+        label={t.messageLabel}
         optional
-        hint="Quanto mais a gente souber, melhor conseguimos preparar a sua experiência."
+        optionalText={t.optional}
+        hint={t.messageHint}
       >
         <textarea
           id="crm-message"
@@ -399,9 +567,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
           maxLength={1500}
           value={message}
           onChange={e => setMessage(e.target.value)}
-          placeholder={interestType === 'retiro'
-            ? 'Ex: um grupo de amigas, 3 noites, queremos yoga de manhã e aula de confeitaria. Alguém é celíaca…'
-            : 'Ex: nunca fiz confeitaria vegana, quero aprender receitas sem trigo para a minha família…'}
+          placeholder={interestType === 'retiro' ? t.messageRetreat : t.messageCourse}
           style={{ ...inputStyle, resize: 'vertical' }}
         />
       </Field>
@@ -411,10 +577,10 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
   const focusBlock = (
     <div className="crm-focus">
       <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 600, color: '#3c2a21', marginBottom: '0.75rem' }}>
-        Áreas de Foco (Opcional)
+        {t.focusTitle}
       </span>
       <p style={{ fontSize: '0.85rem', color: '#7a6a61', marginBottom: '1rem' }}>
-        Selecione os temas que você tem mais interesse para que possamos personalizar sua experiência.
+        {t.focusIntro}
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
         {availableFocusAreas.map(area => {
@@ -437,7 +603,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
               }}
             >
               {on && <span aria-hidden style={{ color: '#a8861f', fontWeight: 700 }}>✓</span>}
-              {area}
+              {focusLabel(area)}
             </button>
           );
         })}
@@ -447,7 +613,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
 
   const privacyNote = (
     <p style={{ fontSize: '0.8rem', color: '#7a6a61', textAlign: 'center' }}>
-      Suas informações estão seguras conosco e serão usadas apenas para organizar seu evento.
+      {t.privacy}
     </p>
   );
 
@@ -527,22 +693,22 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
             exit={narrow ? { y: 40 } : { scale: 0.9, y: 20 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button type="button" className="crm-close" onClick={onClose} aria-label="Fechar">
+            <button type="button" className="crm-close" onClick={onClose} aria-label={t.close}>
               ✕
             </button>
 
             <div className="crm-head">
-              <span className="crm-eyebrow">RESERVA EXCLUSIVA</span>
+              <span className="crm-eyebrow">{t.eyebrow}</span>
               <h2 id="crm-title" className="crm-title">
-                {interestType === 'curso' ? 'Agendar Curso' : 'Agendar Retiro'}
+                {interestType === 'curso' ? t.titleCourse : t.titleRetreat}
               </h2>
               {!narrow && <p className="crm-intro">{introText}</p>}
               {narrow && status !== 'success' && (
                 <div className="crm-progress" aria-live="polite">
                   <div className="crm-bars" aria-hidden>
-                    {STEP_TITLES.map((t, i) => <span key={t} className={i <= step ? 'on' : ''} />)}
+                    {t.steps.map((title, i) => <span key={title} className={i <= step ? 'on' : ''} />)}
                   </div>
-                  <span className="crm-step-label">Passo {step + 1} de {STEP_TITLES.length}</span>
+                  <span className="crm-step-label">{t.stepOf(step + 1, t.steps.length)}</span>
                 </div>
               )}
             </div>
@@ -550,9 +716,9 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
             {status === 'success' ? (
               <div className="crm-body" style={{ textAlign: 'center', padding: narrow ? '2rem 1rem' : '2rem 0', justifyContent: 'center' }}>
                 <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>✨</div>
-                <h3 style={{ color: '#3c2a21', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>Reserva Recebida!</h3>
-                <p style={{ color: '#594a42' }}>Você receberá uma mensagem no WhatsApp com os detalhes da sua reserva.</p>
-                <SunbakedLettersNote />
+                <h3 style={{ color: '#3c2a21', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>{t.successTitle}</h3>
+                <p style={{ color: '#594a42' }}>{t.successText}</p>
+                <SunbakedLettersNote locale={locale} />
               </div>
             ) : (
               <form ref={formRef} className="crm-form" onSubmit={handleSubmit} noValidate>
@@ -565,7 +731,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
 
                   {narrow ? (
                     <>
-                      <h3 ref={stepHeadingRef} tabIndex={-1} className="crm-step-title">{STEP_TITLES[step]}</h3>
+                      <h3 ref={stepHeadingRef} tabIndex={-1} className="crm-step-title">{t.steps[step]}</h3>
                       {stepBody[step]}
                     </>
                   ) : (
@@ -585,7 +751,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                 <div className="crm-foot">
                   {narrow && step > 0 && (
                     <button type="button" className="crm-back" onClick={() => setStep(step - 1)}>
-                      ← Voltar
+                      {t.back}
                     </button>
                   )}
                   <button
@@ -595,8 +761,8 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                     style={{ opacity: status === 'submitting' ? 0.7 : 1 }}
                   >
                     {status === 'submitting'
-                      ? 'Processando...'
-                      : narrow && step < LAST_STEP ? 'Continuar →' : 'Fazer Reserva'}
+                      ? t.sending
+                      : narrow && step < LAST_STEP ? t.next : t.submit}
                   </button>
                   {!narrow && privacyNote}
                 </div>
