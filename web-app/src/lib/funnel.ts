@@ -49,11 +49,14 @@ export const INTERESTS: { id: Interest; emoji: string; path: string; img: string
 
 /** The e-mail sequence after the sign-up (automation 'receitas-sequencia'): day after sign-up → campaign. */
 export const SEQUENCE = [
-  { day: 1, campaignId: 'receitas-d1', sells: false, nearbyOnly: false },
-  { day: 3, campaignId: 'receitas-d3', sells: true, nearbyOnly: false },
-  { day: 5, campaignId: 'receitas-d5', sells: true, nearbyOnly: false },
-  { day: 7, campaignId: 'receitas-d7', sells: true, nearbyOnly: false },
-  { day: 9, campaignId: 'receitas-local', sells: false, nearbyOnly: true },
+  { day: 1, campaignId: 'receitas-d1', sells: false, nearbyOnly: false, farOnly: false },
+  { day: 3, campaignId: 'receitas-d3', sells: true, nearbyOnly: false, farOnly: false },
+  { day: 5, campaignId: 'receitas-d5', sells: true, nearbyOnly: false, farOnly: false },
+  { day: 7, campaignId: 'receitas-d7', sells: true, nearbyOnly: false, farOnly: false },
+  // Day 9 invites everyone to cook with Dolly: people near Ubatuba/Paraty get the local version, everyone else
+  // the "when you come to Ubatuba" one (Andrew, Nov 2026: the free recipes should lead to classes, retreats, coaching).
+  { day: 9, campaignId: 'receitas-local', sells: false, nearbyOnly: true, farOnly: false },
+  { day: 9, campaignId: 'receitas-visita', sells: false, nearbyOnly: false, farOnly: true },
 ] as const;
 /** How long the welcome price in the day-5 e-mail stays open, in days after that e-mail. */
 export const WELCOME_DAYS = 2;
