@@ -7,8 +7,9 @@ import RainbowJourney from './RainbowJourney';
 import EbookBuyBox from './EbookBuyBox';
 import AmazonEditions, { AmazonBadge, PdfPerks } from './AmazonEditions';
 import { EditionNotice, EnglishNotice, LangBar, rich, useGoogleTranslated } from './EbookLang';
+import HandWrittenLang from '@/components/HandWrittenLang';
 import { EBOOK, RECIPES, TOTAL_TREATS, stripeMoney } from '@/lib/ebook';
-import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
+import { EBOOK_COPY, LANG_PATH, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import { useBookWallet } from './BookPay';
 import './sweetEscape.css';
@@ -53,6 +54,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
 
   return (
     <div className="se" lang={lang}>
+      <HandWrittenLang lang={lang} paths={LANG_PATH} />
       <LangBar lang={lang} />
 
       {/* ══ HERO: the floating-photo style from /retreats, with the book itself in the middle ══ */}
