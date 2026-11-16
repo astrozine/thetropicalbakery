@@ -1310,30 +1310,10 @@ body {
 
 
 
-/* Delivery-area notice: a bar on desktop, a quick toast on phones that fades
-   away on its own so it never pushes the page down. */
-@keyframes announce-toast {
-  0%   { opacity: 0; transform: translate(-50%, -12px); }
-  8%   { opacity: 1; transform: translate(-50%, 0); }
-  85%  { opacity: 1; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, -12px); visibility: hidden; }
-}
+/* Delivery-area notice: a bar on desktop only. On phones it used to pop up as a
+   toast over the logo; Andrew found it in the way (2026-11-16), so phones skip it. */
 @media (max-width: 767px) {
-  .announce-bar {
-    position: fixed !important;
-    top: 0.75rem;
-    left: 50%;
-    width: min(92vw, 380px) !important;
-    z-index: 2000 !important;
-    border-radius: 16px;
-    box-shadow: 0 10px 28px rgba(60, 42, 33, 0.35);
-    pointer-events: none;
-    opacity: 0;
-    animation: announce-toast 6s ease-in-out 0.8s forwards;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .announce-bar { animation-duration: 6s; }
+  .announce-bar { display: none !important; }
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
