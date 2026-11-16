@@ -21,6 +21,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Google Search Console proves the site is ours with this code (public, set in Vercel). Not set = no tag.
+const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+
 export const metadata: Metadata = {
   title: "The Tropical Bakery",
   description: "Experience the ultimate in healthy, tropical indulgence. Vegan, wheat-free surprise treat boxes, handmade in Itamambuca.",
@@ -41,6 +44,7 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     type: "website",
   },
+  ...(googleSiteVerification ? { verification: { google: googleSiteVerification } } : {}),
 };
 
 export default function RootLayout({

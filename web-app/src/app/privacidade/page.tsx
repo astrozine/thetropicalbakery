@@ -78,6 +78,7 @@ export default function PrivacyPolicyPage() {
             <li style={liStyle}><strong>Google e Facebook</strong> — apenas se você optar por entrar com essas contas</li>
             <li style={liStyle}><strong>WhatsApp/Twilio</strong> — para enviar confirmações e notificações sobre seu pedido</li>
             <li style={liStyle}><strong>Meta (Facebook e Instagram)</strong> — somente se você aceitar os cookies no aviso do site, usamos o Pixel da Meta para medir visitas e mostrar nossos anúncios a quem pode se interessar</li>
+            <li style={liStyle}><strong>Google (Analytics e Ads)</strong> — somente se você aceitar os cookies no aviso do site, para contar as visitas e saber quais anúncios trazem as pessoas até aqui</li>
             <li style={liStyle}><strong>Google Translate</strong> — para traduzir o conteúdo do site para visitantes de outros idiomas</li>
             <li style={liStyle}><strong>ViaCEP</strong> — quando você digita seu CEP, consultamos a base pública dos Correios para preencher rua, bairro e cidade automaticamente. Enviamos apenas o CEP, nunca seu nome ou endereço completo</li>
           </ul>
@@ -96,6 +97,11 @@ export default function PrivacyPolicyPage() {
             Facebook e no Instagram. Se clicar em &ldquo;Recusar&rdquo;, ou não responder, o Pixel não é carregado e nada
             é enviado à Meta. Você pode mudar de ideia limpando os dados do site no seu navegador, e o aviso
             aparecerá de novo.
+          </p>
+          <p style={pStyle}>
+            Com o mesmo &ldquo;Aceitar&rdquo;, também carregamos o Google Analytics e a tag do Google Ads, que usam
+            cookies para contar as visitas ao site e saber quais anúncios trazem as pessoas até aqui. Se você
+            clicar em &ldquo;Recusar&rdquo;, ou não responder, nada disso é carregado e nada é enviado ao Google.
           </p>
         </section>
 

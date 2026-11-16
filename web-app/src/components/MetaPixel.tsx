@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { loadGoogleTag, trackGoogle } from '@/lib/googleTag';
 import { Consent, CONSENT_KEY as STORAGE_KEY, isTrackedPath, loadPixel, readConsent } from '@/lib/metaPixel';
 
 /**
- * LGPD: the Meta pixel is only loaded after the visitor taps "Aceitar".
- * "Recusar" (or no answer) means nothing is sent to Meta. The choice is kept in localStorage.
+ * LGPD: the Meta pixel and the Google tag (Analytics / Ads) are only loaded after the visitor taps "Aceitar".
+ * "Recusar" (or no answer) means nothing is sent to Meta or Google. One banner, one choice, kept in localStorage.
  */
 export default function MetaPixel() {
   const pathname = usePathname();
@@ -29,6 +30,9 @@ export default function MetaPixel() {
     if (consent !== 'accepted' || !tracked) return;
     loadPixel();
     window.fbq?.('track', 'PageView');
+    // Same consent, same moment: runs on the tap of "Aceitar" and again on every route change.
+    loadGoogleTag();
+    trackGoogle('page_view', { page_location: window.location.href, page_path: pathname });
   }, [consent, tracked, pathname]);
 
   function choose(value: 'accepted' | 'declined') {
@@ -66,7 +70,7 @@ export default function MetaPixel() {
     >
       <p style={{ margin: 0 }}>
         🌴 Sejamos sinceros: o algoritmo não está fazendo favor a ninguém. Pra uma cozinha pequena como a da Chef
-        Dolly, chegar até a comunidade vegana nas redes está cada vez mais difícil. Aceitar os cookies da Meta é um
+        Dolly, chegar até a comunidade vegana nas redes está cada vez mais difícil. Aceitar os cookies da Meta e do Google é um
         empurrãozinho contra o algoritmo: a gente aparece pra quem vai amar, e você vê menos anúncio aleatório.
         Só ativamos se você aceitar.{' '}
         <Link href="/privacidade" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>

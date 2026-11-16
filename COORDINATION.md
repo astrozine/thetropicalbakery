@@ -207,6 +207,12 @@ Verified live, 2026-09-26:
   full to members, outline + first phase to everyone else. Never import vontadePlans from client code. G-BOMBS day tracker on the
   phone (localStorage), crossed with the cravings log.
 
+- **Google tag (written 2026-11-16, ids NOT set yet).** `src/lib/googleTag.ts` loads gtag.js for Google Analytics
+  (`NEXT_PUBLIC_GA_ID`) and Google Ads (`NEXT_PUBLIC_GOOGLE_ADS_ID`); with neither set in Vercel nothing loads. It shares the
+  Meta pixel's banner and consent (`MetaPixel.tsx`, `readConsent()`): one banner, one choice, never a second one. Pages keep
+  calling only `trackMeta()`, which also sends the matching Google event (`toGoogle()` in `metaPixel.ts`).
+  `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` adds the Search Console tag in `layout.tsx`.
+
 Not built yet (ask Andrew before starting): the cookie
 consent banner and privacy-policy update that must come **before** installing any ad pixel (LGPD); the Google / Meta pixel itself.
 
