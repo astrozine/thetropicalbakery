@@ -350,6 +350,7 @@ export async function planFor(db: SupabaseClient, def: AutomationDef, row: Autom
           const age = daysBetween(brasiliaDay(l.created_at), today);
           if (age < step.day || age > step.day + 1) return false;
           if (step.nearbyOnly && !isNearby(l.segment)) return false;
+          if (step.farOnly && isNearby(l.segment)) return false;
           return !(step.sells && buyers.has(l.email.toLowerCase()));
         });
         for (const lang of ['pt', 'en'] as const) {

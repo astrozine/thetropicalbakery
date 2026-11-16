@@ -174,40 +174,73 @@ export const FUNNEL_CAMPAIGNS: Campaign[] = [
   {
     ...base,
     id: 'receitas-local',
-    name: 'Receitas grátis · dia 9: prove os de verdade (região)',
+    name: 'Receitas grátis · dia 9: venha cozinhar comigo (região)',
     emoji: '🌴',
-    description: 'Só para quem mora ou vai visitar Ubatuba / Paraty: a caixa, a assinatura, o brunch, os cursos e o Menu de Eventos.',
-    subject: v => (isPt(v) ? 'Você está pertinho: quer provar os meus?' : 'You’re close by: want to taste mine?'),
+    description: 'Só para quem mora ou está em Ubatuba / Paraty: a aula de doces, o Menu de Eventos e o coaching.',
+    subject: v => (isPt(v) ? 'Você está pertinho: vem cozinhar comigo?' : 'You’re close by: come and cook with me?'),
     messageKey: () => 'receitas-local',
     build: v => isPt(v)
       ? {
-          preheader: 'Caixa da semana, brunch, cursos e doces para eventos, aqui em Ubatuba.',
-          heading: 'Prove feitos por mim',
+          preheader: 'Uma tarde de doces na minha cozinha em Itamambuca, doces para a sua festa e uma conversa grátis.',
+          heading: 'Venha cozinhar comigo',
           body:
-            paragraphs('Você me contou que está por aqui, em Ubatuba ou Paraty. Então, além das receitas, eu posso levar os doces até você:') +
+            paragraphs('Você me contou que está por aqui, em Ubatuba ou Paraty. Então, além das receitas, tem mais jeitos de a gente se ver:') +
             bulletList([
-              'Caixa de Degustação: os doces da semana, numa caixa kraft, entregue em Ubatuba e região.',
-              'Assinatura: a caixa toda semana, com os seus favoritos escolhidos por você.',
-              'Brunch Tropical: chá, doces e conversa de verdade, em grupo pequeno.',
-              'Cursos: aprenda estes e muitos outros na minha mesa.',
-              'Menu de Eventos: bliss balls e barrinhas por bandeja para a sua festa.',
+              'Aula de doces na minha cozinha em Itamambuca: todo dia às 14h, três horas. Você faz, prova e leva as receitas.',
+              'Menu de Eventos: bliss balls e barrinhas por bandeja para a sua festa (thetropicalbakery.com/menu).',
+              'Coaching de alimentação: uma conversa grátis de 30 minutos, online (thetropicalbakery.com/coaching).',
             ]),
-          cta: { label: 'Ver a caixa da semana', href: track('/caixas', 'receitas-local') },
+          cta: { label: 'Marcar minha aula', href: track('/cursos', 'receitas-local') },
           note: 'Prefere conversar? Responda pelo WhatsApp que aparece no site.',
         }
       : {
-          preheader: 'This week’s box, brunch, courses and event treats, right here in Ubatuba.',
-          heading: 'Taste them made by me',
+          preheader: 'An afternoon of treats in my kitchen in Itamambuca, treats for your party and a free call.',
+          heading: 'Come and cook with me',
           body:
-            paragraphs('You told me you’re around Ubatuba or Paraty. So besides the recipes, I can bring the treats to you:') +
+            paragraphs('You told me you’re around Ubatuba or Paraty. So besides the recipes, there are more ways to meet:') +
             bulletList([
-              'Tasting Box: this week’s treats in a kraft box, delivered around Ubatuba.',
-              'Subscription: the box every week, with the favorites you pick.',
-              'Brunch Tropical: tea, treats and real conversation, in a small group.',
-              'Courses: learn these and many more at my table.',
-              'Events Menu: bliss balls and bars by the tray for your party.',
+              'A treats class in my kitchen in Itamambuca: every day at 2 pm, three hours. You make, taste and take the recipes home.',
+              'Events Menu: bliss balls and bars by the tray for your party (thetropicalbakery.com/menu).',
+              'Food coaching: a free 30-minute call, online (thetropicalbakery.com/coaching/en).',
             ]),
-          cta: { label: 'See this week’s box', href: track('/caixas', 'receitas-local') },
+          cta: { label: 'Book my class', href: track('/cursos', 'receitas-local') },
+          note: 'With love, Dolly',
+        },
+  },
+
+  {
+    ...base,
+    id: 'receitas-visita',
+    name: 'Receitas grátis · dia 9: quando vier a Ubatuba',
+    emoji: '🏝️',
+    description: 'Para quem está longe de Ubatuba: a aula quando vier, o retiro e o coaching online.',
+    subject: v => (isPt(v) ? 'Quando vier a Ubatuba, venha cozinhar comigo' : 'When you come to Brazil, come and cook with me'),
+    messageKey: () => 'receitas-visita',
+    build: v => isPt(v)
+      ? {
+          preheader: 'Uma tarde na minha cozinha em Itamambuca, um retiro na praia ou uma conversa online.',
+          heading: 'Venha me conhecer',
+          body:
+            paragraphs('Essas receitas nasceram na minha cozinha em Itamambuca, pertinho da praia, em Ubatuba. Se um dia você vier para cá, ou quiser seguir comigo de onde estiver, tem três jeitos:') +
+            bulletList([
+              'Aula de doces: uma tarde na minha cozinha, todo dia às 14h. Você faz, prova e leva as receitas.',
+              'Retiro: dias de praia, cachoeira e comida de verdade com a gente (thetropicalbakery.com/retreats).',
+              'Coaching de alimentação: uma conversa grátis de 30 minutos, online, de onde você estiver (thetropicalbakery.com/coaching).',
+            ]),
+          cta: { label: 'Ver as aulas', href: track('/cursos', 'receitas-visita') },
+          note: 'Um beijo, Dolly',
+        }
+      : {
+          preheader: 'An afternoon in my kitchen in Itamambuca, a beach retreat or a call online.',
+          heading: 'Come and meet me',
+          body:
+            paragraphs('These recipes were born in my kitchen in Itamambuca, a few steps from the beach in Ubatuba, Brazil. If you ever come here, or want to keep going with me from wherever you are, there are three ways:') +
+            bulletList([
+              'A treats class: an afternoon in my kitchen, every day at 2 pm. You make, taste and take the recipes home.',
+              'A retreat: days of beach, waterfalls and real food with us (thetropicalbakery.com/retreats).',
+              'Food coaching: a free 30-minute call, online, from wherever you are (thetropicalbakery.com/coaching/en).',
+            ]),
+          cta: { label: 'See the classes', href: track('/cursos', 'receitas-visita') },
           note: 'With love, Dolly',
         },
   },
