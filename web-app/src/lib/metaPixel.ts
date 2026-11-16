@@ -8,7 +8,9 @@ import { loadGoogleTag, trackGoogle } from './googleTag';
 
 // Meta dataset (pixel) "The Tropical Bakery Website". The ID is public by design.
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1953002309021163';
-export const CONSENT_KEY = 'tb-cookie-consent';
+// "-v2": the banner now asks about Meta AND Google. A choice made under the old Meta-only wording
+// (key 'tb-cookie-consent') does not count for Google, so those visitors see the banner once more.
+export const CONSENT_KEY = 'tb-cookie-consent-v2';
 
 export type Consent = 'accepted' | 'declined' | null;
 

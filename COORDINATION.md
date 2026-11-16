@@ -212,9 +212,9 @@ Verified live, 2026-09-26:
   Meta pixel's banner and consent (`MetaPixel.tsx`, `readConsent()`): one banner, one choice, never a second one. Pages keep
   calling only `trackMeta()`, which also sends the matching Google event (`toGoogle()` in `metaPixel.ts`).
   `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` adds the Search Console tag in `layout.tsx`.
+  The consent key is `tb-cookie-consent-v2`: if the banner ever asks about one more company, bump it again so people are re-asked.
+  The cookie banner, the privacy-policy text and the Meta pixel are all built and live (`MetaPixel.tsx`, `metaPixel.ts`).
 
-Not built yet (ask Andrew before starting): the cookie
-consent banner and privacy-policy update that must come **before** installing any ad pixel (LGPD); the Google / Meta pixel itself.
 
 ## 7. When you stop
 
