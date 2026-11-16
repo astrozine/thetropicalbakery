@@ -7,6 +7,7 @@ import { trackMeta } from '@/lib/metaPixel';
 import { clearGoogleTranslate } from '@/lib/googleTranslate';
 import { DOLLY_CALENDLY_URL, STORE_WHATSAPP } from '@/lib/siteContact';
 import { COACHING_COPY, COACHING_LANGS, COACHING_LANG_LABEL, COACHING_PATH, type CoachingLang } from '@/lib/coachingCopy';
+import HandWrittenLang from '@/components/HandWrittenLang';
 
 /*
  * The words come from Dolly herself: her Paradise Pantry guide (her basket question, the six building blocks, where
@@ -77,6 +78,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
   const gateLocale = lang === 'nl' ? 'en' : lang;
   return (
     <main className="fc" lang={lang}>
+      <HandWrittenLang lang={lang} paths={COACHING_PATH} />
       {/* ── HERO: Dolly over the Mata Atlântica, one clear next step ── */}
       <section className="fc-hero">
         <div className="fc-hero__bg" />

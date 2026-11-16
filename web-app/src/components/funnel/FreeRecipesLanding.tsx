@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { EBOOK, BOOK_OFFERS, RECIPES } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
 import { FUNNEL, FUNNEL_COPY, SEGMENTS, freeCover, type Segment } from '@/lib/funnel';
+import HandWrittenLang from '@/components/HandWrittenLang';
 import { trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
 import { PayPicker, PixBox, bookPrice, payMethodFor, shownPrice, toPath, usePayMethods } from './FunnelPay';
@@ -104,6 +105,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
 
   return (
     <div className="se fr" lang={lang}>
+      <HandWrittenLang lang={lang} paths={FUNNEL.pagePath} />
       {/* ══ HERO: the floating-photo style, the free mini-book in the middle, the form right there ══ */}
       <section className="se-hero fr-hero">
         <div className="se-hero__bg" />
