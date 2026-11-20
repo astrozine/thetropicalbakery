@@ -154,7 +154,7 @@ const EN: EbookCopy = {
     kicker: 'Meet Dolly', title: 'From the ballet stage to a jungle kitchen',
     paragraphs: [
       'My relationship with food began in a world where discipline was everything: professional ballet. I learned to control every calorie, every bite, and it left me disconnected from the joy of food.',
-      'Through love and loss, I rebuilt my life on the Brazilian coast, surrounded by the ocean, the rainforest, the sunlight and the abundance of Brazil. That is where food became creativity, nourishment became pleasure, and dessert became a celebration rather than a compromise.',
+      'Through love and loss, I rebuilt my life on the Brazilian coast, surrounded by the ocean, the jungle, the sunlight and the abundance of Brazil. That is where food became creativity, nourishment became pleasure, and dessert became a celebration rather than a compromise.',
       '*Sweet Escape* is everything I learned, woven through seven recipes, so you can bring that same joy into your own kitchen.',
     ],
     sign: 'Come into my jungle kitchen.', photoAlt: 'Dolly holding a tray of her plant-based treats in the garden',
@@ -508,7 +508,7 @@ const ES: EbookCopy = {
     kicker: 'Conoce a Dolly', title: 'Del escenario del ballet a una cocina en la selva',
     paragraphs: [
       'Mi relación con la comida empezó en un mundo donde la disciplina lo era todo: el ballet profesional. Aprendí a controlar cada caloría, cada bocado, y eso me alejó de la alegría de comer.',
-      'Entre el amor y la pérdida, reconstruí mi vida en la costa brasileña, rodeada del mar, la selva, el sol y la abundancia de Brasil. Allí la comida se volvió creatividad, nutrirse se volvió placer, y el postre se volvió una celebración en lugar de una concesión.',
+      'Entre el amor y la pérdida, reconstruí mi vida en la costa brasileña, rodeada del océano, la selva, el sol y la abundancia de Brasil. Allí la comida se volvió creatividad, nutrirse se volvió placer, y el postre se volvió una celebración en lugar de una concesión.',
       '*Sweet Escape* es todo lo que aprendí, en siete recetas, para que lleves esa misma alegría a tu cocina.',
     ],
     sign: 'Entra en mi cocina en la selva.', photoAlt: 'Dolly sosteniendo una bandeja de sus dulces de plantas en el jardín',
@@ -686,7 +686,7 @@ const NL: EbookCopy = {
     kicker: 'Maak kennis met Dolly', title: 'Van het balletpodium naar een jungle-keuken',
     paragraphs: [
       'Mijn relatie met eten begon in een wereld waar discipline alles was: professioneel ballet. Ik leerde elke calorie, elke hap te beheersen, en dat maakte dat ik het plezier in eten kwijtraakte.',
-      'Door liefde en verlies bouwde ik mijn leven opnieuw op aan de Braziliaanse kust, omringd door de oceaan, het regenwoud, het zonlicht en de overvloed van Brazilië. Daar werd eten creativiteit, voeden werd genieten, en dessert werd een feest in plaats van een compromis.',
+      'Door liefde en verlies bouwde ik mijn leven opnieuw op aan de Braziliaanse kust, omringd door de oceaan, de jungle, het zonlicht en de overvloed van Brazilië. Daar werd eten creativiteit, voeden werd genieten, en dessert werd een feest in plaats van een compromis.',
       '*Sweet Escape* is alles wat ik leerde, verweven door zeven recepten, zodat jij diezelfde vreugde in je eigen keuken kunt brengen.',
     ],
     sign: 'Kom binnen in mijn jungle-keuken.', photoAlt: 'Dolly met een schaal van haar plantaardige traktaties in de tuin',
@@ -869,7 +869,7 @@ const DE: EbookCopy = {
     kicker: 'Das ist Dolly', title: 'Von der Ballettbühne in eine Dschungelküche',
     paragraphs: [
       'Meine Beziehung zum Essen begann in einer Welt, in der Disziplin alles war: im professionellen Ballett. Ich lernte, jede Kalorie, jeden Bissen zu kontrollieren, und verlor dabei die Freude am Essen.',
-      'Durch Liebe und Verlust habe ich mir an der brasilianischen Küste ein neues Leben aufgebaut, umgeben vom Meer, vom Regenwald, vom Sonnenlicht und von der Fülle Brasiliens. Dort wurde Essen zu Kreativität, Nähren zu Genuss und Dessert zu einem Fest statt zu einem Kompromiss.',
+      'Durch Liebe und Verlust habe ich mir an der brasilianischen Küste ein neues Leben aufgebaut, umgeben vom Ozean, vom Dschungel, vom Sonnenlicht und von der Fülle Brasiliens. Dort wurde Essen zu Kreativität, Nähren zu Genuss und Dessert zu einem Fest statt zu einem Kompromiss.',
       '*Sweet Escape* ist alles, was ich gelernt habe, verwoben in sieben Rezepte, damit du dieselbe Freude in deine eigene Küche bringen kannst.',
     ],
     sign: 'Komm in meine Dschungelküche.', photoAlt: 'Dolly mit einem Tablett ihrer pflanzlichen Leckereien im Garten',

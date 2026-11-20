@@ -49,7 +49,7 @@ const UI = {
   en: {
     html: 'en', choose: 'Choose which e-mails you get', leave: 'Unsubscribe from everything', hi: 'Hi',
     originKicker: 'Belgian craft &middot; Brazilian nature',
-    origin: 'Recipes by Elisabeth &ldquo;Dolly&rdquo; Van Dam, with cacao, nuts and fruit from the Atlantic rainforest. Vegan, wheat-free, handmade on Itamambuca beach.',
+    origin: 'Recipes by Elisabeth &ldquo;Dolly&rdquo; Van Dam, with cacao, nuts and fruit from the “Mata Atlântica” jungle. Vegan, wheat-free, handmade on Itamambuca beach.',
     flagsAlt: 'Belgium and Brazil',
     deeper: 'To go deeper:', newsletter: 'Dolly’s newsletter on Substack', inEnglish: '',
     whatsapp: 'Talk to us on WhatsApp', prefs: 'E-mail preferences', unsub: 'Unsubscribe',
@@ -58,7 +58,7 @@ const UI = {
   es: {
     html: 'es', choose: 'Elegir qué e-mails recibir', leave: 'Darse de baja de todo', hi: 'Hola',
     originKicker: 'Oficio belga &middot; Naturaleza brasileña',
-    origin: 'Recetas de Elisabeth &ldquo;Dolly&rdquo; Van Dam, con cacao, frutos secos y frutas de la Mata Atlántica. Vegano, sin trigo, hecho a mano en la playa de Itamambuca.',
+    origin: 'Recetas de Elisabeth &ldquo;Dolly&rdquo; Van Dam, con cacao, frutos secos y frutas de la selva, la “Mata Atlântica”. Vegano, sin trigo, hecho a mano en la playa de Itamambuca.',
     flagsAlt: 'Bélgica y Brasil',
     deeper: 'Para ir más a fondo:', newsletter: 'el newsletter de Dolly en Substack', inEnglish: '(en inglés)',
     whatsapp: 'Hablar con nosotros por WhatsApp', prefs: 'Preferencias de e-mail', unsub: 'Darse de baja',
@@ -66,7 +66,7 @@ const UI = {
   nl: {
     html: 'nl', choose: 'Kies welke e-mails je krijgt', leave: 'Uitschrijven voor alles', hi: 'Hoi',
     originKicker: 'Belgisch vakmanschap &middot; Braziliaanse natuur',
-    origin: 'Recepten van Elisabeth &ldquo;Dolly&rdquo; Van Dam, met cacao, noten en fruit uit het Atlantisch regenwoud. Vegan, tarwevrij, met de hand gemaakt aan het strand van Itamambuca.',
+    origin: 'Recepten van Elisabeth &ldquo;Dolly&rdquo; Van Dam, met cacao, noten en fruit uit de jungle van de “Mata Atlântica”. Vegan, tarwevrij, met de hand gemaakt aan het strand van Itamambuca.',
     flagsAlt: 'België en Brazilië',
     deeper: 'Verder lezen:', newsletter: 'Dolly’s nieuwsbrief op Substack', inEnglish: '(in het Engels)',
     whatsapp: 'Stuur ons een WhatsApp', prefs: 'E-mailvoorkeuren', unsub: 'Uitschrijven',
@@ -74,7 +74,7 @@ const UI = {
   de: {
     html: 'de', choose: 'Wähle, welche E-Mails du bekommst', leave: 'Von allem abmelden', hi: 'Hallo',
     originKicker: 'Belgisches Handwerk &middot; Brasilianische Natur',
-    origin: 'Rezepte von Elisabeth &bdquo;Dolly&ldquo; Van Dam, mit Kakao, Nüssen und Früchten aus dem atlantischen Regenwald. Vegan, weizenfrei, von Hand gemacht am Strand von Itamambuca.',
+    origin: 'Rezepte von Elisabeth &bdquo;Dolly&ldquo; Van Dam, mit Kakao, Nüssen und Früchten aus dem Dschungel der &bdquo;Mata Atlântica&ldquo;. Vegan, weizenfrei, von Hand gemacht am Strand von Itamambuca.',
     flagsAlt: 'Belgien und Brasilien',
     deeper: 'Mehr dazu:', newsletter: 'Dollys Newsletter auf Substack', inEnglish: '(auf Englisch)',
     whatsapp: 'Schreib uns auf WhatsApp', prefs: 'E-Mail-Einstellungen', unsub: 'Abmelden',

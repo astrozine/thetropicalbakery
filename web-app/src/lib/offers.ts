@@ -69,7 +69,7 @@ export const DEFAULT_INCLUDED: Record<OfferKind, Record<OfferLang, string[]>> = 
       'Your suite at the house in Itamambuca, steps from the beach',
       'The Tropical Bakery immersion: a pastry workshop with Chef Dolly',
       'Breakfast and plant-based meals made fresh',
-      'Rainforest and ocean: trail, waterfall, beach',
+      'Jungle and ocean: trail, waterfall, beach',
     ],
   },
   curso: {
@@ -192,7 +192,7 @@ export const OFFER_COPY: Record<OfferLang, Copy> = {
   en: {
     eyebrow: name => `A proposal just for ${name}`,
     promise: {
-      retiro: 'Days of ocean, rainforest and handmade treats, at your own pace. You go home a different person.',
+      retiro: 'Days of ocean, jungle and handmade treats, at your own pace. You go home a different person.',
       curso: 'Learn to make treats that wow from someone who bakes them every day, and take the technique home.',
       pacote: 'Treats handmade by Dolly, at your door every week, at a founding-member price.',
     },
