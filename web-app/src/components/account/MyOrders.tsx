@@ -10,7 +10,12 @@ const MONTHS = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', '
 function kindLabel(o: JourneyOrder) {
   if (o.order_kind === 'quote') return 'Orçamento de evento';
   if (o.order_kind === 'events') return 'Menu de eventos';
-  if ((o.order_kind as string) === 'ebook') return 'E-book';
+  const k = o.order_kind as string;
+  if (k === 'ebook') return 'E-book';
+  if (k === 'curso') return 'Aula';
+  if (k === 'retiro') return 'Retiro';
+  if (k === 'brunch') return 'Brunch';
+  if (k === 'app') return 'App';
   return o.fulfillment === 'pickup' ? 'Caixa · retirada' : 'Caixa · entrega';
 }
 
@@ -24,7 +29,8 @@ export default function MyOrders({ orders }: { orders: JourneyOrder[] }) {
         {orders.map(o => {
           const d = new Date(o.requested_date ? `${o.requested_date}T00:00:00` : o.created_at);
           const stage = ORDER_STAGE[o.stage] ?? ORDER_STAGE.awaiting_payment;
-          const again = o.order_kind === 'box' ? '/caixas' : (o.order_kind as string) === 'ebook' ? '/sweet-escape/pt' : '/menu';
+          // The box is paused, so only the events menu gets an "order again".
+          const again = o.order_kind === 'events' ? '/menu' : null;
           return (
             <li key={o.id} className="acct-order">
               <div className="acct-order-date" aria-hidden>
@@ -39,7 +45,7 @@ export default function MyOrders({ orders }: { orders: JourneyOrder[] }) {
                   {o.total_price ? <span>{formatBRL(Number(o.total_price))}</span> : null}
                 </div>
               </div>
-              {(o.stage === 'done' || o.stage === 'confirmed') && (
+              {again && (o.stage === 'done' || o.stage === 'confirmed') && (
                 <Link href={again} className="acct-order-again">Pedir de novo</Link>
               )}
             </li>
