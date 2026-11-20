@@ -284,4 +284,66 @@ export const ACCOUNT_CSS = `
   .acct-trail { padding: 1.75rem; }
   .acct-trail-path { overflow: visible; }
 }
+/* ============================================ refocused page (2026-11-20) */
+.acct-top {
+  padding: 2.25rem 1rem 3.4rem; text-align: center; color: #fdfaf3;
+  background: radial-gradient(ellipse at 50% 0%, #4a3428 0%, #2b1e17 75%); border-radius: 0 0 28px 28px;
+}
+.acct-top-inner { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+.acct-top-avatar {
+  width: 72px; height: 72px; border-radius: 50%; overflow: hidden; margin-bottom: 0.8rem;
+  border: 3px solid #d4af37; background: #d4af37; display: flex; align-items: center; justify-content: center;
+}
+.acct-top-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.acct-top-avatar span { font-family: var(--font-heading); font-size: 1.7rem; font-weight: 800; color: #3c2a21; }
+.acct-top-hello { font-family: var(--font-heading); font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.1; margin: 0 0 0.45rem; }
+.acct-top-line { margin: 0 0 1.1rem; color: rgba(253,250,243,0.85); font-size: 0.98rem; line-height: 1.55; max-width: 26rem; }
+.acct-top .acct-btn { width: 100%; max-width: 20rem; }
+
+.ag { display: flex; flex-direction: column; gap: 2rem; }
+.ag-h { margin-bottom: 0.9rem; }
+.ag .acct-live { display: flex; flex-direction: column; gap: 0.9rem; margin-bottom: 0.9rem; }
+.ag .acct-live:empty { display: none; }
+.ag-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.7rem; }
+.ag-row {
+  display: flex; gap: 0.9rem; align-items: flex-start; background: #fff; border: 1px solid #efe6d8;
+  border-radius: 18px; padding: 0.95rem 1rem; min-width: 0;
+}
+.ag-row.is-you { border-color: #e9c46a; background: #fffaf0; }
+.ag-when {
+  width: 52px; flex-shrink: 0; border-radius: 12px; overflow: hidden; text-align: center;
+  background: #fdfaf3; border: 1px solid rgba(212,175,55,0.45);
+}
+.ag-when span { display: block; background: #d4af37; color: #3c2a21; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.12em; padding: 0.12rem 0; }
+.ag-when strong { display: block; font-family: var(--font-heading); font-size: 1.3rem; color: #3c2a21; padding: 0.1rem 0 0.2rem; }
+.ag-when em { display: flex; height: 52px; align-items: center; justify-content: center; font-style: normal; font-size: 1.5rem; }
+.ag-body { flex: 1; min-width: 0; }
+.ag-kind { margin: 0; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #a6832b; }
+.ag-title { margin: 0.15rem 0 0.2rem; font-weight: 700; color: #3c2a21; line-height: 1.35; overflow-wrap: anywhere; }
+.ag-sub { margin: 0 0 0.45rem; font-size: 0.86rem; color: #7a6a61; line-height: 1.5; }
+.ag-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; }
+.ag-link { font-size: 0.86rem; font-weight: 800; color: #8a6d1f; text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+.ag-empty { padding: 1.4rem 1.2rem; border-radius: 18px; border: 1px dashed #e3d6bf; color: #7a6a61; font-size: 0.92rem; line-height: 1.6; }
+.ag-empty p { margin: 0; }
+
+.ag-partner { background: #fff; border: 1px solid #efe6d8; border-radius: 20px; padding: 1.1rem; margin-bottom: 0.9rem; }
+.ag-partner-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.6rem; }
+.ag-note { margin: 0 0 0.6rem; padding: 0.7rem 0.9rem; border-radius: 12px; background: #fdf7ee; color: #594a42; font-size: 0.9rem; line-height: 1.55; }
+.ag-note span { color: #a6832b; font-weight: 700; }
+.ag-partner-btn { width: 100%; margin-top: 0.4rem; }
+
+.ag-offers ul { list-style: none; padding: 0; margin: 0; border-radius: 20px; overflow: hidden; border: 1px solid #efe6d8; background: #fff; }
+.ag-offers li + li { border-top: 1px solid #f3ece0; }
+.ag-offer { display: flex; align-items: center; gap: 0.85rem; padding: 0.85rem 1rem; text-decoration: none; color: #3c2a21; min-height: 60px; }
+.ag-offer:hover { background: #fdf7ee; }
+.ag-offer-emoji { font-size: 1.35rem; width: 1.8rem; text-align: center; flex-shrink: 0; }
+.ag-offer-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ag-offer-text strong { font-size: 0.95rem; }
+.ag-offer-text span { font-size: 0.82rem; color: #7a6a61; line-height: 1.4; }
+.ag-offer-go { color: #a6832b; font-weight: 800; }
+
+@media (min-width: 1024px) {
+  .acct-top { max-width: 1220px; margin: 1.25rem auto 0; border-radius: 32px; padding: 3rem 2rem 3.8rem; }
+  .acct-top .acct-btn { width: auto; }
+}
 `;

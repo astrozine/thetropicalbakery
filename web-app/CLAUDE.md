@@ -205,6 +205,13 @@ promise (perks, credit days, hold hours, vote budget, venue kinds) lives in **`s
 
 # Minha Conta: the Clube Tropical home (a design that worked)
 
+> **Refocused 2026-11-20 (Andrew):** the tasting box is paused, so Início is now **Agenda**: a compact list of what the
+> customer has with Dolly (classes, retreats, proposals to pay, events-menu orders, brunch tickets, and a partner card
+> for businesses), then "Mais com a Dolly" (the rest of the ladder, `DOLLY_OFFERS` in `src/lib/agenda.ts`). Data:
+> `my_agenda()` (`migration_50_my_agenda.sql`); UI `src/components/account/MyAgenda.tsx`. The stamp card, trail, level
+> ring and share card are off the page (components kept). Neat, minimal, one gold button in a small dark header.
+> The notes below describe the earlier box-centred version.
+
 Andrew asked for an account page that "keeps people buying and gets them up the value ladder" and called the
 result a **great job** (2026-09-29). Treat it as the reference for customer-facing dashboards. What made it work:
 

@@ -7,18 +7,16 @@ import LoginPanel from '@/components/LoginPanel';
 import AddressFields, { AddressValue, EMPTY_ADDRESS, addressToOneLine } from '@/components/AddressFields';
 import MySubscription from '@/components/MySubscription';
 import MyPickups from '@/components/MyPickups';
-import { SUBSCRIPTION_ZONES, formatBRL, isItamambuca } from '@/lib/deliveryZones';
+import { SUBSCRIPTION_ZONES, formatBRL } from '@/lib/deliveryZones';
 import DietaryPicker, { DietaryValue } from '@/components/DietaryPicker';
 import AccountSection from '@/components/AccountSection';
-import AccountHero, { HeroAction } from '@/components/account/AccountHero';
-import StampCard from '@/components/account/StampCard';
-import TropicalTrail from '@/components/account/TropicalTrail';
 import MyOrders from '@/components/account/MyOrders';
+import MyAgenda, { agendaItems } from '@/components/account/MyAgenda';
 import MyBrunches from '@/components/brunch/MyBrunches';
 import { roomPath, type MyBrunches as BrunchData } from '@/lib/brunch';
 import { allergensFrom, dietTagsFrom, legacyFlags, normalizeDiet, tagsFromLegacy } from '@/lib/dietary';
-import { Journey, STAMPS_PER_REWARD, TRAIL, levelFor, trailDone } from '@/lib/loyalty';
-import { SUBSTACK_URL } from '@/lib/siteContact';
+import type { Journey } from '@/lib/loyalty';
+import type { Agenda } from '@/lib/agenda';
 import { supabase } from '@/lib/supabase';
 import { ACCOUNT_CSS } from './accountStyles';
 
@@ -46,17 +44,11 @@ const inputStyle: React.CSSProperties = {
 const FOLD_ORDER = ['dados', 'endereco', 'dieta', 'gostos'] as const;
 type FoldId = typeof FOLD_ORDER[number];
 
-const FOLD_META: Record<FoldId, { emoji: string; todo: string; ok: string }> = {
-  dados: { emoji: '🎂', todo: 'Seu aniversário (ganha surpresa)', ok: 'Seus dados' },
-  endereco: { emoji: '🏡', todo: 'Onde entregamos', ok: 'Endereço' },
-  dieta: { emoji: '🌱', todo: 'Restrições e alergias', ok: 'Restrições' },
-  gostos: { emoji: '💛', todo: 'Sabores que você ama', ok: 'Seus gostos' },
-};
 
 type Tab = 'inicio' | 'pedidos' | 'perfil';
 const TABS: { id: Tab; label: string; emoji: string }[] = [
-  { id: 'inicio', label: 'Início', emoji: '🌴' },
-  { id: 'pedidos', label: 'Pedidos', emoji: '📦' },
+  { id: 'inicio', label: 'Agenda', emoji: '🗓️' },
+  { id: 'pedidos', label: 'Pedidos', emoji: '🧾' },
   { id: 'perfil', label: 'Perfil', emoji: '✨' },
 ];
 
@@ -75,9 +67,13 @@ function completeness(
   };
 }
 
-const SHARE_TEXT = encodeURIComponent(
-  'Conheci a The Tropical Bakery: doces veganos e sem trigo, feitos à mão em Itamambuca. Você vai amar 🌴 https://thetropicalbakery.com',
-);
+type HeroAction = { label: string; href?: string; onClick?: () => void };
+
+function HeroButton({ a }: { a: HeroAction }) {
+  return a.href
+    ? <Link href={a.href} className="acct-btn acct-btn-gold">{a.label}</Link>
+    : <button type="button" onClick={a.onClick} className="acct-btn acct-btn-gold">{a.label}</button>;
+}
 
 export default function MyAccountPage() {
   const { user, profile, loading, saveProfile, signOut } = useAuth();
@@ -110,6 +106,8 @@ export default function MyAccountPage() {
   const [journey, setJourney] = useState<Journey | null>(null);
   const [subStatus, setSubStatus] = useState<string | null>(null);
   const [loadedAt, setLoadedAt] = useState(0);
+  // Classes, retreats, events-menu orders, proposals, partnership (migration 50); null until it runs.
+  const [agenda, setAgenda] = useState<Agenda | null>(null);
   // Brunch tickets (migration 41); null when there are none or the migration has not run.
   const [brunches, setBrunches] = useState<BrunchData | null>(null);
   const loadBrunches = useCallback(() => {
@@ -137,12 +135,14 @@ export default function MyAccountPage() {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [{ data: j, error }, { data: subs }] = await Promise.all([
+      const [{ data: j, error }, { data: subs }, { data: ag, error: agErr }] = await Promise.all([
         supabase.rpc('my_journey'),
         supabase.from('subscriptions').select('status').order('created_at', { ascending: false }).limit(5),
+        supabase.rpc('my_agenda'),
       ]);
       if (cancelled) return;
       if (!error && j) setJourney(j as Journey);
+      if (!agErr && ag) setAgenda(ag as Agenda);
       setLoadedAt(Date.now());
       const current = (subs || []).find(s => s.status !== 'cancelled');
       setSubStatus(current?.status ?? null);
@@ -263,15 +263,6 @@ export default function MyAccountPage() {
     setTimeout(() => setSaved(false), 3000);
   };
 
-  const openFold = (id: FoldId) => {
-    setOpenIds(ids => (ids.includes(id) ? ids : [...ids, id]));
-    setTabState('perfil');
-    try { history.replaceState(null, '', '#perfil'); } catch { /* ignore */ }
-    setTimeout(() => {
-      document.getElementById(`fold-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 80);
-  };
-
   const firstName = (basics.full_name || profile?.full_name || '').trim().split(' ')[0];
   const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
   const checks = Object.values(done);
@@ -285,63 +276,48 @@ export default function MyAccountPage() {
     diet.allergens.length ? `${diet.allergens.length} ${diet.allergens.length === 1 ? 'alergia' : 'alergias'}: ${allergensFrom(diet.allergens).map(a => a.label).join(', ')}` : '',
   ].filter(Boolean).join(' · ');
 
-  const inItamambuca = isItamambuca({
-    delivery_zone: basics.delivery_zone,
-    address_neighborhood: address.address_neighborhood,
-    address_city: address.address_city,
-  });
 
-  // ---------------------------------------------------------------- the ladder
-  const subscriber = subStatus === 'active' || subStatus === 'paused' || subStatus === 'pending';
-  const paidBoxes = journey?.paid_boxes ?? 0;
-  const { level, next, toNext } = levelFor(paidBoxes, subStatus === 'active');
+  // ------------------------------------------------------------ the agenda
+  const items = agendaItems(agenda);
+  const orders = journey?.orders ?? [];
   const brunchTickets = (brunches?.tickets || []).filter(t => t.status === 'pago');
   const nextBrunch = brunchTickets
     .filter(t => new Date(t.starts_at).getTime() > loadedAt)
     .sort((a, b) => a.starts_at.localeCompare(b.starts_at))[0];
-  const trail = trailDone(journey, subscriber, brunchTickets.length > 0);
-  const nextStep = TRAIL.find(s => !trail[s.id]);
-  const orders = journey?.orders ?? [];
-  const liveOrder = orders.find(o => o.stage === 'ready')
-    ?? orders.find(o => o.stage === 'awaiting_payment' && loadedAt - new Date(o.created_at).getTime() < 14 * 86400000);
+  // The box is paused: only a running subscription (or a box pickup) still shows its own card.
+  const liveSub = subStatus === 'active' || subStatus === 'paused';
+  const liveBox = orders.find(o => o.order_kind === 'box' && (o.stage === 'ready' || o.stage === 'preparing' || o.stage === 'confirmed'));
+  const hasLive = !!nextBrunch || liveSub || !!liveBox;
 
-  const scrollToLive = () => {
+  const scrollToAgenda = () => {
     setTab('inicio', false);
     setTimeout(() => document.getElementById('acct-live')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
   };
 
-  let heroAlert: string | undefined;
+  // One line and one button: what needs them now, else what comes next, else a first step.
+  const pay = items.find(i => i.needsYou);
+  const upcoming = items.find(i => i.date);
+  let heroLine: string;
   let primary: HeroAction;
-  if (liveOrder?.stage === 'ready') {
-    heroAlert = '🎉 Sua caixa está pronta!';
-    primary = { label: 'Ver minha caixa', onClick: scrollToLive };
-  } else if (liveOrder) {
-    heroAlert = '⏳ Seu pedido está esperando o Pix. O código está no e-mail que mandamos.';
-    primary = { label: 'Ver meu pedido', onClick: () => setTab('pedidos') };
-  } else if (nextBrunch) {
-    heroAlert = `🥂 Seu brunch: ${new Date(nextBrunch.starts_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'long' })}`;
+  if (pay) {
+    heroLine = `⏳ ${pay.kind}: ${pay.title} está aguardando o pagamento.`;
+    primary = pay.action ?? { label: 'Ver meus pedidos', onClick: () => setTab('pedidos') };
+  } else if (nextBrunch && (!upcoming || nextBrunch.starts_at.slice(0, 10) <= (upcoming.date ?? ''))) {
+    heroLine = `🥂 Seu brunch: ${new Date(nextBrunch.starts_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'long' })}`;
     primary = { label: 'Entrar no grupo do brunch', href: roomPath(nextBrunch.slug) };
-  } else if (subStatus === 'pending') {
-    heroAlert = '⏳ Sua assinatura está aguardando o pagamento.';
-    primary = { label: 'Ver minha assinatura', onClick: scrollToLive };
-  } else if (subStatus === 'active') {
-    primary = { label: 'Escolher os doces da semana', onClick: scrollToLive };
-  } else if (nextStep) {
-    primary = { label: nextStep.cta, href: nextStep.href };
+  } else if (upcoming) {
+    heroLine = `Próximo: ${upcoming.kind.toLowerCase()} em ${new Date(`${upcoming.date}T12:00:00`).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}.`;
+    primary = { label: 'Ver minha agenda', onClick: scrollToAgenda };
+  } else if (agenda?.partner) {
+    heroLine = `${agenda.partner.business_name} · parceria com a Dolly`;
+    primary = { label: 'Abrir o portal do parceiro', href: '/parceiro' };
+  } else if (items.length) {
+    heroLine = 'Suas aulas, retiros e pedidos com a Dolly, num lugar só.';
+    primary = { label: 'Ver minha agenda', onClick: scrollToAgenda };
   } else {
-    primary = { label: 'Pedir uma caixa', href: '/caixas' };
+    heroLine = 'Aqui ficam suas aulas, retiros e pedidos com a Dolly.';
+    primary = { label: 'Marcar uma aula com a Dolly', href: '/cursos' };
   }
-  const secondary: HeroAction | undefined = pct < 100
-    ? { label: `Completar meu perfil · ${pct}%`, onClick: () => setTab('perfil') }
-    : orders.length ? { label: 'Meus pedidos', onClick: () => setTab('pedidos') } : undefined;
-
-  const stats: string[] = [];
-  if (journey) stats.push(`🎟️ ${paidBoxes % STAMPS_PER_REWARD}/${STAMPS_PER_REWARD} carimbos`);
-  if (journey?.first_order_at) {
-    const since = new Date(journey.first_order_at).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }).replace('.', '');
-    stats.push(`Cliente desde ${since}`);
-  }
-  if (orders.length) stats.push(`${orders.length} ${orders.length === 1 ? 'pedido' : 'pedidos'}`);
 
   if (loading || !user) {
     return (
@@ -355,7 +331,7 @@ export default function MyAccountPage() {
           ) : (
             <>
               <p style={{ color: '#594a42', lineHeight: 1.8, marginBottom: '2rem' }}>
-                Entre para salvar seus dados de entrega, juntar carimbos no cartão fidelidade e fazer seus próximos pedidos em segundos.
+                Entre para ver suas aulas, retiros e pedidos com a Dolly, e deixar seus dados prontos para a próxima vez.
               </p>
               <LoginPanel />
             </>
@@ -367,18 +343,19 @@ export default function MyAccountPage() {
 
   return (
     <main className="acct-page">
-      <AccountHero
-        firstName={firstName}
-        avatarUrl={avatarUrl}
-        level={level}
-        next={next}
-        toNext={toNext}
-        ring={journey ? (paidBoxes % STAMPS_PER_REWARD) / STAMPS_PER_REWARD : pct / 100}
-        stats={stats}
-        primary={primary}
-        secondary={secondary}
-        alert={heroAlert}
-      />
+      <section className="acct-top" aria-label="Seu perfil">
+        <div className="acct-top-inner">
+          <div className="acct-top-avatar" aria-hidden>
+            {avatarUrl
+              // eslint-disable-next-line @next/next/no-img-element
+              ? <img src={avatarUrl} alt="" />
+              : <span>{(firstName[0] || '🌴').toUpperCase()}</span>}
+          </div>
+          <h1 className="acct-top-hello notranslate" translate="no">{firstName ? `Oi, ${firstName}` : 'Minha conta'}</h1>
+          <p className="acct-top-line">{heroLine}</p>
+          <HeroButton a={primary} />
+        </div>
+      </section>
 
       <div className="acct-wrap">
         <div className="acct-tabs" role="tablist" aria-label="Minha conta" ref={tabsRef}>
@@ -398,66 +375,20 @@ export default function MyAccountPage() {
           ))}
         </div>
 
-        {/* ============================================================ INÍCIO */}
-        <div role="tabpanel" hidden={tab !== 'inicio'} className="acct-home">
-          <div className="acct-col-main">
-            <div id="acct-live" className="acct-live">
-              <MyBrunches data={brunches} reload={loadBrunches} />
-              <MyPickups />
-              <MySubscription />
-            </div>
-            <div className="acct-o-trail">
-              <TropicalTrail done={trail} local={inItamambuca} />
-            </div>
-          </div>
-
-          <aside className="acct-col-side">
-            <div className="acct-o-stamps">
-              <StampCard paidBoxes={journey ? paidBoxes : null} />
-            </div>
-
-            <section className="acct-card acct-o-quest" aria-label="Seu perfil de sabor">
-              <div className="acct-quest-head">
-                <div className="acct-quest-ring" style={{ ['--p' as string]: `${pct}%` } as React.CSSProperties}>
-                  <span>{pct}%</span>
-                </div>
-                <div>
-                  <p className="acct-kicker" data-sign="🍓">Seu perfil de sabor</p>
-                  <h2 className="acct-h3">
-                    {pct === 100 ? 'A Dolly já sabe tudo 🎉' : 'Quanto mais completo, mais a caixa é a sua cara'}
-                  </h2>
-                </div>
+        {/* ============================================================ AGENDA */}
+        <div role="tabpanel" hidden={tab !== 'inicio'} className="acct-panel-narrow">
+          <MyAgenda
+            agenda={agenda}
+            items={items}
+            hasLive={hasLive}
+            live={(
+              <div className="acct-live">
+                <MyBrunches data={brunches} reload={loadBrunches} />
+                <MyPickups />
+                {liveSub && <MySubscription />}
               </div>
-              <ul className="acct-quest-list">
-                {FOLD_ORDER.map(id => (
-                  <li key={id}>
-                    <button type="button" onClick={() => openFold(id)} className={done[id] ? 'is-done' : ''}>
-                      <span aria-hidden>{done[id] ? '✓' : FOLD_META[id].emoji}</span>
-                      {done[id] ? FOLD_META[id].ok : FOLD_META[id].todo}
-                      <span className="acct-quest-go" aria-hidden>{done[id] ? 'editar' : '→'}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="acct-card acct-share acct-o-share" aria-label="Indique a Tropical">
-              <p className="acct-kicker" data-sign="💛">Espalhe o sabor</p>
-              <h2 className="acct-h3">Tem alguém que merece um doce? 💛</h2>
-              <p className="acct-muted">Mande a Tropical para quem você ama, ou surpreenda com uma caixa de presente.</p>
-              <div className="acct-share-row">
-                <a href={`https://wa.me/?text=${SHARE_TEXT}`} target="_blank" rel="noopener noreferrer" className="acct-btn acct-btn-soft">
-                  Indicar no WhatsApp
-                </a>
-                <Link href="/caixas" className="acct-btn acct-btn-soft">Mandar de presente 🎁</Link>
-              </div>
-            </section>
-
-            <a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" className="acct-letters acct-o-letters">
-              <span aria-hidden>✉️</span>
-              <span><strong>Sunbaked Letters</strong> · as receitas e histórias da Dolly no Substack (em inglês) ↗</span>
-            </a>
-          </aside>
+            )}
+          />
         </div>
 
         {/* =========================================================== PEDIDOS */}
@@ -466,14 +397,10 @@ export default function MyAccountPage() {
             <MyOrders orders={orders} />
           ) : (
             <div className="acct-empty">
-              <p className="acct-empty-emoji" aria-hidden>📦</p>
-              <h2 className="acct-h2" data-sign="📦">{journey ? 'Nenhum pedido ainda' : 'Seus pedidos aparecem aqui'}</h2>
-              <p className="acct-muted">
-                {journey
-                  ? 'Sua primeira caixa ganha o primeiro carimbo do cartão fidelidade.'
-                  : 'Retiradas e assinatura estão na aba Início.'}
-              </p>
-              <Link href="/caixas" className="acct-btn acct-btn-gold">Escolher minha caixa</Link>
+              <p className="acct-empty-emoji" aria-hidden>🧾</p>
+              <h2 className="acct-h2">Nenhum pedido ainda</h2>
+              <p className="acct-muted">Pedidos do menu de eventos, aulas e e-book aparecem aqui.</p>
+              <Link href="/menu" className="acct-btn acct-btn-gold">Ver o menu de eventos</Link>
             </div>
           )}
         </div>
@@ -482,9 +409,9 @@ export default function MyAccountPage() {
         <div role="tabpanel" hidden={tab !== 'perfil'} className="acct-panel-narrow">
           <form onSubmit={handleSave}>
             <div className="acct-perfil-head">
-              <h2 className="acct-h2" data-sign="🍓">Seu perfil de sabor</h2>
+              <h2 className="acct-h2">Seus dados</h2>
               <p className="acct-muted">
-                Tudo aqui é preenchido sozinho nos seus pedidos e na sua assinatura, e a cozinha confere antes de montar a sua caixa.
+                Preenchidos sozinhos nos seus pedidos, aulas e retiros. A Dolly confere suas restrições antes de preparar qualquer coisa para você.
               </p>
               <div className="acct-bar" aria-hidden><div style={{ width: `${pct}%` }} /></div>
             </div>
@@ -553,7 +480,7 @@ export default function MyAccountPage() {
                   summary={dietSummaryLine || 'Vegano, sem glúten, alergias…'}
                 >
                   <p style={{ fontSize: '0.86rem', color: '#7a6a61', lineHeight: 1.7, margin: '0 0 1rem' }}>
-                    A gente confere isto contra <strong>cada doce</strong> antes de te mandar qualquer novidade.
+                    A Dolly confere isto antes de preparar <strong>qualquer doce ou refeição</strong> para você.
                   </p>
                   <DietaryPicker value={diet} onChange={setDiet} showNotes={false} />
 
@@ -566,7 +493,7 @@ export default function MyAccountPage() {
                       style={{ ...inputStyle, borderColor: tastes.allergies ? '#c0392b' : 'rgba(212,175,55,0.5)' }}
                     />
                     <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginTop: '0.4rem' }}>
-                      Aparece destacado em vermelho na cozinha toda semana.
+                      Aparece destacado em vermelho para a cozinha.
                     </p>
                   </div>
                 </AccountSection>
