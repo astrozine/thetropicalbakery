@@ -49,15 +49,15 @@ export type PlanLocale = 'pt' | 'en' | 'es';
 const REGION_DAYS_I18N: Record<'en' | 'es', typeof REGION_DAYS> = {
   en: [
     { emoji: '💧', title: 'Prumirim Waterfall and Island', text: 'The waterfall pool in the morning, a boat to the island in the afternoon.' },
-    { emoji: '🥾', title: 'Seven Beaches Trail', text: 'A hike through the Atlantic Forest, from one empty beach to the next.' },
-    { emoji: '🏄', title: 'Surf and sea in Itamambuca', text: 'A surf lesson or just the sea, 100 m from the house, and the sunset on the sand.' },
+    { emoji: '🥾', title: 'Seven Beaches Trail', text: 'A hike through the jungle of the “Mata Atlântica”, from one empty beach to the next.' },
+    { emoji: '🏄', title: 'Surf and ocean in Itamambuca', text: 'A surf lesson or just the ocean, 100 m from the house, and the sunset on the sand.' },
     { emoji: '🏘️', title: 'Paraty', text: 'The old town, the market and a schooner trip around the islands.' },
     { emoji: '🌿', title: 'Picinguaba and the Casa da Farinha', text: 'The caiçara village inside the state park, and cassava flour made the old way.' },
   ],
   es: [
     { emoji: '💧', title: 'Cascada e Isla de Prumirim', text: 'La poza de la cascada en la mañana, y en barco hasta la isla en la tarde.' },
-    { emoji: '🥾', title: 'Sendero de las Siete Playas', text: 'Un sendero por la Mata Atlántica, de playa desierta en playa desierta.' },
-    { emoji: '🏄', title: 'Surf y mar en Itamambuca', text: 'Clase de surf o solo el mar, a 100 m de la casa, y el atardecer en la arena.' },
+    { emoji: '🥾', title: 'Sendero de las Siete Playas', text: 'Un sendero por la selva de la “Mata Atlântica”, de playa desierta en playa desierta.' },
+    { emoji: '🏄', title: 'Surf y océano en Itamambuca', text: 'Clase de surf o solo el océano, a 100 m de la casa, y el atardecer en la arena.' },
     { emoji: '🏘️', title: 'Paraty', text: 'El centro histórico, el mercado y un paseo en goleta por las islas.' },
     { emoji: '🌿', title: 'Picinguaba y la Casa da Farinha', text: 'La aldea caiçara dentro del parque estatal y la harina de yuca hecha como antes.' },
   ],

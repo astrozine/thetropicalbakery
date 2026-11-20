@@ -93,7 +93,7 @@ const ROOM_COPY_EN: Record<string, RoomCopy> = {
     capacity: 'Up to 11 guests',
     tagline: 'All of Salt n’ Paradise, just for your group.',
     description:
-      'A modern tropical beach house 100 meters from the sea in Itamambuca, with three places to stay: the Penthouse for up to 6, the Master Suite for 3 and the Studio for 2. A garden with banana trees and exotic flowers, a large terrace, a laundry room and an outdoor beach shower. The right place for group retreats, big families and organizers who want the whole house for their experience.',
+      'A modern tropical beach house 100 meters from the ocean in Itamambuca, with three places to stay: the Penthouse for up to 6, the Master Suite for 3 and the Studio for 2. A garden with banana trees and exotic flowers, a large terrace, a laundry room and an outdoor beach shower. The right place for group retreats, big families and organizers who want the whole house for their experience.',
     highlights: [
       'Three places to stay, up to 11 guests',
       '100 m from the Itamambuca waves',
@@ -138,7 +138,7 @@ const ROOM_COPY_ES: Record<string, RoomCopy> = {
     capacity: 'Hasta 11 personas',
     tagline: 'Todo Salt n’ Paradise, solo para tu grupo.',
     description:
-      'Una casa de playa tropical y moderna, a 100 metros del mar en Itamambuca, con tres alojamientos: el Ático para hasta 6, la Suite Master para 3 y el Estudio para 2. Jardín con bananos y flores exóticas, terraza amplia, lavandería y ducha de playa al aire libre. El lugar ideal para retiros en grupo, familias grandes y organizadores que quieren la casa entera para su experiencia.',
+      'Una casa de playa tropical y moderna, a 100 metros del océano en Itamambuca, con tres alojamientos: el Ático para hasta 6, la Suite Master para 3 y el Estudio para 2. Jardín con bananos y flores exóticas, terraza amplia, lavandería y ducha de playa al aire libre. El lugar ideal para retiros en grupo, familias grandes y organizadores que quieren la casa entera para su experiencia.',
     highlights: [
       'Tres alojamientos, hasta 11 personas',
       'A 100 m de las olas de Itamambuca',
