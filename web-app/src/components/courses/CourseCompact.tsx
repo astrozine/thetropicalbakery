@@ -24,8 +24,13 @@ const bg = (src: string, w: 384 | 750 | 1080 | 1920 = 1920) => `url("${optimized
 const endHour = `${parseInt(WORKSHOP_START, 10) + WORKSHOP_HOURS}h`;
 
 /* ------------------------------------------------------------------ hero: what, when, how long, book */
-export function CompactHero({ eyebrow, title, tagline, image, cta, onCta, secondary }: {
-  eyebrow: string; title: string; tagline: string; image: string;
+/**
+ * The course's own photo is the star: shown bright and big, with two smaller photos tucked on its corners
+ * (Andrew, 2026-11-21: "those pages say nothing without those images"). A blurred, dark copy sits behind it
+ * only as atmosphere. Phone: photo first, then the words. Desktop: words left, photo right.
+ */
+export function CompactHero({ eyebrow, title, tagline, image, floating = [], cta, onCta, secondary }: {
+  eyebrow: string; title: string; tagline: string; image: string; floating?: string[];
   cta: string; onCta: () => void; secondary?: { label: string; href: string };
 }) {
   // Read after the page is on screen, so the visitor's own date decides it (and the server's render matches).
@@ -33,7 +38,14 @@ export function CompactHero({ eyebrow, title, tagline, image, cta, onCta, second
   useEffect(() => { setBreakLine(workshopBreakLine()); }, []);
   return (
     <section className="cx-hero">
-      <div className="cx-hero-bg" style={{ backgroundImage: bg(image) }} aria-hidden />
+      <div className="cx-hero-bg" style={{ backgroundImage: bg(image, 750) }} aria-hidden />
+      <div className="cx-hero-grid">
+      <figure className="cx-hero-photo">
+        <img className="cx-hero-main" src={optimizedSrc(image, 1080)} alt={title} fetchPriority="high" />
+        {floating.slice(0, 2).map((src, i) => (
+          <img key={src} className={`cx-hero-float cx-hero-float-${i}`} src={optimizedSrc(src, 384)} alt="" aria-hidden />
+        ))}
+      </figure>
       <div className="cx-hero-in">
         <span className="cx-eyebrow">{eyebrow}</span>
         <h1>{title}</h1>
@@ -49,6 +61,7 @@ export function CompactHero({ eyebrow, title, tagline, image, cta, onCta, second
           {secondary && <a href={secondary.href} className="cx-btn cx-btn-ghost">{secondary.label}</a>}
         </div>
         {breakLine && <p className="cx-hero-note">{breakLine}</p>}
+      </div>
       </div>
     </section>
   );

@@ -58,6 +58,7 @@ export default function CursosPage() {
         title="Aprenda a fazer o doce que faz bem"
         tagline="Uma tarde na cozinha tropical da Dolly, a poucos passos do mar. Você põe a mão na massa e leva as receitas."
         image="/assets/surfers_retreat_treats_1789884582282.jpg"
+        floating={['/menu-items/20250914_132214.jpg', '/menu-items/Screenshot_20260518_122444_Gallery.jpg']}
         cta="Agendar minha aula"
         onCta={() => book('Cursos')}
         secondary={{ label: 'Ver os cursos ↓', href: '#cursos-list' }}

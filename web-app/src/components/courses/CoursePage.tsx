@@ -26,6 +26,7 @@ export default function CoursePage({ slug }: { slug: string }) {
         title={c.title}
         tagline={c.tagline}
         image={c.heroImage}
+        floating={c.floating}
         cta={c.cta}
         onCta={() => book()}
       />
