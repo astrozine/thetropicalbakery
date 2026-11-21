@@ -17,9 +17,16 @@
 .cx-btn-sm { min-height: 44px; padding: .5rem 1.1rem; font-size: .92rem; }
 
 /* ---- hero: one screen or less, the hours inside it */
-.cx-hero { position: relative; overflow: hidden; background: #2a1c15; padding: 7.25rem 1rem 1.75rem; }
-.cx-hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(.4) saturate(1.1); }
-.cx-hero-in { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; text-align: center; }
+.cx-hero { position: relative; overflow: hidden; background: #2a1c15; padding: 1.75rem 1rem 1.75rem; }
+.cx-hero-bg { position: absolute; inset: -30px; background-size: cover; background-position: center; filter: brightness(.32) saturate(1.15) blur(16px); }
+.cx-hero-grid { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; display: grid; gap: 1.35rem; }
+.cx-hero-in { position: relative; max-width: 760px; margin: 0 auto; text-align: center; }
+/* The photo itself, bright and framed, with two small ones on its corners */
+.cx-hero-photo { position: relative; margin: .4rem auto 0; width: 100%; max-width: 540px; }
+.cx-hero-main { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 20px; border: 3px solid rgba(253, 250, 243, .92); box-shadow: 0 20px 44px rgba(0, 0, 0, .5); }
+.cx-hero-float { position: absolute; width: 24%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; border: 3px solid #fdfaf3; box-shadow: 0 12px 28px rgba(0, 0, 0, .45); }
+.cx-hero-float-0 { left: -2px; bottom: -16px; transform: rotate(-6deg); }
+.cx-hero-float-1 { right: -2px; top: -14px; transform: rotate(6deg); }
 .cx-hero .cx-eyebrow { color: #f0cf6a; }
 .cx-hero h1 { font-family: var(--font-heading); font-size: clamp(1.7rem, 7.4vw, 3.4rem); line-height: 1.06; color: #fff; margin: 0 0 .7rem; text-shadow: 0 4px 22px rgba(0, 0, 0, .4); }
 .cx-hero-tag { font-size: clamp(1rem, 2.4vw, 1.2rem); line-height: 1.5; color: rgba(253, 250, 243, .93); margin: 0 auto 1rem; max-width: 600px; }
@@ -110,7 +117,17 @@
 @media (min-width: 760px) {
   .cx-wrap { padding: 0 1.5rem; }
   .cx-sec, .cx-magic, .cx-cta { padding: 3rem 0; }
-  .cx-hero { padding: 9rem 1.5rem 3.5rem; }
+  .cx-hero { padding: 3.5rem 1.5rem 3.75rem; }
+  .cx-hero-main { aspect-ratio: 4 / 3; }
+  .cx-hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 3.25rem; }
+  .cx-hero-photo { order: 2; max-width: none; margin: 0; }
+  .cx-hero-in { order: 1; text-align: left; margin: 0; }
+  .cx-hero-tag { margin-left: 0; }
+  .cx-facts, .cx-hero-actions { justify-content: flex-start; }
+  .cx-hero h1 { font-size: clamp(2rem, 4.2vw, 3.3rem); }
+  .cx-hero-float { width: 30%; }
+  .cx-hero-float-0 { left: -28px; bottom: -26px; }
+  .cx-hero-float-1 { right: -22px; top: -24px; }
   .cx-strip { justify-content: center; }
   .cx-courses { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem; }
   .cx-course { grid-template-columns: minmax(0, 1fr); padding: 0 0 1rem; overflow: hidden; }
