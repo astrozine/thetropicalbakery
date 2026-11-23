@@ -161,6 +161,8 @@ export default function Home() {
             {HERO.map((h, i) => (
               <img key={h.src} src={optimizedSrc(h.src, 640)} alt={h.alt} fetchPriority={i < 2 ? 'high' : undefined} />
             ))}
+            {/* Phones only: the pineapple seal arrives over the four treats, sways once like a hanging sign, then settles in the middle */}
+            <span className="hm-seal" aria-hidden="true"><img src="/hero-logo-transparent.png" alt="" /></span>
           </div>
         </div>
       </section>
@@ -256,10 +258,37 @@ const CSS = `
 .hm-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 1.6rem; border-radius: 999px; font-weight: 800; font-size: 1rem; text-decoration: none; }
 .hm-btn--dark { background: #3c2a21; color: #f4d675; }
 .hm-btn--ghost { border: 1.5px solid #3c2a21; color: #3c2a21; }
-.hm-hero__photos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; max-width: 560px; width: 100%; justify-self: center; }
-.hm-hero__photos img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 18px; box-shadow: 0 12px 28px rgba(60,42,33,0.14); }
-.hm-hero__photos img:nth-child(even) { transform: translateY(1.5rem); }
-@media (max-width: 899px) { .hm-hero__photos { order: -1; } .hm-hero__photos img { aspect-ratio: 1; } .hm-hero__photos img:nth-child(even) { transform: none; } }
+.hm-hero__photos { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; max-width: 560px; width: 100%; justify-self: center; }
+.hm-hero__photos > img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 18px; box-shadow: 0 12px 28px rgba(60,42,33,0.14); }
+.hm-hero__photos > img:nth-child(even) { transform: translateY(1.5rem); }
+@media (max-width: 899px) { .hm-hero__photos { order: -1; } .hm-hero__photos > img { aspect-ratio: 1; } .hm-hero__photos > img:nth-child(even) { transform: none; } }
+
+/* Phone hero seal (Andrew, 2026-11-22): the four treats show first, then the pineapple logo rises over them,
+   sways once like a hanging shop sign and settles as a seal in the middle of the photos. Desktop keeps the logo above the title. */
+.hm-seal { display: none; }
+@media (max-width: 899px) {
+  .hm-seal { display: grid; place-items: center; position: absolute; inset: 0; pointer-events: none; }
+  .hm-seal::before { content: ''; position: absolute; inset: -2px; border-radius: 20px;
+    background: radial-gradient(circle at 50% 50%, rgba(253,250,243,0.92) 0%, rgba(253,250,243,0.55) 45%, rgba(253,250,243,0) 75%);
+    opacity: 0; animation: hm-veil 3.6s ease 0.7s both; }
+  .hm-seal img { position: relative; width: 34%; max-width: 190px; height: auto; transform-origin: 50% 8%;
+    filter: drop-shadow(0 14px 22px rgba(60,42,33,0.35)) drop-shadow(0 2px 4px rgba(60,42,33,0.25));
+    animation: hm-seal 3.6s cubic-bezier(.22,.8,.26,1) 0.7s both; }
+}
+@keyframes hm-veil { 0% { opacity: 0; } 22% { opacity: 1; } 60% { opacity: 1; } 100% { opacity: 0.35; } }
+@keyframes hm-seal {
+  0%   { opacity: 0; transform: translateY(14px) scale(0.55); }
+  22%  { opacity: 1; transform: translateY(0) scale(1.6); }
+  36%  { transform: scale(1.6) rotate(-4deg); }
+  48%  { transform: scale(1.6) rotate(3deg); }
+  58%  { transform: scale(1.6) rotate(-1.5deg); }
+  66%  { transform: scale(1.6) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hm-seal img, .hm-seal::before { animation: none; }
+  .hm-seal::before { opacity: 0.35; }
+}
 
 /* boxes showcase */
 .hm-boxes { display: grid; gap: 0.6rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
