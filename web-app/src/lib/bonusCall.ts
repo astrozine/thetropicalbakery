@@ -72,6 +72,8 @@ interface Copy {
     intro: string;
     siteBuyer: string;
     amazonIntro: string;
+    /** Someone who downloaded the free recipes (the sampler PDF links here with from=recipes). */
+    readerIntro: string;
     name: string;
     email: string;
     whatsapp: string;
@@ -118,6 +120,7 @@ const EN: Copy = {
     intro: '30 minutes, just you and me, on WhatsApp video or Google Meet. We talk about what you eat now, what you crave and your first easy steps. If you’d like more help after that, I’ll tell you how my coaching works. No pressure.',
     siteBuyer: 'We found your order. Just tell me how to reach you.',
     amazonIntro: 'Bought Sweet Escape on Amazon? Type your order number (it’s in your Amazon order e-mail and under Your Orders).',
+    readerIntro: 'You downloaded my free recipes, so this one’s on me too. Tell me how to reach you.',
     name: 'Your name',
     email: 'E-mail',
     whatsapp: 'WhatsApp (with country code)',
@@ -166,6 +169,7 @@ export const BONUS_CALL_COPY: Record<EbookLang, Copy> = {
       intro: '30 minutos, só eu e você, por vídeo no WhatsApp ou Google Meet. Falamos do que você come hoje, das suas vontades e dos seus primeiros passos. Se depois quiser mais ajuda, eu te conto como funciona o meu acompanhamento. Sem pressão.',
       siteBuyer: 'Encontramos o seu pedido. Só me diga como falar com você.',
       amazonIntro: 'Comprou o Sweet Escape na Amazon? Digite o número do pedido (está no e-mail da Amazon e em Seus Pedidos).',
+      readerIntro: 'Você baixou as minhas receitas grátis, então esta conversa também é presente. Me diga como falar com você.',
       name: 'Seu nome',
       email: 'E-mail',
       whatsapp: 'WhatsApp (com DDD)',
@@ -211,6 +215,7 @@ export const BONUS_CALL_COPY: Record<EbookLang, Copy> = {
       intro: '30 minutos, solo tú y yo, por video en WhatsApp o Google Meet, en inglés o portugués. Hablamos de lo que comes hoy, tus antojos y tus primeros pasos. Si después quieres más ayuda, te cuento cómo funciona mi acompañamiento. Sin presión.',
       siteBuyer: 'Encontramos tu pedido. Solo dime cómo contactarte.',
       amazonIntro: '¿Compraste Sweet Escape en Amazon? Escribe tu número de pedido (está en el e-mail de Amazon y en Mis pedidos).',
+      readerIntro: 'Descargaste mis recetas gratis, así que esta llamada también es un regalo. Dime cómo contactarte.',
       name: 'Tu nombre',
       email: 'E-mail',
       whatsapp: 'WhatsApp (con código de país)',
@@ -256,6 +261,7 @@ export const BONUS_CALL_COPY: Record<EbookLang, Copy> = {
       intro: '30 minuten, alleen jij en ik, via WhatsApp-video of Google Meet. We praten over wat je nu eet, waar je trek in hebt en je eerste makkelijke stappen. Wil je daarna meer hulp, dan vertel ik hoe mijn coaching werkt. Geen druk.',
       siteBuyer: 'We hebben je bestelling gevonden. Vertel me alleen hoe ik je bereik.',
       amazonIntro: 'Sweet Escape via Amazon gekocht? Vul je bestelnummer in (staat in de bevestigingsmail van Amazon en bij Mijn bestellingen).',
+      readerIntro: 'Je hebt mijn gratis recepten gedownload, dus dit gesprek is ook een cadeautje. Vertel me hoe ik je bereik.',
       name: 'Je naam',
       email: 'E-mail',
       whatsapp: 'WhatsApp (met landcode)',
@@ -301,6 +307,7 @@ export const BONUS_CALL_COPY: Record<EbookLang, Copy> = {
       intro: '30 Minuten, nur du und ich, per WhatsApp-Video oder Google Meet. Wir sprechen darüber, was du heute isst, worauf du Lust hast und über deine ersten einfachen Schritte. Wenn du danach mehr Hilfe möchtest, erzähle ich dir, wie mein Coaching funktioniert. Ohne Druck.',
       siteBuyer: 'Wir haben deine Bestellung gefunden. Sag mir nur, wie ich dich erreiche.',
       amazonIntro: 'Sweet Escape bei Amazon gekauft? Gib deine Bestellnummer ein (sie steht in der Amazon-Bestätigung und unter Meine Bestellungen).',
+      readerIntro: 'Du hast meine Gratis-Rezepte heruntergeladen, also ist auch dieses Gespräch ein Geschenk. Sag mir, wie ich dich erreiche.',
       name: 'Dein Name',
       email: 'E-Mail',
       whatsapp: 'WhatsApp (mit Ländervorwahl)',

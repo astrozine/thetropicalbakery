@@ -20,6 +20,8 @@ export default function BonusCallClaim() {
   const lang = isEbookLang(langParam) ? langParam : 'en';
   const ref = q.get('ref') || '';
   const k = q.get('k') || '';
+  // From the free-recipes PDF: no order to show, the call is a gift to the reader.
+  const reader = q.get('from') === 'recipes';
   const c = BONUS_CALL_COPY[lang].claim;
 
   const [buyer, setBuyer] = useState<Buyer | null>(null);
@@ -57,7 +59,7 @@ export default function BonusCallClaim() {
       const r = await fetch('/api/bonus-call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lang, name, email, whatsapp, goal, when, ...(site ? { ref, k } : { amazonOrder: order, edition }) }),
+        body: JSON.stringify({ lang, name, email, whatsapp, goal, when, ...(site ? { ref, k } : reader ? { reader: true } : { amazonOrder: order, edition }) }),
       });
       const j = await r.json();
       if (!r.ok) {
@@ -91,8 +93,8 @@ export default function BonusCallClaim() {
                 <p>{c.intro}</p>
                 {site && buyer?.paid === false && <p className="se-error" role="alert">{c.errNotPaid}</p>}
                 <form className="se-form" onSubmit={submit} noValidate>
-                  {site ? <p className="bc-claim__found">{c.siteBuyer}</p> : <p style={{ margin: 0 }}>{c.amazonIntro}</p>}
-                  {!site && (
+                  {site ? <p className="bc-claim__found">{c.siteBuyer}</p> : <p style={{ margin: 0 }}>{reader ? c.readerIntro : c.amazonIntro}</p>}
+                  {!site && !reader && (
                     <>
                       <fieldset className="bc-editions">
                         <legend>{c.edition}</legend>

@@ -54,6 +54,8 @@ export interface ClaimInput {
   /** Amazon buyer. */
   amazonOrder?: string;
   edition?: string;
+  /** Someone who downloaded the free recipes (no order): the sampler PDF links here with from=recipes. */
+  reader?: boolean;
 }
 
 const text = (v: unknown, max: number) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
@@ -87,6 +89,8 @@ export async function claimBonusCall(input: ClaimInput): Promise<{ ok: true; lat
     const { data } = await db.from('orders').select('created_at').eq('pix_transaction_id', ref).maybeSingle();
     if (data?.created_at && Date.now() - new Date(data.created_at).getTime() > BONUS_CALL.claimDays * 86400_000) return { ok: false, error: 'old' };
     source = `site ${ref}`;
+  } else if (input.reader) {
+    source = 'free recipes reader';
   } else {
     const order = normalizeAmazonOrder(String(input.amazonOrder || ''));
     if (!AMAZON_ORDER.test(order)) return { ok: false, error: 'order' };
@@ -95,11 +99,14 @@ export async function claimBonusCall(input: ClaimInput): Promise<{ ok: true; lat
   }
 
   const status = await bonusCallStatus(db);
-  // Switched off: site buyers who were promised it still get it; a new Amazon claim is turned away politely.
+  // Switched off: site buyers who were promised it still get it; Amazon and free-recipes claims are turned away politely.
   if (!status.on && !ref) return { ok: false, error: 'off' };
 
-  // One call per order.
-  const { count } = await db.from('contact_leads').select('id', { count: 'exact', head: true }).like('topic', `%${source.split(' ').slice(0, 2).join(' ')}%`);
+  // One call per order (a free-recipes reader: one per WhatsApp number).
+  const q = db.from('contact_leads').select('id', { count: 'exact', head: true }).like('topic', `${CLAIM_TOPIC}%`);
+  const { count } = await (input.reader && !ref
+    ? q.eq('whatsapp', whatsapp)
+    : q.like('topic', `%${source.split(' ').slice(0, 2).join(' ')}%`));
   if ((count ?? 0) > 0) return { ok: false, error: 'used' };
 
   const extra = [text(input.goal, 90) && `wants help with: ${text(input.goal, 90)}`, text(input.when, 60) && `best times: ${text(input.when, 60)}`, `lang ${lang}`]
