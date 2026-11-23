@@ -507,7 +507,7 @@ export function renderEmail(o: LayoutOptions): string {
             </td></tr>
             <tr><td height="${look ? 6 : 4}" bgcolor="${accent}" style="background:${accent};line-height:${look ? 6 : 4}px;font-size:0;">&nbsp;</td></tr>
             <tr><td class="tb-card" style="padding:32px 36px 34px;">
-                            <p style="text-align:center;font-family:${BODY_FONT};font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;color:${look ? accent : GOLD_DEEP};margin:0 0 12px;">&#10022;&nbsp; ${esc(look ? look.kicker : theme.kicker)} &nbsp;&#10022;</p>
+              <p style="text-align:center;font-family:${BODY_FONT};font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;color:${look ? accent : GOLD_DEEP};margin:0 0 12px;">&#10022;&nbsp; ${esc(look ? look.kicker : theme.kicker)} &nbsp;&#10022;</p>
               <h1 class="tb-h1" style="font-family:${HEADING_FONT};font-weight:700;color:${COCOA};font-size:27px;line-height:1.22;margin:0 0 22px;text-align:center;letter-spacing:-0.3px;">${esc(o.heading)}</h1>
               ${o.body.split(KICKER_MARK).join(look ? accent : GOLD_DEEP)}
               ${o.facts?.length ? factsRow(o.facts) : ''}
