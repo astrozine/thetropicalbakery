@@ -270,19 +270,24 @@ const CSS = `
   .hm-seal { display: grid; place-items: center; position: absolute; inset: 0; pointer-events: none; }
   .hm-seal::before { content: ''; position: absolute; inset: -2px; border-radius: 20px;
     background: radial-gradient(circle at 50% 50%, rgba(253,250,243,0.92) 0%, rgba(253,250,243,0.55) 45%, rgba(253,250,243,0) 75%);
-    opacity: 0; animation: hm-veil 3.6s ease 0.7s both; }
-  .hm-seal img { position: relative; width: 34%; max-width: 190px; height: auto; transform-origin: 50% 8%;
+    opacity: 0; animation: hm-veil 3.8s ease 0.7s both; }
+  .hm-seal img { position: relative; width: 34%; max-width: 190px; height: auto; transform-origin: 50% 60%;
     filter: drop-shadow(0 14px 22px rgba(60,42,33,0.35)) drop-shadow(0 2px 4px rgba(60,42,33,0.25));
-    animation: hm-seal 3.6s cubic-bezier(.22,.8,.26,1) 0.7s both; }
+    animation: hm-seal 3.8s linear 0.7s both; }
 }
 @keyframes hm-veil { 0% { opacity: 0; } 22% { opacity: 1; } 60% { opacity: 1; } 100% { opacity: 0.35; } }
 @keyframes hm-seal {
-  0%   { opacity: 0; transform: translateY(14px) scale(0.55); }
-  22%  { opacity: 1; transform: translateY(0) scale(1.6); }
-  36%  { transform: scale(1.6) rotate(-4deg); }
-  48%  { transform: scale(1.6) rotate(3deg); }
-  58%  { transform: scale(1.6) rotate(-1.5deg); }
-  66%  { transform: scale(1.6) rotate(0deg); }
+  0%   { opacity: 0; transform: translateY(24px) scale(0.4); animation-timing-function: cubic-bezier(.2,1.5,.4,1); }
+  16%  { opacity: 1; transform: translateY(0) scale(1.6); animation-timing-function: ease-in-out; }
+  /* a happy little jelly wiggle: tilt, squish and stretch, smaller each time */
+  24%  { transform: scale(1.68, 1.52) rotate(-9deg); }
+  32%  { transform: scale(1.52, 1.68) rotate(7deg); }
+  39%  { transform: scale(1.64, 1.56) rotate(-5deg); }
+  45%  { transform: scale(1.57, 1.63) rotate(3deg); }
+  50%  { transform: scale(1.6) rotate(-1deg); }
+  55%  { transform: scale(1.6) rotate(0deg); animation-timing-function: cubic-bezier(.5,0,.3,1.4); }
+  /* shrinks into place with a soft bounce, then stays put */
+  84%  { transform: scale(0.94) rotate(0deg); animation-timing-function: ease-out; }
   100% { opacity: 1; transform: scale(1) rotate(0deg); }
 }
 @media (prefers-reduced-motion: reduce) {
