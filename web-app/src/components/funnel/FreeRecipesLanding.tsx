@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { preload } from 'react-dom';
 import { supabase } from '@/lib/supabase';
 import { EBOOK, BOOK_OFFERS, RECIPES } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
-import { FUNNEL, FUNNEL_COPY, SEGMENTS, freeCover, type Segment } from '@/lib/funnel';
+import { FUNNEL, FUNNEL_COPY, SEGMENTS, freeCoverSm, type Segment } from '@/lib/funnel';
 import HandWrittenLang from '@/components/HandWrittenLang';
 import { readConsent, trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
@@ -13,6 +14,9 @@ import '@/components/ebook/sweetEscape.css';
 import './funnel.css';
 
 const IMG = '/ebook/sweet-escape';
+// Phone-sized copies of the photos (public/ebook/sweet-escape/sm): the originals are 825 px wide and up to 250 KB each.
+const SM = `${IMG}/sm`;
+const sm = (src: string) => src.replace(`${IMG}/`, `${SM}/`);
 const SEG_ICON: Record<Segment, string> = { local: '🌴', visiting: '🧳', away: '🌍' };
 const isFree = (day: number) => (FUNNEL.recipeDays as readonly number[]).includes(day);
 
@@ -26,6 +30,9 @@ const Lock = () => (
  * splits people for the thank-you page and the e-mails: around Ubatuba / Paraty they also see the local offers.
  */
 export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }) {
+  // Ads land here on phones: start fetching the hero photo with the HTML instead of after the CSS (it is the biggest thing
+  // on the first screen). Same file the CSS picks for phones in sweetEscape.css.
+  preload('/dolly/hero-mata-phone.webp', { as: 'image', fetchPriority: 'high', media: '(max-width: 760px)' });
   const c = FUNNEL_COPY[lang];
   const f = c.form;
   const book = EBOOK_COPY[lang].recipes;
@@ -123,17 +130,17 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
           <div className="se-hero__stage fr-stage" aria-hidden>
             <div className="fr-paid">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${IMG}/${lang}/cover.webp`} alt="" />
+              <img src={`${IMG}/${lang}/cover-sm.webp`} alt="" fetchPriority="high" />
               <span className="fr-paid__tag">{fill(c.hero.paidTag, { price: full })}</span>
             </div>
             <div className="se-book">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={freeCover(lang)} alt="" />
+              <img src={freeCoverSm(lang)} alt="" fetchPriority="high" />
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="se-float se-float--b" src={`${IMG}/red.webp`} alt="" />
+            <img className="se-float se-float--b" src={`${SM}/red.webp`} alt="" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="se-float se-float--d" src={`${IMG}/caramel.webp`} alt="" />
+            <img className="se-float se-float--d" src={`${SM}/caramel.webp`} alt="" />
             <div className="se-hero__card fr-badge"><b>2</b><span><strong>{c.hero.badge}</strong>{c.hero.badgeOf}</span></div>
           </div>
 
@@ -191,7 +198,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
                   </label>
                   <div className="fr-bump__body">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`${IMG}/${lang}/cover.webp`} alt="Sweet Escape" loading="lazy" />
+                    <img src={`${IMG}/${lang}/cover-sm.webp`} alt="Sweet Escape" loading="lazy" />
                     <p>{rich(fill(c.bump.text, { pages: EBOOK.pages, price: shownPrice(wallet) }))}</p>
                   </div>
                   {bump && <PayPicker lang={lang} methods={methods} method={method} setMethod={setMethod} wallet={wallet} foreign={foreign} setWallet={setWallet} legend={c.bump.pay} name="fr-method" />}
@@ -219,7 +226,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
             {c.recipes.items.map((r, i) => (
               <article key={r.name} className="fr-recipe" style={{ '--c': i === 0 ? '#e8364f' : '#c9853c' } as React.CSSProperties}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`${IMG}/${i === 0 ? 'red-scatter' : 'caramel-close'}.webp`} alt={r.name} loading="lazy" />
+                <img src={`${SM}/${i === 0 ? 'red-scatter' : 'caramel-close'}.webp`} alt={r.name} loading="lazy" />
                 <span className="fr-recipe__free">{c.strip.free}</span>
                 <div>
                   <small>{r.note}</small>
@@ -243,7 +250,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
             {RECIPES.map((r, i) => isFree(r.day) ? null : (
               <li key={r.day} style={{ '--c': r.hex, '--ink': r.ink } as React.CSSProperties}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={r.img} alt={book[i].alt} loading="lazy" />
+                <img src={sm(r.img)} alt={book[i].alt} loading="lazy" />
                 <span className="fr-rest__lock"><Lock /></span>
                 <div><small>{book[i].color}</small><b>{book[i].name}</b></div>
               </li>
@@ -261,7 +268,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
         <div className="se-wrap se-story">
           <div className="se-story__photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/dolly/dolly-portrait.jpg" alt="Dolly" loading="lazy" />
+            <img src="/dolly/dolly-portrait-sm.webp" alt="Dolly" loading="lazy" />
             <span className="se-story__tag">Dolly · The Tropical Bakery</span>
           </div>
           <div className="se-story__text">
@@ -277,7 +284,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
       <section className="se-final">
         <div className="se-final__photos" aria-hidden>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {RECIPES.map(r => <img key={r.day} src={r.img} alt="" loading="lazy" style={{ borderColor: r.hex }} />)}
+          {RECIPES.map(r => <img key={r.day} src={sm(r.img)} alt="" loading="lazy" style={{ borderColor: r.hex }} />)}
         </div>
         <div className="se-wrap se-narrow se-center">
           <h2 className="se-final__title">{c.final.title}</h2>

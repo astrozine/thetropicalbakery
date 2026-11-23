@@ -52,7 +52,7 @@ export default function Footer() {
       <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(60,42,33,0.82) 0%, rgba(60,42,33,0.72) 100%)' }} />
       <div className="container footer-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
         <div className="footer-brand">
-          <img src="/logo.svg" alt="The Tropical Bakery" style={{ height: '60px', marginBottom: '1rem', filter: 'brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(5deg)' }} />
+          <img src="/logo.svg" alt="The Tropical Bakery" loading="lazy" decoding="async" style={{ height: '60px', marginBottom: '1rem', filter: 'brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(5deg)' }} />
           <p style={{ marginBottom: '1rem', color: '#e8e1d7' }}>{t('Confeitaria saudável de luxo em Ubatuba, pelas mãos da chef belga Elisabeth “Dolly” Van Dam.')}</p>
           <span className="footer-seal"><OriginSeal tone="dark" style={{ marginBottom: '1.75rem' }} /></span>
           <br />

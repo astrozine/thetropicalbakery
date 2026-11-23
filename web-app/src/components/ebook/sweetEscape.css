@@ -47,6 +47,9 @@
 /* ══ HERO ══ */
 .se-hero { position: relative; background: var(--se-jungle); color: #fff; overflow: hidden; padding: 2rem 0 0; }
 .se-hero__bg { position: absolute; inset: 0; background: url('/dolly/hero-mata.webp') center 30% / cover no-repeat; filter: brightness(0.38) saturate(1.15); transform: scale(1.05); }
+/* Phones get a 38 KB copy of the photo (the full one is 415 KB): it sits behind a dark filter, so the smaller file looks the same
+   and the page shows up seconds sooner on a phone connection. The landing pages preload this same file. */
+@media (max-width: 760px) { .se-hero__bg { background-image: url('/dolly/hero-mata-phone.webp'); } }
 .se-hero__bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 70% 45%, rgba(255, 120, 40, 0.18), transparent 60%), linear-gradient(180deg, rgba(18, 38, 27, 0.2), rgba(18, 38, 27, 0.75)); }
 /* Phone: headline, then the book, then the pitch and the button. Wide: words on the left, book on the right. */
 .se-hero__grid { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: 'head' 'stage' 'body'; gap: 1.25rem; padding-bottom: 3rem; }
