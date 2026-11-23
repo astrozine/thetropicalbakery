@@ -24,8 +24,11 @@ const SAND = '#f3ead8';
 const LINE = '#eadfca';
 const TEXT = '#594a42';
 const MUTED = '#a89a90';
-const TILE = '#f1eee8';
-const TILE_LINE = '#e2dcd2';
+/**
+ * Kicker colour stand-in: kicker() is a pure helper with no idea which e-mail it is in, so it writes this and
+ * renderEmail() swaps in the e-mail's accent (orange on a Sweet Escape e-mail, gold everywhere else).
+ */
+const KICKER_MARK = '#a6832c';
 
 const HEADING_FONT = `'Unbounded','Outfit',Helvetica,Arial,sans-serif`;
 const BODY_FONT = `'Outfit',Helvetica,Arial,sans-serif`;
@@ -86,8 +89,8 @@ export type EmailTheme = 'caixa' | 'assinatura' | 'eventos' | 'cursos' | 'retiro
 
 interface ThemeDef {
   kicker: string;
-  /** The signpost tile above the heading: one simple emoji that says what the e-mail is about. */
-  icon: string;
+  /** Height of the top photo at 580px wide (the photos are captures of each landing page's own header). */
+  heroHeight?: number;
   heroAlt: string;
   stripTitle: string;
   strip: { img: string; caption: string; alt: string; path: string }[];
@@ -95,78 +98,78 @@ interface ThemeDef {
 
 const THEMES: Record<EmailTheme, ThemeDef> = {
   caixa: {
-    kicker: 'Caixa de Degustação', icon: '🎁',
-    heroAlt: 'Caixa de Degustação aberta, com doces veganos',
+    kicker: 'Caixa de Degustação', heroHeight: 380,
+    heroAlt: 'Caixa de Degustação aberta, com doces da Dolly',
     stripTitle: 'Saído da nossa cozinha',
     strip: [
       { img: 'tile-pitaya', caption: 'Pitaya & cacau', alt: 'Doce de pitaya em prato dourado', path: '/caixas' },
       { img: 'tile-bundt', caption: 'Bundt de chocolate', alt: 'Mini bundt coberto de chocolate', path: '/caixas' },
-      { img: 'tile-berry', caption: 'Torta de frutas vermelhas', alt: 'Torta de frutas vermelhas', path: '/caixas' },
+      { img: 'tile-truffles', caption: 'Trufas de morango', alt: 'Trufas cobertas de morango', path: '/caixas' },
     ],
   },
   assinatura: {
-    kicker: 'Sua assinatura', icon: '🗓️',
+    kicker: 'Sua assinatura', heroHeight: 380,
     heroAlt: 'Caixa de Degustação com doces da semana',
-    stripTitle: 'O que anda saindo do forno',
+    stripTitle: 'O que anda saindo da cozinha',
     strip: [
       { img: 'tile-truffles', caption: 'Trufas de morango', alt: 'Trufas cobertas de morango', path: '/assinatura' },
       { img: 'tile-caramel', caption: 'Bundt de caramelo', alt: 'Bolinhos com calda de caramelo', path: '/assinatura' },
-      { img: 'tile-mango', caption: 'Cheesecake de manga', alt: 'Cheesecake vegano de manga', path: '/assinatura' },
+      { img: 'tile-pecan', caption: 'Chocolate & pecã', alt: 'Doces de chocolate com pecã', path: '/assinatura' },
     ],
   },
   eventos: {
-    kicker: 'Menu de Eventos', icon: '🍰',
-    heroAlt: 'Convidados provando doces numa festa tropical',
-    stripTitle: 'Mesas que a gente já montou',
+    kicker: 'Menu de Eventos', heroHeight: 380,
+    heroAlt: 'Convidados provando os doces da Dolly numa festa',
+    stripTitle: 'Do Menu de Eventos',
     strip: [
-      { img: 'tile-event-night', caption: 'Jantares ao ar livre', alt: 'Jantar tropical à noite', path: '/menu' },
-      { img: 'tile-table', caption: 'Mesas de doces', alt: 'Mesa farta de doces tropicais', path: '/menu' },
       { img: 'tile-glasses', caption: 'Taças individuais', alt: 'Taças de açaí com creme', path: '/menu' },
+      { img: 'tile-pecan', caption: 'Chocolate & pecã', alt: 'Doces de chocolate com pecã', path: '/menu' },
+      { img: 'tile-pistachio', caption: 'Torta de pistache', alt: 'Fatia de torta de pistache', path: '/menu' },
     ],
   },
   cursos: {
-    kicker: 'Cursos em Itamambuca', icon: '🎓',
-    heroAlt: 'Aula prática de confeitaria',
+    kicker: 'Cursos com a Chef Dolly', heroHeight: 386,
+    heroAlt: 'Uma turma provando doces na cozinha da Dolly',
     stripTitle: 'O que se aprende na bancada',
     strip: [
-      { img: 'tile-nuts', caption: 'Castanhas & sementes', alt: 'Ilustração de castanhas e nozes', path: '/cursos' },
-      { img: 'tile-mango', caption: 'Sobremesas cruas', alt: 'Cheesecake vegano de manga', path: '/cursos' },
-      { img: 'tile-bakery', caption: 'Vitrine de padaria', alt: 'Vitrine com pães e doces', path: '/cursos' },
+      { img: 'tile-dolly-tray', caption: 'Com a Dolly', alt: 'Dolly segurando uma tábua de doces', path: '/cursos' },
+      { img: 'tile-pistachio', caption: 'Torta de pistache', alt: 'Fatia de torta de pistache', path: '/cursos' },
+      { img: 'tile-caramel', caption: 'Bundt de caramelo', alt: 'Bolinhos com calda de caramelo', path: '/cursos' },
     ],
   },
   retiros: {
-    kicker: 'Retiros em Itamambuca', icon: '🌴',
+    kicker: 'Retiros em Itamambuca', heroHeight: 416,
     heroAlt: 'Praia de Itamambuca vista do alto',
     stripTitle: 'Pertinho da casa',
     strip: [
       { img: 'tile-island', caption: 'Ilha do Prumirim · 15–20 min', alt: 'Ilha do Prumirim vista do alto', path: '/retreats' },
       { img: 'tile-waterfall', caption: 'Cachoeira · 15–20 min', alt: 'Piscina natural na Cachoeira do Prumirim', path: '/retreats' },
-      { img: 'tile-surf', caption: 'Surfe · aulas à parte', alt: 'Surfista numa onda', path: '/retreats' },
+      { img: 'tile-dolly-tray', caption: 'Cozinhando com a Dolly', alt: 'Dolly segurando uma tábua de doces', path: '/retreats' },
     ],
   },
   parcerias: {
-    kicker: 'Parcerias', icon: '🤝',
-    heroAlt: 'Café da manhã de hotel com vista para o mar',
-    stripTitle: 'Onde nossos doces já moram',
+    kicker: 'Parcerias', heroHeight: 380,
+    heroAlt: 'Caixa de doces da Dolly para hotéis, pousadas e cafés',
+    stripTitle: 'O que vai para a sua vitrine',
     strip: [
-      { img: 'tile-tray', caption: 'Café na cama (Airbnbs)', alt: 'Bandeja de café da manhã com doces', path: '/b2b/airbnbs' },
-      { img: 'tile-pousada', caption: 'Pousadas', alt: 'Hóspedes na varanda de uma pousada', path: '/b2b/pousadas' },
+      { img: 'tile-box', caption: 'Caixas de boas-vindas', alt: 'Caixa de doces montada', path: '/b2b' },
+      { img: 'tile-glasses', caption: 'Taças para servir', alt: 'Taças de açaí com creme', path: '/b2b' },
       { img: 'tile-pecan', caption: 'Vitrines & cafés', alt: 'Doces de chocolate com pecã', path: '/b2b' },
     ],
   },
   equipe: {
-    kicker: 'Trabalhe com a gente', icon: '💼',
-    heroAlt: 'Vitrine da padaria',
-    stripTitle: 'O dia a dia na cozinha',
+    kicker: 'Trabalhe com a gente', heroHeight: 380,
+    heroAlt: 'Dolly na cozinha, com espátula e doces',
+    stripTitle: 'O que sai das nossas mãos',
     strip: [
-      { img: 'tile-chef', caption: 'Mão na massa', alt: 'Confeiteiras trabalhando juntas', path: '/trabalhe-conosco' },
       { img: 'tile-box', caption: 'Caixas montadas à mão', alt: 'Caixa de doces montada', path: '/trabalhe-conosco' },
-      { img: 'tile-caramel', caption: 'Pequenos lotes', alt: 'Bolinhos com calda de caramelo', path: '/trabalhe-conosco' },
+      { img: 'tile-bundt', caption: 'Pequenos lotes', alt: 'Mini bundt coberto de chocolate', path: '/trabalhe-conosco' },
+      { img: 'tile-truffles', caption: 'Detalhe em tudo', alt: 'Trufas cobertas de morango', path: '/trabalhe-conosco' },
     ],
   },
   brunch: {
-    kicker: 'Brunch Tropical', icon: '🥞',
-    heroAlt: 'Mulheres rindo em volta de uma mesa de brunch tropical com doces e chá',
+    kicker: 'Brunch Tropical', heroHeight: 418,
+    heroAlt: 'Mulheres em volta de uma mesa de brunch tropical com doces e chá',
     stripTitle: 'Como é um brunch com a Dolly',
     strip: [
       { img: 'tile-brunch-box', caption: 'A mesa de doces', alt: 'Mesa com doces saudáveis, frutas e chá', path: '/brunch' },
@@ -175,12 +178,12 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
     ],
   },
   novidades: {
-    kicker: 'Carta da padaria', icon: '💌',
-    heroAlt: 'Mesa de doces tropicais',
+    kicker: 'Da cozinha da Dolly', heroHeight: 448,
+    heroAlt: 'O abacaxi da The Tropical Bakery sobre quatro doces da Dolly',
     stripTitle: 'Da nossa mesa',
     strip: [
-      { img: 'tile-mango', caption: 'Caixa de Degustação', alt: 'Cheesecake vegano de manga', path: '/caixas' },
-      { img: 'tile-event-night', caption: 'Menu de Eventos', alt: 'Jantar tropical à noite', path: '/menu' },
+      { img: 'tile-yellow', caption: 'Sweet Escape', alt: 'Doce amarelo do livro Sweet Escape', path: '/sweet-escape/pt' },
+      { img: 'tile-dolly-tray', caption: 'Cursos com a Dolly', alt: 'Dolly segurando uma tábua de doces', path: '/cursos' },
       { img: 'tile-island', caption: 'Retiros', alt: 'Ilha do Prumirim vista do alto', path: '/retreats' },
     ],
   },
@@ -190,25 +193,9 @@ const THEMES: Record<EmailTheme, ThemeDef> = {
 export interface EmailFact {
   num: string;
   label: string;
-  /** Optional emoji shown above the number. */
+  /** Ignored (no emoji in e-mails). Kept so old callers compile. */
   icon?: string;
 }
-
-/**
- * The site's signpost in e-mail form: an emoji on a pale grey embossed tile. A one-cell table so Outlook
- * keeps the size; the shadow is a bonus where it renders, the border carries the shape where it doesn't.
- */
-export const iconTile = (emoji: string, size = 56, align: 'center' | 'left' = 'center') =>
-  `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="${align}" style="margin:${align === 'center' ? '0 auto' : '0'};">` +
-  `<tr><td width="${size}" height="${size}" align="center" valign="middle" bgcolor="${TILE}" ` +
-  `style="width:${size}px;height:${size}px;background:${TILE};background-image:linear-gradient(145deg,#fdfcfa 0%,#ebe7e0 100%);border:1px solid ${TILE_LINE};border-radius:${Math.round(size * 0.3)}px;` +
-  `box-shadow:inset 0 1px 0 #ffffff,0 2px 4px rgba(60,42,33,0.12);font-size:${Math.round(size * 0.52)}px;line-height:${size}px;text-align:center;mso-line-height-rule:exactly;">${emoji}</td></tr></table>`;
-
-/** The same tile at text size, inline before a label. */
-const inlineTile = (emoji: string) =>
-  `<span style="display:inline-block;width:30px;height:30px;line-height:30px;text-align:center;vertical-align:middle;margin:0 9px 0 0;` +
-  `background:${TILE};background-image:linear-gradient(145deg,#fdfcfa 0%,#ebe7e0 100%);border:1px solid ${TILE_LINE};border-radius:9px;` +
-  `font-size:16px;letter-spacing:0;text-transform:none;">${emoji}</span>`;
 
 export interface LayoutOptions {
   /** Hidden line Gmail shows next to the subject. */
@@ -226,7 +213,7 @@ export interface LayoutOptions {
   facts?: EmailFact[];
   /** Picks the photo, kicker and photo strip. Defaults to 'novidades'. */
   theme?: EmailTheme;
-  /** The emoji in the tile above the heading, when this e-mail needs a different one from its theme (📖 on an e-book receipt). */
+  /** Ignored since 2026-11-23 (no more emoji tiles; Andrew called them AI slop). Kept so old callers still compile. */
   icon?: string;
   /** Where images load from. The admin preview passes its own origin so new images show before deploy. */
   assetBase?: string;
@@ -277,8 +264,8 @@ export const greeting = (firstName: string, lang: EmailLang = 'pt') =>
   `<p style="color:${COCOA};font-family:${BODY_FONT};font-size:17px;font-weight:bold;margin:0 0 12px;">${UI[lang].hi}, ${esc(firstName)}!</p>`;
 
 /** Small gold uppercase label above a list or section, the same one the site uses. With an emoji, it gets the signpost tile. */
-export const kicker = (text: string, icon?: string) =>
-  `<p style="color:${GOLD_DEEP};font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;margin:${icon ? '14px' : '8px'} 0 10px;">${icon ? inlineTile(icon) : ''}${esc(text)}</p>`;
+export const kicker = (text: string, _icon?: string) =>
+  `<p style="color:${KICKER_MARK};font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;margin:14px 0 10px;">${esc(text)}</p>`;
 
 export interface OrderLine {
   label: string;
@@ -319,11 +306,11 @@ export const copyBox = (label: string, code: string) =>
 const THEMES_EN: Partial<Record<EmailTheme, Partial<ThemeDef>>> = {
   novidades: {
     kicker: 'From Dolly’s kitchen',
-    heroAlt: 'A table of tropical treats',
+    heroAlt: 'The Tropical Bakery pineapple over four of Dolly’s treats',
     stripTitle: 'From our table',
     strip: [
-      { img: 'tile-mango', caption: 'Tasting Box', alt: 'Vegan mango cheesecake', path: '/caixas' },
-      { img: 'tile-event-night', caption: 'Events Menu', alt: 'A tropical dinner at night', path: '/menu' },
+      { img: 'tile-yellow', caption: 'Sweet Escape', alt: 'A yellow treat from the Sweet Escape book', path: '/sweet-escape' },
+      { img: 'tile-dolly-tray', caption: 'Cook with Dolly', alt: 'Dolly holding a board of treats', path: '/cursos' },
       { img: 'tile-island', caption: 'Retreats', alt: 'Prumirim island from above', path: '/en/retreats' },
     ],
   },
@@ -332,62 +319,62 @@ const THEMES_EN: Partial<Record<EmailTheme, Partial<ThemeDef>>> = {
 /** The same, in the other languages the free-recipes funnel writes in. */
 const THEMES_INTL: Record<'es' | 'nl' | 'de', Partial<Record<EmailTheme, Partial<ThemeDef>>>> = {
   es: { novidades: {
-    kicker: 'Desde la cocina de Dolly', heroAlt: 'Una mesa de dulces tropicales', stripTitle: 'De nuestra mesa',
+    kicker: 'Desde la cocina de Dolly', heroAlt: 'La piña de The Tropical Bakery sobre cuatro dulces de Dolly', stripTitle: 'De nuestra mesa',
     strip: [
-      { img: 'tile-mango', caption: 'Caja de Degustación', alt: 'Cheesecake vegano de mango', path: '/caixas' },
-      { img: 'tile-event-night', caption: 'Menú de Eventos', alt: 'Una cena tropical de noche', path: '/menu' },
+      { img: 'tile-yellow', caption: 'Sweet Escape', alt: 'Un dulce amarillo del libro Sweet Escape', path: '/sweet-escape/es' },
+      { img: 'tile-dolly-tray', caption: 'Cocina con Dolly', alt: 'Dolly con una tabla de dulces', path: '/cursos' },
       { img: 'tile-island', caption: 'Retiros', alt: 'La isla de Prumirim desde arriba', path: '/es/retiros' },
     ],
   } },
   nl: { novidades: {
-    kicker: 'Uit Dolly’s keuken', heroAlt: 'Een tafel vol tropisch lekkers', stripTitle: 'Van onze tafel',
+    kicker: 'Uit Dolly’s keuken', heroAlt: 'De ananas van The Tropical Bakery boven vier lekkernijen van Dolly', stripTitle: 'Van onze tafel',
     strip: [
-      { img: 'tile-mango', caption: 'Proefbox', alt: 'Vegan mangocheesecake', path: '/caixas' },
-      { img: 'tile-event-night', caption: 'Evenementenmenu', alt: 'Een tropisch diner bij nacht', path: '/menu' },
+      { img: 'tile-yellow', caption: 'Sweet Escape', alt: 'Een geel snoepje uit het boek Sweet Escape', path: '/sweet-escape/nl' },
+      { img: 'tile-dolly-tray', caption: 'Kook met Dolly', alt: 'Dolly met een plank vol lekkers', path: '/cursos' },
       { img: 'tile-island', caption: 'Retreats', alt: 'Het eiland Prumirim van bovenaf', path: '/en/retreats' },
     ],
   } },
   de: { novidades: {
-    kicker: 'Aus Dollys Küche', heroAlt: 'Ein Tisch voller tropischer Leckereien', stripTitle: 'Von unserem Tisch',
+    kicker: 'Aus Dollys Küche', heroAlt: 'Die Ananas von The Tropical Bakery über vier Leckereien von Dolly', stripTitle: 'Von unserem Tisch',
     strip: [
-      { img: 'tile-mango', caption: 'Probierbox', alt: 'Veganer Mango-Cheesecake', path: '/caixas' },
-      { img: 'tile-event-night', caption: 'Event-Menü', alt: 'Ein tropisches Abendessen', path: '/menu' },
+      { img: 'tile-yellow', caption: 'Sweet Escape', alt: 'Eine gelbe Leckerei aus dem Buch Sweet Escape', path: '/sweet-escape/de' },
+      { img: 'tile-dolly-tray', caption: 'Koch mit Dolly', alt: 'Dolly mit einem Brett voller Leckereien', path: '/cursos' },
       { img: 'tile-island', caption: 'Retreats', alt: 'Die Insel Prumirim von oben', path: '/en/retreats' },
     ],
   } },
 };
 
 const FOOTER_LINKS_EN: { label: string; path: string }[] = [
-  { label: '📖 Sweet Escape', path: '/sweet-escape' },
-  { label: '🎁 Tasting Box', path: '/caixas' },
-  { label: '🍰 Events Menu', path: '/menu' },
-  { label: '🌴 Retreats', path: '/en/retreats' },
+  { label: 'Sweet Escape', path: '/sweet-escape' },
+  { label: 'Cook with Dolly', path: '/cursos' },
+  { label: 'Events Menu', path: '/menu' },
+  { label: 'Retreats', path: '/en/retreats' },
 ];
 
 const FOOTER_LINKS_INTL: Record<'es' | 'nl' | 'de', { label: string; path: string }[]> = {
   es: [
-    { label: '📖 Sweet Escape', path: '/sweet-escape/es' },
-    { label: '🍰 Menú de Eventos', path: '/menu' },
-    { label: '🌴 Retiros', path: '/es/retiros' },
+    { label: 'Sweet Escape', path: '/sweet-escape/es' },
+    { label: 'Menú de Eventos', path: '/menu' },
+    { label: 'Retiros', path: '/es/retiros' },
   ],
   nl: [
-    { label: '📖 Sweet Escape', path: '/sweet-escape/nl' },
-    { label: '🍰 Evenementenmenu', path: '/menu' },
-    { label: '🌴 Retreats', path: '/en/retreats' },
+    { label: 'Sweet Escape', path: '/sweet-escape/nl' },
+    { label: 'Evenementenmenu', path: '/menu' },
+    { label: 'Retreats', path: '/en/retreats' },
   ],
   de: [
-    { label: '📖 Sweet Escape', path: '/sweet-escape/de' },
-    { label: '🍰 Event-Menü', path: '/menu' },
-    { label: '🌴 Retreats', path: '/en/retreats' },
+    { label: 'Sweet Escape', path: '/sweet-escape/de' },
+    { label: 'Event-Menü', path: '/menu' },
+    { label: 'Retreats', path: '/en/retreats' },
   ],
 };
 
 const FOOTER_LINKS: { label: string; path: string }[] = [
-  { label: '🎁 Caixa de Degustação', path: '/caixas' },
-  { label: '🗓️ Assinatura', path: '/assinatura' },
-  { label: '🍰 Menu de Eventos', path: '/menu' },
-  { label: '🎓 Cursos', path: '/cursos' },
-  { label: '🌴 Retiros', path: '/retreats' },
+  { label: 'Sweet Escape', path: '/sweet-escape/pt' },
+  { label: 'Cursos', path: '/cursos' },
+  { label: 'Coaching', path: '/coaching' },
+  { label: 'Menu de Eventos', path: '/menu' },
+  { label: 'Retiros', path: '/retreats' },
 ];
 
 const img = (base: string, name: string, ext = 'jpg') => `${base}/email/${name}.${ext}`;
@@ -400,7 +387,6 @@ function factsRow(facts: EmailFact[]): string {
     <td class="tb-fact" width="${w}%" valign="top" style="padding:0 4px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr><td class="tb-fact-in" height="96" valign="middle" bgcolor="${SAND}" style="height:96px;background:${SAND};border:1px solid ${LINE};border-radius:14px;padding:12px 10px;text-align:center;">
-          ${f.icon ? `<div style="font-size:24px;line-height:1;margin:0 0 6px;">${f.icon}</div>` : ''}
           <div class="tb-fact-num${f.num.length > 7 ? " tb-fact-num--long" : ""}" style="font-family:${HEADING_FONT};font-weight:700;font-size:${f.num.length > 7 ? 16 : 22}px;line-height:1.15;color:${GOLD_DEEP};">${esc(f.num)}</div>
           <div class="tb-fact-lbl" style="font-family:${BODY_FONT};font-size:12px;line-height:1.4;color:${TEXT};margin-top:6px;">${esc(f.label)}</div>
         </td></tr>
@@ -516,15 +502,14 @@ export function renderEmail(o: LayoutOptions): string {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff"
             style="background:#ffffff;border:1px solid ${LINE};border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 18px 40px rgba(60,42,33,0.10);">
             <tr><td bgcolor="${SAND}" style="background:${SAND};line-height:0;font-size:0;border-radius:22px 22px 0 0;overflow:hidden;">
-              <img src="${heroSrc}" width="580" height="${look?.heroHeight || 387}" alt="${esc(heroAlt)}"
+              <img src="${heroSrc}" width="580" height="${look?.heroHeight || theme.heroHeight || 387}" alt="${esc(heroAlt)}"
                 style="display:block;width:100%;max-width:580px;height:auto;border:0;border-radius:22px 22px 0 0;">
             </td></tr>
             <tr><td height="${look ? 6 : 4}" bgcolor="${accent}" style="background:${accent};line-height:${look ? 6 : 4}px;font-size:0;">&nbsp;</td></tr>
             <tr><td class="tb-card" style="padding:32px 36px 34px;">
-              ${look ? '' : `<div style="margin:0 0 14px;">${iconTile(o.icon || theme.icon)}</div>`}
               <p style="text-align:center;font-family:${BODY_FONT};font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;color:${look ? accent : GOLD_DEEP};margin:0 0 12px;">&#10022;&nbsp; ${esc(look ? look.kicker : theme.kicker)} &nbsp;&#10022;</p>
               <h1 class="tb-h1" style="font-family:${HEADING_FONT};font-weight:700;color:${COCOA};font-size:27px;line-height:1.22;margin:0 0 22px;text-align:center;letter-spacing:-0.3px;">${esc(o.heading)}</h1>
-              ${o.body}
+              ${o.body.split(KICKER_MARK).join(look ? accent : GOLD_DEEP)}
               ${o.facts?.length ? factsRow(o.facts) : ''}
               ${o.cta ? button(o.cta.label, o.cta.href, accent, look ? look.accentInk || '#ffffff' : COCOA) : ''}
               ${o.afterCta || ''}

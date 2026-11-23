@@ -1,6 +1,6 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { SITE_URL, copyBox, esc, kicker, orderTable, paragraphs, bulletList } from './layout';
+import { SITE_URL, copyBox, esc, kicker, orderTable, paragraphs, bulletList, type LayoutOptions } from './layout';
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
 import { EBOOK, usdForBRL } from '@/lib/ebook';
@@ -35,10 +35,21 @@ const money = (o: EbookReceipt) => (o.method === 'stripe' ? o.charged ?? `US$ ${
 
 const hello = (template: string, name: string) => {
   const first = (name || '').trim().split(' ')[0];
+  // The copy's own "Hi {name}," wording, in the frame's font (was Georgia, which no other e-mail uses).
   return first
-    ? `<p style="color:#3c2a21;font-family:Georgia,serif;font-size:17px;font-weight:bold;margin:0 0 12px;">${esc(fill(template, { name: first }))}</p>`
+    ? `<p style="color:#3c2a21;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:17px;font-weight:bold;margin:0 0 12px;">${esc(fill(template, { name: first }))}</p>`
     : '';
 };
+
+/**
+ * Dressed like /sweet-escape, the page they bought on: the book on its jungle background (a capture of that page's
+ * header, public/email/hero-ebook-<lang>.jpg) and the book's orange (sweetEscape.css), the same look as the
+ * free-recipes e-mails (funnelMail.ts). The frame speaks the buyer's language.
+ */
+const bookLook = (o: EbookReceipt): Pick<LayoutOptions, 'look' | 'lang'> => ({
+  lang: o.lang ?? 'en',
+  look: { hero: `hero-ebook-${o.lang ?? 'en'}.jpg`, heroAlt: 'Sweet Escape', heroHeight: 431, kicker: 'Sweet Escape', accent: '#ff4f0a' },
+});
 
 const link = (o: EbookReceipt) => `${SITE_URL}${EBOOK.thanksPath}?ref=${o.reference}&k=${o.key}&lang=${o.lang ?? 'en'}`;
 
@@ -59,7 +70,7 @@ export async function sendEbookOrderReceived(db: SupabaseClient, o: EbookReceipt
   const body =
     hello(m.hi, o.customerName) +
     paragraphs(fill(isPix ? m.receivedPix : m.receivedCard, v)) +
-    kicker(m.yourOrder, '🛍️') +
+    kicker(m.yourOrder) +
     orderTable([{ label: `${EBOOK.lineName} · ${LANG_LABEL[o.book ?? 'en']}`, amount: money(o) }, { label: 'Total', amount: money(o), strong: true }]) +
     (isPix && o.pixPayload ? copyBox('Pix copia e cola', o.pixPayload) : '');
 
@@ -69,7 +80,7 @@ export async function sendEbookOrderReceived(db: SupabaseClient, o: EbookReceipt
     body,
     cta: { label: m.myPage, href: link(o) },
     note: fill(m.receivedNote, v),
-    theme: 'novidades', icon: '📖',
+    ...bookLook(o),
   });
 }
 
@@ -79,13 +90,13 @@ export async function sendEbookPaid(db: SupabaseClient, o: EbookReceipt) {
   const body =
     hello(m.hi, o.customerName) +
     paragraphs(m.paidText) +
-    kicker(m.edition, '📖') +
-    paragraphs(`📖 ${LANG_LABEL[o.book ?? 'en']}`) +
-    kicker(m.whereToStart, '🧭') +
+    kicker(m.edition) +
+    paragraphs(LANG_LABEL[o.book ?? 'en']) +
+    kicker(m.whereToStart) +
     bulletList(m.tips) +
     paragraphs(m.paidLink) +
     // The reader's gift (lib/bookPerk.ts): 15% off their first purchase of anything else.
-    kicker(PERK_COPY[o.lang ?? 'en'].title, '🎁') +
+    kicker(PERK_COPY[o.lang ?? 'en'].title) +
     paragraphs(PERK_COPY[o.lang ?? 'en'].text);
 
   await send(db, o, `ebook-paid:${o.reference}`, m.paidSubject, {
@@ -94,6 +105,6 @@ export async function sendEbookPaid(db: SupabaseClient, o: EbookReceipt) {
     body,
     cta: { label: m.paidCta, href: link(o) },
     note: fill(m.paidNote, v),
-    theme: 'novidades', icon: '📖',
+    ...bookLook(o),
   });
 }

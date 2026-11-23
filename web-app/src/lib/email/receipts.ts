@@ -1,7 +1,7 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { PICKUP_EXTRA_DAYS, pickupWindowText } from '@/lib/pickupWindow';
-import { SITE_URL, STORE_WHATSAPP, copyBox, greeting, kicker, orderTable, paragraphs, type LayoutOptions } from './layout';
+import { SITE_URL, STORE_WHATSAPP, copyBox, greeting, kicker, orderTable, paragraphs, type EmailTheme, type LayoutOptions } from './layout';
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
 import { CARE_PATH, CARE_SHORT } from '@/lib/treatCare';
@@ -82,6 +82,17 @@ function fulfilment(order: ReceiptOrder): string {
   return '';
 }
 
+/**
+ * Which page the receipt should look like: a course/retreat proposal (PRP…) looks like /cursos or /retreats, a box
+ * order like the box, and everything else (the Events Menu, now that the box is paused) like /menu.
+ */
+function themeFor(order: ReceiptOrder): EmailTheme {
+  const what = [order.summary || '', ...(order.lines || []).map(l => l.name)].join(' ');
+  if (/^PRP/.test(order.reference)) return /retiro|retreat/i.test(what) ? 'retiros' : 'cursos';
+  if (/caixa|assinatura/i.test(what)) return 'caixa';
+  return 'eventos';
+}
+
 /** One transactional e-mail to one address, or nothing when we have no address. */
 async function send(db: SupabaseClient, order: ReceiptOrder, messageKey: string, subject: string, layout: Omit<LayoutOptions, 'theme'>) {
   const email = (order.customerEmail || '').trim().toLowerCase();
@@ -99,7 +110,7 @@ async function send(db: SupabaseClient, order: ReceiptOrder, messageKey: string,
       topic: 'pedido',
       template: messageKey.split(':')[0],
       transactional: true,
-      layout: { ...layout, theme: 'caixa' },
+      layout: { ...layout, theme: themeFor(order) },
     });
   } catch (err) {
     console.error('receipt failed for', order.reference, err);
@@ -123,7 +134,7 @@ export async function sendOrderReceived(db: SupabaseClient, order: ReceiptOrder)
         ? 'Recebemos o seu pedido e guardamos ele para você. Falta só o Pix cair — assim que cair, a gente confirma aqui e no WhatsApp.'
         : 'Recebemos o seu pedido! Estamos só esperando a confirmação do pagamento, que costuma levar alguns minutos.',
     ) +
-    kicker('Seu pedido', '🛍️') +
+    kicker('Seu pedido') +
     amounts(order) +
     (isPix && order.pixPayload ? copyBox('Pix copia e cola', order.pixPayload) : '') +
     (where ? paragraphs(where) : '');
@@ -153,15 +164,15 @@ export async function sendOrderPaid(db: SupabaseClient, order: ReceiptOrder) {
         ? 'Quando estiver pronto a gente te avisa no WhatsApp para você vir buscar.'
         : 'A Dolly faz tudo à mão, fresco, o mais perto possível do dia da entrega.'),
     ) +
-    kicker('O que você pediu', '🛍️') +
+    kicker('O que você pediu') +
     amounts(order) +
     (where ? paragraphs(where) : '') +
     // How to keep the treats (src/lib/treatCare.ts): this is the e-mail everyone who paid gets.
-    (spot ? '' : kicker('Quando a caixa chegar', '❄️') + paragraphs(`${CARE_SHORT}
+    (spot ? '' : kicker(themeFor(order) === 'caixa' ? 'Quando a caixa chegar' : 'Quando os doces chegarem') + paragraphs(`${CARE_SHORT}
 
 Todos os cuidados: ${SITE_URL}${CARE_PATH}`));
 
-  await send(db, order, `order-paid:${order.reference}`, `Pagamento confirmado ✅ ${order.reference}`, {
+  await send(db, order, `order-paid:${order.reference}`, `Pagamento confirmado: ${order.reference}`, {
     preheader: `Recebemos ${formatBRL(order.total)}. Seu pedido está confirmado.`,
     heading: 'Pagamento confirmado',
     body,
