@@ -1,11 +1,13 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { SITE_URL, copyBox, esc, kicker, orderTable, paragraphs, bulletList, type LayoutOptions } from './layout';
+import { SITE_URL, button, copyBox, esc, kicker, orderTable, paragraphs, bulletList, type LayoutOptions } from './layout';
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
 import { EBOOK, usdForBRL } from '@/lib/ebook';
 import { PERK_COPY } from '@/lib/bookPerk';
 import { EBOOK_COPY, LANG_LABEL, fill, type EbookLang } from '@/lib/ebookCopy';
+import { BONUS_CALL_COPY, claimPath } from '@/lib/bonusCall';
+import { bonusCallOn } from '@/lib/payments/bonusCall';
 
 /**
  * The e-book's two e-mails, in the language the buyer read the page in (the book comes in English, Português,
@@ -84,14 +86,28 @@ export async function sendEbookOrderReceived(db: SupabaseClient, o: EbookReceipt
   });
 }
 
+/** The free call with Dolly (lib/bonusCall.ts): her photo, two lines and a button to the claim page. */
+const callBlock = (o: EbookReceipt) => {
+  const lang = o.lang ?? 'en';
+  const c = BONUS_CALL_COPY[lang];
+  return (
+    kicker(c.paidTitle) +
+    `<img src="${SITE_URL}/dolly/dolly-portrait.jpg" alt="Dolly" width="520" style="display:block;width:100%;max-width:520px;height:auto;border-radius:14px;margin:0 0 16px;">` +
+    paragraphs(c.paidText) +
+    button(c.paidCta, `${SITE_URL}${claimPath(lang, o.reference, o.key)}`, '#ff4f0a', '#ffffff')
+  );
+};
+
 export async function sendEbookPaid(db: SupabaseClient, o: EbookReceipt) {
   const m = EBOOK_COPY[o.lang ?? 'en'].mail;
+  const call = await bonusCallOn(db);
   const v = { price: money(o), ref: o.reference };
   const body =
     hello(m.hi, o.customerName) +
     paragraphs(m.paidText) +
     kicker(m.edition) +
     paragraphs(LANG_LABEL[o.book ?? 'en']) +
+    (call ? callBlock(o) : '') +
     kicker(m.whereToStart) +
     bulletList(m.tips) +
     paragraphs(m.paidLink) +

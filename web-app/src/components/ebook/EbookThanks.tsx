@@ -7,6 +7,7 @@ import { EBOOK_COPY, fill, isEbookLang, LANG_LABEL, LANG_PATH } from '@/lib/eboo
 import { rich } from './EbookLang';
 import { useEbookPayment } from './useEbookPayment';
 import { PERK_COPY } from '@/lib/bookPerk';
+import { BonusCallCard } from './BonusCall';
 import './sweetEscape.css';
 
 const NEXT = [
@@ -50,6 +51,7 @@ export default function EbookThanks() {
               <p>{rich(c.paidText)}</p>
               {fileError && <p className="se-error" role="alert">{c.fileError}</p>}
               <a className="se-btn se-btn--primary se-btn--big" href={download}>{c.download}</a>
+              <BonusCallCard lang={lang} refCode={ref} k={k} />
               <div className="se-thanks__tips">
                 <b>🎁 {PERK_COPY[lang].title}</b>
                 <p style={{ margin: 0 }}>{PERK_COPY[lang].text}</p>

@@ -1,0 +1,42 @@
+/* The free call with Dolly that comes with Sweet Escape: pop-up, paid card, badge and claim page. Lives inside .se. */
+
+.bc-badge { display: flex; gap: 0.6rem; align-items: center; margin: 0.9rem 0 1rem; padding: 0.65rem 0.8rem; border-radius: 12px; background: #fff3e8; border: 1.5px dashed var(--se-orange, #ff4f0a); color: var(--se-cocoa, #3c2a21); font-size: 0.92rem; font-weight: 700; line-height: 1.35; text-align: left; }
+.bc-badge img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex: none; }
+.bc-badge--dark { background: rgba(255, 255, 255, 0.08); color: #fff; border-color: #ffc79f; }
+
+.bc-pop { position: fixed; inset: 0; z-index: 1200; display: flex; align-items: flex-end; justify-content: center; padding: 0; background: rgba(18, 38, 27, 0.55); animation: bc-fade 0.25s ease; }
+@keyframes bc-fade { from { opacity: 0; } }
+.bc-pop__card { position: relative; width: 100%; max-width: 460px; max-height: 92vh; overflow-y: auto; background: var(--se-paper, #fdf7ec); color: var(--se-cocoa, #3c2a21); border-radius: 22px 22px 0 0; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25); animation: bc-up 0.3s ease; }
+@keyframes bc-up { from { transform: translateY(40px); } }
+@media (min-width: 600px) { .bc-pop { align-items: center; padding: 16px; } .bc-pop__card { border-radius: 22px; } }
+.bc-pop__photo { display: block; width: 100%; height: 190px; object-fit: cover; object-position: center 18%; }
+.bc-pop__body { padding: 1.2rem 1.3rem 1.4rem; }
+.bc-pop__body h2 { font-family: var(--font-heading); font-size: 1.4rem; line-height: 1.2; margin: 0 0 0.6rem; }
+.bc-pop__body p { margin: 0 0 0.8rem; line-height: 1.6; color: #5b463a; }
+.bc-pop__body ul { list-style: disc; margin: 0 0 1rem; padding-left: 1.2rem; line-height: 1.6; font-size: 0.95rem; }
+.bc-pop__body .se-btn { width: 100%; }
+.bc-pop__link { display: block; margin-top: 0.8rem; text-align: center; color: var(--se-orange-deep, #e03e00); font-weight: 700; font-size: 0.92rem; min-height: 44px; line-height: 44px; }
+.bc-pop__x { position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.92); color: var(--se-cocoa, #3c2a21); font-size: 1.4rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+
+.bc-card { display: grid; gap: 0.9rem; margin: 1.6rem 0 0; padding: 1rem; text-align: left; background: #fff; border: 2px solid var(--se-orange, #ff4f0a); border-radius: 18px; }
+.bc-card img { width: 100%; height: 170px; object-fit: cover; object-position: center 25%; border-radius: 12px; }
+.bc-card h3 { font-family: var(--font-heading); font-size: 1.2rem; margin: 0 0 0.4rem; }
+.bc-card p { margin: 0 0 0.9rem; line-height: 1.6; color: #5b463a; }
+.bc-card .se-btn { width: 100%; }
+@media (min-width: 640px) { .bc-card { grid-template-columns: 180px 1fr; align-items: center; } .bc-card img { height: 100%; min-height: 180px; } }
+
+.bc-claim { padding: 2.5rem 0 4rem; background: var(--se-paper, #fdf7ec); min-height: 70vh; }
+.bc-claim__card { max-width: 560px; margin: 0 auto; background: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 10px 30px rgba(60, 42, 33, 0.08); }
+.bc-claim__card > img { display: block; width: 100%; height: 220px; object-fit: cover; object-position: center 18%; }
+.bc-claim__body { padding: 1.3rem 1.2rem 1.6rem; }
+.bc-claim__body h1 { font-family: var(--font-heading); font-size: clamp(1.5rem, 5vw, 2rem); line-height: 1.2; margin: 0 0 0.7rem; }
+.bc-claim__body > p { line-height: 1.65; color: #5b463a; margin: 0 0 1rem; }
+.bc-claim .se-field textarea, .bc-claim .se-field select { min-height: 48px; padding: 0.7rem 0.9rem; border-radius: 12px; border: 1.5px solid #dcc6a3; background: #fff; font: inherit; font-size: 1rem; font-weight: 400; color: var(--se-cocoa, #3c2a21); }
+.bc-claim .se-field textarea { min-height: 76px; resize: vertical; }
+.bc-claim__found { padding: 0.7rem 0.9rem; border-radius: 12px; background: #eaf6ec; color: #1f5130; font-weight: 600; }
+.bc-claim__fine { font-size: 0.8rem; color: #8a7466; text-align: center; margin: 0; }
+.bc-editions { display: flex; flex-wrap: wrap; gap: 0.5rem; border: 0; padding: 0; margin: 0; }
+.bc-editions legend { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.35rem; }
+.bc-editions label { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; padding: 0 0.9rem; border-radius: 999px; border: 1.5px solid #dcc6a3; cursor: pointer; font-weight: 600; font-size: 0.92rem; }
+.bc-editions label.is-on { border-color: var(--se-orange, #ff4f0a); background: #fff3e8; }
+.bc-editions input { accent-color: var(--se-orange, #ff4f0a); }

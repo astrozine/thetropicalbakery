@@ -12,6 +12,7 @@ import { EBOOK, RECIPES, TOTAL_TREATS, stripeMoney } from '@/lib/ebook';
 import { EBOOK_COPY, LANG_PATH, fill, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import { useBookWallet } from './BookPay';
+import { BonusCallBadge, BonusCallPopup } from './BonusCall';
 import './sweetEscape.css';
 
 const IMG = '/ebook/sweet-escape';
@@ -56,6 +57,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
     <div className="se" lang={lang}>
       <HandWrittenLang lang={lang} paths={LANG_PATH} />
       <LangBar lang={lang} />
+      <BonusCallPopup lang={lang} onBuy={() => document.getElementById('buy')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
 
       {/* ══ HERO: the floating-photo style from /retreats, with the book itself in the middle ══ */}
       <section className="se-hero">
@@ -197,6 +199,7 @@ export default function SweetEscapeLanding({ lang = 'en' }: { lang?: EbookLang }
                 </div>
               </div>
               <PdfPerks lang={lang} />
+              <BonusCallBadge lang={lang} />
               <EbookBuyBox lang={lang} translated={translated} />
             </div>
             <AmazonEditions lang={lang} img={IMG} />

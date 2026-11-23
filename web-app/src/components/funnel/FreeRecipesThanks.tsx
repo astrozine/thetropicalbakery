@@ -11,6 +11,7 @@ import { trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
 import { useEbookPayment } from '@/components/ebook/useEbookPayment';
 import { PERK_COPY } from '@/lib/bookPerk';
+import { BonusCallBadge, BonusCallCard, BonusCallPopup } from '@/components/ebook/BonusCall';
 import { PayPicker, PixBox, bookPrice, payMethodFor, shownPrice, toPath, usePayMethods } from './FunnelPay';
 import '@/components/ebook/sweetEscape.css';
 import './funnel.css';
@@ -141,6 +142,7 @@ export default function FreeRecipesThanks() {
               <>
                 <p>{t.bookPaid}</p>
                 <a className="se-btn se-btn--primary se-btn--big" href={`/api/ebook/download?ref=${encodeURIComponent(ref)}&k=${encodeURIComponent(k)}&lang=${lang}`}>{t.bookDownload}</a>
+                <BonusCallCard lang={lang} refCode={ref} k={k} />
                 <div className="se-thanks__tips">
                   <b>🎁 {PERK_COPY[lang].title}</b>
                   <p style={{ margin: 0 }}>{PERK_COPY[lang].text}</p>
@@ -151,7 +153,8 @@ export default function FreeRecipesThanks() {
             )}
           </div>
         ) : !declined && (
-          <div className="fr-block fr-oto">
+          <div className="fr-block fr-oto" id="fr-oto">
+            <BonusCallPopup lang={lang} delay={6000} scroll={0.25} enabled={!pix} onBuy={() => document.getElementById('fr-oto')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
             <p className="se-kicker">{t.otoKicker}</p>
             <h2>{t.otoTitle}</h2>
             {pix ? (
@@ -163,6 +166,7 @@ export default function FreeRecipesThanks() {
                   <img src={`/ebook/sweet-escape/${lang}/cover.webp`} alt="Sweet Escape" />
                   <p>{t.otoText}</p>
                 </div>
+                <BonusCallBadge lang={lang} />
                 <p><b>{t.otoMissing}</b></p>
                 <ul className="fr-oto__missing">
                   {missing.map(r => <li key={r.name}><i style={{ background: r.hex }} />{r.name}</li>)}

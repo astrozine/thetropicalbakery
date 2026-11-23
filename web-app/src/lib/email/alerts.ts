@@ -1,4 +1,5 @@
 import 'server-only';
+import { CLAIM_TOPIC } from '@/lib/bonusCall';
 import { after } from 'next/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdmin } from '@/lib/payments/server';
@@ -119,7 +120,10 @@ const SOURCES: { table: string; build: (r: Row) => Alert }[] = [
   {
     table: 'contact_leads',
     build: r => ({
-      subject: `${/coaching/i.test(r.topic || '') ? 'Coaching request' : 'New contact'}: ${first(r.name)}${r.topic ? ` (${r.topic})` : ''}`,
+      subject: String(r.topic || '').startsWith(CLAIM_TOPIC)
+        // The free call that comes with Sweet Escape (lib/bonusCall.ts): Dolly messages them on WhatsApp to pick a time.
+        ? `Free Dolly call claimed (book buyer): ${first(r.name)}, ${/· Amazon /.test(r.topic) ? 'Amazon' : 'site'}`
+        : `${/coaching/i.test(r.topic || '') ? 'Coaching request' : 'New contact'}: ${first(r.name)}${r.topic ? ` (${r.topic})` : ''}`,
       facts: [['Name', r.name], ['About', r.topic], ['Page', r.source_page]],
       whatsapp: r.whatsapp, email: r.email,
     }),
