@@ -42,7 +42,7 @@ const base = {
   ],
 };
 
-export const FUNNEL_CAMPAIGNS: Campaign[] = [
+const STEPS: Campaign[] = [
   {
     ...base,
     id: 'receitas-d1',
@@ -245,3 +245,16 @@ export const FUNNEL_CAMPAIGNS: Campaign[] = [
         },
   },
 ];
+
+/** Every step wears the book's look (the page they signed up on), not the bakery's tropical banner. */
+export const FUNNEL_CAMPAIGNS: Campaign[] = STEPS.map(c => ({
+  ...c,
+  build: v => ({
+    ...c.build(v),
+    look: {
+      hero: `se-hero-${lang(v)}.jpg`, heroHeight: 420, accent: '#ff4f0a',
+      heroAlt: isPt(v) ? 'Sweet Escape: 2 receitas grátis de 7' : 'Sweet Escape: 2 free recipes out of 7',
+      kicker: isPt(v) ? 'Sweet Escape · da cozinha da Dolly' : 'Sweet Escape · from Dolly’s kitchen',
+    },
+  }),
+}));
