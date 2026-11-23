@@ -6,7 +6,7 @@ import { EBOOK, BOOK_OFFERS, RECIPES } from '@/lib/ebook';
 import { EBOOK_COPY, fill, type EbookLang } from '@/lib/ebookCopy';
 import { FUNNEL, FUNNEL_COPY, SEGMENTS, freeCover, type Segment } from '@/lib/funnel';
 import HandWrittenLang from '@/components/HandWrittenLang';
-import { trackMeta } from '@/lib/metaPixel';
+import { readConsent, trackMeta } from '@/lib/metaPixel';
 import { rich } from '@/components/ebook/EbookLang';
 import { PayPicker, PixBox, bookPrice, payMethodFor, shownPrice, toPath, usePayMethods } from './FunnelPay';
 import '@/components/ebook/sweetEscape.css';
@@ -33,7 +33,9 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [segment, setSegment] = useState<Segment | null>(null);
+  // Only the Portuguese page asks "where are you?": the other languages are read abroad, so one less question.
+  const askWhere = lang === 'pt';
+  const [segment, setSegment] = useState<Segment | null>(askWhere ? null : 'away');
   const [bump, setBump] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -50,6 +52,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
       utm_campaign: q.get('utm_campaign') || '',
       utm_content: q.get('utm_content') || '',
       referrer: document.referrer || '',
+      fbclid: q.get('fbclid') || '',
     };
     supabase.auth.getSession().then(({ data }) => {
       const s = data.session;
@@ -77,15 +80,16 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return setError(f.errEmail);
     if (!segment) return setError(f.errWhere);
     setBusy(true);
+    const eventId = `lead-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     try {
       const r = await fetch('/api/free-recipes/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ name, email, lang, segment, ...utm.current, bump: bump ? { payMethod: payMethodFor(method, wallet) } : null }),
+        body: JSON.stringify({ name, email, lang, segment, ...utm.current, event_id: eventId, consent: readConsent(), page: window.location.pathname, bump: bump ? { payMethod: payMethodFor(method, wallet) } : null }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || f.errGeneric);
-      trackMeta('Lead', { content_name: 'free-recipes', value: 0 });
+      trackMeta('Lead', { content_name: 'free-recipes', value: 0 }, eventId);
       if (bump) trackMeta('InitiateCheckout', { value: BOOK_OFFERS.full.brl, content_name: EBOOK.id, content_type: 'product', num_items: 1 });
       if (j.url) { window.location.href = j.url; return; }
       if (j.book?.pix) {
@@ -144,7 +148,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
               {RECIPES.map((r, i) => (
                 <li key={r.day} className={isFree(r.day) ? 'is-free' : ''} style={{ '--c': r.hex } as React.CSSProperties}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={r.img} alt={book[i].name} />
+                  <img src={r.img.replace('/sweet-escape/', '/sweet-escape/thumb/')} alt={book[i].name} width={160} height={160} />
                   {isFree(r.day) ? <span className="fr-seven__free">{c.strip.free}</span> : <span className="fr-seven__lock"><Lock /></span>}
                 </li>
               ))}
@@ -168,7 +172,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
                   <input type="email" inputMode="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required />
                 </label>
 
-                <fieldset className="fr-where">
+                {askWhere && <fieldset className="fr-where">
                   <legend>{f.where}</legend>
                   {SEGMENTS.map(s => (
                     <label key={s} className={segment === s ? 'is-on' : ''}>
@@ -176,7 +180,7 @@ export default function FreeRecipesLanding({ lang = 'en' }: { lang?: EbookLang }
                       <span aria-hidden>{SEG_ICON[s]}</span> {f.segments[s]}
                     </label>
                   ))}
-                </fieldset>
+                </fieldset>}
 
                 {/* ══ ORDER BUMP ══ */}
                 <div className={`fr-bump${bump ? ' is-on' : ''}`}>

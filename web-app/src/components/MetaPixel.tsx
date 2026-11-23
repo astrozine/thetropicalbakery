@@ -46,11 +46,14 @@ export default function MetaPixel() {
   }
 
   if (!ready || consent !== null || !tracked) return null;
+  // The English (and ES/NL/DE) ebook pages are where the international ads land: a Portuguese notice there reads as
+  // "wrong site". Everything else keeps Andrew's Portuguese words.
+  const t = isEnglishPath(pathname) ? TEXT.en : TEXT.pt;
 
   return (
     <div
       role="dialog"
-      aria-label="Aviso de cookies"
+      aria-label={t.label}
       style={{
         position: 'fixed',
         left: '0.75rem',
@@ -72,27 +75,24 @@ export default function MetaPixel() {
       {/* Short on purpose (Nov 2026): the full notice covered most of a phone screen and few people answered it,
           so the pixel saw almost no one. Andrew's full text is one tap away. */}
       <p style={{ margin: 0 }}>
-        🌴 Sejamos sinceros: o algoritmo não está fazendo favor a ninguém. Aceitar os cookies é um empurrãozinho pra Chef
-        Dolly aparecer pra quem vai amar. Só ativamos se você aceitar.{' '}
+        {t.short}{' '}
         {more ? null : (
           <button
             type="button"
             onClick={() => setMore(true)}
             style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-secondary)', fontWeight: 600, cursor: 'pointer', font: 'inherit' }}
           >
-            Ler mais
+            {t.more}
           </button>
         )}
         {more ? null : ' · '}
         <Link href="/privacidade" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>
-          Privacidade
+          {t.privacy}
         </Link>
       </p>
       {more ? (
         <p style={{ margin: '0.5rem 0 0' }}>
-          Pra uma cozinha pequena como a da Chef Dolly, chegar até a comunidade vegana nas redes está cada vez mais difícil.
-          Aceitar os cookies da Meta e do Google é um empurrãozinho contra o algoritmo: a gente aparece pra quem vai amar,
-          e você vê menos anúncio aleatório.
+          {t.long}
         </p>
       ) : null}
       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
@@ -110,7 +110,7 @@ export default function MetaPixel() {
             cursor: 'pointer',
           }}
         >
-          Aceitar
+          {t.accept}
         </button>
         <button
           type="button"
@@ -126,9 +126,37 @@ export default function MetaPixel() {
             cursor: 'pointer',
           }}
         >
-          Recusar
+          {t.decline}
         </button>
       </div>
     </div>
   );
+}
+
+const TEXT = {
+  pt: {
+    label: 'Aviso de cookies',
+    short: '🌴 Sejamos sinceros: o algoritmo não está fazendo favor a ninguém. Aceitar os cookies é um empurrãozinho pra Chef Dolly aparecer pra quem vai amar. Só ativamos se você aceitar.',
+    more: 'Ler mais',
+    privacy: 'Privacidade',
+    long: 'Pra uma cozinha pequena como a da Chef Dolly, chegar até a comunidade vegana nas redes está cada vez mais difícil. Aceitar os cookies da Meta e do Google é um empurrãozinho contra o algoritmo: a gente aparece pra quem vai amar, e você vê menos anúncio aleatório.',
+    accept: 'Aceitar',
+    decline: 'Recusar',
+  },
+  en: {
+    label: 'Cookie notice',
+    short: "🌴 Let's be honest: the algorithm isn't doing anyone favors. Accepting cookies gives Chef Dolly a little push to reach people who'll love her treats. Only on if you say yes.",
+    more: 'Read more',
+    privacy: 'Privacy',
+    long: "For a small kitchen like Chef Dolly's, reaching the vegan community on social media keeps getting harder. Accepting Meta and Google cookies is a small push against the algorithm: we show up for people who'll love it, and you see fewer random ads.",
+    accept: 'Accept',
+    decline: 'Decline',
+  },
+};
+
+/** The international ebook pages: /free-recipes (+ /es /nl /de, thank-you, offer), /sweet-escape (not /pt), /en/… */
+function isEnglishPath(pathname: string | null): boolean {
+  const p = pathname || '';
+  if (p === '/sweet-escape/pt' || p.startsWith('/sweet-escape/pt/')) return false;
+  return /^\/(free-recipes|sweet-escape|en)(\/|$)/.test(p);
 }
