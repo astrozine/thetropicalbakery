@@ -4,6 +4,9 @@ import React from 'react';
 import { AMAZON_EDITIONS, AMAZON_FORMATS, amazonLink, amazonPrice, type AmazonFormat } from '@/lib/ebook';
 import { EBOOK_COPY, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
+import Link from 'next/link';
+import { BONUS_CALL_COPY, claimPath } from '@/lib/bonusCall';
+import { useBonusCallOn } from './BonusCall';
 
 const jump = (id: string) => (e: React.MouseEvent) => {
   e.preventDefault();
@@ -37,6 +40,7 @@ export function PdfPerks({ lang }: { lang: EbookLang }) {
 export default function AmazonEditions({ lang, img }: { lang: EbookLang; img: string }) {
   const a = EBOOK_COPY[lang].amazon;
   const edition = AMAZON_EDITIONS[lang]?.edition;
+  const callOn = useBonusCallOn();
   if (!a || !edition) return null;
   const amzCover = `${img}/${edition}/cover.webp`;
   const click = (format: AmazonFormat) => trackMeta('AmazonClick', { content_name: `sweet-escape-${format}`, content_type: 'product' });
@@ -61,6 +65,11 @@ export default function AmazonEditions({ lang, img }: { lang: EbookLang; img: st
         ))}
       </div>
       {edition !== lang && a.edition && <p className="se-ed__edition">{a.edition}</p>}
+      {callOn && (
+        <p className="se-ed__edition">
+          {BONUS_CALL_COPY[lang].amazonLine} <Link href={claimPath(lang)} style={{ color: 'inherit', fontWeight: 700 }}>{BONUS_CALL_COPY[lang].amazonCta} →</Link>
+        </p>
+      )}
     </div>
   );
 }

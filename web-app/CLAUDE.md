@@ -285,3 +285,17 @@ lives in **`src/lib/bookPerk.ts`**.
   reveal who bought the book); `useBookPerk` shows the lower price in the checkout and the brunch panel.
 - Told to buyers in the "book is ready" e-mail, both download pages, and as a bonus line on the funnel's one-time offer.
 - Known gap, accepted: someone typing a book buyer's e-mail at checkout gets the 15% (the receipts go to that buyer).
+
+# The book's free call with Dolly (Sweet Escape bonus)
+
+Every Sweet Escape buyer (PDF here, or Kindle / paperback / hardcover on Amazon) gets a free 30-minute get-to-know-you call with
+Dolly, the door into her coaching. Asked for by Andrew 2026-11-23. Words in 5 languages and the numbers in **`src/lib/bonusCall.ts`**.
+
+- Shown by `src/components/ebook/BonusCall.tsx`: a pop-up once per visitor on `/sweet-escape*` and on the free-recipes thank-you
+  one-time offer, a badge on the order card and the offer, a line under the Amazon editions, and a "Book my free call" card on both
+  "your book is ready" pages. Also in the "book is ready" e-mail (`ebookReceipts.ts`) and the selling steps of the free-recipes sequence.
+- Claim page `/sweet-escape/call` (`BonusCallClaim.tsx`, `POST /api/bonus-call`): site buyers come with `ref` + `k` (checked paid,
+  within 60 days); Amazon buyers type their order number (format only, one claim per order). Claims are `contact_leads` rows whose
+  topic starts with `CLAIM_TOPIC`, so they show in the inbox and the team alert ("Free Dolly call claimed").
+- Dolly's time: site_settings `bonus_call_weekly` (migration 51, default 5), set in Admin › Ligação grátis. Over the number nobody is
+  refused; the page says she will message them for next week. 0 switches the bonus off everywhere (site buyers can still claim).

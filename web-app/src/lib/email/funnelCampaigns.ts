@@ -13,9 +13,12 @@ import type { Campaign, CampaignValues } from './campaigns';
 import { EBOOK, BOOK_OFFERS, TOTAL_TREATS } from '@/lib/ebook';
 import { EBOOK_COPY, LANG_PATH } from '@/lib/ebookCopy';
 import { FUNNEL, freePdf } from '@/lib/funnel';
+import { BONUS_CALL_COPY } from '@/lib/bonusCall';
 
 const isPt = (v: CampaignValues) => v.lang === 'pt';
 const lang = (v: CampaignValues) => (isPt(v) ? 'pt' : 'en') as 'pt' | 'en';
+/** The free call with Dolly that comes with the book, when the automation says it is on (v.call = '1'). */
+const callLine = (v: CampaignValues) => (v.call === '1' ? paragraphs(BONUS_CALL_COPY[lang(v)].line) : '');
 const track = (path: string, step: string) => `${SITE_URL}${path}${path.includes('?') ? '&' : '?'}utm_source=email&utm_medium=funil&utm_campaign=${step}`;
 
 const full = (v: CampaignValues) => (isPt(v) ? `R$ ${BOOK_OFFERS.full.brl}` : `US$ ${BOOK_OFFERS.full.usd}`);
@@ -100,7 +103,7 @@ const STEPS: Campaign[] = [
             paragraphs('O Vermelho e o Caramelo vieram do meu livro Sweet Escape: 7 Cores, 7 Receitas. Eu montei o livro como uma semana: cada dia uma cor, cada cor um doce que cuida de você.') +
             kicker('Ainda esperando por você', '📖') +
             bulletList(missing(v)) +
-            paragraphs(`Além das receitas, o livro explica o porquê de cada ingrediente, para você começar a inventar os seus. Uma rodada pelo livro rende uns ${TOTAL_TREATS} doces.\n\nO livro completo custa ${full(v)}, em PDF na hora, com garantia de 7 dias.`),
+            paragraphs(`Além das receitas, o livro explica o porquê de cada ingrediente, para você começar a inventar os seus. Uma rodada pelo livro rende uns ${TOTAL_TREATS} doces.\n\nO livro completo custa ${full(v)}, em PDF na hora, com garantia de 7 dias.`) + callLine(v),
           cta: { label: 'Ver o Sweet Escape', href: bookPage(v, 'receitas-d3') },
           note: 'Com carinho, Dolly',
         }
@@ -111,7 +114,7 @@ const STEPS: Campaign[] = [
             paragraphs('Red and Caramel come from my book Sweet Escape: 7 Colors, 7 Recipes. I built it like a week: every day a color, every color a treat that loves you back.') +
             kicker('Still waiting for you', '📖') +
             bulletList(missing(v)) +
-            paragraphs(`Besides the recipes, the book explains the why behind every ingredient, so you can start inventing your own. One run through the book makes about ${TOTAL_TREATS} treats.\n\nThe full book is ${full(v)}, an instant PDF with a 7-day money-back promise.`),
+            paragraphs(`Besides the recipes, the book explains the why behind every ingredient, so you can start inventing your own. One run through the book makes about ${TOTAL_TREATS} treats.\n\nThe full book is ${full(v)}, an instant PDF with a 7-day money-back promise.`) + callLine(v),
           cta: { label: 'See Sweet Escape', href: bookPage(v, 'receitas-d3') },
           note: 'With love, Dolly',
         },
@@ -131,7 +134,7 @@ const STEPS: Campaign[] = [
           heading: `Sweet Escape por ${welcome(v)}`,
           body:
             paragraphs(`Obrigada por cozinhar comigo esta semana. Quero que você tenha as 7 cores, então fiz um preço de boas-vindas só para quem baixou as receitas: ${welcome(v)} em vez de ${full(v)}.\n\nVale até ${v.until}. Depois volta ao preço normal.`) +
-            bulletList(['As 7 receitas, uma para cada dia da semana', 'O porquê de cada ingrediente', `${EBOOK.pages} páginas em PDF, na hora`, 'Garantia de 7 dias: não gostou, devolvo']),
+            bulletList(['As 7 receitas, uma para cada dia da semana', 'O porquê de cada ingrediente', `${EBOOK.pages} páginas em PDF, na hora`, 'Garantia de 7 dias: não gostou, devolvo']) + callLine(v),
           cta: { label: `Quero por ${welcome(v)}`, href: offerLink(v, 'receitas-d5') },
           note: `Preço de boas-vindas válido até ${v.until}.`,
         }
@@ -140,7 +143,7 @@ const STEPS: Campaign[] = [
           heading: `Sweet Escape for ${welcome(v)}`,
           body:
             paragraphs(`Thank you for baking with me this week. I’d love you to have all 7 colors, so here is a welcome price only for people who downloaded the recipes: ${welcome(v)} instead of ${full(v)}.\n\nIt’s good until ${v.until}. Then it goes back to the normal price.`) +
-            bulletList(['All 7 recipes, one for every day of the week', 'The why behind every ingredient', `${EBOOK.pages} pages, instant PDF`, '7-day money-back promise']),
+            bulletList(['All 7 recipes, one for every day of the week', 'The why behind every ingredient', `${EBOOK.pages} pages, instant PDF`, '7-day money-back promise']) + callLine(v),
           cta: { label: `Get it for ${welcome(v)}`, href: offerLink(v, 'receitas-d5') },
           note: `Welcome price good until ${v.until}.`,
         },
@@ -158,14 +161,14 @@ const STEPS: Campaign[] = [
       ? {
           preheader: 'Amanhã o Sweet Escape volta ao preço normal.',
           heading: 'Último dia',
-          body: paragraphs(`Só um lembrete carinhoso: o preço de boas-vindas do Sweet Escape (${welcome(v)} em vez de ${full(v)}) termina ${v.until}.\n\nSe as duas receitas já viraram favoritas na sua casa, as outras cinco vão virar também. E se não gostar, a garantia de 7 dias continua valendo.`),
+          body: paragraphs(`Só um lembrete carinhoso: o preço de boas-vindas do Sweet Escape (${welcome(v)} em vez de ${full(v)}) termina ${v.until}.\n\nSe as duas receitas já viraram favoritas na sua casa, as outras cinco vão virar também. E se não gostar, a garantia de 7 dias continua valendo.`) + callLine(v),
           cta: { label: `Quero por ${welcome(v)}`, href: offerLink(v, 'receitas-d7') },
           note: 'Com carinho, Dolly',
         }
       : {
           preheader: 'Tomorrow Sweet Escape goes back to its normal price.',
           heading: 'Last day',
-          body: paragraphs(`Just a friendly reminder: the welcome price for Sweet Escape (${welcome(v)} instead of ${full(v)}) ends ${v.until}.\n\nIf those two recipes are already favorites at home, the other five will be too. And if you don’t love it, the 7-day promise still stands.`),
+          body: paragraphs(`Just a friendly reminder: the welcome price for Sweet Escape (${welcome(v)} instead of ${full(v)}) ends ${v.until}.\n\nIf those two recipes are already favorites at home, the other five will be too. And if you don’t love it, the 7-day promise still stands.`) + callLine(v),
           cta: { label: `Get it for ${welcome(v)}`, href: offerLink(v, 'receitas-d7') },
           note: 'With love, Dolly',
         },

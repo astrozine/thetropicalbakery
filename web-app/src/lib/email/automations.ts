@@ -7,6 +7,7 @@ import type { DietTargeting, SendRequest } from './send';
 import { HOST, creditDeadline, fmtWhen, normalizeEvent, venueKind, type BrunchEvent } from '@/lib/brunch';
 import { SEQUENCE, WELCOME_DAYS, isNearby, type Segment } from '@/lib/funnel';
 import { offerToken } from '@/lib/payments/ebook';
+import { bonusCallOn } from '@/lib/payments/bonusCall';
 import { paidBookEmails } from '@/lib/payments/funnel';
 
 /**
@@ -337,6 +338,7 @@ export async function planFor(db: SupabaseClient, def: AutomationDef, row: Autom
       if (!leads.length) return nothing('Ninguém baixou as receitas nos últimos dias.');
 
       const buyers = new Set(await paidBookEmails(db, leads.map(l => l.email)));
+      const callOn = await bonusCallOn(db);
       // The end of a Brasília day, `n` days from today: when a welcome price stops working.
       const endOf = (n: number) => new Date(`${addDaysISO(today, n)}T23:59:59-03:00`);
       const spell = (d: Date, lang: 'pt' | 'en') =>
@@ -357,6 +359,8 @@ export async function planFor(db: SupabaseClient, def: AutomationDef, row: Autom
           const emails = due.filter(l => (l.lang === 'pt' ? 'pt' : 'en') === lang).map(l => l.email);
           if (!emails.length) continue;
           const values: Record<string, string> = { lang };
+          // The free call with Dolly that comes with the book (lib/bonusCall.ts), unless it is switched off.
+          if (step.sells && callOn) values.call = '1';
           if (step.campaignId === 'receitas-d5' || step.campaignId === 'receitas-d7') {
             const until = endOf(step.campaignId === 'receitas-d5' ? WELCOME_DAYS : 0);
             values.offer = offerToken(until);
