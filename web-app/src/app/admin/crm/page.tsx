@@ -67,7 +67,33 @@ interface Customer {
   itamambuca: boolean;
   manual: boolean;
   adminNotes: string | null;
+  /** They asked for the 2 free recipes (funnel_leads). */
+  recipes: RecipesInfo | null;
 }
+
+interface RecipesInfo {
+  at: string;
+  lang: string;
+  /** Where they came from: the ad's utm tags, or null for a direct visit. */
+  ad: string | null;
+  /** true = the PDF e-mail went out, false = it failed, null = no record (yet). */
+  delivered: boolean | null;
+  boughtBook: boolean;
+}
+
+interface FunnelLeadRow {
+  id: string;
+  created_at: string;
+  email: string;
+  first_name: string | null;
+  lang: string;
+  utm_source: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+}
+
+const LANG_LABEL: Record<string, string> = { en: '🇬🇧 Inglês', pt: '🇧🇷 Português', es: '🇪🇸 Espanhol', nl: '🇳🇱 Holandês', de: '🇩🇪 Alemão' };
+const emailKey = (v: string | null | undefined) => (v || '').trim().toLowerCase();
 
 const isItamambucaAddress = (address: string | null) => /itamambuca/i.test(address || '');
 
@@ -121,6 +147,7 @@ export default function CRMAdmin() {
   const [onlyItamambuca, setOnlyItamambuca] = useState(false);
   const [dietFilter, setDietFilter] = useState('');
   const [allergenFilter, setAllergenFilter] = useState('');
+  const [onlyRecipes, setOnlyRecipes] = useState(false);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState('');
 
@@ -135,11 +162,15 @@ export default function CRMAdmin() {
     // Two sources of truth, deliberately: `users` is everyone who has ordered,
     // `user_profiles` is everyone who has created an account. Plenty of people
     // are in one and not the other, so we merge rather than pick.
-    const [crmRes, profileRes, ordersRes] = await Promise.all([
+    const [crmRes, profileRes, ordersRes, leadsRes, pdfRes] = await Promise.all([
       supabase.from('users').select('*').order('created_at', { ascending: false }),
       supabase.from('user_profiles').select('*'),
-      // Only to tell whether someone added by hand has ordered since.
-      supabase.from('orders').select('customer_whatsapp, customer_email'),
+      // To tell whether someone added by hand has ordered since, and who paid for the e-book.
+      supabase.from('orders').select('*'),
+      // Free-recipes sign-ups (migration 43). Missing table = just no recipes info.
+      supabase.from('funnel_leads').select('id, created_at, email, first_name, lang, utm_source, utm_campaign, utm_content').order('created_at', { ascending: false }).limit(5000),
+      // The recipes PDF e-mail (funnelMail.ts, message key 'receitas-gratis:pdf').
+      supabase.from('email_sends').select('email, status').eq('message_key', 'receitas-gratis:pdf').limit(5000),
     ]);
 
     if (crmRes.error) {
@@ -158,7 +189,7 @@ export default function CRMAdmin() {
       profiles.filter(p => phoneKey(p.phone)).map(p => [phoneKey(p.phone), p]),
     );
     const usedProfileIds = new Set<string>();
-    const orders = (ordersRes.error ? [] : (ordersRes.data || [])) as { customer_whatsapp: string | null; customer_email: string | null }[];
+    const orders = (ordersRes.error ? [] : (ordersRes.data || [])) as { id: string; customer_whatsapp: string | null; customer_email: string | null; status?: string | null; order_kind?: string | null }[];
     const orderedPhones = new Set(orders.map(o => phoneKey(o.customer_whatsapp)).filter(Boolean));
     const orderedEmails = new Set(orders.map(o => (o.customer_email || '').trim().toLowerCase()).filter(Boolean));
 
@@ -190,6 +221,7 @@ export default function CRMAdmin() {
         itamambuca: isItamambucaAddress(address),
         manual,
         adminNotes: c.admin_notes || null,
+        recipes: null,
       };
     });
 
@@ -210,7 +242,57 @@ export default function CRMAdmin() {
         itamambuca: isItamambucaAddress(p.address),
         manual: false,
         adminNotes: null,
+        recipes: null,
       });
+    }
+
+    // Free-recipes sign-ups: shown on the person's card if we already know them, else as their own card.
+    const leads = (leadsRes.error ? [] : (leadsRes.data || [])) as FunnelLeadRow[];
+    if (leads.length) {
+      const pdf = new Map<string, boolean>();
+      for (const r of (pdfRes.error ? [] : (pdfRes.data || [])) as { email: string; status: string }[]) {
+        const k = emailKey(r.email);
+        pdf.set(k, pdf.get(k) || r.status !== 'failed');
+      }
+      // E-book paid = status PAID, or a Pix confirmed by hand in the inbox (moved past 'new').
+      const books = orders.filter(o => o.order_kind === 'ebook');
+      const open = books.filter(o => String(o.status || '').toUpperCase() !== 'PAID').map(o => String(o.id));
+      const confirmed = new Set<string>();
+      for (let i = 0; i < open.length; i += 200) {
+        const { data } = await supabase.from('inbox_status').select('source_id, status').eq('source_table', 'orders').in('source_id', open.slice(i, i + 200));
+        (data || []).forEach(x => { if (x.status !== 'new' && x.status !== 'cancelled') confirmed.add(String(x.source_id)); });
+      }
+      const bookBuyers = new Set(books
+        .filter(o => String(o.status || '').toUpperCase() === 'PAID' || confirmed.has(String(o.id)))
+        .map(o => emailKey(o.customer_email)).filter(Boolean));
+
+      const byEmail = new Map(merged.filter(c => c.email).map(c => [emailKey(c.email), c]));
+      // Oldest first, so a person who signed up twice keeps their first date.
+      for (const l of [...leads].reverse()) {
+        const k = emailKey(l.email);
+        const ad = [l.utm_source, l.utm_campaign, l.utm_content].filter(Boolean).join(' · ') || null;
+        const info: RecipesInfo = { at: l.created_at, lang: l.lang, ad, delivered: pdf.has(k) ? pdf.get(k)! : null, boughtBook: bookBuyers.has(k) };
+        const known = byEmail.get(k);
+        if (known) { if (!known.recipes) known.recipes = info; continue; }
+        const c: Customer = {
+          key: `recipes-${l.id}`,
+          name: l.first_name || l.email,
+          whatsapp: null,
+          email: l.email,
+          address: null,
+          provider: null,
+          hasAccount: false,
+          ordered: info.boughtBook,
+          createdAt: l.created_at,
+          dietary: [], dietIds: [], allergenIds: [], allergies: [], dietNotes: null,
+          itamambuca: false,
+          manual: false,
+          adminNotes: null,
+          recipes: info,
+        };
+        merged.push(c);
+        byEmail.set(k, c);
+      }
     }
 
     merged.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
@@ -222,15 +304,16 @@ export default function CRMAdmin() {
     const q = search.trim().toLowerCase();
     let list = customers;
     if (onlyItamambuca) list = list.filter(c => c.itamambuca);
+    if (onlyRecipes) list = list.filter(c => c.recipes);
     if (dietFilter) list = list.filter(c => c.dietIds.includes(dietFilter));
     if (allergenFilter) list = list.filter(c => c.allergenIds.includes(allergenFilter));
     if (!q) return list;
     return list.filter(c =>
-      [c.name, c.email, c.address, c.whatsapp, c.dietNotes, c.adminNotes, ...c.dietary, ...c.allergies]
+      [c.name, c.email, c.address, c.whatsapp, c.dietNotes, c.adminNotes, c.recipes?.ad, ...c.dietary, ...c.allergies]
         .filter(Boolean)
         .some(v => String(v).toLowerCase().includes(q)),
     );
-  }, [customers, search, onlyItamambuca, dietFilter, allergenFilter]);
+  }, [customers, search, onlyItamambuca, onlyRecipes, dietFilter, allergenFilter]);
 
   // Only offer a filter for something at least one person actually marked.
   const dietOptions = useMemo(
@@ -248,6 +331,7 @@ export default function CRMAdmin() {
     ordered: customers.filter(c => c.ordered).length,
     leads: customers.filter(c => c.hasAccount && !c.ordered).length,
     itamambuca: customers.filter(c => c.itamambuca).length,
+    recipes: customers.filter(c => c.recipes).length,
   }), [customers]);
 
   if (adding) {
@@ -275,7 +359,7 @@ export default function CRMAdmin() {
         <button type="button" className="bx-btn bx-btn--dark" onClick={() => { setAdded(''); setAdding(true); }}>+ Adicionar pessoa</button>
       </div>
       <p style={{ color: '#7f8c8d', marginBottom: '2rem', lineHeight: 1.7 }}>
-        Todo mundo que fez um pedido ou criou uma conta no site, e quem você adicionou à mão. Quem tem conta não precisa
+        Todo mundo que fez um pedido, criou uma conta ou pediu as receitas grátis no site, e quem você adicionou à mão. Quem tem conta não precisa
         digitar nome, WhatsApp e endereço de novo — já vem preenchido no próximo pedido.
       </p>
 
@@ -301,6 +385,7 @@ export default function CRMAdmin() {
           { label: 'Com conta', value: stats.withAccount },
           { label: 'Conta sem pedido', value: stats.leads },
           { label: '📍 Em Itamambuca', value: stats.itamambuca },
+          { label: '📗 Receitas grátis', value: stats.recipes },
         ].map(s => (
           <div key={s.label} style={{ background: 'white', padding: '1.25rem', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
             <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: '#2c3e50' }}>{s.value}</div>
@@ -333,6 +418,23 @@ export default function CRMAdmin() {
           }}
         >
           📍 Só Itamambuca{onlyItamambuca ? ' ✓' : ''}
+        </button>
+        <button
+          type="button"
+          onClick={() => setOnlyRecipes(v => !v)}
+          style={{
+            padding: '0.9rem 1.4rem',
+            borderRadius: '8px',
+            border: onlyRecipes ? '1px solid #2e8b57' : '1px solid #dfe4ea',
+            background: onlyRecipes ? '#e9f7ef' : 'white',
+            color: onlyRecipes ? '#1e6b40' : '#7f8c8d',
+            fontWeight: 700,
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          📗 Só receitas grátis{onlyRecipes ? ' ✓' : ''}
         </button>
         <select
           value={dietFilter}
@@ -386,6 +488,11 @@ export default function CRMAdmin() {
                         Sem pedido
                       </span>
                     )}
+                    {c.recipes && (
+                      <span style={{ background: '#e9f7ef', color: '#1e6b40', padding: '0.15rem 0.6rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        📗 Receitas grátis
+                      </span>
+                    )}
                     {c.itamambuca && (
                       <span style={{ background: '#fdf7ee', color: '#8a6d1f', padding: '0.15rem 0.6rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         📍 Itamambuca
@@ -397,6 +504,18 @@ export default function CRMAdmin() {
                     <div>📱 {formatPhone(c.whatsapp)}</div>
                     <div>✉️ {c.email || '—'}</div>
                     <div>📍 {c.address || 'Endereço não informado'}</div>
+                    {c.recipes && (
+                      <div style={{ background: '#f4fbf7', border: '1px solid #cfe9da', borderRadius: '8px', padding: '0.5rem 0.75rem', margin: '0.35rem 0', lineHeight: 1.7, color: '#2c3e50' }}>
+                        <div>📗 Pediu as receitas grátis em {new Date(c.recipes.at).toLocaleDateString('pt-BR')} · {LANG_LABEL[c.recipes.lang] || c.recipes.lang}</div>
+                        <div>📣 {c.recipes.ad ? `Veio de: ${c.recipes.ad}` : 'Veio direto (sem anúncio)'}</div>
+                        <div>
+                          {c.recipes.delivered === true ? '✅ E-mail com as receitas enviado'
+                            : c.recipes.delivered === false ? '⚠️ O e-mail com as receitas falhou'
+                            : '⏳ Sem registro do e-mail das receitas'}
+                        </div>
+                        <div>{c.recipes.boughtBook ? '💰 Comprou o e-book Sweet Escape' : '📕 Ainda não comprou o e-book'}</div>
+                      </div>
+                    )}
                     {c.adminNotes && <div style={{ whiteSpace: 'pre-line', color: '#5d4a3a' }}>📝 {c.adminNotes}</div>}
                     {c.createdAt && (
                       <div style={{ fontSize: '0.8rem', color: '#b2bec3' }}>
