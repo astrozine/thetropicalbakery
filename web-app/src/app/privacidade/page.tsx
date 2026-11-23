@@ -94,8 +94,10 @@ export default function PrivacyPolicyPage() {
           <p style={pStyle}>
             Se você clicar em &ldquo;Aceitar&rdquo; no aviso de cookies, também carregamos o Pixel da Meta, que usa
             cookies para registrar as páginas que você visita e nos ajuda a medir e melhorar nossos anúncios no
-            Facebook e no Instagram. Se clicar em &ldquo;Recusar&rdquo;, ou não responder, o Pixel não é carregado e nada
-            é enviado à Meta. Você pode mudar de ideia limpando os dados do site no seu navegador, e o aviso
+            Facebook e no Instagram. Se clicar em &ldquo;Recusar&rdquo;, ou não responder, o Pixel não é carregado. A única exceção é o
+            cadastro das receitas grátis: quando você se cadastra (e não recusou os cookies), o nosso servidor avisa a Meta
+            que houve um cadastro, com o seu e-mail criptografado (hash SHA-256, ilegível), o identificador do clique no
+            anúncio, o endereço IP e o navegador. Nunca o seu nome. Isso serve só para medir os anúncios. Você pode mudar de ideia limpando os dados do site no seu navegador, e o aviso
             aparecerá de novo.
           </p>
           <p style={pStyle}>
