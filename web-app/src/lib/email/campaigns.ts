@@ -7,7 +7,7 @@
 
 import { SITE_URL, bulletList, esc, kicker, paragraphs } from './layout';
 import { CARE_PATH, CARE_SHORT } from '@/lib/treatCare';
-import type { EmailFact, EmailLang, EmailTheme } from './layout';
+import type { EmailFact, EmailLang, EmailTheme, LayoutOptions } from './layout';
 import type { ContactTag } from '@/lib/emailTopics';
 import { FUNNEL_CAMPAIGNS } from './funnelCampaigns';
 
@@ -32,6 +32,8 @@ export interface CampaignContent {
   note?: string;
   /** Up to three big-number tiles, e.g. "100 m · da casa até a areia". */
   facts?: EmailFact[];
+  /** Wear a product's look instead of the theme (see LayoutOptions.look): the Sweet Escape e-mails. */
+  look?: LayoutOptions['look'];
 }
 
 export interface Campaign {

@@ -218,6 +218,8 @@ export interface LayoutOptions {
   /** Body HTML (paragraphs, lists — already escaped by the caller). */
   body: string;
   cta?: { label: string; href: string };
+  /** More body HTML under the button (an upsell after the main action). */
+  afterCta?: string;
   /** Small print under the button. */
   note?: string;
   /** Up to three "100 m / da areia" tiles under the text. */
@@ -235,6 +237,12 @@ export interface LayoutOptions {
   reason?: string;
   /** The frame's language. Default Portuguese. */
   lang?: EmailLang;
+  /**
+   * Dress the e-mail as a product page instead of the bakery's theme (the Sweet Escape e-mails wear the book's look):
+   * its own top image (a path under public/email/), its own kicker, an accent colour for the bar under the photo, the
+   * kicker and the button, no emoji tile, and no bakery photo strip.
+   */
+  look?: { hero: string; heroAlt: string; heroHeight?: number; kicker: string; accent: string; accentInk?: string };
 }
 
 /** Escapes text coming from the admin form so a stray < can't break the e-mail. */
@@ -401,11 +409,11 @@ function factsRow(facts: EmailFact[]): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 24px;table-layout:fixed;"><tr>${cells}</tr></table>`;
 }
 
-function button(label: string, href: string): string {
+export function button(label: string, href: string, bg = GOLD, ink = COCOA): string {
   return `
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:6px auto 4px;">
-      <tr><td bgcolor="${GOLD}" style="background:${GOLD};border-radius:999px;box-shadow:0 6px 16px rgba(166,131,43,0.35);">
-        <a href="${href}" style="display:inline-block;padding:16px 36px;font-family:${BODY_FONT};font-size:14px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:${COCOA};text-decoration:none;border-radius:999px;">${esc(label)}&nbsp;&rarr;</a>
+      <tr><td bgcolor="${bg}" style="background:${bg};border-radius:999px;box-shadow:0 6px 16px rgba(60,42,33,0.25);">
+        <a href="${href}" style="display:inline-block;padding:16px 32px;font-family:${BODY_FONT};font-size:14px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:${ink};text-decoration:none;border-radius:999px;">${esc(label)}&nbsp;&rarr;</a>
       </td></tr>
     </table>`;
 }
@@ -448,6 +456,10 @@ export function renderEmail(o: LayoutOptions): string {
   const t = UI[lang];
   const local = lang === 'pt' ? undefined : lang === 'en' ? THEMES_EN[themeName] : THEMES_INTL[lang][themeName] ?? THEMES_EN[themeName];
   const theme: ThemeDef = local ? { ...THEMES[themeName], ...local } : THEMES[themeName];
+  const look = o.look;
+  const accent = look?.accent || GOLD;
+  const heroSrc = look ? `${base}/email/${look.hero}` : img(base, `hero-${themeName}`);
+  const heroAlt = look ? look.heroAlt : theme.heroAlt;
   const footerLinks = lang === 'pt' ? FOOTER_LINKS : lang === 'en' ? FOOTER_LINKS_EN : FOOTER_LINKS_INTL[lang];
 
   const note = o.note
@@ -504,23 +516,24 @@ export function renderEmail(o: LayoutOptions): string {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff"
             style="background:#ffffff;border:1px solid ${LINE};border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 18px 40px rgba(60,42,33,0.10);">
             <tr><td bgcolor="${SAND}" style="background:${SAND};line-height:0;font-size:0;border-radius:22px 22px 0 0;overflow:hidden;">
-              <img src="${img(base, `hero-${themeName}`)}" width="580" height="387" alt="${esc(theme.heroAlt)}"
+              <img src="${heroSrc}" width="580" height="${look?.heroHeight || 387}" alt="${esc(heroAlt)}"
                 style="display:block;width:100%;max-width:580px;height:auto;border:0;border-radius:22px 22px 0 0;">
             </td></tr>
-            <tr><td height="4" bgcolor="${GOLD}" style="background:${GOLD};line-height:4px;font-size:0;">&nbsp;</td></tr>
+            <tr><td height="${look ? 6 : 4}" bgcolor="${accent}" style="background:${accent};line-height:${look ? 6 : 4}px;font-size:0;">&nbsp;</td></tr>
             <tr><td class="tb-card" style="padding:32px 36px 34px;">
-              <div style="margin:0 0 14px;">${iconTile(o.icon || theme.icon)}</div>
-              <p style="text-align:center;font-family:${BODY_FONT};font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;color:${GOLD_DEEP};margin:0 0 12px;">&#10022;&nbsp; ${esc(theme.kicker)} &nbsp;&#10022;</p>
+              ${look ? '' : `<div style="margin:0 0 14px;">${iconTile(o.icon || theme.icon)}</div>`}
+              <p style="text-align:center;font-family:${BODY_FONT};font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;color:${look ? accent : GOLD_DEEP};margin:0 0 12px;">&#10022;&nbsp; ${esc(look ? look.kicker : theme.kicker)} &nbsp;&#10022;</p>
               <h1 class="tb-h1" style="font-family:${HEADING_FONT};font-weight:700;color:${COCOA};font-size:27px;line-height:1.22;margin:0 0 22px;text-align:center;letter-spacing:-0.3px;">${esc(o.heading)}</h1>
               ${o.body}
               ${o.facts?.length ? factsRow(o.facts) : ''}
-              ${o.cta ? button(o.cta.label, o.cta.href) : ''}
+              ${o.cta ? button(o.cta.label, o.cta.href, accent, look ? look.accentInk || '#ffffff' : COCOA) : ''}
+              ${o.afterCta || ''}
               ${note}
             </td></tr>
           </table>
         </td></tr>
 
-        ${photoStrip(theme, base)}
+        ${look ? '' : photoStrip(theme, base)}
         ${originBand(base, t)}
 
         <tr><td align="center" style="padding:26px 8px 0;">
@@ -531,7 +544,7 @@ export function renderEmail(o: LayoutOptions): string {
           <p style="margin:0 0 12px;font-family:${BODY_FONT};line-height:2;">
             ${footerLinks.map(
               l => `<a href="${SITE_URL}${l.path}" style="color:${TEXT};font-size:12px;text-decoration:none;margin:0 4px;white-space:nowrap;">${l.label}</a>`,
-            ).join(`<span style="color:${GOLD};">&nbsp;&#10022;&nbsp;</span>`)}
+            ).join(`<span style="color:${GOLD};">&nbsp;&#10022;</span> `)}
           </p>
           <p style="color:${MUTED};font-family:${BODY_FONT};font-size:12px;line-height:1.7;margin:0;">
             The Tropical Bakery · Itamambuca, Ubatuba — SP<br>
@@ -557,6 +570,7 @@ export function plainTextFallback(o: LayoutOptions): string {
     strip(o.body),
     o.facts?.length ? o.facts.map(f => `${f.num} — ${f.label}`).join('\n') : '',
     o.cta ? `\n${o.cta.label}: ${o.cta.href}` : '',
+    o.afterCta ? `\n${strip(o.afterCta)}` : '',
     '',
     `${UI[isEmailLang(o.lang) ? o.lang : 'pt'].deeper} Sunbaked Letters, ${UI[isEmailLang(o.lang) ? o.lang : 'pt'].newsletter}${UI[isEmailLang(o.lang) ? o.lang : 'pt'].inEnglish ? ' ' + UI[isEmailLang(o.lang) ? o.lang : 'pt'].inEnglish : ''}: ${SUBSTACK_URL}`,
     '',

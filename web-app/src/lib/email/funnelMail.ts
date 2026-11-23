@@ -1,6 +1,6 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { SITE_URL, bulletList, kicker, paragraphs } from './layout';
+import { SITE_URL, button, esc, paragraphs, type LayoutOptions } from './layout';
 import { deliver } from './send';
 import { BOOK_OFFERS } from '@/lib/ebook';
 import { LANG_PATH, fill, type EbookLang } from '@/lib/ebookCopy';
@@ -13,90 +13,181 @@ import { FUNNEL, freePdf } from '@/lib/funnel';
  * goes through sendCampaign (lib/email/funnelCampaigns.ts).
  */
 
-const COPY: Record<EbookLang, { subject: string; preheader: string; heading: string; hi: string; text: string; inside: string; recipes: string[]; cta: string; ps: string; note: string }> = {
+interface MailCopy {
+  subject: string; preheader: string; kicker: string; heading: string; hi: string; text: string;
+  free: string; recipes: { name: string; makes: string }[]; cta: string;
+  moreKicker: string; moreTitle: string; moreText: string; moreCta: string; heroAlt: string; note: string;
+}
+
+const COPY: Record<EbookLang, MailCopy> = {
   en: {
     subject: 'Your 2 free recipes from Dolly 🍓',
-    preheader: 'Red Berry Bliss Balls and Peanutty Banoffee Bars, no oven needed.',
-    heading: 'Your recipes are here',
+    preheader: 'Red Berry Bliss Balls and Peanutty Banoffee Bars. No oven, 20 minutes.',
+    kicker: 'Sweet Escape · free recipes',
+    heading: 'Your 2 recipes are here',
     hi: 'Hi, {name}!',
-    text: 'Thank you for joining me. Here is my little gift: two of my favorite recipes from Sweet Escape, both without an oven and without refined sugar.',
-    inside: 'Inside',
-    recipes: ['Tangy Red Berry Bliss Balls (makes 12–14)', 'Peanutty Banoffee Bars (makes 8–10)'],
-    cta: 'Download my recipes',
-    ps: 'P.S. Loved them? The full book has five more colors, one for every day of the week: {book} ({price}).',
+    text: 'Here they are: two treats from my book Sweet Escape that look like candy and are made of fruit, nuts and dates. No oven, about 20 minutes, and little hands can help roll them.',
+    free: 'Free',
+    recipes: [{ name: 'Tangy Red Berry Bliss Balls', makes: 'Day 3 · Red · makes 12–14' }, { name: 'Peanutty Banoffee Bars', makes: 'Day 6 · Caramel · makes 8–10' }],
+    cta: 'Download my 2 recipes',
+    moreKicker: '5 more colors are waiting',
+    moreTitle: 'The full Sweet Escape',
+    moreText: 'One treat for every day of the week, each a different color, plus the why behind every ingredient so you can invent your own.',
+    moreCta: 'Get all 7 · {price}',
+    heroAlt: 'Sweet Escape: 2 free recipes out of 7',
     note: 'With love, Dolly · Itamambuca beach, Brazil',
   },
   pt: {
     subject: 'Suas 2 receitas grátis da Dolly 🍓',
-    preheader: 'Bliss Balls de Frutas Vermelhas e Barrinhas Banoffee, sem forno.',
-    heading: 'Suas receitas chegaram',
+    preheader: 'Bliss Balls de Frutas Vermelhas e Barrinhas Banoffee. Sem forno, 20 minutos.',
+    kicker: 'Sweet Escape · receitas grátis',
+    heading: 'Suas 2 receitas chegaram',
     hi: 'Oi, {name}!',
-    text: 'Obrigada por cozinhar comigo. Aqui está o meu presente: duas das minhas receitas favoritas do Sweet Escape, as duas sem forno e sem açúcar refinado.',
-    inside: 'Dentro',
-    recipes: ['Bliss Balls Azedinhas de Frutas Vermelhas (rende 12–14)', 'Barrinhas Banoffee de Amendoim (rende 8–10)'],
-    cta: 'Baixar minhas receitas',
-    ps: 'P.S. Gostou? O livro completo tem mais cinco cores, uma para cada dia da semana: {book} ({price}).',
+    text: 'Aqui estão: dois docinhos do meu livro Sweet Escape que parecem bala e são feitos de frutas, castanhas e tâmaras. Sem forno, uns 20 minutos, e as mãozinhas das crianças podem ajudar a enrolar.',
+    free: 'Grátis',
+    recipes: [{ name: 'Bliss Balls Azedinhas de Frutas Vermelhas', makes: 'Dia 3 · Vermelho · rende 12–14' }, { name: 'Barrinhas Banoffee de Amendoim', makes: 'Dia 6 · Caramelo · rende 8–10' }],
+    cta: 'Baixar minhas 2 receitas',
+    moreKicker: 'Mais 5 cores esperando por você',
+    moreTitle: 'O Sweet Escape completo',
+    moreText: 'Um doce para cada dia da semana, cada um de uma cor, e o porquê de cada ingrediente para você criar os seus.',
+    moreCta: 'Quero as 7 · {price}',
+    heroAlt: 'Sweet Escape: 2 receitas grátis de 7',
     note: 'Com carinho, Dolly · Praia de Itamambuca, Ubatuba',
   },
   es: {
     subject: 'Tus 2 recetas gratis de Dolly 🍓',
-    preheader: 'Bliss Balls de Frutos Rojos y Barritas Banoffee, sin horno.',
-    heading: 'Aquí están tus recetas',
+    preheader: 'Bliss Balls de Frutos Rojos y Barritas Banoffee. Sin horno, 20 minutos.',
+    kicker: 'Sweet Escape · recetas gratis',
+    heading: 'Aquí están tus 2 recetas',
     hi: '¡Hola, {name}!',
-    text: 'Gracias por cocinar conmigo. Aquí está mi regalo: dos de mis recetas favoritas de Sweet Escape, las dos sin horno y sin azúcar refinada.',
-    inside: 'Dentro',
-    recipes: ['Bliss Balls Aciditas de Frutos Rojos (salen 12–14)', 'Barritas Banoffee de Maní (salen 8–10)'],
-    cta: 'Descargar mis recetas',
-    ps: 'P.D. ¿Te gustaron? El libro completo tiene cinco colores más, uno para cada día de la semana: {book} ({price}).',
+    text: 'Aquí las tienes: dos dulces de mi libro Sweet Escape que parecen golosinas y están hechos de fruta, frutos secos y dátiles. Sin horno, unos 20 minutos, y las manos pequeñas pueden ayudar a hacer las bolitas.',
+    free: 'Gratis',
+    recipes: [{ name: 'Bliss Balls Aciditas de Frutos Rojos', makes: 'Día 3 · Rojo · salen 12–14' }, { name: 'Barritas Banoffee de Maní', makes: 'Día 6 · Caramelo · salen 8–10' }],
+    cta: 'Descargar mis 2 recetas',
+    moreKicker: 'Te esperan 5 colores más',
+    moreTitle: 'El Sweet Escape completo',
+    moreText: 'Un dulce para cada día de la semana, cada uno de un color, y el porqué de cada ingrediente para que inventes los tuyos.',
+    moreCta: 'Quiero las 7 · {price}',
+    heroAlt: 'Sweet Escape: 2 recetas gratis de 7',
     note: 'Con cariño, Dolly · Playa de Itamambuca, Brasil',
   },
   nl: {
     subject: 'Je 2 gratis recepten van Dolly 🍓',
-    preheader: 'Rode Bessen Bliss Balls en Pinda Banoffee Repen, zonder oven.',
-    heading: 'Hier zijn je recepten',
+    preheader: 'Rode Bessen Bliss Balls en Pinda Banoffee Repen. Zonder oven, 20 minuten.',
+    kicker: 'Sweet Escape · gratis recepten',
+    heading: 'Hier zijn je 2 recepten',
     hi: 'Hoi {name}!',
-    text: 'Dank je dat je met me meebakt. Hier is mijn cadeautje: twee van mijn favoriete recepten uit Sweet Escape, allebei zonder oven en zonder geraffineerde suiker.',
-    inside: 'Erin',
-    recipes: ['Frisse Rode Bessen Bliss Balls (voor 12–14)', 'Pinda Banoffee Repen (voor 8–10)'],
-    cta: 'Download mijn recepten',
-    ps: 'P.S. Lekker? Het hele boek heeft nog vijf kleuren, één voor elke dag van de week: {book} ({price}).',
+    text: 'Hier zijn ze: twee lekkernijen uit mijn boek Sweet Escape die eruitzien als snoep en gemaakt zijn van fruit, noten en dadels. Zonder oven, zo’n 20 minuten, en kleine handjes kunnen helpen rollen.',
+    free: 'Gratis',
+    recipes: [{ name: 'Frisse Rode Bessen Bliss Balls', makes: 'Dag 3 · Rood · voor 12–14' }, { name: 'Pinda Banoffee Repen', makes: 'Dag 6 · Karamel · voor 8–10' }],
+    cta: 'Download mijn 2 recepten',
+    moreKicker: 'Er wachten nog 5 kleuren',
+    moreTitle: 'Het hele Sweet Escape',
+    moreText: 'Een lekkernij voor elke dag van de week, elk in een andere kleur, plus het waarom van elk ingrediënt zodat je je eigen kunt bedenken.',
+    moreCta: 'Alle 7 · {price}',
+    heroAlt: 'Sweet Escape: 2 gratis recepten van 7',
     note: 'Liefs, Dolly · Itamambuca-strand, Brazilië',
   },
   de: {
     subject: 'Deine 2 Gratis-Rezepte von Dolly 🍓',
-    preheader: 'Spritzige Rote-Beeren-Bliss-Balls und Erdnuss-Banoffee-Schnitten, ganz ohne Ofen.',
-    heading: 'Hier sind deine Rezepte',
+    preheader: 'Rote-Beeren-Bliss-Balls und Erdnuss-Banoffee-Schnitten. Ohne Ofen, 20 Minuten.',
+    kicker: 'Sweet Escape · Gratis-Rezepte',
+    heading: 'Hier sind deine 2 Rezepte',
     hi: 'Hallo {name}!',
-    text: 'Danke, dass du mit mir backst. Hier ist mein kleines Geschenk: zwei meiner Lieblingsrezepte aus Sweet Escape, beide ohne Ofen und ohne raffinierten Zucker.',
-    inside: 'Drin',
-    recipes: ['Spritzige Rote-Beeren-Bliss-Balls (für 12–14 Stück)', 'Erdnuss-Banoffee-Schnitten (für 8–10 Stück)'],
-    cta: 'Meine Rezepte herunterladen',
-    ps: 'P.S. Haben sie dir geschmeckt? Das ganze Buch hat noch fünf Farben mehr, eine für jeden Tag der Woche: {book} ({price}).',
+    text: 'Hier sind sie: zwei Leckereien aus meinem Buch Sweet Escape, die wie Süßigkeiten aussehen und aus Obst, Nüssen und Datteln gemacht sind. Ohne Ofen, etwa 20 Minuten, und kleine Hände können beim Rollen helfen.',
+    free: 'Gratis',
+    recipes: [{ name: 'Spritzige Rote-Beeren-Bliss-Balls', makes: 'Tag 3 · Rot · für 12–14 Stück' }, { name: 'Erdnuss-Banoffee-Schnitten', makes: 'Tag 6 · Karamell · für 8–10 Stück' }],
+    cta: 'Meine 2 Rezepte herunterladen',
+    moreKicker: 'Noch 5 Farben warten auf dich',
+    moreTitle: 'Das ganze Sweet Escape',
+    moreText: 'Eine Leckerei für jeden Tag der Woche, jede in einer anderen Farbe, und das Warum hinter jeder Zutat, damit du eigene erfinden kannst.',
+    moreCta: 'Alle 7 · {price}',
+    heroAlt: 'Sweet Escape: 2 von 7 Rezepten gratis',
     note: 'Alles Liebe, Dolly · Strand von Itamambuca, Brasilien',
   },
 };
 
-export async function sendFreeRecipes(db: SupabaseClient, o: { email: string; firstName: string; lang: EbookLang }) {
-  const email = o.email.trim().toLowerCase();
-  if (!email.includes('@')) return;
+// The book's own colours (sweetEscape.css), so the e-mail looks like the page they signed up on.
+const ORANGE = '#ff4f0a';
+const COCOA = '#3c2a21';
+const PAPER = '#fdf7ec';
+const FONT = `'Outfit',Helvetica,Arial,sans-serif`;
+const HEAD = `'Unbounded','Outfit',Helvetica,Arial,sans-serif`;
+const RECIPE_LOOK = [{ img: 'se-red.jpg', hex: '#e8364f' }, { img: 'se-caramel.jpg', hex: '#c9853c' }];
+
+/** The two free recipes side by side, like the cards on the landing page: photo, colour bar, FREE tag, name. */
+function recipeCards(c: MailCopy, base: string): string {
+  const cells = c.recipes.map((r, i) => `
+    <td width="50%" valign="top" style="padding:0 5px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff"
+        style="background:#ffffff;border:1px solid #efdfc6;border-top:6px solid ${RECIPE_LOOK[i].hex};border-radius:14px;border-collapse:separate;overflow:hidden;">
+        <tr><td style="line-height:0;font-size:0;">
+          <img src="${base}/email/${RECIPE_LOOK[i].img}" width="250" height="188" alt="${esc(r.name)}"
+            style="display:block;width:100%;max-width:250px;height:auto;border:0;background:${PAPER};">
+        </td></tr>
+        <tr><td style="padding:10px 12px 14px;">
+          <span style="display:inline-block;padding:3px 9px;border-radius:999px;background:${ORANGE};color:#ffffff;font-family:${FONT};font-size:10px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;">${esc(c.free)}</span>
+          <p style="font-family:${HEAD};font-weight:700;font-size:15px;line-height:1.25;color:${COCOA};margin:8px 0 4px;">${esc(r.name)}</p>
+          <p style="font-family:${FONT};font-size:12px;line-height:1.4;color:#8a7466;margin:0;">${esc(r.makes)}</p>
+        </td></tr>
+      </table>
+    </td>`).join('');
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;margin:6px 0 22px;"><tr>${cells}</tr></table>`;
+}
+
+/** The book: all 7 colours (the free two lit), the cover, one line and a button. */
+function bookBlock(c: MailCopy, lang: EbookLang, base: string, href: string, price: string): string {
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${PAPER}"
+      style="background:${PAPER};border:2px solid ${ORANGE};border-radius:18px;border-collapse:separate;margin:28px 0 0;">
+      <tr><td style="padding:20px 18px 22px;">
+        <p style="text-align:center;font-family:${FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;color:${ORANGE};margin:0 0 12px;">&#10022;&nbsp; ${esc(c.moreKicker)} &nbsp;&#10022;</p>
+        <a href="${href}" style="text-decoration:none;"><img src="${base}/email/se-seven.jpg" width="500" height="67" alt="Sweet Escape: 7 colors"
+          style="display:block;width:100%;max-width:500px;height:auto;border:0;margin:0 auto 16px;"></a>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td width="34%" valign="middle" style="padding:0 14px 0 0;">
+            <a href="${href}" style="text-decoration:none;"><img src="${base}/email/se-cover-${lang}.jpg" width="160" alt="Sweet Escape"
+              style="display:block;width:100%;max-width:160px;height:auto;border:0;border-radius:4px 8px 8px 4px;box-shadow:0 10px 22px rgba(60,42,33,0.25);"></a>
+          </td>
+          <td valign="middle">
+            <p style="font-family:${HEAD};font-weight:700;font-size:18px;line-height:1.2;color:${COCOA};margin:0 0 8px;">${esc(c.moreTitle)}</p>
+            <p style="font-family:${FONT};font-size:14px;line-height:1.55;color:#594a42;margin:0;">${esc(c.moreText)}</p>
+          </td>
+        </tr></table>
+        <div style="height:16px;line-height:16px;font-size:0;">&nbsp;</div>
+        ${button(fill(c.moreCta, { price }), href, COCOA, '#ffd08a')}
+      </td></tr>
+    </table>`;
+}
+
+/** The e-mail itself, without sending: shared by the send and by previews. `base` is where images load from. */
+export function freeRecipesLayout(o: { firstName: string; lang: EbookLang }, base = SITE_URL): LayoutOptions {
   const c = COPY[o.lang];
   const price = o.lang === 'pt' ? `R$ ${BOOK_OFFERS.full.brl}` : o.lang === 'de' ? `€ ${BOOK_OFFERS.full.eur}` : `US$ ${BOOK_OFFERS.full.usd}`;
   const book = `${SITE_URL}${LANG_PATH[o.lang]}?utm_source=email&utm_medium=funil&utm_campaign=receitas-d0`;
   const hello = o.firstName
-    ? `<p style="color:#3c2a21;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:17px;font-weight:bold;margin:0 0 12px;">${fill(c.hi, { name: o.firstName.replace(/[<>&"]/g, '') })}</p>`
+    ? `<p style="color:${COCOA};font-family:${FONT};font-size:17px;font-weight:bold;margin:0 0 12px;">${fill(c.hi, { name: o.firstName.replace(/[<>&"]/g, '') })}</p>`
     : '';
+  return {
+    lang: o.lang,
+    assetBase: base,
+    look: { hero: `se-hero-${o.lang}.jpg`, heroAlt: c.heroAlt, heroHeight: 420, kicker: c.kicker, accent: ORANGE },
+    preheader: c.preheader,
+    heading: c.heading,
+    body: hello + paragraphs(c.text) + recipeCards(c, base),
+    cta: { label: c.cta, href: `${SITE_URL}${freePdf(o.lang)}` },
+    afterCta: bookBlock(c, o.lang, base, book, price),
+    note: c.note,
+  };
+}
+
+export async function sendFreeRecipes(db: SupabaseClient, o: { email: string; firstName: string; lang: EbookLang }) {
+  const email = o.email.trim().toLowerCase();
+  if (!email.includes('@')) return;
   try {
     await deliver(db, {
-      email, token: '', messageKey: `${FUNNEL.source}:pdf`, subject: c.subject, topic: 'pedido', template: 'receitas-d0', transactional: true,
-      layout: {
-        lang: o.lang,
-        theme: 'novidades', icon: '📝',
-        preheader: c.preheader,
-        heading: c.heading,
-        body: hello + paragraphs(c.text) + kicker(c.inside, '📝') + bulletList(c.recipes) + paragraphs(fill(c.ps, { book, price })),
-        cta: { label: c.cta, href: `${SITE_URL}${freePdf(o.lang)}` },
-        note: c.note,
-      },
+      email, token: '', messageKey: `${FUNNEL.source}:pdf`, subject: COPY[o.lang].subject, topic: 'pedido', template: 'receitas-d0', transactional: true,
+      layout: freeRecipesLayout(o),
     });
   } catch (err) {
     console.error('free recipes e-mail failed for', email, err);
