@@ -35,19 +35,49 @@ interface Alert {
   facts: [string, string | null | undefined][];
   whatsapp?: string | null;
   email?: string | null;
+  /** The e-mail the site should have sent this person for this row, so the alert can say whether it went out. */
+  expects?: { label: string; previewUrl?: string };
 }
 
 type Row = Record<string, any>;
 
-const br = (iso?: string | null) => {
+/** Dates as Andrew and Dolly read them: 12 Dec 2026. */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const day = (iso?: string | null) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '');
-  return m ? `${m[3]}/${m[2]}/${m[1]}` : (iso || '');
+  return m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]} ${m[1]}` : (iso || '');
 };
 const money = (v: unknown) => {
   const n = Number(v);
   return Number.isFinite(n) && n > 0 ? `R$ ${n.toFixed(2).replace('.', ',')}` : null;
 };
-const first = (s?: string | null) => (s || '').trim() || 'Sem nome';
+const first = (s?: string | null) => (s || '').trim() || 'No name';
+
+const LANG_NAME: Row = { en: 'English', pt: 'Portuguese', es: 'Spanish', nl: 'Dutch', de: 'German' };
+
+/**
+ * Where a visitor came from, in words instead of the raw utm tags. Unknown tags fall through as they are, so a new ad
+ * still shows something. Add a line here when a new ad or link gets its own utm_campaign.
+ */
+const SOURCE_NAME: Row = {
+  meta: 'Meta ad', facebook: 'Facebook', fb: 'Facebook', instagram: 'Instagram', ig: 'Instagram', whatsapp: 'WhatsApp share',
+  email: 'one of our e-mails', funil: 'the thank-you page', 'app-vontade': 'the Vontade app', google: 'Google',
+};
+const CAMPAIGN_NAME: Row = {
+  free_recipes_en_video: 'English video ad', 'receitas-pt': 'Portuguese recipes ad', 'recipes-en': 'English recipes ad',
+  'rezepte-de': 'German recipes ad', receitas: 'recipes link', 'receitas-d0': 'free-recipes e-mail', bio: 'Instagram bio link', post: 'Instagram post',
+};
+const CONTENT_NAME: Row = { moms_snack_fight: 'moms, "snack-time fights" version' };
+export function cameFrom(r: Row): string {
+  const src = (r.utm_source || '').toLowerCase(), camp = (r.utm_campaign || ''), content = (r.utm_content || '');
+  if (!src && !camp && !content) {
+    const ref = (r.referrer || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+    return ref ? `Link on ${ref}` : 'Typed the address or no tracking tag';
+  }
+  const parts = [CAMPAIGN_NAME[camp] || camp, CONTENT_NAME[content] || content].filter(Boolean);
+  const head = SOURCE_NAME[src] || src || 'Unknown source';
+  return parts.length ? `${head}: ${parts.join(', ')}` : head;
+}
 
 /** One entry per table: what to read and how to say it. Tables that don't exist yet are skipped quietly. */
 const SOURCES: { table: string; build: (r: Row) => Alert }[] = [
@@ -56,11 +86,11 @@ const SOURCES: { table: string; build: (r: Row) => Alert }[] = [
     build: r => {
       const retreat = /retiro/i.test(r.interest_type || '');
       return {
-        subject: `${retreat ? '🏝️ Pedido de retiro' : '👩‍🍳 Nova reserva de aula'}: ${first(r.customer_name)}${r.requested_date ? `, ${br(r.requested_date)}` : ''}${r.group_size ? `, ${r.group_size} pessoa(s)` : ''}`,
+        subject: `${retreat ? 'Retreat request' : 'New class booking'}: ${first(r.customer_name)}${r.requested_date ? `, ${day(r.requested_date)}` : ''}${r.group_size ? `, ${r.group_size} ${Number(r.group_size) === 1 ? 'person' : 'people'}` : ''}`,
         facts: [
-          ['Nome', r.customer_name], ['O quê', r.specific_interest || r.interest_type], ['Data', br(r.requested_date)],
-          ['Pessoas', r.group_size ? String(r.group_size) : null],
-          ['Interesses', Array.isArray(r.focus_areas) ? r.focus_areas.join(', ') : null], ['Mensagem', r.message],
+          ['Name', r.customer_name], ['What', r.specific_interest || r.interest_type], ['Date', day(r.requested_date)],
+          ['People', r.group_size ? String(r.group_size) : null],
+          ['Interests', Array.isArray(r.focus_areas) ? r.focus_areas.join(', ') : null], ['Message', r.message],
         ],
         whatsapp: r.customer_whatsapp, email: r.email,
       };
@@ -73,45 +103,54 @@ const SOURCES: { table: string; build: (r: Row) => Alert }[] = [
       const total = money(r.total_price);
       return {
         subject: quote
-          ? `🎉 Pedido de orçamento (evento): ${first(r.customer_name)}${r.items?.guests ? `, ${r.items.guests} convidados` : ''}${r.requested_date ? `, ${br(r.requested_date)}` : ''}`
-          : `🛒 Novo pedido: ${first(r.customer_name)}${total ? `, ${total}` : ''} (aguardando pagamento)`,
+          ? `Event quote request: ${first(r.customer_name)}${r.items?.guests ? `, ${r.items.guests} guests` : ''}${r.requested_date ? `, ${day(r.requested_date)}` : ''}`
+          : `New order: ${first(r.customer_name)}${total ? `, ${total}` : ''} (waiting for payment)`,
         facts: [
-          ['Nome', r.customer_name],
-          ['O quê', r.items_summary || (Array.isArray(r.items?.picks) ? r.items.picks.join(', ') : null)],
-          ['Data', br(r.requested_date)], ['Convidados', r.items?.guests ? String(r.items.guests) : null],
-          ['Total', quote ? null : total], ['Referência', r.pix_transaction_id], ['Observação', r.items?.note],
+          ['Name', r.customer_name],
+          ['What', r.items_summary || (Array.isArray(r.items?.picks) ? r.items.picks.join(', ') : null)],
+          ['Date', day(r.requested_date)], ['Guests', r.items?.guests ? String(r.items.guests) : null],
+          ['Total', quote ? null : total], ['Reference', r.pix_transaction_id], ['Note', r.items?.note],
         ],
         whatsapp: r.customer_whatsapp, email: r.customer_email,
+        expects: quote ? undefined : { label: 'the order receipt with the Pix code ("Recebemos seu pedido")' },
       };
     },
   },
   {
     table: 'contact_leads',
     build: r => ({
-      subject: `💬 ${/coaching/i.test(r.topic || '') ? 'Pedido de coaching' : 'Novo contato'}: ${first(r.name)}${r.topic ? ` (${r.topic})` : ''}`,
-      facts: [['Nome', r.name], ['Assunto', r.topic], ['Página', r.source_page]],
+      subject: `${/coaching/i.test(r.topic || '') ? 'Coaching request' : 'New contact'}: ${first(r.name)}${r.topic ? ` (${r.topic})` : ''}`,
+      facts: [['Name', r.name], ['About', r.topic], ['Page', r.source_page]],
       whatsapp: r.whatsapp, email: r.email,
     }),
   },
   {
     table: 'funnel_leads',
-    build: r => ({
-      subject: `📗 Receitas grátis: ${first(r.first_name)} (${r.email})`,
-      facts: [
-        ['Nome', r.first_name], ['Onde mora', ({ local: 'Perto (Ubatuba/Paraty)', visiting: 'Vem visitar', away: 'Longe' } as Row)[r.segment] || r.segment],
-        ['Idioma', r.lang], ['Veio de', [r.utm_source, r.utm_campaign, r.utm_content].filter(Boolean).join(' / ') || null],
-        ['Comprou o livro', r.book_ref ? `sim (${r.book_ref})` : null],
-      ],
-      email: r.email,
-    }),
+    build: r => {
+      const lang = LANG_NAME[r.lang] ? r.lang : 'en';
+      return {
+        subject: `Free recipes sign-up: ${first(r.first_name)} (${CAMPAIGN_NAME[r.utm_campaign] || SOURCE_NAME[(r.utm_source || '').toLowerCase()] || LANG_NAME[lang]})`,
+        facts: [
+          ['Name', r.first_name], ['Language', LANG_NAME[lang]],
+          ['Lives', ({ local: 'Close by (Ubatuba/Paraty)', visiting: 'Coming to visit', away: 'Far away' } as Row)[r.segment] || r.segment],
+          ['Came from', cameFrom(r)],
+          ['Bought the book', r.book_ref ? `Yes (${r.book_ref})` : 'Not yet'],
+        ],
+        email: r.email,
+        expects: {
+          label: `the 2 free recipes e-mail, in ${LANG_NAME[lang]}`,
+          previewUrl: `${SITE_URL}/api/email/preview/free-recipes?lang=${lang}&name=${encodeURIComponent((r.first_name || '').trim().split(' ')[0].slice(0, 30))}`,
+        },
+      };
+    },
   },
   {
     table: 'waitlist',
-    build: r => ({ subject: `⏳ Fila de espera: ${first(r.name)}`, facts: [['Nome', r.name]], whatsapp: r.whatsapp, email: r.email }),
+    build: r => ({ subject: `Waiting list: ${first(r.name)}`, facts: [['Name', r.name]], whatsapp: r.whatsapp, email: r.email }),
   },
   {
     table: 'job_applications',
-    build: r => ({ subject: `🧑‍🍳 Candidatura: ${first(r.full_name)} (${r.role || 'vaga'})`, facts: [['Nome', r.full_name], ['Vaga', r.role], ['Cidade', r.city]], whatsapp: r.whatsapp, email: r.email }),
+    build: r => ({ subject: `Job application: ${first(r.full_name)} (${r.role || 'open role'})`, facts: [['Name', r.full_name], ['Role', r.role], ['City', r.city]], whatsapp: r.whatsapp, email: r.email }),
   },
 ];
 
@@ -120,16 +159,57 @@ const waLink = (v: string) => {
   return `https://wa.me/${d.length <= 11 ? '55' + d : d}`;
 };
 
-function body(a: Alert) {
+interface SentMail { subject: string | null; status: string | null; provider_id: string | null; sent_at: string }
+
+/** What the site e-mailed this person since they arrived (the alert's own sends left out). */
+async function mailsTo(db: SupabaseClient, email: string | null | undefined, since: string): Promise<SentMail[] | null> {
+  const to = (email || '').trim().toLowerCase();
+  if (!to.includes('@')) return null;
+  const from = new Date(new Date(since).getTime() - 2 * 60_000).toISOString();
+  const { data, error } = await db.from('email_sends').select('subject,status,provider_id,sent_at')
+    .ilike('email', to).gte('sent_at', from).not('message_key', 'like', 'alerta:%').order('sent_at').limit(5);
+  return error ? null : (data as SentMail[]);
+}
+
+const FONT = `'Outfit',Helvetica,Arial,sans-serif`;
+const time = (iso: string) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+
+/** "What they got": every e-mail that went to them, or a clear warning when the one they should have got is missing. */
+function receivedBlock(a: Alert, mails: SentMail[] | null): string {
+  if (!a.email || (!a.expects && !mails?.length)) return '';
+  const ok = (m: SentMail) => m.status !== 'failed';
+  const good = (mails || []).filter(ok);
+  const box = (bg: string, line: string, inner: string) =>
+    `<div style="margin:6px 0 18px;padding:14px 16px;border-radius:12px;background:${bg};border:1px solid ${line};font-family:${FONT};font-size:15px;line-height:1.55;color:#3c2a21;">${inner}</div>`;
+  const title = (t: string) => `<p style="margin:0 0 6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;color:#3c2a21;">${t}</p>`;
+  const preview = a.expects?.previewUrl
+    ? `<p style="margin:8px 0 0;"><a href="${a.expects.previewUrl}" style="color:#a6832b;font-weight:bold;">See the e-mail they got &rarr;</a></p>`
+    : '';
+  if (good.length) {
+    return box('#eefbf1', '#bfe8cb',
+      title('&#10003; What they got') +
+      good.map(m => `<p style="margin:0 0 4px;"><b>${esc(m.subject || 'E-mail')}</b><br><span style="color:#5b463a;">Sent to ${esc(a.email!)} at ${time(m.sent_at)} (Brasília)${m.provider_id ? ', accepted by the mail service' : ''}</span></p>`).join('') +
+      (a.expects ? `<p style="margin:6px 0 0;color:#5b463a;">That is ${esc(a.expects.label)}.</p>` : '') + preview);
+  }
+  if (mails === null) {
+    return box('#fdf7ec', '#eadfca', title('What they got') + `<p style="margin:0;">Couldn't check the send log. ${a.expects ? `They should have got ${esc(a.expects.label)}.` : ''}</p>` + preview);
+  }
+  return box('#fff1ec', '#ffc9b5',
+    title('&#9888; Nothing went out to them') +
+    `<p style="margin:0;">${a.expects ? `They should have got ${esc(a.expects.label)}, but the site has no record of it being sent.` : 'The site sent them no e-mail.'} Reply to them by hand, and tell Claude so we can look at why.</p>` + preview);
+}
+
+function body(a: Alert, mails: SentMail[] | null) {
   const rows = a.facts.filter(([, v]) => v && String(v).trim());
   const contact: string[] = [];
   if (a.whatsapp) contact.push(`WhatsApp: <a href="${waLink(a.whatsapp)}">${esc(a.whatsapp)}</a>`);
   if (a.email) contact.push(`E-mail: <a href="mailto:${esc(a.email)}">${esc(a.email)}</a>`);
   return (
-    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:0 0 16px;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#3c2a21;">` +
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:0 0 16px;font-family:${FONT};font-size:16px;line-height:1.5;color:#3c2a21;">` +
     rows.map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;font-weight:700;white-space:nowrap;vertical-align:top;">${esc(k)}</td><td style="padding:4px 0;">${esc(String(v))}</td></tr>`).join('') +
     `</table>` +
-    (contact.length ? `<p style="margin:0 0 12px;font-size:16px;">${contact.join('<br>')}</p>` : '')
+    (contact.length ? `<p style="margin:0 0 12px;font-family:${FONT};font-size:16px;">${contact.join('<br>')}</p>` : '') +
+    receivedBlock(a, mails)
   );
 }
 
@@ -150,6 +230,7 @@ export async function sendNewArrivalAlerts(db: SupabaseClient, windowMinutes = W
       for (const row of data as Row[]) {
         result.checked += 1;
         const a = source.build(row);
+        const mails = await mailsTo(db, a.email, row.created_at || since).catch(() => null);
         for (const email of to) {
           const outcome = await deliver(db, {
             email, token: '', messageKey: `alerta:${source.table}:${row.id}`, subject: a.subject,
@@ -157,10 +238,10 @@ export async function sendNewArrivalAlerts(db: SupabaseClient, windowMinutes = W
             layout: {
               preheader: a.facts.filter(([, v]) => v).map(([, v]) => v).join(' · ').slice(0, 140),
               heading: a.subject,
-              body: body(a),
-              cta: { label: 'Abrir a Caixa de Entrada', href: `${SITE_URL}/admin` },
-              note: 'Aviso automático do site para a equipe.',
-              icon: '🔔',
+              body: body(a, mails),
+              cta: { label: 'Open the inbox', href: `${SITE_URL}/admin` },
+              note: 'Automatic note from the site to the team.',
+              lang: 'en',
             },
           }).catch(err => { console.error('alert deliver failed', err); return 'failed' as const; });
           if (outcome === 'sent') result.sent += 1;
