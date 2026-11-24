@@ -1,7 +1,7 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { PICKUP_EXTRA_DAYS, pickupWindowText } from '@/lib/pickupWindow';
-import { SITE_URL, STORE_WHATSAPP, copyBox, greeting, kicker, orderTable, paragraphs, type EmailTheme, type LayoutOptions } from './layout';
+import { SITE_URL, STORE_WHATSAPP, copyBox, greeting, kicker, orderTable, paragraphs, type EmailTheme, type BuiltEmail } from './layout';
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
 import { CARE_PATH, CARE_SHORT } from '@/lib/treatCare';
@@ -94,7 +94,7 @@ function themeFor(order: ReceiptOrder): EmailTheme {
 }
 
 /** One transactional e-mail to one address, or nothing when we have no address. */
-async function send(db: SupabaseClient, order: ReceiptOrder, messageKey: string, subject: string, layout: Omit<LayoutOptions, 'theme'>) {
+async function send(db: SupabaseClient, order: ReceiptOrder, { messageKey, subject, layout }: BuiltEmail) {
   const email = (order.customerEmail || '').trim().toLowerCase();
   if (!email || !email.includes('@')) return;
 
@@ -110,7 +110,7 @@ async function send(db: SupabaseClient, order: ReceiptOrder, messageKey: string,
       topic: 'pedido',
       template: messageKey.split(':')[0],
       transactional: true,
-      layout: { ...layout, theme: themeFor(order) },
+      layout,
     });
   } catch (err) {
     console.error('receipt failed for', order.reference, err);
@@ -123,6 +123,10 @@ async function send(db: SupabaseClient, order: ReceiptOrder, messageKey: string,
  * the payment.
  */
 export async function sendOrderReceived(db: SupabaseClient, order: ReceiptOrder) {
+  await send(db, order, orderReceivedEmail(order));
+}
+
+export function orderReceivedEmail(order: ReceiptOrder): BuiltEmail {
   const firstName = (order.customerName || '').trim().split(' ')[0];
   const isPix = order.method === 'pix';
   const where = fulfilment(order);
@@ -139,17 +143,22 @@ export async function sendOrderReceived(db: SupabaseClient, order: ReceiptOrder)
     (isPix && order.pixPayload ? copyBox('Pix copia e cola', order.pixPayload) : '') +
     (where ? paragraphs(where) : '');
 
-  await send(db, order, `order-received:${order.reference}`, `Recebemos seu pedido — ${order.reference}`, {
+  return { messageKey: `order-received:${order.reference}`, subject: `Recebemos seu pedido — ${order.reference}`, layout: {
+    theme: themeFor(order),
     preheader: isPix ? `Falta o Pix de ${formatBRL(order.total)} para fechar o pedido.` : `Pedido de ${formatBRL(order.total)} recebido.`,
     heading: 'Recebemos seu pedido',
     body,
     cta: { label: 'Falar com a gente no WhatsApp', href: whatsappLink },
     note: `Guarde o número do pedido: ${order.reference}.`,
-  });
+  } };
 }
 
 /** When the money actually arrives (card, PayPal, or an admin confirming a Pix). */
 export async function sendOrderPaid(db: SupabaseClient, order: ReceiptOrder) {
+  await send(db, order, orderPaidEmail(order));
+}
+
+export function orderPaidEmail(order: ReceiptOrder): BuiltEmail {
   const firstName = (order.customerName || '').trim().split(' ')[0];
   // A course or retreat proposal (PRP…): a spot, not a box for the kitchen.
   const spot = /^PRP/.test(order.reference);
@@ -172,11 +181,12 @@ export async function sendOrderPaid(db: SupabaseClient, order: ReceiptOrder) {
 
 Todos os cuidados: ${SITE_URL}${CARE_PATH}`));
 
-  await send(db, order, `order-paid:${order.reference}`, `Pagamento confirmado: ${order.reference}`, {
+  return { messageKey: `order-paid:${order.reference}`, subject: `Pagamento confirmado: ${order.reference}`, layout: {
+    theme: themeFor(order),
     preheader: `Recebemos ${formatBRL(order.total)}. Seu pedido está confirmado.`,
     heading: 'Pagamento confirmado',
     body,
     cta: { label: 'Ver minha conta', href: `${SITE_URL}/minha-conta` },
     note: `Pedido ${order.reference}. Precisa mudar algo? Fale com a gente no WhatsApp.`,
-  });
+  } };
 }

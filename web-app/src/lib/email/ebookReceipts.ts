@@ -1,6 +1,6 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { SITE_URL, button, copyBox, esc, kicker, orderTable, paragraphs, bulletList, type LayoutOptions } from './layout';
+import { SITE_URL, button, copyBox, esc, kicker, orderTable, paragraphs, bulletList, type BuiltEmail, type LayoutOptions } from './layout';
 import { deliver } from './send';
 import { formatBRL } from '@/lib/deliveryZones';
 import { EBOOK, usdForBRL } from '@/lib/ebook';
@@ -55,7 +55,7 @@ const bookLook = (o: EbookReceipt): Pick<LayoutOptions, 'look' | 'lang'> => ({
 
 const link = (o: EbookReceipt) => `${SITE_URL}${EBOOK.thanksPath}?ref=${o.reference}&k=${o.key}&lang=${o.lang ?? 'en'}`;
 
-async function send(db: SupabaseClient, o: EbookReceipt, messageKey: string, subject: string, layout: Parameters<typeof deliver>[1]['layout']) {
+async function send(db: SupabaseClient, o: EbookReceipt, { messageKey, subject, layout }: BuiltEmail) {
   const email = (o.customerEmail || '').trim().toLowerCase();
   if (!email.includes('@')) return;
   try {
@@ -66,6 +66,10 @@ async function send(db: SupabaseClient, o: EbookReceipt, messageKey: string, sub
 }
 
 export async function sendEbookOrderReceived(db: SupabaseClient, o: EbookReceipt) {
+  await send(db, o, ebookReceivedEmail(o));
+}
+
+export function ebookReceivedEmail(o: EbookReceipt): BuiltEmail {
   const m = EBOOK_COPY[o.lang ?? 'en'].mail;
   const v = { price: money(o), ref: o.reference };
   const isPix = o.method === 'pix';
@@ -76,14 +80,14 @@ export async function sendEbookOrderReceived(db: SupabaseClient, o: EbookReceipt
     orderTable([{ label: `${EBOOK.lineName} · ${LANG_LABEL[o.book ?? 'en']}`, amount: money(o) }, { label: 'Total', amount: money(o), strong: true }]) +
     (isPix && o.pixPayload ? copyBox('Pix copia e cola', o.pixPayload) : '');
 
-  await send(db, o, `ebook-received:${o.reference}`, fill(m.receivedSubject, v), {
+  return { messageKey: `ebook-received:${o.reference}`, subject: fill(m.receivedSubject, v), layout: {
     preheader: fill(isPix ? m.receivedPreheaderPix : m.receivedPreheaderCard, v),
     heading: m.receivedHeading,
     body,
     cta: { label: m.myPage, href: link(o) },
     note: fill(m.receivedNote, v),
     ...bookLook(o),
-  });
+  } };
 }
 
 /** The free call with Dolly (lib/bonusCall.ts): her photo, two lines and a button to the claim page. */
@@ -99,8 +103,12 @@ const callBlock = (o: EbookReceipt) => {
 };
 
 export async function sendEbookPaid(db: SupabaseClient, o: EbookReceipt) {
+  await send(db, o, ebookPaidEmail(o, await bonusCallOn(db)));
+}
+
+/** `call`: whether the free call with Dolly is on (Admin › Ligação grátis above 0). */
+export function ebookPaidEmail(o: EbookReceipt, call: boolean): BuiltEmail {
   const m = EBOOK_COPY[o.lang ?? 'en'].mail;
-  const call = await bonusCallOn(db);
   const v = { price: money(o), ref: o.reference };
   const body =
     hello(m.hi, o.customerName) +
@@ -115,12 +123,12 @@ export async function sendEbookPaid(db: SupabaseClient, o: EbookReceipt) {
     kicker(PERK_COPY[o.lang ?? 'en'].title) +
     paragraphs(PERK_COPY[o.lang ?? 'en'].text);
 
-  await send(db, o, `ebook-paid:${o.reference}`, m.paidSubject, {
+  return { messageKey: `ebook-paid:${o.reference}`, subject: m.paidSubject, layout: {
     preheader: m.paidPreheader,
     heading: m.paidHeading,
     body,
     cta: { label: m.paidCta, href: link(o) },
     note: fill(m.paidNote, v),
     ...bookLook(o),
-  });
+  } };
 }

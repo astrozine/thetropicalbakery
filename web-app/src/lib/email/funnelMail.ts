@@ -1,6 +1,6 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { SITE_URL, button, esc, paragraphs, type LayoutOptions } from './layout';
+import { SITE_URL, button, esc, paragraphs, type BuiltEmail, type LayoutOptions } from './layout';
 import { deliver } from './send';
 import { BOOK_OFFERS } from '@/lib/ebook';
 import { LANG_PATH, fill, type EbookLang } from '@/lib/ebookCopy';
@@ -179,6 +179,11 @@ export function freeRecipesLayout(o: { firstName: string; lang: EbookLang }, bas
     afterCta: bookBlock(c, o.lang, base, book, price),
     note: c.note,
   };
+}
+
+/** The whole e-mail (key, subject, layout) for a sign-up: the send and the admin preview share it. */
+export function freeRecipesEmail(o: { firstName: string; lang: EbookLang }, base = SITE_URL): BuiltEmail {
+  return { messageKey: `${FUNNEL.source}:pdf`, subject: COPY[o.lang].subject, layout: freeRecipesLayout(o, base) };
 }
 
 export async function sendFreeRecipes(db: SupabaseClient, o: { email: string; firstName: string; lang: EbookLang }) {

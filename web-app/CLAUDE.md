@@ -73,6 +73,10 @@ that only add columns or policies to existing tables need nothing extra.
   longer loses the payment) and `sendOrderPaid` from `markOrderPaid`. Both are wrapped in try/catch at
   the call site on purpose: **an e-mail failure must never fail a saved or paid order.** They are
   deliberately not in `CAMPAIGNS` — the admin never hand-sends a receipt.
+- **Admin › E-mails › Todos os e-mails** (`/admin/emails/todos`, `src/lib/email/catalog.ts`) previews every e-mail
+  with example data so Andrew and Dolly can see what customers get. Campaigns appear by themselves. A new automatic
+  e-mail must export a builder returning `BuiltEmail` (the send calls it too) and get a line in `AUTOMATIC` in
+  catalog.ts under the same `template` id it writes to `email_sends`; the page warns about templates sent without a preview.
 - **Preferences page** `/preferencias?token=…` uses the SECURITY DEFINER functions
   `email_prefs_get` / `email_prefs_set` / `email_unsubscribe_all`, so a logged-out person can manage
   their own row without the table being readable. `?sair=1` unsubscribes immediately (one click).

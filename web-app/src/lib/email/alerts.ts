@@ -3,7 +3,7 @@ import { CLAIM_TOPIC } from '@/lib/bonusCall';
 import { after } from 'next/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdmin } from '@/lib/payments/server';
-import { SITE_URL, esc } from './layout';
+import { SITE_URL, esc, type BuiltEmail, type LayoutOptions } from './layout';
 import { deliver } from './send';
 
 /**
@@ -217,6 +217,31 @@ function body(a: Alert, mails: SentMail[] | null) {
   );
 }
 
+function alertLayout(a: Alert, mails: SentMail[] | null): LayoutOptions {
+  return {
+    preheader: a.facts.filter(([, v]) => v).map(([, v]) => v).join(' · ').slice(0, 140),
+    heading: a.subject,
+    body: body(a, mails),
+    cta: { label: 'Open the inbox', href: `${SITE_URL}/admin` },
+    note: 'Automatic note from the site to the team.',
+    lang: 'en',
+  };
+}
+
+/**
+ * For Admin › E-mails › "Todos os e-mails": the team alert as it looks for one made-up row of `table`
+ * (the newest free-recipes sign-up by default), with the "What they got" box filled in.
+ */
+export function sampleAlert(table: string, row: Row): BuiltEmail | null {
+  const source = SOURCES.find(s => s.table === table);
+  if (!source) return null;
+  const a = source.build(row);
+  const mails: SentMail[] | null = a.expects
+    ? [{ subject: a.expects.label, status: 'sent', provider_id: 'exemplo', sent_at: new Date().toISOString() }]
+    : null;
+  return { messageKey: `alerta:${table}:exemplo`, subject: a.subject, layout: alertLayout(a, mails) };
+}
+
 export interface AlertResult { sent: number; failed: number; checked: number }
 
 /** Mails every row created in the last few minutes that hasn't been announced yet. Never throws. */
@@ -239,14 +264,7 @@ export async function sendNewArrivalAlerts(db: SupabaseClient, windowMinutes = W
           const outcome = await deliver(db, {
             email, token: '', messageKey: `alerta:${source.table}:${row.id}`, subject: a.subject,
             topic: 'pedido', template: 'alerta-interno', transactional: true,
-            layout: {
-              preheader: a.facts.filter(([, v]) => v).map(([, v]) => v).join(' · ').slice(0, 140),
-              heading: a.subject,
-              body: body(a, mails),
-              cta: { label: 'Open the inbox', href: `${SITE_URL}/admin` },
-              note: 'Automatic note from the site to the team.',
-              lang: 'en',
-            },
+            layout: alertLayout(a, mails),
           }).catch(err => { console.error('alert deliver failed', err); return 'failed' as const; });
           if (outcome === 'sent') result.sent += 1;
           else if (outcome === 'failed') result.failed += 1;
