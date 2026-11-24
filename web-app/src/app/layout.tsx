@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import Script from 'next/script';
 import "./globals.css";
 import Navigation from "@/components/Navigation";
@@ -11,16 +10,6 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import BrandDialogHost from "@/components/BrandDialogHost";
 import MetaPixel from "@/components/MetaPixel";
 import TranslateGlossary from "@/components/TranslateGlossary";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 // Google Search Console proves the site is ours with this code (public, set in Vercel). Not set = no tag.
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
@@ -57,7 +46,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col">
         {/*
@@ -97,7 +86,9 @@ export default function RootLayout({
           <MetaPixel />
           <TranslateGlossary />
         </Providers>
-        <Script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" strategy="afterInteractive" />
+        {/* The language switcher is not needed to read the page: load Google's script after everything else, so on a phone it
+            no longer competes with the page's own photos and code (ads land on phones in Facebook/Instagram). */}
+        <Script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" strategy="lazyOnload" />
         <Script id="google-translate-script" strategy="afterInteractive">
           {`
             function googleTranslateElementInit() {

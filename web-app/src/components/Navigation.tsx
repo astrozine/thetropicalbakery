@@ -361,7 +361,7 @@ export default function Navigation() {
       }}>
         {/* flexShrink 0: next to the long one-line desktop menu the logo used to be squeezed to nothing. */}
         <Link href="/" aria-label="Início" title="Início" className="glass-pill logo-pill" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', maxWidth: '70vw', flexShrink: 0 }}>
-          <img src="/logo-gold.webp" alt="The Tropical Bakery Logo" style={{ height: '62px', width: 'auto', maxWidth: '100%', objectFit: 'contain' }} />
+          <img src="/logo-gold-sm.webp" alt="The Tropical Bakery Logo" width={240} height={215} style={{ height: '62px', width: 'auto', maxWidth: '100%', objectFit: 'contain' }} />
         </Link>
 
         {/* Desktop: logo | the menu, centred on the page | account and cart. */}

@@ -28,6 +28,8 @@ export const FUNNEL = {
 /** The free PDF, public on purpose: it is a gift, and passing it on is marketing. */
 export const freePdf = (lang: EbookLang) => `/free-recipes/free-recipes-${lang}.pdf`;
 export const freeCover = (lang: EbookLang) => `/free-recipes/cover-${lang}.webp`;
+/** The same cover at phone size (420 px, ~26 KB) for the page itself; the full one stays for share cards. */
+export const freeCoverSm = (lang: EbookLang) => `/free-recipes/cover-${lang}-sm.webp`;
 
 /** Where the person is: decides whether the local offers appear. */
 export type Segment = 'local' | 'visiting' | 'away';
