@@ -246,6 +246,9 @@ export default function AdminEmailsPage() {
         Escolha o tipo de e-mail, preencha, veja como vai chegar e envie. Cada pessoa só recebe a <strong>mesma</strong> mensagem
         uma vez — se você clicar em enviar de novo, só recebe quem ficou faltando.
       </p>
+      <a href="/admin/emails/todos" style={{ display: 'inline-block', marginBottom: '1.5rem', padding: '0.7rem 1.2rem', borderRadius: '10px', background: '#fdf6dd', border: '2px solid #d4af37', color: '#2c3e50', fontWeight: 'bold', textDecoration: 'none' }}>
+        👀 Ver todos os e-mails que o site manda (recibos, livro, receitas grátis…)
+      </a>
 
       {setupError && (
         <div style={{ padding: '1rem 1.25rem', borderRadius: '10px', marginBottom: '1.5rem', background: '#fff4e5', color: '#7a4a00', border: '1px solid #f0d9b5' }}>

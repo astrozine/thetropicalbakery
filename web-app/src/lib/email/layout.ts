@@ -232,6 +232,12 @@ export interface LayoutOptions {
   look?: { hero: string; heroAlt: string; heroHeight?: number; kicker: string; accent: string; accentInk?: string };
 }
 
+/**
+ * One e-mail, built but not sent: what a send hands to deliver(), and what Admin › E-mails › "Todos os e-mails"
+ * previews (catalog.ts). Every automatic e-mail exports a builder that returns this, so the preview is the real thing.
+ */
+export interface BuiltEmail { messageKey: string; subject: string; layout: LayoutOptions }
+
 /** Escapes text coming from the admin form so a stray < can't break the e-mail. */
 export const esc = (s: string) =>
   String(s ?? '')
