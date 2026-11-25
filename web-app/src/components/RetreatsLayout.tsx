@@ -63,8 +63,8 @@ const PAGE_COPY = {
     packageTitle: 'O Pacote Completo, Não Só a Estadia',
     heroInterest: 'Retiro Tropical',
     finalInterest: 'Retiro Geral',
-    barPrice: 'Quarto + experiência',
-    barNote: 'o total das suas datas',
+    barPrice: 'Seu retiro',
+    barNote: 'quarto + experiência',
     barLabel: 'Ver preços',
   },
   en: {
@@ -77,8 +77,8 @@ const PAGE_COPY = {
     packageTitle: 'The Whole Package, Not Just the Stay',
     heroInterest: 'Tropical Retreat',
     finalInterest: 'General Retreat',
-    barPrice: 'Room + experience',
-    barNote: 'the total for your dates',
+    barPrice: 'Your stay',
+    barNote: 'room + experience',
     barLabel: 'See prices',
   },
   es: {
@@ -91,8 +91,8 @@ const PAGE_COPY = {
     packageTitle: 'El Paquete Completo, No Solo la Estadía',
     heroInterest: 'Retiro Tropical',
     finalInterest: 'Retiro General',
-    barPrice: 'Habitación + experiencia',
-    barNote: 'el total de tus fechas',
+    barPrice: 'Tu estadía',
+    barNote: 'habitación + experiencia',
     barLabel: 'Ver precios',
   },
 };
