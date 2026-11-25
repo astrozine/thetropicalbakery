@@ -6,7 +6,8 @@ import WhatsAppGate from '@/components/WhatsAppGate';
 import { trackMeta } from '@/lib/metaPixel';
 import { clearGoogleTranslate } from '@/lib/googleTranslate';
 import { DOLLY_CALENDLY_URL, STORE_WHATSAPP } from '@/lib/siteContact';
-import { COACHING_COPY, COACHING_LANGS, COACHING_LANG_LABEL, COACHING_PATH, type CoachingLang } from '@/lib/coachingCopy';
+import { COACHING_COPY, COACHING_LANGS, COACHING_LANG_LABEL, COACHING_PATH, COACHING_PRICES, type CoachingLang } from '@/lib/coachingCopy';
+import { formatForeign, useExchangeRates } from '@/lib/currency';
 import HandWrittenLang from '@/components/HandWrittenLang';
 
 /*
@@ -14,9 +15,22 @@ import HandWrittenLang from '@/components/HandWrittenLang';
  * she shops, the "Food Healing Studio" pages) and the Food Healing ad inside Sweet Escape, written by hand in four
  * languages in src/lib/coachingCopy.ts. The page is about her whole way of eating, breakfast to dinner, told under her
  * own names only (see the note at the top of coachingCopy.ts), and it is written for women who may carry shame about
- * their weight, so there is no scale, no number and no before-and-after anywhere on it. Prices are not on the page
- * on purpose: every plan is made to measure and Dolly gives the price on the free call.
+ * their weight, so there is no scale, no number and no before-and-after anywhere on it. The two prices (the 4-week
+ * Reset and one session, Andrew 2026-11-25) live in COACHING_PRICES; the free call still comes first.
  */
+
+/** "R$ 497", plus "≈ US$ 87" (or euros on the Dutch page) for visitors reading in another language. */
+function Price({ brl, lang }: { brl: number; lang: CoachingLang }) {
+  const { rates } = useExchangeRates();
+  const cur = lang === 'nl' ? 'EUR' : 'USD';
+  const foreign = lang === 'pt' ? '' : formatForeign(brl, cur === 'EUR' ? rates.eur : rates.usd, cur);
+  return (
+    <p className="fc-price__amount">
+      R$ {brl}
+      {foreign && <span className="fc-price__foreign">{foreign}</span>}
+    </p>
+  );
+}
 
 /** The seven colors of the plate (Dolly's own frame, from the seven colors of Sweet Escape). */
 const COLOR_DOTS = ['#4f8a3a', '#d33a3a', '#6b3c8f', '#e67e22', '#e9c23a', '#f3ede0', '#8a5a2b'];
@@ -268,6 +282,31 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
         </div>
       </section>
 
+      {/* ── The two prices: the 4-week Reset (through the free call) and one session ── */}
+      <section id="valores" className="fc-sec fc-prices">
+        <p className="fc-kicker" data-sign="🌿">{t.prices.kicker}</p>
+        <h2 className="fc-h2">{t.prices.title}</h2>
+        <div className="fc-prices__grid">
+          <div className="fc-price fc-price--main">
+            <span className="fc-sos__badge">{t.prices.reset.badge}</span>
+            <h3 className="fc-price__name">{t.prices.reset.name}</h3>
+            <Price brl={COACHING_PRICES.reset} lang={lang} />
+            <p className="fc-price__text">{t.prices.reset.text}</p>
+            <ul className="fc-price__list">{t.prices.reset.items.map(i => <li key={i}>{i}</li>)}</ul>
+            <BookCall label={t.prices.reset.cta} className="btn btn-primary fc-price__cta" where="valores" lang={lang} />
+          </div>
+          <div className="fc-price">
+            <h3 className="fc-price__name">{t.prices.session.name}</h3>
+            <Price brl={COACHING_PRICES.session} lang={lang} />
+            <p className="fc-price__text">{t.prices.session.text}</p>
+            <WhatsAppGate href={wa(t.whatsapp.session)} topic={`Coaching: sessão avulsa R$ ${COACHING_PRICES.session} (${lang})`} tags={['cursos']} locale={gateLocale} className="btn btn-secondary fc-price__cta">
+              {t.prices.session.cta}
+            </WhatsAppGate>
+          </div>
+        </div>
+        <p className="fc-prices__note">{t.prices.note}</p>
+      </section>
+
       {/* ── The separate 2-week package ── */}
       <section id="sos" className="fc-sec fc-sos">
         <div className="fc-sos__card">
@@ -473,6 +512,21 @@ const CSS = `
 .fc-final__cta { padding: 1rem 2.4rem; font-size: 1.05rem; }
 .fc-final__or { color: rgba(255,255,255,0.8); margin: 1.3rem 0 0; font-size: 0.95rem; }
 .fc-final__wa { color: #e7c75a; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; cursor: pointer; font: inherit; padding: 0; }
+
+/* Prices */
+.fc-prices { max-width: 900px; }
+.fc-prices__grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 1rem; margin-top: 1.4rem; align-items: start; }
+.fc-price { background: #fff; border: 1px solid rgba(60,42,33,0.14); border-radius: 20px; padding: 1.4rem 1.3rem; text-align: left; display: flex; flex-direction: column; gap: 0.5rem; }
+.fc-price--main { border: 2px solid #d4af37; }
+.fc-price .fc-sos__badge { align-self: flex-start; margin-bottom: 0.2rem; }
+.fc-price__name { font-family: var(--font-heading); color: #2e4432; font-size: 1.15rem; margin: 0; }
+.fc-price__amount { font-family: var(--font-heading); color: #3c2a21; font-size: 2rem; margin: 0; display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.fc-price__foreign { font-family: inherit; font-size: 0.95rem; color: #8a7a70; }
+.fc-price__text { color: #594a42; line-height: 1.6; margin: 0; }
+.fc-price__list { list-style: disc; margin: 0.2rem 0 0.4rem; padding-left: 1.2rem; color: #594a42; line-height: 1.6; }
+.fc-price__cta { display: flex; justify-content: center; align-items: center; text-align: center; margin-top: 0.4rem; }
+.fc-prices__note { text-align: center; color: #594a42; margin: 1.2rem auto 0; max-width: 620px; line-height: 1.6; font-size: 0.95rem; }
+@media (max-width: 700px) { .fc-prices__grid { grid-template-columns: 1fr; } }
 
 /* FAQ */
 .fc-faq { max-width: 780px; }

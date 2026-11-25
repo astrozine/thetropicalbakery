@@ -32,7 +32,7 @@ type Item = { title: string; text: string };
 export interface CoachingCopy {
   meta: { title: string; description: string; ogDescription: string; ogAlt: string };
   langLabel: string;
-  whatsapp: { reset: string; sos: string };
+  whatsapp: { reset: string; sos: string; session: string };
   hero: {
     dollyAlt: string; tag: string; talkAlt: string; studioAlt: string; tableAlt: string;
     kicker: string; text: string; hi: string; cta: string; note: string; gift: string;
@@ -60,8 +60,18 @@ export interface CoachingCopy {
   final: {
     kicker: string; title: string; gifts: Item[]; cta: string; or: string; wa: string;
   };
+  /** The two prices (Andrew, 2026-11-25): the 4-week Reset and one single session. Numbers in COACHING_PRICES. */
+  prices: {
+    kicker: string; title: string;
+    reset: { badge: string; name: string; text: string; items: string[]; cta: string };
+    session: { name: string; text: string; cta: string };
+    note: string;
+  };
   faq: { kicker: string; title: string; items: { q: string; a: string }[] };
 }
+
+/** What coaching costs, in reais (Andrew picked these on 2026-11-25). Change them here and nowhere else. */
+export const COACHING_PRICES = { reset: 497, session: 150, resetWeeks: 4 } as const;
 
 export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
   pt: {
@@ -75,6 +85,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
     whatsapp: {
       reset: 'Olá, Dolly! Quero saber mais sobre o The Daily Tropical Reset.',
       sos: 'Olá, Dolly! Quero saber mais sobre o Reset do Paladar: 14 dias sem sal e sem óleo.',
+      session: 'Olá, Dolly! Quero marcar uma sessão avulsa (R$ 150).',
     },
     hero: {
       dollyAlt: 'Dolly com uma bandeja dos seus doces, no jardim em Itamambuca',
@@ -245,6 +256,18 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       or: 'Prefere conversar antes?',
       wa: 'Fale com a Dolly no WhatsApp',
     },
+    prices: {
+      kicker: 'Valores',
+      title: 'Dois jeitos de começar comigo',
+      reset: {
+        badge: 'O caminho inteiro', name: 'O Reset · 4 semanas',
+        text: 'A sua alimentação inteira, do café da manhã ao jantar, passo a passo e no seu ritmo.',
+        items: ['4 encontros por vídeo, um por semana', 'O raio-X da sua rotina e o destralhe da despensa', 'O seu plano semanal completo e o guia Paradise Pantry'],
+        cta: 'Começar pela conversa grátis',
+      },
+      session: { name: 'Uma sessão', text: 'Uma conversa por vídeo para uma dúvida, um tema ou um primeiro passo.', cta: 'Marcar uma sessão' },
+      note: 'Antes de pagar qualquer coisa, a conversa de 30 minutos é grátis: a gente vê juntas se o Reset é para você.',
+    },
     faq: {
       kicker: 'Dúvidas',
       title: 'Bom saber',
@@ -255,7 +278,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
         { q: 'É online?', a: 'Sim. A conversa e os encontros são por vídeo, então dá para fazer de qualquer lugar. Quem está perto de Ubatuba pode combinar com a Dolly um encontro presencial.' },
         { q: 'Preciso virar vegana de uma vez?', a: 'Não. O Reset é passo a passo, no seu ritmo, sem tudo-ou-nada. Você começa pelo que é mais fácil para você e a gente vai trocando o resto com calma.' },
         { q: 'Funciona com marido e filhos que não querem mudar?', a: 'É exatamente por isso que existe a parte da família: pratos que todo mundo come, sem cozinhar duas vezes e sem briga na mesa.' },
-        { q: 'Quanto custa?', a: 'Cada plano é feito sob medida. Na conversa grátis de 30 minutos a Dolly entende o que você precisa e te mostra as opções e o valor, sem pressão.' },
+        { q: 'Quanto custa?', a: 'O Reset de 4 semanas custa R$ 497, e uma sessão avulsa, R$ 150. A conversa de 30 minutos é grátis e sem compromisso: a gente vê juntas o que faz sentido para você, sem pressão.' },
         { q: 'Substitui o meu médico ou nutricionista?', a: 'Não. O coaching é educação alimentar e mudança de hábitos. Se você tem uma condição de saúde ou toma remédios, continue com o seu médico e conte a ele sobre as mudanças.' },
       ],
     },
@@ -272,6 +295,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
     whatsapp: {
       reset: 'Hi Dolly! I’d love to know more about The Daily Tropical Reset.',
       sos: 'Hi Dolly! I’d love to know more about the Taste Reset: 14 days with no salt and no oil.',
+      session: 'Hi Dolly! I’d like to book a single session (R$ 150).',
     },
     hero: {
       dollyAlt: 'Dolly holding a tray of her treats in the garden at Itamambuca',
@@ -442,6 +466,18 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       or: 'Rather chat first?',
       wa: 'Message Dolly on WhatsApp',
     },
+    prices: {
+      kicker: 'Prices',
+      title: 'Two ways to start with me',
+      reset: {
+        badge: 'The whole journey', name: 'The Reset · 4 weeks',
+        text: 'Your whole way of eating, breakfast to dinner, step by step and at your own pace.',
+        items: ['4 video sessions, one a week', 'A look at your routine and a pantry declutter', 'Your complete weekly plan and the Paradise Pantry guide'],
+        cta: 'Start with the free call',
+      },
+      session: { name: 'One session', text: 'A video call for one question, one topic or a first step.', cta: 'Book a session' },
+      note: 'Before you pay anything, the 30-minute call is free: we see together whether the Reset is right for you. Prices are in Brazilian reais.',
+    },
     faq: {
       kicker: 'Questions',
       title: 'Good to know',
@@ -452,7 +488,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
         { q: 'Is it online?', a: 'Yes. The call and the sessions happen by video, so you can join from anywhere in the world. If you are near Ubatuba, Brazil, you can arrange to meet Dolly in person.' },
         { q: 'Do I have to go vegan overnight?', a: 'No. The Reset is step by step, at your pace, with no all-or-nothing. You start with what is easiest for you and we swap the rest calmly.' },
         { q: 'Does it work if my partner and kids don’t want to change?', a: 'That is exactly why there is a family part: meals everyone eats, without cooking twice and without fights at the table.' },
-        { q: 'How much does it cost?', a: 'Every plan is made to measure. On the free 30-minute call Dolly gets to know what you need and shows you the options and the price, with no pressure.' },
+        { q: 'How much does it cost?', a: 'The 4-week Reset is R$ 497 and a single session is R$ 150 (Brazilian reais). The 30-minute call is free, with no strings attached: we see together what makes sense for you, with no pressure.' },
         { q: 'Does it replace my doctor or dietitian?', a: 'No. The coaching is food education and habit change. If you have a health condition or take medication, keep seeing your doctor and tell them about the changes.' },
       ],
     },
@@ -469,6 +505,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
     whatsapp: {
       reset: '¡Hola, Dolly! Quiero saber más sobre The Daily Tropical Reset.',
       sos: '¡Hola, Dolly! Quiero saber más sobre el Reset del Paladar: 14 días sin sal y sin aceite.',
+      session: '¡Hola, Dolly! Quiero reservar una sesión suelta (R$ 150).',
     },
     hero: {
       dollyAlt: 'Dolly con una bandeja de sus dulces en el jardín de Itamambuca',
@@ -639,6 +676,18 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       or: '¿Prefieres hablar antes?',
       wa: 'Escríbele a Dolly por WhatsApp',
     },
+    prices: {
+      kicker: 'Precios',
+      title: 'Dos maneras de empezar conmigo',
+      reset: {
+        badge: 'El camino entero', name: 'El Reset · 4 semanas',
+        text: 'Tu alimentación entera, del desayuno a la cena, paso a paso y a tu ritmo.',
+        items: ['4 encuentros por video, uno por semana', 'Una mirada a tu rutina y el orden de tu despensa', 'Tu plan semanal completo y la guía Paradise Pantry'],
+        cta: 'Empezar con la llamada gratis',
+      },
+      session: { name: 'Una sesión', text: 'Una llamada por video para una duda, un tema o un primer paso.', cta: 'Reservar una sesión' },
+      note: 'Antes de pagar nada, la llamada de 30 minutos es gratis: vemos juntas si el Reset es para ti. Los precios están en reales brasileños.',
+    },
     faq: {
       kicker: 'Preguntas',
       title: 'Bueno saberlo',
@@ -649,7 +698,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
         { q: '¿Es online?', a: 'Sí. La llamada y las sesiones son por videollamada, así que puedes hacerlo desde cualquier lugar. Si estás cerca de Ubatuba (Brasil), puedes quedar con Dolly en persona.' },
         { q: '¿Tengo que hacerme vegana de golpe?', a: 'No. El Reset es paso a paso, a tu ritmo, sin todo-o-nada. Empiezas por lo que te resulta más fácil y vamos cambiando el resto con calma.' },
         { q: '¿Funciona si mi pareja y mis hijos no quieren cambiar?', a: 'Justamente para eso está la parte de la familia: platos que come todo el mundo, sin cocinar dos veces y sin peleas en la mesa.' },
-        { q: '¿Cuánto cuesta?', a: 'Cada plan se hace a medida. En la llamada gratis de 30 minutos Dolly entiende lo que necesitas y te muestra las opciones y el precio, sin presión.' },
+        { q: '¿Cuánto cuesta?', a: 'El Reset de 4 semanas cuesta R$ 497 y una sesión suelta, R$ 150 (reales brasileños). La llamada de 30 minutos es gratis y sin compromiso: vemos juntas qué tiene sentido para ti, sin presión.' },
         { q: '¿Sustituye a mi médico o nutricionista?', a: 'No. El coaching es educación alimentaria y cambio de hábitos. Si tienes una condición de salud o tomas medicación, sigue con tu médico y cuéntale los cambios.' },
       ],
     },
@@ -666,6 +715,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
     whatsapp: {
       reset: 'Hoi Dolly! Ik wil graag meer weten over The Daily Tropical Reset.',
       sos: 'Hoi Dolly! Ik wil graag meer weten over de Smaak-Reset: 14 dagen zonder zout en zonder olie.',
+      session: 'Hoi Dolly! Ik wil graag een losse sessie boeken (R$ 150).',
     },
     hero: {
       dollyAlt: 'Dolly met een dienblad vol lekkers in de tuin in Itamambuca',
@@ -836,6 +886,18 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
       or: 'Liever eerst even praten?',
       wa: 'Stuur Dolly een WhatsApp',
     },
+    prices: {
+      kicker: 'Prijzen',
+      title: 'Twee manieren om met mij te beginnen',
+      reset: {
+        badge: 'De hele weg', name: 'De Reset · 4 weken',
+        text: 'Je hele eetpatroon, van ontbijt tot avondeten, stap voor stap en in je eigen tempo.',
+        items: ['4 videogesprekken, één per week', 'Een blik op je routine en het opruimen van je voorraadkast', 'Je volledige weekplan en de Paradise Pantry-gids'],
+        cta: 'Begin met het gratis gesprek',
+      },
+      session: { name: 'Eén sessie', text: 'Een videogesprek voor één vraag, één onderwerp of een eerste stap.', cta: 'Boek een sessie' },
+      note: 'Voordat je iets betaalt, is het gesprek van 30 minuten gratis: samen kijken we of de Reset bij je past. Prijzen zijn in Braziliaanse reais.',
+    },
     faq: {
       kicker: 'Vragen',
       title: 'Goed om te weten',
@@ -846,7 +908,7 @@ export const COACHING_COPY: Record<CoachingLang, CoachingCopy> = {
         { q: 'Is het online?', a: 'Ja. Het gesprek en de sessies gaan via video, dus je kunt overal ter wereld meedoen. Ben je in de buurt van Ubatuba, Brazilië, dan kun je met Dolly ook afspreken om elkaar in het echt te zien.' },
         { q: 'Moet ik in één keer veganist worden?', a: 'Nee. De Reset gaat stap voor stap, in jouw tempo, zonder alles-of-niets. Je begint met wat voor jou het makkelijkst is en de rest ruilen we rustig om.' },
         { q: 'Werkt het als mijn partner en kinderen niet willen veranderen?', a: 'Precies daarvoor is het gezinsdeel er: gerechten die iedereen eet, zonder twee keer te koken en zonder ruzie aan tafel.' },
-        { q: 'Wat kost het?', a: 'Elk plan is op maat. In het gratis gesprek van 30 minuten ontdekt Dolly wat je nodig hebt en laat ze je de mogelijkheden en de prijs zien, zonder druk.' },
+        { q: 'Wat kost het?', a: 'De Reset van 4 weken kost R$ 497 en een losse sessie R$ 150 (Braziliaanse reais). Het gesprek van 30 minuten is gratis en vrijblijvend: samen kijken we wat bij je past, zonder druk.' },
         { q: 'Vervangt het mijn arts of diëtist?', a: 'Nee. De coaching is voedingseducatie en gewoontes veranderen. Heb je een aandoening of gebruik je medicijnen, blijf dan bij je arts en vertel over de veranderingen.' },
       ],
     },
