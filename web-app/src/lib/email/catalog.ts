@@ -8,6 +8,7 @@ import { freeRecipesEmail } from './funnelMail';
 import { brunchConfirmedEmail, brunchReservedEmail, brunchWaitlistEmail } from './brunchMail';
 import { appPlusPixEmail, appPlusUnlockedEmail } from './appPlusMail';
 import { sampleAlert } from './alerts';
+import { letterReceivedEmail } from './letterMail';
 import { EBOOK_LANGS, type EbookLang } from '@/lib/ebookCopy';
 import type { BrunchEvent } from '@/lib/brunch';
 
@@ -158,6 +159,16 @@ const AUTOMATIC: CatalogEntry[] = [
     name: 'Tropical+ liberado',
     when: 'Quando o pagamento do Tropical+ é confirmado.',
     render: () => appPlusUnlockedEmail({ name: 'Maria Souza', email: 'maria@exemplo.com', reference: 'APP1764000EXEMPLO' }),
+  },
+  {
+    id: 'carta-recebida', group: 'Avisos para vocês dois', to: 'equipe', automatic: true, langs: ['en'],
+    name: 'A Dolly mandou a carta de domingo',
+    when: 'Para o Andrew (ALERT_EMAILS) assim que a Dolly manda fotos e texto pela página /carta/escrever. Um botão abre a carta pronta em Admin › E-mails.',
+    render: () => letterReceivedEmail({
+      id: 'exemplo', created_at: new Date().toISOString(), sunday: '2026-11-30', lang: 'en', title: 'Christmas in the kitchen',
+      story: 'This week the kitchen smells like orange peel and chocolate. I’ve been packing our first Christmas boxes.',
+      tip: 'Candied orange keeps for weeks in a glass jar.', photos: [],
+    }),
   },
   {
     id: 'alerta-interno', group: 'Avisos para vocês dois', to: 'equipe', automatic: true, langs: ['en'],

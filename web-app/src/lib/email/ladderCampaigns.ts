@@ -13,6 +13,8 @@
 
 import { SITE_URL, kicker, paragraphs, bulletList } from './layout';
 import type { Campaign, CampaignValues } from './campaigns';
+import { letterPhotos } from './letterMail';
+import { LETTER_WRITER, prettySunday, titleFrom } from '@/lib/letter';
 
 const isPt = (v: CampaignValues) => v.lang === 'pt';
 const lang = (v: CampaignValues) => (isPt(v) ? 'pt' : 'en') as 'pt' | 'en';
@@ -42,21 +44,55 @@ const LETTER: Campaign = {
     { name: 'lang', label: 'Idioma: pt (vai para quem fala português) ou en (para todo o resto)', type: 'text', required: true, placeholder: 'pt' },
     { name: 'title', label: 'Título (vira o assunto)', type: 'text', required: true, placeholder: 'O bolo que quase deu errado' },
     { name: 'story', label: 'A história (linhas em branco separam parágrafos)', type: 'textarea', required: true, placeholder: 'Domingo de chuva em Itamambuca, e a banana passou do ponto. Em vez de jogar fora, virou o bolo mais pedido da semana.' },
+    { name: 'photos', label: 'Fotos (links, um por linha; vêm sozinhos quando a Dolly manda a carta)', type: 'textarea' },
     { name: 'tipTitle', label: 'Título da dica ou receita (opcional)', type: 'text', placeholder: 'A dica da semana' },
     { name: 'tip', label: 'A dica ou receita (opcional)', type: 'textarea', placeholder: 'Banana bem madura adoça sozinha: quanto mais pintadinha, menos você precisa de tâmara.' },
     { name: 'ctaLabel', label: 'Texto do botão (opcional)', type: 'text', placeholder: 'Ver as receitas grátis' },
     { name: 'ctaPath', label: 'Página do botão', type: 'text', placeholder: '/receitas' },
   ],
-  subject: v => v.title,
-  messageKey: v => `carta-domingo:${lang(v)}:${slug(v.title)}`,
+  subject: v => v.title || titleFrom(v.story),
+  messageKey: v => `carta-domingo:${lang(v)}:${slug(v.title || titleFrom(v.story))}`,
   build: v => ({
     preheader: (v.story || v.title || '').slice(0, 90),
-    heading: v.title,
+    heading: v.title || titleFrom(v.story),
     body:
+      letterPhotos(v.photos, isPt(v) ? 'Da cozinha da Dolly' : 'From Dolly’s kitchen') +
       paragraphs(v.story) +
       ((v.tip || '').trim() ? kicker(v.tipTitle || (isPt(v) ? 'A dica da semana' : 'This week’s tip')) + paragraphs(v.tip) : ''),
     cta: v.ctaLabel ? { label: v.ctaLabel, href: track(v.ctaPath || '/', `carta-${slug(v.title)}`) } : undefined,
     note: sign(v),
+  }),
+};
+
+// ------------------------------------------------------------ the Thursday prompt to Dolly
+
+/** To Dolly only (automation carta-pedido, sent as a one-person send): her link to write this Sunday's letter. */
+const LETTER_PROMPT: Campaign = {
+  id: 'carta-pedido',
+  theme: 'novidades',
+  name: 'Pedido da carta de domingo (para a Dolly)',
+  emoji: '✍️',
+  topic: 'conta',
+  groupOnly: true,
+  lang: () => 'en',
+  description: `Toda quinta, só para a Dolly (${LETTER_WRITER.email}): o link para mandar fotos e algumas linhas da semana. Em inglês.`,
+  reason: 'Você recebe este e-mail porque escreve a carta de domingo.',
+  reasonEn: 'You get this e-mail because you write the Sunday letter.',
+  fields: [
+    { name: 'sunday', label: 'Domingo (preenchido pela automação)', type: 'text', placeholder: '2026-11-30' },
+    { name: 'link', label: 'Link da página (preenchido pela automação)', type: 'text' },
+  ],
+  subject: () => 'Your Sunday letter: a few photos and a few lines?',
+  messageKey: v => `carta-pedido:${v.sunday || 'exemplo'}`,
+  build: v => ({
+    preheader: 'Two minutes on your phone. Andrew does the rest.',
+    heading: 'Time for your Sunday letter',
+    body: paragraphs(
+      `Hi ${LETTER_WRITER.name}! What happened in the kitchen this week? Tap the button, add 1 to 4 photos and write a few lines, like a message to a friend.\n\n` +
+      `Andrew reads it and sends it to everyone on ${v.sunday ? prettySunday(v.sunday) : 'Sunday'}. You don’t need to log in or format anything.`,
+    ),
+    cta: { label: 'Write my letter', href: v.link || `${SITE_URL}/carta/escrever` },
+    note: 'No time this week? Just skip it, no problem.',
   }),
 };
 
@@ -195,6 +231,7 @@ export const BOOK_BUYER_SEQUENCE = [
 /** Buyers' e-mails wear the book's look, like the free-recipes ones. The letter keeps the bakery's. */
 export const LADDER_CAMPAIGNS: Campaign[] = [
   LETTER,
+  LETTER_PROMPT,
   ...BUYER_STEPS.map(c => ({
     ...c,
     build: (v: CampaignValues) => ({
