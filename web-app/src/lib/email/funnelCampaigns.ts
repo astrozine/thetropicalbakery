@@ -27,9 +27,9 @@ const bookPage = (v: CampaignValues, step: string) => track(LANG_PATH[lang(v)], 
 const offerLink = (v: CampaignValues, step: string) =>
   track(`${FUNNEL.offerPath}?t=${encodeURIComponent(v.offer || '')}&lang=${lang(v)}`, step);
 
-/** The five recipes the free PDF does not have (days 1, 2, 4, 5, 7), in the reader's language. */
+/** The five recipes the free PDF does not have, in the reader's language, each with what wins a kid over. */
 const missing = (v: CampaignValues) =>
-  EBOOK_COPY[lang(v)].recipes.filter((_, i) => i !== 2 && i !== 5).map(r => `${r.color}: ${r.name}`);
+  EBOOK_COPY[lang(v)].recipes.filter((_, i) => i !== 2 && i !== 5).map(r => `${r.name}. ${r.kidAngle}`);
 
 const base = {
   theme: 'novidades' as const,
@@ -66,7 +66,7 @@ const STEPS: Campaign[] = [
               'Molhe as mãos para enrolar as bolinhas: a massa não gruda e elas ficam lisinhas.',
               'Nas Barrinhas Banoffee, corte com uma faca quente (passe na água fervendo e seque). As camadas ficam perfeitas.',
             ]) +
-            paragraphs('Sem framboesa liofilizada? Passe as bolinhas no coco ralado ou em castanhas picadas. Fica lindo também.\n\nFez? Me marca no Instagram, @_thetropicalbakery_. Eu vejo todas!'),
+            paragraphs('Sem framboesa liofilizada? Passe as bolinhas no coco ralado ou em castanhas picadas. Fica lindo também.\n\nFez? Me marca no Instagram, @_thetropicalbakery_. Eu vejo todas!\n\nUm aviso: criança se apaixona rápido por um doce novo, e enjoa dele na mesma velocidade. Daqui a dois dias eu te conto o que fazer com isso.'),
           cta: { label: 'Abrir minhas receitas', href: `${SITE_URL}${freePdf('pt')}` },
           note: 'Com carinho, Dolly',
         }
@@ -81,7 +81,7 @@ const STEPS: Campaign[] = [
               'Wet your hands to roll the balls: the dough won’t stick and they come out smooth.',
               'For the Banoffee Bars, cut with a hot knife (dip it in boiling water, wipe dry). Perfect layers every time.',
             ]) +
-            paragraphs('No freeze-dried raspberry? Roll the balls in shredded coconut or chopped nuts. Just as pretty.\n\nMade them? Tag me on Instagram, @_thetropicalbakery_. I look at every single one!'),
+            paragraphs('No freeze-dried raspberry? Roll the balls in shredded coconut or chopped nuts. Just as pretty.\n\nMade them? Tag me on Instagram, @_thetropicalbakery_. I look at every single one!\n\nOne heads-up: kids fall for a new treat fast, and get bored of it just as fast. In two days I’ll tell you what to do about that.'),
           cta: { label: 'Open my recipes', href: `${SITE_URL}${freePdf('en')}` },
           note: 'With love, Dolly',
         },
@@ -90,32 +90,32 @@ const STEPS: Campaign[] = [
   {
     ...base,
     id: 'receitas-d3',
-    name: 'Receitas grátis · dia 3: as outras 5 cores',
-    emoji: '🌈',
-    description: 'Apresenta o livro completo: as cinco receitas que faltam, o que ele ensina e o preço normal.',
-    subject: v => (isPt(v) ? 'As 5 cores que você ainda não provou' : 'The 5 colors you haven’t tried yet'),
+    name: 'Receitas grátis · dia 3: criança enjoa rápido',
+    emoji: '🙄',
+    description: 'Vende o livro pela dor real: duas receitas enjoam rápido, e cada criança tem um favorito diferente. Mostra as outras 5 pelo olhar da criança, preço normal e garantia.',
+    subject: v => (isPt(v) ? 'E quando enjoarem das Bliss Balls?' : 'What happens when they’re bored of the Bliss Balls?'),
     messageKey: () => 'receitas-d3',
     build: v => isPt(v)
       ? {
-          preheader: 'Amarelo, laranja, roxo, verde e chocolate. Um doce para cada dia da semana.',
-          heading: 'Você tem 2 cores. Faltam 5.',
+          preheader: 'Duas receitas duram uma semana. Depois vem o “de novo isso?”.',
+          heading: 'Criança enjoa. Rápido.',
           body:
-            paragraphs('O Vermelho e o Caramelo vieram do meu livro Sweet Escape: 7 Cores, 7 Receitas. Eu montei o livro como uma semana: cada dia uma cor, cada cor um doce que cuida de você.') +
-            kicker('Ainda esperando por você', '📖') +
+            paragraphs('Você conhece essa história. A primeira fornada é um sucesso. A segunda passa. Na terceira vem a cara de “de novo isso?”.\n\nE tem mais: ninguém garante que o favorito da criançada aí de casa está entre os dois doces que eu te mandei. Cada criança é de um jeito. Uma é louca por chocolate, outra só quer o que dá para pegar com a mão, outra só aceita o que parece sorvete.\n\nPor isso o Sweet Escape tem 7. Sete sabores, formatos e texturas diferentes, para você achar aquele que eles pedem de novo.') +
+            kicker('Mais 5 chances de achar o favorito', '🎯') +
             bulletList(missing(v)) +
-            paragraphs(`Além das receitas, o livro explica o porquê de cada ingrediente, para você começar a inventar os seus. Uma rodada pelo livro rende uns ${TOTAL_TREATS} doces.\n\nO livro completo custa ${full(v)}, em PDF na hora, com garantia de 7 dias.`) + callLine(v),
-          cta: { label: 'Ver o Sweet Escape', href: bookPage(v, 'receitas-d3') },
+            paragraphs(`E como o livro explica o porquê de cada ingrediente, você adapta qualquer um ao que eles estiverem curtindo na semana.\n\nO livro completo custa ${full(v)}, em PDF na hora. Se ninguém aí em casa achar um favorito, eu devolvo o seu dinheiro (garantia de 7 dias).`) + callLine(v),
+          cta: { label: 'Achar o favorito deles', href: bookPage(v, 'receitas-d3') },
           note: 'Com carinho, Dolly',
         }
       : {
-          preheader: 'Yellow, orange, purple, green and chocolate. A treat for every day of the week.',
-          heading: 'You have 2 colors. 5 to go.',
+          preheader: 'Two recipes last about a week. Then comes “this again?”',
+          heading: 'Kids get bored. Fast.',
           body:
-            paragraphs('Red and Caramel come from my book Sweet Escape: 7 Colors, 7 Recipes. I built it like a week: every day a color, every color a treat that loves you back.') +
-            kicker('Still waiting for you', '📖') +
+            paragraphs('You know how this goes. The first batch is a hit. The second one is fine. By the third you get the face: “this again?”\n\nAnd here’s the other thing: nobody can promise your kid’s favorite is one of the two treats I sent you. Every kid is different. One lives for chocolate, one only eats what they can hold, one wants anything that looks like ice cream.\n\nThat’s why Sweet Escape has 7. Seven different flavors, shapes and textures, so you keep going until you find the one they ask for again.') +
+            kicker('5 more chances to find their favorite', '🎯') +
             bulletList(missing(v)) +
-            paragraphs(`Besides the recipes, the book explains the why behind every ingredient, so you can start inventing your own. One run through the book makes about ${TOTAL_TREATS} treats.\n\nThe full book is ${full(v)}, an instant PDF with a 7-day money-back promise.`) + callLine(v),
-          cta: { label: 'See Sweet Escape', href: bookPage(v, 'receitas-d3') },
+            paragraphs(`And because the book explains the why behind every ingredient, you can twist any of them into whatever they’re into this week.\n\nThe full book is ${full(v)}, an instant PDF. If nobody at home finds a favorite, I give your money back (7-day promise).`) + callLine(v),
+          cta: { label: 'Find their favorite', href: bookPage(v, 'receitas-d3') },
           note: 'With love, Dolly',
         },
   },
@@ -125,26 +125,38 @@ const STEPS: Campaign[] = [
     id: 'receitas-d5',
     name: 'Receitas grátis · dia 5: preço de boas-vindas',
     emoji: '🎁',
-    description: 'O downsell: o livro completo pelo preço de boas-vindas, com link assinado que vence em 2 dias.',
-    subject: v => (isPt(v) ? `Um presente de boas-vindas: o livro completo por ${welcome(v)}` : `A welcome gift: the full book for ${welcome(v)}`),
+    description: 'O downsell: as 7 receitas pelo preço de boas-vindas antes de bater o tédio, com link assinado que vence em 2 dias.',
+    subject: v => (isPt(v) ? `Antes de bater o tédio: as 7 receitas por ${welcome(v)}` : `Before the boredom hits: all 7 recipes for ${welcome(v)}`),
     messageKey: () => 'receitas-d5',
     build: v => isPt(v)
       ? {
           preheader: `Só para quem baixou as receitas, até ${v.until}.`,
-          heading: `Sweet Escape por ${welcome(v)}`,
+          heading: `As 7 receitas por ${welcome(v)}`,
           body:
-            paragraphs(`Obrigada por cozinhar comigo esta semana. Quero que você tenha as 7 cores, então fiz um preço de boas-vindas só para quem baixou as receitas: ${welcome(v)} em vez de ${full(v)}.\n\nVale até ${v.until}. Depois volta ao preço normal.`) +
-            bulletList(['As 7 receitas, uma para cada dia da semana', 'O porquê de cada ingrediente', `${EBOOK.pages} páginas em PDF, na hora`, 'Garantia de 7 dias: não gostou, devolvo']) + callLine(v),
-          cta: { label: `Quero por ${welcome(v)}`, href: offerLink(v, 'receitas-d5') },
+            paragraphs(`A essa altura, as Bliss Balls e as Barrinhas Banoffee já tiveram o seu momento. Não espere a cara de “de novo isso?”.\n\nFiz um preço de boas-vindas só para quem baixou as receitas: ${welcome(v)} em vez de ${full(v)}. Vale até ${v.until}. Depois volta ao preço normal.`) +
+            bulletList([
+              '5 doces novos, 5 novas chances de achar o favorito deles',
+              'Muffins, sanduíche de sorvete, tartarugas de chocolate, cheesecake roxo e quadradinhos de abacaxi',
+              'O porquê de cada ingrediente, para você inventar variações',
+              `${EBOOK.pages} páginas em PDF, na hora`,
+              'Garantia de 7 dias: ninguém gostou, eu devolvo',
+            ]) + callLine(v),
+          cta: { label: `Quero as 7 por ${welcome(v)}`, href: offerLink(v, 'receitas-d5') },
           note: `Preço de boas-vindas válido até ${v.until}.`,
         }
       : {
-          preheader: `Only for people who downloaded the recipes, until ${v.until}.`,
-          heading: `Sweet Escape for ${welcome(v)}`,
+          preheader: `Only for people who got the free recipes, until ${v.until}.`,
+          heading: `All 7 recipes for ${welcome(v)}`,
           body:
-            paragraphs(`Thank you for baking with me this week. I’d love you to have all 7 colors, so here is a welcome price only for people who downloaded the recipes: ${welcome(v)} instead of ${full(v)}.\n\nIt’s good until ${v.until}. Then it goes back to the normal price.`) +
-            bulletList(['All 7 recipes, one for every day of the week', 'The why behind every ingredient', `${EBOOK.pages} pages, instant PDF`, '7-day money-back promise']) + callLine(v),
-          cta: { label: `Get it for ${welcome(v)}`, href: offerLink(v, 'receitas-d5') },
+            paragraphs(`By now the Bliss Balls and the Banoffee Bars have had their moment. Don’t wait for the “this again?” face.\n\nHere’s a welcome price, only for people who downloaded the free recipes: ${welcome(v)} instead of ${full(v)}. It’s good until ${v.until}. Then it goes back to normal.`) +
+            bulletList([
+              '5 new treats, 5 new chances to find their favorite',
+              'Muffins, ice cream sandwiches, chocolate turtles, a purple cheesecake and pineapple squares',
+              'The why behind every ingredient, so you can make your own versions',
+              `${EBOOK.pages} pages, instant PDF`,
+              '7-day promise: if nobody loves it, I give your money back',
+            ]) + callLine(v),
+          cta: { label: `Get all 7 for ${welcome(v)}`, href: offerLink(v, 'receitas-d5') },
           note: `Welcome price good until ${v.until}.`,
         },
   },
@@ -154,22 +166,22 @@ const STEPS: Campaign[] = [
     id: 'receitas-d7',
     name: 'Receitas grátis · dia 7: último dia',
     emoji: '⏳',
-    description: 'Último lembrete do preço de boas-vindas, que termina hoje.',
-    subject: v => (isPt(v) ? `Hoje é o último dia do livro por ${welcome(v)}` : `Last day: the full book for ${welcome(v)}`),
+    description: 'Último lembrete do preço de boas-vindas, que termina hoje: duas receitas não seguram um mês de lanche.',
+    subject: v => (isPt(v) ? `Último dia: as 7 receitas por ${welcome(v)}` : `Last day: all 7 recipes for ${welcome(v)}`),
     messageKey: () => 'receitas-d7',
     build: v => isPt(v)
       ? {
-          preheader: 'Amanhã o Sweet Escape volta ao preço normal.',
+          preheader: 'Duas receitas não seguram um mês de lanche.',
           heading: 'Último dia',
-          body: paragraphs(`Só um lembrete carinhoso: o preço de boas-vindas do Sweet Escape (${welcome(v)} em vez de ${full(v)}) termina ${v.until}.\n\nSe as duas receitas já viraram favoritas na sua casa, as outras cinco vão virar também. E se não gostar, a garantia de 7 dias continua valendo.`) + callLine(v),
-          cta: { label: `Quero por ${welcome(v)}`, href: offerLink(v, 'receitas-d7') },
+          body: paragraphs(`Rapidinho: o preço de boas-vindas do Sweet Escape (${welcome(v)} em vez de ${full(v)}) termina ${v.until}.\n\nDuas receitas não seguram um mês de lanche. E você só descobre qual vai ser o favorito deles quando eles provam. Com sete, a chance é de verdade.\n\nE se ninguém aí em casa gostar, a garantia de 7 dias continua valendo.`) + callLine(v),
+          cta: { label: `Quero as 7 por ${welcome(v)}`, href: offerLink(v, 'receitas-d7') },
           note: 'Com carinho, Dolly',
         }
       : {
-          preheader: 'Tomorrow Sweet Escape goes back to its normal price.',
+          preheader: 'Two recipes won’t get you through a month of snack time.',
           heading: 'Last day',
-          body: paragraphs(`Just a friendly reminder: the welcome price for Sweet Escape (${welcome(v)} instead of ${full(v)}) ends ${v.until}.\n\nIf those two recipes are already favorites at home, the other five will be too. And if you don’t love it, the 7-day promise still stands.`) + callLine(v),
-          cta: { label: `Get it for ${welcome(v)}`, href: offerLink(v, 'receitas-d7') },
+          body: paragraphs(`Quick one: the welcome price for Sweet Escape (${welcome(v)} instead of ${full(v)}) ends ${v.until}.\n\nTwo recipes won’t get you through a month of snack time. And you only find out which one becomes their favorite once they taste it. Seven gives you a real shot.\n\nAnd if nobody at home loves any of them, the 7-day promise still stands.`) + callLine(v),
+          cta: { label: `Get all 7 for ${welcome(v)}`, href: offerLink(v, 'receitas-d7') },
           note: 'With love, Dolly',
         },
   },
