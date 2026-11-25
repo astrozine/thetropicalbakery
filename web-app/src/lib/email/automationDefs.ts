@@ -117,7 +117,7 @@ export const AUTOMATIONS: AutomationDef[] = [
     emoji: '🍓',
     campaignId: 'receitas-d1',
     watches: 'Alguém baixou as receitas grátis (/receitas, /free-recipes) há 1, 3, 5, 7 ou 9 dias.',
-    sends: 'Dia 1 dicas para fazer · dia 3 as outras 5 cores do livro · dia 5 o livro pelo preço de boas-vindas (2 dias) · dia 7 último dia · dia 9 o convite para cozinhar com a Dolly: quem está em Ubatuba/Paraty recebe a aula, os eventos e o coaching; quem está longe, a aula quando vier, o retiro e o coaching online. Quem já comprou o livro não recebe as ofertas.',
+    sends: 'Dia 1 dicas para fazer · dia 3 criança enjoa rápido: as outras 5 receitas do livro · dia 5 o livro pelo preço de boas-vindas (2 dias) · dia 7 último dia · dia 9 o convite para cozinhar com a Dolly: quem está em Ubatuba/Paraty recebe a aula, os eventos e o coaching; quem está longe, a aula quando vier, o retiro e o coaching online. Quem já comprou o livro não recebe as ofertas.',
     knobs: [],
     knobLabel: {},
   },
