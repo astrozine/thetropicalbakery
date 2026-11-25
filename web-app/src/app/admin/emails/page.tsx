@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { CAMPAIGNS, CampaignValues, campaignById, previewValues } from '@/lib/email/campaigns';
+import { titleFrom } from '@/lib/letter';
 import { SITE_URL, greeting, renderEmail } from '@/lib/email/layout';
 import { EMAIL_TOPICS, MARKETING_TOPICS, TAG_LABELS, ContactTag, canReceive, topicById } from '@/lib/emailTopics';
 import DietTargeting, { DietTargetingValue, EMPTY_TARGETING } from './DietTargeting';
@@ -99,6 +100,22 @@ export default function AdminEmailsPage() {
     if (!wanted) return;
     const filled: CampaignValues = {};
     wanted.fields.forEach(f => { const v = q.get(f.name); if (v) filled[f.name] = v; });
+    // ?carta=<id>: the letter Dolly sent from /carta/escrever (lib/letter.ts), straight into the Sunday letter.
+    const carta = q.get('carta');
+    if (carta) {
+      supabase.from('letter_submissions').select('*').eq('id', carta).maybeSingle().then(({ data }) => {
+        if (data) {
+          Object.assign(filled, {
+            lang: data.lang === 'pt' ? 'pt' : 'en', title: data.title || titleFrom(data.story || ''), story: data.story || '', tip: data.tip || '',
+            photos: (data.photos || []).join('\n'), ctaLabel: data.lang === 'pt' ? 'Ver as receitas grátis' : 'Get the free recipes',
+            ctaPath: data.lang === 'pt' ? '/receitas' : '/free-recipes',
+          });
+        }
+        pendingValues.current = filled;
+        setCampaignId(wanted.id);
+      });
+      return;
+    }
     pendingValues.current = filled;
     setCampaignId(wanted.id);
   }, []);

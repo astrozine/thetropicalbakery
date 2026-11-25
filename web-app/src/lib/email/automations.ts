@@ -10,6 +10,8 @@ import { offerToken, thanksUrl, ebookKey, langFromAddress } from '@/lib/payments
 import { BOOK_BUYER_SEQUENCE } from './ladderCampaigns';
 import { CLAIM_TOPIC, claimPath } from '@/lib/bonusCall';
 import { SITE_URL } from './layout';
+import { LETTER_WRITER, PROMPT_WEEKDAY, sundayFor } from '@/lib/letter';
+import { letterLink } from '@/lib/letterServer';
 import { bonusCallOn } from '@/lib/payments/bonusCall';
 import { paidBookEmails } from '@/lib/payments/funnel';
 
@@ -419,6 +421,17 @@ export async function planFor(db: SupabaseClient, def: AutomationDef, row: Autom
       return requests.length
         ? { requests, note: `Compradores do livro, ${notes.join(', ')}.` }
         : nothing(`${sends.length} compra(s) recentes, nenhuma no dia de receber e-mail.`);
+    }
+
+    // ---------------------------------------------------------- carta-pedido
+    case 'carta-pedido': {
+      const weekday = new Date(today + 'T12:00:00Z').getUTCDay();
+      if (weekday !== PROMPT_WEEKDAY) return nothing('Só às quintas.');
+      const sunday = sundayFor(today);
+      return {
+        requests: [{ campaignId: 'carta-pedido', values: { sunday, link: letterLink(SITE_URL, sunday) }, testEmail: LETTER_WRITER.email }],
+        note: `Pedido da carta de ${sunday} para a Dolly.`,
+      };
     }
 
     default:

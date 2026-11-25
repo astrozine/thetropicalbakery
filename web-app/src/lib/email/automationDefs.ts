@@ -131,6 +131,16 @@ export const AUTOMATIONS: AutomationDef[] = [
     knobs: [],
     knobLabel: {},
   },
+  {
+    id: 'carta-pedido',
+    name: 'Pedir a carta de domingo à Dolly',
+    emoji: '✍️',
+    campaignId: 'carta-pedido',
+    watches: 'Toda quinta-feira.',
+    sends: 'Um e-mail só para a Dolly, em inglês, com o link (sem login) para mandar fotos e algumas linhas da semana. Quando ela manda, você recebe a carta pronta em Admin › E-mails para revisar e enviar. Nada vai para a lista sozinho.',
+    knobs: [],
+    knobLabel: {},
+  },
 ];
 
 export const automationById = (id: string) => AUTOMATIONS.find(a => a.id === id);
