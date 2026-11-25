@@ -171,10 +171,16 @@ const AUTOMATIC: CatalogEntry[] = [
 // ---------------------------------------------------------------- the campaigns, straight from CAMPAIGNS
 
 const isFunnelStep = (c: Campaign) => c.topic === 'receitas';
+/** The Sweet Escape buyers' e-mails (automation livro-sequencia). */
+const isBookStep = (c: Campaign) => c.id.startsWith('livro-');
+/** Written in English and Portuguese (the funnel, the buyers' e-mails, Dolly's Sunday letter). */
+const bilingual = (c: Campaign) => !!c.lang;
 
 /** Fills what an automation would fill, so the free-recipes steps read like the real ones. */
 function exampleValues(c: Campaign, lang: EmailLang): CampaignValues {
   const v = previewValues(c, {});
+  if (bilingual(c)) v.lang = lang;
+  if (isBookStep(c)) v.call = '1';
   if (isFunnelStep(c)) {
     v.lang = lang;
     v.offer = 'exemplo';
@@ -186,17 +192,18 @@ function exampleValues(c: Campaign, lang: EmailLang): CampaignValues {
 
 function fromCampaign(c: Campaign): CatalogEntry {
   const funnel = isFunnelStep(c);
-  const rule = AUTOMATIONS.find(a => a.campaignId === c.id || (funnel && a.campaignId.startsWith('receitas-')));
+  const book = isBookStep(c);
+  const rule = AUTOMATIONS.find(a => a.campaignId === c.id || (funnel && a.campaignId.startsWith('receitas-')) || (book && a.campaignId.startsWith('livro-')));
   return {
     id: c.id,
-    group: funnel ? 'Receitas grátis' : c.groupOnly && c.theme === 'brunch' ? 'Brunch' : 'Campanhas para a lista',
+    group: funnel ? 'Receitas grátis' : book ? 'Sweet Escape (e-book)' : c.groupOnly && c.theme === 'brunch' ? 'Brunch' : 'Campanhas para a lista',
     name: c.name,
     when: c.description,
     to: 'cliente',
     // groupOnly campaigns are sent by an automation or the brunch page, never by hand from Admin › E-mails.
     automatic: !!c.groupOnly,
     rule: rule?.name,
-    langs: funnel ? ['en', 'pt'] : ['pt'],
+    langs: bilingual(c) ? ['en', 'pt'] : ['pt'],
     render: lang => {
       const v = exampleValues(c, lang);
       const l = c.lang?.(v) ?? 'pt';
