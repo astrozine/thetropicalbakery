@@ -119,15 +119,17 @@ export default function AdminLayout({
   useEffect(() => {
     if (access !== 'allowed') return;
     const loadUnread = async () => {
-      const [jobs, orders, courses, waitlist, handled, leads] = await Promise.all([
+      const [jobs, orders, courses, waitlist, handled, leads, recipes] = await Promise.all([
         supabase.from('job_applications').select('id', { count: 'exact', head: true }),
         supabase.from('orders').select('id', { count: 'exact', head: true }),
         supabase.from('course_registrations').select('id', { count: 'exact', head: true }),
         supabase.from('waitlist').select('id', { count: 'exact', head: true }),
         supabase.from('inbox_status').select('source_id', { count: 'exact', head: true }).neq('status', 'new'),
         supabase.from('contact_leads').select('id', { count: 'exact', head: true }),
+        // Free-recipes sign-ups show in the inbox for 60 days (InboxFeed / recipeLeads.ts).
+        supabase.from('funnel_leads').select('id', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 60 * 86400000).toISOString()),
       ]);
-      const total = (jobs.count || 0) + (orders.count || 0) + (courses.count || 0) + (waitlist.count || 0) + (leads.count || 0);
+      const total = (jobs.count || 0) + (orders.count || 0) + (courses.count || 0) + (waitlist.count || 0) + (leads.count || 0) + (recipes.count || 0);
       setUnreadCount(Math.max(0, total - (handled.count || 0)));
 
       // Partners waiting for approval + restock requests nobody has answered.

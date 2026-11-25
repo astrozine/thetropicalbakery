@@ -5,6 +5,7 @@ import QuickMenu from './QuickMenu';
 import OverviewHero from './OverviewHero';
 import CommsColumn from './CommsColumn';
 import BoxStock from './BoxStock';
+import NewPeople from './NewPeople';
 import { useAdminStats } from './adminStats';
 
 const greeting = () => {
@@ -34,6 +35,8 @@ export default function AdminDashboard() {
       <div className="admin-overview">
         <div className="admin-overview__hero">
           <OverviewHero stats={stats} />
+          {/* The free-recipes sign-ups: the people Andrew most wants to see (Nov 2026). */}
+          <NewPeople />
           {/* "Sobraram quantas?" right here: a box eaten at home is two taps, not a trip through the box form. */}
           <BoxStock box={stats.box} onChanged={stats.reload} compact />
         </div>

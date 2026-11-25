@@ -295,8 +295,13 @@ export default function CRMAdmin() {
       }
     }
 
-    merged.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-    setCustomers(merged);
+    // Our own team (the admins list: Andrew, Dolly, Jess) signs up to test things: never a customer card.
+    const { data: admins } = await supabase.from('admins').select('email');
+    const team = new Set(((admins || []) as { email: string }[]).map(a => emailKey(a.email)));
+    const people = merged.filter(c => !c.email || !team.has(emailKey(c.email)));
+
+    people.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    setCustomers(people);
     setLoading(false);
   };
 

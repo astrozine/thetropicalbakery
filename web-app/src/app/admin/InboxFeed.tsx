@@ -4,9 +4,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { pickupLastDay } from '@/lib/pickupWindow';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { BOOK_LABEL, loadRecipeLeads, sequenceLine } from './recipeLeads';
 import { BUCKETS, BUCKET_ORDER, bucketOf, urgencyOf, urgencyRank, type Bucket, type Urgency } from './inboxStatus';
 
-type ItemType = 'job_application' | 'order' | 'retreat_inquiry' | 'course_inquiry' | 'waitlist' | 'contact_lead';
+type ItemType = 'job_application' | 'order' | 'retreat_inquiry' | 'course_inquiry' | 'waitlist' | 'contact_lead' | 'recipes_signup';
 
 interface InboxItem {
   key: string;
@@ -24,6 +25,8 @@ interface InboxItem {
   dueDate?: string | null;
   /** Orders: what to pack (items_summary, which carries the treats they chose), where it goes, and diet notes. */
   details?: { what: string | null; where: string | null; diet: string | null };
+  /** Free-recipes sign-ups: where they are in the follow-up e-mails. */
+  recipes?: string;
 }
 
 interface StatusStep {
@@ -70,6 +73,13 @@ const FLOWS: Record<ItemType, StatusStep[]> = {
     { status: 'contacted', icon: '📞', label: 'Contato Feito', color: '#8a6d1f', bg: '#fdf7ee' },
     { status: 'resolved', icon: '✅', label: 'Resolvido', color: '#0b6b3a', bg: '#e6f4ec' },
   ],
+  // Someone who asked for the free recipes (funnel_leads): the follow-up e-mails go out by themselves,
+  // a personal hello from Dolly or Andrew is what moves them along.
+  recipes_signup: [
+    { status: 'new', icon: '⭐', label: 'Nova pessoa', color: '#c0392b', bg: '#fdecea' },
+    { status: 'contacted', icon: '👋', label: 'Dissemos oi', color: '#8a6d1f', bg: '#fdf7ee' },
+    { status: 'resolved', icon: '✅', label: 'Resolvido', color: '#0b6b3a', bg: '#e6f4ec' },
+  ],
 };
 
 /** Same steps as a delivery, worded for someone collecting their box. Customers' Minha Conta reads these steps too. */
@@ -94,10 +104,11 @@ const TYPE_INFO: Record<ItemType, { label: string; icon: string; section: string
   course_inquiry: { label: 'Interesse em Curso', icon: '🍰', section: 'Cursos & Retiros', color: '#b0322a', bg: '#fbe3e0', href: '/admin/inscricoes', hrefLabel: 'Inscrições em Cursos' },
   retreat_inquiry: { label: 'Interesse em Retiro', icon: '🏡', section: 'Cursos & Retiros', color: '#b0322a', bg: '#fbe3e0', href: '/admin/inscricoes', hrefLabel: 'Inscrições em Cursos' },
   contact_lead: { label: 'Contato pelo site', icon: '💬', section: 'Parcerias & Contatos', color: '#0b6b3a', bg: '#e6f4ec' },
+  recipes_signup: { label: 'Receitas grátis', icon: '⭐', section: 'Clientes', color: '#a6832b', bg: '#fdf3d9', href: '/admin/crm', hrefLabel: 'Clientes' },
   job_application: { label: 'Candidatura', icon: '👷', section: 'Equipe & Casa', color: '#2f6f9f', bg: '#e1eefa', href: '/admin/vagas', hrefLabel: 'Candidaturas de Emprego' },
 };
 
-const TYPE_ORDER: ItemType[] = ['order', 'contact_lead', 'course_inquiry', 'retreat_inquiry', 'waitlist', 'job_application'];
+const TYPE_ORDER: ItemType[] = ['order', 'recipes_signup', 'contact_lead', 'course_inquiry', 'retreat_inquiry', 'waitlist', 'job_application'];
 
 const digitsOnly = (v: string | null | undefined) => (v || '').replace(/\D/g, '');
 const waLink = (v: string | null) => {
@@ -117,7 +128,7 @@ function useInbox() {
   const load = useCallback(async () => {
     setLoading(true);
 
-    const [jobsRes, ordersRes, coursesRes, waitlistRes, statusRes, leadsRes] = await Promise.all([
+    const [jobsRes, ordersRes, coursesRes, waitlistRes, statusRes, leadsRes, recipeLeads] = await Promise.all([
       supabase.from('job_applications').select('*').order('created_at', { ascending: false }),
       supabase.from('orders').select('*').order('created_at', { ascending: false }),
       supabase.from('course_registrations').select('*').order('created_at', { ascending: false }),
@@ -125,6 +136,8 @@ function useInbox() {
       supabase.from('inbox_status').select('*'),
       // Absent until migration 23 runs: the error just leaves this list empty.
       supabase.from('contact_leads').select('*').order('created_at', { ascending: false }),
+      // Free-recipes sign-ups of the last 60 days (our own test addresses left out). Never blocks the inbox.
+      loadRecipeLeads({ days: 60 }).catch(() => []),
     ]);
 
     const merged: InboxItem[] = [
@@ -165,6 +178,15 @@ function useInbox() {
         type: 'contact_lead' as const,
         title: l.name, subtitle: `${l.topic || 'Contato'}${l.signed_in ? ' · entrou com conta' : ''}`,
         whatsapp: l.whatsapp, email: l.email, created_at: l.created_at,
+      })),
+      ...recipeLeads.map(l => ({
+        key: `funnel_leads:${l.id}`, source_table: 'funnel_leads', source_id: l.id,
+        type: 'recipes_signup' as const,
+        title: l.name,
+        subtitle: `${l.email} · ${l.from === 'Amazon' ? 'veio da Amazon' : l.from ? `anúncio: ${l.from}` : 'visita direta'}`,
+        whatsapp: null, email: l.email, created_at: l.createdAt,
+        details: { what: `${BOOK_LABEL[l.book].text}`, where: null, diet: null },
+        recipes: sequenceLine(l),
       })),
       ...(waitlistRes.data || []).map((w: any) => ({
         key: `waitlist:${w.id}`, source_table: 'waitlist', source_id: w.id,
@@ -370,11 +392,12 @@ function ItemCard({ row, onSet, compact }: {
         <p style={{ color: '#7f8c8d', fontSize: '0.88rem', margin: 0 }}>{item.subtitle}</p>
         {item.details && (item.details.what || item.details.where || item.details.diet) && !compact && (
           <div style={{ marginTop: '0.45rem', fontSize: '0.86rem', color: '#2c3e50', lineHeight: 1.55, overflowWrap: 'anywhere' }}>
-            {item.details.what && <div>📦 {item.details.what}</div>}
+            {item.details.what && <div>{item.type === 'recipes_signup' ? '' : '📦 '}{item.details.what}</div>}
             {item.details.where && <div style={{ color: '#7f8c8d' }}>📍 {item.details.where}</div>}
             {item.details.diet && <div style={{ color: '#a03027', fontWeight: 600 }}>⚠ {item.details.diet}</div>}
           </div>
         )}
+        {item.recipes && <div style={{ marginTop: '0.3rem', fontSize: '0.84rem', color: '#8a6d1f', fontWeight: 600 }}>✉️ {item.recipes}</div>}
         <p style={{ color: '#95a5a6', fontSize: '0.78rem', marginTop: '0.3rem' }}>
           {stamp(item.created_at)}
           {t.href && !compact && (
@@ -396,6 +419,17 @@ function ItemCard({ row, onSet, compact }: {
             style={{ ...actionBtn('#25D366', 'white'), justifyContent: 'center', textDecoration: 'none' }}
           >
             💬 WhatsApp
+          </a>
+        )}
+
+        {/* Free-recipes sign-ups only left an e-mail: write to them from there. */}
+        {item.type === 'recipes_signup' && item.email && (
+          <a
+            className="inbox-btn"
+            href={`mailto:${item.email}`}
+            style={{ ...actionBtn('#eaf2f8', '#1a5276', '#c5d9ea'), justifyContent: 'center', textDecoration: 'none' }}
+          >
+            ✉️ E-mail
           </a>
         )}
 
