@@ -61,7 +61,7 @@ const PT: StayCopy = {
       { time: '10h', title: 'Na cozinha com a Dolly', text: 'Você prepara o almoço com ela: técnica, temperos sem sal, óleo ou açúcar refinado, e o porquê de cada coisa.' },
       { time: '13h', title: 'Almoço juntos', text: 'Prato cheio, colorido, e você sai satisfeito(a). É aí que a ficha cai.' },
       { time: 'Tarde', title: 'Livre', text: 'Cachoeira, rio, surfe, rede ou soneca. A gente indica e ajuda a combinar.' },
-      { time: '17h', title: 'Conversa do fim de tarde', text: 'Meia hora sobre o que está por trás: densidade de nutrientes (Fuhrman), a "armadilha do prazer" (Goldhamer) e como a fome se acalma.' },
+      { time: 'Fim de tarde', title: 'Conversa na varanda', text: 'Em algumas tardes, meia hora sobre o que está por trás: densidade de nutrientes (Fuhrman), a "armadilha do prazer" (Goldhamer) e como a fome se acalma.' },
       { time: '19h', title: 'Jantar e doce', text: 'Jantar na varanda e um doce que você mesmo(a) fez.' },
     ],
     note: 'Os horários mudam com o tempo, a maré e as crianças. Faz parte.',
@@ -72,9 +72,7 @@ const PT: StayCopy = {
     items: [
       { title: 'Saber se satisfazer', text: 'Comer até ficar bem, sem contar calorias, e entender por que a vontade de doce e de sal diminui.' },
       { title: 'As receitas que você fez', text: 'Tudo o que você cozinhou aqui, escrito, para repetir na sua cozinha.' },
-      { title: 'Uma semana pronta', text: 'Um plano de refeições para a primeira semana em casa e a lista de compras do seu mercado.' },
-      { title: 'A sua despensa nova', text: 'O que comprar, o que tirar de casa e como ler um rótulo.' },
-      { title: 'Uma conversa depois', text: 'Uma chamada de vídeo com a Dolly umas semanas depois, para ajustar o que travou.' },
+      { title: 'A sua despensa nova', text: 'O que comprar no seu mercado, o que tirar de casa e como ler um rótulo.' },
     ],
   },
   price: {
@@ -149,7 +147,7 @@ const EN: StayCopy = {
       { time: '10 am', title: 'In the kitchen with Dolly', text: 'You make lunch with her: technique, flavor without salt, oil or refined sugar, and the why behind each step.' },
       { time: '1 pm', title: 'Lunch together', text: 'A big, colorful plate, and you leave the table satisfied. That’s when it clicks.' },
       { time: 'Afternoon', title: 'Free', text: 'Waterfall, river, surf, hammock or a nap. We point the way and help you set it up.' },
-      { time: '5 pm', title: 'Sunset talk', text: 'Half an hour on the ideas behind it: nutrient density (Fuhrman), the “pleasure trap” (Goldhamer) and how hunger settles down.' },
+      { time: 'Sunset', title: 'Terrace talk', text: 'Some evenings, half an hour on the ideas behind it: nutrient density (Fuhrman), the “pleasure trap” (Goldhamer) and how hunger settles down.' },
       { time: '7 pm', title: 'Dinner and dessert', text: 'Dinner on the terrace, and a treat you made yourself.' },
     ],
     note: 'Times move with the weather, the tide and the kids. That’s part of it.',
@@ -160,9 +158,7 @@ const EN: StayCopy = {
     items: [
       { title: 'Knowing how to feel satisfied', text: 'Eating until you’re content, no calorie counting, and understanding why cravings for sweet and salty fade.' },
       { title: 'The recipes you made', text: 'Everything you cooked here, written down, to make again in your own kitchen.' },
-      { title: 'A week ready to go', text: 'A meal plan for your first week home and a shopping list for your own supermarket.' },
-      { title: 'A new pantry', text: 'What to buy, what to clear out and how to read a label.' },
-      { title: 'A call afterwards', text: 'A video call with Dolly a few weeks later, to fix whatever got stuck.' },
+      { title: 'A new pantry', text: 'What to buy at your own supermarket, what to clear out and how to read a label.' },
     ],
   },
   price: {
@@ -237,7 +233,7 @@ const ES: StayCopy = {
       { time: '10 h', title: 'En la cocina con Dolly', text: 'Preparas el almuerzo con ella: técnica, sabor sin sal, aceite ni azúcar refinado, y el porqué de cada paso.' },
       { time: '13 h', title: 'Almuerzo juntos', text: 'Un plato grande y colorido, y te levantas satisfecho. Ahí se entiende todo.' },
       { time: 'Tarde', title: 'Libre', text: 'Cascada, río, surf, hamaca o siesta. Te indicamos y ayudamos a organizarlo.' },
-      { time: '17 h', title: 'Charla del atardecer', text: 'Media hora sobre las ideas de fondo: densidad de nutrientes (Fuhrman), la “trampa del placer” (Goldhamer) y cómo se calma el hambre.' },
+      { time: 'Atardecer', title: 'Charla en la terraza', text: 'Algunas tardes, media hora sobre las ideas de fondo: densidad de nutrientes (Fuhrman), la “trampa del placer” (Goldhamer) y cómo se calma el hambre.' },
       { time: '19 h', title: 'Cena y postre', text: 'Cena en la terraza y un dulce que hiciste tú.' },
     ],
     note: 'Los horarios cambian con el clima, la marea y los niños. Es parte de la experiencia.',
@@ -248,9 +244,7 @@ const ES: StayCopy = {
     items: [
       { title: 'Saber quedar satisfecho', text: 'Comer hasta estar bien, sin contar calorías, y entender por qué bajan las ganas de dulce y de sal.' },
       { title: 'Las recetas que hiciste', text: 'Todo lo que cocinaste aquí, por escrito, para repetirlo en tu cocina.' },
-      { title: 'Una semana lista', text: 'Un plan de comidas para tu primera semana en casa y la lista de compras de tu supermercado.' },
-      { title: 'Una despensa nueva', text: 'Qué comprar, qué sacar de casa y cómo leer una etiqueta.' },
-      { title: 'Una llamada después', text: 'Una videollamada con Dolly unas semanas más tarde, para ajustar lo que se trabó.' },
+      { title: 'Una despensa nueva', text: 'Qué comprar en tu supermercado, qué sacar de casa y cómo leer una etiqueta.' },
     ],
   },
   price: {

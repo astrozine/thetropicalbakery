@@ -11,7 +11,9 @@
  * market rate). The immersion fee below is ours to set — adjust it here as
  * the offering (workshops, meals, activities included) evolves.
  */
-export const IMMERSION_FEE_PER_GUEST_PER_NIGHT = 180; // R$ — workshop + meals + activities
+// Andrew asked Claude to set it (2026-11-25): R$ 490 per guest per night, every meal + cooking with Dolly + outings.
+// The top rung: one 3-hour class alone is R$ 330, so a full day with the family sits above it. Admin › Retiros (site_settings) wins.
+export const IMMERSION_FEE_PER_GUEST_PER_NIGHT = 490; // R$
 
 export interface RetreatRoom {
   id: string;
