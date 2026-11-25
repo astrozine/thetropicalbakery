@@ -51,12 +51,17 @@ export default function AdminFreeRecipesPage() {
   const [period, setPeriod] = useState('30');
   const [copied, setCopied] = useState('');
   const [now] = useState(() => Date.now());
+  const [amz, setAmz] = useState<{ step: string; created_at: string }[] | null>(null);
 
   useEffect(() => {
     (async () => {
       const { data, error } = await supabase.from('funnel_leads').select('*').order('created_at', { ascending: false }).limit(5000);
       if (error) { setMissing(true); setLoading(false); return; }
       setLeads((data || []) as Lead[]);
+
+      // Visitors leaving for Amazon from the Sweet Escape pages (migration 52; null = not run yet).
+      const { data: clicks, error: clickErr } = await supabase.from('amazon_clicks').select('step, created_at').order('created_at', { ascending: false }).limit(10000);
+      setAmz(clickErr ? null : (clicks || []) as { step: string; created_at: string }[]);
 
       const { data: o } = await supabase.from('orders').select('id, pix_transaction_id, customer_email, status, total_price, items_summary, created_at')
         .like('pix_transaction_id', 'EBK%').order('created_at', { ascending: false }).limit(5000);
@@ -118,16 +123,18 @@ export default function AdminFreeRecipesPage() {
       if (buyers.has(l.email.toLowerCase())) a.buyers += 1;
       ads.set(k, a);
     }
+    const amzList = (amz || []).filter(c => Date.parse(c.created_at) >= since);
+    const amazon = { total: amzList.length, signup: amzList.filter(c => c.step === 'signup').length, skip: amzList.filter(c => c.step === 'skip').length };
     const money = offers.bump.money + offers.oto.money + offers.welcome.money;
     return {
-      list, offers, buyers: buyers.size, money,
+      list, offers, buyers: buyers.size, money, amazon,
       nearby: list.filter(l => l.segment !== 'away').length,
       segments: count(l => l.segment),
       interests: count(l => l.interest),
       langs: count(l => l.lang),
       ads: [...ads.entries()].sort((a, b) => b[1].leads - a[1].leads),
     };
-  }, [leads, orders, period, now]);
+  }, [leads, orders, amz, period, now]);
 
   const copy = async (text: string) => {
     try { await navigator.clipboard.writeText(text); setCopied(text); setTimeout(() => setCopied(''), 2000); } catch { /* shown, copy by hand */ }
@@ -177,6 +184,20 @@ export default function AdminFreeRecipesPage() {
                 <div style={{ fontSize: '0.85rem', color: '#57606f' }}>{x.l}</div>
               </div>
             ))}
+          </div>
+
+          <div style={card}>
+            <h2 style={{ margin: '0 0 0.5rem', fontSize: '1.1rem' }}>🛒 Quem foi para a Amazon</h2>
+            {amz === null ? (
+              <p style={{ margin: 0, color: '#8a5a00' }}>Para contar os cliques, rode <code>migration_52_amazon_clicks.sql</code> no Supabase (SQL Editor). Os cadastros já aparecem abaixo como <b>amazon-detour</b>.</p>
+            ) : (
+              <p style={{ margin: 0 }}>
+                <b>{s.amazon.total}</b> clique(s) em Kindle / capa comum / capa dura · <b style={{ color: '#1e6b3c' }}>{s.amazon.signup}</b> deixaram o e-mail antes ({pct(s.amazon.signup, s.amazon.signup + s.amazon.skip)} de quem viu a janelinha) · {s.amazon.skip} pularam
+              </p>
+            )}
+            <p style={{ margin: '0.5rem 0 0', fontSize: '0.82rem', color: '#747d8c' }}>
+              No primeiro clique numa edição da Amazon, a página oferece as 2 receitas grátis (e a ligação com a Dolly) em troca do e-mail, e abre a Amazon de qualquer jeito. Quem já viu vai direto.
+            </p>
           </div>
 
           <div style={card}>
