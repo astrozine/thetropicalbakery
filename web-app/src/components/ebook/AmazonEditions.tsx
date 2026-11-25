@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { AMAZON_EDITIONS, AMAZON_FORMATS, amazonLink, amazonPrice, type AmazonFormat } from '@/lib/ebook';
 import { EBOOK_COPY, type EbookLang } from '@/lib/ebookCopy';
 import { trackMeta } from '@/lib/metaPixel';
 import Link from 'next/link';
 import { BONUS_CALL_COPY, claimPath } from '@/lib/bonusCall';
 import { useBonusCallOn } from './BonusCall';
+import AmazonDetour, { countAmazonClick, detourSeen } from './AmazonDetour';
 
 const jump = (id: string) => (e: React.MouseEvent) => {
   e.preventDefault();
@@ -41,9 +42,17 @@ export default function AmazonEditions({ lang, img }: { lang: EbookLang; img: st
   const a = EBOOK_COPY[lang].amazon;
   const edition = AMAZON_EDITIONS[lang]?.edition;
   const callOn = useBonusCallOn();
+  const [detour, setDetour] = useState<{ format: AmazonFormat; url: string } | null>(null);
+  const closeDetour = useCallback(() => setDetour(null), []);
   if (!a || !edition) return null;
   const amzCover = `${img}/${edition}/cover.webp`;
-  const click = (format: AmazonFormat) => trackMeta('AmazonClick', { content_name: `sweet-escape-${format}`, content_type: 'product' });
+  // First tap on this device: offer the free recipes before Amazon ("Heading to Amazon?"). After that, straight through.
+  const click = (format: AmazonFormat, url: string) => (e: React.MouseEvent) => {
+    trackMeta('AmazonClick', { content_name: `sweet-escape-${format}`, content_type: 'product' });
+    if (detourSeen() || e.metaKey || e.ctrlKey || e.shiftKey) { countAmazonClick(format, 'direct', lang); return; }
+    e.preventDefault();
+    setDetour({ format, url });
+  };
 
   return (
     <div className="se-amzrow" id="editions">
@@ -52,7 +61,7 @@ export default function AmazonEditions({ lang, img }: { lang: EbookLang; img: st
       </p>
       <div className="se-amzrow__grid">
         {AMAZON_FORMATS.map(f => (
-          <a key={f} href={amazonLink(lang, f)!} target="_blank" rel="noopener noreferrer" onClick={() => click(f)} className="se-amzrow__item">
+          <a key={f} href={amazonLink(lang, f)!} target="_blank" rel="noopener noreferrer" onClick={click(f, amazonLink(lang, f)!)} className="se-amzrow__item">
             {f === 'hardcover' && <span className="se-ed__gift">{a.giftTag}</span>}
             <span className={`se-ed__cover se-amz__cover--${f}`} aria-hidden>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -70,6 +79,7 @@ export default function AmazonEditions({ lang, img }: { lang: EbookLang; img: st
           {BONUS_CALL_COPY[lang].amazonLine} <Link href={claimPath(lang)} style={{ color: 'inherit', fontWeight: 700 }}>{BONUS_CALL_COPY[lang].amazonCta} →</Link>
         </p>
       )}
+      <AmazonDetour lang={lang} target={detour} callOn={callOn} onClose={closeDetour} />
     </div>
   );
 }
