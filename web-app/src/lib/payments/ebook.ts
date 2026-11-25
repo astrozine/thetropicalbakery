@@ -175,7 +175,7 @@ export async function createEbookOrder(input: EbookOrderInput, userToken: string
 
   // Their e-mail on the list (tagged as a customer); never fatal.
   try {
-    await db.rpc('email_contact_upsert', { p_email: email, p_full_name: name, p_tags: ['cliente'], p_source: 'ebook' });
+    await db.rpc('email_contact_upsert', { p_email: email, p_full_name: name, p_tags: ['cliente'], p_source: 'ebook', p_locale: lang });
   } catch { /* the sale matters more */ }
 
   const pix = method === 'pix' ? await generatePixData({ value: total, transactionId: reference }) : undefined;

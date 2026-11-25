@@ -6,7 +6,10 @@ import type { AutomationDef, AutomationRow } from './automationDefs';
 import type { DietTargeting, SendRequest } from './send';
 import { HOST, creditDeadline, fmtWhen, normalizeEvent, venueKind, type BrunchEvent } from '@/lib/brunch';
 import { SEQUENCE, WELCOME_DAYS, isNearby, type Segment } from '@/lib/funnel';
-import { offerToken } from '@/lib/payments/ebook';
+import { offerToken, thanksUrl, ebookKey, langFromAddress } from '@/lib/payments/ebook';
+import { BOOK_BUYER_SEQUENCE } from './ladderCampaigns';
+import { CLAIM_TOPIC, claimPath } from '@/lib/bonusCall';
+import { SITE_URL } from './layout';
 import { bonusCallOn } from '@/lib/payments/bonusCall';
 import { paidBookEmails } from '@/lib/payments/funnel';
 
@@ -373,6 +376,49 @@ export async function planFor(db: SupabaseClient, def: AutomationDef, row: Autom
       return requests.length
         ? { requests, note: `Receitas grátis, ${notes.join(', ')}.` }
         : nothing(`${leads.length} cadastro(s) recentes, nenhum no dia de receber e-mail.`);
+    }
+
+    // ------------------------------------------------------- livro-sequencia
+    // Sweet Escape buyers on the site, counted from the "your book is ready" e-mail (sent the moment it is paid,
+    // by card or by a Pix confirmed in the inbox). Amazon buyers are not here: Amazon never gives us their e-mail.
+    case 'livro-sequencia': {
+      const oldest = Math.max(...BOOK_BUYER_SEQUENCE.map(st => st.day)) + 2;
+      const { data, error } = await db.from('email_sends').select('email, message_key, sent_at')
+        .eq('template', 'ebook-paid').eq('status', 'sent')
+        .gte('sent_at', new Date(Date.now() - (oldest + 1) * 86400000).toISOString());
+      if (error) return nothing(error.message);
+      const sends = (data || []) as { email: string; message_key: string; sent_at: string }[];
+      if (!sends.length) return nothing('Ninguém comprou o livro nos últimos dias.');
+
+      const refs = sends.map(r => r.message_key.split(':')[1]).filter(Boolean);
+      const [{ data: orders }, { data: claims }] = await Promise.all([
+        db.from('orders').select('pix_transaction_id, delivery_address').in('pix_transaction_id', refs),
+        db.from('contact_leads').select('topic').like('topic', `${CLAIM_TOPIC}%`),
+      ]);
+      const address = new Map(((orders || []) as { pix_transaction_id: string; delivery_address: string | null }[])
+        .map(o => [o.pix_transaction_id, o.delivery_address]));
+      const claimed = (ref: string) => ((claims || []) as { topic: string }[]).some(c => c.topic.includes(`site ${ref}`));
+
+      const requests: SendRequest[] = [];
+      const notes: string[] = [];
+      for (const step of BOOK_BUYER_SEQUENCE) {
+        let n = 0;
+        for (const r of sends) {
+          const age = daysBetween(brasiliaDay(r.sent_at), today);
+          if (age < step.day || age > step.day + 1) continue;
+          const ref = r.message_key.split(':')[1];
+          const lang = langFromAddress(address.get(ref)) === 'pt' ? 'pt' : 'en';
+          const values: Record<string, string> = { lang, book: thanksUrl(SITE_URL, ref, lang) };
+          // A site buyer can claim the free call even when it is switched off (they were promised it).
+          if (!claimed(ref)) { values.call = '1'; values.callUrl = `${SITE_URL}${claimPath(lang, ref, ebookKey(ref))}`; }
+          requests.push({ campaignId: step.campaignId, values, onlyEmails: [r.email] });
+          n++;
+        }
+        if (n) notes.push(`dia ${step.day}: ${n}`);
+      }
+      return requests.length
+        ? { requests, note: `Compradores do livro, ${notes.join(', ')}.` }
+        : nothing(`${sends.length} compra(s) recentes, nenhuma no dia de receber e-mail.`);
     }
 
     default:

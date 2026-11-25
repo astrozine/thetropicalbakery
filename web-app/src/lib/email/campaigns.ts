@@ -10,6 +10,7 @@ import { CARE_PATH, CARE_SHORT } from '@/lib/treatCare';
 import type { EmailFact, EmailLang, EmailTheme, LayoutOptions } from './layout';
 import type { ContactTag } from '@/lib/emailTopics';
 import { FUNNEL_CAMPAIGNS } from './funnelCampaigns';
+import { LADDER_CAMPAIGNS } from './ladderCampaigns';
 
 export type FieldType = 'text' | 'textarea' | 'date' | 'number';
 
@@ -51,6 +52,11 @@ export interface Campaign {
    * campaign picker in /admin/emails, and refused by sendCampaign without a group.
    */
   groupOnly?: boolean;
+  /**
+   * Send each language only to the people who speak it: a 'pt' send reaches contacts whose locale is 'pt', an 'en'
+   * send everyone else (Dolly's Sunday letter). Needs `lang`.
+   */
+  byLocale?: boolean;
   description: string;
   /** Line explaining to the reader why they got it. */
   reason: string;
@@ -637,6 +643,9 @@ Todos os cuidados: ${url(CARE_PATH)}`),
 
   // The free-recipes sequence (automation receitas-sequencia), kept in its own file.
   ...FUNNEL_CAMPAIGNS,
+
+  // Dolly's Sunday letter and the Sweet Escape buyers' e-mails (automation livro-sequencia).
+  ...LADDER_CAMPAIGNS,
 ];
 
 export const campaignById = (id: string) => CAMPAIGNS.find(c => c.id === id);

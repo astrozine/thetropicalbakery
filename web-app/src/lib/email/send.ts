@@ -28,6 +28,8 @@ export interface Contact {
   tags: string[] | null;
   opted_out: string[] | null;
   unsubscribed_all: boolean;
+  /** Migration 15: 'pt', 'en', 'es'… The language they signed up in. */
+  locale?: string | null;
   /** Migration 19. Missing on a database where it hasn't been run. */
   diet_tags?: string[] | null;
   allergens_avoid?: string[] | null;
@@ -81,8 +83,8 @@ export class SendError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
-const CONTACT_COLUMNS = 'email, full_name, token, tags, opted_out, unsubscribed_all, diet_tags, allergens_avoid';
-const CONTACT_COLUMNS_LEGACY = 'email, full_name, token, tags, opted_out, unsubscribed_all';
+const CONTACT_COLUMNS = 'email, full_name, token, tags, opted_out, unsubscribed_all, locale, diet_tags, allergens_avoid';
+const CONTACT_COLUMNS_LEGACY = 'email, full_name, token, tags, opted_out, unsubscribed_all, locale';
 
 /** The personal diet line, wrapped so it stands out in the message. */
 const dietBlock = (line: string, warning: boolean) => line
@@ -161,6 +163,12 @@ export async function sendCampaign(db: SupabaseClient, req: SendRequest): Promis
   const contacts = await loadContacts(db);
 
   let eligible = audienceFor(campaign, contacts, req.diet);
+
+  // One language per send (Dolly's Sunday letter): Portuguese to Portuguese contacts, English to everyone else.
+  if (campaign.byLocale && campaign.lang) {
+    const pt = campaign.lang(req.values) === 'pt';
+    eligible = eligible.filter(c => ((c.locale || 'pt') === 'pt') === pt);
+  }
 
   // A named group (e.g. the waiting list): keep only those addresses.
   if (req.onlyEmails) {

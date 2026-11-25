@@ -121,6 +121,16 @@ export const AUTOMATIONS: AutomationDef[] = [
     knobs: [],
     knobLabel: {},
   },
+  {
+    id: 'livro-sequencia',
+    name: 'Quem comprou o Sweet Escape: 3 e-mails',
+    emoji: '📖',
+    campaignId: 'livro-d1',
+    watches: 'Alguém comprou o Sweet Escape no site (o e-mail "seu livro está pronto" saiu) há 1, 3 ou 7 dias.',
+    sends: 'Dia 1 comece por uma receita só (sem venda) · dia 3 o jeito da Dolly em três regras e a conversa grátis de 30 minutos · dia 7 além dos doces: o coaching, e a aula ou o retiro para quem vier a Ubatuba. Quem já marcou a conversa recebe o link do coaching no lugar. Compras na Amazon não entram (a Amazon não passa o e-mail).',
+    knobs: [],
+    knobLabel: {},
+  },
 ];
 
 export const automationById = (id: string) => AUTOMATIONS.find(a => a.id === id);
