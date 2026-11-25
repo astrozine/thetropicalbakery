@@ -6,6 +6,7 @@ import { formatBRL } from '@/lib/deliveryZones';
 import { RetreatRoom, quoteRetreatPackage, IMMERSION_FEE_PER_GUEST_PER_NIGHT } from '@/lib/retreatPricing';
 import { getSiteSetting } from '@/lib/siteSettings';
 import { useExchangeRates, formatForeign } from '@/lib/currency';
+import { awayNights } from '@/lib/retreatStayCopy';
 import WhatsAppGate from '@/components/WhatsAppGate';
 import { COURSE_CONTENT } from '@/lib/courseContent';
 import { ROOM_SHORT_NAMES } from '@/lib/retreatRooms';
@@ -35,11 +36,10 @@ const COPY = {
     months: ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
     weekdays: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
     date: (wd: string, day: number, month: string) => `${wd}, ${day} ${month.slice(0, 3)}`,
-    title: 'Monte Seu Pacote',
-    intro: <>Uma aula com a Dolly a cada dois dias, e no dia seguinte a região: cachoeira, ilha, trilha, Paraty.
-        Escolha os cursos e a gente monta o tamanho certo da estadia.</>,
+    title: 'Monte a Sua Estadia',
+    intro: <>Escolha o quarto, quantas pessoas e quantas noites, e veja o total. Quer sair com um curso completo também? Some no passo 1.</>,
     courses: '1 · Cursos',
-    coursesSoft: '(escolha quantos quiser)',
+    coursesSoft: '(opcional: um curso completo além do dia a dia)',
     classes: (n: number) => (n > 1 ? 'aulas' : 'aula'),
     seeCourses: 'Ver o que cada curso ensina →',
     where: '2 · Onde dormir',
@@ -64,7 +64,7 @@ const COPY = {
     rainText: 'A cozinha é coberta: a aula vem para o dia de chuva e o passeio vai para o dia seguinte. Se chover no último passeio:',
     roomLine: (room: string, n: number) => `${room} (${n} noites)`,
     toConfirm: 'a confirmar',
-    hospitality: 'Hospitalidade Tropical: café, refeições plant-based e dias na região',
+    hospitality: 'A experiência: todas as refeições com a família, a cozinha com a Dolly e os passeios',
     people: (g: number) => `${g}p`,
     nightsShort: (n: number) => `${n}n`,
     approx: '(aproximado)',
@@ -89,11 +89,10 @@ const COPY = {
     months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     date: (wd: string, day: number, month: string) => `${wd}, ${month.slice(0, 3)} ${day}`,
-    title: 'Build Your Package',
-    intro: <>A class with Dolly every other day, and the day after, the region: waterfall, island, trail, Paraty.
-        Pick your courses and we’ll work out the right length for your stay.</>,
+    title: 'Plan Your Stay',
+    intro: <>Pick the room, how many people and how many nights, and see the total. Want a full course too? Add it in step 1.</>,
     courses: '1 · Courses',
-    coursesSoft: '(pick as many as you like)',
+    coursesSoft: '(optional: a full course on top of daily life with us)',
     classes: (n: number) => (n > 1 ? 'classes' : 'class'),
     seeCourses: 'See what each course teaches →',
     where: '2 · Where to stay',
@@ -118,7 +117,7 @@ const COPY = {
     rainText: 'The kitchen is covered: the class moves to the rainy day and the outing moves to the next day. If it rains on the last outing:',
     roomLine: (room: string, n: number) => `${room} (${n} nights)`,
     toConfirm: 'to be confirmed',
-    hospitality: 'Tropical Hospitality: breakfast, plant-based meals and days out in the region',
+    hospitality: 'The experience: every meal with the family, cooking with Dolly and outings',
     people: (g: number) => `${g} ${g === 1 ? 'guest' : 'guests'}`,
     nightsShort: (n: number) => `${n} nights`,
     approx: '(approximate)',
@@ -143,11 +142,10 @@ const COPY = {
     months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
     weekdays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
     date: (wd: string, day: number, month: string) => `${wd}, ${day} ${month.slice(0, 3)}`,
-    title: 'Arma tu Paquete',
-    intro: <>Una clase con Dolly cada dos días, y al día siguiente la región: cascada, isla, sendero, Paraty.
-        Elige los cursos y armamos la estadía del largo justo.</>,
+    title: 'Arma tu Estadía',
+    intro: <>Elige la habitación, cuántas personas y cuántas noches, y mira el total. ¿Quieres también un curso completo? Súmalo en el paso 1.</>,
     courses: '1 · Cursos',
-    coursesSoft: '(elige los que quieras)',
+    coursesSoft: '(opcional: un curso completo además del día a día)',
     classes: (n: number) => (n > 1 ? 'clases' : 'clase'),
     seeCourses: 'Ver qué enseña cada curso →',
     where: '2 · Dónde dormir',
@@ -172,7 +170,7 @@ const COPY = {
     rainText: 'La cocina es techada: la clase pasa al día de lluvia y el paseo pasa al día siguiente. Si llueve en el último paseo:',
     roomLine: (room: string, n: number) => `${room} (${n} noches)`,
     toConfirm: 'por confirmar',
-    hospitality: 'Hospitalidad Tropical: desayuno, comidas plant-based y días en la región',
+    hospitality: 'La experiencia: todas las comidas con la familia, la cocina con Dolly y los paseos',
     people: (g: number) => `${g} ${g === 1 ? 'persona' : 'personas'}`,
     nightsShort: (n: number) => `${n} noches`,
     approx: '(aproximado)',
@@ -279,10 +277,12 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
 
   const room = rooms.find(r => r.id === roomId) || rooms[0];
   const cappedGuests = Math.min(guests, room.max_guests);
-  const busy = useMemo(
-    () => (busyData ? effectiveBusy(rooms.map(r => r.id), busyData.ical, busyData.booked, busyData.blocked) : null),
-    [busyData, rooms],
-  );
+  // Nobody is home over the holidays (Dec 23 – Feb 17, see AWAY in retreatStayCopy.ts): those nights are always taken.
+  const busy = useMemo(() => {
+    const away = awayNights();
+    const base = busyData ? effectiveBusy(rooms.map(r => r.id), busyData.ical, busyData.booked, busyData.blocked) : {};
+    return Object.fromEntries(rooms.map(r => [r.id, new Set([...(base[r.id] ?? []), ...away])]));
+  }, [busyData, rooms]);
   const roomBusy = busy?.[room.id];
   const earliest = addDays(todayBR(), LEAD_DAYS);
   const canArrive = (d: string) => d >= earliest && isFree(roomBusy, d, nights);

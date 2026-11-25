@@ -22,7 +22,7 @@ const COPY: Record<Lang, { hi: string; sub: string; lead: Item; items: Item[] }>
       { img: '/dolly/dolly-portrait-sm.webp', title: 'Coaching de alimentação', text: 'Do café da manhã ao jantar, sem balança. Começa com uma conversa grátis de 30 min.', href: '/coaching' },
       { img: '/ebook/sweet-escape/pt/cover-sm.webp', title: 'O livro Sweet Escape', text: '7 doces, um para cada dia da semana, e uma conversa grátis comigo.', href: '/sweet-escape/pt' },
       { img: '/event_hero.jpg', title: 'Doces para a sua festa', text: 'Bandejas para aniversários, casamentos e eventos em Ubatuba e região.', href: '/menu' },
-      { img: '/assets/retreats_beach_bg_1789884804918.jpg', title: 'Retiro na praia', text: 'Dias de praia, cachoeira e comida de verdade com a gente.', href: '/retreats' },
+      { img: '/retreats/rooms/house-11.jpg', title: 'Viva uns dias na nossa casa', text: 'O retiro: você (ou a família toda) mora com a gente, come na nossa mesa e aprende a comer assim.', href: '/retreats' },
     ],
   },
   en: {
@@ -33,7 +33,7 @@ const COPY: Record<Lang, { hi: string; sub: string; lead: Item; items: Item[] }>
       { img: '/dolly/dolly-portrait-sm.webp', title: 'Food coaching with me', text: 'Breakfast to dinner, no scale. It starts with a free 30-minute call, online.', href: '/coaching/en' },
       { img: '/ebook/sweet-escape/en/cover-sm.webp', title: 'The Sweet Escape book', text: '7 treats, one for every day of the week, plus a free call with me.', href: '/sweet-escape' },
       { img: '/dolly-course1.jpg', title: 'A treats class in my kitchen', text: 'One afternoon in Itamambuca. You make, taste and take the recipes home.', href: '/cursos' },
-      { img: '/assets/retreats_beach_bg_1789884804918.jpg', title: 'A beach retreat', text: 'Days of beach, waterfalls and real food with us.', href: '/retreats' },
+      { img: '/retreats/rooms/house-11.jpg', title: 'Live a few days in our home', text: 'The retreat: you (or the whole family) stay with us, eat at our table and learn to eat this way.', href: '/en/retreats' },
     ],
   },
 };

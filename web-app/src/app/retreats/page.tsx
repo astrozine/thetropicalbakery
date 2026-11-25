@@ -3,32 +3,17 @@ import RetreatsLayout from '@/components/RetreatsLayout';
 
 export default function RetreatsPage() {
   const portugueseTexts = {
-    whatsappMessage: 'Olá! Gostaria de saber mais sobre os Retiros da Tropical Bakery.',
+    whatsappMessage: 'Olá! Quero saber mais sobre o retiro na casa de vocês em Itamambuca.',
     hero: {
       location: 'Itamambuca · Ubatuba · Brasil',
-      title: <>Retiros de Culinária<br />e Bem-Estar</>,
-      description: 'Uma jornada imersiva para mulheres em Itamambuca. Descubra os segredos da confeitaria saudável enquanto relaxa em meio à natureza.',
-      cta: 'Reserve o Seu Retiro',
-    },
-    experience: {
-      subtitle: 'A Experiência',
-      title: 'Reconecte-se com a Natureza e a Comida',
-      description: 'Nossos retiros são projetados para reconectar você com a comida de uma forma curativa e deliciosa. Você aprenderá na prática como preparar sobremesas luxuosas que nutrem o corpo.',
-      bullets: [
-        'Workshops de confeitaria saudável',
-        'Sessões matinais de Yoga na praia',
-        'Hospedagem de luxo em Itamambuca',
-        'Leve habilidades incríveis para sua família'
-      ],
-    },
-    foodHero: {
-      title: 'Criações Exclusivas The Tropical Bakery',
-      subtitle: '100% Vegano · Sem Trigo · Feito com ingredientes tropicais frescos',
+      title: <>Viva uns dias<br />na nossa casa</>,
+      description: 'Fique com a gente em Itamambuca, coma na nossa mesa e volte para casa sabendo comer assim, com prazer e satisfeito(a). Sozinho(a), em casal ou com a família toda.',
+      cta: 'Quero vir',
     },
     suites: {
-      subtitle: 'Salt n\' Paradise',
-      title: 'Nossas Suítes',
-      description: 'Hospede-se em nossa bela casa a poucos passos da praia. Suítes com design tropical e sustentável, conforto absoluto.',
+      subtitle: 'Onde você fica',
+      title: 'Três quartos, ou a casa toda',
+      description: 'A nossa casa, Salt n’ Paradise, a 100 m da praia. Escolha o quarto que cabe em você ou na sua família.',
       penthouse: {
         capacity: 'Até 6 pessoas',
         title: 'Cobertura (Penthouse)',
@@ -47,12 +32,6 @@ export default function RetreatsPage() {
         description: 'Aconchegante e intimista, ideal para casais ou viajantes solo.',
         cta: 'Ver no Airbnb',
       },
-    },
-    finalCta: {
-      subtitle: 'Vagas Limitadas',
-      title: 'Comece Sua Jornada',
-      description: 'Entre em contato para reservar seu lugar no próximo retiro. Vagas limitadas para garantir uma experiência íntima e transformadora.',
-      cta: 'Reserve pelo WhatsApp',
     },
   };
 

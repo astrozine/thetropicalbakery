@@ -111,7 +111,7 @@ export const DOLLY_OFFERS: { id: string; emoji: string; title: string; line: str
   { id: 'curso', emoji: '👩‍🍳', title: 'Aula na cozinha da Dolly', line: 'Três horas de mão na massa em Itamambuca', href: '/cursos' },
   { id: 'coaching', emoji: '💬', title: 'Coaching de alimentação', line: 'Conversas com a Dolly sobre comer bem, no seu ritmo', href: '/coaching' },
   { id: 'eventos', emoji: '🎉', title: 'Menu de eventos', line: 'Doces para festas, casamentos e encontros', href: '/menu' },
-  { id: 'retiro', emoji: '🌿', title: 'Retiro em Itamambuca', line: 'Dias de comida, mar e descanso com a Dolly', href: '/retreats' },
+  { id: 'retiro', emoji: '🌿', title: 'Retiro em Itamambuca', line: 'Dias na nossa casa: comer com a família e aprender a comer assim', href: '/retreats' },
   { id: 'parceria', emoji: '🤝', title: 'Parceria para empresas', line: 'Doces da Dolly no seu hotel, pousada ou café', href: '/b2b' },
   { id: 'ebook', emoji: '📖', title: 'E-book Sweet Escape', line: 'As receitas da Dolly para fazer em casa', href: '/sweet-escape/pt' },
 ];

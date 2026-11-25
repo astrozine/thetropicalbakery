@@ -7,8 +7,7 @@ import CrmRegistrationModal from '@/components/CrmRegistrationModal';
 import RetreatPricingCalculator from '@/components/RetreatPricingCalculator';
 import MobileBuyBar from '@/components/MobileBuyBar';
 import RoomsAccordion from '@/components/RoomsAccordion';
-import RetreatTracks from '@/components/RetreatTracks';
-import { InspirationSection } from '@/components/InspirationSection';
+import RetreatStay from '@/components/RetreatStay';
 import { supabase } from '@/lib/supabase';
 
 export interface RetreatsLayoutProps {
@@ -22,16 +21,6 @@ export interface RetreatsLayoutProps {
       description: string;
       cta: string;
     };
-    experience: {
-      subtitle: string;
-      title: string;
-      description: string;
-      bullets: string[];
-    };
-    foodHero: {
-      title: string;
-      subtitle: string;
-    };
     suites: {
       subtitle: string;
       title: string;
@@ -39,12 +28,6 @@ export interface RetreatsLayoutProps {
       penthouse: { capacity: string; title: string; description: string; cta: string };
       bigSuite: { capacity: string; title: string; description: string; cta: string };
       smallSuite: { capacity: string; title: string; description: string; cta: string };
-    };
-    finalCta: {
-      subtitle: string;
-      title: string;
-      description: string;
-      cta: string;
     };
   }
 }
@@ -80,8 +63,8 @@ const PAGE_COPY = {
     packageTitle: 'O Pacote Completo, Não Só a Estadia',
     heroInterest: 'Retiro Tropical',
     finalInterest: 'Retiro Geral',
-    barPrice: 'Monte seu pacote',
-    barNote: 'estadia + cursos + comida',
+    barPrice: 'Quarto + experiência',
+    barNote: 'o total das suas datas',
     barLabel: 'Ver preços',
   },
   en: {
@@ -94,8 +77,8 @@ const PAGE_COPY = {
     packageTitle: 'The Whole Package, Not Just the Stay',
     heroInterest: 'Tropical Retreat',
     finalInterest: 'General Retreat',
-    barPrice: 'Build your package',
-    barNote: 'stay + courses + food',
+    barPrice: 'Room + experience',
+    barNote: 'the total for your dates',
     barLabel: 'See prices',
   },
   es: {
@@ -108,8 +91,8 @@ const PAGE_COPY = {
     packageTitle: 'El Paquete Completo, No Solo la Estadía',
     heroInterest: 'Retiro Tropical',
     finalInterest: 'Retiro General',
-    barPrice: 'Arma tu paquete',
-    barNote: 'estadía + cursos + comida',
+    barPrice: 'Habitación + experiencia',
+    barNote: 'el total de tus fechas',
     barLabel: 'Ver precios',
   },
 };
@@ -261,108 +244,8 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
         ` }} />
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════
-          WHAT'S INCLUDED — Alternating full-bleed sections
-      ══════════════════════════════════════════════════════════════ */}
+      <RetreatStay part="intro" locale={locale} whatsappHref={whatsappLink} />
 
-      {/* Experience Block */}
-      <section style={{ background: 'var(--color-background)' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'stretch', minHeight: '70vh' }}>
-          {/* Image side: an arched portrait with the wide waterfall overlapping it, gold outline behind */}
-          <div className="rx">
-            <div className="rx__stage">
-              <div className="rx__ring" aria-hidden />
-              <div className="rx__arch">
-                <img src="/retreats/prumirim-woman.jpg" alt={copy.altWoman} loading="lazy" />
-              </div>
-              <div className="rx__wide">
-                <img src="/retreats/real-cachoeira.jpg" alt={copy.altWaterfall} loading="lazy" />
-              </div>
-              <div className="rx__card">
-                <b className="rx__num">{nearby.waterfall.num}</b>
-                <span className="rx__lbl">{nearby.waterfall.label}</span>
-              </div>
-            </div>
-            <style dangerouslySetInnerHTML={{ __html: `
-              .rx { flex: 1 1 50%; min-width: 300px; display: flex; align-items: center; justify-content: center; padding: clamp(1.5rem, 4vw, 4rem); background: linear-gradient(160deg, #f7eedb 0%, #ecdcbc 100%); overflow: hidden; }
-              .rx__stage { position: relative; width: min(100%, 640px); aspect-ratio: 1 / 1.1; }
-              .rx__arch, .rx__ring { position: absolute; left: 6%; top: 0; width: 58%; aspect-ratio: 3 / 4.1; border-radius: 999px 999px 28px 28px; }
-              .rx__ring { left: 0; top: -3%; border: 1.5px solid #d4af37; }
-              .rx__arch { overflow: hidden; box-shadow: 0 30px 60px rgba(60,42,33,0.3); z-index: 1; }
-              .rx__arch img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
-              .rx__wide { position: absolute; right: 0; bottom: 4%; width: 62%; aspect-ratio: 4 / 3; border: 8px solid #fdfaf3; border-radius: 22px; overflow: hidden; box-shadow: 0 24px 50px rgba(60,42,33,0.35); transform: rotate(3deg); z-index: 2; }
-              .rx__wide img { display: block; width: 100%; height: 100%; object-fit: cover; }
-              /* Same "how far" card as the hero, in brown so it sits on the cream panel. */
-              .rx__card { position: absolute; left: 2%; bottom: -1%; z-index: 3; display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 0.8rem; max-width: 62%; padding: 0.7rem 1.05rem 0.7rem 0.95rem; background: #3c2a21; color: #fdfaf3; border: 1px solid rgba(212,175,55,0.55); border-radius: 14px; box-shadow: 0 16px 34px rgba(60,42,33,0.4); }
-              .rx__num { font-family: var(--font-heading); font-size: clamp(1.15rem, 2.4vw, 1.7rem); line-height: 1; color: #d4af37; white-space: nowrap; }
-              .rx__lbl { font-size: clamp(0.72rem, 1.5vw, 0.8rem); line-height: 1.3; color: rgba(253,250,243,0.85); }
-              /* Phones: the card hangs below the photos, across the full width, so it never sits on the picture
-                 or squeezes its own words into a narrow column. */
-              @media (max-width: 767px) {
-                .rx { padding-bottom: 5.25rem; }
-                .rx__wide { border-width: 5px; border-radius: 16px; }
-                .rx__card { left: 0; right: 0; bottom: -3.75rem; max-width: none; padding: 0.65rem 0.9rem; column-gap: 0.75rem; }
-                .rx__num { font-size: 1.45rem; }
-                .rx__lbl { font-size: 0.78rem; }
-              }
-              /* Shorter (2026-11-13): phones show just the waterfall, with the distance under it. */
-              @media (max-width: 767px) {
-                .rx { padding: 1.25rem 1.25rem 0.5rem; background: none; }
-                .rx__stage { aspect-ratio: auto; }
-                .rx__arch, .rx__ring { display: none; }
-                .rx__wide { position: relative; right: auto; bottom: auto; width: 100%; border: 0; border-radius: 14px; box-shadow: none; }
-                .rx__card { position: static; margin-top: 0.6rem; }
-              }
-            ` }} />
-          </div>
-          {/* Text side */}
-          <div style={{ flex: '1 1 50%', minWidth: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(2rem, 6vw, 6rem)' }}>
-            <ScrollReveal>
-              <div style={{ maxWidth: '500px' }}>
-                <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, marginBottom: '1rem', display: 'block' }}>
-                  {texts.experience.subtitle}
-                </span>
-                <h2 data-sign="✨" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', lineHeight: '1.15', marginBottom: '1.5rem' }}>
-                  {texts.experience.title}
-                </h2>
-                <p style={{ fontSize: '1.1rem', lineHeight: '2', color: '#594a42', marginBottom: '2rem' }}>
-                  {texts.experience.description}
-                </p>
-                <ul style={{ listStyle: 'none', padding: 0 }}>
-                  {texts.experience.bullets.map((item, i) => (
-                    <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '1rem', fontSize: '1.05rem', lineHeight: '1.7', color: '#594a42' }}>
-                      <span style={{ color: '#d4af37', fontSize: '1.2rem', flexShrink: 0 }}>✦</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </ScrollReveal>
-          </div>
-        </div>
-      </section>
-
-      {/* Food Hero — full-bleed with treats mosaic */}
-      <section style={{ position: 'relative', padding: '6rem 2rem', background: '#3c2a21', textAlign: 'center', overflow: 'hidden' }}>
-        <div className="tb-rail" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',   // .tb-rail turns this into a swipe on phones
-          gap: '1rem',
-          maxWidth: '1200px',
-          margin: '0 auto 3rem',
-        }}>
-          <ZoomableImage src="/menu-items/Screenshot_20260415_110305_Gallery.jpg" alt={copy.altTreats} style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
-          <ZoomableImage src="/menu-items/Screenshot_20260401_193246_Edits.jpg"   alt={copy.altTreats} style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
-          <ZoomableImage src="/menu-items/Screenshot_20260518_122444_Gallery.jpg" alt={copy.altTreats} style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
-          <ZoomableImage src="/menu-items/20260209_172647.jpg"                    alt={copy.altTreats} style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
-        </div>
-        <h2 data-sign-top="🍫" style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', marginBottom: '1rem' }}>
-          {texts.foodHero.title}
-        </h2>
-        <p style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.7)', maxWidth: '600px', margin: '0 auto', lineHeight: '1.8' }}>
-          {texts.foodHero.subtitle}
-        </p>
-      </section>
 
       {/* Suites Section */}
       <section id="quartos" style={{ background: 'var(--color-background)', padding: 'clamp(2.25rem, 8vw, 8rem) clamp(1rem, 4vw, 2rem)', scrollMarginTop: '4.5rem' }}>
@@ -385,20 +268,10 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
         </div>
       </section>
 
-      <RetreatTracks locale={locale} onInquire={(interest) => { setSelectedInterest(interest); setIsModalOpen(true); }} />
-
-      <InspirationSection locale={locale} />
 
       {/* Pricing Calculator */}
       <section style={{ padding: 'clamp(2.25rem, 8vw, 6rem) 1.5rem', background: 'linear-gradient(180deg, #2e4432 0%, #3c2a21 100%)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '1rem' }}>
-            {copy.packageEyebrow}
-          </span>
-          <h2 data-sign-top="✈️" style={{ fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', lineHeight: '1.15' }}>
-            {copy.packageTitle}
-          </h2>
-        </div>
+        <RetreatStay part="price" locale={locale} whatsappHref={whatsappLink} />
         <div id="pacote"><RetreatPricingCalculator whatsappNumber={WHATSAPP_NUMBER} locale={locale} /></div>
       </section>
 
@@ -418,31 +291,8 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section style={{
-        padding: 'clamp(2.25rem, 8vw, 8rem) 2rem',
-        background: 'linear-gradient(180deg, #3c2a21 0%, #2e4432 100%)',
-        textAlign: 'center'
-      }}>
-        <ScrollReveal>
-          <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '1.5rem' }}>
-            {texts.finalCta.subtitle}
-          </span>
-          <h2 style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontFamily: 'var(--font-heading)', color: '#fdfaf3', marginBottom: '1.5rem', lineHeight: '1.15' }}>
-            {texts.finalCta.title}
-          </h2>
-          <p style={{ fontSize: '1.15rem', color: 'rgba(253,250,243,0.7)', maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: '1.9' }}>
-            {texts.finalCta.description}
-          </p>
-          <button 
-            onClick={() => { setSelectedInterest(copy.finalInterest); setIsModalOpen(true); }}
-            className="btn btn-secondary" 
-            style={{ padding: '1.2rem 3.5rem', fontSize: '1.1rem', letterSpacing: '2px' }}
-          >
-            {texts.finalCta.cta}
-          </button>
-        </ScrollReveal>
-      </section>
+      <RetreatStay part="after" locale={locale} whatsappHref={whatsappLink} />
+
 
       <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 767px) { .rgal { grid-template-rows: repeat(2, 110px) !important; } }

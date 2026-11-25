@@ -19,6 +19,15 @@ import HandWrittenLang from '@/components/HandWrittenLang';
  * Reset and one session, Andrew 2026-11-25) live in COACHING_PRICES; the free call still comes first.
  */
 
+
+/** The top rung under the prices: the lived-in retreat (Andrew, 2026-11-25). */
+const STAY_LINK: Record<CoachingLang, { label: string; href: string }> = {
+  pt: { label: 'Quer viver isso de perto? Venha passar uns dias na nossa casa em Itamambuca →', href: '/retreats' },
+  en: { label: 'Want to live it up close? Come stay a few days in our home in Itamambuca →', href: '/en/retreats' },
+  es: { label: '¿Quieres vivirlo de cerca? Ven unos días a nuestra casa en Itamambuca →', href: '/es/retiros' },
+  nl: { label: 'Wil je het van dichtbij beleven? Kom een paar dagen bij ons logeren in Itamambuca →', href: '/en/retreats' },
+};
+
 /** "R$ 497", plus "≈ US$ 87" (or euros on the Dutch page) for visitors reading in another language. */
 function Price({ brl, lang }: { brl: number; lang: CoachingLang }) {
   const { rates } = useExchangeRates();
@@ -305,6 +314,7 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
           </div>
         </div>
         <p className="fc-prices__note">{t.prices.note}</p>
+        <a className="fc-prices__stay" href={STAY_LINK[lang].href}>{STAY_LINK[lang].label}</a>
       </section>
 
       {/* ── The separate 2-week package ── */}
@@ -526,6 +536,7 @@ const CSS = `
 .fc-price__list { list-style: disc; margin: 0.2rem 0 0.4rem; padding-left: 1.2rem; color: #594a42; line-height: 1.6; }
 .fc-price__cta { display: flex; justify-content: center; align-items: center; text-align: center; margin-top: 0.4rem; }
 .fc-prices__note { text-align: center; color: #594a42; margin: 1.2rem auto 0; max-width: 620px; line-height: 1.6; font-size: 0.95rem; }
+.fc-prices__stay { display: block; text-align: center; margin: 1rem auto 0; max-width: 620px; color: #2e4432; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; line-height: 1.5; }
 @media (max-width: 700px) { .fc-prices__grid { grid-template-columns: 1fr; } }
 
 /* FAQ */
