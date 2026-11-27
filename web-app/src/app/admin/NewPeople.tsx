@@ -64,7 +64,7 @@ export default function NewPeople({ limit = 6 }: { limit?: number }) {
             return (
               <li key={l.id} className="np-card">
                 <div className="np-top">
-                  {l.number > 0 && <span className="np-num">#{l.number}</span>}
+                  {l.number > 0 && <span className="np-num">{l.number}</span>}
                   <strong className="np-name">{l.name}</strong>
                   <span className="np-flag" title={l.lang}>{LANG_FLAG[l.lang] || l.lang}</span>
                   <span className="np-when">{ago(l.createdAt)}</span>
