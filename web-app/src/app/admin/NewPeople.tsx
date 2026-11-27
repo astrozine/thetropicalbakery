@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BOOK_LABEL, LANG_FLAG, loadRecipeLeads, sequenceLine, type RecipeLead } from './recipeLeads';
+import { BOOK_LABEL, LANG_FLAG, flagOf, loadRecipeLeads, sequenceLine, type RecipeLead } from './recipeLeads';
 
 const ago = (iso: string) => {
   const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
@@ -66,7 +66,9 @@ export default function NewPeople({ limit = 6 }: { limit?: number }) {
                 <div className="np-top">
                   {l.number > 0 && <span className="np-num">{l.number}</span>}
                   <strong className="np-name">{l.name}</strong>
-                  <span className="np-flag" title={l.lang}>{LANG_FLAG[l.lang] || l.lang}</span>
+                  {l.country
+                    ? <span className="np-flag" title={`País: ${l.country} · idioma: ${l.lang}`}>{flagOf(l.country)}</span>
+                    : <span className="np-flag" title={`Idioma: ${l.lang}`}>{LANG_FLAG[l.lang] || l.lang}</span>}
                   <span className="np-when">{ago(l.createdAt)}</span>
                 </div>
                 <a href={`mailto:${l.email}`} className="np-email">{l.email}</a>

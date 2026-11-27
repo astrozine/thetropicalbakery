@@ -79,6 +79,8 @@ interface RecipesInfo {
   /** true = the PDF e-mail went out, false = it failed, null = no record (yet). */
   delivered: boolean | null;
   boughtBook: boolean;
+  /** Two-letter country of the sign-up (migration 57), null for older ones. */
+  country: string | null;
 }
 
 interface FunnelLeadRow {
@@ -90,10 +92,20 @@ interface FunnelLeadRow {
   utm_source: string | null;
   utm_campaign: string | null;
   utm_content: string | null;
+  country?: string | null;
 }
 
 const LANG_LABEL: Record<string, string> = { en: '🇬🇧 Inglês', pt: '🇧🇷 Português', es: '🇪🇸 Espanhol', nl: '🇳🇱 Holandês', de: '🇩🇪 Alemão' };
 const emailKey = (v: string | null | undefined) => (v || '').trim().toLowerCase();
+
+/** 'US' -> '🇺🇸 Estados Unidos'. */
+const flagOf = (code: string) => code.toUpperCase().replace(/./g, ch => String.fromCodePoint(127397 + ch.charCodeAt(0)));
+const countryName = (code: string) => {
+  try { return new Intl.DisplayNames(['pt-BR'], { type: 'region' }).of(code) || code; } catch { return code; }
+};
+const countryLabel = (code: string) => `${flagOf(code)} ${countryName(code)}`;
+/** The language people get the recipes and e-mails in; 'pt' also covers Brazilian accounts and orders. */
+const langOf = (c: { recipes: RecipesInfo | null }) => c.recipes?.lang || '';
 
 const isItamambucaAddress = (address: string | null) => /itamambuca/i.test(address || '');
 
@@ -148,6 +160,8 @@ export default function CRMAdmin() {
   const [dietFilter, setDietFilter] = useState('');
   const [allergenFilter, setAllergenFilter] = useState('');
   const [onlyRecipes, setOnlyRecipes] = useState(false);
+  const [langFilter, setLangFilter] = useState('');
+  const [countryFilter, setCountryFilter] = useState('');
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState('');
 
@@ -168,7 +182,7 @@ export default function CRMAdmin() {
       // To tell whether someone added by hand has ordered since, and who paid for the e-book.
       supabase.from('orders').select('*'),
       // Free-recipes sign-ups (migration 43). Missing table = just no recipes info.
-      supabase.from('funnel_leads').select('id, created_at, email, first_name, lang, utm_source, utm_campaign, utm_content').order('created_at', { ascending: false }).limit(5000),
+      supabase.from('funnel_leads').select('*').order('created_at', { ascending: false }).limit(5000),
       // The recipes PDF e-mail (funnelMail.ts, message key 'receitas-gratis:pdf').
       supabase.from('email_sends').select('email, status').eq('message_key', 'receitas-gratis:pdf').limit(5000),
     ]);
@@ -271,7 +285,7 @@ export default function CRMAdmin() {
       for (const l of [...leads].reverse()) {
         const k = emailKey(l.email);
         const ad = [l.utm_source, l.utm_campaign, l.utm_content].filter(Boolean).join(' · ') || null;
-        const info: RecipesInfo = { at: l.created_at, lang: l.lang, ad, delivered: pdf.has(k) ? pdf.get(k)! : null, boughtBook: bookBuyers.has(k) };
+        const info: RecipesInfo = { at: l.created_at, lang: l.lang, ad, delivered: pdf.has(k) ? pdf.get(k)! : null, boughtBook: bookBuyers.has(k), country: l.country || null };
         const known = byEmail.get(k);
         if (known) { if (!known.recipes) known.recipes = info; continue; }
         const c: Customer = {
@@ -311,6 +325,8 @@ export default function CRMAdmin() {
     if (onlyItamambuca) list = list.filter(c => c.itamambuca);
     if (onlyRecipes) list = list.filter(c => c.recipes);
     if (dietFilter) list = list.filter(c => c.dietIds.includes(dietFilter));
+    if (langFilter) list = list.filter(c => langOf(c) === langFilter);
+    if (countryFilter) list = list.filter(c => (countryFilter === '?' ? c.recipes && !c.recipes.country : c.recipes?.country === countryFilter));
     if (allergenFilter) list = list.filter(c => c.allergenIds.includes(allergenFilter));
     if (!q) return list;
     return list.filter(c =>
@@ -318,7 +334,19 @@ export default function CRMAdmin() {
         .filter(Boolean)
         .some(v => String(v).toLowerCase().includes(q)),
     );
-  }, [customers, search, onlyItamambuca, onlyRecipes, dietFilter, allergenFilter]);
+  }, [customers, search, onlyItamambuca, onlyRecipes, dietFilter, allergenFilter, langFilter, countryFilter]);
+
+  // Only the languages and countries that are really there, with how many people each.
+  const langOptions = useMemo(() => {
+    const n = new Map<string, number>();
+    customers.forEach(c => { const l = langOf(c); if (l) n.set(l, (n.get(l) || 0) + 1); });
+    return [...n.entries()].sort((a, b) => b[1] - a[1]);
+  }, [customers]);
+  const countryOptions = useMemo(() => {
+    const n = new Map<string, number>();
+    customers.forEach(c => { if (c.recipes) { const k = c.recipes.country || '?'; n.set(k, (n.get(k) || 0) + 1); } });
+    return [...n.entries()].sort((a, b) => (a[0] === '?' ? 1 : b[0] === '?' ? -1 : b[1] - a[1]));
+  }, [customers]);
 
   // Only offer a filter for something at least one person actually marked.
   const dietOptions = useMemo(
@@ -457,6 +485,24 @@ export default function CRMAdmin() {
           <option value="">🚫 Qualquer alergia</option>
           {allergenOptions.map(o => <option key={o.id} value={o.id}>Evita {o.label} ({o.n})</option>)}
         </select>
+        <select
+          value={langFilter}
+          onChange={e => setLangFilter(e.target.value)}
+          aria-label="Filtrar por idioma"
+          style={{ padding: '0.9rem 1rem', borderRadius: '8px', border: langFilter ? '1px solid #2f6f9f' : '1px solid #dfe4ea', background: langFilter ? '#eaf2f8' : 'white', fontSize: '0.9rem', fontWeight: 700, color: langFilter ? '#1a5276' : '#7f8c8d', cursor: 'pointer' }}
+        >
+          <option value="">🗣️ Todos os idiomas</option>
+          {langOptions.map(([l, n]) => <option key={l} value={l}>{LANG_LABEL[l] || l} ({n})</option>)}
+        </select>
+        <select
+          value={countryFilter}
+          onChange={e => setCountryFilter(e.target.value)}
+          aria-label="Filtrar por país"
+          style={{ padding: '0.9rem 1rem', borderRadius: '8px', border: countryFilter ? '1px solid #2f6f9f' : '1px solid #dfe4ea', background: countryFilter ? '#eaf2f8' : 'white', fontSize: '0.9rem', fontWeight: 700, color: countryFilter ? '#1a5276' : '#7f8c8d', cursor: 'pointer' }}
+        >
+          <option value="">🌎 Todos os países</option>
+          {countryOptions.map(([k, n]) => <option key={k} value={k}>{k === '?' ? '❔ País não registrado' : countryLabel(k)} ({n})</option>)}
+        </select>
       </div>
 
       {filtered.length === 0 ? (
@@ -511,7 +557,7 @@ export default function CRMAdmin() {
                     <div>📍 {c.address || 'Endereço não informado'}</div>
                     {c.recipes && (
                       <div style={{ background: '#f4fbf7', border: '1px solid #cfe9da', borderRadius: '8px', padding: '0.5rem 0.75rem', margin: '0.35rem 0', lineHeight: 1.7, color: '#2c3e50' }}>
-                        <div>📗 Pediu as receitas grátis em {new Date(c.recipes.at).toLocaleDateString('pt-BR')} · {LANG_LABEL[c.recipes.lang] || c.recipes.lang}</div>
+                        <div>📗 Pediu as receitas grátis em {new Date(c.recipes.at).toLocaleDateString('pt-BR')} · {LANG_LABEL[c.recipes.lang] || c.recipes.lang}{c.recipes.country ? ` · ${countryLabel(c.recipes.country)}` : ''}</div>
                         <div>📣 {c.recipes.ad ? `Veio de: ${c.recipes.ad}` : 'Veio direto (sem anúncio)'}</div>
                         <div>
                           {c.recipes.delivered === true ? '✅ E-mail com as receitas enviado'

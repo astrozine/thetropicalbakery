@@ -27,6 +27,8 @@ export interface LeadInput {
   referrer?: string;
   /** Ticked the order bump: how they want to pay for the book. */
   bump?: { payMethod?: string } | null;
+  /** Two-letter country from the hosting's location header (set by the route, never by the visitor). */
+  country?: string | null;
 }
 
 const text = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max);
@@ -55,13 +57,21 @@ export async function createLead(input: LeadInput, userToken: string | null): Pr
   const segment: Segment = isSegment(input.segment) ? input.segment : 'away';
 
   const db = supabaseAdmin();
-  const { data, error } = await db.from('funnel_leads').insert([{
+  const row: Record<string, unknown> = {
     email, first_name: firstName(name), lang, segment,
     utm_source: text(input.utm_source, 120) || null,
     utm_campaign: text(input.utm_campaign, 120) || null,
     utm_content: text(input.utm_content, 120) || null,
     referrer: text(input.referrer, 300) || null,
-  }]).select('id').single();
+  };
+  const country = String(input.country || '').toUpperCase();
+  if (/^[A-Z]{2}$/.test(country) && country !== 'XX') row.country = country;
+  let { data, error } = await db.from('funnel_leads').insert([row]).select('id').single();
+  // Before migration 57 there is no country column: save the sign-up without it rather than lose it.
+  if (error && 'country' in row && /country/i.test(error.message)) {
+    delete row.country;
+    ({ data, error } = await db.from('funnel_leads').insert([row]).select('id').single());
+  }
   if (error) console.error('createLead: funnel_leads insert failed (run migration 43?):', error.message);
   const id = (data?.id as string | undefined) ?? null;
 

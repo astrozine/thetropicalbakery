@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { pickupLastDay } from '@/lib/pickupWindow';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { BOOK_LABEL, loadRecipeLeads, sequenceLine } from './recipeLeads';
+import { BOOK_LABEL, flagOf, loadRecipeLeads, sequenceLine } from './recipeLeads';
 import { BUCKETS, BUCKET_ORDER, bucketOf, urgencyOf, urgencyRank, type Bucket, type Urgency } from './inboxStatus';
 
 type ItemType = 'job_application' | 'order' | 'retreat_inquiry' | 'course_inquiry' | 'waitlist' | 'contact_lead' | 'recipes_signup';
@@ -186,7 +186,7 @@ function useInbox() {
         type: 'recipes_signup' as const,
         // "#5 Janice": their place on our own list, so the count of owned traffic is visible on every card.
         title: l.number ? `${l.number} ${l.name}` : l.name,
-        subtitle: `${l.email} · ${l.from === 'Amazon' ? 'veio da Amazon' : l.from ? `anúncio: ${l.from}` : 'visita direta'}`,
+        subtitle: `${l.country ? `${flagOf(l.country)} ${l.country} · ` : ''}${l.email} · ${l.from === 'Amazon' ? 'veio da Amazon' : l.from ? `anúncio: ${l.from}` : 'visita direta'}`,
         whatsapp: null, email: l.email, created_at: l.createdAt,
         details: { what: `${BOOK_LABEL[l.book].text}`, where: null, diet: null },
         recipes: sequenceLine(l),

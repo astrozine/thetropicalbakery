@@ -20,6 +20,8 @@ export interface RecipeLead {
   email: string;
   name: string;
   lang: string;
+  /** Two-letter country of the sign-up (migration 57), null for older ones. */
+  country: string | null;
   segment: Segment | null;
   interest: string | null;
   /** 'Amazon' for the Amazon detour, the ad's utm tags, or null for a direct visit. */
@@ -37,6 +39,9 @@ export interface RecipeLead {
   book: 'paid' | 'waiting' | 'none';
 }
 
+/** 'US' -> '🇺🇸'. */
+export const flagOf = (code: string) => code.toUpperCase().replace(/./g, ch => String.fromCodePoint(127397 + ch.charCodeAt(0)));
+
 export const LANG_FLAG: Record<string, string> = { en: '🇬🇧', pt: '🇧🇷', es: '🇪🇸', nl: '🇳🇱', de: '🇩🇪' };
 
 const key = (v: string | null | undefined) => (v || '').trim().toLowerCase();
@@ -51,6 +56,7 @@ interface LeadRow {
   id: string; created_at: string; email: string; first_name: string | null; lang: string | null;
   segment?: string | null; interest?: string | null; book_ref?: string | null;
   utm_source: string | null; utm_campaign: string | null; utm_content: string | null;
+  country?: string | null;
 }
 
 export async function loadRecipeLeads(opts: { days?: number; limit?: number } = {}): Promise<RecipeLead[]> {
@@ -138,6 +144,7 @@ export async function loadRecipeLeads(opts: { days?: number; limit?: number } = 
       email: r.email,
       name: (r.first_name || '').trim() || r.email.split('@')[0],
       lang: r.lang || 'en',
+      country: r.country || null,
       segment,
       interest: r.interest || null,
       from,
