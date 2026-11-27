@@ -288,3 +288,12 @@
 .rj-lock__panel .rj-login { color: var(--rj-ink); background: #fffdf8; border-radius: 16px; padding: 0.8rem; }
 .rj-lock__panel .rj-linkbtn { color: #e7c75a; }
 .rj-gallery span:only-child { grid-column: 1 / -1; aspect-ratio: 4 / 3; }
+
+/* collection page */
+.rj-mosaic { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.4rem; max-width: 420px; margin-top: 1.3rem; }
+.rj-mosaic span { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.25); }
+.rj-mosaic img { object-fit: cover; }
+.rj-collprice { margin-top: 1.3rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 0.9rem; }
+.rj-collprice strong { font-family: var(--font-heading); font-size: 2rem; color: #fff; }
+.rj-collprice span { color: rgba(253, 250, 243, 0.85); font-size: 0.95rem; }
+.rj-collprice s { opacity: 0.8; }

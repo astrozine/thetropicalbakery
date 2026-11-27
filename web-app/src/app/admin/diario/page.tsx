@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { brandConfirm } from '@/lib/brandDialog';
 import RecipeEditor, { type Draft } from './RecipeEditor';
 import { Categories, Codes, Sales } from './Extras';
+import Collections from './Collections';
 import {
   DEFAULT_CATEGORIES, fmtBRL, isLive, priceOf, recipeHref, textOf,
   type JournalCategory, type JournalRecipe, type RecipeBody, type JournalLang,
@@ -12,9 +13,10 @@ import {
 import '../caixas/caixas.css';
 import '../crm/crm.css';
 
-type Tab = 'receitas' | 'categorias' | 'cupons' | 'vendas';
+type Tab = 'receitas' | 'colecoes' | 'categorias' | 'cupons' | 'vendas';
 const TABS: { id: Tab; label: string }[] = [
   { id: 'receitas', label: '📖 Receitas' },
+  { id: 'colecoes', label: '📚 Coleções' },
   { id: 'vendas', label: '💰 Vendas e números' },
   { id: 'cupons', label: '🏷️ Cupons' },
   { id: 'categorias', label: '🗂️ Categorias' },
@@ -114,6 +116,7 @@ export default function AdminJournalPage() {
 
       {tab === 'categorias' && <Categories cats={cats} onChange={load} />}
       {tab === 'cupons' && <Codes />}
+      {tab === 'colecoes' && <Collections recipes={rows} />}
       {tab === 'vendas' && <Sales recipes={rows} />}
 
       {tab === 'receitas' && (
