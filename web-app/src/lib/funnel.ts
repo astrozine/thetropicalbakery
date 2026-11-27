@@ -412,15 +412,15 @@ const ES: FunnelCopy = {
 const NL: FunnelCopy = {
   meta: {
     title: '2 gratis recepten van Dolly | The Tropical Bakery',
-    description: 'Rode Bessen Bliss Balls en Pinda Banoffee Repen: twee desserts zonder oven en zonder geraffineerde suiker, gratis, uit Sweet Escape. Direct als pdf.',
+    description: 'Rode Bessen Bliss Balls en Pinda Banoffee Repen: twee desserts zonder oven, gratis, uit Sweet Escape. Direct als pdf.',
     ogLocale: 'nl_NL',
   },
   hero: {
     eyebrow: 'Gratis · 2 recepten uit mijn boek Sweet Escape',
     title: '2 desserts waarvan niemand gelooft dat ze',
     em: 'gezond zijn',
-    lead: 'Twee van de zeven recepten uit mijn boek **Sweet Escape**, cadeau: frisse **Rode Bessen Bliss Balls** en **Pinda Banoffee Repen** in drie lagen. Zonder oven, zonder geraffineerde suiker, zonder tarwebloem. Alleen fruit, noten en dadels.',
-    ticks: ['Zonder oven, 20 minuten werk', 'Vegan, geen geraffineerde suiker, zonder tarwe', 'Direct als pdf, in het Nederlands'],
+    lead: 'Twee van de zeven recepten uit mijn boek **Sweet Escape**, cadeau: frisse **Rode Bessen Bliss Balls** en **Pinda Banoffee Repen** in drie lagen. Zonder oven en zonder tarwebloem. Gemaakt van fruit, noten en dadels.',
+    ticks: ['Zonder oven, 20 minuten werk', 'Vegan en zonder tarwe', 'Direct als pdf, in het Nederlands'],
     badge: 'GRATIS', badgeOf: 'van 7 recepten', paidTag: '7 recepten · {price}',
   },
   strip: { label: '**2 van de 7** recepten uit Sweet Escape', worth: 'Het boek kost **{price}**. Deze twee krijg je van mij.', free: 'Gratis',
@@ -500,7 +500,7 @@ const NL: FunnelCopy = {
     shareTitle: 'Ken je iemand die hier blij van wordt?',
     shareText: 'Stuur ze de gratis recepten. Het kost niets en maakt hun week zoeter.',
     shareButton: 'Delen via WhatsApp',
-    shareMessage: 'Dolly van The Tropical Bakery geeft 2 recepten weg: zonder oven, zonder geraffineerde suiker 🍓 {url}',
+    shareMessage: 'Dolly van The Tropical Bakery geeft 2 recepten weg: zonder oven, met fruit en dadels 🍓 {url}',
   },
   offer: {
     kicker: 'Alleen voor wie met mij bakt',
