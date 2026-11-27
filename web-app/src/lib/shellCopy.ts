@@ -27,6 +27,8 @@ const T: Record<string, Row> = {
   'Conta': { en: 'Account', es: 'Cuenta', nl: 'Account', de: 'Konto' },
 
   // Menu groups and links
+  'Entrar': { en: 'Log in', es: 'Entrar', nl: 'Inloggen', de: 'Anmelden' },
+  'Entrar ou criar conta': { en: 'Log in or sign up', es: 'Entrar o crear cuenta', nl: 'Inloggen of account maken', de: 'Anmelden oder registrieren' },
   'Receitas': { en: 'Recipes', es: 'Recetas', nl: 'Recepten', de: 'Rezepte' },
   'Retiro': { en: 'Retreat', es: 'Retiro', nl: 'Retreat', de: 'Retreat' },
   'Coaching': { en: 'Coaching', es: 'Coaching', nl: 'Coaching', de: 'Coaching' },

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { ClubeModal } from '@/components/ClubeInvite';
+import { ClubeModal, PersonIcon } from '@/components/ClubeInvite';
 import { usePageLang } from '@/lib/usePageLang';
 import { shellHref, shellText } from '@/lib/shellCopy';
 
@@ -116,13 +116,13 @@ export default function MobileBottomNav() {
       {/* Signed out: the Clube Tropical invitation. Signed in: their account. */}
       {user ? (
         <Link href="/minha-conta" style={{ ...tabStyle, color: pathname === '/minha-conta' ? '#d4af37' : '#887d77' }}>
-          <span style={{ fontSize: '1.5rem' }}>🎟️</span>
+          <span style={{ height: '1.5rem', display: 'flex', alignItems: 'center' }}><PersonIcon size={24} /></span>
           <span style={tabLabel}>{shellText('Conta', lang)}</span>
         </Link>
       ) : (
-        <button type="button" onClick={() => setClubeOpen(true)} style={{ ...tabStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#8a6d1f' }}>
-          <span style={{ fontSize: '1.5rem' }}>🎟️</span>
-          <span style={{ ...tabLabel, fontWeight: 700 }}>{shellText('Clube', lang)}</span>
+        <button type="button" onClick={() => setClubeOpen(true)} style={{ ...tabStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#3c2a21' }}>
+          <span style={{ height: '1.5rem', display: 'flex', alignItems: 'center' }}><PersonIcon size={24} /></span>
+          <span style={{ ...tabLabel, fontWeight: 700 }}>{shellText('Entrar', lang)}</span>
         </button>
       )}
       <ClubeModal open={clubeOpen} onClose={closeClube} />

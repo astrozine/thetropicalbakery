@@ -51,7 +51,7 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
 
   if (variant === 'mobile') {
     return (
-      <div style={{ padding: '1.5rem 0 0.5rem 0', borderTop: '1px solid rgba(0,0,0,0.06)', marginTop: '1rem' }}>
+      <div style={{ padding: '0.75rem 0 0.5rem 0', borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
           {avatar}
           <span className="notranslate" translate="no" style={{ color: '#3c2a21', fontWeight: 600 }}>{displayName}</span>
