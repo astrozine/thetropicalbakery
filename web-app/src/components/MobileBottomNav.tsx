@@ -50,10 +50,11 @@ export default function MobileBottomNav() {
   if (!isMobile) return null;
 
   const navItems = ([
-    { name: 'Início', path: '/', icon: '🏠' },
-    { name: 'Cardápio', path: '/menu', icon: '🍰' },
+    // What people pay for, in the order of the top menu (Andrew, 2026-11-27); the logo up top is the way home.
+    { name: 'Receitas', path: '/diario', icon: '🍰' },
     { name: 'Cursos', path: '/cursos', icon: '🎓' },
-    { name: 'Retiros', path: '/retreats', icon: '🌴' },
+    { name: 'Coaching', path: '/coaching', icon: '🌱' },
+    { name: 'Retiro', path: '/retreats', icon: '🌴' },
   ]).map(i => ({ ...i, name: shellText(i.name, lang), path: shellHref(i.path, lang) }));
 
   return (

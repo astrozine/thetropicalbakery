@@ -27,6 +27,18 @@ const T: Record<string, Row> = {
   'Conta': { en: 'Account', es: 'Cuenta', nl: 'Account', de: 'Konto' },
 
   // Menu groups and links
+  'Receitas': { en: 'Recipes', es: 'Recetas', nl: 'Recepten', de: 'Rezepte' },
+  'Retiro': { en: 'Retreat', es: 'Retiro', nl: 'Retreat', de: 'Retreat' },
+  'Coaching': { en: 'Coaching', es: 'Coaching', nl: 'Coaching', de: 'Coaching' },
+  '🎁 Receitas grátis': { en: '🎁 Free recipes', es: '🎁 Recetas gratis', nl: '🎁 Gratis recepten', de: '🎁 Gratis Rezepte' },
+  'Cursos e Retiro': { en: 'Classes & Retreat', es: 'Cursos y Retiro', nl: 'Cursussen & Retreat', de: 'Kurse & Retreat' },
+  'Eventos e Catering': { en: 'Events & Catering', es: 'Eventos y Catering', nl: 'Events & Catering', de: 'Events & Catering' },
+  'O Retiro': { en: 'The Retreat', es: 'El Retiro', nl: 'De Retreat', de: 'Das Retreat' },
+  'fique com a nossa família em Itamambuca': { en: 'stay with our family in Itamambuca', es: 'quédate con nuestra familia en Itamambuca', nl: 'logeer bij ons gezin in Itamambuca', de: 'wohne bei unserer Familie in Itamambuca' },
+  'Sessão avulsa': { en: 'Single session', es: 'Sesión suelta', nl: 'Losse sessie', de: 'Einzelsitzung' },
+  'peça um orçamento': { en: 'get a quote', es: 'pide un presupuesto', nl: 'vraag een offerte', de: 'Angebot anfragen' },
+  'E-book Sweet Escape': { en: 'Sweet Escape e-book', es: 'E-book Sweet Escape', nl: 'E-book Sweet Escape', de: 'E-Book Sweet Escape' },
+  'hotéis, pousadas, restaurantes': { en: 'hotels, guesthouses, restaurants', es: 'hoteles, posadas, restaurantes', nl: 'hotels, pensions, restaurants', de: 'Hotels, Pensionen, Restaurants' },
   'Caixa de Degustação': { en: 'Tasting Box', es: 'Caja de Degustación', nl: 'Proefbox', de: 'Probierbox' },
   'Caixa da Semana': { en: 'This Week’s Box', es: 'Caja de la Semana', nl: 'Box van de Week', de: 'Box der Woche' },
   'Assinatura de Caixa': { en: 'Box Subscription', es: 'Suscripción de Caja', nl: 'Box-abonnement', de: 'Box-Abo' },
