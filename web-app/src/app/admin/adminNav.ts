@@ -69,6 +69,7 @@ export const buildGroups = (): NavGroup[] => [
     items: [
       { name: 'E-mails', path: '/admin/emails', word: 'E-mails', emoji: '✉️', hint: 'Escrever e enviar e-mails para clientes, parceiros e candidatos' },
       { name: 'Todos os e-mails (ver)', path: '/admin/emails/todos', word: 'Ver e-mails', emoji: '👀', hint: 'Ver cada e-mail que o site manda (recibos, livro, receitas grátis, brunch, campanhas) do jeito que o cliente recebe' },
+      { name: 'Diário de Receitas', path: '/admin/diario', word: 'Diário', emoji: '📖', hint: 'O Diário de Receitas do site (/diario): receitas grátis e premium, a receita da semana, preços, cupons e vendas' },
       { name: 'Receitas do App', path: '/admin/app-receitas', word: 'App', emoji: '🆘', hint: 'As receitas do app Bateu Vontade?: criar, mudar, esconder, e quais são grátis ou Tropical+' },
       { name: 'Funil de Receitas', path: '/admin/receitas', word: 'Funil', emoji: '🍓', hint: 'As 2 receitas grátis dos anúncios: cadastros, vendas do livro, quem está na região e qual anúncio funciona' },
       { name: 'Ligação grátis (livro)', path: '/admin/ligacao-gratis', word: 'Ligações', emoji: '📞', hint: 'Quem comprou o Sweet Escape e pediu a conversa de 30 minutos com a Dolly, e quantas por semana ela aceita' },

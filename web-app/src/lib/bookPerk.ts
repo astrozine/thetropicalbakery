@@ -80,7 +80,8 @@ export async function hasBookPerk(db: SupabaseClient, email: string | null | und
     const books = paid.filter(r => /^EBK/.test(String(r.pix_transaction_id ?? ''))).map(r => r.created_at).sort();
     if (!books.length) return false;
     const firstBook = books[0];
-    return !paid.some(r => !/^EBK/.test(String(r.pix_transaction_id ?? '')) && r.created_at > firstBook);
+    // Recipe Journal purchases (RJ…) never get the 15% (digital recipes are priced low already), so they don't use it up.
+    return !paid.some(r => !/^(EBK|RJ)/.test(String(r.pix_transaction_id ?? '')) && r.created_at > firstBook);
   } catch (e) {
     console.error('hasBookPerk:', e);
     return false; // a lookup failure costs the customer a discount, never the order

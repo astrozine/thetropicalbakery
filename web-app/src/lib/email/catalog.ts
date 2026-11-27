@@ -9,6 +9,7 @@ import { brunchConfirmedEmail, brunchReservedEmail, brunchWaitlistEmail } from '
 import { appPlusPixEmail, appPlusUnlockedEmail } from './appPlusMail';
 import { sampleAlert } from './alerts';
 import { letterReceivedEmail } from './letterMail';
+import { journalPixEmail, journalUnlockedEmail, type JournalMail } from './journalMail';
 import { EBOOK_LANGS, type EbookLang } from '@/lib/ebookCopy';
 import type { BrunchEvent } from '@/lib/brunch';
 
@@ -52,6 +53,7 @@ export const GROUPS = [
   'Pedidos, aulas e retiros',
   'Brunch',
   'App Bateu Vontade?',
+  'Diário de Receitas',
   'Campanhas para a lista',
   'Avisos para vocês dois',
 ] as const;
@@ -95,6 +97,15 @@ const ALERT_ROWS: Record<string, Record<string, unknown>> = {
 
 const ALL_BOOK_LANGS = EBOOK_LANGS as EmailLang[];
 
+const journalSample = (lang: EmailLang): JournalMail => {
+  const en = lang === 'en';
+  return {
+    name: 'Maria Souza', email: 'maria@exemplo.com', reference: 'RJEXEMPLO', total: 14.9, lang: en ? 'en' : 'pt',
+    title: en ? 'Purple Sweet Potato Longevity Cheesecake' : 'Cheesecake da Longevidade de Batata-Doce Roxa',
+    href: `${SITE_URL}${en ? '/en/journal/purple-sweet-potato-longevity-cheesecake' : '/diario/cheesecake-longevidade-batata-doce-roxa'}`,
+  };
+};
+
 const AUTOMATIC: CatalogEntry[] = [
   {
     id: 'ebook-received', group: 'Sweet Escape (e-book)', to: 'cliente', automatic: true, langs: ALL_BOOK_LANGS,
@@ -115,6 +126,18 @@ const AUTOMATIC: CatalogEntry[] = [
     name: 'As 2 receitas grátis (dia 0)',
     when: 'Na hora em que alguém se cadastra em /free-recipes ou /receitas: o PDF com as 2 receitas e o convite para o livro.',
     render: lang => freeRecipesEmail({ firstName: 'Maria', lang: lang as EbookLang }),
+  },
+  {
+    id: 'journal-pix', group: 'Diário de Receitas', to: 'cliente', automatic: true, langs: ['pt', 'en'],
+    name: 'Falta só o Pix para abrir a receita',
+    when: 'Quando alguém escolhe o Pix direto (nosso QR code) para uma receita premium do Diário. Leva o código copia e cola.',
+    render: lang => journalPixEmail({ ...journalSample(lang), pixPayload: '00020126580014BR.GOV.BCB.PIX0136exemplo-exemplo-exemplo5204000053039865405' }),
+  },
+  {
+    id: 'journal-paid', group: 'Diário de Receitas', to: 'cliente', automatic: true, langs: ['pt', 'en'],
+    name: 'Sua receita está aberta',
+    when: 'Quando o pagamento de uma receita premium do Diário é confirmado (sozinho pelo Mercado Pago ou Stripe, ou no “Pix caiu”).',
+    render: lang => journalUnlockedEmail(journalSample(lang)),
   },
   {
     id: 'order-received', group: 'Pedidos, aulas e retiros', to: 'cliente', automatic: true, langs: ['pt'],

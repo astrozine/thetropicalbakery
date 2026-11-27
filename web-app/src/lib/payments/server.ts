@@ -128,6 +128,13 @@ async function sendPaidReceipt(orderId: string) {
     return;
   }
 
+  // A Recipe Journal recipe or collection: "your recipe is open", with the link.
+  if (data.order_kind === 'journal' || /^RJ/.test(String(data.pix_transaction_id ?? ''))) {
+    const { onJournalPaid } = await import('./journal');
+    await onJournalPaid(data);
+    return;
+  }
+
   const address = String(data.delivery_address ?? '');
   await sendOrderPaid(db, {
     reference: String(data.pix_transaction_id ?? ''),

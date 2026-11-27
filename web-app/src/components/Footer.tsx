@@ -73,6 +73,7 @@ export default function Footer() {
             <li><Link href="/cursos" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Cursos com Dolly')}</Link></li>
             <li><Link href="/dolly" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Sobre a Dolly')}</Link></li>
             <li><Link href={shellHref('/sweet-escape/pt', lang)} onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('E-book Sweet Escape')}</Link></li>
+            <li><Link href={shellHref('/diario', lang)} onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Diário de Receitas')}</Link></li>
             <li><Link href="/trabalhe-conosco" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Trabalhe Conosco')}</Link></li>
           </ul>
         </div>

@@ -203,6 +203,7 @@ export default function Navigation() {
     { id: 'ebook', name: 'E-book', links: [
       { name: '2 Receitas Grátis', path: '/receitas', icon: '📝' },
       { name: 'Livro Completo', path: '/sweet-escape/pt', icon: '📖', highlight: true, sub: '7 dias, 7 doces' },
+      { name: 'Diário de Receitas', path: '/diario', icon: '🍰', sub: 'receitas grátis e premium' },
     ] },
     // Dolly's page first, her Instagram second and inside the menu: the feed is one deliberate tap away (new tab),
     // not a bare icon in the bar that takes people off the site before they have seen it.
