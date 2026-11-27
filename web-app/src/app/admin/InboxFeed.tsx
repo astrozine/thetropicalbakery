@@ -124,6 +124,8 @@ function useInbox() {
   const [items, setItems] = useState<InboxItem[]>([]);
   const [statusMap, setStatusMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  /** Everyone who ever asked for the free recipes: the list we own. */
+  const [ownedTotal, setOwnedTotal] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -182,7 +184,8 @@ function useInbox() {
       ...recipeLeads.map(l => ({
         key: `funnel_leads:${l.id}`, source_table: 'funnel_leads', source_id: l.id,
         type: 'recipes_signup' as const,
-        title: l.name,
+        // "#5 Janice": their place on our own list, so the count of owned traffic is visible on every card.
+        title: l.number ? `#${l.number} ${l.name}` : l.name,
         subtitle: `${l.email} · ${l.from === 'Amazon' ? 'veio da Amazon' : l.from ? `anúncio: ${l.from}` : 'visita direta'}`,
         whatsapp: null, email: l.email, created_at: l.createdAt,
         details: { what: `${BOOK_LABEL[l.book].text}`, where: null, diet: null },
@@ -198,6 +201,7 @@ function useInbox() {
 
     merged.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
     setItems(merged);
+    setOwnedTotal(recipeLeads[0]?.total || 0);
 
     const sMap: Record<string, string> = {};
     (statusRes.data || []).forEach((s: any) => { sMap[`${s.source_table}:${s.source_id}`] = s.status; });
@@ -242,7 +246,7 @@ function useInbox() {
     if (next) await setStatus(item, next.status);
   };
 
-  return { items, statusMap, loading, advanceStatus, setStatus };
+  return { items, statusMap, loading, advanceStatus, setStatus, ownedTotal };
 }
 
 /** The big, coloured "what is this and where does it live" tag on every card. */
@@ -491,7 +495,7 @@ const countStyle = (color: string, active: boolean): React.CSSProperties => ({
 
 /** The full inbox page: mail-style tabs (needs you / in progress / done / archived), plus a filter per kind of message. */
 export function InboxFull() {
-  const { items, statusMap, loading, setStatus } = useInbox();
+  const { items, statusMap, loading, setStatus, ownedTotal } = useInbox();
   const [tab, setTab] = useState<Bucket | 'all'>('attention');
   const [typeFilter, setTypeFilter] = useState<ItemType | 'all'>('all');
   const [toast, setToast] = useState<{ text: string; undo: () => void } | null>(null);
@@ -533,6 +537,22 @@ export function InboxFull() {
         Use os botões de cada cartão para mover; <strong>🗄️ Arquivar</strong> tira da frente sem apagar.
         Um <strong style={{ color: '#c0392b' }}>🚨 selo vermelho</strong> avisa o que não pode esperar.
       </p>
+
+      {ownedTotal > 0 && (
+        <Link href="/admin/crm" className="inbox-owned" style={{
+          display: 'flex', alignItems: 'center', gap: '0.9rem', flexWrap: 'wrap', textDecoration: 'none',
+          background: 'linear-gradient(135deg, #fdf3d9 0%, #fbe9b7 100%)', border: '1px solid #ecd28a', borderRadius: '14px',
+          padding: '0.85rem 1.2rem', marginBottom: '1.25rem', color: '#6b5310',
+        }}>
+          <span style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: '#8a6d1f', lineHeight: 1 }}>⭐ {ownedTotal}</span>
+          <span style={{ fontWeight: 700, lineHeight: 1.4 }}>
+            {ownedTotal === 1 ? 'pessoa na nossa lista' : 'pessoas na nossa lista'} (pediram as receitas grátis)
+            <span style={{ display: 'block', fontWeight: 500, fontSize: '0.85rem', color: '#8a7440' }}>
+              Tráfego próprio: cada uma recebe nossos e-mails sem pagar anúncio. O número no cartão (#1, #2...) é a ordem em que chegaram.
+            </span>
+          </span>
+        </Link>
+      )}
 
       {redFlags > 0 && (
         <div style={{ background: '#fdecea', border: '1px solid rgba(192,57,43,0.4)', color: '#a93226', borderRadius: '12px', padding: '0.85rem 1.1rem', marginBottom: '1.25rem', fontWeight: 700 }}>

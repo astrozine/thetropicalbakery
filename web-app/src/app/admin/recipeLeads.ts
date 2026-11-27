@@ -12,6 +12,10 @@ import { SEQUENCE, isNearby, type Segment } from '@/lib/funnel';
 
 export interface RecipeLead {
   id: string;
+  /** Their place in line: #1 is the first person who ever asked for the recipes (team tests not counted). */
+  number: number;
+  /** How many people in total have ever asked (our owned list), the same on every card. */
+  total: number;
   createdAt: string;
   email: string;
   name: string;
@@ -51,14 +55,22 @@ interface LeadRow {
 
 export async function loadRecipeLeads(opts: { days?: number; limit?: number } = {}): Promise<RecipeLead[]> {
   const since = new Date(Date.now() - (opts.days ?? 60) * 86400000).toISOString();
-  const [leadsRes, adminsRes, ruleRes] = await Promise.all([
+  const [leadsRes, adminsRes, ruleRes, everyoneRes] = await Promise.all([
     supabase.from('funnel_leads').select('*').gte('created_at', since).order('created_at', { ascending: false }).limit(opts.limit ?? 500),
     supabase.from('admins').select('email'),
     supabase.from('email_automations').select('enabled').eq('id', 'receitas-sequencia').maybeSingle(),
+    // Everyone who ever signed up (just e-mail + date), oldest first: gives each person their number.
+    supabase.from('funnel_leads').select('email, created_at').order('created_at', { ascending: true }).limit(20000),
   ]);
   if (leadsRes.error || !leadsRes.data?.length) return [];
 
   const team = new Set(((adminsRes.data || []) as { email: string }[]).map(a => key(a.email)));
+  const numberOf = new Map<string, number>();
+  for (const r of (everyoneRes.data || []) as { email: string }[]) {
+    const k = key(r.email);
+    if (k && !team.has(k) && !numberOf.has(k)) numberOf.set(k, numberOf.size + 1);
+  }
+  const total = numberOf.size;
   // One card per person: the first sign-up wins (the list is newest first, so walk it backwards).
   const seen = new Set<string>();
   const rows: LeadRow[] = [];
@@ -120,6 +132,8 @@ export async function loadRecipeLeads(opts: { days?: number; limit?: number } = 
       : [r.utm_source, r.utm_campaign, r.utm_content].filter(Boolean).join(' · ') || null;
     return {
       id: r.id,
+      number: numberOf.get(k) || 0,
+      total,
       createdAt: r.created_at,
       email: r.email,
       name: (r.first_name || '').trim() || r.email.split('@')[0],
