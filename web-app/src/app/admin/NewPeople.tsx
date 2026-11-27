@@ -54,7 +54,7 @@ export default function NewPeople({ limit = 6 }: { limit?: number }) {
       <p className="np-sub">
         {leads === null ? 'Carregando...' : leads.length === 0
           ? 'Ninguém pediu as receitas grátis nos últimos 60 dias ainda.'
-          : <>Pediram as receitas grátis: <strong>{week}</strong> esta semana · <strong>{leads.length}</strong> em 60 dias · <strong>{buyers}</strong> {buyers === 1 ? 'comprou' : 'compraram'} o e-book</>}
+          : <><strong className="np-total">{leads[0].total}</strong> {leads[0].total === 1 ? 'pessoa na nossa lista' : 'pessoas na nossa lista'} · <strong>{week}</strong> esta semana · <strong>{buyers}</strong> {buyers === 1 ? 'comprou' : 'compraram'} o e-book</>}
       </p>
 
       {shown.length > 0 && (
@@ -64,6 +64,7 @@ export default function NewPeople({ limit = 6 }: { limit?: number }) {
             return (
               <li key={l.id} className="np-card">
                 <div className="np-top">
+                  {l.number > 0 && <span className="np-num">#{l.number}</span>}
                   <strong className="np-name">{l.name}</strong>
                   <span className="np-flag" title={l.lang}>{LANG_FLAG[l.lang] || l.lang}</span>
                   <span className="np-when">{ago(l.createdAt)}</span>
@@ -94,6 +95,8 @@ export default function NewPeople({ limit = 6 }: { limit?: number }) {
         .np-card { background: #fdfaf3; border: 1px solid #efe5cc; border-left: 6px solid #d4a72c; border-radius: 12px; padding: 0.75rem 0.85rem; min-width: 0; }
         .np-top { display: flex; align-items: center; gap: 0.45rem; }
         .np-name { font-size: 1.08rem; color: #2c3e50; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .np-num { background: #8a6d1f; color: #fff; font-weight: 900; font-size: 0.78rem; border-radius: 999px; padding: 0.1rem 0.5rem; flex-shrink: 0; }
+        .np-total { font-size: 1.15rem; color: #8a6d1f; }
         .np-when { margin-left: auto; color: #95a5a6; font-size: 0.78rem; white-space: nowrap; }
         .np-email { display: block; color: #5d6d7e; font-size: 0.84rem; text-decoration: none; overflow-wrap: anywhere; margin-top: 0.1rem; }
         .np-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
