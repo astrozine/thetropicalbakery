@@ -15,7 +15,7 @@ import { clearGoogleTranslate } from '@/lib/googleTranslate';
 import { usePageLang } from '@/lib/usePageLang';
 import { shellHref, shellText } from '@/lib/shellCopy';
 import { FUNNEL } from '@/lib/funnel';
-import { COACHING_PATH, isCoachingLang } from '@/lib/coachingCopy';
+import { COACHING_PATH, COACHING_PRICES, isCoachingLang } from '@/lib/coachingCopy';
 import IconTile from '@/components/IconTile';
 
 // Desktop menu (xl and up): one line at 1280px, roomier on bigger screens.
@@ -60,6 +60,10 @@ const APPS_COPY = {
     nl: 'een gezonde ruil voor elke trek · gratis',
   } as Record<string, string>,
 };
+/** "4 weeks · R$ 497" in each menu language (numbers from COACHING_PRICES). */
+const RESET_SUB: Record<string, string> = Object.fromEntries(Object.entries({
+  pt: 'semanas', en: 'weeks', es: 'semanas', it: 'settimane', fr: 'semaines', de: 'Wochen', nl: 'weken',
+}).map(([l, w]) => [l, `${COACHING_PRICES.resetWeeks} ${w} · R$ ${COACHING_PRICES.reset}`]));
 const MENU_LANGS = ['pt', 'en', 'es', 'it', 'fr', 'de', 'nl'];
 
 // The "plan your trip" button: forest green with a gold edge, so it reads as the way in for travellers
@@ -67,6 +71,12 @@ const MENU_LANGS = ['pt', 'en', 'es', 'it', 'fr', 'de', 'nl'];
 const FEATURE_STYLE: React.CSSProperties = {
   background: 'linear-gradient(135deg, #2e4432 0%, #3d5a40 100%)', color: '#fdfaf3', border: '1px solid #d4af37',
   boxShadow: '0 6px 16px rgba(46,68,50,0.25)', fontWeight: 'bold', display: 'flex', flexDirection: 'column', lineHeight: 1.2,
+};
+
+// The one call-to-action in the bar: a dark pill with gold letters (the account button beside it is the gold one).
+const CTA_STYLE: React.CSSProperties = {
+  background: '#3c2a21', color: '#f3d77a', border: '1px solid #d4af37', borderRadius: '999px', fontWeight: 'bold', textDecoration: 'none',
+  textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(60,42,33,0.25)',
 };
 
 /** A menu entry: a page on the site, or (external) somewhere else, opened in a new tab so the shop stays open. */
@@ -180,30 +190,30 @@ export default function Navigation() {
       // The weekly subscription is the core of the business, so it keeps the foil treatment.
       { name: 'Assinatura de Caixa', path: '/assinatura', icon: '🗓️', highlight: true, sub: 'caixa toda semana' },
     ] },
-    { id: 'eventos', name: 'Eventos', links: [
-      { name: 'Brunch Social', path: '/brunch', icon: '🥞' },
-      { name: 'Menu de Eventos', path: '/menu', icon: '🍰' },
+    // Reorganized 2026-11-27 (Andrew: "prioritize things people would spend money on"): the paid offers come first, each
+    // menu opens on the thing people pay for (gold), and the free doors sit below it. Apps live with the recipes now and
+    // Partners moved into Chef Dolly (the footer still lists every partner page), so the bar has five short words.
+    { id: 'receitas', name: 'Receitas', links: [
+      { name: 'Diário de Receitas', path: '/diario', icon: '🍰', highlight: true, sub: 'receitas grátis e premium' },
+      { name: 'E-book Sweet Escape', path: '/sweet-escape/pt', icon: '📖', sub: '7 dias, 7 doces' },
+      { name: '2 Receitas Grátis', path: '/receitas', icon: '📝' },
+      { name: 'Bateu Vontade?', path: '/vontade', icon: '🥊', brand: true, sub: APPS_COPY.vontade.pt, subByLang: APPS_COPY.vontade },
     ] },
-    { id: 'cursos', name: 'Cursos e Retiros', links: [
-      // People travelling in plan the stay and pick their courses in one place: the package builder on /retreats.
-      { name: 'Planejar meu Retiro', path: '/retreats#pacote', icon: '✈️', feature: true, sub: 'hospedagem + cursos, num só pacote' },
+    { id: 'cursos', name: 'Cursos e Retiro', links: [
+      // The retreat is the top rung: a stay at the family's house in Itamambuca.
+      { name: 'O Retiro', path: '/retreats', icon: '🌴', feature: true, sub: 'fique com a nossa família em Itamambuca' },
       ...cursosLinks,
     ] },
-    // Dolly's food coaching (her Food Healing Studio): its own place in the bar, the free call one tap away.
+    // Dolly's food coaching: the two prices are in the menu, the free call one tap away.
     { id: 'coaching', name: 'Coaching', links: [
-      { name: 'The Daily Tropical Reset', path: '/coaching', icon: '🌱', highlight: true, brand: true, sub: 'sua alimentação inteira, com a Dolly' },
+      { name: 'The Daily Tropical Reset', path: '/coaching', icon: '🌱', highlight: true, brand: true, sub: RESET_SUB.pt, subByLang: RESET_SUB },
+      { name: 'Sessão avulsa', path: '/coaching#valores', icon: '🗓️', sub: `R$ ${COACHING_PRICES.session}` },
       { name: 'Reset do Paladar · 14 dias', path: '/coaching#sos', icon: '💧', sub: 'sem sal e sem óleo' },
       { name: 'Conversa grátis de 30 min', path: '/coaching#conversa', icon: '☎️' },
     ] },
-    // Apps: their own little shelf (fun, helpful tools for eating well), not a side door of the book. Room for more.
-    { id: 'apps', name: 'Apps', intro: APPS_COPY.intro, links: [
-      { name: 'Bateu Vontade?', path: '/vontade', icon: '🥊', brand: true, sub: APPS_COPY.vontade.pt, subByLang: APPS_COPY.vontade },
-    ] },
-    // The free 2-recipe sampler (/receitas) is the door into Sweet Escape, the full 7-day book.
-    { id: 'ebook', name: 'E-book', links: [
-      { name: '2 Receitas Grátis', path: '/receitas', icon: '📝' },
-      { name: 'Livro Completo', path: '/sweet-escape/pt', icon: '📖', highlight: true, sub: '7 dias, 7 doces' },
-      { name: 'Diário de Receitas', path: '/diario', icon: '🍰', sub: 'receitas grátis e premium' },
+    { id: 'eventos', name: 'Eventos e Catering', links: [
+      { name: 'Menu de Eventos', path: '/menu', icon: '🍰', highlight: true, sub: 'peça um orçamento' },
+      { name: 'Brunch Social', path: '/brunch', icon: '🥞' },
     ] },
     // Dolly's page first, her Instagram second and inside the menu: the feed is one deliberate tap away (new tab),
     // not a bare icon in the bar that takes people off the site before they have seen it.
@@ -212,6 +222,8 @@ export default function Navigation() {
       { name: 'Instagram', path: STORE_INSTAGRAM_URL, sub: INSTAGRAM_HANDLE, external: true },
       { name: 'Instagram da Dolly', path: DOLLY_INSTAGRAM_URL, sub: DOLLY_INSTAGRAM_HANDLE, external: true },
       { name: 'The Family of the Future', path: FAMILY_INSTAGRAM_URL, sub: FAMILY_INSTAGRAM_HANDLE, external: true },
+      { name: 'Parcerias', path: '/b2b', icon: '🤝', sub: 'hotéis, pousadas, restaurantes' },
+      { name: 'Trabalhe Conosco', path: '/trabalhe-conosco', icon: '💼' },
     ] },
   ];
   // The box menu stays in the code but is hidden while the weekly box is not on sale (lib/boxSale.ts).
@@ -223,8 +235,9 @@ export default function Navigation() {
   };
   const groups = allGroups.filter(g => BOX_SALE_ON || g.id !== 'caixa')
     .map(g => ({ ...g, name: tl(g.name), links: g.links.map(localize) }));
+  const cta = { name: tl('🎁 Receitas grátis'), path: shellHref('/receitas', pageL) };
   const [openGroup, setOpenGroup] = useState<string | null>(null);
-  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, eventos: true, coaching: true, apps: true, ebook: true });
+  const [mobileGroupsOpen, setMobileGroupsOpen] = useState<Record<string, boolean>>({ caixa: true, receitas: true, cursos: true, coaching: true, eventos: true });
 
   // Which language the page is showing (Google Translate's cookie, or a hand-written English page), so the
   // hand-written menu lines match it. Google flips <html lang> when it translates, so watch that to re-read.
@@ -254,22 +267,6 @@ export default function Navigation() {
     </>
   );
 
-  const b2bLinks: NavLink[] = [
-    { name: 'Todas as Parcerias', path: '/b2b', icon: '🤝', highlight: true },
-    { name: 'Hotéis', path: '/b2b/hotels', icon: '🏨' },
-    { name: 'Pousadas', path: '/b2b/pousadas', icon: '🏡' },
-    { name: 'Airbnbs', path: '/b2b/airbnbs', icon: '🔑' },
-    { name: 'Restaurantes', path: '/b2b/restaurants', icon: '🍽️' },
-    { name: 'Padarias', path: '/b2b/bakeries', icon: '🥐' },
-    { name: 'Barcos e Marinas', path: '/b2b/barcos', icon: '⛵' },
-    { name: 'Yoga, Academias e Spas', path: '/b2b/bem-estar', icon: '🪷' },
-    { name: 'Travel Managers', path: '/b2b/travel-managers', icon: '🧳' },
-    { name: 'Afiliados', path: '/b2b/affiliates', icon: '🔗' },
-    // Not a B2B account, but it belongs in the same "ways to partner with us"
-    // menu — and this is where a job seeker would naturally look first.
-    { name: 'Trabalhe Conosco', path: '/trabalhe-conosco', icon: '💼' },
-  ].map(localize);
-
   const retreatLangs = [
     { name: '🇧🇷 Português', path: '/retreats' },
     { name: '🇦🇷 Español', path: '/es/retiros' },
@@ -294,11 +291,9 @@ export default function Navigation() {
     setLangLabel(LABELS[deviceLang] || 'Language');
   }, []);
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isRetreatsDropdownOpen, setIsRetreatsDropdownOpen] = useState(false);
 
   // Mobile Accordion States
-  const [mobileB2bOpen, setMobileB2bOpen] = useState(false);
 
   // The floating pills sit ON TOP of the page, so while you read they cover the
   // text underneath. Every app solves this the same way: tuck the bar away when
@@ -470,65 +465,11 @@ export default function Navigation() {
           {/* Hidden Google Translate Widget for Desktop */}
           <div id="google_translate_element" style={{ display: 'none' }}></div>
 
-          {/* B2B Dropdown */}
-          <div 
-            style={{ position: 'relative', marginLeft: GAP, cursor: 'pointer' }}
-            onMouseEnter={() => setIsDropdownOpen(true)}
-            onMouseLeave={() => setIsDropdownOpen(false)}
-          >
-            <span style={{
-              color: '#3c2a21',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: TOP_SIZE,
-              whiteSpace: 'nowrap',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              {tl('Parcerias')} ▾
-            </span>
-            {isDropdownOpen && (
-              <div style={{
-                // Anchored on the right: Parcerias is the last menu, so a left-anchored list ran off the screen.
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                background: 'rgba(253,250,243,0.95)',
-                backdropFilter: 'blur(10px)',
-                minWidth: '200px',
-                padding: '1rem 0',
-                borderRadius: '8px',
-                boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem'
-              }}>
-                {b2bLinks.map((link) => (
-                  <NavItem key={link.path} link={link} style={{
-                    padding: '0.5rem 1.5rem',
-                    color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
-                    textDecoration: 'none',
-                    fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
-                    fontSize: '0.9rem',
-                    textTransform: 'uppercase',
-                    whiteSpace: 'nowrap',
-                    ...(link.highlight ? {
-                      background: '#d4af37',
-                      borderRadius: '6px',
-                      margin: '0 0.75rem',
-                      padding: '0.5rem 0.75rem',
-                    } : {}),
-                  }}>
-                    {link.name}
-                  </NavItem>
-                ))}
-              </div>
-            )}
-          </div>
           </div>
 
           <div className="nav-actions" style={{ display: 'flex', alignItems: 'center', justifySelf: 'end' }}>
+          {/* The one button in the bar: the free recipes, the first "yes" that leads to the book, the journal and Dolly. */}
+          <Link href={cta.path} style={{ ...CTA_STYLE, marginRight: GAP, fontSize: TOP_SIZE, padding: '0.55rem 1rem' }}>{cta.name}</Link>
           <AccountMenu />
 
           <button
@@ -647,6 +588,7 @@ export default function Navigation() {
             WebkitOverflowScrolling: 'touch',
             padding: '1rem 1.5rem 6rem 1.5rem',
           }}>
+            <Link href={cta.path} onClick={closeMenu} style={{ ...CTA_STYLE, display: 'block', textAlign: 'center', margin: '0.5rem 0 0.75rem', padding: '0.9rem 1rem', fontSize: '1rem' }}>{cta.name}</Link>
             {/* The delivery area: off the phone header (it got in the way), shown here instead. */}
             <p style={{
               margin: '0.5rem 0 0.25rem', padding: '0.7rem 0.9rem', borderRadius: '12px',
@@ -654,7 +596,7 @@ export default function Navigation() {
             }}>
               {tl('🌴 Entregamos em Itamambuca, Ubatuba e região. Paraty: pedidos a partir de R$ 600.')}
             </p>
-            {/* Caixa de Degustação / Eventos — open by default so the subscription is one tap away. */}
+            {/* The paid offers, open by default so each is one tap away; Chef Dolly (and partners) folded. */}
             {groups.map((group) => (
               <div key={group.id}>
                 <button
@@ -693,54 +635,6 @@ export default function Navigation() {
             ))}
 
 
-            {/* B2B Section Header */}
-            <button 
-              onClick={() => setMobileB2bOpen(!mobileB2bOpen)}
-              style={{ 
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '1.5rem 0 0.5rem 0', 
-                fontWeight: 'bold', 
-                color: '#3c2a21', 
-                fontSize: '0.85rem',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                opacity: 0.8,
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left'
-              }}>
-              {tl('PARCERIAS')} <span>{mobileB2bOpen ? '▲' : '▼'}</span>
-            </button>
-            {mobileB2bOpen && b2bLinks.map((link) => (
-              <NavItem
-                key={link.path}
-                link={link}
-                onClick={closeMenu}
-                tile={34}
-                style={{
-                  display: 'block',
-                  padding: '0.8rem 0 0.8rem 1rem',
-                  textDecoration: 'none',
-                  color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
-                  fontWeight: link.highlight || pathname === link.path ? 'bold' : '400',
-                  fontSize: '1.1rem',
-                  borderBottom: link.highlight ? 'none' : '1px solid rgba(0,0,0,0.04)',
-                  animation: 'fadeIn 0.2s ease-out',
-                  ...(link.highlight ? {
-                    background: '#d4af37',
-                    borderRadius: '8px',
-                    margin: '0.3rem 0',
-                    padding: '0.8rem 1rem',
-                  } : {}),
-                }}
-              >
-                {link.name}
-              </NavItem>
-            ))}
-            
             {/* Language Section Header — kept untranslated, same reason as desktop */}
             <button
               className="notranslate"
