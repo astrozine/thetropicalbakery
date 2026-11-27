@@ -230,6 +230,11 @@ export interface LayoutOptions {
    * kicker and the button, no emoji tile, and no bakery photo strip.
    */
   look?: { hero: string; heroAlt: string; heroHeight?: number; kicker: string; accent: string; accentInk?: string };
+  /**
+   * A real photo as the top image instead of the theme's (Dolly's Sunday letter uses her first photo). Any https URL;
+   * its height follows the photo. The theme's kicker and photo strip stay.
+   */
+  heroPhoto?: { src: string; alt: string };
 }
 
 /**
@@ -450,8 +455,9 @@ export function renderEmail(o: LayoutOptions): string {
   const theme: ThemeDef = local ? { ...THEMES[themeName], ...local } : THEMES[themeName];
   const look = o.look;
   const accent = look?.accent || GOLD;
-  const heroSrc = look ? `${base}/email/${look.hero}` : img(base, `hero-${themeName}`);
-  const heroAlt = look ? look.heroAlt : theme.heroAlt;
+  const heroSrc = o.heroPhoto ? o.heroPhoto.src : look ? `${base}/email/${look.hero}` : img(base, `hero-${themeName}`);
+  const heroAlt = o.heroPhoto ? o.heroPhoto.alt : look ? look.heroAlt : theme.heroAlt;
+  const heroSize = o.heroPhoto ? '' : `height="${look?.heroHeight || theme.heroHeight || 387}"`;
   const footerLinks = lang === 'pt' ? FOOTER_LINKS : lang === 'en' ? FOOTER_LINKS_EN : FOOTER_LINKS_INTL[lang];
 
   const note = o.note
@@ -508,7 +514,7 @@ export function renderEmail(o: LayoutOptions): string {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff"
             style="background:#ffffff;border:1px solid ${LINE};border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 18px 40px rgba(60,42,33,0.10);">
             <tr><td bgcolor="${SAND}" style="background:${SAND};line-height:0;font-size:0;border-radius:22px 22px 0 0;overflow:hidden;">
-              <img src="${heroSrc}" width="580" height="${look?.heroHeight || theme.heroHeight || 387}" alt="${esc(heroAlt)}"
+              <img src="${esc(heroSrc)}" width="580" ${heroSize} alt="${esc(heroAlt)}"
                 style="display:block;width:100%;max-width:580px;height:auto;border:0;border-radius:22px 22px 0 0;">
             </td></tr>
             <tr><td height="${look ? 6 : 4}" bgcolor="${accent}" style="background:${accent};line-height:${look ? 6 : 4}px;font-size:0;">&nbsp;</td></tr>

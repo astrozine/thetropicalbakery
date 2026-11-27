@@ -35,6 +35,8 @@ export interface CampaignContent {
   facts?: EmailFact[];
   /** Wear a product's look instead of the theme (see LayoutOptions.look): the Sweet Escape e-mails. */
   look?: LayoutOptions['look'];
+  /** A real photo as the top image (Dolly's Sunday letter: her first photo). */
+  heroPhoto?: LayoutOptions['heroPhoto'];
 }
 
 export interface Campaign {
