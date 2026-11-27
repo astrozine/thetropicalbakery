@@ -157,7 +157,7 @@ export async function confirmStripeSession(sessionId: string): Promise<{ ok: boo
   const reference = String(session.client_reference_id || '');
   const status = String(session.payment_status || '');
   const ebook = /^EBK[A-Za-z0-9]+$/.test(reference);
-  if (!ebook && !/^(ORD|PRP)[A-Za-z0-9]+$/.test(reference)) return { ok: false, status: 'not_ours' };
+  if (!ebook && !/^(ORD|PRP|RJ)[A-Za-z0-9]+$/.test(reference)) return { ok: false, status: 'not_ours' };
 
   const order = await findOrder(reference);
   if (!order) return { ok: false, status, reference };

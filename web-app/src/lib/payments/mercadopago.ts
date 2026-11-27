@@ -10,7 +10,12 @@ export const mercadoPagoConfigured = () => !!process.env.MERCADOPAGO_ACCESS_TOKE
  * For purchases that are not a box order (the e-book): where to send the customer back — a full URL that
  * already has a `?` — and what the payment page calls the purchase. Omitted, everything works as before.
  */
-export interface CheckoutOptions { returnUrl?: string; title?: string }
+export interface CheckoutOptions {
+  returnUrl?: string;
+  title?: string;
+  /** Also offer Pix on Mercado Pago's page (confirmed by Mercado Pago, so it unlocks on its own). Used by the Recipe Journal. */
+  allowPix?: boolean;
+}
 
 const auth = () => ({ Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`, 'Content-Type': 'application/json' });
 
@@ -43,7 +48,7 @@ export async function createMercadoPagoCheckout(order: PayableOrder, opts: Check
       notification_url: `${site}/api/webhooks/mercadopago`,
       statement_descriptor: 'TROPICALBAKERY',
       payment_methods: {
-        excluded_payment_types: [{ id: 'ticket' }, { id: 'atm' }, { id: 'bank_transfer' }],
+        excluded_payment_types: opts.allowPix ? [{ id: 'ticket' }, { id: 'atm' }] : [{ id: 'ticket' }, { id: 'atm' }, { id: 'bank_transfer' }],
         installments: 6,
       },
     }),

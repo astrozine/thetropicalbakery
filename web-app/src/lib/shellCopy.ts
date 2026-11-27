@@ -45,6 +45,8 @@ const T: Record<string, Row> = {
   'Reset do Paladar · 14 dias': { en: 'Taste Reset · 14 days', es: 'Reset del Paladar · 14 días', nl: 'Smaakreset · 14 dagen', de: 'Geschmacks-Reset · 14 Tage' },
   'sem sal e sem óleo': { en: 'no salt, no oil', es: 'sin sal y sin aceite', nl: 'zonder zout en olie', de: 'ohne Salz und Öl' },
   'Conversa grátis de 30 min': { en: 'Free 30-min call', es: 'Charla gratis de 30 min', nl: 'Gratis gesprek van 30 min', de: 'Kostenloses 30-Min-Gespräch' },
+  'Diário de Receitas': { en: 'Recipe Journal', es: 'Diario de Recetas', nl: 'Receptendagboek', de: 'Rezept-Tagebuch' },
+  'receitas grátis e premium': { en: 'free and premium recipes', es: 'recetas gratis y premium', nl: 'gratis en premium recepten', de: 'gratis und Premium-Rezepte' },
   '2 Receitas Grátis': { en: '2 Free Recipes', es: '2 Recetas Gratis', nl: '2 Gratis Recepten', de: '2 Gratis-Rezepte' },
   'Livro Completo': { en: 'The Full Book', es: 'El Libro Completo', nl: 'Het Volledige Boek', de: 'Das ganze Buch' },
   '7 dias, 7 doces': { en: '7 days, 7 treats', es: '7 días, 7 dulces', nl: '7 dagen, 7 lekkernijen', de: '7 Tage, 7 Leckereien' },
@@ -140,6 +142,7 @@ export function shellHref(ptPath: string, lang: ShellLang): string {
   if (lang === 'pt') return ptPath;
   if (ptPath === '/sweet-escape/pt') return LANG_PATH[lang];
   if (ptPath === '/receitas') return FUNNEL.pagePath[lang];
+  if (ptPath === '/diario' || ptPath.startsWith('/diario/')) return lang === 'en' ? '/en/journal' + ptPath.slice('/diario'.length).replace('/minhas-receitas', '/my-recipes') : ptPath;
   if (ptPath.startsWith('/coaching')) {
     const base = (COACHING_PATH as Record<string, string>)[lang] ?? COACHING_PATH.en;
     return base + ptPath.slice('/coaching'.length);

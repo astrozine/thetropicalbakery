@@ -303,3 +303,21 @@ Dolly, the door into her coaching. Asked for by Andrew 2026-11-23. Words in 5 la
   topic starts with `CLAIM_TOPIC`, so they show in the inbox and the team alert ("Free Dolly call claimed").
 - Dolly's time: site_settings `bonus_call_weekly` (migration 51, default 5), set in Admin › Ligação grátis. Over the number nobody is
   refused; the page says she will message them for next week. 0 switches the bonus off everywhere (site buyers can still claim).
+
+# The Recipe Journal (/diario, /en/journal)
+
+Free and premium recipes by Dolly, asked for by Andrew 2026-11-27. Schema `migration_55_recipe_journal.sql` (seeds the 7
+Sweet Escape recipes; Bliss Balls and Banoffee Bars stay free because they feed the free-recipes list).
+
+- **Words and rules** in `src/lib/journal/journal.ts` (`JOURNAL_COPY` pt/en, `DEFAULT_CATEGORIES`, `BANNED_CLAIMS`). Never
+  "sem glúten"/"gluten-free" or "sem açúcar"/"sugar-free": the category is "Sem trigo / Wheat-free"; the editor warns.
+- **Security lives in the database:** the steps and ingredients are in `journal_recipe_bodies`, readable only when the recipe is
+  free, by an admin, or when `journal_has_access()` finds a paid order (`journal_access` + `orders`, same "paid" rule as
+  everywhere). Pages render free bodies on the server; premium ones load in the browser through RLS (`RecipeUnlock`).
+- **Buying** = `POST /api/journal/buy` -> `createJournalOrder` (`src/lib/payments/journal.ts`): signed-in only, price and codes
+  read on the server, `orders` row with reference `RJ…`, Mercado Pago (Pix + card, unlocks itself), Stripe for English, or our
+  own Pix confirmed in the inbox / Admin › Diário › Vendas. `onJournalPaid` sends the "recipe is open" e-mail (`journalMail.ts`).
+- **Design**: the site's landing-page language (dark photo hero with jump links, icon + gold kicker over each title, cream and
+  dark-green bands, two cards across on phones). Styles `src/components/journal/journal.css` (`rj-`).
+- Admin `/admin/diario` (Divulgação): recipes (featured, free/premium, publish/schedule), Vendas e números, Cupons, Categorias.
+- Phase 2 (collections page + admin) and 3 (membership) not built yet; `journal_collections` already exists.
