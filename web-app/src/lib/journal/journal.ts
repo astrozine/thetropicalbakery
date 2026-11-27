@@ -33,8 +33,10 @@ export interface RecipeText {
   yield?: string;
   /** The first few ingredient lines, shown on a locked recipe. Written by the admin on save. */
   preview?: string[];
-  /** Every ingredient line, lower-case, so the library search finds premium recipes by ingredient. Written on save. */
+  /** Single ingredient words (no quantities, no order) so the library search finds premium recipes. Written on save. Public! */
   search?: string;
+  /** How many ingredient lines the recipe has (for the paywall's "+ 13 more"). Written on save. */
+  count?: number;
   seo_title?: string;
   seo_description?: string;
 }
@@ -156,9 +158,23 @@ export const isLive = (r: Pick<JournalRecipe, 'status' | 'publish_at'>, now = Da
 
 /** The first lines of a body, for the teaser on a locked recipe. */
 export const previewFrom = (b: RecipeBody | undefined, n = 4) => (b?.sections?.[0]?.ingredients || []).slice(0, n);
-/** The search text of a body: every ingredient line, lower-case, without quantities' fuss. */
-export const searchFrom = (b: RecipeBody | undefined) =>
-  (b?.sections || []).flatMap(s => s.ingredients).join(' · ').toLowerCase().slice(0, 2000);
+/**
+ * The search words of a body. This sits in journal_recipes.text, which anyone can read, so it must NOT be the ingredient
+ * list: only single words (no quantities, no units, no order), de-duplicated and sorted, enough to find "manga" or
+ * "cacau" and useless as a recipe. The same rule is in tools/journal-seed.mjs.
+ */
+const SEARCH_SKIP = new Set(('xicara xicaras colher colheres sopa cha gramas grama pitada pitadas unidade unidades quanto baste para dar ponto '
+  + 'mais menos sem com bem cada como gosto opcional picado picada picados picadas maduro madura maduras maduros fresco fresca '
+  + 'cup cups tablespoon tablespoons teaspoon teaspoons tbsp tsp grams gram pinch ounce ounces optional chopped ripe fresh about '
+  + 'needed taste with from into large small medium more less each').split(' '));
+export const searchWords = (text: string) => {
+  const words = (text || '').toLowerCase().replace(/\([^)]*\)/g, ' ')
+    .split(/[^a-zà-ÿ]+/).filter(w => w.length >= 4 && !SEARCH_SKIP.has(fold(w)));
+  return [...new Set(words)].sort().join(' ');
+};
+export const searchFrom = (b: RecipeBody | undefined) => searchWords((b?.sections || []).flatMap(s => s.ingredients).join(' '));
+/** How many ingredient lines a body has, for "+ 13 ingredients and the method" on the paywall. */
+export const countFrom = (b: RecipeBody | undefined) => (b?.sections || []).reduce((n, s) => n + s.ingredients.length, 0);
 /** Lower-case, without accents: "Cúrcuma" and "curcuma" find the same recipe. */
 export const fold = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 

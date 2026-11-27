@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { uploadPublicImage } from '@/lib/imageUpload';
 import { ALLERGENS } from '@/lib/allergens';
 import {
-  DIFFICULTY, JOURNAL_LANGS, bannedClaimsIn, previewFrom, searchFrom,
+  DIFFICULTY, JOURNAL_LANGS, bannedClaimsIn, countFrom, previewFrom, searchFrom,
   type Difficulty, type JournalCategory, type JournalLang, type JournalRecipe, type RecipeBody, type RecipeText,
 } from '@/lib/journal/journal';
 
@@ -116,7 +116,7 @@ export default function RecipeEditor({ initial, categories, onCancel, onDone }: 
       const b = bodyFor(l);
       const tl = r.text?.[l];
       if (tl?.title?.trim()) {
-        text[l] = { ...tl, benefits: (tl.benefits || []).map(x => x.trim()).filter(Boolean), preview: previewFrom(b), search: searchFrom(b) };
+        text[l] = { ...tl, benefits: (tl.benefits || []).map(x => x.trim()).filter(Boolean), preview: previewFrom(b), search: searchFrom(b), count: countFrom(b) };
       }
       if (b.sections.length) body[l] = b;
     }

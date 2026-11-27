@@ -10,6 +10,16 @@ const src = fs.readFileSync(path.join(here, '../src/lib/journal/journal.ts'), 'u
 const cats = [...src.matchAll(/\{ slug: '([a-z0-9-]+)', kind: '(tema|dieta)', name: \{ pt: '([^']+)', en: '([^']+)' \}, sort: (\d+) \}/g)]
   .map(m => ({ slug: m[1], kind: m[2], name: { pt: m[3], en: m[4] }, sort: Number(m[5]) }));
 
+
+// Same rule as searchFrom in src/lib/journal/journal.ts: single words only, never the ingredient list (the text is public).
+const SKIP = new Set(('xicara xicaras colher colheres sopa cha gramas grama pitada pitadas unidade unidades quanto baste para dar ponto '
+  + 'mais menos sem com bem cada como gosto opcional picado picada picados picadas maduro madura maduras maduros fresco fresca '
+  + 'cup cups tablespoon tablespoons teaspoon teaspoons tbsp tsp grams gram pinch ounce ounces optional chopped ripe fresh about '
+  + 'needed taste with from into large small medium more less each').split(' '));
+const fold = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const searchFrom = b => [...new Set((b?.sections || []).flatMap(x => x.ingredients).join(' ').toLowerCase().replace(/\([^)]*\)/g, ' ')
+  .split(/[^a-zà-ÿ]+/).filter(w => w.length >= 4 && !SKIP.has(fold(w))))].sort().join(' ');
+
 const q = s => `'${String(s).replace(/'/g, "''")}'`;
 const arr = a => `ARRAY[${a.map(q).join(', ')}]::text[]`;
 const js = o => `${q(JSON.stringify(o))}::jsonb`;
@@ -20,7 +30,7 @@ out += cats.map(c => `    (${q(c.slug)}, ${q(c.kind)}, ${js(c.name)}, ${c.sort})
 
 for (const r of seed.recipes) {
   const text = {};
-  for (const lang of Object.keys(r.text)) text[lang] = { ...r.text[lang], preview: (r.body[lang]?.sections?.[0]?.ingredients || []).slice(0, 4), search: (r.body[lang]?.sections || []).flatMap(x => x.ingredients).join(' · ').toLowerCase().slice(0, 2000) };
+  for (const lang of Object.keys(r.text)) text[lang] = { ...r.text[lang], preview: (r.body[lang]?.sections?.[0]?.ingredients || []).slice(0, 4), search: searchFrom(r.body[lang]), count: (r.body[lang]?.sections || []).reduce((n, x) => n + x.ingredients.length, 0) };
   out += `-- ${r.text.pt.title}\n`;
   out += 'INSERT INTO public.journal_recipes (slug, slug_en, status, publish_at, is_free, price_brl, is_featured, sort, hero_url, gallery, prep_minutes, cook_minutes, chill_minutes, difficulty, categories, tags, contains, text)\n';
   out += `SELECT ${q(r.slug)}, ${q(r.slug_en)}, 'published', now() - interval '${70 - r.sort} minutes', ${r.is_free}, ${r.price_brl}, `;
