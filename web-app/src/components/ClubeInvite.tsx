@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '@/context/AuthContext';
 import LoginPanel from '@/components/LoginPanel';
-import { STAMPS_PER_REWARD, STAMP_REWARD } from '@/lib/loyalty';
+import { usePageLang } from '@/lib/usePageLang';
+import { shellText } from '@/lib/shellCopy';
 
 /**
  * The signed-out visitor's way into an account, framed as joining Clube Tropical (src/lib/loyalty.ts).
@@ -12,10 +13,11 @@ import { STAMPS_PER_REWARD, STAMP_REWARD } from '@/lib/loyalty';
  * Same button creates an account or signs back in (Google / Facebook / e-mail / WhatsApp code).
  */
 const PERKS: { icon: string; title: string; text: string }[] = [
-  { icon: '🎟️', title: 'Cartão fidelidade', text: `A cada ${STAMPS_PER_REWARD} caixas, ${STAMP_REWARD}.` },
-  { icon: '⚡', title: 'Próximo pedido em segundos', text: 'Nome, WhatsApp e endereço já preenchidos.' },
-  { icon: '🥥', title: 'Seu perfil de sabor', text: 'Suas alergias e preferências salvas: a cozinha confere antes de montar a sua caixa.' },
-  { icon: '📦', title: 'Tudo num só lugar', text: 'Seus pedidos e sua assinatura sempre à mão.' },
+  // Boxes are paused (2026-11), so the perks talk about what people buy now: recipes, classes, retreat, coaching.
+  { icon: '📖', title: 'Suas receitas guardadas', text: 'As receitas que você abrir no Diário ficam na sua conta.' },
+  { icon: '🗓️', title: 'Sua agenda com a Dolly', text: 'Aulas, retiro, coaching e pedidos, tudo num só lugar.' },
+  { icon: '⚡', title: 'Próxima compra em segundos', text: 'Nome, WhatsApp e endereço já preenchidos.' },
+  { icon: '🥥', title: 'Seu perfil de sabor', text: 'Suas alergias e preferências salvas, para a Dolly conferir.' },
 ];
 
 /** Small second line under a gold pill, saying what it is. Also used by Navigation (Assinatura). */
@@ -52,7 +54,7 @@ export function ClubeModal({ open, onClose }: { open: boolean; onClose: () => vo
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Clube Tropical"
+        aria-label="Entrar"
         onClick={e => e.stopPropagation()}
         style={{
           position: 'relative', width: '100%', maxWidth: '460px', maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto',
@@ -72,10 +74,10 @@ export function ClubeModal({ open, onClose }: { open: boolean; onClose: () => vo
           ×
         </button>
         <p style={{ margin: 0, fontSize: '0.75rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#8a6d1f', fontWeight: 700 }}>
-          Grátis · leva 10 segundos
+          Clube Tropical · grátis · 10 segundos
         </p>
         <h2 style={{ margin: '0.3rem 0 1rem', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', fontSize: '1.7rem', lineHeight: 1.2 }}>
-          Entre para o Clube Tropical 🌴
+          Entre ou crie sua conta
         </h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.2rem', display: 'grid', gap: '0.7rem' }}>
           {PERKS.map(p => (
@@ -92,42 +94,51 @@ export function ClubeModal({ open, onClose }: { open: boolean; onClose: () => vo
   );
 }
 
-/** The gold "Entrar no Clube" button that sits where a signed-in person's name goes. */
+/** A simple person outline: the sign everyone reads as "log in / my account". */
+export function PersonIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+    </svg>
+  );
+}
+
+/** The log-in button (Andrew, 2026-11-27: "Entrar no Clube" read like a promo, not a login). Opens the Clube Tropical sign-in. that sits where a signed-in person's name goes. */
 export default function ClubeInvite({ variant = 'desktop' }: { variant?: 'desktop' | 'mobile' }) {
   const [open, setOpen] = useState(false);
   const close = React.useCallback(() => setOpen(false), []);
+  const lang = usePageLang();
 
   const button = variant === 'mobile'
     ? (
-      <div style={{ padding: '1.5rem 0 0.5rem 0', borderTop: '1px solid rgba(0,0,0,0.06)', marginTop: '1rem' }}>
+      <div style={{ padding: '0.25rem 0 0.75rem' }}>
         <button
           type="button"
           onClick={() => setOpen(true)}
           style={{
-            width: '100%', minHeight: '48px', border: 'none', borderRadius: '999px', background: '#d4af37',
+            width: '100%', minHeight: '48px', border: '2px solid #3c2a21', borderRadius: '999px', background: '#fff',
             color: '#3c2a21', fontWeight: 700, fontSize: '1rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
           }}
         >
-          🌴 Entrar no Clube Tropical
+          <PersonIcon size={20} /> {shellText('Entrar ou criar conta', lang)}
         </button>
-        <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', textAlign: 'center', color: '#594a42' }}>
-          Cartão fidelidade e pedidos em segundos. Grátis.
-        </p>
       </div>
     )
     : (
       <button
         type="button"
         onClick={() => setOpen(true)}
-        title="Sua conta grátis: pedidos, fidelidade e dados salvos"
+        title={shellText('Entrar ou criar conta', lang)}
         style={{
-          marginLeft: 'clamp(0.7rem, 1.1vw, 1.5rem)', padding: '0.35rem 1rem', border: 'none', borderRadius: '999px', background: '#d4af37',
-          color: '#3c2a21', fontWeight: 700, fontSize: 'clamp(0.72rem, 0.75vw, 0.8rem)', letterSpacing: '0.5px', textTransform: 'uppercase',
-          cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.15,
+          marginLeft: 'clamp(0.7rem, 1.1vw, 1.5rem)', padding: '0.5rem 1.1rem', border: 'none', borderRadius: '999px', background: '#d4af37',
+          color: '#3c2a21', fontWeight: 700, fontSize: 'clamp(0.74rem, 0.78vw, 0.9rem)', letterSpacing: '0.5px', textTransform: 'uppercase',
+          cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+          boxShadow: '0 4px 12px rgba(212,175,55,0.35)',
         }}
       >
-        🌴 Entrar no Clube
-        <span style={SUB_STYLE}>pedidos sem redigitar</span>
+        <PersonIcon size={17} /> {shellText('Entrar', lang)}
       </button>
     );
 

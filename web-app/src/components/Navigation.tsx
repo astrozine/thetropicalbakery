@@ -8,7 +8,8 @@ import { useCart } from '@/context/CartContext';
 import AccountMenu from '@/components/AccountMenu';
 import { INSTAGRAM_HANDLE, InstagramIcon } from '@/components/InstagramLink';
 import { DOLLY_INSTAGRAM_HANDLE, DOLLY_INSTAGRAM_URL, FAMILY_INSTAGRAM_HANDLE, FAMILY_INSTAGRAM_URL, STORE_INSTAGRAM_URL } from '@/lib/siteContact';
-import { SUB_STYLE } from '@/components/ClubeInvite';
+import { SUB_STYLE, ClubeModal, PersonIcon } from '@/components/ClubeInvite';
+import { useAuth } from '@/context/AuthContext';
 import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
 import { clearGoogleTranslate } from '@/lib/googleTranslate';
@@ -98,6 +99,9 @@ export default function Navigation() {
   const pageL = usePageLang();
   const tl = (pt: string) => shellText(pt, pageL);
   const { totalItems, setIsCartOpen } = useCart();
+  const { user } = useAuth();
+  const [loginOpen, setLoginOpen] = useState(false);
+  const closeLogin = React.useCallback(() => setLoginOpen(false), []);
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -488,6 +492,21 @@ export default function Navigation() {
 
         {/* Mobile Menu Toggle & Cart */}
         <div className="xl:hidden glass-pill actions-pill flex items-center gap-4">
+          {/* Log in / my account, always in sight on phones (Andrew, 2026-11-27). */}
+          {user ? (
+            <Link href="/minha-conta" aria-label={tl('Conta')} style={{ color: '#3c2a21', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+              <PersonIcon size={24} />
+            </Link>
+          ) : (
+            <button type="button" onClick={() => setLoginOpen(true)} aria-label={tl('Entrar')} style={{
+              background: 'none', border: 'none', cursor: 'pointer', color: '#3c2a21', minHeight: '44px', padding: 0,
+              display: 'inline-flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1px',
+            }}>
+              <PersonIcon size={22} />
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{tl('Entrar')}</span>
+            </button>
+          )}
+          <ClubeModal open={loginOpen} onClose={closeLogin} />
           {/* 44x44 is the smallest a thumb hits reliably (Apple HIG); the glyph stays 1.5rem. */}
           <button
             onClick={() => setIsCartOpen(true)}
@@ -588,6 +607,7 @@ export default function Navigation() {
             WebkitOverflowScrolling: 'touch',
             padding: '1rem 1.5rem 6rem 1.5rem',
           }}>
+            <AccountMenu variant="mobile" />
             <Link href={cta.path} onClick={closeMenu} style={{ ...CTA_STYLE, display: 'block', textAlign: 'center', margin: '0.5rem 0 0.75rem', padding: '0.9rem 1rem', fontSize: '1rem' }}>{cta.name}</Link>
             {/* The delivery area: off the phone header (it got in the way), shown here instead. */}
             <p style={{
@@ -677,7 +697,6 @@ export default function Navigation() {
               </button>
             ))}
 
-            <AccountMenu variant="mobile" />
           </div>
         </div>
       )}
