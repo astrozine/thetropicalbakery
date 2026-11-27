@@ -320,4 +320,5 @@ Sweet Escape recipes; Bliss Balls and Banoffee Bars stay free because they feed 
 - **Design**: the site's landing-page language (dark photo hero with jump links, icon + gold kicker over each title, cream and
   dark-green bands, two cards across on phones). Styles `src/components/journal/journal.css` (`rj-`).
 - Admin `/admin/diario` (Divulgação): recipes (featured, free/premium, publish/schedule), Vendas e números, Cupons, Categorias.
-- Phase 2 (collections page + admin) and 3 (membership) not built yet; `journal_collections` already exists.
+- Collections (phase 2): `/diario/colecoes/<slug>`, `/en/journal/collections/<slug>` (`CollectionPage.tsx`), bought like a recipe
+  (kind `collection`); owning one is read from `journal_my_purchases()`. Admin › Diário › Coleções. Membership (phase 3) not built yet.

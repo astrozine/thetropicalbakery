@@ -28,6 +28,12 @@ interface Props {
   yieldText?: string;
   /** false = migration 55 not run yet: show the paywall without a working button. */
   live: boolean;
+  /** A collection: journal_collections.id. Owning it is read from journal_my_purchases(), not from a body. */
+  collectionId?: string | null;
+  /** Words for a collection's panel (a recipe uses the default "Love this recipe?"). */
+  title?: string;
+  text?: string;
+  ownedText?: string;
 }
 
 /**
@@ -56,12 +62,19 @@ export default function RecipeUnlock(p: Props) {
   const ran = useRef(false);
 
   /** Try to read the full recipe. Returns true when it opened. */
+  const [ownsCollection, setOwnsCollection] = useState(false);
   const load = useCallback(async (): Promise<boolean> => {
+    if (p.collectionId) {
+      const { data } = await supabase.rpc('journal_my_purchases');
+      const ok = ((data || []) as { collection_id: string | null; paid: boolean }[]).some(x => x.collection_id === p.collectionId && x.paid);
+      if (ok) setOwnsCollection(true);
+      return ok;
+    }
     if (!p.recipeId) return false;
     const { data } = await supabase.from('journal_recipe_bodies').select('body').eq('recipe_id', p.recipeId).maybeSingle();
     if (data?.body) { setBody(data.body as Record<string, RecipeBody>); return true; }
     return false;
-  }, [p.recipeId]);
+  }, [p.recipeId, p.collectionId]);
 
   useEffect(() => {
     let alive = true;
@@ -146,6 +159,16 @@ export default function RecipeUnlock(p: Props) {
     }
   };
 
+  if (ownsCollection) {
+    return (
+      <section className="rj-lock">
+        <div className="rj-lock__panel" style={{ marginTop: 0 }}>
+          <h2>{c.paid}</h2>
+          <p>{p.ownedText}</p>
+        </div>
+      </section>
+    );
+  }
   if (body) {
     const b = (body[p.lang] || body.pt) as RecipeBody | undefined;
     if (b) return <RecipeBodyView body={b} lang={p.lang} yieldText={p.yieldText} />;
@@ -164,9 +187,9 @@ export default function RecipeUnlock(p: Props) {
         </div>
       )}
       {more > 0 && <p className="rj-lock__more">{c.lockMore(more)}</p>}
-      <div className="rj-lock__panel">
-        <h2>{c.lockTitle}</h2>
-        <p>{c.lockBody}</p>
+      <div className="rj-lock__panel" style={p.preview.length ? undefined : { marginTop: 0 }}>
+        <h2>{p.title || c.lockTitle}</h2>
+        <p>{p.text || c.lockBody}</p>
 
         {phase === 'checking' && <p className="rj-okline">{c.checking}</p>}
         {phase === 'waiting' && <p className="rj-fine">{c.waiting}</p>}

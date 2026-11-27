@@ -78,3 +78,11 @@ export async function getRecipe(slug: string): Promise<{ data: JournalData; reci
     return { data, recipe, body: null };
   }
 }
+
+/** One published collection by its slug, with its live recipes in Dolly's order. */
+export async function getCollection(slug: string): Promise<{ data: JournalData; collection: JournalCollection | null; recipes: JournalRecipe[] }> {
+  const data = await getJournal();
+  const collection = data.collections.find(k => k.slug === slug && k.published) || null;
+  const recipes = collection ? collection.recipe_ids.map(id => data.recipes.find(r => r.id === id)).filter((r): r is JournalRecipe => !!r) : [];
+  return { data, collection, recipes };
+}
