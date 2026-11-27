@@ -34,6 +34,9 @@ const nextConfig: NextConfig = {
     return [
       { source: '/caixas', destination: '/#caixas', permanent: false },
       { source: '/assinatura', destination: '/#caixas', permanent: false },
+      // The Christmas recipe was renamed on Andrew's ask (2026-11-27): they taste nothing like brigadeiros.
+      { source: '/diario/brigadeiros-de-panetone', destination: '/diario/bolinhas-de-panetone', permanent: true },
+      { source: '/en/journal/panettone-brigadeiro-balls', destination: '/en/journal/panettone-bliss-balls', permanent: true },
     ];
   },
   async headers() {
