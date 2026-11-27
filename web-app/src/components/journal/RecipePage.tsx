@@ -102,7 +102,7 @@ export default async function RecipePage({ slug, lang }: { slug: string; lang: J
     .sort((a, z) => z.score - a.score || z.r.publish_at.localeCompare(a.r.publish_at))
     .slice(0, 3).map(x => x.r);
   const inCollections = data.collections.filter(k => k.published && k.recipe_ids.includes(recipe.id));
-  const ingredientCount = (t.search || '').split(' · ').filter(Boolean).length;
+  const ingredientCount = t.count ?? (t.preview || []).length;
   const story = (t.story || '').split(/\n{2,}/).filter(Boolean);
 
   return (

@@ -2,7 +2,7 @@ import 'server-only';
 import { createClient } from '@supabase/supabase-js';
 import seed from './seed.json';
 import {
-  DEFAULT_CATEGORIES, isLive,
+  DEFAULT_CATEGORIES, countFrom, isLive, searchFrom, searchWords,
   type JournalCategory, type JournalCollection, type JournalLang, type JournalRecipe, type RecipeBody,
 } from './journal';
 
@@ -27,7 +27,7 @@ const seedRecipes: JournalRecipe[] = seed.recipes.map((r: SeedRecipe, i) => ({
   hero_url: r.hero_url, gallery: r.gallery, video_url: null, prep_minutes: r.prep_minutes, cook_minutes: r.cook_minutes,
   chill_minutes: r.chill_minutes, difficulty: r.difficulty as JournalRecipe['difficulty'], categories: r.categories, tags: r.tags,
   contains: r.contains, views: 0, created_at: new Date(Date.UTC(2026, 10, 27, 12, i)).toISOString(),
-  text: Object.fromEntries(Object.entries(r.text).map(([lang, t]) => [lang, { ...t, preview: r.body[lang as JournalLang].sections[0].ingredients.slice(0, 4), search: r.body[lang as JournalLang].sections.flatMap(x => x.ingredients).join(' · ').toLowerCase() }])),
+  text: Object.fromEntries(Object.entries(r.text).map(([lang, t]) => [lang, { ...t, preview: r.body[lang as JournalLang].sections[0].ingredients.slice(0, 4), search: searchFrom(r.body[lang as JournalLang] as RecipeBody), count: countFrom(r.body[lang as JournalLang] as RecipeBody) }])),
 }));
 const seedBody = (slug: string): Record<JournalLang, RecipeBody> | null => {
   const r = seed.recipes.find(x => x.slug === slug);
@@ -54,7 +54,16 @@ export async function getJournal(): Promise<JournalData> {
       db.from('journal_collection_recipes').select('collection_id, recipe_id, sort').order('sort'),
     ]);
     if (r.error) throw r.error;
-    const recipes = ((r.data || []) as JournalRecipe[]).filter(x => isLive(x));
+    // Never pass an ingredient list to the browser: older rows kept every line (with amounts) in text.search, so it is
+    // reduced to single words here whatever the database holds (migration 56 rewrites the rows themselves).
+    const recipes = ((r.data || []) as JournalRecipe[]).filter(x => isLive(x)).map(x => ({
+      ...x,
+      text: Object.fromEntries(Object.entries(x.text || {}).map(([l, t]) => [l, t && {
+        ...t,
+        count: t.count ?? (t.search ? t.search.split(' · ').filter(Boolean).length : undefined),
+        search: searchWords(t.search || ''),
+      }])) as JournalRecipe['text'],
+    }));
     const collections = ((k.data || []) as Omit<JournalCollection, 'recipe_ids'>[]).map(col => ({
       ...col,
       recipe_ids: ((kr.data || []) as { collection_id: string; recipe_id: string }[]).filter(x => x.collection_id === col.id).map(x => x.recipe_id),
