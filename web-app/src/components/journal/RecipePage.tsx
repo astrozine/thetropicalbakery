@@ -8,6 +8,7 @@ import RecipeBodyView from './RecipeBodyView';
 import RecipeUnlock from './RecipeUnlock';
 import RecipeCard, { chipNames } from './RecipeCard';
 import ViewCount from './ViewCount';
+import MoreWithDolly from './MoreWithDolly';
 import { ALLERGENS } from '@/lib/allergens';
 import { getRecipe } from '@/lib/journal/data';
 import { SITE_URL } from '@/lib/email/layout';
@@ -16,6 +17,12 @@ import {
   type JournalLang, type JournalRecipe, type RecipeBody,
 } from '@/lib/journal/journal';
 import './journal.css';
+
+/** An Instagram post or reel link (what Andrew pastes) becomes its embed address; anything else is used as given. */
+const embedUrl = (u: string) => {
+  const m = u.match(/instagram\.com\/(?:[^/]+\/)?(p|reel|reels|tv)\/([A-Za-z0-9_-]+)/);
+  return m ? `https://www.instagram.com/${m[1] === 'p' ? 'p' : 'reel'}/${m[2]}/embed` : u;
+};
 
 const iso = (min: number) => `PT${Math.floor(min / 60) ? `${Math.floor(min / 60)}H` : ''}${min % 60 ? `${min % 60}M` : ''}` || 'PT0M';
 
@@ -202,7 +209,7 @@ export default async function RecipePage({ slug, lang }: { slug: string; lang: J
           <div className="rj-video">
             {/\.(mp4|webm|mov)(\?|$)/i.test(recipe.video_url)
               ? <video src={recipe.video_url} controls playsInline preload="metadata" />
-              : <iframe src={recipe.video_url} title={c.video} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen loading="lazy" />}
+              : <iframe src={embedUrl(recipe.video_url)} title={c.video} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen loading="lazy" />}
           </div>
         )}
 
@@ -218,6 +225,10 @@ export default async function RecipePage({ slug, lang }: { slug: string; lang: J
         )}
 
       </div>
+
+      {(recipe.is_free || recipe.is_featured) && (
+        <MoreWithDolly lang={lang} premiumFrom={Math.min(...data.recipes.filter(r => !r.is_free).map(priceOf), 12.9)} />
+      )}
 
       {related.length > 0 && (
         <section className="rj-band rj-band--cream rj-related rj-noprint">

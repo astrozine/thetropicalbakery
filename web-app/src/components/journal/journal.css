@@ -297,3 +297,18 @@
 .rj-collprice strong { font-family: var(--font-heading); font-size: 2rem; color: #fff; }
 .rj-collprice span { color: rgba(253, 250, 243, 0.85); font-size: 0.95rem; }
 .rj-collprice s { opacity: 0.8; }
+
+/* ── "More with Dolly": the value ladder under free and featured recipes ── */
+.rj-intro--light { color: rgba(253, 250, 243, 0.82); }
+.rj-more__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.8rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 700px) { .rj-more__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1050px) { .rj-more__list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.rj-more__card { display: grid; gap: 0.35rem; height: 100%; padding: 1.1rem 1.15rem; border-radius: 16px; text-decoration: none; color: #fbf7ef;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14); transition: background 0.15s, border-color 0.15s; }
+.rj-more__card:hover, .rj-more__card:focus-visible { background: rgba(255, 255, 255, 0.11); border-color: #e7c75a; }
+.rj-more__sign { font-size: 1.5rem; line-height: 1; }
+.rj-more__title { font-size: 1.05rem; }
+.rj-more__line { color: rgba(253, 250, 243, 0.8); font-size: 0.93rem; line-height: 1.5; }
+.rj-more__foot { display: flex; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; align-items: baseline; margin-top: 0.35rem;
+  font-size: 0.88rem; color: rgba(253, 250, 243, 0.7); align-self: end; }
+.rj-more__cta { color: #e7c75a; font-weight: 700; }

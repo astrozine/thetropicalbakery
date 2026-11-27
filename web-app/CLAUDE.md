@@ -322,3 +322,5 @@ Sweet Escape recipes; Bliss Balls and Banoffee Bars stay free because they feed 
 - Admin `/admin/diario` (Divulgação): recipes (featured, free/premium, publish/schedule), Vendas e números, Cupons, Categorias.
 - Collections (phase 2): `/diario/colecoes/<slug>`, `/en/journal/collections/<slug>` (`CollectionPage.tsx`), bought like a recipe
   (kind `collection`); owning one is read from `journal_my_purchases()`. Admin › Diário › Coleções. Membership (phase 3) not built yet.
+- Free recipes and the featured one end with "Mais com a Dolly" (`MoreWithDolly.tsx`): premium recipes, the book, coaching,
+  classes, retreat (Dolly, 2026-11-27). Prices come from ebook.ts / coachingCopy.ts. `video_url` takes a plain Instagram post/reel link.
