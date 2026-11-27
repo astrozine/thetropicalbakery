@@ -185,7 +185,7 @@ function useInbox() {
         key: `funnel_leads:${l.id}`, source_table: 'funnel_leads', source_id: l.id,
         type: 'recipes_signup' as const,
         // "#5 Janice": their place on our own list, so the count of owned traffic is visible on every card.
-        title: l.number ? `#${l.number} ${l.name}` : l.name,
+        title: l.number ? `${l.number} ${l.name}` : l.name,
         subtitle: `${l.email} · ${l.from === 'Amazon' ? 'veio da Amazon' : l.from ? `anúncio: ${l.from}` : 'visita direta'}`,
         whatsapp: null, email: l.email, created_at: l.createdAt,
         details: { what: `${BOOK_LABEL[l.book].text}`, where: null, diet: null },
@@ -548,7 +548,7 @@ export function InboxFull() {
           <span style={{ fontWeight: 700, lineHeight: 1.4 }}>
             {ownedTotal === 1 ? 'pessoa na nossa lista' : 'pessoas na nossa lista'} (pediram as receitas grátis)
             <span style={{ display: 'block', fontWeight: 500, fontSize: '0.85rem', color: '#8a7440' }}>
-              Tráfego próprio: cada uma recebe nossos e-mails sem pagar anúncio. O número no cartão (#1, #2...) é a ordem em que chegaram.
+              Tráfego próprio: cada uma recebe nossos e-mails sem pagar anúncio. O número no cartão (1, 2, 3...) é a ordem em que chegaram.
             </span>
           </span>
         </Link>
