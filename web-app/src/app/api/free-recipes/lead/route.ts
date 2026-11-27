@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const lead = await createLead(body, bearer(req));
+    // The country comes from Vercel's own location header, never from what the visitor sends.
+    const lead = await createLead({ ...body, country: req.headers.get('x-vercel-ip-country') }, bearer(req));
     alertAfterResponse();
     // Tell Meta about the sign-up from the server (same event_id as the browser pixel), unless cookies were declined.
     if (body.consent !== 'declined') {
