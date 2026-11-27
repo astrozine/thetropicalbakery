@@ -13,7 +13,7 @@
 
 import { SITE_URL, kicker, paragraphs, bulletList } from './layout';
 import type { Campaign, CampaignValues } from './campaigns';
-import { letterPhotos } from './letterMail';
+import { letterHero, letterStory } from './letterMail';
 import { LETTER_WRITER, prettySunday, titleFrom } from '@/lib/letter';
 
 const isPt = (v: CampaignValues) => v.lang === 'pt';
@@ -55,9 +55,9 @@ const LETTER: Campaign = {
   build: v => ({
     preheader: (v.story || v.title || '').slice(0, 90),
     heading: v.title || titleFrom(v.story),
+    heroPhoto: letterHero(v.photos, isPt(v) ? 'Da cozinha da Dolly' : 'From Dolly’s kitchen'),
     body:
-      letterPhotos(v.photos, isPt(v) ? 'Da cozinha da Dolly' : 'From Dolly’s kitchen') +
-      paragraphs(v.story) +
+      letterStory(v.story, v.photos, isPt(v) ? 'Da cozinha da Dolly' : 'From Dolly’s kitchen') +
       ((v.tip || '').trim() ? kicker(v.tipTitle || (isPt(v) ? 'A dica da semana' : 'This week’s tip')) + paragraphs(v.tip) : ''),
     cta: v.ctaLabel ? { label: v.ctaLabel, href: track(v.ctaPath || '/', `carta-${slug(v.title)}`) } : undefined,
     note: sign(v),
