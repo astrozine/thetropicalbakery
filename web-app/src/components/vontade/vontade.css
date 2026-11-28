@@ -9,7 +9,7 @@
  */
 html:has(.va-shell), html:has(.va-shell) body { overflow: hidden; }
 /* The delivery banner is pinned above everything on phones; the app has its own header. */
-body:has(.va-shell) .announce-bar, body:has(.va-shell) .mobile-header-nav { display: none !important; }
+body:has(.va-shell) .announce-bar { display: none !important; }
 
 .va-shell {
   --va-bg: #fffaf0; --va-surface: #ffffff; --va-ink: #2a1a12; --va-muted: #7a6a5d;
@@ -757,3 +757,166 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 /* Dolly's name above her chat follows the screen (dark arena, dark mode); her bubbles stay light with dark text. */
 .va-shell .dc__name { color: var(--va-ink); }
 .va-shell .dc__msg { color: #2a1a12; }
+
+/* ================================================================ JUNGLE GLAM (Andrew, 2026-11-28)
+ * Night in the garden in Itamambuca instead of the purple arcade: the site's own top menu stays, in a dark half-height
+ * version (game first, more screen); deep greens, gold contours, guava; Burle Marx leaves drawn as flat shapes
+ * (public/vontade/jungle-*.svg). Titles in Fraunces. On every screen size, so the sunset intro lands on this. */
+body:has(.va-shell) { --va-nav-h: 52px; background: #0b1d19; }
+body:has(.va-shell) .mobile-header-nav {
+  position: fixed !important; top: 0; left: 0; right: 0; z-index: 1060 !important; pointer-events: auto !important;
+  background: rgba(8, 22, 19, 0.94) !important; backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: 0 1px 0 rgba(201, 162, 87, 0.35) !important;
+}
+body:has(.va-shell) .mobile-header-inner { height: var(--va-nav-h); padding: 0 16px !important; }
+body:has(.va-shell) .mobile-header-nav .glass-pill {
+  background: none !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  padding: 0 !important; transform: none !important; opacity: 1 !important; pointer-events: auto !important;
+}
+body:has(.va-shell) .mobile-header-nav .logo-pill img { height: 38px !important; filter: none !important; content: url(/logo-gold-sm.webp); }
+body:has(.va-shell) .nav-links > div > button, body:has(.va-shell) .nav-links > div > span,
+body:has(.va-shell) .actions-pill > a, body:has(.va-shell) .actions-pill > button,
+body:has(.va-shell) .nav-actions > button > span, body:has(.va-shell) .nav-actions > div > button { color: #f3e6cc !important; }
+body:has(.va-shell) .nav-links > div > button[aria-expanded='true'] { color: #e2c27a !important; }
+body:has(.va-shell) .nav-actions > a { padding: 0.4rem 0.9rem !important; }
+
+.va-shell {
+  --va-bg: #0b1d19; --va-surface: #12302a; --va-ink: #f6efe2; --va-muted: #a9c2b6;
+  --va-line: #1d3f37; --va-line-d: #2a5348; --va-soft: #173a33;
+  --va-green: #2e9e74; --va-green-d: #7fd9ae; --va-green-l: #123d31;
+  --va-gold: #e2c27a; --va-red: #ee6f86;
+  --va-arcade: 'Fraunces', Georgia, serif;
+  top: var(--va-nav-h);
+  background:
+    url(/vontade/jungle-top.svg) top -30px center / min(820px, 150vw) auto no-repeat,
+    radial-gradient(60% 30% at 50% 0%, rgba(255, 236, 190, 0.12), transparent 70%),
+    linear-gradient(#0e2924, #08150f);
+}
+.va-shell .va-title, .va-shell .va-h2, .va-shell .va-tabs__brand strong {
+  font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em;
+}
+.va-shell .va-title { font-weight: 500; }
+.va-shell .va-title em, .va-shell .va-arena__title .va-title { font-style: italic; }
+/* The site's menu now carries the logo and the sign-in: the app's own bar keeps only the scores. */
+.va-brand { display: none; }
+.va-top { justify-content: flex-end; padding-top: 0.4rem; background: rgba(8, 22, 19, 0.6); border-bottom: 1px solid rgba(201, 162, 87, 0.22); }
+.va-top:not(:has(.va-stats)) { display: none; }
+.va-kicker { color: var(--va-gold); }
+.va-btn--ghost { border-width: 1.5px; }
+.va-card, .va-row, .va-chip, .va-gb__item { border-width: 1.5px; }
+.va-chip[aria-pressed='true'], .va-chip[aria-selected='true'] { background: rgba(201, 162, 87, 0.14); border-color: #c9a257; color: #f3dca2; box-shadow: 0 3px 0 #8a6a2e; }
+.va-tabs { border-top: 1px solid rgba(201, 162, 87, 0.25); background: rgba(8, 22, 19, 0.9); }
+.va-tabs button[aria-current] { color: #f3dca2; background: rgba(201, 162, 87, 0.14); border-color: #c9a257; }
+.va-tabs button[aria-current] .va-tabs__icon, .va-tabs__icon { filter: none; }
+.va-dock { background: linear-gradient(to top, var(--va-bg) 70%, transparent); }
+.va-ring__cap strong { color: #ff9fb1; }
+.va-ring--faded .va-bag, .va-ring--faded .va-fighter { opacity: 0.78; filter: saturate(0.8); }
+.va-ring::after { background: radial-gradient(rgba(0, 0, 0, 0.45), transparent 70%); }
+.va-ring__beam { background: linear-gradient(#e2c27a, #8a6a2e); }
+.va-blur { text-shadow: 0 0 8px rgba(245, 236, 224, 0.45); }
+.va-tip { background: #2b2510; color: #ffe9a8; }
+.va-same { color: var(--va-ink); }
+
+@media (min-width: 900px) {
+  body:has(.va-shell) { --va-nav-h: 56px; }
+  .va-shell {
+    background:
+      radial-gradient(50% 40% at 60% -5%, rgba(255, 220, 150, 0.12), transparent 60%),
+      linear-gradient(#0e2924, #08150f);
+  }
+  /* The game menu: dark green, the selected item in a gold contour. */
+  .va-tabs {
+    border: 0; border-right: 1px solid rgba(201, 162, 87, 0.25);
+    background: url(/vontade/jungle-side.svg) left -90px bottom -120px / 330px auto no-repeat, linear-gradient(#0f2a25, #091916);
+  }
+  .va-tabs__brand strong { font-style: italic; font-size: 1.45rem; color: #f0d48f; line-height: 1.05; }
+  .va-tabs__brand small { color: #a9c2b6; }
+  .va-tabs button { color: #c7d8cf; border-radius: 999px 10px 10px 999px; }
+  .va-tabs button:hover:not([aria-current]) { background: rgba(201, 162, 87, 0.08); color: #fff; }
+  .va-tabs button[aria-current] {
+    background: rgba(201, 162, 87, 0.13); color: #f6e3b4; border: 1.5px solid #c9a257;
+    box-shadow: 0 0 0 4px #0c211d, 0 0 0 5px rgba(201, 162, 87, 0.35), 0 0 30px rgba(201, 162, 87, 0.15);
+  }
+  .va-dock { background: linear-gradient(to top, #0a1b17 70%, transparent); }
+  .va-choice:hover, .va-gcard:hover, .va-tile:hover {
+    box-shadow: 0 10px 0 var(--edge), 0 0 0 3px #c9a257, 0 0 34px color-mix(in srgb, var(--c) 60%, transparent);
+  }
+
+  /* The garden at night: an arch with a gold contour, leaves on both sides, the moon above, a calçadão wave as the floor. */
+  .va-arena {
+    border-radius: 120px 120px 30px 30px;
+    background:
+      url(/vontade/jungle-side.svg) left -110px bottom -60px / auto 74% no-repeat,
+      url(/vontade/jungle-side-r.svg) right -110px bottom -60px / auto 74% no-repeat,
+      radial-gradient(24% 34% at 50% 4%, rgba(255, 238, 200, 0.3), transparent 70%),
+      radial-gradient(70% 45% at 50% 112%, rgba(238, 140, 156, 0.2), transparent 70%),
+      linear-gradient(#143f37 0%, #0d2a24 55%, #081a16 100%);
+    box-shadow: 0 0 0 5px #0b1d19, 0 0 0 7px #c9a257, 0 30px 70px rgba(0, 0, 0, 0.55), inset 0 0 120px rgba(0, 0, 0, 0.45);
+  }
+  .va-arena::before {
+    left: 0; right: 0; bottom: 0; height: 42px; transform: none; box-shadow: none; opacity: 0.35;
+    background: url(/email/calcadao.png) repeat-x center / auto 100%; filter: invert(1) sepia(1) saturate(2) hue-rotate(5deg);
+  }
+  .va-arena::after { background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.35) 100%); }
+  .va-hud { padding: 1.4rem 5.5rem 0.2rem; }
+  .va-hud__side > img { border: 2px solid #c9a257; border-radius: 50%; }
+  .va-hud__info b { font-style: italic; font-weight: 600; font-size: 1.2rem; text-shadow: none; }
+  .va-hud__info small { color: #a9c2b6; }
+  .va-hud__bar { border: 2px solid #c9a257; background: #06120f; border-radius: 999px; transform: none; box-shadow: 0 0 0 3px #0b1d19; height: 16px; }
+  .va-hud__bar--you i { background: linear-gradient(90deg, #e2c27a, #7fd9ae 50%, #2e9e74); }
+  .va-hud__bar--foe i { background: linear-gradient(90deg, #ee8c9c, #f3a65a); }
+  .va-hud__mid small { color: #e2c27a; font-family: inherit; font-weight: 800; }
+  .va-hud__mid b { font-weight: 500; font-style: italic; text-shadow: 0 0 24px rgba(240, 212, 143, 0.5); color: #f6e3b4; }
+  .va-hud__sound { border-radius: 50%; border-color: rgba(201, 162, 87, 0.5); }
+  .va-arena__title .va-kicker { color: #e2c27a; }
+  .va-arena__title .va-title {
+    font-weight: 500; font-size: clamp(3rem, 5.2vw, 4.6rem); color: #f6e3b4; transform: none;
+    text-shadow: 0 0 40px rgba(240, 200, 120, 0.45), 0 3px 0 #0b1d19;
+  }
+  .va-arena__ropes i { height: 5px; }
+  .va-arena__ropes i:nth-child(1) { background: linear-gradient(#f3d58f, #b98d3e); }
+  .va-arena__ropes i:nth-child(2) { background: linear-gradient(#ffc0cb, #d9677f); }
+  .va-arena__ropes i:nth-child(3) { background: linear-gradient(#fff6e6, #cdbd9f); }
+  .va-arena__ropes::before, .va-arena__ropes::after { width: 12px; border-radius: 999px 999px 3px 3px; background: linear-gradient(90deg, #8a6a2e, #f1d79a 45%, #8a6a2e); }
+  .va-arena__press { font-family: inherit; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.22em; color: #f0d48f; }
+  .va-arena__dialog {
+    background: rgba(7, 22, 18, 0.9); border: 1.5px solid #c9a257; border-radius: 22px 22px 22px 6px;
+    box-shadow: 0 0 0 5px rgba(7, 22, 18, 0.9), 0 0 0 6px rgba(201, 162, 87, 0.35);
+  }
+  .va-arena__dialog .dc__name { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 600; font-size: 1.05rem; color: #f0d48f; letter-spacing: 0; }
+  .va-arena__dialog .dc__avatar img { border-radius: 50%; border: 2px solid #c9a257; }
+  .va-sheet .va-sheet__panel { border: 1.5px solid #c9a257; box-shadow: 0 0 0 6px rgba(7, 22, 18, 0.9), 0 0 0 7px rgba(201, 162, 87, 0.35), 0 30px 80px rgba(0, 0, 0, 0.6); }
+}
+
+/* ---------------------------------------------------------------- nightfall: the load intro
+ * Day sky to sunset (yellow, orange, red, purple) to night, the sun sinking with a glow, palm silhouettes, then
+ * stars drifting up, then the night garden. 3.4 s, never blocks a tap, skipped for reduced motion. */
+.va-night { position: fixed; inset: 0; z-index: 1080; pointer-events: none; overflow: hidden; background: #0b1d19; animation: va-night-out 3.4s ease-in forwards; }
+@keyframes va-night-out { 0%, 76% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+.va-night__sky {
+  position: absolute; left: 0; right: 0; top: 0; height: 700%;
+  background: linear-gradient(180deg, #a8d8ea 0%, #d8ecd9 8%, #ffe9a6 17%, #ffc95a 26%, #ff9b3d 35%, #f2604e 44%, #c8406e 53%, #8a3a8f 62%, #4a2a74 71%, #1d1d46 81%, #0b1d19 92%, #0b1d19 100%);
+  animation: va-sky 2.9s cubic-bezier(0.5, 0.05, 0.35, 1) forwards;
+}
+@keyframes va-sky { from { transform: translateY(0); } to { transform: translateY(-85.71%); } }
+.va-night__sun {
+  position: absolute; left: 50%; bottom: 30%; width: 150px; height: 150px; margin-left: -75px; border-radius: 50%;
+  background: radial-gradient(circle, #fffbe6 0%, #ffe08a 40%, #ff9b3d 75%, rgba(255, 120, 60, 0) 100%);
+  box-shadow: 0 0 80px 40px rgba(255, 190, 90, 0.45), 0 0 200px 120px rgba(255, 120, 80, 0.25);
+  animation: va-sun 2.6s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+}
+@keyframes va-sun {
+  0% { transform: translateY(-20vh); filter: none; opacity: 1; }
+  55% { filter: hue-rotate(-20deg) saturate(1.3); opacity: 1; }
+  100% { transform: translateY(32vh) scale(1.15); filter: hue-rotate(-40deg) saturate(1.5); opacity: 0; }
+}
+.va-night__palms { position: absolute; inset: auto 0 0 0; height: 62%; filter: brightness(0) opacity(0.82); }
+.va-night__palms::before, .va-night__palms::after { content: ''; position: absolute; bottom: -10%; width: 60vh; max-width: 55vw; height: 110%; background: url(/vontade/jungle-side.svg) left bottom / contain no-repeat; }
+.va-night__palms::before { left: -6vw; }
+.va-night__palms::after { right: -6vw; background-image: url(/vontade/jungle-side-r.svg); background-position: right bottom; }
+.va-night i {
+  position: absolute; border-radius: 50%; background: #fff8e6; opacity: 0;
+  box-shadow: 0 0 6px 1px rgba(255, 240, 200, 0.85); animation-name: va-star; animation-timing-function: ease-out; animation-fill-mode: forwards;
+}
+@keyframes va-star { 0% { opacity: 0; transform: translateY(0); } 25% { opacity: 1; } 100% { opacity: 0.85; transform: translateY(-38vh); } }
+@media (prefers-reduced-motion: reduce) { .va-night { display: none; } }
