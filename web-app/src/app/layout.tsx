@@ -7,6 +7,7 @@ import GlobalMenuTeaser from "@/components/GlobalMenuTeaser";
 import Providers from "@/app/Providers";
 import CartDrawer from "@/components/CartDrawer";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import SwipeHint from "@/components/SwipeHint";
 import BrandDialogHost from "@/components/BrandDialogHost";
 import MetaPixel from "@/components/MetaPixel";
 import TranslateGlossary from "@/components/TranslateGlossary";
@@ -85,6 +86,7 @@ export default function RootLayout({
           <BrandDialogHost />
           <MetaPixel />
           <TranslateGlossary />
+          <SwipeHint />
         </Providers>
         {/* The language switcher is not needed to read the page: load Google's script after everything else, so on a phone it
             no longer competes with the page's own photos and code (ads land on phones in Facebook/Instagram). */}

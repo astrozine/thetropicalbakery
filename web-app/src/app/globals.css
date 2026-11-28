@@ -1465,3 +1465,21 @@ body {
 }
 
 .logo-text-sm { display: none; }
+
+/* The blinking "there's more" arrow on phone carousels (components/SwipeHint.tsx, Andrew 2026-11-28). */
+.swipe-hint {
+  position: absolute; z-index: 5; transform: translateY(-50%);
+  width: 40px; height: 40px; border-radius: 50%; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(253,250,243,0.94); color: #2a1a12; border: 1px solid rgba(201,162,87,0.55);
+  box-shadow: 0 6px 18px rgba(42,26,18,0.28);
+  animation: swipe-hint-blink 1.6s ease-in-out infinite;
+  transition: opacity .3s;
+}
+.swipe-hint.is-hidden { opacity: 0; pointer-events: none; animation: none; }
+@keyframes swipe-hint-blink {
+  0%, 100% { opacity: 1; transform: translate(0, -50%); }
+  50% { opacity: 0.45; transform: translate(5px, -50%); }
+}
+@media (prefers-reduced-motion: reduce) { .swipe-hint { animation: none; } }
+@media (min-width: 768px) { .swipe-hint { display: none; } }
