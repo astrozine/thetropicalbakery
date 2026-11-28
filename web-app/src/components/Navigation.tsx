@@ -81,6 +81,15 @@ const CTA_STYLE: React.CSSProperties = {
 };
 
 /** Line icons in place of the old emoji (2026-11-28 redesign). */
+// The number of items in the shopping bag: a small gold dot that sits on the bag's corner without covering it (2026-11-28;
+// was a red bubble that hid the icon).
+const BAG_BADGE: React.CSSProperties = {
+  position: 'absolute', top: '2px', right: '-6px', minWidth: '17px', height: '17px', padding: '0 4px',
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box',
+  background: '#c9a257', color: '#2a1a12', border: '1.5px solid #faf5ec', borderRadius: '999px',
+  fontSize: '0.62rem', fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums', pointerEvents: 'none',
+};
+
 function BagIcon({ size = 22 }: { size?: number }) {
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>);
 }
@@ -491,8 +500,8 @@ export default function Navigation() {
           >
             <span style={{ display: 'flex', color: '#2a1a12' }}><BagIcon size={24} /></span>
             {totalItems > 0 && (
-              <span style={{ position: 'absolute', top: '-5px', right: '-10px', background: '#e74c3c', color: 'white', fontSize: '0.75rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '50%' }}>
-                {totalItems}
+              <span aria-label={`${totalItems} na sacola`} style={BAG_BADGE}>
+                {totalItems > 99 ? '99+' : totalItems}
               </span>
             )}
           </button>
@@ -536,18 +545,8 @@ export default function Navigation() {
           >
             <BagIcon size={22} />
             {totalItems > 0 && (
-              <span style={{
-                position: 'absolute',
-                top: '-5px',
-                right: '-10px',
-                background: '#c9a257',
-                color: '#fff',
-                borderRadius: '50%',
-                padding: '2px 6px',
-                fontSize: '0.75rem',
-                fontWeight: 'bold'
-              }}>
-                {totalItems}
+              <span aria-label={`${totalItems} na sacola`} style={BAG_BADGE}>
+                {totalItems > 99 ? '99+' : totalItems}
               </span>
             )}
           </button>

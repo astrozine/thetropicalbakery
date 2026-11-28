@@ -30,7 +30,7 @@ const MUTED = '#a89a90';
  */
 const KICKER_MARK = '#a6832c';
 
-const HEADING_FONT = `'Bodoni Moda','Didot','Bodoni 72',Georgia,'Times New Roman',serif`;
+const HEADING_FONT = `'Fraunces',Georgia,'Times New Roman',serif`;
 const BODY_FONT = `'Outfit',Helvetica,Arial,sans-serif`;
 
 /**
@@ -484,7 +484,7 @@ export function renderEmail(o: LayoutOptions): string {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light">
 <title>${esc(o.heading)}</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Bodoni+Moda:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
 <style>
   :root { color-scheme: light; }
   a { color: ${GOLD_DEEP}; }
