@@ -5,6 +5,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdmin } from '@/lib/payments/server';
 import { SITE_URL, esc, type BuiltEmail, type LayoutOptions } from './layout';
 import { deliver } from './send';
+import { FREE_RECIPES_KEY, sendFreeRecipes } from './funnelMail';
+import { isEbookLang } from '@/lib/ebookCopy';
 
 /**
  * "Someone just booked": an e-mail to Andrew and Dolly for every new thing a visitor leaves on the site
@@ -37,7 +39,9 @@ interface Alert {
   whatsapp?: string | null;
   email?: string | null;
   /** The e-mail the site should have sent this person for this row, so the alert can say whether it went out. */
-  expects?: { label: string; previewUrl?: string };
+  expects?: { label: string; previewUrl?: string; messageKey?: string };
+  /** Sends that expected e-mail now if it never went out (the alert fixes it before it reports). */
+  resend?: (db: SupabaseClient) => Promise<unknown>;
 }
 
 type Row = Record<string, any>;
@@ -144,7 +148,11 @@ const SOURCES: { table: string; build: (r: Row) => Alert }[] = [
         expects: {
           label: `the 2 free recipes e-mail, in ${LANG_NAME[lang]}`,
           previewUrl: `${SITE_URL}/api/email/preview/free-recipes?lang=${lang}&name=${encodeURIComponent((r.first_name || '').trim().split(' ')[0].slice(0, 30))}`,
+          messageKey: FREE_RECIPES_KEY,
         },
+        resend: (db: SupabaseClient) => sendFreeRecipes(db, {
+          email: String(r.email || ''), firstName: (r.first_name || '').trim().split(' ')[0], lang: isEbookLang(r.lang) ? r.lang : 'en',
+        }),
       };
     },
   },
@@ -173,6 +181,13 @@ async function mailsTo(db: SupabaseClient, email: string | null | undefined, sin
   const { data, error } = await db.from('email_sends').select('subject,status,provider_id,sent_at')
     .ilike('email', to).gte('sent_at', from).not('message_key', 'like', 'alerta:%').order('sent_at').limit(5);
   return error ? null : (data as SentMail[]);
+}
+
+/** The expected e-mail sent to this address at any time (the send is once per address, so a repeat sign-up gets nothing new). */
+async function earlierSend(db: SupabaseClient, email: string, messageKey: string): Promise<SentMail | null> {
+  const { data, error } = await db.from('email_sends').select('subject,status,provider_id,sent_at')
+    .ilike('email', email.trim().toLowerCase()).eq('message_key', messageKey).limit(1);
+  return error || !data?.length ? null : (data[0] as SentMail);
 }
 
 const FONT = `'Outfit',Helvetica,Arial,sans-serif`;
@@ -259,7 +274,17 @@ export async function sendNewArrivalAlerts(db: SupabaseClient, windowMinutes = W
       for (const row of data as Row[]) {
         result.checked += 1;
         const a = source.build(row);
-        const mails = await mailsTo(db, a.email, row.created_at || since).catch(() => null);
+        let mails = await mailsTo(db, a.email, row.created_at || since).catch(() => null);
+        if (mails && !mails.length && a.email && a.expects?.messageKey) {
+          // Nothing since they arrived. Either they signed up before and already have it (one copy per address),
+          // or the send failed: then send it now, before telling the team.
+          const earlier = await earlierSend(db, a.email, a.expects.messageKey).catch(() => null);
+          if (earlier) mails = [{ ...earlier, subject: `${earlier.subject || 'The e-mail'} (they signed up before, so they already had it)` }];
+          else if (a.resend) {
+            await a.resend(db).catch(err => console.error('alert resend failed', err));
+            mails = await mailsTo(db, a.email, row.created_at || since).catch(() => null);
+          }
+        }
         for (const email of to) {
           const outcome = await deliver(db, {
             email, token: '', messageKey: `alerta:${source.table}:${row.id}`, subject: a.subject,

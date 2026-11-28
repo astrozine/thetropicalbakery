@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { SendError, sendCampaign, type SendRequest } from '@/lib/email/send';
 import { AUTOMATIONS, type AutomationRow } from '@/lib/email/automationDefs';
 import { isDue, planFor } from '@/lib/email/automations';
+import { resendMissingFreeRecipes } from '@/lib/email/funnelMail';
 import type { CampaignValues } from '@/lib/email/campaigns';
 import type { DietTargeting } from '@/lib/email/send';
 
@@ -292,6 +293,17 @@ async function tick(req: NextRequest) {
     const db = serviceClient();
     const scheduled = await runSchedule(db, deadline, dry, lines);
     const automated = await runAutomations(db, deadline, dry, lines);
+    // Safety net: any free-recipes sign-up of the last week still without its recipes e-mail gets it now.
+    if (!dry) {
+      try {
+        const healed = await resendMissingFreeRecipes(db);
+        if (healed.sent.length || healed.failed.length) {
+          lines.push({ what: 'receitas grátis (reenvio)', result: `${healed.sent.length} enviado(s)${healed.failed.length ? `, ${healed.failed.length} falharam` : ''}` });
+        }
+      } catch (err) {
+        lines.push({ what: 'receitas grátis (reenvio)', result: `erro: ${err instanceof Error ? err.message : 'erro'}` });
+      }
+    }
 
     const sent = scheduled.sent + automated.sent;
     const failed = scheduled.failed + automated.failed;
