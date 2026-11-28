@@ -19,6 +19,7 @@ import { shellHref, shellText, type ShellLang } from '@/lib/shellCopy';
 import { FUNNEL } from '@/lib/funnel';
 import { COACHING_PATH, COACHING_PRICES, isCoachingLang } from '@/lib/coachingCopy';
 import IconTile from '@/components/IconTile';
+import MobileMenu from '@/components/MobileMenu';
 
 // Desktop menu (xl and up): one line at 1280px, roomier on bigger screens.
 const GAP = 'clamp(0.7rem, 1.1vw, 1.5rem)';
@@ -353,7 +354,6 @@ export default function Navigation() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => { cancelAnimationFrame(frame); clearTimeout(settle); window.removeEventListener('scroll', onScroll); };
   }, []);
-  const [mobileLangOpen, setMobileLangOpen] = useState(false);
 
   return (
     <>
@@ -610,149 +610,17 @@ export default function Navigation() {
         </div>
       </div>
     </nav>
-      {/* ============ MOBILE FULL-SCREEN MENU ============ */}
-      {isOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100vw',
-          height: '100vh',
-          background: '#faf5ec',
-          zIndex: 99999,
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
-          {/* Menu Header with close button */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '1rem 1.5rem',
-            borderBottom: '1px solid rgba(212,175,55,0.2)',
-            flexShrink: 0,
-          }}>
-            <Link href="/" onClick={closeMenu} style={{ textDecoration: 'none' }}>
-              <img src="/logo-pineapple-sm.webp" alt="Logo" style={{ height: '58px', width: 'auto' }} />
-            </Link>
-            <button 
-              onClick={closeMenu}
-              style={{
-                background: 'none',
-                border: 'none',
-                fontSize: '2rem',
-                cursor: 'pointer',
-                color: '#2a1a12',
-                padding: '0.5rem',
-                lineHeight: 1,
-              }}
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Scrollable menu body */}
-          <div style={{
-            flex: 1,
-            overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch',
-            padding: '1rem 1.5rem 6rem 1.5rem',
-          }}>
-            <AccountMenu variant="mobile" />
-            <Link href={cta.path} onClick={closeMenu} style={{ ...CTA_STYLE, display: 'block', textAlign: 'center', margin: '0.5rem 0 0.75rem', padding: '0.9rem 1rem', fontSize: '1rem' }}>{cta.name}</Link>
-            {/* The delivery area: off the phone header (it got in the way), shown here instead. */}
-            <p style={{
-              margin: '0.5rem 0 0.25rem', padding: '0.7rem 0.9rem', borderRadius: '12px',
-              background: '#2a1a12', color: '#c9a257', fontSize: '0.85rem', lineHeight: 1.4, fontWeight: 600, textAlign: 'center',
-            }}>
-              {tl('🌴 Entregamos em Itamambuca, Ubatuba e região. Paraty: pedidos a partir de R$ 600.')}
-            </p>
-            {/* The paid offers, open by default so each is one tap away; Chef Dolly (and partners) folded. */}
-            {groups.map((group) => (
-              <div key={group.id}>
-                <button
-                  onClick={() => setMobileGroupsOpen(s => ({ ...s, [group.id]: !s[group.id] }))}
-                  style={{
-                    width: '100%', display: 'flex', justifyContent: 'space-between', padding: '1.5rem 0 0.5rem 0',
-                    fontWeight: 'bold', color: '#2a1a12', fontSize: '0.85rem', textTransform: 'uppercase',
-                    letterSpacing: '2px', opacity: 0.8, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
-                  }}>
-                  {group.name} <span>{mobileGroupsOpen[group.id] ? '▲' : '▼'}</span>
-                </button>
-                {mobileGroupsOpen[group.id] && groupIntro(group.intro, { display: 'block', padding: '0.2rem 0 0.4rem', fontSize: '0.9rem', lineHeight: 1.4, color: '#8a7a6d' })}
-                {mobileGroupsOpen[group.id] && group.links.map((link) => (
-                  <NavItem
-                    key={link.path}
-                    link={link}
-                    onClick={closeMenu}
-                    tile={34}
-                    style={{
-                      display: 'block',
-                      padding: '0.8rem 0 0.8rem 1rem',
-                      textDecoration: 'none',
-                      color: link.highlight ? '#2a1a12' : pathname === link.path ? '#c9a257' : '#594a42',
-                      fontWeight: link.highlight || pathname === link.path ? 'bold' : '400',
-                      fontSize: '1.1rem',
-                      borderBottom: link.highlight || link.feature ? 'none' : '1px solid rgba(0,0,0,0.04)',
-                      animation: 'fadeIn 0.2s ease-out',
-                      ...(link.highlight ? { background: '#c9a257', borderRadius: '8px', margin: '0.3rem 0', padding: '0.8rem 1rem' } : {}),
-                      ...(link.feature ? { ...FEATURE_STYLE, borderRadius: '8px', margin: '0.3rem 0', padding: '0.9rem 1rem' } : {}),
-                    }}
-                  >
-                    {linkText(link, { display: 'block', fontSize: '0.8rem', fontWeight: 500, opacity: 0.85 })}
-                  </NavItem>
-                ))}
-              </div>
-            ))}
-
-
-            {/* Language Section Header — kept untranslated, same reason as desktop */}
-            <button
-              className="notranslate"
-              translate="no"
-              onClick={() => setMobileLangOpen(!mobileLangOpen)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '1.5rem 0 0.5rem 0', 
-                fontWeight: 'bold', 
-                color: '#2a1a12', 
-                fontSize: '0.85rem',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                opacity: 0.8,
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left'
-              }}>
-              <GlobeIcon /> {langLabel.toUpperCase()} <span>{mobileLangOpen ? '▲' : '▼'}</span>
-            </button>
-            {mobileLangOpen && [
-              { code: 'pt', name: 'Português' },
-              { code: 'en', name: 'English' },
-              { code: 'es', name: 'Español' },
-              { code: 'it', name: 'Italiano' },
-              { code: 'fr', name: 'Français' },
-              { code: 'de', name: 'Deutsch' },
-              { code: 'nl', name: 'Nederlands' }
-            ].map((lang) => (
-              <button
-                key={lang.code}
-                className="notranslate"
-                translate="no"
-                onClick={() => { changeLanguage(lang.code); closeMenu(); }}
-                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '0.8rem 0 0.8rem 1rem', color: '#594a42', fontSize: '1.1rem', borderBottom: '1px solid rgba(0,0,0,0.04)', animation: 'fadeIn 0.2s ease-out' }}>
-                {lang.name}
-              </button>
-            ))}
-
-          </div>
-        </div>
-      )}
+      {/* ============ PHONE MENU (components/MobileMenu.tsx) ============ */}
+      <MobileMenu
+        open={isOpen}
+        onClose={closeMenu}
+        lang={ownL}
+        pageLang={pageL}
+        currentLang={pageL !== 'pt' ? pageL : trL}
+        own={ownL !== 'pt' || trL === 'pt'}
+        onLanguage={changeLanguage}
+        onSignIn={() => setLoginOpen(true)}
+      />
     </>
   );
 }
