@@ -9,6 +9,7 @@
  * Keys are the Portuguese text as it appears in the shell; `shellText(pt, lang)` returns the hand-written version, or
  * the Portuguese when a line has none yet.
  */
+import { noEmoji } from '@/lib/noEmoji';
 import { LANG_PATH } from '@/lib/ebookCopy';
 import { FUNNEL } from '@/lib/funnel';
 import { COACHING_PATH } from '@/lib/coachingCopy';
@@ -124,8 +125,7 @@ const T: Record<string, Row> = {
 };
 
 export function shellText(pt: string, lang: ShellLang): string {
-  if (lang === 'pt') return pt;
-  return T[pt]?.[lang] ?? pt;
+  return noEmoji(lang === 'pt' ? pt : (T[pt]?.[lang] ?? pt));
 }
 
 const SE_PATHS = Object.entries(LANG_PATH) as [ShellLang, string][];

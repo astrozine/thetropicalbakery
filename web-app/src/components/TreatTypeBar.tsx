@@ -141,7 +141,7 @@ export default function TreatTypeBar({ treats, value, onChange, label = 'Ver só
           aria-pressed={value.length === 0}
           data-on={value.length === 0 ? 'true' : 'false'}
           onClick={() => onChange([])}
-          style={value.length === 0 ? { background: '#d4af37', color: '#3c2a21', borderColor: '#d4af37' } : undefined}
+          style={value.length === 0 ? { background: '#c9a257', color: '#2a1a12', borderColor: '#c9a257' } : undefined}
         >
           Todos <span className="ttb__n">{within.length}</span>
         </button>
@@ -172,7 +172,7 @@ export default function TreatTypeBar({ treats, value, onChange, label = 'Ver só
         /* min-width/max-width matter: without them this flex item sizes to its content, the inner
            strip never gets to scroll, and the pills push the whole page sideways. */
         .ttb { display: flex; align-items: center; gap: 0.7rem; min-width: 0; max-width: 100%; }
-        .ttb__label { flex: none; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #d4af37; }
+        .ttb__label { flex: none; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #c9a257; }
         /* On a light surface the gold label washes out and the cream ring below disappears. */
         .ttb[data-tone="light"] .ttb__label { color: #8a6d1f; }
         /* Phones: one swipeable strip rather than a block of chips that pushes the treats down the page. */
@@ -185,9 +185,9 @@ export default function TreatTypeBar({ treats, value, onChange, label = 'Ver só
           background: #fff; color: #6d5c50; border: 1px solid #e6ddcd;
           transition: background .15s, color .15s, border-color .15s, transform .12s;
         }
-        .ttb__pill:hover { border-color: var(--pill-accent, #d4af37); color: #3c2a21; }
+        .ttb__pill:hover { border-color: var(--pill-accent, #c9a257); color: #2a1a12; }
         .ttb__pill:active { transform: scale(0.97); }
-        .ttb__pill:focus-visible { outline: 2px solid #d4af37; outline-offset: 2px; }
+        .ttb__pill:focus-visible { outline: 2px solid #c9a257; outline-offset: 2px; }
         /* A cream ring around whatever is switched on, so even the darkest accent (Chocolates)
            still separates from the dark cocoa section behind it. */
         .ttb__pill[data-on="true"] { box-shadow: 0 0 0 2px rgba(253,250,243,0.85), 0 4px 12px rgba(0,0,0,0.25); }

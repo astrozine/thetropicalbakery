@@ -76,7 +76,7 @@ export default function AdminDashboard() {
           background: linear-gradient(160deg, #fdf9f0 0%, #f9f4e6 100%);
           border-radius: 18px;
           border: 1px solid #e6dcc6;
-          box-shadow: 0 2px 10px rgba(60,42,33,0.06);
+          box-shadow: 0 2px 10px rgba(42,26,18,0.06);
           padding: 1.25rem;
         }
 

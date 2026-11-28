@@ -46,7 +46,7 @@ const FLOWS: Record<ItemType, StatusStep[]> = {
   order: [
     { status: 'new', icon: '❓', label: 'Novo Pedido', color: '#c0392b', bg: '#fdecea' },
     { status: 'confirmed', icon: '💰', label: 'Pagamento Confirmado', color: '#8a6d1f', bg: '#fdf7ee' },
-    { status: 'preparing', icon: '👩‍🍳', label: 'Em Preparo', color: '#a6832b', bg: '#fdf7ee' },
+    { status: 'preparing', icon: '👩‍🍳', label: 'Em Preparo', color: '#a8843f', bg: '#fdf7ee' },
     { status: 'shipped', icon: '🛵', label: 'Saiu para Entrega', color: '#1a5276', bg: '#eaf2f8' },
     { status: 'delivered', icon: '✅', label: 'Entregue', color: '#0b6b3a', bg: '#e6f4ec' },
     { status: 'cancelled', icon: '🚫', label: 'Cancelado (caixas liberadas)', color: '#6c757d', bg: '#f1f2f6' },
@@ -54,13 +54,13 @@ const FLOWS: Record<ItemType, StatusStep[]> = {
   retreat_inquiry: [
     { status: 'new', icon: '❓', label: 'Novo', color: '#c0392b', bg: '#fdecea' },
     { status: 'contacted', icon: '📞', label: 'Contato Feito', color: '#8a6d1f', bg: '#fdf7ee' },
-    { status: 'scheduling', icon: '🗓️', label: 'Agendando', color: '#a6832b', bg: '#fdf7ee' },
+    { status: 'scheduling', icon: '🗓️', label: 'Agendando', color: '#a8843f', bg: '#fdf7ee' },
     { status: 'scheduled', icon: '✅', label: 'Evento Agendado', color: '#0b6b3a', bg: '#e6f4ec' },
   ],
   course_inquiry: [
     { status: 'new', icon: '❓', label: 'Novo', color: '#c0392b', bg: '#fdecea' },
     { status: 'contacted', icon: '📞', label: 'Contato Feito', color: '#8a6d1f', bg: '#fdf7ee' },
-    { status: 'scheduling', icon: '🗓️', label: 'Agendando', color: '#a6832b', bg: '#fdf7ee' },
+    { status: 'scheduling', icon: '🗓️', label: 'Agendando', color: '#a8843f', bg: '#fdf7ee' },
     { status: 'scheduled', icon: '✅', label: 'Curso Agendado', color: '#0b6b3a', bg: '#e6f4ec' },
   ],
   waitlist: [
@@ -86,7 +86,7 @@ const FLOWS: Record<ItemType, StatusStep[]> = {
 const PICKUP_ORDER_FLOW: StatusStep[] = [
   { status: 'new', icon: '❓', label: 'Novo Pedido (retirada)', color: '#c0392b', bg: '#fdecea' },
   { status: 'confirmed', icon: '💰', label: 'Pagamento Confirmado (libera o endereço)', color: '#8a6d1f', bg: '#fdf7ee' },
-  { status: 'preparing', icon: '👩‍🍳', label: 'Em Preparo', color: '#a6832b', bg: '#fdf7ee' },
+  { status: 'preparing', icon: '👩‍🍳', label: 'Em Preparo', color: '#a8843f', bg: '#fdf7ee' },
   { status: 'shipped', icon: '🛍️', label: 'Pronta para retirada', color: '#1a5276', bg: '#eaf2f8' },
   { status: 'delivered', icon: '✅', label: 'Retirado', color: '#0b6b3a', bg: '#e6f4ec' },
   { status: 'cancelled', icon: '🚫', label: 'Cancelado (caixas liberadas)', color: '#6c757d', bg: '#f1f2f6' },
@@ -104,7 +104,7 @@ const TYPE_INFO: Record<ItemType, { label: string; icon: string; section: string
   course_inquiry: { label: 'Interesse em Curso', icon: '🍰', section: 'Cursos & Retiros', color: '#b0322a', bg: '#fbe3e0', href: '/admin/inscricoes', hrefLabel: 'Inscrições em Cursos' },
   retreat_inquiry: { label: 'Interesse em Retiro', icon: '🏡', section: 'Cursos & Retiros', color: '#b0322a', bg: '#fbe3e0', href: '/admin/inscricoes', hrefLabel: 'Inscrições em Cursos' },
   contact_lead: { label: 'Contato pelo site', icon: '💬', section: 'Parcerias & Contatos', color: '#0b6b3a', bg: '#e6f4ec' },
-  recipes_signup: { label: 'Receitas grátis', icon: '⭐', section: 'Clientes', color: '#a6832b', bg: '#fdf3d9', href: '/admin/crm', hrefLabel: 'Clientes' },
+  recipes_signup: { label: 'Receitas grátis', icon: '⭐', section: 'Clientes', color: '#a8843f', bg: '#fdf3d9', href: '/admin/crm', hrefLabel: 'Clientes' },
   job_application: { label: 'Candidatura', icon: '👷', section: 'Equipe & Casa', color: '#2f6f9f', bg: '#e1eefa', href: '/admin/vagas', hrefLabel: 'Candidaturas de Emprego' },
 };
 
@@ -613,7 +613,7 @@ export function InboxFull() {
           display: 'flex', gap: '1.25rem', alignItems: 'center', fontWeight: 600,
         }}>
           <span>{toast.text}</span>
-          <button onClick={toast.undo} style={{ background: 'none', border: 'none', color: '#f4d675', fontWeight: 800, cursor: 'pointer', fontSize: '0.95rem' }}>Desfazer</button>
+          <button onClick={toast.undo} style={{ background: 'none', border: 'none', color: '#e8c77e', fontWeight: 800, cursor: 'pointer', fontSize: '0.95rem' }}>Desfazer</button>
         </div>
       )}
     </div>

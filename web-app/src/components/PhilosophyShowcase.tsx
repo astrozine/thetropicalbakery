@@ -26,7 +26,7 @@ const CHIPS = ['Festas', 'Eventos', 'Celebrações', 'Mesas de sobremesa', 'Cate
 
 const rowStyle: React.CSSProperties = {
   display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '1rem',
-  padding: '0.7rem 0', borderBottom: '1px dashed rgba(60,42,33,0.2)',
+  padding: '0.7rem 0', borderBottom: '1px dashed rgba(42,26,18,0.2)',
 };
 
 interface Panel {
@@ -126,7 +126,7 @@ const panels: Panel[] = [
             ['🍯', 'Para ocasiões especiais', 'Doce não é para todo dia. É para celebrar sem bagunçar a saúde.'],
             ['✨', 'Sem trigo**', 'Receitas sem ingredientes com glúten.'],
           ].map(([emoji, name, text]) => (
-            <div key={name} style={{ display: 'flex', gap: '0.85rem', padding: '0.65rem 0', borderBottom: '1px dashed rgba(60,42,33,0.2)' }}>
+            <div key={name} style={{ display: 'flex', gap: '0.85rem', padding: '0.65rem 0', borderBottom: '1px dashed rgba(42,26,18,0.2)' }}>
               <span aria-hidden style={{ fontSize: '1.3rem', lineHeight: 1.4 }}>{emoji}</span>
               <span><strong>{name}</strong><br /><span style={{ color: '#594a42' }}>{text}</span></span>
             </div>
@@ -178,7 +178,7 @@ const panels: Panel[] = [
           ))}
         </div>
         <p style={{ marginTop: '1.1rem', color: '#594a42', lineHeight: 1.7 }}>
-          <strong style={{ color: '#3c2a21' }}>Retirada no home bakery:</strong> escolha a retirada ao fazer o pedido e o
+          <strong style={{ color: '#2a1a12' }}>Retirada no home bakery:</strong> escolha a retirada ao fazer o pedido e o
           endereço aparece na sua conta assim que o pagamento for confirmado.
         </p>
         <div className="phil-cta-row">
@@ -205,13 +205,13 @@ export default function PhilosophyShowcase({ featuredImage }: { featuredImage: s
         <ScrollReveal>
           <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto' }}>
             <span style={{
-              display: 'inline-block', color: '#d4af37', letterSpacing: '0.28em', textTransform: 'uppercase',
+              display: 'inline-block', color: '#c9a257', letterSpacing: '0.28em', textTransform: 'uppercase',
               fontSize: '0.78rem', fontWeight: 600, marginBottom: '1.4rem', paddingBottom: '0.5rem',
               borderBottom: '1px solid rgba(212,175,55,0.4)',
             }}>
               Itamambuca · Mata Atlântica
             </span>
-            <h2 data-sign-top="🌱" data-sign-dark style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.3rem, 6.5vw, 4.4rem)', lineHeight: 1.05, color: '#fdfaf3', marginBottom: '1.4rem' }}>
+            <h2 data-sign-top="🌱" data-sign-dark style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.3rem, 6.5vw, 4.4rem)', lineHeight: 1.05, color: '#faf5ec', marginBottom: '1.4rem' }}>
               Nossa Filosofia
             </h2>
             <p style={{ fontSize: 'clamp(1.05rem, 2.4vw, 1.3rem)', lineHeight: 1.7, color: 'rgba(253,250,243,0.9)' }}>
@@ -230,7 +230,7 @@ export default function PhilosophyShowcase({ featuredImage }: { featuredImage: s
         </ScrollReveal>
 
         <ScrollReveal delay={0.1}>
-          <p style={{ textAlign: 'center', color: '#d4af37', fontSize: '0.8rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, margin: 'clamp(2rem, 5vw, 3rem) 0 1.1rem' }}>
+          <p style={{ textAlign: 'center', color: '#c9a257', fontSize: '0.8rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, margin: 'clamp(2rem, 5vw, 3rem) 0 1.1rem' }}>
             Toque para saber mais
           </p>
           <div className="phil-grid">

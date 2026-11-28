@@ -103,7 +103,7 @@ export default function WaitlistCapture({ theme = 'dark', heading, subheading, p
   if (success) {
     return (
       <div style={{ background: containerBg, padding: '2rem', borderRadius: '16px', backdropFilter: isLight ? 'none' : 'blur(10px)', border: containerBorder, boxShadow: containerShadow, maxWidth: '500px', margin: '0 auto', animation: 'fadeIn 0.5s ease' }}>
-        <h3 style={{ color: '#d4af37', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>Tudo Certo! 🎉</h3>
+        <h3 style={{ color: '#c9a257', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>Tudo Certo! 🎉</h3>
         <p style={{ fontSize: '1.1rem', lineHeight: '1.5', color: textColor }}>
           Você está na nossa lista VIP! Vamos te avisar pelo WhatsApp assim que o próximo lote surpresa for lançado. Fique de olho!
         </p>
@@ -113,7 +113,7 @@ export default function WaitlistCapture({ theme = 'dark', heading, subheading, p
 
   return (
     <div style={{ background: plain ? 'transparent' : containerBg, padding: plain ? '0' : '2rem', borderRadius: '16px', backdropFilter: isLight || plain ? 'none' : 'blur(10px)', border: plain ? 'none' : containerBorder, boxShadow: plain ? 'none' : containerShadow, maxWidth: '500px', margin: '0 auto', textAlign: 'left' }}>
-      <h3 style={{ color: '#d4af37', fontSize: '1.3rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>
+      <h3 style={{ color: '#c9a257', fontSize: '1.3rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)', textAlign: 'center' }}>
         {heading ?? 'Quero ser avisado do próximo lote!'}
       </h3>
       <p style={{ fontSize: '0.9rem', color: subtextColor, marginBottom: '1.5rem', textAlign: 'center' }}>
@@ -180,7 +180,7 @@ export default function WaitlistCapture({ theme = 'dark', heading, subheading, p
         <button 
           type="submit" 
           disabled={loading}
-          style={{ width: '100%', padding: '1rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer', marginTop: '0.5rem', transition: 'background 0.3s' }}
+          style={{ width: '100%', padding: '1rem', background: '#c9a257', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer', marginTop: '0.5rem', transition: 'background 0.3s' }}
         >
           {loading ? 'Cadastrando...' : 'Me Avise Primeiro!'}
         </button>

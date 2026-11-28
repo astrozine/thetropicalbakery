@@ -15,11 +15,11 @@ const STORE_WHATSAPP = '5511932119196';
 
 const card: React.CSSProperties = {
   background: '#fff', border: '1px solid #e8e1d7', borderRadius: '20px',
-  padding: 'clamp(1.25rem, 3vw, 2rem)', boxShadow: '0 8px 24px rgba(60,42,33,0.05)',
+  padding: 'clamp(1.25rem, 3vw, 2rem)', boxShadow: '0 8px 24px rgba(42,26,18,0.05)',
 };
 const label: React.CSSProperties = {
   display: 'block', fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase',
-  color: '#a6832b', fontWeight: 700, marginBottom: '0.4rem',
+  color: '#a8843f', fontWeight: 700, marginBottom: '0.4rem',
 };
 
 const fmtDay = (iso: string) =>
@@ -162,7 +162,7 @@ export default function WorkerPortalPage() {
                 }}>
                   <span aria-hidden style={{ fontSize: '1.6rem' }}>📅</span>
                   <div style={{ flex: 1, minWidth: '180px' }}>
-                    <p style={{ color: '#3c2a21', fontWeight: 700, textTransform: 'capitalize' }}>{fmtDay(s.shift_date)}</p>
+                    <p style={{ color: '#2a1a12', fontWeight: 700, textTransform: 'capitalize' }}>{fmtDay(s.shift_date)}</p>
                     <p style={{ color: '#7a6a61', fontSize: '0.9rem' }}>
                       {s.start_time && s.end_time ? `${hhmm(s.start_time)} às ${hhmm(s.end_time)}` : 'horário a combinar'}
                       {s.task ? ` · ${s.task}` : ''}
@@ -182,20 +182,20 @@ export default function WorkerPortalPage() {
               {MONTH_NAMES[view.getMonth()]} de {view.getFullYear()}
             </h2>
             <button type="button" onClick={() => setMonthOffset(m => m - 1)} aria-label="Mês anterior"
-              style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', cursor: 'pointer', color: '#3c2a21' }}>‹</button>
+              style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', cursor: 'pointer', color: '#2a1a12' }}>‹</button>
             <button type="button" onClick={() => setMonthOffset(m => m + 1)} disabled={monthOffset >= 0} aria-label="Próximo mês"
-              style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', cursor: monthOffset >= 0 ? 'default' : 'pointer', opacity: monthOffset >= 0 ? 0.35 : 1, color: '#3c2a21' }}>›</button>
+              style={{ width: '38px', height: '38px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', cursor: monthOffset >= 0 ? 'default' : 'pointer', opacity: monthOffset >= 0 ? 0.35 : 1, color: '#2a1a12' }}>›</button>
           </div>
 
           {pay && (
             <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', marginBottom: '1.5rem' }}>
               <div>
                 <span style={label}>Turnos feitos</span>
-                <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', color: '#3c2a21' }}>{pay.shifts}</p>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', color: '#2a1a12' }}>{pay.shifts}</p>
               </div>
               <div>
                 <span style={label}>Horas</span>
-                <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', color: '#3c2a21' }}>{pay.hours}h</p>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', color: '#2a1a12' }}>{pay.hours}h</p>
               </div>
               <div>
                 <span style={label}>{pay.isMonthly ? 'Salário do mês' : 'A receber pelas horas'}</span>
@@ -219,7 +219,7 @@ export default function WorkerPortalPage() {
                 return (
                   <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap', borderBottom: '1px solid #f4efe6', padding: '0.6rem 0' }}>
                     <span aria-hidden>{st.emoji}</span>
-                    <span style={{ color: '#3c2a21', minWidth: '110px' }}>
+                    <span style={{ color: '#2a1a12', minWidth: '110px' }}>
                       {new Date(s.shift_date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                     </span>
                     <span style={{ color: '#7a6a61', fontSize: '0.9rem', flex: 1, minWidth: '140px' }}>

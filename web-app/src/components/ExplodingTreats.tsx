@@ -89,7 +89,7 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
                 borderRadius: '20px', 
                 objectFit: 'cover', 
                 cursor: 'pointer', 
-                boxShadow: '0 10px 25px rgba(60,42,33,0.2)',
+                boxShadow: '0 10px 25px rgba(42,26,18,0.2)',
                 aspectRatio: '4/5'
               }}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -107,15 +107,15 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
         {/* Fixed Pinned CTA Action Area */}
         <div style={{ width: '90%', marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
            <div style={{ background: 'rgba(253,250,243,0.72)', backdropFilter: 'blur(14px)', border: '1px solid rgba(212,175,55,0.4)', padding: '1.1rem 1.25rem', borderRadius: '18px', textAlign: 'center' }}>
-            <span style={{ display: 'block', color: '#a6832b', fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            <span style={{ display: 'block', color: '#a8843f', fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               🌴 Itamambuca · Ubatuba
             </span>
-            <p style={{ color: '#3c2a21', fontWeight: 800, fontSize: '0.95rem', margin: '0 0 0.65rem', fontFamily: 'var(--font-heading)' }}>
+            <p style={{ color: '#2a1a12', fontWeight: 800, fontSize: '0.95rem', margin: '0 0 0.65rem', fontFamily: 'var(--font-heading)' }}>
               Veganos Chegando em Itamambuca
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', justifyContent: 'center' }}>
               {tags.map(tag => (
-                <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#3c2a21', fontSize: '0.78rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#2a1a12', fontSize: '0.78rem', fontWeight: 700, padding: '0.25rem 0.6rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)' }}>
                   {tag}
                 </span>
               ))}
@@ -135,7 +135,7 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 flex items-center justify-center"
-              style={{ backdropFilter: 'blur(20px)', background: 'rgba(60, 42, 33, 0.4)', zIndex: 99999 }}
+              style={{ backdropFilter: 'blur(20px)', background: 'rgba(42, 26, 18, 0.4)', zIndex: 99999 }}
             >
               <div className="absolute inset-0 z-[-1]" onClick={() => setSelectedId(null)} />
               <button onClick={() => setSelectedId(null)} className="absolute top-8 right-8 text-white text-4xl" style={{ background: 'none', border: 'none', cursor: 'pointer', zIndex: 100000 }}>✕</button>
@@ -185,7 +185,7 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
               onClick={() => setSelectedId(p.id)}
               style={{
                 cursor: 'pointer', background: '#fffdf8', padding: '9px', borderRadius: '20px',
-                boxShadow: '0 30px 60px -18px rgba(60,42,33,0.45), 0 10px 22px -10px rgba(60,42,33,0.3), inset 0 0 0 1px rgba(212,175,55,0.25)',
+                boxShadow: '0 30px 60px -18px rgba(42,26,18,0.45), 0 10px 22px -10px rgba(42,26,18,0.3), inset 0 0 0 1px rgba(212,175,55,0.25)',
               }}
             >
               <img src={p.src} alt="Caixa de Degustação The Tropical Bakery" style={{ display: 'block', width: '100%', aspectRatio: p.aspect, objectFit: 'cover', borderRadius: '13px' }} />
@@ -200,10 +200,10 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
             transition={{ type: 'spring', stiffness: 80, damping: 12, delay: 0.7 }}
             style={{
               position: 'absolute', zIndex: 3, left: '-4%', bottom: '30%', width: 'clamp(76px, 5.5vw, 100px)', aspectRatio: '1', borderRadius: '50%',
-              background: 'radial-gradient(circle at 30% 25%, #f3dc8a, #d4af37 55%, #a6832b)',
-              boxShadow: '0 12px 26px -8px rgba(60,42,33,0.5), inset 0 0 0 3px rgba(253,250,243,0.55)',
+              background: 'radial-gradient(circle at 30% 25%, #f3dc8a, #c9a257 55%, #a8843f)',
+              boxShadow: '0 12px 26px -8px rgba(42,26,18,0.5), inset 0 0 0 3px rgba(253,250,243,0.55)',
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-              color: '#3c2a21', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.1, fontSize: 'clamp(0.5rem, 0.42vw, 0.64rem)', letterSpacing: '0.08em',
+              color: '#2a1a12', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.1, fontSize: 'clamp(0.5rem, 0.42vw, 0.64rem)', letterSpacing: '0.08em',
             }}
           >
             <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>🌴</span>
@@ -231,7 +231,7 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
         <motion.img
           src="/hero-logo-transparent.png"
           alt="The Tropical Bakery Logo"
-          style={{ width: '150px', position: 'relative', zIndex: 2, filter: 'drop-shadow(0 14px 18px rgba(60,42,33,0.28))', marginBottom: '-64px' }}
+          style={{ width: '150px', position: 'relative', zIndex: 2, filter: 'drop-shadow(0 14px 18px rgba(42,26,18,0.28))', marginBottom: '-64px' }}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1 }}
@@ -249,21 +249,21 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
             // Wider when two boxes sit side by side, so their photos are big enough to want.
             maxWidth: liveBoxes.length > 1 ? '600px' : '480px',
             textAlign: 'center',
-            boxShadow: '0 25px 50px -12px rgba(60,42,33,0.3)',
+            boxShadow: '0 25px 50px -12px rgba(42,26,18,0.3)',
             pointerEvents: 'auto',
             position: 'relative',
           }}
         >
           {liveBoxes.length <= 1 && boxesLeft !== null && boxesLeft > 0 && <BoxesLeftBadge remaining={boxesLeft} variant="sticker" />}
-          <span style={{ display: 'inline-block', color: '#a6832b', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+          <span style={{ display: 'inline-block', color: '#a8843f', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
             🌴 Itamambuca · Ubatuba
           </span>
-          <h2 style={{ color: '#3c2a21', fontWeight: 700, fontSize: 'clamp(1.5rem, 3.4vw, 1.9rem)', marginBottom: '1.1rem', lineHeight: 1.35, letterSpacing: '0.01em', fontFamily: 'var(--font-heading)' }}>
+          <h2 style={{ color: '#2a1a12', fontWeight: 700, fontSize: 'clamp(1.5rem, 3.4vw, 1.9rem)', marginBottom: '1.1rem', lineHeight: 1.35, letterSpacing: '0.01em', fontFamily: 'var(--font-heading)' }}>
             Veganos Chegando em Itamambuca
           </h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
             {tags.map(tag => (
-              <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#3c2a21', fontSize: '0.8rem', fontWeight: 700, padding: '0.35rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.35)' }}>
+              <span key={tag} style={{ background: 'rgba(212,175,55,0.15)', color: '#2a1a12', fontSize: '0.8rem', fontWeight: 700, padding: '0.35rem 0.8rem', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.35)' }}>
                 {tag}
               </span>
             ))}
@@ -283,7 +283,7 @@ export default function ExplodingTreats({ boxesLeft = null, liveBoxes = [] }: { 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 flex items-center justify-center"
-            style={{ backdropFilter: 'blur(20px)', background: 'rgba(60, 42, 33, 0.4)', zIndex: 99999 }}
+            style={{ backdropFilter: 'blur(20px)', background: 'rgba(42, 26, 18, 0.4)', zIndex: 99999 }}
           >
             <div className="absolute inset-0 z-[-1]" onClick={() => setSelectedId(null)} style={{ backdropFilter: 'blur(25px)' }} />
             <button onClick={() => setSelectedId(null)} className="absolute top-8 right-8 text-white text-4xl" style={{ background: 'none', border: 'none', cursor: 'pointer', mixBlendMode: 'difference', zIndex: 100000 }}>✕</button>

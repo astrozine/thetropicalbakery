@@ -30,7 +30,7 @@ const input: React.CSSProperties = { width: '100%', padding: '0.7rem', border: '
 const label: React.CSSProperties = { display: 'block', fontWeight: 700, color: '#2c3e50', marginBottom: '0.3rem', fontSize: '0.85rem' };
 const chip = (on: boolean): React.CSSProperties => ({
   padding: '0.45rem 0.9rem', borderRadius: '999px', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem',
-  border: `2px solid ${on ? '#d4af37' : '#e5e5e5'}`, background: on ? '#fffdf3' : 'white', color: '#2c3e50',
+  border: `2px solid ${on ? '#c9a257' : '#e5e5e5'}`, background: on ? '#fffdf3' : 'white', color: '#2c3e50',
 });
 const dark: React.CSSProperties = { background: '#2c3e50', color: 'white', border: 'none', padding: '0.7rem 1.2rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 };
 const MONTHS = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -249,7 +249,7 @@ export default function RetreatReservations() {
         <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
           {syncNote && <span style={{ fontSize: '0.85rem', color: '#7f8c8d' }}>{syncNote}</span>}
           <button type="button" style={dark} onClick={syncNow} disabled={syncing}>{syncing ? 'Lendo o Airbnb…' : '🔄 Sincronizar agora'}</button>
-          <button type="button" style={{ ...dark, background: '#d4af37', color: '#2c3e50' }} onClick={() => openForm(rooms[1]?.id ?? 'penthouse', addDays(todayBR(), 7))}>+ Novo retiro</button>
+          <button type="button" style={{ ...dark, background: '#c9a257', color: '#2c3e50' }} onClick={() => openForm(rooms[1]?.id ?? 'penthouse', addDays(todayBR(), 7))}>+ Novo retiro</button>
         </div>
       </div>
 
@@ -329,7 +329,7 @@ export default function RetreatReservations() {
 
       {/* New reservation */}
       {form && (
-        <div style={{ ...card, border: '2px solid #d4af37' }}>
+        <div style={{ ...card, border: '2px solid #c9a257' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ margin: '0 0 1rem' }}>Novo retiro</h2>
             <button type="button" style={chip(false)} onClick={() => setForm(null)}>Fechar</button>
@@ -374,7 +374,7 @@ export default function RetreatReservations() {
               </div>
             </div>
             <div><label style={label}>Anotações (alergias, como chegam, pedidos)</label><textarea style={{ ...input, minHeight: '70px' }} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} /></div>
-            <button type="button" style={{ ...dark, background: '#d4af37', color: '#2c3e50', padding: '0.9rem' }} onClick={save} disabled={saving}>
+            <button type="button" style={{ ...dark, background: '#c9a257', color: '#2c3e50', padding: '0.9rem' }} onClick={save} disabled={saving}>
               {saving ? 'Conferindo o Airbnb e salvando…' : 'Salvar e bloquear as noites'}
             </button>
           </div>

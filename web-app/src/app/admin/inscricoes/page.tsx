@@ -131,7 +131,7 @@ export default function CourseRegistrationsAdmin() {
                 {r.focus_areas && r.focus_areas.length > 0 && (
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.6rem' }}>
                     {r.focus_areas.map(a => (
-                      <span key={a} style={{ background: '#fdf7ee', color: '#d4af37', border: '1px solid #e8e1d7', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                      <span key={a} style={{ background: '#fdf7ee', color: '#c9a257', border: '1px solid #e8e1d7', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', fontWeight: 'bold' }}>
                         {a}
                       </span>
                     ))}
@@ -143,7 +143,7 @@ export default function CourseRegistrationsAdmin() {
               <div style={{ flex: '2 1 320px', maxWidth: '640px', minWidth: 0 }}>
                 <h4 style={{ fontSize: '0.8rem', color: '#95a5a6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Mensagem</h4>
                 {r.message ? (
-                  <p style={{ margin: 0, padding: '0.85rem 1.1rem', background: '#fdf7ee', borderLeft: '4px solid #d4af37', borderRadius: '0 10px 10px 0', color: '#2c3e50', fontSize: '0.95rem', lineHeight: 1.75, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+                  <p style={{ margin: 0, padding: '0.85rem 1.1rem', background: '#fdf7ee', borderLeft: '4px solid #c9a257', borderRadius: '0 10px 10px 0', color: '#2c3e50', fontSize: '0.95rem', lineHeight: 1.75, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
                     {r.message}
                   </p>
                 ) : (
@@ -154,7 +154,7 @@ export default function CourseRegistrationsAdmin() {
               <div style={{ flex: '0 0 auto', marginLeft: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <Link
                   href={`/admin/propostas?from=course_registrations:${r.id}`}
-                  style={{ background: '#d4af37', color: 'white', padding: '0.8rem 1.4rem', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', textAlign: 'center', whiteSpace: 'nowrap' }}
+                  style={{ background: '#c9a257', color: 'white', padding: '0.8rem 1.4rem', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', textAlign: 'center', whiteSpace: 'nowrap' }}
                 >
                   💳 Enviar proposta
                 </Link>

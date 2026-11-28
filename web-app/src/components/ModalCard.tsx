@@ -89,7 +89,7 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
           <Image src={imageSrc} alt={title} fill style={{ objectFit: 'cover' }} className="menu-image" />
         </div>
         <div className="menu-content">
-          <h3 className="menu-title" style={{ color: '#3c2a21' }}>{title}</h3>
+          <h3 className="menu-title" style={{ color: '#2a1a12' }}>{title}</h3>
           <p className="menu-desc" style={{ color: '#7a6a61' }}>{description}</p>
         </div>
       </div>
@@ -124,7 +124,7 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
           <div 
             className="order-modal"
             style={{
-              backgroundColor: '#fdfaf3',
+              backgroundColor: '#faf5ec',
               borderRadius: '24px',
               overflow: 'hidden',
               width: '100%',
@@ -151,7 +151,7 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                 alignItems: 'center',
                 justifyContent: 'center',
                 zIndex: 10,
-                color: '#3c2a21'
+                color: '#2a1a12'
               }}
             >
               ×
@@ -161,11 +161,11 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
             </div>
             
             <div style={{ flex: 1, minWidth: 0, padding: '1.75rem 2rem', textAlign: 'center', overflowY: 'auto' }}>
-              <h3 style={{ fontSize: '1.8rem', color: '#3c2a21', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>{title}</h3>
+              <h3 style={{ fontSize: '1.8rem', color: '#2a1a12', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>{title}</h3>
               <p style={{ color: '#594a42', fontSize: '1rem', marginBottom: '1.1rem', lineHeight: 1.6 }}>{description}</p>
               
               <div style={{ background: 'white', padding: '1.1rem 1.25rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '0.9rem', textAlign: 'left' }}>
-                <h4 style={{ marginBottom: '0.75rem', color: '#3c2a21', fontSize: '1.1rem', textAlign: 'center' }}>Quantas caixas você quer?</h4>
+                <h4 style={{ marginBottom: '0.75rem', color: '#2a1a12', fontSize: '1.1rem', textAlign: 'center' }}>Quantas caixas você quer?</h4>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                   {BOX_SIZES.map(option => {
                     const selected = size?.pieces === option.pieces;
@@ -175,7 +175,7 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                         type="button"
                         aria-pressed={selected}
                         onClick={() => setSize(selected ? null : option)}
-                        style={{ flex: 1, padding: '0.6rem 0.25rem', borderRadius: '10px', cursor: 'pointer', textAlign: 'center', lineHeight: 1.3, background: selected ? '#d4af37' : '#fdf7ee', color: selected ? 'white' : '#3c2a21', border: `1px solid ${selected ? '#d4af37' : '#e8e1d7'}` }}
+                        style={{ flex: 1, padding: '0.6rem 0.25rem', borderRadius: '10px', cursor: 'pointer', textAlign: 'center', lineHeight: 1.3, background: selected ? '#c9a257' : '#fdf7ee', color: selected ? 'white' : '#2a1a12', border: `1px solid ${selected ? '#c9a257' : '#e8e1d7'}` }}
                       >
                         <strong style={{ display: 'block' }}>{option.pieces} peças</strong>
                         <span style={{ fontSize: '0.85rem' }}>R$ {option.price}</span>
@@ -185,22 +185,22 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                   })}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-                  <span style={{ fontWeight: 600, color: '#3c2a21' }}>Quantidade de caixas</span>
+                  <span style={{ fontWeight: 600, color: '#2a1a12' }}>Quantidade de caixas</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
-                    <button type="button" aria-label="Menos" onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #e8e1d7', background: '#fff', color: '#3c2a21', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold' }}>-</button>
-                    <span aria-live="polite" style={{ minWidth: '1.5rem', textAlign: 'center', fontSize: '1.2rem', fontWeight: 'bold', color: '#3c2a21' }}>{quantity}</span>
-                    <button type="button" aria-label="Mais" onClick={() => setQuantity(q => Math.min(20, q + 1))} style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: '#d4af37', color: '#fff', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold' }}>+</button>
+                    <button type="button" aria-label="Menos" onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #e8e1d7', background: '#fff', color: '#2a1a12', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold' }}>-</button>
+                    <span aria-live="polite" style={{ minWidth: '1.5rem', textAlign: 'center', fontSize: '1.2rem', fontWeight: 'bold', color: '#2a1a12' }}>{quantity}</span>
+                    <button type="button" aria-label="Mais" onClick={() => setQuantity(q => Math.min(20, q + 1))} style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: '#c9a257', color: '#fff', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold' }}>+</button>
                   </div>
                 </div>
                 {size && (
-                  <p style={{ marginTop: '0.9rem', textAlign: 'right', color: '#3c2a21' }}>
+                  <p style={{ marginTop: '0.9rem', textAlign: 'right', color: '#2a1a12' }}>
                     {quantity} × R$ {size.price} = <strong>{formatBRL(quantity * size.price)}</strong>
                   </p>
                 )}
               </div>
 
               <div style={{ background: 'white', padding: '1.1rem 1.25rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '1.1rem' }}>
-                <h4 style={{ marginBottom: '0.75rem', color: '#3c2a21', fontSize: '1.1rem' }}>Preencha seus dados para continuar</h4>
+                <h4 style={{ marginBottom: '0.75rem', color: '#2a1a12', fontSize: '1.1rem' }}>Preencha seus dados para continuar</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
                   <input 
                     type="text" 
@@ -228,7 +228,7 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                     flex: '1 1 200px',
                     fontSize: '0.95rem',
                     padding: '1rem 0.75rem',
-                    background: '#d4af37',
+                    background: '#c9a257',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -293,7 +293,7 @@ export default function ModalCard({ imageSrc, title, description }: ModalCardPro
                   <button 
                     onClick={() => setErrorMsg('')}
                     className="btn btn-primary"
-                    style={{ width: '100%', padding: '1rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                    style={{ width: '100%', padding: '1rem', background: '#c9a257', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
                   >
                     Entendido
                   </button>

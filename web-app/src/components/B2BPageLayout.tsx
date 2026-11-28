@@ -105,7 +105,7 @@ export default function B2BPageLayout({
 
       {/* Partnership options */}
       <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(3.5rem, 7vw, 5.5rem)', paddingBottom: '1rem' }}>
-        <h2 style={{ position: 'relative', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#3c2a21', marginBottom: 'clamp(1.5rem, 4vw, 3rem)' }}>
+        <h2 style={{ position: 'relative', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#2a1a12', marginBottom: 'clamp(1.5rem, 4vw, 3rem)' }}>
           {optionsHeading}
         </h2>
         {/* Phones: the options swipe sideways (tb-rail) instead of stacking four tall cards (2026-11-13). */}
@@ -113,7 +113,7 @@ export default function B2BPageLayout({
           {options.map((opt, i) => (
             <div key={i} className="liquid-glass-card" style={{ padding: 'clamp(1.4rem, 4vw, 2rem)', textAlign: 'center' }}>
               <div style={{ fontSize: '2.4rem', marginBottom: '1rem' }}>{opt.icon}</div>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: '#3c2a21', marginBottom: '0.75rem' }}>{opt.title}</h3>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: '#2a1a12', marginBottom: '0.75rem' }}>{opt.title}</h3>
               <p style={{ color: '#594a42', lineHeight: 1.7, fontSize: '0.98rem' }}>{opt.description}</p>
               {opt.note && <p style={{ marginTop: '1rem', color: '#8a6d1f', fontWeight: 700, fontSize: '0.95rem' }}>{opt.note}</p>}
               {opt.link && (
@@ -132,7 +132,7 @@ export default function B2BPageLayout({
       <section className="container px-4 max-w-4xl mx-auto text-center" style={{ paddingTop: '1rem', paddingBottom: 'clamp(3rem, 8vw, 7.5rem)' }}>
         {whyChooseUs.length > 0 && (
           <>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#d4af37', fontFamily: 'var(--font-heading)' }}>{whyHeading}</h3>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#c9a257', fontFamily: 'var(--font-heading)' }}>{whyHeading}</h3>
             <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2.5rem', color: '#594a42', lineHeight: 2, fontSize: '1.05rem' }}>
               {whyChooseUs.map((line, i) => (
                 <li key={i}>✦ {line}</li>

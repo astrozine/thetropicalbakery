@@ -52,8 +52,8 @@ export default function BoxesLeftBadge({ remaining, variant = 'hero' }: { remain
         /* Home page: stuck on the corner of the light "Veganos chegando" card, so it is placed against that
            card (the caller makes it position: relative) and softened for a cream background. */
         .boxes-left--sticker { display: block; top: auto; left: auto; bottom: 0.5rem; right: -4.4rem; width: clamp(112px, 9vw, 148px); z-index: 12; }
-        .boxes-left--sticker .boxes-left__disc { filter: drop-shadow(0 0 8px rgba(255,118,117,0.45)) drop-shadow(0 5px 12px rgba(60,42,33,0.28)); }
-        .boxes-left--sticker .boxes-left__label { color: #ff5a59; text-shadow: 0 0 4px #fdfaf3, 0 0 10px #fdfaf3, 0 0 16px #fdfaf3; }
+        .boxes-left--sticker .boxes-left__disc { filter: drop-shadow(0 0 8px rgba(255,118,117,0.45)) drop-shadow(0 5px 12px rgba(42,26,18,0.28)); }
+        .boxes-left--sticker .boxes-left__label { color: #ff5a59; text-shadow: 0 0 4px #faf5ec, 0 0 10px #faf5ec, 0 0 16px #faf5ec; }
         @media (prefers-reduced-motion: reduce) { .boxes-left { animation: none; transform: rotate(-4deg); } }
       ` }} />
     </div>

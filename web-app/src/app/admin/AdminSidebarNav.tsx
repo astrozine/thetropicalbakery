@@ -90,8 +90,8 @@ export default function AdminSidebarNav({ pathname, unreadCount, partnerCount = 
       {/* The one thing Dolly does every week */}
       <div style={{ padding: '0.4rem 0.9rem 0.5rem' }}>
         <Link href={NEW_BOX_PATH} onClick={onNavigate} title="Montar a caixa de degustação da semana"
-          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.7rem 0.9rem', borderRadius: '14px', textDecoration: 'none', background: 'linear-gradient(135deg, #f4c542, #e2a52a)', color: '#3c2a21', fontWeight: 800, fontSize: '0.98rem', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
-          <span aria-hidden style={{ width: '2rem', height: '2rem', borderRadius: '50%', background: '#3c2a21', color: '#f4c542', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', lineHeight: 1, paddingBottom: '0.15rem' }}>+</span>
+          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.7rem 0.9rem', borderRadius: '14px', textDecoration: 'none', background: 'linear-gradient(135deg, #f4c542, #e2a52a)', color: '#2a1a12', fontWeight: 800, fontSize: '0.98rem', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
+          <span aria-hidden style={{ width: '2rem', height: '2rem', borderRadius: '50%', background: '#2a1a12', color: '#f4c542', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', lineHeight: 1, paddingBottom: '0.15rem' }}>+</span>
           Nova caixa da semana
         </Link>
       </div>

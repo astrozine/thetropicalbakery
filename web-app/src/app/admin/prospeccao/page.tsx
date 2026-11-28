@@ -144,7 +144,7 @@ export default function AdminProspectsPage() {
 
   const pill = (active: boolean): React.CSSProperties => ({
     padding: '0.4rem 0.9rem', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.82rem',
-    border: active ? '2px solid #d4af37' : '1px solid #dfe4ea', background: active ? '#fdf6dd' : '#fff', color: '#2c3e50',
+    border: active ? '2px solid #c9a257' : '1px solid #dfe4ea', background: active ? '#fdf6dd' : '#fff', color: '#2c3e50',
   });
   const dueCount = leads.filter(due).length;
 
@@ -176,7 +176,7 @@ export default function AdminProspectsPage() {
         </select>
         <form onSubmit={add} style={{ display: 'flex', gap: '0.4rem', flex: '1 1 260px', minWidth: 0 }}>
           <input type="text" placeholder="Novo contato (nome do negócio)" value={newName} onChange={e => setNewName(e.target.value)} style={{ ...field, minWidth: 0 }} />
-          <button type="submit" style={{ ...btn, background: '#d4af37' }}>Adicionar</button>
+          <button type="submit" style={{ ...btn, background: '#c9a257' }}>Adicionar</button>
         </form>
       </div>
 

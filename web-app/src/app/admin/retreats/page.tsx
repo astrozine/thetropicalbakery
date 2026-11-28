@@ -71,8 +71,8 @@ export default function AdminRetreatsPage() {
   }
 
   return (
-    <div className="fade-in" style={{ maxWidth: '1100px', margin: '0 auto', color: '#3c2a21' }}>
-      <h1 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: '#d4af37' }}>
+    <div className="fade-in" style={{ maxWidth: '1100px', margin: '0 auto', color: '#2a1a12' }}>
+      <h1 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: '#c9a257' }}>
         Gerenciar Imagens dos Retiros
       </h1>
       <p style={{ fontSize: '1.1rem', color: '#594a42', marginBottom: '2rem' }}>
@@ -105,7 +105,7 @@ export default function AdminRetreatsPage() {
                 style={{ width: '120px', height: '90px', objectFit: 'cover', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.4)' }}
                 onError={(e) => { (e.target as HTMLImageElement).src = '/retreats/Room with open ripada door.jpg'; }}
               />
-              <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: '#3c2a21', margin: 0 }}>
+              <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: '#2a1a12', margin: 0 }}>
                 {room.name}
               </h3>
             </div>
@@ -117,7 +117,7 @@ export default function AdminRetreatsPage() {
             />
 
             <div style={{ borderTop: '1px solid rgba(212,175,55,0.3)', paddingTop: '1.25rem' }}>
-              <strong style={{ display: 'block', color: '#3c2a21', marginBottom: '0.75rem' }}>Preço e capacidade</strong>
+              <strong style={{ display: 'block', color: '#2a1a12', marginBottom: '0.75rem' }}>Preço e capacidade</strong>
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
                 <div style={{ flex: '1 1 160px', maxWidth: '220px' }}>
                   <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 'bold', color: '#594a42', marginBottom: '0.5rem' }}>

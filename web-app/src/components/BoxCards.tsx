@@ -35,17 +35,17 @@ export function BoxCards({ boxes, prices, heading, sub, onPick }: {
     <section className="bxc" aria-label={heading}>
       <style>{`
         .bxc { max-width: 1000px; margin: 0 auto; }
-        .bxc-kicker { text-align: center; color: #a6832b; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.4rem; }
-        .bxc-h { text-align: center; font-family: var(--font-heading); color: #3c2a21; font-size: clamp(1.5rem, 4vw, 2.1rem); line-height: 1.15; margin: 0 0 1.25rem; }
+        .bxc-kicker { text-align: center; color: #a8843f; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.4rem; }
+        .bxc-h { text-align: center; font-family: var(--font-heading); color: #2a1a12; font-size: clamp(1.5rem, 4vw, 2.1rem); line-height: 1.15; margin: 0 0 1.25rem; }
         .bxc-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
-        .bxc-card { display: flex; gap: 0.9rem; align-items: center; width: 100%; text-align: left; background: #fff; border: 1px solid #e8e1d7; border-radius: 18px; padding: 0.75rem; cursor: pointer; color: #3c2a21; text-decoration: none; box-shadow: 0 10px 24px rgba(60,42,33,0.08); transition: transform 0.2s, box-shadow 0.2s; font: inherit; }
-        .bxc-card:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(60,42,33,0.14); }
+        .bxc-card { display: flex; gap: 0.9rem; align-items: center; width: 100%; text-align: left; background: #fff; border: 1px solid #e8e1d7; border-radius: 18px; padding: 0.75rem; cursor: pointer; color: #2a1a12; text-decoration: none; box-shadow: 0 10px 24px rgba(42,26,18,0.08); transition: transform 0.2s, box-shadow 0.2s; font: inherit; }
+        .bxc-card:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(42,26,18,0.14); }
         .bxc-card img { width: 88px; height: 88px; flex-shrink: 0; object-fit: cover; border-radius: 12px; background: #f5efe2; }
         .bxc-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem; }
         .bxc-badge { align-self: flex-start; background: #fff5d6; color: #8a6d00; border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.75rem; font-weight: 800; }
         .bxc-title { font-weight: 800; line-height: 1.25; overflow-wrap: anywhere; }
         .bxc-meta { font-size: 0.85rem; color: #594a42; }
-        .bxc-go { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: #d4af37; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+        .bxc-go { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: #c9a257; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
       `}</style>
       <p className="bxc-kicker" data-sign="🎁">{boxes.length === 1 ? 'Mais uma caixa à venda' : `Mais ${boxes.length} caixas à venda`}</p>
       <h2 className="bxc-h">{heading}</h2>

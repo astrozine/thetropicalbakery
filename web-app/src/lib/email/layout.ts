@@ -16,10 +16,10 @@ export const SITE_URL = 'https://thetropicalbakery.com';
 export const STORE_WHATSAPP = '5511932119196';
 export const FROM_ADDRESS = 'The Tropical Bakery <nao-responda@thetropicalbakery.com>';
 
-const COCOA = '#3c2a21';
-const GOLD = '#d4af37';
-const GOLD_DEEP = '#a6832b';
-const CREAM = '#fdfaf3';
+const COCOA = '#2a1a12';
+const GOLD = '#c9a257';
+const GOLD_DEEP = '#a8843f';
+const CREAM = '#faf5ec';
 const SAND = '#f3ead8';
 const LINE = '#eadfca';
 const TEXT = '#594a42';
@@ -409,7 +409,7 @@ function factsRow(facts: EmailFact[]): string {
 export function button(label: string, href: string, bg = GOLD, ink = COCOA): string {
   return `
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:6px auto 4px;">
-      <tr><td bgcolor="${bg}" style="background:${bg};border-radius:999px;box-shadow:0 6px 16px rgba(60,42,33,0.25);">
+      <tr><td bgcolor="${bg}" style="background:${bg};border-radius:999px;box-shadow:0 6px 16px rgba(42,26,18,0.25);">
         <a href="${href}" style="display:inline-block;padding:16px 32px;font-family:${BODY_FONT};font-size:14px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:${ink};text-decoration:none;border-radius:999px;">${esc(label)}&nbsp;&rarr;</a>
       </td></tr>
     </table>`;
@@ -512,7 +512,7 @@ export function renderEmail(o: LayoutOptions): string {
 
         <tr><td>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff"
-            style="background:#ffffff;border:1px solid ${LINE};border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 18px 40px rgba(60,42,33,0.10);">
+            style="background:#ffffff;border:1px solid ${LINE};border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 18px 40px rgba(42,26,18,0.10);">
             <tr><td bgcolor="${SAND}" style="background:${SAND};line-height:0;font-size:0;border-radius:22px 22px 0 0;overflow:hidden;">
               <img src="${esc(heroSrc)}" width="580" ${heroSize} alt="${esc(heroAlt)}"
                 style="display:block;width:100%;max-width:580px;height:auto;border:0;border-radius:22px 22px 0 0;">

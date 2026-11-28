@@ -24,9 +24,9 @@ export default function Footer() {
 
   return (
     <footer className="footer fade-in relative" style={{
-      backgroundColor: '#3c2a21',
+      backgroundColor: '#2a1a12',
       overflow: 'hidden',
-      color: '#fdfaf3',
+      color: '#faf5ec',
       padding: '6rem 2rem 3rem'
     }}>
       {/* Phones: the link lists sit two by two and the padding shrinks, so the footer no longer takes two screens. */}
@@ -49,10 +49,10 @@ export default function Footer() {
         backgroundImage: 'url(/textures/copacabana-baker.webp)', backgroundSize: 'cover', backgroundPosition: 'center 65%',
         filter: 'grayscale(1) sepia(0.45) contrast(1.1)',
       }} />
-      <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(60,42,33,0.82) 0%, rgba(60,42,33,0.72) 100%)' }} />
+      <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(42,26,18,0.82) 0%, rgba(42,26,18,0.72) 100%)' }} />
       <div className="container footer-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
         <div className="footer-brand">
-          <img src="/logo.svg" alt="The Tropical Bakery" loading="lazy" decoding="async" style={{ height: '60px', marginBottom: '1rem', filter: 'brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(5deg)' }} />
+          <img src="/logo-pineapple-sm.webp" alt="The Tropical Bakery" loading="lazy" decoding="async" width={121} height={180} style={{ height: '96px', width: 'auto', marginBottom: '1rem', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.35))' }} />
           <p style={{ marginBottom: '1rem', color: '#e8e1d7' }}>{t('Confeitaria saudável de luxo em Ubatuba, pelas mãos da chef belga Elisabeth “Dolly” Van Dam.')}</p>
           <span className="footer-seal"><OriginSeal tone="dark" style={{ marginBottom: '1.75rem' }} /></span>
           <br />
@@ -60,15 +60,15 @@ export default function Footer() {
         </div>
         
         <div>
-          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t('Menu')}</h3>
+          <h3 style={{ marginBottom: '1rem', color: '#c9a257', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t('Menu')}</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, lineHeight: '2' }}>
             {BOX_SALE_ON ? (
               <>
-                <li><Link href="/assinatura" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>{t('Assinatura Semanal')}</Link></li>
+                <li><Link href="/assinatura" onClick={handleScrollToTop} style={{ color: '#c9a257', textDecoration: 'none', fontWeight: 600 }}>{t('Assinatura Semanal')}</Link></li>
                 <li><Link href="/" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Fazer Pedido')}</Link></li>
               </>
             ) : (
-              <li><Link href="/menu" onClick={handleScrollToTop} style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>{t('Doces para Eventos')}</Link></li>
+              <li><Link href="/menu" onClick={handleScrollToTop} style={{ color: '#c9a257', textDecoration: 'none', fontWeight: 600 }}>{t('Doces para Eventos')}</Link></li>
             )}
             <li><Link href="/cursos" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Cursos com Dolly')}</Link></li>
             <li><Link href="/dolly" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Sobre a Dolly')}</Link></li>
@@ -78,7 +78,7 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t('Parcerias')}</h3>
+          <h3 style={{ marginBottom: '1rem', color: '#c9a257', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t('Parcerias')}</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, lineHeight: '2' }}>
             <li><Link href="/b2b/hotels" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Hotéis')}</Link></li>
             <li><Link href="/b2b/pousadas" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Pousadas')}</Link></li>
@@ -90,7 +90,7 @@ export default function Footer() {
           </ul>
         </div>
         <div className="footer-contact">
-          <h3 style={{ marginBottom: '1rem', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t('Contato')}</h3>
+          <h3 style={{ marginBottom: '1rem', color: '#c9a257', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t('Contato')}</h3>
           <p style={{ lineHeight: 1.7, color: '#e8e1d7', fontSize: '0.92rem' }}>
             {lang === 'pt' ? (
               <>Home bakery em Itamambuca, Ubatuba · SP.<br />
@@ -98,7 +98,7 @@ export default function Footer() {
             ) : 'Home bakery in Itamambuca, Ubatuba · SP, Brazil.'}
           </p>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0.75rem 0 0', lineHeight: '2' }}>
-            <li><a href={`https://wa.me/${STORE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" style={{ color: '#d4af37', textDecoration: 'none', fontWeight: 600 }}>WhatsApp {STORE_WHATSAPP_DISPLAY}</a></li>
+            <li><a href={`https://wa.me/${STORE_WHATSAPP}`} target="_blank" rel="noopener noreferrer" style={{ color: '#c9a257', textDecoration: 'none', fontWeight: 600 }}>WhatsApp {STORE_WHATSAPP_DISPLAY}</a></li>
             <li><Link href="/minha-conta" onClick={handleScrollToTop} style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Minha conta e retiradas')}</Link></li>
             <li><a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#e8e1d7', textDecoration: 'none' }}>{t('Sunbaked Letters, a newsletter ↗')}</a></li>
           </ul>

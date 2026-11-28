@@ -29,7 +29,7 @@ export default function ScatteredImages({ sectionId }: ScatteredImagesProps) {
           borderRadius: '12px',
           objectFit: 'cover',
           zIndex: 0,
-          boxShadow: '0 10px 25px rgba(60,42,33,0.1)',
+          boxShadow: '0 10px 25px rgba(42,26,18,0.1)',
           transform: 'rotate(-15deg)',
           opacity: 0.8
         }}
@@ -49,7 +49,7 @@ export default function ScatteredImages({ sectionId }: ScatteredImagesProps) {
           borderRadius: '12px',
           objectFit: 'cover',
           zIndex: 0,
-          boxShadow: '0 10px 25px rgba(60,42,33,0.1)',
+          boxShadow: '0 10px 25px rgba(42,26,18,0.1)',
           transform: 'rotate(20deg)',
           opacity: 0.7
         }}
@@ -69,7 +69,7 @@ export default function ScatteredImages({ sectionId }: ScatteredImagesProps) {
           borderRadius: '12px',
           objectFit: 'cover',
           zIndex: 0,
-          boxShadow: '0 10px 25px rgba(60,42,33,0.1)',
+          boxShadow: '0 10px 25px rgba(42,26,18,0.1)',
           transform: 'rotate(-10deg)',
           opacity: 0.6
         }}

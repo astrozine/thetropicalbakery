@@ -87,7 +87,7 @@ export function TreatTags({ item, size = 'sm' }: { item: TreatDetailItem; size?:
         </span>
       )}
       {kind && (
-        <span style={{ maxWidth: '100%', lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(60,42,33,0.85)', color: '#fdfaf3', padding: pad, borderRadius: '20px', fontSize: fs, fontWeight: 700, letterSpacing: '0.02em', backdropFilter: 'blur(2px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span style={{ maxWidth: '100%', lineHeight: 1.25, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(42,26,18,0.85)', color: '#faf5ec', padding: pad, borderRadius: '20px', fontSize: fs, fontWeight: 700, letterSpacing: '0.02em', backdropFilter: 'blur(2px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           <span aria-hidden>{kind.emoji}</span>{kind.label}
         </span>
       )}
@@ -166,7 +166,7 @@ export default function TreatDetail({ item, picked = false, onTogglePick, onAdd,
                 onClick={onTogglePick}
                 aria-pressed={picked}
                 style={{ width: '100%', minHeight: '48px', marginBottom: '1rem', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, fontSize: '0.95rem', fontFamily: 'inherit',
-                  border: '2px solid #d4af37', background: picked ? '#d4af37' : 'rgba(212,175,55,0.08)', color: picked ? '#3c2a21' : '#8a6d1f' }}
+                  border: '2px solid #c9a257', background: picked ? '#c9a257' : 'rgba(212,175,55,0.08)', color: picked ? '#2a1a12' : '#8a6d1f' }}
               >
                 {picked ? '✓ Na sua escolha rápida (toque para tirar)' : '+ Incluir na escolha rápida'}
               </button>
@@ -175,12 +175,12 @@ export default function TreatDetail({ item, picked = false, onTogglePick, onAdd,
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontSize: '0.85rem', color: '#7a6a61' }}>Preço unitário</span>
-                <span style={{ fontWeight: 'bold', color: '#3c2a21', fontSize: '1.3rem' }}>R$ {item.price}</span>
+                <span style={{ fontWeight: 'bold', color: '#2a1a12', fontSize: '1.3rem' }}>R$ {item.price}</span>
               </div>
               <button
                 type="button"
                 onClick={onAdd}
-                style={{ background: '#d4af37', color: 'white', border: 'none', padding: '1rem 2rem', borderRadius: '12px', fontWeight: 'bold', fontSize: '1rem', textTransform: 'uppercase', boxShadow: '0 4px 15px rgba(212,175,55,0.4)', cursor: 'pointer' }}
+                style={{ background: '#c9a257', color: 'white', border: 'none', padding: '1rem 2rem', borderRadius: '12px', fontWeight: 'bold', fontSize: '1rem', textTransform: 'uppercase', boxShadow: '0 4px 15px rgba(212,175,55,0.4)', cursor: 'pointer' }}
               >
                 Adicionar +
               </button>
@@ -197,7 +197,7 @@ export default function TreatDetail({ item, picked = false, onTogglePick, onAdd,
           display: grid; grid-template-rows: min(58vh, 100vw) auto; }
         .treat-detail-info { padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); }
         .treat-detail-close { position: absolute; top: 12px; right: 12px; z-index: 2; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,0.92);
-          color: #3c2a21; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; }
+          color: #2a1a12; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; }
         /* Wide screens: a centred card, the photo as tall as the card on the left, details scrolling on the right. */
         @media (min-width: 768px) {
           .treat-detail { align-items: center; padding: 2rem; }

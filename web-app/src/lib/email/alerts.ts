@@ -184,10 +184,10 @@ function receivedBlock(a: Alert, mails: SentMail[] | null): string {
   const ok = (m: SentMail) => m.status !== 'failed';
   const good = (mails || []).filter(ok);
   const box = (bg: string, line: string, inner: string) =>
-    `<div style="margin:6px 0 18px;padding:14px 16px;border-radius:12px;background:${bg};border:1px solid ${line};font-family:${FONT};font-size:15px;line-height:1.55;color:#3c2a21;">${inner}</div>`;
-  const title = (t: string) => `<p style="margin:0 0 6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;color:#3c2a21;">${t}</p>`;
+    `<div style="margin:6px 0 18px;padding:14px 16px;border-radius:12px;background:${bg};border:1px solid ${line};font-family:${FONT};font-size:15px;line-height:1.55;color:#2a1a12;">${inner}</div>`;
+  const title = (t: string) => `<p style="margin:0 0 6px;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;color:#2a1a12;">${t}</p>`;
   const preview = a.expects?.previewUrl
-    ? `<p style="margin:8px 0 0;"><a href="${a.expects.previewUrl}" style="color:#a6832b;font-weight:bold;">See the e-mail they got &rarr;</a></p>`
+    ? `<p style="margin:8px 0 0;"><a href="${a.expects.previewUrl}" style="color:#a8843f;font-weight:bold;">See the e-mail they got &rarr;</a></p>`
     : '';
   if (good.length) {
     return box('#eefbf1', '#bfe8cb',
@@ -209,7 +209,7 @@ function body(a: Alert, mails: SentMail[] | null) {
   if (a.whatsapp) contact.push(`WhatsApp: <a href="${waLink(a.whatsapp)}">${esc(a.whatsapp)}</a>`);
   if (a.email) contact.push(`E-mail: <a href="mailto:${esc(a.email)}">${esc(a.email)}</a>`);
   return (
-    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:0 0 16px;font-family:${FONT};font-size:16px;line-height:1.5;color:#3c2a21;">` +
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:0 0 16px;font-family:${FONT};font-size:16px;line-height:1.5;color:#2a1a12;">` +
     rows.map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;font-weight:700;white-space:nowrap;vertical-align:top;">${esc(k)}</td><td style="padding:4px 0;">${esc(String(v))}</td></tr>`).join('') +
     `</table>` +
     (contact.length ? `<p style="margin:0 0 12px;font-family:${FONT};font-size:16px;">${contact.join('<br>')}</p>` : '') +

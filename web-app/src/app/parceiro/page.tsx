@@ -18,11 +18,11 @@ const STORE_WHATSAPP = '5511932119196';
 
 const card: React.CSSProperties = {
   background: '#fff', border: '1px solid #e8e1d7', borderRadius: '20px',
-  padding: 'clamp(1.25rem, 3vw, 2rem)', boxShadow: '0 8px 24px rgba(60,42,33,0.05)',
+  padding: 'clamp(1.25rem, 3vw, 2rem)', boxShadow: '0 8px 24px rgba(42,26,18,0.05)',
 };
 const label: React.CSSProperties = {
   display: 'block', fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase',
-  color: '#a6832b', fontWeight: 700, marginBottom: '0.4rem',
+  color: '#a8843f', fontWeight: 700, marginBottom: '0.4rem',
 };
 const input: React.CSSProperties = {
   width: '100%', padding: '0.85rem 1rem', border: '1px solid rgba(212,175,55,0.5)',
@@ -204,14 +204,14 @@ export default function PartnerPortalPage() {
           <div style={card}>
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', color: 'var(--color-primary)', marginBottom: '1.25rem' }}>Nossa parceria</h2>
             <dl style={{ margin: 0, display: 'grid', gap: '0.9rem' }}>
-              <div><dt style={label}>Tipo</dt><dd style={{ margin: 0, color: '#3c2a21' }}>{kind.label}</dd></div>
-              {partner.contact_name && <div><dt style={label}>Contato</dt><dd style={{ margin: 0, color: '#3c2a21' }}>{partner.contact_name}</dd></div>}
+              <div><dt style={label}>Tipo</dt><dd style={{ margin: 0, color: '#2a1a12' }}>{kind.label}</dd></div>
+              {partner.contact_name && <div><dt style={label}>Contato</dt><dd style={{ margin: 0, color: '#2a1a12' }}>{partner.contact_name}</dd></div>}
               {(partner.address || partner.neighborhood) && (
-                <div><dt style={label}>Endereço</dt><dd style={{ margin: 0, color: '#3c2a21' }}>{[partner.address, partner.neighborhood].filter(Boolean).join(' — ')}</dd></div>
+                <div><dt style={label}>Endereço</dt><dd style={{ margin: 0, color: '#2a1a12' }}>{[partner.address, partner.neighborhood].filter(Boolean).join(' — ')}</dd></div>
               )}
               {partner.commission_pct > 0 && (
                 <div><dt style={label}>{partner.kind === 'afiliado' ? 'Sua comissão' : 'Sua margem'}</dt>
-                  <dd style={{ margin: 0, color: '#3c2a21', fontWeight: 700 }}>{partner.commission_pct}%</dd></div>
+                  <dd style={{ margin: 0, color: '#2a1a12', fontWeight: 700 }}>{partner.commission_pct}%</dd></div>
               )}
               {partner.affiliate_code && (
                 <div>
@@ -249,11 +249,11 @@ export default function PartnerPortalPage() {
               <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))' }}>
                 <div>
                   <span style={label}>Pedidos</span>
-                  <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.9rem', color: '#3c2a21' }}>{affiliate.orders_count}</p>
+                  <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.9rem', color: '#2a1a12' }}>{affiliate.orders_count}</p>
                 </div>
                 <div>
                   <span style={label}>Vendas</span>
-                  <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.9rem', color: '#3c2a21' }}>{formatBRL(affiliate.revenue || 0)}</p>
+                  <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.9rem', color: '#2a1a12' }}>{formatBRL(affiliate.revenue || 0)}</p>
                 </div>
                 <div>
                   <span style={label}>Sua comissão</span>
@@ -276,7 +276,7 @@ export default function PartnerPortalPage() {
               <li><strong>Fora do freezer e da geladeira, poucas horas</strong>, menos ainda no calor. Não deixe doce cremoso exposto ao sol.</li>
               <li><strong>Alérgenos:</strong> nada leva trigo, mas todos podem ter traços de glúten, castanhas, amendoim, coco, gergelim, soja e aveia. Se um cliente perguntar, mostre os ingredientes no site ou chame a Dolly.</li>
             </ul>
-            <Link href={CARE_PATH} target="_blank" style={{ display: 'inline-block', marginTop: '0.9rem', fontSize: '0.88rem', fontWeight: 600, color: '#a6832b' }}>
+            <Link href={CARE_PATH} target="_blank" style={{ display: 'inline-block', marginTop: '0.9rem', fontSize: '0.88rem', fontWeight: 600, color: '#a8843f' }}>
               Página para mostrar aos seus clientes →
             </Link>
           </div>
@@ -327,7 +327,7 @@ export default function PartnerPortalPage() {
                     const st = RESTOCK_STATUS[r.status];
                     return (
                       <div key={r.id} style={{ border: '1px solid #f0e9dd', borderRadius: '12px', padding: '0.85rem 1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                        <span style={{ flex: 1, minWidth: '200px', color: '#3c2a21', lineHeight: 1.6 }}>{r.items}</span>
+                        <span style={{ flex: 1, minWidth: '200px', color: '#2a1a12', lineHeight: 1.6 }}>{r.items}</span>
                         {r.wanted_date && (
                           <span style={{ color: '#7a6a61', fontSize: '0.85rem' }}>
                             para {new Date(r.wanted_date + 'T00:00:00').toLocaleDateString('pt-BR')}

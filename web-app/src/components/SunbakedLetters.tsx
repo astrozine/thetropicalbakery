@@ -18,15 +18,15 @@ export default function SunbakedLetters({ tone = 'light' }: { tone?: 'light' | '
       style={{
         maxWidth: '760px', margin: '0 auto', textAlign: 'center',
         padding: 'clamp(1.5rem, 4vw, 2.25rem)', borderRadius: '20px',
-        background: dark ? 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)' : 'linear-gradient(135deg, #fffaf0 0%, #fdf1d6 100%)',
+        background: dark ? 'linear-gradient(135deg, #2a1a12 0%, #5a3d2e 100%)' : 'linear-gradient(135deg, #fffaf0 0%, #fdf1d6 100%)',
         border: `1px solid ${dark ? 'rgba(212,175,55,0.5)' : 'rgba(212,175,55,0.45)'}`,
-        boxShadow: dark ? '0 16px 40px rgba(0,0,0,0.25)' : '0 8px 24px rgba(60,42,33,0.08)',
+        boxShadow: dark ? '0 16px 40px rgba(0,0,0,0.25)' : '0 8px 24px rgba(42,26,18,0.08)',
       }}
     >
-      <p style={{ fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: dark ? '#ffd166' : '#a6832b', marginBottom: '0.6rem' }}>
+      <p style={{ fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 700, color: dark ? '#ffd166' : '#a8843f', marginBottom: '0.6rem' }}>
         Para ir mais fundo
       </p>
-      <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.5rem, 4vw, 2.1rem)', color: dark ? '#fdfaf3' : '#3c2a21', lineHeight: 1.15, marginBottom: '0.75rem' }}>
+      <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.5rem, 4vw, 2.1rem)', color: dark ? '#faf5ec' : '#2a1a12', lineHeight: 1.15, marginBottom: '0.75rem' }}>
         Sunbaked Letters
       </h3>
       <p style={{ color: dark ? 'rgba(253,250,243,0.88)' : '#594a42', lineHeight: 1.75, maxWidth: '560px', margin: '0 auto 1.25rem' }}>
@@ -36,7 +36,7 @@ export default function SunbakedLetters({ tone = 'light' }: { tone?: 'light' | '
       </p>
       <a
         {...linkProps}
-        style={{ display: 'inline-block', background: '#d4af37', color: '#3c2a21', padding: '0.85rem 1.8rem', borderRadius: '999px', fontWeight: 700, fontSize: '0.95rem' }}
+        style={{ display: 'inline-block', background: '#c9a257', color: '#2a1a12', padding: '0.85rem 1.8rem', borderRadius: '999px', fontWeight: 700, fontSize: '0.95rem' }}
       >
         Conhecer no Substack ↗
       </a>
@@ -56,7 +56,7 @@ export function SunbakedLettersNote({ dark = false, locale = 'pt' }: { dark?: bo
   return (
     <p style={{ fontSize: '0.88rem', lineHeight: 1.7, color: dark ? 'rgba(253,250,243,0.8)' : '#7a6a61', marginTop: '1.5rem' }}>
       {t.lead}{' '}
-      <a {...linkProps} style={{ color: dark ? '#ffd166' : '#a6832b', fontWeight: 700, textDecoration: 'underline' }}>
+      <a {...linkProps} style={{ color: dark ? '#ffd166' : '#a8843f', fontWeight: 700, textDecoration: 'underline' }}>
         Sunbaked Letters ↗
       </a>
       {t.lang && <>{' '}<span style={{ opacity: 0.8 }}>{t.lang}</span></>}

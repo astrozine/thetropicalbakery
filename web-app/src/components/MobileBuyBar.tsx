@@ -124,7 +124,7 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-top: 1px solid rgba(212,175,55,0.35);
-            box-shadow: 0 -8px 24px rgba(60,42,33,0.13);
+            box-shadow: 0 -8px 24px rgba(42,26,18,0.13);
             transition: transform .25s ease-out, opacity .28s, padding .28s;
           }
           .tb-buybar[data-hidden="true"] {
@@ -142,11 +142,11 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
           .tb-buybar__price { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; flex: 1 1 0; overflow: hidden; }
           .tb-buybar__kicker {
             font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
-            color: #a6832b; font-weight: 800;
+            color: #a8843f; font-weight: 800;
             max-height: 2em; overflow: hidden;
             transition: max-height .28s, opacity .28s, margin .28s;
           }
-          .tb-buybar__price strong { font-family: var(--font-heading); font-size: 1.3rem; color: #3c2a21; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+          .tb-buybar__price strong { font-family: var(--font-heading); font-size: 1.3rem; color: #2a1a12; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
           .tb-buybar__note {
             font-size: 0.75rem; color: #7a6a61; white-space: nowrap;
             overflow: hidden; text-overflow: ellipsis;
@@ -160,8 +160,8 @@ export default function MobileBuyBar({ kicker, price, note, label, targetId }: P
             padding: 0 1.4rem;
             border: none;
             border-radius: 999px;
-            background: linear-gradient(135deg, #d4af37, #c19b2e);
-            color: #3c2a21;
+            background: linear-gradient(135deg, #c9a257, #c19b2e);
+            color: #2a1a12;
             font-family: inherit;
             font-weight: 800;
             font-size: 0.98rem;

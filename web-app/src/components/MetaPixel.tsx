@@ -65,7 +65,7 @@ export default function MetaPixel() {
         background: 'var(--color-background)',
         border: '1px solid var(--color-secondary)',
         borderRadius: '16px',
-        boxShadow: '0 10px 40px rgba(60,42,33,0.25)',
+        boxShadow: '0 10px 40px rgba(42,26,18,0.25)',
         padding: '0.7rem 0.9rem',
         color: '#594a42',
         fontSize: '0.85rem',
@@ -136,7 +136,7 @@ export default function MetaPixel() {
 const TEXT = {
   pt: {
     label: 'Aviso de cookies',
-    short: '🌴 Sejamos sinceros: o algoritmo não está fazendo favor a ninguém. Aceitar os cookies é um empurrãozinho pra Chef Dolly aparecer pra quem vai amar. Só ativamos se você aceitar.',
+    short: 'Sejamos sinceros: o algoritmo não está fazendo favor a ninguém. Aceitar os cookies é um empurrãozinho pra Chef Dolly aparecer pra quem vai amar. Só ativamos se você aceitar.',
     more: 'Ler mais',
     privacy: 'Privacidade',
     long: 'Pra uma cozinha pequena como a da Chef Dolly, chegar até a comunidade vegana nas redes está cada vez mais difícil. Aceitar os cookies da Meta e do Google é um empurrãozinho contra o algoritmo: a gente aparece pra quem vai amar, e você vê menos anúncio aleatório.',
@@ -145,7 +145,7 @@ const TEXT = {
   },
   en: {
     label: 'Cookie notice',
-    short: "🌴 Let's be honest: the algorithm isn't doing anyone favors. Accepting cookies gives Chef Dolly a little push to reach people who'll love her treats. Only on if you say yes.",
+    short: "Let's be honest: the algorithm isn't doing anyone favors. Accepting cookies gives Chef Dolly a little push to reach people who'll love her treats. Only on if you say yes.",
     more: 'Read more',
     privacy: 'Privacy',
     long: "For a small kitchen like Chef Dolly's, reaching the vegan community on social media keeps getting harder. Accepting Meta and Google cookies is a small push against the algorithm: we show up for people who'll love it, and you see fewer random ads.",

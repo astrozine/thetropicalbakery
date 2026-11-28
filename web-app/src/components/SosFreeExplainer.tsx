@@ -39,7 +39,7 @@ export default function SosFreeExplainer({ tone = 'light', open = false, style }
         }
         .sosx__q { text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
         .sosx summary::-webkit-details-marker { display: none; }
-        .sosx summary:focus-visible { outline: 2px solid #d4af37; outline-offset: 2px; border-radius: 4px; }
+        .sosx summary:focus-visible { outline: 2px solid #c9a257; outline-offset: 2px; border-radius: 4px; }
         .sosx__caret { font-size: 0.75rem; transition: transform .18s; display: inline-block; }
         .sosx[open] .sosx__caret { transform: rotate(180deg); }
         .sosx__body { display: grid; gap: 0.55rem; margin-top: 0.3rem; padding: 0.9rem 1rem; border-radius: 12px;

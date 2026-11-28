@@ -9,15 +9,15 @@ import { KitchenFacts } from '@/components/TreatInfo';
  * - <TreatCareCard />: the short version beside the box contents, on /assinatura and in Minha Conta.
  */
 
-const brown = '#3c2a21';
+const brown = '#2a1a12';
 const body = '#594a42';
-const gold = '#a6832b';
+const gold = '#a8843f';
 
 function Steps({ steps }: { steps: CareStep[] }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 230px), 1fr))', gap: '0.85rem' }}>
       {steps.map(s => (
-        <div key={s.title} style={{ background: '#fff', border: '1px solid #e8e1d7', borderRadius: '18px', padding: '1.1rem 1.2rem', boxShadow: '0 4px 14px rgba(60,42,33,0.05)' }}>
+        <div key={s.title} style={{ background: '#fff', border: '1px solid #e8e1d7', borderRadius: '18px', padding: '1.1rem 1.2rem', boxShadow: '0 4px 14px rgba(42,26,18,0.05)' }}>
           <div aria-hidden style={{ fontSize: '1.6rem', marginBottom: '0.4rem' }}>{s.emoji}</div>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', color: brown, lineHeight: 1.25, marginBottom: '0.35rem' }}>{s.title}</h3>
           <p style={{ color: body, lineHeight: 1.65, fontSize: '0.92rem', margin: 0 }}>{s.text}</p>

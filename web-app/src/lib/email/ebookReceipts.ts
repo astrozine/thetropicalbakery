@@ -39,7 +39,7 @@ const hello = (template: string, name: string) => {
   const first = (name || '').trim().split(' ')[0];
   // The copy's own "Hi {name}," wording, in the frame's font (was Georgia, which no other e-mail uses).
   return first
-    ? `<p style="color:#3c2a21;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:17px;font-weight:bold;margin:0 0 12px;">${esc(fill(template, { name: first }))}</p>`
+    ? `<p style="color:#2a1a12;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:17px;font-weight:bold;margin:0 0 12px;">${esc(fill(template, { name: first }))}</p>`
     : '';
 };
 

@@ -79,7 +79,7 @@ export function brunchConfirmedEmail(o: Who & { reference: string | null; total:
     paragraphs(`Você está dentro! Seu lugar no brunch "${o.event.title}" está garantido e a Dolly já está te esperando no grupo.`) +
     kicker('Quando e onde', '📍') +
     paragraphs(`${fmtWhen(o.event)}\n${where(o.event)}\n\nO endereço exato está na sua sala do brunch.`) +
-    `<p style="margin:0 0 18px;"><a href="${esc(calendarLink(o.event))}" style="color:#a6832b;font-weight:bold;">📅 Colocar na minha agenda</a></p>` +
+    `<p style="margin:0 0 18px;"><a href="${esc(calendarLink(o.event))}" style="color:#a8843f;font-weight:bold;">📅 Colocar na minha agenda</a></p>` +
     kicker('Antes do brunch', '📝') +
     bulletList([
       'Monte o seu cartão: uma foto, um emoji, o que você faz e com o que pode ajudar. É assim que as pessoas te acham na mesa.',

@@ -193,15 +193,15 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
           .rh__ph--island { bottom: 21%; right: 8%; width: clamp(250px, 40vw, 550px); z-index: 3; transform: rotate(4deg); }
           .rh__ph--coast img, .rh__ph--island img { display: block; width: 100%; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); object-fit: cover; opacity: 0.9; }
           /* The "how far" cards: cream, gold-edged, hanging off the bottom of the photo like a name tag. */
-          .rh__card { position: absolute; left: 1.25rem; bottom: -1.3rem; z-index: 3; display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 0.85rem; max-width: min(88%, 340px); padding: 0.7rem 1.05rem 0.7rem 0.95rem; background: rgba(253,250,243,0.97); color: #3c2a21; border: 1px solid rgba(212,175,55,0.6); border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,0.4); }
+          .rh__card { position: absolute; left: 1.25rem; bottom: -1.3rem; z-index: 3; display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 0.85rem; max-width: min(88%, 340px); padding: 0.7rem 1.05rem 0.7rem 0.95rem; background: rgba(253,250,243,0.97); color: #2a1a12; border: 1px solid rgba(212,175,55,0.6); border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,0.4); }
           .rh__card--right { left: auto; right: 1.25rem; }
           .rh__num { font-family: var(--font-heading); font-size: clamp(1.3rem, 2.1vw, 1.85rem); line-height: 1; color: #b8921f; white-space: nowrap; }
           .rh__lbl { font-size: 0.82rem; line-height: 1.3; color: #594a42; }
-          .rh__extra { grid-column: 1 / -1; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(212,175,55,0.7); font-size: 0.68rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: #3c2a21; }
-          .rh__extra span { color: #d4af37; }
+          .rh__extra { grid-column: 1 / -1; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(212,175,55,0.7); font-size: 0.68rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: #2a1a12; }
+          .rh__extra span { color: #c9a257; }
           .rh__content { position: relative; z-index: 10; text-align: center; padding: 0 2rem; max-width: 800px; }
           .rh__ribbon { width: clamp(140px, 20vw, 220px); margin: 0 auto 1rem; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.4)); }
-          .rh__location { display: inline-block; color: #d4af37; letter-spacing: 4px; text-transform: uppercase; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(212,175,55,0.4); padding-bottom: 0.5rem; }
+          .rh__location { display: inline-block; color: #c9a257; letter-spacing: 4px; text-transform: uppercase; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(212,175,55,0.4); padding-bottom: 0.5rem; }
           .rh__title { font-size: clamp(1.95rem, 7vw, 5.5rem); color: #fff; font-family: var(--font-heading); line-height: 1.1; margin-bottom: 1.5rem; text-shadow: 0 4px 30px rgba(0,0,0,0.5); }
           .rh__text { font-size: clamp(1rem, 2.5vw, 1.3rem); color: rgba(255,255,255,0.85); line-height: 1.9; max-width: 600px; margin: 0 auto 2.5rem; font-weight: 300; }
           .rh__cta { padding: 1rem 3rem; font-size: 1.1rem; letter-spacing: 2px; }
@@ -213,7 +213,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
                picture, so it never covers the photo. The two treats float over their corners. The polaroids are
                in the flow (their height follows the note), the treats are the only absolute pieces. */
             .rh__photos { position: relative; inset: auto; width: min(92%, 480px); margin: 0 auto 1.25rem; padding-bottom: 0.5rem; }
-            .rh__ph--coast, .rh__ph--island { position: relative; top: auto; right: auto; bottom: auto; left: auto; padding: 6px 6px 0; background: #fdfaf3; border: 1px solid rgba(212,175,55,0.55); border-radius: 16px; box-shadow: 0 18px 36px rgba(0,0,0,0.5); }
+            .rh__ph--coast, .rh__ph--island { position: relative; top: auto; right: auto; bottom: auto; left: auto; padding: 6px 6px 0; background: #faf5ec; border: 1px solid rgba(212,175,55,0.55); border-radius: 16px; box-shadow: 0 18px 36px rgba(0,0,0,0.5); }
             .rh__ph--coast  { width: 68%; transform: rotate(-3deg); }
             .rh__ph--island { width: 64%; margin: -0.6rem 0 0 auto; transform: rotate(3deg); z-index: 2; }
             .rh__ph--coast img, .rh__ph--island img { opacity: 1; border-radius: 11px; box-shadow: none; aspect-ratio: 4 / 3; }
@@ -236,7 +236,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
             .rh__ph--bundt, .rh__ph--cake, .rh__ph--island { display: none; }
             .rh__ph--coast { width: 100%; transform: none; border: 0; padding: 0; background: none; box-shadow: none; }
             .rh__ph--coast img { border-radius: 14px; aspect-ratio: 16 / 10; }
-            .rh__ph--coast .rh__card { color: #fdfaf3; }
+            .rh__ph--coast .rh__card { color: #faf5ec; }
             .rh__ph--coast .rh__lbl { color: rgba(253,250,243,0.8); }
             .rh__ph--coast .rh__num { color: #e7c75a; }
             .rh__ph--coast .rh__extra { color: rgba(253,250,243,0.7); border-top-color: rgba(253,250,243,0.2); }
@@ -252,7 +252,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <ScrollReveal>
             <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-              <span style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, marginBottom: '1rem', display: 'block' }}>
+              <span style={{ color: '#c9a257', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, marginBottom: '1rem', display: 'block' }}>
                 {texts.suites.subtitle}
               </span>
               <h2 data-sign-top="🏡" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontFamily: 'var(--font-heading)', color: 'var(--color-primary)', lineHeight: '1.15', marginBottom: '1.5rem' }}>
@@ -270,7 +270,7 @@ export default function RetreatsLayout({ texts, locale = 'pt' }: RetreatsLayoutP
 
 
       {/* Pricing Calculator */}
-      <section style={{ padding: 'clamp(2.25rem, 8vw, 6rem) 1.5rem', background: 'linear-gradient(180deg, #2e4432 0%, #3c2a21 100%)' }}>
+      <section style={{ padding: 'clamp(2.25rem, 8vw, 6rem) 1.5rem', background: 'linear-gradient(180deg, #1e5d54 0%, #2a1a12 100%)' }}>
         <RetreatStay part="price" locale={locale} whatsappHref={whatsappLink} />
         <div id="pacote"><RetreatPricingCalculator whatsappNumber={WHATSAPP_NUMBER} locale={locale} /></div>
       </section>

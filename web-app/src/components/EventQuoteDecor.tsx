@@ -6,7 +6,7 @@ import type { CSSProperties } from 'react';
 export default function EventQuoteDecor() {
   const sticker = (bg: string): CSSProperties => ({
     width: 58, height: 58, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center',
-    justifyContent: 'center', fontSize: '1.9rem', border: '3px solid #fff', boxShadow: '0 6px 16px rgba(60,42,33,0.18)',
+    justifyContent: 'center', fontSize: '1.9rem', border: '3px solid #fff', boxShadow: '0 6px 16px rgba(42,26,18,0.18)',
   });
 
   return (
@@ -23,10 +23,10 @@ export default function EventQuoteDecor() {
 
       {/* Left: the events hero as a small polaroid, with a gold seal tucked over its corner */}
       <div className="quote-decor quote-decor-left" aria-hidden="true">
-        <div className="decor-bob" style={{ ['--r' as string]: '-5deg', background: '#fff', padding: '10px 10px 12px', borderRadius: 6, boxShadow: '0 14px 28px rgba(60,42,33,0.2)' }}>
+        <div className="decor-bob" style={{ ['--r' as string]: '-5deg', background: '#fff', padding: '10px 10px 12px', borderRadius: 6, boxShadow: '0 14px 28px rgba(42,26,18,0.2)' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/event_hero.jpg" alt="" style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', borderRadius: 3, display: 'block' }} />
-          <div style={{ fontFamily: 'var(--font-heading)', color: '#3c2a21', textAlign: 'center', fontSize: '0.95rem', marginTop: 8 }}>
+          <div style={{ fontFamily: 'var(--font-heading)', color: '#2a1a12', textAlign: 'center', fontSize: '0.95rem', marginTop: 8 }}>
             Seu evento, do nosso jeito
           </div>
         </div>
@@ -36,8 +36,8 @@ export default function EventQuoteDecor() {
 
       {/* Right: a kraft tag, a few little stickers */}
       <div className="quote-decor quote-decor-right" aria-hidden="true">
-        <div className="decor-bob" style={{ ['--r' as string]: '4deg', background: '#d9b98a', color: '#3c2a21', borderRadius: 10, padding: '1.1rem 1rem 1rem', textAlign: 'center', boxShadow: '0 12px 24px rgba(60,42,33,0.2)', position: 'relative', animationDelay: '0.6s' }}>
-          <div style={{ position: 'absolute', top: 9, left: '50%', width: 12, height: 12, marginLeft: -6, borderRadius: '50%', background: '#fdfaf3', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)' }} />
+        <div className="decor-bob" style={{ ['--r' as string]: '4deg', background: '#d9b98a', color: '#2a1a12', borderRadius: 10, padding: '1.1rem 1rem 1rem', textAlign: 'center', boxShadow: '0 12px 24px rgba(42,26,18,0.2)', position: 'relative', animationDelay: '0.6s' }}>
+          <div style={{ position: 'absolute', top: 9, left: '50%', width: 12, height: 12, marginLeft: -6, borderRadius: '50%', background: '#faf5ec', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)' }} />
           <div style={{ marginTop: 14, fontFamily: 'var(--font-heading)', fontSize: '1.05rem', lineHeight: 1.2 }}>Casamentos, festas &amp; restaurantes</div>
           <div style={{ fontSize: '0.78rem', marginTop: 8, lineHeight: 1.45 }}>100% vegetal e sem trigo</div>
         </div>

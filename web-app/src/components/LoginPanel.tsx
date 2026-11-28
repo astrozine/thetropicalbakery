@@ -8,7 +8,7 @@ const OAUTH_STYLES: Record<OAuthProvider, { label: string; icon: string; style: 
   google: {
     label: 'Google',
     icon: 'https://www.svgrepo.com/show/475656/google-color.svg',
-    style: { background: '#fff', color: '#3c2a21', border: '1px solid #ddd' },
+    style: { background: '#fff', color: '#2a1a12', border: '1px solid #ddd' },
   },
   facebook: {
     label: 'Facebook',
@@ -32,7 +32,7 @@ const actionStyle: React.CSSProperties = {
   padding: '0.85rem 1.25rem',
   borderRadius: '8px',
   border: 'none',
-  background: '#d4af37',
+  background: '#c9a257',
   color: '#fff',
   fontWeight: 700,
   cursor: 'pointer',
@@ -179,7 +179,7 @@ export default function LoginPanel({
 
   return (
     <div style={{
-      background: '#fdfaf3',
+      background: '#faf5ec',
       padding: '1.5rem 1.25rem',
       borderRadius: '16px',
       border: '1px solid #e8e1d7',
@@ -191,7 +191,7 @@ export default function LoginPanel({
         style={{ height: '52px', width: 'auto', margin: '0 auto 0.75rem', display: 'block' }}
       />
 
-      <p style={{ fontSize: '1rem', color: '#3c2a21', fontWeight: 700, marginBottom: '0.35rem' }}>
+      <p style={{ fontSize: '1rem', color: '#2a1a12', fontWeight: 700, marginBottom: '0.35rem' }}>
         {message ?? t.message}
       </p>
       <p style={{ fontSize: '0.85rem', color: '#7a6a61', marginBottom: '1.25rem' }}>
@@ -252,9 +252,9 @@ export default function LoginPanel({
                 padding: '0.4rem 1rem',
                 borderRadius: '20px',
                 border: '1px solid',
-                borderColor: activeTab === key ? '#d4af37' : '#e8e1d7',
+                borderColor: activeTab === key ? '#c9a257' : '#e8e1d7',
                 background: activeTab === key ? 'rgba(212,175,55,0.12)' : 'transparent',
-                color: activeTab === key ? '#3c2a21' : '#7a6a61',
+                color: activeTab === key ? '#2a1a12' : '#7a6a61',
                 fontWeight: activeTab === key ? 700 : 500,
                 fontSize: '0.85rem',
                 cursor: 'pointer',
@@ -336,7 +336,7 @@ export default function LoginPanel({
               </button>
             </div>
           ) : (
-            <p style={{ fontSize: '0.9rem', color: '#2e4432', background: 'rgba(46,68,50,0.08)', padding: '0.85rem 1rem', borderRadius: '8px' }}>
+            <p style={{ fontSize: '0.9rem', color: '#1e5d54', background: 'rgba(46,68,50,0.08)', padding: '0.85rem 1rem', borderRadius: '8px' }}>
               {t.linkSent}
             </p>
           )}

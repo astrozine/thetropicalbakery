@@ -6,7 +6,7 @@ export const ACCOUNT_CSS = `
 /* ------------------------------------------------------------------ hero */
 .acct-hero {
   position: relative; isolation: isolate; overflow: hidden;
-  padding: 2.5rem 1rem 4.25rem; color: #fdfaf3; text-align: center;
+  padding: 2.5rem 1rem 4.25rem; color: #faf5ec; text-align: center;
   border-radius: 0 0 32px 32px; background: #2b1e17;
 }
 .acct-hero-bg { object-fit: cover; z-index: -2; }
@@ -20,7 +20,7 @@ export const ACCOUNT_CSS = `
 
 .acct-float {
   position: absolute; z-index: 0; border-radius: 16px; overflow: hidden;
-  border: 5px solid #fdfaf3; box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  border: 5px solid #faf5ec; box-shadow: 0 18px 40px rgba(0,0,0,0.45);
   animation: acctBob 7s ease-in-out infinite;
 }
 .acct-float img { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -36,13 +36,13 @@ export const ACCOUNT_CSS = `
   border-radius: 50%; object-fit: cover;
 }
 .acct-avatar-initial {
-  display: flex; align-items: center; justify-content: center; background: #d4af37; color: #3c2a21;
+  display: flex; align-items: center; justify-content: center; background: #c9a257; color: #2a1a12;
   font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800;
 }
 .acct-avatar-badge {
   position: absolute; right: -2px; bottom: 2px; width: 38px; height: 38px; border-radius: 50%;
-  background: #fdfaf3; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.35); border: 2px solid #d4af37;
+  background: #faf5ec; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35); border: 2px solid #c9a257;
 }
 .acct-eyebrow {
   margin: 0 0 0.4rem; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #ffd166;
@@ -63,7 +63,7 @@ export const ACCOUNT_CSS = `
 }
 .acct-hero-stats li {
   font-size: 0.8rem; font-weight: 700; padding: 0.35rem 0.8rem; border-radius: 999px;
-  background: rgba(253,250,243,0.12); border: 1px solid rgba(253,250,243,0.22); color: #fdfaf3;
+  background: rgba(253,250,243,0.12); border: 1px solid rgba(253,250,243,0.22); color: #faf5ec;
 }
 
 /* --------------------------------------------------------------- buttons */
@@ -73,37 +73,37 @@ export const ACCOUNT_CSS = `
   text-decoration: none; cursor: pointer; border: 2px solid transparent; transition: transform .2s, box-shadow .2s, background .2s;
 }
 .acct-btn:hover { transform: translateY(-2px); }
-.acct-btn-gold { background: linear-gradient(135deg, #ffd166, #d4af37); color: #3c2a21; box-shadow: 0 10px 26px rgba(212,175,55,0.4); }
+.acct-btn-gold { background: linear-gradient(135deg, #ffd166, #c9a257); color: #2a1a12; box-shadow: 0 10px 26px rgba(212,175,55,0.4); }
 .acct-btn-gold:hover { box-shadow: 0 14px 32px rgba(212,175,55,0.55); }
-.acct-btn-ghost { background: rgba(253,250,243,0.08); color: #fdfaf3; border-color: rgba(253,250,243,0.5); }
-.acct-btn-dark { background: #3c2a21; color: #fdfaf3; }
-.acct-btn-soft { background: #fdf1d6; color: #3c2a21; border-color: rgba(212,175,55,0.45); font-size: 0.88rem; padding: 0.7rem 1.1rem; }
+.acct-btn-ghost { background: rgba(253,250,243,0.08); color: #faf5ec; border-color: rgba(253,250,243,0.5); }
+.acct-btn-dark { background: #2a1a12; color: #faf5ec; }
+.acct-btn-soft { background: #fdf1d6; color: #2a1a12; border-color: rgba(212,175,55,0.45); font-size: 0.88rem; padding: 0.7rem 1.1rem; }
 
 /* ------------------------------------------------------------------ tabs */
 .acct-wrap { max-width: 1220px; margin: 0 auto; padding: 0 1rem; }
 .acct-tabs {
   position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem;
   max-width: 460px; margin: -1.75rem auto 1.75rem; padding: 0.35rem; border-radius: 999px;
-  background: #fffdf8; box-shadow: 0 14px 34px rgba(60,42,33,0.18); border: 1px solid rgba(212,175,55,0.35);
+  background: #fffdf8; box-shadow: 0 14px 34px rgba(42,26,18,0.18); border: 1px solid rgba(212,175,55,0.35);
 }
 .acct-tab {
   position: relative; min-height: 46px; border: none; border-radius: 999px; background: transparent; cursor: pointer;
   font-family: var(--font-body); font-weight: 800; font-size: 0.9rem; color: #7a6a61; transition: background .25s, color .25s;
 }
-.acct-tab.is-on { background: #3c2a21; color: #fdfaf3; }
+.acct-tab.is-on { background: #2a1a12; color: #faf5ec; }
 .acct-tab-dot { position: absolute; top: 10px; right: 22px; width: 8px; height: 8px; border-radius: 50%; background: #e2792a; }
 .acct-tab-count {
   display: inline-flex; min-width: 20px; height: 20px; padding: 0 5px; margin-left: 4px; border-radius: 999px;
-  align-items: center; justify-content: center; font-size: 0.72rem; background: #d4af37; color: #3c2a21; vertical-align: 1px;
+  align-items: center; justify-content: center; font-size: 0.72rem; background: #c9a257; color: #2a1a12; vertical-align: 1px;
 }
 
 /* --------------------------------------------------------------- common */
-.acct-kicker { margin: 0 0 0.3rem; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #a6832b; }
-.acct-h2 { font-family: var(--font-heading); font-size: clamp(1.25rem, 4vw, 1.55rem); line-height: 1.2; color: #3c2a21; margin: 0; }
-.acct-h3 { font-family: var(--font-heading); font-size: 1.1rem; line-height: 1.3; color: #3c2a21; margin: 0; }
+.acct-kicker { margin: 0 0 0.3rem; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #a8843f; }
+.acct-h2 { font-family: var(--font-heading); font-size: clamp(1.25rem, 4vw, 1.55rem); line-height: 1.2; color: #2a1a12; margin: 0; }
+.acct-h3 { font-family: var(--font-heading); font-size: 1.1rem; line-height: 1.3; color: #2a1a12; margin: 0; }
 .acct-muted { color: #7a6a61; font-size: 0.92rem; line-height: 1.65; margin: 0.4rem 0 0; }
 .acct-card {
-  background: #fff; border-radius: 24px; padding: 1.4rem; border: 1px solid #efe6d8; box-shadow: 0 8px 24px rgba(60,42,33,0.06);
+  background: #fff; border-radius: 24px; padding: 1.4rem; border: 1px solid #efe6d8; box-shadow: 0 8px 24px rgba(42,26,18,0.06);
 }
 .acct-pill { display: inline-block; font-size: 0.75rem; font-weight: 800; padding: 0.22rem 0.65rem; border-radius: 999px; }
 
@@ -121,36 +121,36 @@ export const ACCOUNT_CSS = `
 
 /* ----------------------------------------------------------- stamp card */
 .acct-stamps {
-  position: relative; padding: 1.4rem; border-radius: 24px; color: #3c2a21;
+  position: relative; padding: 1.4rem; border-radius: 24px; color: #2a1a12;
   background:
     radial-gradient(circle at 12% 18%, rgba(255,255,255,0.35), transparent 40%),
-    repeating-linear-gradient(45deg, rgba(60,42,33,0.025) 0 2px, transparent 2px 6px),
+    repeating-linear-gradient(45deg, rgba(42,26,18,0.025) 0 2px, transparent 2px 6px),
     #efd9ad;
-  border: 2px dashed rgba(60,42,33,0.25); box-shadow: 0 12px 30px rgba(60,42,33,0.12);
+  border: 2px dashed rgba(42,26,18,0.25); box-shadow: 0 12px 30px rgba(42,26,18,0.12);
 }
 .acct-stamps-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.1rem; }
 .acct-stamps .acct-kicker { color: #7a5a17; }
-.acct-stamps-count { font-family: var(--font-heading); font-size: 2.2rem; line-height: 1; color: #3c2a21; }
+.acct-stamps-count { font-family: var(--font-heading); font-size: 2.2rem; line-height: 1; color: #2a1a12; }
 .acct-stamps-count small { font-size: 1rem; opacity: 0.6; }
 .acct-stamp-row { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.45rem; }
 .acct-stamp {
   aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  border: 2px dashed rgba(60,42,33,0.35); color: rgba(60,42,33,0.45); font-weight: 800; font-size: 0.9rem;
+  border: 2px dashed rgba(42,26,18,0.35); color: rgba(42,26,18,0.45); font-weight: 800; font-size: 0.9rem;
   background: rgba(255,255,255,0.35);
 }
-.acct-stamp.is-gift { border-style: solid; border-color: #d4af37; background: rgba(255,255,255,0.6); font-size: 1.1rem; }
+.acct-stamp.is-gift { border-style: solid; border-color: #c9a257; background: rgba(255,255,255,0.6); font-size: 1.1rem; }
 .acct-stamp.is-filled {
   border: 3px double #a03027; background: radial-gradient(circle, #fff8ea 55%, #fbe3c4 100%); color: #a03027; font-size: 1.25rem;
   box-shadow: inset 0 0 0 2px rgba(160,48,39,0.15); animation: acctStamp .5s cubic-bezier(.2,1.6,.4,1) both;
 }
-.acct-stamp.is-next { border-color: #3c2a21; border-style: solid; animation: acctPulse 1.8s ease-in-out infinite; }
+.acct-stamp.is-next { border-color: #2a1a12; border-style: solid; animation: acctPulse 1.8s ease-in-out infinite; }
 @keyframes acctStamp { from { transform: scale(1.8) rotate(0); opacity: 0; } }
-@keyframes acctPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(60,42,33,0.35); } 50% { box-shadow: 0 0 0 7px rgba(60,42,33,0); } }
+@keyframes acctPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(42,26,18,0.35); } 50% { box-shadow: 0 0 0 7px rgba(42,26,18,0); } }
 .acct-stamps-line { font-size: 0.92rem; line-height: 1.6; margin: 0 0 1rem; }
 .acct-stamps .acct-btn { width: 100%; }
 
 /* ----------------------------------------------------------------- trail */
-.acct-trail { background: #fff; border-radius: 28px; padding: 1.4rem; border: 1px solid #efe6d8; box-shadow: 0 10px 30px rgba(60,42,33,0.07); }
+.acct-trail { background: #fff; border-radius: 28px; padding: 1.4rem; border: 1px solid #efe6d8; box-shadow: 0 10px 30px rgba(42,26,18,0.07); }
 .acct-trail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; }
 .acct-trail-count { flex-shrink: 0; font-size: 0.78rem; font-weight: 800; color: #8a6d1f; background: #fdf1d6; padding: 0.3rem 0.7rem; border-radius: 999px; }
 .acct-trail-path {
@@ -164,20 +164,20 @@ export const ACCOUNT_CSS = `
 }
 .acct-node {
   width: 100%; background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
-  font-family: var(--font-body); padding: 0; color: #3c2a21;
+  font-family: var(--font-body); padding: 0; color: #2a1a12;
 }
 .acct-node-dot {
   width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
   background: #f5efe4; border: 2px solid #eadfcd; transition: transform .2s, box-shadow .2s; filter: grayscale(0.4);
 }
-.acct-node.is-done .acct-node-dot { background: linear-gradient(135deg, #ffd166, #d4af37); border-color: #d4af37; color: #3c2a21; font-weight: 900; filter: none; }
-.acct-node.is-next .acct-node-dot { background: #3c2a21; border-color: #3c2a21; filter: none; animation: acctPulse 1.8s ease-in-out infinite; }
-.acct-node.is-shown .acct-node-dot { transform: scale(1.1); box-shadow: 0 0 0 4px #fdfaf3, 0 0 0 6px #d4af37; }
+.acct-node.is-done .acct-node-dot { background: linear-gradient(135deg, #ffd166, #c9a257); border-color: #c9a257; color: #2a1a12; font-weight: 900; filter: none; }
+.acct-node.is-next .acct-node-dot { background: #2a1a12; border-color: #2a1a12; filter: none; animation: acctPulse 1.8s ease-in-out infinite; }
+.acct-node.is-shown .acct-node-dot { transform: scale(1.1); box-shadow: 0 0 0 4px #faf5ec, 0 0 0 6px #c9a257; }
 .acct-node-label { font-size: 0.75rem; font-weight: 700; line-height: 1.25; text-align: center; min-height: 2.5em; }
 .acct-node-tag { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em; color: #8a6d1f; }
-.acct-node-tag.is-next { color: #fdfaf3; background: #e2792a; padding: 0.1rem 0.5rem; border-radius: 999px; }
+.acct-node-tag.is-next { color: #faf5ec; background: #e2792a; padding: 0.1rem 0.5rem; border-radius: 999px; }
 
-.acct-spot { display: grid; grid-template-columns: 1fr; border-radius: 22px; overflow: hidden; background: #3c2a21; color: #fdfaf3; animation: acctFade .45s ease both; }
+.acct-spot { display: grid; grid-template-columns: 1fr; border-radius: 22px; overflow: hidden; background: #2a1a12; color: #faf5ec; animation: acctFade .45s ease both; }
 .acct-spot-img { position: relative; height: 180px; }
 .acct-spot-body { padding: 1.25rem 1.3rem 1.4rem; }
 .acct-spot-emoji { font-size: 1.6rem; margin: 0 0 0.2rem; }
@@ -190,21 +190,21 @@ export const ACCOUNT_CSS = `
 .acct-quest-head { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; }
 .acct-quest-ring {
   flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  background: conic-gradient(#d4af37 var(--p), #f1e9da 0);
+  background: conic-gradient(#c9a257 var(--p), #f1e9da 0);
 }
 .acct-quest-ring span {
   width: 50px; height: 50px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 0.85rem; color: #3c2a21;
+  font-weight: 900; font-size: 0.85rem; color: #2a1a12;
 }
 .acct-quest-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
 .acct-quest-list button {
   width: 100%; min-height: 48px; display: flex; align-items: center; gap: 0.7rem; padding: 0.65rem 0.9rem; border-radius: 14px;
   background: #fdf7ee; border: 1px solid #f1e4cc; cursor: pointer; font-family: var(--font-body); font-size: 0.92rem;
-  font-weight: 700; color: #3c2a21; text-align: left;
+  font-weight: 700; color: #2a1a12; text-align: left;
 }
 .acct-quest-list button.is-done { background: #f3faf5; border-color: #d5ecdd; color: #2f5a3d; font-weight: 600; }
-.acct-quest-list button:hover { border-color: #d4af37; }
-.acct-quest-go { margin-left: auto; font-size: 0.78rem; color: #a6832b; font-weight: 800; }
+.acct-quest-list button:hover { border-color: #c9a257; }
+.acct-quest-go { margin-left: auto; font-size: 0.78rem; color: #a8843f; font-weight: 800; }
 .acct-quest-list button.is-done .acct-quest-go { color: #6b8d77; }
 
 /* ------------------------------------------------------------- share */
@@ -224,19 +224,19 @@ export const ACCOUNT_CSS = `
 .acct-orders ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
 .acct-order {
   display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; background: #fff; border: 1px solid #efe6d8;
-  border-radius: 20px; padding: 1rem 1.1rem; box-shadow: 0 6px 18px rgba(60,42,33,0.05);
+  border-radius: 20px; padding: 1rem 1.1rem; box-shadow: 0 6px 18px rgba(42,26,18,0.05);
 }
 .acct-order-date {
-  width: 58px; flex-shrink: 0; border-radius: 14px; overflow: hidden; text-align: center; background: #fdfaf3; border: 1px solid rgba(212,175,55,0.45);
+  width: 58px; flex-shrink: 0; border-radius: 14px; overflow: hidden; text-align: center; background: #faf5ec; border: 1px solid rgba(212,175,55,0.45);
 }
-.acct-order-date span { display: block; background: #d4af37; color: #3c2a21; font-size: 0.68rem; font-weight: 900; letter-spacing: 0.12em; padding: 0.15rem 0; }
-.acct-order-date strong { display: block; font-family: var(--font-heading); font-size: 1.4rem; color: #3c2a21; padding: 0.15rem 0 0.25rem; }
+.acct-order-date span { display: block; background: #c9a257; color: #2a1a12; font-size: 0.68rem; font-weight: 900; letter-spacing: 0.12em; padding: 0.15rem 0; }
+.acct-order-date strong { display: block; font-family: var(--font-heading); font-size: 1.4rem; color: #2a1a12; padding: 0.15rem 0 0.25rem; }
 .acct-order-body { flex: 1 1 180px; min-width: 0; }
-.acct-order-kind { margin: 0; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #a6832b; }
-.acct-order-summary { margin: 0.15rem 0 0.4rem; font-weight: 700; color: #3c2a21; line-height: 1.35; }
+.acct-order-kind { margin: 0; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #a8843f; }
+.acct-order-summary { margin: 0.15rem 0 0.4rem; font-weight: 700; color: #2a1a12; line-height: 1.35; }
 .acct-order-meta { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; font-size: 0.88rem; color: #594a42; }
 .acct-order-again {
-  margin-left: auto; font-weight: 800; font-size: 0.85rem; color: #3c2a21; background: #fdf1d6; border: 1px solid rgba(212,175,55,0.5);
+  margin-left: auto; font-weight: 800; font-size: 0.85rem; color: #2a1a12; background: #fdf1d6; border: 1px solid rgba(212,175,55,0.5);
   border-radius: 999px; padding: 0.55rem 1rem; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center;
 }
 .acct-empty { text-align: center; padding: 2.5rem 1.25rem; background: #fff; border-radius: 28px; border: 1px dashed #e3d6bf; }
@@ -245,14 +245,14 @@ export const ACCOUNT_CSS = `
 
 .acct-perfil-head { margin-bottom: 1.25rem; }
 .acct-bar { height: 8px; border-radius: 999px; background: #efe6d8; overflow: hidden; margin-top: 0.9rem; }
-.acct-bar div { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ffd166, #d4af37); transition: width .5s; }
+.acct-bar div { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ffd166, #c9a257); transition: width .5s; }
 .acct-save { width: 100%; margin-top: 1.5rem; }
 .acct-dirty {
   position: fixed; left: 50%; bottom: 1.25rem; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 1rem;
-  padding: 0.6rem 0.6rem 0.6rem 1.25rem; background: #3c2a21; color: #fdfaf3; border-radius: 999px; box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  padding: 0.6rem 0.6rem 0.6rem 1.25rem; background: #2a1a12; color: #faf5ec; border-radius: 999px; box-shadow: 0 12px 32px rgba(0,0,0,0.3);
   max-width: calc(100vw - 2rem); font-size: 0.9rem; font-weight: 600; white-space: nowrap;
 }
-.acct-dirty button { background: #d4af37; color: #3c2a21; border: none; border-radius: 999px; padding: 0.6rem 1.2rem; min-height: 44px; font-weight: 800; font-size: 0.88rem; cursor: pointer; }
+.acct-dirty button { background: #c9a257; color: #2a1a12; border: none; border-radius: 999px; padding: 0.6rem 1.2rem; min-height: 44px; font-weight: 800; font-size: 0.88rem; cursor: pointer; }
 .acct-account { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px dashed #e3d6bf; color: #7a6a61; font-size: 0.88rem; line-height: 1.75; }
 .acct-account p { margin: 0 0 0.6rem; }
 .acct-account a { color: #8a6d1f; font-weight: 700; }
@@ -286,16 +286,16 @@ export const ACCOUNT_CSS = `
 }
 /* ============================================ refocused page (2026-11-20) */
 .acct-top {
-  padding: 2.25rem 1rem 3.4rem; text-align: center; color: #fdfaf3;
+  padding: 2.25rem 1rem 3.4rem; text-align: center; color: #faf5ec;
   background: radial-gradient(ellipse at 50% 0%, #4a3428 0%, #2b1e17 75%); border-radius: 0 0 28px 28px;
 }
 .acct-top-inner { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
 .acct-top-avatar {
   width: 72px; height: 72px; border-radius: 50%; overflow: hidden; margin-bottom: 0.8rem;
-  border: 3px solid #d4af37; background: #d4af37; display: flex; align-items: center; justify-content: center;
+  border: 3px solid #c9a257; background: #c9a257; display: flex; align-items: center; justify-content: center;
 }
 .acct-top-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.acct-top-avatar span { font-family: var(--font-heading); font-size: 1.7rem; font-weight: 800; color: #3c2a21; }
+.acct-top-avatar span { font-family: var(--font-heading); font-size: 1.7rem; font-weight: 800; color: #2a1a12; }
 .acct-top-hello { font-family: var(--font-heading); font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.1; margin: 0 0 0.45rem; }
 .acct-top-line { margin: 0 0 1.1rem; color: rgba(253,250,243,0.85); font-size: 0.98rem; line-height: 1.55; max-width: 26rem; }
 .acct-top .acct-btn { width: 100%; max-width: 20rem; }
@@ -312,14 +312,14 @@ export const ACCOUNT_CSS = `
 .ag-row.is-you { border-color: #e9c46a; background: #fffaf0; }
 .ag-when {
   width: 52px; flex-shrink: 0; border-radius: 12px; overflow: hidden; text-align: center;
-  background: #fdfaf3; border: 1px solid rgba(212,175,55,0.45);
+  background: #faf5ec; border: 1px solid rgba(212,175,55,0.45);
 }
-.ag-when span { display: block; background: #d4af37; color: #3c2a21; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.12em; padding: 0.12rem 0; }
-.ag-when strong { display: block; font-family: var(--font-heading); font-size: 1.3rem; color: #3c2a21; padding: 0.1rem 0 0.2rem; }
+.ag-when span { display: block; background: #c9a257; color: #2a1a12; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.12em; padding: 0.12rem 0; }
+.ag-when strong { display: block; font-family: var(--font-heading); font-size: 1.3rem; color: #2a1a12; padding: 0.1rem 0 0.2rem; }
 .ag-when em { display: flex; height: 52px; align-items: center; justify-content: center; font-style: normal; font-size: 1.5rem; }
 .ag-body { flex: 1; min-width: 0; }
-.ag-kind { margin: 0; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #a6832b; }
-.ag-title { margin: 0.15rem 0 0.2rem; font-weight: 700; color: #3c2a21; line-height: 1.35; overflow-wrap: anywhere; }
+.ag-kind { margin: 0; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #a8843f; }
+.ag-title { margin: 0.15rem 0 0.2rem; font-weight: 700; color: #2a1a12; line-height: 1.35; overflow-wrap: anywhere; }
 .ag-sub { margin: 0 0 0.45rem; font-size: 0.86rem; color: #7a6a61; line-height: 1.5; }
 .ag-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; }
 .ag-link { font-size: 0.86rem; font-weight: 800; color: #8a6d1f; text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
@@ -329,18 +329,18 @@ export const ACCOUNT_CSS = `
 .ag-partner { background: #fff; border: 1px solid #efe6d8; border-radius: 20px; padding: 1.1rem; margin-bottom: 0.9rem; }
 .ag-partner-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.6rem; }
 .ag-note { margin: 0 0 0.6rem; padding: 0.7rem 0.9rem; border-radius: 12px; background: #fdf7ee; color: #594a42; font-size: 0.9rem; line-height: 1.55; }
-.ag-note span { color: #a6832b; font-weight: 700; }
+.ag-note span { color: #a8843f; font-weight: 700; }
 .ag-partner-btn { width: 100%; margin-top: 0.4rem; }
 
 .ag-offers ul { list-style: none; padding: 0; margin: 0; border-radius: 20px; overflow: hidden; border: 1px solid #efe6d8; background: #fff; }
 .ag-offers li + li { border-top: 1px solid #f3ece0; }
-.ag-offer { display: flex; align-items: center; gap: 0.85rem; padding: 0.85rem 1rem; text-decoration: none; color: #3c2a21; min-height: 60px; }
+.ag-offer { display: flex; align-items: center; gap: 0.85rem; padding: 0.85rem 1rem; text-decoration: none; color: #2a1a12; min-height: 60px; }
 .ag-offer:hover { background: #fdf7ee; }
 .ag-offer-emoji { font-size: 1.35rem; width: 1.8rem; text-align: center; flex-shrink: 0; }
 .ag-offer-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .ag-offer-text strong { font-size: 0.95rem; }
 .ag-offer-text span { font-size: 0.82rem; color: #7a6a61; line-height: 1.4; }
-.ag-offer-go { color: #a6832b; font-weight: 800; }
+.ag-offer-go { color: #a8843f; font-weight: 800; }
 
 @media (min-width: 1024px) {
   .acct-top { max-width: 1220px; margin: 1.25rem auto 0; border-radius: 32px; padding: 3rem 2rem 3.8rem; }

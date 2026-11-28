@@ -22,7 +22,7 @@ const LANG_NAME: Record<string, string> = { pt: 'Português', en: 'English', es:
 const card: React.CSSProperties = { background: 'white', borderRadius: '12px', padding: 'clamp(1rem, 3vw, 1.5rem)', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' };
 const chip = (on: boolean): React.CSSProperties => ({
   padding: '0.35rem 0.8rem', borderRadius: '20px', cursor: 'pointer', fontSize: '0.82rem',
-  border: on ? '2px solid #d4af37' : '1px solid #dfe4ea', background: on ? '#fdf6dd' : '#fff', color: '#2c3e50', fontWeight: on ? 'bold' : 'normal',
+  border: on ? '2px solid #c9a257' : '1px solid #dfe4ea', background: on ? '#fdf6dd' : '#fff', color: '#2c3e50', fontWeight: on ? 'bold' : 'normal',
 });
 
 const EMAIL_WIDTH = 640;
@@ -40,7 +40,7 @@ function ScaledPreview({ html }: { html: string }) {
   }, []);
   const realHeight = scale < 1 ? 1500 : 900;
   return (
-    <div ref={box} style={{ width: '100%', height: realHeight * scale, overflow: 'hidden', borderRadius: '10px', border: '1px solid #e8e1d7', background: '#fdfaf3' }}>
+    <div ref={box} style={{ width: '100%', height: realHeight * scale, overflow: 'hidden', borderRadius: '10px', border: '1px solid #e8e1d7', background: '#faf5ec' }}>
       <iframe title="Prévia do e-mail" srcDoc={html} scrolling={scale < 1 ? 'no' : 'auto'}
         style={{ width: scale < 1 ? EMAIL_WIDTH : '100%', height: realHeight, border: 0, display: 'block', transform: `scale(${scale})`, transformOrigin: 'top left' }} />
     </div>
@@ -92,7 +92,7 @@ export default function AllEmailsPage() {
 
   return (
     <div style={{ maxWidth: '1400px' }}>
-      <p style={{ marginBottom: '0.5rem' }}><Link href="/admin/emails" style={{ color: '#a6832b' }}>← E-mails</Link></p>
+      <p style={{ marginBottom: '0.5rem' }}><Link href="/admin/emails" style={{ color: '#a8843f' }}>← E-mails</Link></p>
       <h1 style={{ fontSize: '2rem', color: '#2c3e50', marginBottom: '0.5rem' }}>Todos os e-mails</h1>
       <p style={{ color: '#7f8c8d', marginBottom: '1.5rem', lineHeight: 1.7, maxWidth: '820px' }}>
         Todos os e-mails que o site manda, do jeito que chegam, com dados de exemplo (Maria Souza, pedidos de mentira).
@@ -125,7 +125,7 @@ export default function AllEmailsPage() {
                       return (
                         <button key={e.id} type="button" onClick={() => pick(e, true)}
                           style={{ textAlign: 'left', padding: '0.7rem 0.9rem', borderRadius: '10px', cursor: 'pointer',
-                            border: on ? '2px solid #d4af37' : '1px solid #dfe4ea', background: on ? '#fdf6dd' : '#fff' }}>
+                            border: on ? '2px solid #c9a257' : '1px solid #dfe4ea', background: on ? '#fdf6dd' : '#fff' }}>
                           <strong style={{ display: 'block', color: '#2c3e50', marginBottom: '0.2rem' }}>{e.name}</strong>
                           <span style={{ display: 'block', fontSize: '0.8rem', color: '#7f8c8d', lineHeight: 1.5 }}>{e.when}</span>
                           <span style={{ display: 'inline-block', marginTop: '0.4rem', fontSize: '0.72rem', color: '#8a6d1f', background: 'rgba(212,175,55,0.15)', padding: '0.15rem 0.5rem', borderRadius: '20px' }}>

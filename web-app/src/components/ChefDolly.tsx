@@ -400,7 +400,7 @@ export default function ChefDolly() {
       </section>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .cd { --gold: #d4af37; --cocoa: #3c2a21; --cream: #fdfaf3; background: var(--cream); }
+        .cd { --gold: #c9a257; --cocoa: #2a1a12; --cream: #faf5ec; background: var(--cream); }
         .cd-wrap { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; }
         .cd-wrap--narrow { max-width: 760px; }
         .cd-rule { display: block; width: 92px; height: 1px; margin: 1.5rem auto; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
@@ -449,7 +449,7 @@ export default function ChefDolly() {
         /* ── Cast ─────────────────────────────────────────────────── */
         .cd-cast { padding: clamp(3.5rem, 9vw, 6.5rem) 0; background: var(--cream); }
         .cd-cast__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.1rem; }
-        .cd-cast__card { position: relative; height: 100%; padding: 2.4rem 1.35rem 1.5rem; background: #fff; border: 1px solid rgba(212,175,55,0.35); border-radius: 16px; box-shadow: 0 10px 30px rgba(60,42,33,0.06); }
+        .cd-cast__card { position: relative; height: 100%; padding: 2.4rem 1.35rem 1.5rem; background: #fff; border: 1px solid rgba(212,175,55,0.35); border-radius: 16px; box-shadow: 0 10px 30px rgba(42,26,18,0.06); }
         .cd-cast__num { position: absolute; top: 0.9rem; left: 1.35rem; font-family: var(--font-heading); font-size: 0.95rem; color: var(--gold); letter-spacing: 0.1em; }
         .cd-cast__card h3 { font-family: var(--font-heading); font-size: 1.1rem; color: var(--cocoa); margin: 0 0 0.55rem; }
         .cd-cast__card p { margin: 0; color: #5d4c42; font-size: 0.93rem; line-height: 1.75; }
@@ -476,13 +476,13 @@ export default function ChefDolly() {
         .cd-cross { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.75rem, 5vw, 4rem); align-items: center; }
         .cd-cross--flip .cd-cross__text { order: 2; }
         .cd-cross--flip .cd-cross__photo { order: 1; }
-        .cd-frame { margin: 0; padding: 10px 10px 0; background: #fff; border: 1px solid rgba(212,175,55,0.45); border-radius: 18px; box-shadow: 0 26px 50px rgba(60,42,33,0.18); transform: rotate(1.5deg); }
+        .cd-frame { margin: 0; padding: 10px 10px 0; background: #fff; border: 1px solid rgba(212,175,55,0.45); border-radius: 18px; box-shadow: 0 26px 50px rgba(42,26,18,0.18); transform: rotate(1.5deg); }
         .cd-frame img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; }
         .cd-frame figcaption { padding: 0.85rem 0.4rem 1rem; text-align: center; }
         .cd-frame figcaption b { display: block; font-family: var(--font-heading); font-size: 1rem; color: var(--cocoa); }
         .cd-frame figcaption span { display: block; margin-top: 0.25rem; font-size: 0.78rem; color: #6d5c50; }
         .cd-passport { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.45rem 1rem 0.45rem 0.7rem; border: 1px solid rgba(212,175,55,0.6); border-radius: 999px; background: #fff; color: #7a5a14; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-        .cd-portrait { max-width: 400px; margin: 0 auto; padding: 10px; background: var(--cream); border: 1px solid rgba(212,175,55,0.5); border-radius: 18px; box-shadow: 0 26px 50px rgba(60,42,33,0.18); transform: rotate(-2deg); }
+        .cd-portrait { max-width: 400px; margin: 0 auto; padding: 10px; background: var(--cream); border: 1px solid rgba(212,175,55,0.5); border-radius: 18px; box-shadow: 0 26px 50px rgba(42,26,18,0.18); transform: rotate(-2deg); }
         .cd-portrait img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 10px; }
 
         /* ── Worlds ───────────────────────────────────────────────── */
@@ -505,14 +505,14 @@ export default function ChefDolly() {
         .cd-gallery { background: #efe7db; padding: clamp(3.5rem, 9vw, 6.5rem) 0; }
         .cd-gallery__wall { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.25rem, 3.5vw, 2.25rem); }
         .cd-piece { margin: 0; }
-        .cd-piece img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 6px; box-shadow: 0 20px 40px rgba(60,42,33,0.2); }
+        .cd-piece img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 6px; box-shadow: 0 20px 40px rgba(42,26,18,0.2); }
         .cd-piece figcaption { margin-top: 1rem; padding-left: 0.85rem; border-left: 2px solid rgba(212,175,55,0.8); }
         .cd-piece figcaption b { display: block; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cocoa); }
         .cd-piece figcaption span { display: block; margin-top: 0.3rem; font-size: 0.78rem; color: #6d5c50; font-style: italic; }
 
         /* ── Curtain ──────────────────────────────────────────────── */
         .cd-end { background: var(--cream); padding: clamp(3.5rem, 9vw, 6.5rem) 0 clamp(4rem, 10vw, 7rem); text-align: center; }
-        .cd-bow { margin: 0 auto 2.25rem; width: min(100%, 270px); padding: 9px; background: #fff; border: 1px solid rgba(212,175,55,0.5); border-radius: 18px; box-shadow: 0 20px 44px rgba(60,42,33,0.16); transform: rotate(2deg); }
+        .cd-bow { margin: 0 auto 2.25rem; width: min(100%, 270px); padding: 9px; background: #fff; border: 1px solid rgba(212,175,55,0.5); border-radius: 18px; box-shadow: 0 20px 44px rgba(42,26,18,0.16); transform: rotate(2deg); }
         .cd-bow img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; }
         .cd-end__p { color: #4a3a31; font-size: clamp(1rem, 2.2vw, 1.15rem); line-height: 1.95; margin: 0 auto 1.5rem; max-width: 56ch; }
         .cd-end__p em { font-style: normal; font-weight: 600; color: var(--cocoa); box-shadow: inset 0 -0.45em 0 rgba(212,175,55,0.28); }
@@ -520,7 +520,7 @@ export default function ChefDolly() {
         .cd-end__welcome { font-family: var(--font-heading); font-size: clamp(1.3rem, 3.6vw, 2.1rem); color: var(--cocoa); margin: 0; }
         .cd-end__tag { font-family: var(--font-heading); font-size: clamp(1.05rem, 3vw, 1.6rem); color: #9a7a1f; letter-spacing: 0.02em; margin: 0 0 2.75rem; }
         .cd-end__doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem; text-align: left; }
-        .cd-door { display: block; min-height: 44px; padding: 1.1rem 1.25rem; background: #fff; border: 1px solid rgba(212,175,55,0.45); border-radius: 14px; text-decoration: none; box-shadow: 0 8px 22px rgba(60,42,33,0.07); }
+        .cd-door { display: block; min-height: 44px; padding: 1.1rem 1.25rem; background: #fff; border: 1px solid rgba(212,175,55,0.45); border-radius: 14px; text-decoration: none; box-shadow: 0 8px 22px rgba(42,26,18,0.07); }
         .cd-door b { display: block; font-family: var(--font-heading); font-size: 1rem; color: var(--cocoa); }
         .cd-door span { display: block; margin-top: 0.3rem; font-size: 0.85rem; color: #6d5c50; line-height: 1.55; }
         .cd-door--gold { background: var(--cocoa); border-color: rgba(212,175,55,0.7); }

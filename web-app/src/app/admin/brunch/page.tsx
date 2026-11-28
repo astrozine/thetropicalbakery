@@ -192,7 +192,7 @@ export default function AdminBrunchPage() {
                   </span>
                   <div style={{ minWidth: 0 }}>
                     <strong style={{ overflowWrap: 'anywhere' }}>{p?.display_name || c.name} {p?.emoji && p.photo_url ? p.emoji : ''}</strong>
-                    {p?.headline && <div style={{ color: '#a6832b', fontWeight: 700, fontSize: '0.88rem' }}>{p.headline}</div>}
+                    {p?.headline && <div style={{ color: '#a8843f', fontWeight: 700, fontSize: '0.88rem' }}>{p.headline}</div>}
                     <div className="bx-sub" style={{ margin: '0.25rem 0', fontSize: '0.88rem' }}>
                       {c.count === 1 ? '1 brunch' : `${c.count} brunches`} · {formatBRL(c.spent)}{c.last ? ` · último ${new Date(c.last).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: 'numeric', month: 'short' })}` : ''}
                     </div>
@@ -206,7 +206,7 @@ export default function AdminBrunchPage() {
                     <div style={{ display: 'flex', gap: '0.9rem', flexWrap: 'wrap', marginTop: '0.4rem', fontSize: '0.88rem' }}>
                       <a href={`mailto:${c.email}`} style={{ color: '#222' }}>{c.email}</a>
                       {c.whatsapp && <a href={`https://wa.me/${c.whatsapp.replace(/\D/g, '').replace(/^(?!55)/, '55')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1e8a4c', fontWeight: 700 }}>WhatsApp</a>}
-                      {p?.instagram && <a href={`https://instagram.com/${p.instagram}`} target="_blank" rel="noopener noreferrer" style={{ color: '#a6832b' }}>@{p.instagram}</a>}
+                      {p?.instagram && <a href={`https://instagram.com/${p.instagram}`} target="_blank" rel="noopener noreferrer" style={{ color: '#a8843f' }}>@{p.instagram}</a>}
                     </div>
                   </div>
                 </div>

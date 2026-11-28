@@ -39,7 +39,7 @@ export default function AccountSection({ id, emoji, accent, title, summary, stat
         borderLeft: `6px solid ${accent}`,
         borderRadius: '20px',
         overflow: 'hidden',
-        boxShadow: open ? `0 16px 40px ${accent}30` : '0 4px 14px rgba(60,42,33,0.05)',
+        boxShadow: open ? `0 16px 40px ${accent}30` : '0 4px 14px rgba(42,26,18,0.05)',
         transition: 'box-shadow .3s, border-color .3s',
       }}
     >
@@ -57,7 +57,7 @@ export default function AccountSection({ id, emoji, accent, title, summary, stat
           {emoji}
         </span>
         <span style={{ flex: 1, minWidth: 0 }}>
-          <strong style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.05rem, 2.6vw, 1.25rem)', color: '#3c2a21', lineHeight: 1.2 }}>
+          <strong style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.05rem, 2.6vw, 1.25rem)', color: '#2a1a12', lineHeight: 1.2 }}>
             {title}
           </strong>
           <span style={{ display: 'block', color: '#7a6a61', fontSize: '0.86rem', marginTop: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -71,7 +71,7 @@ export default function AccountSection({ id, emoji, accent, title, summary, stat
         )}
         <span
           aria-hidden
-          style={{ flexShrink: 0, width: '36px', height: '36px', borderRadius: '50%', background: open ? accent : '#f5efe2', color: open ? '#fff' : '#3c2a21', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', transform: open ? 'rotate(45deg)' : 'none', transition: 'transform .25s, background .25s' }}
+          style={{ flexShrink: 0, width: '36px', height: '36px', borderRadius: '50%', background: open ? accent : '#f5efe2', color: open ? '#fff' : '#2a1a12', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', transform: open ? 'rotate(45deg)' : 'none', transition: 'transform .25s, background .25s' }}
         >
           +
         </span>

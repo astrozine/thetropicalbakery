@@ -24,28 +24,28 @@ interface Props {
 
 const chip = (on: boolean): React.CSSProperties => ({
   padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid',
-  borderColor: on ? '#d4af37' : '#e8e1d7',
+  borderColor: on ? '#c9a257' : '#e8e1d7',
   background: on ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.7)',
-  color: on ? '#3c2a21' : '#7a6a61',
+  color: on ? '#2a1a12' : '#7a6a61',
   fontWeight: on ? 700 : 500, fontSize: '0.85rem', cursor: 'pointer',
   fontFamily: 'inherit', textAlign: 'left', lineHeight: 1.3,
 });
 
 const groupTitle: React.CSSProperties = {
   fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase',
-  color: '#a6832b', fontWeight: 800, marginBottom: '0.5rem',
+  color: '#a8843f', fontWeight: 800, marginBottom: '0.5rem',
 };
 
 const expander = (open: boolean): React.CSSProperties => ({
   display: 'flex', alignItems: 'center', gap: '0.6rem', width: '100%',
   padding: '0.75rem 1rem', borderRadius: '12px', cursor: 'pointer',
-  border: `1px dashed ${open ? '#d4af37' : '#e0d6c8'}`,
+  border: `1px dashed ${open ? '#c9a257' : '#e0d6c8'}`,
   background: open ? 'rgba(212,175,55,0.08)' : 'rgba(255,255,255,0.55)',
   color: '#594a42', fontSize: '0.9rem', fontWeight: 600, fontFamily: 'inherit', textAlign: 'left',
 });
 
 const countPill = (n: number): React.CSSProperties => ({
-  marginLeft: 'auto', background: n ? '#d4af37' : '#eee7db', color: n ? '#fff' : '#a89a90',
+  marginLeft: 'auto', background: n ? '#c9a257' : '#eee7db', color: n ? '#fff' : '#a89a90',
   borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.78rem', fontWeight: 800,
 });
 

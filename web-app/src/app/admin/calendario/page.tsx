@@ -385,7 +385,7 @@ export default function DeliveryCalendarAdmin() {
               const info = dayState(iso, activeRules, map);
               const isPast = iso < today;
               const extra = info.state === 'open' && !info.fromRule;
-              let bg = '#fdf7ee', color = '#3c2a21';
+              let bg = '#fdf7ee', color = '#2a1a12';
               if (isPast) { bg = '#f1f2f6'; color = '#bdc3c7'; }
               else if (info.state === 'open') { bg = extra ? '#2a9d8f' : '#0b6b3a'; color = 'white'; }
               else if (info.state === 'blocked') { bg = '#fdecea'; color = '#c0392b'; }
@@ -406,7 +406,7 @@ export default function DeliveryCalendarAdmin() {
                     <button
                       onClick={() => setSelectedNote({ date: iso, text: info.override?.notes || '' })}
                       title="Adicionar nota"
-                      style={{ position: 'absolute', top: '-4px', right: '-4px', width: '18px', height: '18px', borderRadius: '50%', border: 'none', background: '#d4af37', color: 'white', fontSize: '0.6rem', cursor: 'pointer', lineHeight: '18px' }}
+                      style={{ position: 'absolute', top: '-4px', right: '-4px', width: '18px', height: '18px', borderRadius: '50%', border: 'none', background: '#c9a257', color: 'white', fontSize: '0.6rem', cursor: 'pointer', lineHeight: '18px' }}
                     >✎</button>
                   )}
                 </div>
@@ -441,7 +441,7 @@ export default function DeliveryCalendarAdmin() {
         ) : (
           <>
             <p style={{ color: '#7f8c8d', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: 1.7 }}>
-              Datas ainda não avisadas (próximas 8 semanas): <strong style={{ color: '#3c2a21' }}>{unnotified.map(fmtShort).join(', ')}</strong>
+              Datas ainda não avisadas (próximas 8 semanas): <strong style={{ color: '#2a1a12' }}>{unnotified.map(fmtShort).join(', ')}</strong>
             </p>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
               <button onClick={notifyCustomers} disabled={notifying} style={dark}>{notifying ? 'Enviando...' : '✉️ Enviar e-mail para clientes'}</button>

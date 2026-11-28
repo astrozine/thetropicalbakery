@@ -57,24 +57,24 @@ export default function BoxTreatPicker({ items, plan, picks, onChange, attention
   return (
     <div className={`btp${attention && left > 0 ? ' btp-attn' : ''}`}>
       <style>{`
-        .btp { background: #fdf7ee; border: 2px solid #e8e1d7; border-radius: 20px; padding: 1.1rem; color: #3c2a21; transition: border-color 0.2s; }
+        .btp { background: #fdf7ee; border: 2px solid #e8e1d7; border-radius: 20px; padding: 1.1rem; color: #2a1a12; transition: border-color 0.2s; }
         .btp-attn { border-color: #c0392b; }
         .btp-kicker { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 800; color: #a8862a; margin: 0 0 0.2rem; }
         .btp-title { font-family: var(--font-heading); font-size: 1.4rem; line-height: 1.15; margin: 0 0 0.3rem; }
         .btp-sub { font-size: 0.92rem; color: #594a42; line-height: 1.5; margin: 0 0 1rem; }
         .btp-tray { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 0.5rem; max-width: 300px; margin: 0 auto;
-          padding: 0.6rem; background: #efe0c4; border-radius: 16px; box-shadow: inset 0 2px 8px rgba(60,42,33,0.18); }
+          padding: 0.6rem; background: #efe0c4; border-radius: 16px; box-shadow: inset 0 2px 8px rgba(42,26,18,0.18); }
         .btp-tray.btp-shake { animation: btp-shake 0.35s; }
         .btp-slot { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center;
-          background: #fff; border: 2px solid #d4af37; padding: 0; font: inherit; color: inherit; }
+          background: #fff; border: 2px solid #c9a257; padding: 0; font: inherit; color: inherit; }
         .btp-slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
         .btp-slot .btp-emoji { font-size: 1.8rem; }
         .btp-slot-empty { background: rgba(255,255,255,0.55); border: 2px dashed #c9a43a; color: #a8862a; font-size: 1.6rem; font-weight: 300; }
         .btp-slot-pick { cursor: pointer; animation: btp-pop 0.25s ease-out; }
-        .btp-slot-pick:focus-visible { outline: 3px solid #3c2a21; outline-offset: 2px; }
-        .btp-x { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(60,42,33,0.85); color: #fff;
+        .btp-slot-pick:focus-visible { outline: 3px solid #2a1a12; outline-offset: 2px; }
+        .btp-x { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(42,26,18,0.85); color: #fff;
           font-size: 0.75rem; font-weight: 900; display: flex; align-items: center; justify-content: center; }
-        .btp-lock { position: absolute; bottom: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; background: #d4af37; color: #fff;
+        .btp-lock { position: absolute; bottom: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; background: #c9a257; color: #fff;
           font-size: 0.75rem; font-weight: 900; display: flex; align-items: center; justify-content: center; }
         .btp-legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.4rem 1rem; margin-top: 0.6rem; font-size: 0.78rem; color: #594a42; }
         .btp-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; vertical-align: -1px; margin-right: 0.35rem; }
@@ -82,25 +82,25 @@ export default function BoxTreatPicker({ items, plan, picks, onChange, attention
         .btp-done { color: #2e7d4f; }
         .btp-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; margin-top: 0.9rem; }
         .btp-card { position: relative; display: flex; flex-direction: column; text-align: left; padding: 0; background: #fff; border: 2px solid #e8e1d7;
-          border-radius: 14px; overflow: hidden; cursor: pointer; font: inherit; color: #3c2a21; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; }
-        .btp-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(60,42,33,0.1); }
-        .btp-card:focus-visible { outline: 3px solid #d4af37; outline-offset: 2px; }
-        .btp-card[data-on="true"] { border-color: #d4af37; box-shadow: 0 8px 20px rgba(212,175,55,0.3); }
+          border-radius: 14px; overflow: hidden; cursor: pointer; font: inherit; color: #2a1a12; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; }
+        .btp-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(42,26,18,0.1); }
+        .btp-card:focus-visible { outline: 3px solid #c9a257; outline-offset: 2px; }
+        .btp-card[data-on="true"] { border-color: #c9a257; box-shadow: 0 8px 20px rgba(212,175,55,0.3); }
         .btp-card-ph { position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; background: #f5efe2; display: flex; align-items: center; justify-content: center; }
         .btp-card-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
         .btp-card-ph .btp-emoji { font-size: 2.2rem; }
         .btp-card-name { padding: 0.5rem 0.6rem 0.6rem; font-weight: 700; font-size: 0.88rem; line-height: 1.25; }
         .btp-card-add { position: absolute; top: 6px; right: 6px; min-width: 28px; height: 28px; padding: 0 6px; border-radius: 999px; background: #fff;
-          color: #3c2a21; font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
-        .btp-card[data-on="true"] .btp-card-add { background: #d4af37; color: #fff; }
+          color: #2a1a12; font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+        .btp-card[data-on="true"] .btp-card-add { background: #c9a257; color: #fff; }
 .btp-slot-dice { font-size: 1.7rem; background: #fff8e6; }
         .btp-dice { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; min-height: 44px; margin-top: 0.7rem;
-          padding: 0.6rem 1rem; border-radius: 999px; border: 2px dashed #c9a43a; background: #fff; color: #3c2a21; font: inherit;
+          padding: 0.6rem 1rem; border-radius: 999px; border: 2px dashed #c9a43a; background: #fff; color: #2a1a12; font: inherit;
           font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
         .btp-dice:hover .btp-dice-icon { transform: rotate(-20deg) scale(1.15); }
         .btp-dice-icon { font-size: 1.3rem; display: inline-block; transition: transform 0.2s; }
-        .btp-dice[aria-pressed="true"] { background: #d4af37; border-style: solid; border-color: #d4af37; color: #fff; }
-        .btp-dice:focus-visible { outline: 3px solid #3c2a21; outline-offset: 2px; }
+        .btp-dice[aria-pressed="true"] { background: #c9a257; border-style: solid; border-color: #c9a257; color: #fff; }
+        .btp-dice:focus-visible { outline: 3px solid #2a1a12; outline-offset: 2px; }
         @keyframes btp-pop { 0% { transform: scale(0.6); } 70% { transform: scale(1.06); } 100% { transform: scale(1); } }
         @keyframes btp-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
         @media (prefers-reduced-motion: reduce) { .btp-slot-pick, .btp-tray.btp-shake { animation: none; } .btp-card { transition: none; } .btp-card:hover { transform: none; } }
@@ -132,7 +132,7 @@ export default function BoxTreatPicker({ items, plan, picks, onChange, attention
 
       {plan.fixed > 0 && plan.picks > 0 && (
         <div className="btp-legend" aria-hidden>
-          <span><i style={{ background: '#fff', border: '2px solid #d4af37' }} />da semana</span>
+          <span><i style={{ background: '#fff', border: '2px solid #c9a257' }} />da semana</span>
           <span><i style={{ border: '2px dashed #c9a43a' }} />você escolhe</span>
         </div>
       )}

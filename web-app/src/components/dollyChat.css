@@ -1,6 +1,6 @@
 /* DollyChat: Dolly messaging you, like a chat app. Works on the site's light pages and inside the craving app. */
 .dc {
-  --dc-bg: #ffffff; --dc-ink: #3c2a21; --dc-muted: #8a7a6d; --dc-line: #e6dccb;
+  --dc-bg: #ffffff; --dc-ink: #2a1a12; --dc-muted: #8a7a6d; --dc-line: #e6dccb;
   display: flex; align-items: flex-start; gap: 0.6rem; margin: 0.6rem 0 1.1rem; text-align: left; color: var(--dc-ink);
 }
 .dc__avatar { position: relative; flex-shrink: 0; }

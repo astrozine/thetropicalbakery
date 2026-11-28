@@ -113,7 +113,7 @@ export default function AnnouncementAdmin() {
       {message && (
         <div style={{ marginTop: '2rem' }}>
           <p style={{ fontSize: '0.8rem', color: '#95a5a6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>Pré-visualização</p>
-          <div style={{ display: 'inline-block', background: '#3c2a21', color: '#fdfaf3', padding: '0.7rem 1.25rem', borderRadius: '30px', fontSize: '0.9rem', fontWeight: 600, border: '1px solid #d4af37' }}>
+          <div style={{ display: 'inline-block', background: '#2a1a12', color: '#faf5ec', padding: '0.7rem 1.25rem', borderRadius: '30px', fontSize: '0.9rem', fontWeight: 600, border: '1px solid #c9a257' }}>
             {message}
           </div>
         </div>

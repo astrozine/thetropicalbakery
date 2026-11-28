@@ -165,7 +165,7 @@ export default function SubscriptionPage() {
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center' }}>
 
           <span style={{
-            display: 'inline-block', border: '1px solid rgba(212,175,55,0.6)', color: '#d4af37',
+            display: 'inline-block', border: '1px solid rgba(212,175,55,0.6)', color: '#c9a257',
             padding: '0.4rem 1.1rem', borderRadius: '30px', fontSize: '0.8rem',
             textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '1.75rem',
           }}>
@@ -174,18 +174,18 @@ export default function SubscriptionPage() {
 
           <h1 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.95rem, 7vw, 4.6rem)',
-            lineHeight: 1.05, color: '#fdfaf3', marginBottom: '1.5rem',
+            lineHeight: 1.05, color: '#faf5ec', marginBottom: '1.5rem',
           }}>
             Uma caixa de doces nova<br />
-            <span style={{ color: '#d4af37' }}>toda semana, mais barata</span>
+            <span style={{ color: '#c9a257' }}>toda semana, mais barata</span>
           </h1>
 
           <p style={{
             fontSize: 'clamp(1rem, 2.4vw, 1.2rem)', color: 'rgba(253,250,243,0.86)',
             lineHeight: 1.75, maxWidth: '620px', margin: '0 auto 2rem',
           }}>
-            Assine uma vez e a Caixa de Degustação da Dolly chega na sua porta <strong style={{ color: '#fdfaf3' }}>toda semana</strong>,
-            com doces diferentes a cada vez{bestDeal && bestDeal.pct > 0 ? <> e <strong style={{ color: '#d4af37' }}>até {bestDeal.pct}% mais barata</strong> que comprar avulsa</> : null}.
+            Assine uma vez e a Caixa de Degustação da Dolly chega na sua porta <strong style={{ color: '#faf5ec' }}>toda semana</strong>,
+            com doces diferentes a cada vez{bestDeal && bestDeal.pct > 0 ? <> e <strong style={{ color: '#c9a257' }}>até {bestDeal.pct}% mais barata</strong> que comprar avulsa</> : null}.
           </p>
 
           {/* The whole offer in three chips, so nobody has to read a paragraph to get it. */}
@@ -199,8 +199,8 @@ export default function SubscriptionPage() {
                 background: 'rgba(253,250,243,0.08)', border: '1px solid rgba(212,175,55,0.45)',
                 borderRadius: '14px', padding: '0.6rem 1rem', textAlign: 'left', minWidth: 0,
               }}>
-                <span style={{ display: 'block', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#d4af37' }}>{f.k}</span>
-                <span style={{ color: '#fdfaf3', fontWeight: 700, fontSize: '0.98rem' }}>
+                <span style={{ display: 'block', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#c9a257' }}>{f.k}</span>
+                <span style={{ color: '#faf5ec', fontWeight: 700, fontSize: '0.98rem' }}>
                   {f.strike && <s style={{ opacity: 0.55, fontWeight: 400, marginRight: '0.35rem' }}>{f.strike}</s>}
                   {f.v}
                 </span>
@@ -209,7 +209,7 @@ export default function SubscriptionPage() {
           </div>
 
           <button onClick={scrollToPlans} className="btn btn-secondary" style={{
-            background: '#d4af37', color: '#3c2a21', border: 'none', padding: '1.1rem 2.5rem',
+            background: '#c9a257', color: '#2a1a12', border: 'none', padding: '1.1rem 2.5rem',
             borderRadius: '10px', fontWeight: 700, fontSize: '1.05rem', cursor: 'pointer',
             letterSpacing: '0.02em',
           }}>
@@ -254,21 +254,21 @@ export default function SubscriptionPage() {
                   <li>· Preço cheio</li>
                 </ul>
               </div>
-              <div style={{ background: 'var(--color-primary)', border: '2px solid #d4af37', borderRadius: '18px', padding: '1.4rem 1.5rem', position: 'relative', boxShadow: '0 18px 40px rgba(212,175,55,0.22)' }}>
+              <div style={{ background: 'var(--color-primary)', border: '2px solid #c9a257', borderRadius: '18px', padding: '1.4rem 1.5rem', position: 'relative', boxShadow: '0 18px 40px rgba(212,175,55,0.22)' }}>
                 {bestDeal && bestDeal.pct > 0 && (
-                  <span style={{ position: 'absolute', top: '-0.8rem', right: '1rem', background: '#d4af37', color: '#3c2a21', fontWeight: 800, fontSize: '0.78rem', padding: '0.3rem 0.75rem', borderRadius: '20px', letterSpacing: '0.04em' }}>
+                  <span style={{ position: 'absolute', top: '-0.8rem', right: '1rem', background: '#c9a257', color: '#2a1a12', fontWeight: 800, fontSize: '0.78rem', padding: '0.3rem 0.75rem', borderRadius: '20px', letterSpacing: '0.04em' }}>
                     ATÉ {bestDeal.pct}% OFF
                   </span>
                 )}
-                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#d4af37', marginBottom: '0.4rem' }}>Assinatura</p>
-                <p style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#fdfaf3', lineHeight: 1.1, marginBottom: '0.75rem' }}>
+                <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#c9a257', marginBottom: '0.4rem' }}>Assinatura</p>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#faf5ec', lineHeight: 1.1, marginBottom: '0.75rem' }}>
                   {bestDeal && bestDeal.pct > 0 && <span style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: '0.85rem', color: 'rgba(253,250,243,0.7)' }}>a partir de</span>}
                   {formatBRL(bestDeal?.price ?? single)} <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: 'rgba(253,250,243,0.7)' }}>por caixa</span>
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'rgba(253,250,243,0.9)', lineHeight: 1.7, fontSize: '0.93rem' }}>
-                  <li><span style={{ color: '#d4af37' }}>✓</span> Uma caixa nova <strong>toda semana</strong></li>
-                  <li><span style={{ color: '#d4af37' }}>✓</span> Chega sozinha, sem pedir de novo</li>
-                  <li><span style={{ color: '#d4af37' }}>✓</span> Desconto em cada caixa + mimos de assinante</li>
+                  <li><span style={{ color: '#c9a257' }}>✓</span> Uma caixa nova <strong>toda semana</strong></li>
+                  <li><span style={{ color: '#c9a257' }}>✓</span> Chega sozinha, sem pedir de novo</li>
+                  <li><span style={{ color: '#c9a257' }}>✓</span> Desconto em cada caixa + mimos de assinante</li>
                 </ul>
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function SubscriptionPage() {
               <ScrollReveal key={s.step}>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                   <div style={{
-                    fontFamily: 'var(--font-heading)', fontSize: '1.4rem', color: '#3c2a21', background: '#d4af37',
+                    fontFamily: 'var(--font-heading)', fontSize: '1.4rem', color: '#2a1a12', background: '#c9a257',
                     width: '2.6rem', height: '2.6rem', borderRadius: '50%', flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
@@ -360,9 +360,9 @@ export default function SubscriptionPage() {
                     onClick={() => setSelectedPlanId(plan.id)}
                     style={{
                       background: featured ? 'var(--color-primary)' : '#fff',
-                      color: featured ? '#fdfaf3' : 'var(--color-text)',
+                      color: featured ? '#faf5ec' : 'var(--color-text)',
                       border: '2px solid',
-                      borderColor: isSelected ? '#d4af37' : featured ? 'var(--color-primary)' : '#e8e1d7',
+                      borderColor: isSelected ? '#c9a257' : featured ? 'var(--color-primary)' : '#e8e1d7',
                       borderRadius: '20px',
                       padding: '2rem 1.5rem',
                       paddingTop: plan.badge ? '3.1rem' : '2rem',
@@ -371,7 +371,7 @@ export default function SubscriptionPage() {
                       overflow: 'hidden',
                       minWidth: 0,
                       transform: featured ? 'scale(1.02)' : 'none',
-                      boxShadow: isSelected ? '0 18px 40px rgba(212,175,55,0.28)' : '0 8px 24px rgba(60,42,33,0.07)',
+                      boxShadow: isSelected ? '0 18px 40px rgba(212,175,55,0.28)' : '0 8px 24px rgba(42,26,18,0.07)',
                       transition: 'box-shadow 0.25s, border-color 0.25s',
                       scrollSnapAlign: 'start',
                       flex: '0 0 min(300px, 82vw)',
@@ -381,7 +381,7 @@ export default function SubscriptionPage() {
                       <span style={{
                         // A tab hanging from the top edge: inside the card, so overflow:hidden never clips it.
                         position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
-                        background: '#d4af37', color: '#3c2a21', padding: '0.35rem 1.1rem 0.4rem',
+                        background: '#c9a257', color: '#2a1a12', padding: '0.35rem 1.1rem 0.4rem',
                         borderRadius: '0 0 12px 12px', fontSize: '0.75rem', fontWeight: 800,
                         textTransform: 'uppercase', letterSpacing: '0.12em', whiteSpace: 'nowrap',
                       }}>
@@ -392,7 +392,7 @@ export default function SubscriptionPage() {
                     <h3 style={{
                       fontFamily: 'var(--font-heading)',
                       fontSize: 'clamp(1.4rem, 5vw, 1.9rem)',
-                      color: featured ? '#d4af37' : 'var(--color-primary)',
+                      color: featured ? '#c9a257' : 'var(--color-primary)',
                       marginBottom: '0.4rem',
                       wordBreak: 'break-word',
                       overflowWrap: 'anywhere',
@@ -412,7 +412,7 @@ export default function SubscriptionPage() {
                       <p style={{ fontSize: '0.85rem', marginBottom: '0.3rem' }}>
                         <s style={{ opacity: 0.6 }}>{formatBRL(single)}</s>{' '}
                         <span style={{
-                          background: '#d4af37', color: '#3c2a21', fontWeight: 800, fontSize: '0.75rem',
+                          background: '#c9a257', color: '#2a1a12', fontWeight: 800, fontSize: '0.75rem',
                           padding: '0.15rem 0.5rem', borderRadius: '6px', marginLeft: '0.25rem',
                         }}>-{off}%</span>
                       </p>
@@ -438,7 +438,7 @@ export default function SubscriptionPage() {
                     {savings > 0 && (
                       <p style={{
                         display: 'inline-block', background: featured ? 'rgba(212,175,55,0.2)' : 'rgba(46,68,50,0.09)',
-                        color: featured ? '#d4af37' : '#2e4432', padding: '0.3rem 0.8rem', borderRadius: '20px',
+                        color: featured ? '#c9a257' : '#1e5d54', padding: '0.3rem 0.8rem', borderRadius: '20px',
                         fontSize: '0.78rem', fontWeight: 700, marginBottom: '1.75rem',
                       }}>
                         Você economiza {formatBRL(savings)} por mês
@@ -452,7 +452,7 @@ export default function SubscriptionPage() {
                           fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '0.7rem',
                           color: featured ? 'rgba(253,250,243,0.9)' : '#594a42',
                         }}>
-                          <span style={{ color: '#d4af37', flexShrink: 0 }}>✓</span>
+                          <span style={{ color: '#c9a257', flexShrink: 0 }}>✓</span>
                           <span>{perk}</span>
                         </li>
                       ))}
@@ -466,7 +466,7 @@ export default function SubscriptionPage() {
                         fontWeight: 700, fontSize: '0.95rem', border: 'none',
                         // Filled foil with dark cocoa text on every card — an
                         // outlined variant here was too faint to read.
-                        background: '#d4af37', color: '#3c2a21',
+                        background: '#c9a257', color: '#2a1a12',
                       }}
                     >
                       Escolher {plan.name}
@@ -509,7 +509,7 @@ export default function SubscriptionPage() {
             <img
               src="/box1.jpg"
               alt="Caixa de Degustação"
-              style={{ width: '100%', borderRadius: '20px', boxShadow: '0 24px 50px rgba(60,42,33,0.22)' }}
+              style={{ width: '100%', borderRadius: '20px', boxShadow: '0 24px 50px rgba(42,26,18,0.22)' }}
             />
           </div>
           <div style={{ flex: '1 1 320px' }}>
@@ -525,7 +525,7 @@ export default function SubscriptionPage() {
                   display: 'flex', gap: '0.85rem', alignItems: 'flex-start',
                   color: '#594a42', lineHeight: 1.75, marginBottom: '1rem',
                 }}>
-                  <span style={{ color: '#d4af37', fontWeight: 700, flexShrink: 0 }}>✦</span>
+                  <span style={{ color: '#c9a257', fontWeight: 700, flexShrink: 0 }}>✦</span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -539,15 +539,15 @@ export default function SubscriptionPage() {
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           <h2 data-sign-top="💛" data-sign-dark style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.9rem, 5vw, 3rem)',
-            color: '#fdfaf3', textAlign: 'center', marginBottom: '3.5rem',
+            color: '#faf5ec', textAlign: 'center', marginBottom: '3.5rem',
           }}>
             Por que assinar em vez de pedir
           </h2>
           <div className="tb-rail sub-why" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '2.5rem' }}>
             {WHY_SUBSCRIBE.map(item => (
               <div key={item.title}>
-                <div style={{ fontSize: '1.8rem', color: '#d4af37', marginBottom: '0.9rem' }}>{item.icon}</div>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fdfaf3', marginBottom: '0.6rem' }}>
+                <div style={{ fontSize: '1.8rem', color: '#c9a257', marginBottom: '0.9rem' }}>{item.icon}</div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#faf5ec', marginBottom: '0.6rem' }}>
                   {item.title}
                 </h3>
                 <p style={{ color: 'rgba(253,250,243,0.78)', lineHeight: 1.8, fontSize: '0.92rem' }}>
@@ -596,7 +596,7 @@ export default function SubscriptionPage() {
                 }}
               >
                 {item.q}
-                <span style={{ color: '#d4af37', flexShrink: 0, fontSize: '1.2rem' }}>
+                <span style={{ color: '#c9a257', flexShrink: 0, fontSize: '1.2rem' }}>
                   {openFaq === i ? '−' : '+'}
                 </span>
               </button>
@@ -622,7 +622,7 @@ export default function SubscriptionPage() {
         <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.8rem, 5vw, 2.8rem)',
-            color: '#fdfaf3', marginBottom: '1.25rem', lineHeight: 1.15,
+            color: '#faf5ec', marginBottom: '1.25rem', lineHeight: 1.15,
           }}>
             Suas quartas-feiras pedem<br />algo melhor
           </h2>
@@ -635,7 +635,7 @@ export default function SubscriptionPage() {
           <button
             onClick={scrollToSignup}
             style={{
-              background: '#d4af37', color: '#3c2a21', border: 'none',
+              background: '#c9a257', color: '#2a1a12', border: 'none',
               padding: '1.15rem 2.75rem', borderRadius: '10px', fontWeight: 700,
               fontSize: '1.05rem', cursor: 'pointer',
             }}
@@ -644,7 +644,7 @@ export default function SubscriptionPage() {
           </button>
           <p style={{ fontSize: '0.8rem', color: 'rgba(253,250,243,0.6)', marginTop: '1.5rem' }}>
             Ou fale direto com a gente no{' '}
-            <WhatsAppGate href="https://wa.me/5511932119196" topic="Assinatura: dúvidas" tags={['assinatura']} style={{ color: '#d4af37', fontWeight: 600, textDecoration: 'underline' }}>
+            <WhatsAppGate href="https://wa.me/5511932119196" topic="Assinatura: dúvidas" tags={['assinatura']} style={{ color: '#c9a257', fontWeight: 600, textDecoration: 'underline' }}>
               WhatsApp
             </WhatsAppGate>
           </p>

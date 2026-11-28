@@ -162,7 +162,7 @@ function ReturnInner() {
               {available.paypal && <button disabled={retrying} onClick={() => retry('paypal')} className="btn btn-secondary" style={{ padding: '0.9rem 1.6rem' }}>PayPal</button>}
             </div>
             {error && <p style={{ color: '#c0392b', fontSize: '0.9rem', marginBottom: '1rem' }}>{error}</p>}
-            <a href={wa} target="_blank" rel="noopener noreferrer" style={{ color: '#a6832b', fontWeight: 700 }}>Prefere pagar por Pix? Fale com a gente no WhatsApp</a>
+            <a href={wa} target="_blank" rel="noopener noreferrer" style={{ color: '#a8843f', fontWeight: 700 }}>Prefere pagar por Pix? Fale com a gente no WhatsApp</a>
           </>
         )}
 

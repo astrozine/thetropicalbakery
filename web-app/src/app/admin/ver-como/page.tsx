@@ -60,7 +60,7 @@ export default function VerComoPage() {
   const personBtn = (id: string, title: string, sub: string, badge?: { label: string; color: string; bg: string }) => (
     <button key={id} type="button" onClick={() => { setSelected(id); setFrameKey(k => k + 1); }}
       style={{ width: '100%', textAlign: 'left', padding: '0.75rem 0.9rem', borderRadius: '10px', cursor: 'pointer',
-        border: selected === id ? '2px solid #d4af37' : '1px solid #eef1f4', background: selected === id ? '#fdf7ee' : '#fff' }}>
+        border: selected === id ? '2px solid #c9a257' : '1px solid #eef1f4', background: selected === id ? '#fdf7ee' : '#fff' }}>
       <strong style={{ display: 'block', color: '#2c3e50' }}>{title}</strong>
       <span style={{ fontSize: '0.8rem', color: '#7f8c8d' }}>{sub}</span>
       {badge && <span style={{ marginLeft: '0.4rem', fontSize: '0.72rem', fontWeight: 700, color: badge.color, background: badge.bg, padding: '0.1rem 0.45rem', borderRadius: '6px' }}>{badge.label}</span>}
@@ -133,7 +133,7 @@ export default function VerComoPage() {
             {src && <a href={src} target="_blank" rel="noopener noreferrer" style={{ color: '#2c3e50', fontWeight: 800, fontSize: '0.88rem' }}>Abrir em nova aba ↗</a>}
           </div>
 
-          <div style={{ margin: '0 auto', width: width === 'phone' ? '390px' : '100%', maxWidth: '100%', background: '#fdfaf3', borderRadius: width === 'phone' ? '28px' : '10px', border: width === 'phone' ? '10px solid #2c3e50' : '1px solid #cfd6dd', overflow: 'hidden' }}>
+          <div style={{ margin: '0 auto', width: width === 'phone' ? '390px' : '100%', maxWidth: '100%', background: '#faf5ec', borderRadius: width === 'phone' ? '28px' : '10px', border: width === 'phone' ? '10px solid #2c3e50' : '1px solid #cfd6dd', overflow: 'hidden' }}>
             {tab === 'login' ? (
               <div style={{ padding: '1.5rem 1rem', minHeight: '480px' }}>
                 <LoginPanel demo message="Entrar no portal" subMessage="Use o mesmo e-mail cadastrado." />
@@ -157,7 +157,7 @@ export default function VerComoPage() {
         {AREAS.map(a => (
           <div key={a.who} style={{ background: '#fff', borderRadius: '12px', padding: '0.8rem 0.95rem', boxShadow: '0 3px 6px rgba(0,0,0,0.05)' }}>
             <p style={{ fontWeight: 800, color: '#2c3e50', fontSize: '0.9rem', margin: '0 0 0.15rem' }}>{a.emoji} {a.who}</p>
-            <a href={a.where} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#a6832b', fontWeight: 700 }}>{a.where} ↗</a>
+            <a href={a.where} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#a8843f', fontWeight: 700 }}>{a.where} ↗</a>
             <p style={{ fontSize: '0.78rem', color: '#594a42', lineHeight: 1.5, margin: '0.4rem 0 0.25rem' }}><strong>Como entra:</strong> {a.how}</p>
             <p style={{ fontSize: '0.78rem', color: '#594a42', lineHeight: 1.5, margin: 0 }}><strong>O que vê:</strong> {a.sees}</p>
           </div>

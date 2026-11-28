@@ -66,7 +66,7 @@ export default function MobileBottomNav() {
       background: 'rgba(253,250,243,0.95)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      boxShadow: '0 -10px 40px rgba(60,42,33,0.1)',
+      boxShadow: '0 -10px 40px rgba(42,26,18,0.1)',
       borderTop: '1px solid rgba(212, 175, 55, 0.2)',
       display: 'flex',
       justifyContent: 'space-around',
@@ -88,7 +88,7 @@ export default function MobileBottomNav() {
             flexDirection: 'column',
             alignItems: 'center',
             textDecoration: 'none',
-            color: isActive ? '#d4af37' : '#887d77',
+            color: isActive ? '#c9a257' : '#887d77',
             gap: '4px',
             position: 'relative',
             width: '20%'
@@ -115,12 +115,12 @@ export default function MobileBottomNav() {
 
       {/* Signed out: the Clube Tropical invitation. Signed in: their account. */}
       {user ? (
-        <Link href="/minha-conta" style={{ ...tabStyle, color: pathname === '/minha-conta' ? '#d4af37' : '#887d77' }}>
+        <Link href="/minha-conta" style={{ ...tabStyle, color: pathname === '/minha-conta' ? '#c9a257' : '#887d77' }}>
           <span style={{ height: '1.5rem', display: 'flex', alignItems: 'center' }}><PersonIcon size={24} /></span>
           <span style={tabLabel}>{shellText('Conta', lang)}</span>
         </Link>
       ) : (
-        <button type="button" onClick={() => setClubeOpen(true)} style={{ ...tabStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#3c2a21' }}>
+        <button type="button" onClick={() => setClubeOpen(true)} style={{ ...tabStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#2a1a12' }}>
           <span style={{ height: '1.5rem', display: 'flex', alignItems: 'center' }}><PersonIcon size={24} /></span>
           <span style={{ ...tabLabel, fontWeight: 700 }}>{shellText('Entrar', lang)}</span>
         </button>

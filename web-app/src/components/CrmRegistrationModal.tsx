@@ -576,7 +576,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
 
   const focusBlock = (
     <div className="crm-focus">
-      <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 600, color: '#3c2a21', marginBottom: '0.75rem' }}>
+      <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 600, color: '#2a1a12', marginBottom: '0.75rem' }}>
         {t.focusTitle}
       </span>
       <p style={{ fontSize: '0.85rem', color: '#7a6a61', marginBottom: '1rem' }}>
@@ -595,9 +595,9 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
                 display: 'flex', alignItems: 'center', gap: '0.5rem',
                 minHeight: 44, padding: '0.5rem 0.9rem',
                 borderRadius: '999px',
-                border: on ? '1px solid #d4af37' : '1px solid rgba(0,0,0,0.15)',
+                border: on ? '1px solid #c9a257' : '1px solid rgba(0,0,0,0.15)',
                 background: on ? 'rgba(212,175,55,0.1)' : 'white',
-                color: on ? '#3c2a21' : '#594a42',
+                color: on ? '#2a1a12' : '#594a42',
                 fontFamily: 'inherit', fontSize: '0.9rem', textAlign: 'left',
                 cursor: 'pointer', transition: 'all 0.2s',
               }}
@@ -647,10 +647,10 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
               scrolling in the middle, buttons pinned to the bottom) so nothing is ever cut off. */}
           <style>{`
             .crm-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: flex; padding: 1rem; overflow-y: auto; overscroll-behavior: contain; }
-            .crm-card { position: relative; margin: auto; width: 100%; max-width: 1040px; background: #fdfaf3; padding: 2.5rem; border-radius: 16px; border: 1px solid rgba(212,175,55,0.3); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+            .crm-card { position: relative; margin: auto; width: 100%; max-width: 1040px; background: #faf5ec; padding: 2.5rem; border-radius: 16px; border: 1px solid rgba(212,175,55,0.3); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
             .crm-close { position: absolute; top: 1.5rem; right: 1.5rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #7a6a61; }
-            .crm-eyebrow { color: #d4af37; letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 0.5rem; }
-            .crm-title { font-family: var(--font-heading); font-size: 2rem; color: #3c2a21; margin-bottom: 0.5rem; line-height: 1.1; }
+            .crm-eyebrow { color: #c9a257; letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 0.5rem; }
+            .crm-title { font-family: var(--font-heading); font-size: 2rem; color: #2a1a12; margin-bottom: 0.5rem; line-height: 1.1; }
             .crm-intro { color: #594a42; margin-bottom: 2rem; font-size: 1rem; max-width: 760px; }
             .crm-progress { display: none; }
             .crm-form, .crm-body { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
@@ -660,7 +660,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
             .crm-foot { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
             .crm-submit { width: 100%; max-width: 520px; min-height: 52px; padding: 1rem; }
             .crm-back { display: none; }
-            .crm-login-toggle { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.7rem 1rem; border-radius: 10px; border: 1px dashed rgba(212,175,55,0.7); background: rgba(212,175,55,0.08); color: #3c2a21; font-family: inherit; font-size: 0.92rem; font-weight: 600; text-align: left; cursor: pointer; }
+            .crm-login-toggle { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.7rem 1rem; border-radius: 10px; border: 1px dashed rgba(212,175,55,0.7); background: rgba(212,175,55,0.08); color: #2a1a12; font-family: inherit; font-size: 0.92rem; font-weight: 600; text-align: left; cursor: pointer; }
             @media (min-width: 900px) { .crm-cols { grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; } }
             @media (max-width: 899px) {
               .crm-overlay { padding: 0; overflow: hidden; }
@@ -672,15 +672,15 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
               .crm-progress { display: block; margin-top: 0.7rem; }
               .crm-bars { display: flex; gap: 0.35rem; }
               .crm-bars span { flex: 1; height: 4px; border-radius: 4px; background: rgba(0,0,0,0.1); }
-              .crm-bars span.on { background: #d4af37; }
+              .crm-bars span.on { background: #c9a257; }
               .crm-step-label { display: block; margin-top: 0.4rem; font-size: 0.78rem; color: #7a6a61; font-weight: 600; }
               .crm-form { flex: 1; min-height: 0; gap: 0; }
               .crm-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 1rem 1rem 1.5rem; }
-              .crm-step-title { font-family: var(--font-heading); font-size: 1.25rem; color: #3c2a21; margin: 0; outline: none; }
+              .crm-step-title { font-family: var(--font-heading); font-size: 1.25rem; color: #2a1a12; margin: 0; outline: none; }
               .crm-focus { background: none; padding: 0; border: none; border-radius: 0; }
-              .crm-foot { flex: none; flex-direction: row; align-items: stretch; gap: 0.6rem; padding: 0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(0,0,0,0.08); background: #fdfaf3; }
+              .crm-foot { flex: none; flex-direction: row; align-items: stretch; gap: 0.6rem; padding: 0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(0,0,0,0.08); background: #faf5ec; }
               .crm-foot .crm-submit { flex: 1; width: auto; max-width: none; min-height: 50px; padding: 0.8rem 1rem; }
-              .crm-back { display: block; flex: none; min-height: 50px; padding: 0 1.1rem; border-radius: 8px; border: 1px solid rgba(0,0,0,0.2); background: white; color: #3c2a21; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; }
+              .crm-back { display: block; flex: none; min-height: 50px; padding: 0 1.1rem; border-radius: 8px; border: 1px solid rgba(0,0,0,0.2); background: white; color: #2a1a12; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; }
             }
           `}</style>
           <motion.div
@@ -716,7 +716,7 @@ export default function CrmRegistrationModal({ isOpen, onClose, interestType, sp
             {status === 'success' ? (
               <div className="crm-body" style={{ textAlign: 'center', padding: narrow ? '2rem 1rem' : '2rem 0', justifyContent: 'center' }}>
                 <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>✨</div>
-                <h3 style={{ color: '#3c2a21', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>{t.successTitle}</h3>
+                <h3 style={{ color: '#2a1a12', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>{t.successTitle}</h3>
                 <p style={{ color: '#594a42' }}>{t.successText}</p>
                 <SunbakedLettersNote locale={locale} />
               </div>

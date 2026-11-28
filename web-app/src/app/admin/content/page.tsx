@@ -103,7 +103,7 @@ export default function SiteContentAdmin() {
 
       {/* Editor Form */}
       <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '3rem' }}>
-        <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#3c2a21' }}>
+        <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#2a1a12' }}>
           {editingId ? 'Editar Seção' : 'Adicionar Nova Seção'}
         </h2>
         
@@ -145,7 +145,7 @@ export default function SiteContentAdmin() {
           </div>
 
           <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <button type="submit" style={{ padding: '0.8rem 2rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+            <button type="submit" style={{ padding: '0.8rem 2rem', background: '#c9a257', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
               {editingId ? 'Salvar Alterações' : 'Adicionar Seção'}
             </button>
             {editingId && (
@@ -172,7 +172,7 @@ export default function SiteContentAdmin() {
             )}
             
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'inline-block', background: '#3c2a21', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.8rem' }}>
+              <div style={{ display: 'inline-block', background: '#2a1a12', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.8rem' }}>
                 ID: {content.section_id}
               </div>
               

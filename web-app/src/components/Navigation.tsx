@@ -70,21 +70,30 @@ const MENU_LANGS = ['pt', 'en', 'es', 'it', 'fr', 'de', 'nl'];
 // The "plan your trip" button: forest green with a gold edge, so it reads as the way in for travellers
 // without competing with the gold "highlight" link beside it.
 const FEATURE_STYLE: React.CSSProperties = {
-  background: 'linear-gradient(135deg, #2e4432 0%, #3d5a40 100%)', color: '#fdfaf3', border: '1px solid #d4af37',
+  background: 'linear-gradient(135deg, #1e5d54 0%, #3d5a40 100%)', color: '#faf5ec', border: '1px solid #c9a257',
   boxShadow: '0 6px 16px rgba(46,68,50,0.25)', fontWeight: 'bold', display: 'flex', flexDirection: 'column', lineHeight: 1.2,
 };
 
 // The one call-to-action in the bar: a dark pill with gold letters (the account button beside it is the gold one).
 const CTA_STYLE: React.CSSProperties = {
-  background: '#3c2a21', color: '#f3d77a', border: '1px solid #d4af37', borderRadius: '999px', fontWeight: 'bold', textDecoration: 'none',
-  textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(60,42,33,0.25)',
+  background: '#2a1a12', color: '#f3d77a', border: '1px solid #c9a257', borderRadius: '999px', fontWeight: 'bold', textDecoration: 'none',
+  textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(42,26,18,0.25)',
 };
+
+/** Line icons in place of the old emoji (2026-11-28 redesign). */
+function BagIcon({ size = 22 }: { size?: number }) {
+  return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>);
+}
+function GlobeIcon({ size = 16 }: { size?: number }) {
+  return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg>);
+}
 
 /** A menu entry: a page on the site, or (external) somewhere else, opened in a new tab so the shop stays open. */
 function NavItem({ link, style, onClick, tile = 30, children }: { link: NavLink; style: React.CSSProperties; onClick?: () => void; tile?: number; children: React.ReactNode }) {
   const row = (
     <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-      <IconTile size={tile}>{link.external ? <InstagramIcon size={tile * 0.55} /> : link.icon}</IconTile>
+      {/* No emoji tiles since the 2026-11-28 redesign: only Instagram keeps its (drawn) icon. */}
+      {link.external && <IconTile size={tile}><InstagramIcon size={tile * 0.55} /></IconTile>}
       <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>{children}</span>
     </span>
   );
@@ -274,7 +283,7 @@ export default function Navigation() {
   const retreatLangs = [
     { name: '🇧🇷 Português', path: '/retreats' },
     { name: '🇦🇷 Español', path: '/es/retiros' },
-    { name: '✈️ English', path: '/en/retreats' },
+    { name: 'English', path: '/en/retreats' },
   ];
 
   /**
@@ -325,8 +334,8 @@ export default function Navigation() {
     <>
       {/* Announcement Banner */}
       <div className="announce-bar" style={{ 
-        background: '#3c2a21', 
-        color: '#d4af37', 
+        background: '#2a1a12', 
+        color: '#c9a257', 
         textAlign: 'center', 
         fontWeight: 600, 
         letterSpacing: '1px', 
@@ -361,7 +370,7 @@ export default function Navigation() {
       }}>
         {/* flexShrink 0: next to the long one-line desktop menu the logo used to be squeezed to nothing. */}
         <Link href="/" aria-label="Início" title="Início" className="glass-pill logo-pill" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', maxWidth: '70vw', flexShrink: 0 }}>
-          <img src="/logo-gold-sm.webp" alt="The Tropical Bakery Logo" width={240} height={215} style={{ height: '62px', width: 'auto', maxWidth: '100%', objectFit: 'contain' }} />
+          <img src="/logo-pineapple-sm.webp" alt="The Tropical Bakery Logo" width={121} height={180} style={{ height: '68px', width: 'auto', maxWidth: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(42,26,18,0.18))' }} />
         </Link>
 
         {/* Desktop: logo | the menu, centred on the page | account and cart. */}
@@ -392,7 +401,7 @@ export default function Navigation() {
                   onClick={() => setOpenGroup(group.id)}
                   style={{
                     background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                    color: active ? '#d4af37' : '#3c2a21',
+                    color: active ? '#c9a257' : '#2a1a12',
                     fontWeight: active ? 'bold' : 'normal',
                     textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: TOP_SIZE, whiteSpace: 'nowrap',
                     fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '0.5rem',
@@ -403,21 +412,21 @@ export default function Navigation() {
                 {open && (
                   <div style={{
                     position: 'absolute', top: '100%', left: 0, background: 'rgba(253,250,243,0.95)', backdropFilter: 'blur(10px)',
-                    minWidth: '230px', padding: '1rem 0', borderRadius: '8px', boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
+                    minWidth: '230px', padding: '1rem 0', borderRadius: '8px', boxShadow: '0 10px 30px rgba(42,26,18,0.1)',
                     display: 'flex', flexDirection: 'column', gap: '0.5rem',
                   }}>
                     {groupIntro(group.intro, { padding: '0 1.5rem 0.4rem', maxWidth: '260px', fontSize: '0.8rem', lineHeight: 1.4, color: '#8a7a6d', whiteSpace: 'normal' })}
                     {group.links.map((link) => (
                       <NavItem key={link.path} link={link} onClick={() => setOpenGroup(null)} style={{
                         padding: '0.5rem 1.5rem',
-                        color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
+                        color: link.highlight ? '#2a1a12' : pathname === link.path ? '#c9a257' : '#594a42',
                         textDecoration: 'none',
                         fontWeight: link.highlight || pathname === link.path ? 'bold' : 'normal',
                         fontSize: '0.9rem',
                         textTransform: 'uppercase',
                         whiteSpace: 'nowrap',
                         ...(link.highlight ? {
-                          background: '#d4af37', borderRadius: '6px', margin: '0 0.75rem', padding: '0.5rem 0.75rem',
+                          background: '#c9a257', borderRadius: '6px', margin: '0 0.75rem', padding: '0.5rem 0.75rem',
                           display: 'flex', flexDirection: 'column', lineHeight: 1.2,
                         } : {}),
                         ...(link.feature ? { ...FEATURE_STYLE, borderRadius: '8px', margin: '0 0.75rem 0.25rem', padding: '0.7rem 0.9rem' } : {}),
@@ -442,11 +451,11 @@ export default function Navigation() {
             onMouseEnter={() => setIsRetreatsDropdownOpen(true)}
             onMouseLeave={() => setIsRetreatsDropdownOpen(false)}
           >
-            <span title={langLabel} aria-label={langLabel} style={{ color: '#3c2a21', textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: TOP_SIZE, whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              🌐 ▾
+            <span title={langLabel} aria-label={langLabel} style={{ color: '#2a1a12', textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: TOP_SIZE, whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <GlobeIcon /> ▾
             </span>
             {isRetreatsDropdownOpen && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, background: 'rgba(253,250,243,0.95)', backdropFilter: 'blur(10px)', minWidth: '200px', padding: '1rem 0', borderRadius: '8px', boxShadow: '0 10px 30px rgba(60,42,33,0.1)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ position: 'absolute', top: '100%', left: 0, background: 'rgba(253,250,243,0.95)', backdropFilter: 'blur(10px)', minWidth: '200px', padding: '1rem 0', borderRadius: '8px', boxShadow: '0 10px 30px rgba(42,26,18,0.1)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {[
                   { code: 'pt', name: 'Português' },
                   { code: 'en', name: 'English' },
@@ -480,7 +489,7 @@ export default function Navigation() {
             onClick={() => setIsCartOpen(true)}
             style={{ marginLeft: GAP, background: 'none', border: 'none', cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center' }}
           >
-            <span style={{ fontSize: '1.5rem' }}>🛒</span>
+            <span style={{ display: 'flex', color: '#2a1a12' }}><BagIcon size={24} /></span>
             {totalItems > 0 && (
               <span style={{ position: 'absolute', top: '-5px', right: '-10px', background: '#e74c3c', color: 'white', fontSize: '0.75rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '50%' }}>
                 {totalItems}
@@ -494,12 +503,12 @@ export default function Navigation() {
         <div className="xl:hidden glass-pill actions-pill flex items-center gap-4">
           {/* Log in / my account, always in sight on phones (Andrew, 2026-11-27). */}
           {user ? (
-            <Link href="/minha-conta" aria-label={tl('Conta')} style={{ color: '#3c2a21', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Link href="/minha-conta" aria-label={tl('Conta')} style={{ color: '#2a1a12', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
               <PersonIcon size={24} />
             </Link>
           ) : (
             <button type="button" onClick={() => setLoginOpen(true)} aria-label={tl('Entrar')} style={{
-              background: 'none', border: 'none', cursor: 'pointer', color: '#3c2a21', minHeight: '44px', padding: 0,
+              background: 'none', border: 'none', cursor: 'pointer', color: '#2a1a12', minHeight: '44px', padding: 0,
               display: 'inline-flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1px',
             }}>
               <PersonIcon size={22} />
@@ -516,7 +525,7 @@ export default function Navigation() {
               border: 'none',
               fontSize: '1.5rem',
               cursor: 'pointer',
-              color: '#3c2a21',
+              color: '#2a1a12',
               position: 'relative',
               minWidth: '44px',
               minHeight: '44px',
@@ -525,13 +534,13 @@ export default function Navigation() {
               justifyContent: 'center',
             }}
           >
-            🛒
+            <BagIcon size={22} />
             {totalItems > 0 && (
               <span style={{
                 position: 'absolute',
                 top: '-5px',
                 right: '-10px',
-                background: '#d4af37',
+                background: '#c9a257',
                 color: '#fff',
                 borderRadius: '50%',
                 padding: '2px 6px',
@@ -548,7 +557,7 @@ export default function Navigation() {
             aria-label={isOpen ? 'Fechar o menu' : 'Abrir o menu'}
             aria-expanded={isOpen}
             style={{
-              background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#3c2a21',
+              background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#2a1a12',
               minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -567,7 +576,7 @@ export default function Navigation() {
           bottom: 0,
           width: '100vw',
           height: '100vh',
-          background: '#fdfaf3',
+          background: '#faf5ec',
           zIndex: 99999,
           display: 'flex',
           flexDirection: 'column',
@@ -582,7 +591,7 @@ export default function Navigation() {
             flexShrink: 0,
           }}>
             <Link href="/" onClick={closeMenu} style={{ textDecoration: 'none' }}>
-              <img src="/logo-gold.webp" alt="Logo" style={{ height: '52px' }} />
+              <img src="/logo-pineapple-sm.webp" alt="Logo" style={{ height: '58px', width: 'auto' }} />
             </Link>
             <button 
               onClick={closeMenu}
@@ -591,7 +600,7 @@ export default function Navigation() {
                 border: 'none',
                 fontSize: '2rem',
                 cursor: 'pointer',
-                color: '#3c2a21',
+                color: '#2a1a12',
                 padding: '0.5rem',
                 lineHeight: 1,
               }}
@@ -612,7 +621,7 @@ export default function Navigation() {
             {/* The delivery area: off the phone header (it got in the way), shown here instead. */}
             <p style={{
               margin: '0.5rem 0 0.25rem', padding: '0.7rem 0.9rem', borderRadius: '12px',
-              background: '#3c2a21', color: '#d4af37', fontSize: '0.85rem', lineHeight: 1.4, fontWeight: 600, textAlign: 'center',
+              background: '#2a1a12', color: '#c9a257', fontSize: '0.85rem', lineHeight: 1.4, fontWeight: 600, textAlign: 'center',
             }}>
               {tl('🌴 Entregamos em Itamambuca, Ubatuba e região. Paraty: pedidos a partir de R$ 600.')}
             </p>
@@ -623,7 +632,7 @@ export default function Navigation() {
                   onClick={() => setMobileGroupsOpen(s => ({ ...s, [group.id]: !s[group.id] }))}
                   style={{
                     width: '100%', display: 'flex', justifyContent: 'space-between', padding: '1.5rem 0 0.5rem 0',
-                    fontWeight: 'bold', color: '#3c2a21', fontSize: '0.85rem', textTransform: 'uppercase',
+                    fontWeight: 'bold', color: '#2a1a12', fontSize: '0.85rem', textTransform: 'uppercase',
                     letterSpacing: '2px', opacity: 0.8, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
                   }}>
                   {group.name} <span>{mobileGroupsOpen[group.id] ? '▲' : '▼'}</span>
@@ -639,12 +648,12 @@ export default function Navigation() {
                       display: 'block',
                       padding: '0.8rem 0 0.8rem 1rem',
                       textDecoration: 'none',
-                      color: link.highlight ? '#3c2a21' : pathname === link.path ? '#d4af37' : '#594a42',
+                      color: link.highlight ? '#2a1a12' : pathname === link.path ? '#c9a257' : '#594a42',
                       fontWeight: link.highlight || pathname === link.path ? 'bold' : '400',
                       fontSize: '1.1rem',
                       borderBottom: link.highlight || link.feature ? 'none' : '1px solid rgba(0,0,0,0.04)',
                       animation: 'fadeIn 0.2s ease-out',
-                      ...(link.highlight ? { background: '#d4af37', borderRadius: '8px', margin: '0.3rem 0', padding: '0.8rem 1rem' } : {}),
+                      ...(link.highlight ? { background: '#c9a257', borderRadius: '8px', margin: '0.3rem 0', padding: '0.8rem 1rem' } : {}),
                       ...(link.feature ? { ...FEATURE_STYLE, borderRadius: '8px', margin: '0.3rem 0', padding: '0.9rem 1rem' } : {}),
                     }}
                   >
@@ -666,7 +675,7 @@ export default function Navigation() {
                 justifyContent: 'space-between',
                 padding: '1.5rem 0 0.5rem 0', 
                 fontWeight: 'bold', 
-                color: '#3c2a21', 
+                color: '#2a1a12', 
                 fontSize: '0.85rem',
                 textTransform: 'uppercase',
                 letterSpacing: '2px',
@@ -676,7 +685,7 @@ export default function Navigation() {
                 cursor: 'pointer',
                 textAlign: 'left'
               }}>
-              🌐 {langLabel.toUpperCase()} <span>{mobileLangOpen ? '▲' : '▼'}</span>
+              <GlobeIcon /> {langLabel.toUpperCase()} <span>{mobileLangOpen ? '▲' : '▼'}</span>
             </button>
             {mobileLangOpen && [
               { code: 'pt', name: 'Português' },

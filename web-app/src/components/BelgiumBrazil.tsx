@@ -50,9 +50,9 @@ export function OriginSeal({ tone = 'light', text = 'Maestria belga · Natureza 
         padding: '0.4rem 0.95rem 0.4rem 0.7rem', borderRadius: 999,
         background: dark ? 'rgba(212,175,55,0.12)' : '#fff',
         border: `1px solid ${dark ? 'rgba(212,175,55,0.55)' : 'rgba(212,175,55,0.6)'}`,
-        color: dark ? '#f4d675' : '#7a5a14',
+        color: dark ? '#e8c77e' : '#7a5a14',
         fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.35,
-        boxShadow: dark ? 'none' : '0 4px 14px rgba(60,42,33,0.08)',
+        boxShadow: dark ? 'none' : '0 4px 14px rgba(42,26,18,0.08)',
         ...style,
       }}
     >
@@ -65,7 +65,7 @@ export function OriginSeal({ tone = 'light', text = 'Maestria belga · Natureza 
 const PILLARS = [
   { icon: <BelgiumFlag size={18} />, title: 'Técnica belga', body: 'A escola do país que aperfeiçoou o chocolate (e a batata frita): temperagem, massas e recheios de confeitaria clássica.' },
   { icon: <BrazilFlag size={18} />, title: 'Natureza brasileira', body: 'Só o melhor da terra: cacau, castanhas, coco e frutas da Mata Atlântica, colhidos no auge.' },
-  { icon: <span style={{ color: '#d4af37', fontSize: '1.3rem', lineHeight: 1 }}>✦</span>, title: 'Luxo que faz bem', body: 'Vegano e sem trigo, com o açúcar de cada doce dito às claras. Feito à mão, em pequenos lotes, por uma única chef.' },
+  { icon: <span style={{ color: '#c9a257', fontSize: '1.3rem', lineHeight: 1 }}>✦</span>, title: 'Luxo que faz bem', body: 'Vegano e sem trigo, com o açúcar de cada doce dito às claras. Feito à mão, em pequenos lotes, por uma única chef.' },
 ];
 
 /**
@@ -99,22 +99,22 @@ export function OriginStory() {
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .bb-story { background: #3c2a21; color: #fdfaf3; padding: clamp(3.5rem, 9vw, 6.5rem) 1.25rem; position: relative; overflow: hidden; }
+        .bb-story { background: #2a1a12; color: #faf5ec; padding: clamp(3.5rem, 9vw, 6.5rem) 1.25rem; position: relative; overflow: hidden; }
         .bb-story::before { content: ''; position: absolute; inset: 0; pointer-events: none;
           background: radial-gradient(60% 50% at 15% 0%, rgba(212,175,55,0.18), transparent 70%), radial-gradient(50% 45% at 90% 100%, rgba(0,156,59,0.14), transparent 70%); }
         .bb-story__inner { position: relative; max-width: 960px; margin: 0 auto; text-align: center; }
         .bb-story__flags { display: flex; justify-content: center; margin-bottom: 1.25rem; }
-        .bb-story__kicker { display: block; color: #d4af37; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 1rem; }
+        .bb-story__kicker { display: block; color: #c9a257; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 1rem; }
         .bb-story__title { font-family: var(--font-heading); font-size: clamp(1.6rem, 4.6vw, 2.9rem); line-height: 1.15; margin-bottom: 1.4rem; }
-        .bb-story__title span { color: #d4af37; }
+        .bb-story__title span { color: #c9a257; }
         .bb-story__lead { max-width: 680px; margin: 0 auto 2.75rem; color: rgba(253,250,243,0.85); line-height: 1.85; font-size: clamp(0.98rem, 2vw, 1.1rem); }
-        .bb-story__lead strong { color: #fdfaf3; }
+        .bb-story__lead strong { color: #faf5ec; }
         .bb-story__pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; text-align: left; }
         .bb-story__pillar { background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.3); border-radius: 16px; padding: 1.4rem 1.3rem; }
-        .bb-story__pillar strong { display: block; font-family: var(--font-heading); font-size: 1.05rem; color: #f4d675; margin: 0.8rem 0 0.45rem; }
+        .bb-story__pillar strong { display: block; font-family: var(--font-heading); font-size: 1.05rem; color: #e8c77e; margin: 0.8rem 0 0.45rem; }
         .bb-story__pillar p { color: rgba(253,250,243,0.78); font-size: 0.93rem; line-height: 1.7; margin: 0; }
         .bb-story__icon { display: inline-flex; height: 24px; align-items: center; }
-        .bb-story__more { display: inline-block; margin-top: 2.25rem; min-height: 44px; padding: 0.85rem 1.75rem; border: 1px solid rgba(212,175,55,0.6); border-radius: 999px; color: #f4d675; text-decoration: none; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+        .bb-story__more { display: inline-block; margin-top: 2.25rem; min-height: 44px; padding: 0.85rem 1.75rem; border: 1px solid rgba(212,175,55,0.6); border-radius: 999px; color: #e8c77e; text-decoration: none; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
       ` }} />
     </section>
   );

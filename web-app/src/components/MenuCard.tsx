@@ -90,7 +90,7 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
           borderRadius: flatTop ? '0 0 16px 16px' : '16px',
           overflow: 'hidden',
           boxShadow: picked ? '0 8px 22px rgba(212,175,55,0.38)' : '0 4px 20px rgba(0,0,0,0.05)',
-          border: picked ? '2px solid #d4af37' : '1px solid rgba(212,175,55,0.1)',
+          border: picked ? '2px solid #c9a257' : '1px solid rgba(212,175,55,0.1)',
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -104,12 +104,12 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
         <WholePhoto src={item.image} alt={item.name} width={isMobile ? 640 : 750} frame={isMobile ? 1 : 5 / 4} maxCrop={0.2}
           style={{ aspectRatio: isMobile ? '1 / 1' : '5 / 4', flexShrink: 0 }}>
           {picked && (
-            <span aria-label="Na sua escolha" style={{ position: 'absolute', top: '8px', left: '8px', width: '30px', height: '30px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(0,0,0,0.28)' }}>✓</span>
+            <span aria-label="Na sua escolha" style={{ position: 'absolute', top: '8px', left: '8px', width: '30px', height: '30px', borderRadius: '50%', background: '#c9a257', color: '#2a1a12', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 10px rgba(0,0,0,0.28)' }}>✓</span>
           )}
           {/* Bottom-left, so the tags never fight the "picked" mark (top-left) or the zoom icon (top-right). */}
           <TreatTags item={item} />
           <div className="ev-card-zoom" aria-hidden style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255,255,255,0.85)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3c2a21" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2a1a12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               <line x1="11" y1="8" x2="11" y2="14"></line>
@@ -167,7 +167,7 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
           )}
 
           <div style={{ marginTop: isMobile ? 'auto' : '0.6rem', borderTop: isMobile ? 'none' : '1px solid rgba(0,0,0,0.05)', paddingTop: isMobile ? '0' : '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontWeight: 600, color: '#3c2a21', fontSize: isMobile ? '1.05rem' : '1rem', whiteSpace: 'nowrap' }}>
+            <span style={{ fontWeight: 600, color: '#2a1a12', fontSize: isMobile ? '1.05rem' : '1rem', whiteSpace: 'nowrap' }}>
               R$ {item.price} <span style={{ fontSize: '0.85rem', color: '#7a6a61', fontWeight: 400 }}>/ un.</span>
             </span>
 
@@ -177,7 +177,7 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
                 className="ev-card-add"
                 onClick={e => { e.stopPropagation(); add(); }}
                 style={{
-                  background: '#d4af37',
+                  background: '#c9a257',
                   color: 'white',
                   border: 'none',
                   padding: '0.5rem 0.9rem',
@@ -210,7 +210,7 @@ export default function MenuCard({ item, picked = false, onTogglePick, flatTop =
 
       <style>{`
         .ev-card { transition: transform 0.25s, box-shadow 0.25s; }
-        .ev-card:focus-visible { outline: 3px solid #d4af37; outline-offset: 2px; }
+        .ev-card:focus-visible { outline: 3px solid #c9a257; outline-offset: 2px; }
         .ev-card-add:hover { background: #c9a67a !important; }
         @media (hover: hover) {
           .ev-card:hover { transform: translateY(-3px); }

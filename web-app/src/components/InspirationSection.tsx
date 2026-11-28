@@ -181,12 +181,12 @@ function VideoCard({ v, t }: { v: typeof VIDEOS[number]; t: Copy }) {
             aria-label={t.watch(v.who)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', padding: 0, border: 'none', cursor: 'pointer', background: `linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), url("https://i.ytimg.com/vi/${v.id}/hqdefault.jpg") center/cover` }}
           >
-            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(253,250,243,0.95)', color: '#3c2a21', fontSize: '1.4rem', paddingLeft: '4px' }}>▶</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(253,250,243,0.95)', color: '#2a1a12', fontSize: '1.4rem', paddingLeft: '4px' }}>▶</span>
           </button>
         )}
       </div>
       <figcaption style={{ padding: '0.85rem 0.25rem 0' }}>
-        <strong style={{ color: '#3c2a21', display: 'block', fontSize: '1rem' }}>{v.who}</strong>
+        <strong style={{ color: '#2a1a12', display: 'block', fontSize: '1rem' }}>{v.who}</strong>
         <span style={{ color: '#8a6d1f', fontSize: '0.82rem', lineHeight: 1.55, display: 'block', margin: '0.15rem 0 0.45rem' }}>{v.credential}</span>
         <span style={{ color: '#594a42', fontSize: '0.9rem', lineHeight: 1.6, display: 'block' }}>{v.caption}</span>
         <span style={{ color: '#a89a90', fontSize: '0.75rem' }}>{v.source} · {t.thirdParty}</span>
@@ -200,13 +200,13 @@ export function InspirationSection({ locale = 'pt' }: { locale?: 'pt' | 'en' | '
   const t = COPY[locale] ?? COPY.pt;
 
   return (
-    <section id="inspiracao" style={{ background: '#fdfaf3', padding: 'clamp(2.25rem, 8vw, 7rem) clamp(1rem, 4vw, 2rem)' }}>
+    <section id="inspiracao" style={{ background: '#faf5ec', padding: 'clamp(2.25rem, 8vw, 7rem) clamp(1rem, 4vw, 2rem)' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.75rem' }}>
-          <span style={{ color: '#a6832b', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '1rem' }}>
+          <span style={{ color: '#a8843f', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '1rem' }}>
             {t.eyebrow}
           </span>
-          <h2 data-sign-top="🌱" style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: '#3c2a21', lineHeight: 1.15, marginBottom: '1.25rem' }}>
+          <h2 data-sign-top="🌱" style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: '#2a1a12', lineHeight: 1.15, marginBottom: '1.25rem' }}>
             {t.title}
           </h2>
           <p style={{ color: '#594a42', fontSize: '1.08rem', lineHeight: 1.85, maxWidth: '720px', margin: '0 auto' }}>
@@ -218,15 +218,15 @@ export function InspirationSection({ locale = 'pt' }: { locale?: 'pt' | 'en' | '
           {t.ideas.map((idea, i) => {
             const isOpen = open === i;
             return (
-              <div key={idea.title} style={{ background: '#fff', border: isOpen ? '1px solid #d4af37' : '1px solid #e8e1d7', borderRadius: '16px', overflow: 'hidden' }}>
+              <div key={idea.title} style={{ background: '#fff', border: isOpen ? '1px solid #c9a257' : '1px solid #e8e1d7', borderRadius: '16px', overflow: 'hidden' }}>
                 <button
                   type="button"
                   onClick={() => setOpen(isOpen ? null : i)}
                   aria-expanded={isOpen}
-                  style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.4rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', color: '#3c2a21', fontSize: '1.05rem', fontWeight: 700 }}
+                  style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', padding: '1.1rem 1.4rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', color: '#2a1a12', fontSize: '1.05rem', fontWeight: 700 }}
                 >
                   {idea.title}
-                  <span aria-hidden style={{ color: '#d4af37', fontSize: '1.5rem', transform: isOpen ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s' }}>+</span>
+                  <span aria-hidden style={{ color: '#c9a257', fontSize: '1.5rem', transform: isOpen ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s' }}>+</span>
                 </button>
                 {isOpen && <p style={{ padding: '0 1.4rem 1.4rem', margin: 0, color: '#594a42', lineHeight: 1.85 }}>{idea.body}</p>}
               </div>
@@ -242,14 +242,14 @@ export function InspirationSection({ locale = 'pt' }: { locale?: 'pt' | 'en' | '
         </div>
 
         <p style={{ background: '#f5efe2', border: '1px solid #e8e1d7', borderRadius: '14px', padding: '1.1rem 1.4rem', color: '#7a6a61', fontSize: '0.85rem', lineHeight: 1.75, margin: 0 }}>
-          <strong style={{ color: '#3c2a21' }}>{t.important}</strong> {t.disclaimer}
+          <strong style={{ color: '#2a1a12' }}>{t.important}</strong> {t.disclaimer}
         </p>
         </details>
         <p style={{ textAlign: 'center', color: '#7a6a61', fontSize: '0.85rem', margin: '0.6rem 0 0' }}>
           {t.short}
         </p>
         <style>{`
-          .insp-more > summary { display: flex; justify-content: center; align-items: center; gap: 0.4rem; min-height: 44px; cursor: pointer; list-style: none; font-weight: 700; color: #2e4432; text-decoration: underline; text-underline-offset: 4px; }
+          .insp-more > summary { display: flex; justify-content: center; align-items: center; gap: 0.4rem; min-height: 44px; cursor: pointer; list-style: none; font-weight: 700; color: #1e5d54; text-decoration: underline; text-underline-offset: 4px; }
           .insp-more > summary::-webkit-details-marker { display: none; }
           .insp-more > summary::after { content: '+'; font-size: 1.2rem; }
           .insp-more[open] > summary::after { content: '–'; }
@@ -267,14 +267,14 @@ export function InspirationTeaser({ href = '/retreats#inspiracao' }: { href?: st
       style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', maxWidth: '900px', margin: '0 auto', padding: '1.25rem 1.6rem', background: '#f5efe2', border: '1px solid #e8e1d7', borderRadius: '16px', textDecoration: 'none' }}
     >
       <span>
-        <span style={{ display: 'block', color: '#a6832b', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+        <span style={{ display: 'block', color: '#a8843f', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
           Inspiração por trás da nossa dieta e do nosso pensamento
         </span>
-        <span style={{ color: '#3c2a21', fontSize: '1rem', lineHeight: 1.5 }}>
+        <span style={{ color: '#2a1a12', fontSize: '1rem', lineHeight: 1.5 }}>
           Conheça as ideias de Joel Fuhrman e Alan Goldhamer que moldaram o jeito como a gente cozinha.
         </span>
       </span>
-      <span style={{ color: '#3c2a21', fontWeight: 700, whiteSpace: 'nowrap' }}>Ler mais →</span>
+      <span style={{ color: '#2a1a12', fontWeight: 700, whiteSpace: 'nowrap' }}>Ler mais →</span>
     </Link>
   );
 }

@@ -193,7 +193,7 @@ export default function CartDrawer() {
               top: 0, right: 0, bottom: 0,
               width: '100%',
               maxWidth: '500px', // Slightly larger max width for desktop
-              backgroundColor: '#fdfaf3',
+              backgroundColor: '#faf5ec',
               zIndex: 9999,
               boxShadow: '-10px 0 30px rgba(0,0,0,0.2)',
               display: 'flex',
@@ -202,7 +202,7 @@ export default function CartDrawer() {
             }}
           >
             {/* Header */}
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(212,175,55,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#3c2a21', color: 'white' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(212,175,55,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#2a1a12', color: 'white' }}>
               <h2 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)' }}>Seu Carrinho</h2>
               <button 
                 onClick={() => setIsCartOpen(false)}
@@ -230,12 +230,12 @@ export default function CartDrawer() {
                         style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '12px' }} 
                       />
                       <div style={{ flex: 1 }}>
-                        <h4 style={{ color: '#3c2a21', fontWeight: 600, fontSize: '1.25rem', marginBottom: '0.25rem' }}>{item.name}</h4>
-                        <p style={{ color: '#d4af37', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.15rem' }}>
+                        <h4 style={{ color: '#2a1a12', fontWeight: 600, fontSize: '1.25rem', marginBottom: '0.25rem' }}>{item.name}</h4>
+                        <p style={{ color: '#c9a257', fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.15rem' }}>
                           R$ {item.price} <span style={{ fontSize: '0.85rem', fontWeight: 400, color: '#7a6a61' }}>por unidade</span>
                         </p>
                         {item.quantity > 1 && (
-                          <p style={{ color: '#3c2a21', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.5rem' }}>
+                          <p style={{ color: '#2a1a12', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.5rem' }}>
                             {formatBRL(parsePrice(item.price) * item.quantity)} <span style={{ fontSize: '0.8rem', fontWeight: 400, color: '#7a6a61' }}>({item.quantity}x)</span>
                           </p>
                         )}
@@ -248,7 +248,7 @@ export default function CartDrawer() {
                           <button onClick={() => removeFromCart(item.id)} style={{ color: '#e74c3c', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', textDecoration: 'underline' }}>Remover</button>
                         </div>
                         {item.min_batch_size && item.min_batch_size > 1 && (
-                          <div style={{ fontSize: '0.8rem', color: '#d4af37', fontWeight: 600, marginTop: '0.5rem' }}>
+                          <div style={{ fontSize: '0.8rem', color: '#c9a257', fontWeight: 600, marginTop: '0.5rem' }}>
                             Pedido Mínimo: {item.min_batch_size} unidades
                           </div>
                         )}
@@ -264,8 +264,8 @@ export default function CartDrawer() {
                       padding: '1.2rem', 
                       marginTop: '0.5rem',
                       background: 'rgba(212,175,55,0.1)', 
-                      color: '#3c2a21', 
-                      border: '2px dashed #d4af37', 
+                      color: '#2a1a12', 
+                      border: '2px dashed #c9a257', 
                       borderRadius: '12px', 
                       fontSize: '1.1rem', 
                       fontWeight: 600, 
@@ -291,14 +291,14 @@ export default function CartDrawer() {
               <div style={{ padding: '1.5rem', background: 'white', borderTop: '1px solid rgba(212,175,55,0.2)', boxShadow: '0 -4px 20px rgba(0,0,0,0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                   <span style={{ fontSize: '1.1rem', color: '#594a42' }}>Total do Pedido</span>
-                  <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#3c2a21' }}>{formatPrice(totalPrice)}</span>
+                  <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#2a1a12' }}>{formatPrice(totalPrice)}</span>
                 </div>
                 <button 
                   onClick={() => {
                     setIsCartOpen(false);
                     router.push('/checkout');
                   }}
-                  style={{ width: '100%', padding: '1rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}
+                  style={{ width: '100%', padding: '1rem', background: '#c9a257', color: 'white', border: 'none', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}
                 >
                   Finalizar Pedido
                 </button>

@@ -60,7 +60,7 @@
 
 /* ══ THE TWO RECIPES ══ */
 .fr-recipes { display: grid; gap: 1.1rem; max-width: 980px; margin: 1.5rem auto 0; }
-.fr-recipe { position: relative; display: grid; background: #fff; border-radius: 20px; overflow: hidden; border: 1px solid #efdfc6; box-shadow: 0 16px 34px rgba(60, 42, 33, 0.1); border-top: 6px solid var(--c); }
+.fr-recipe { position: relative; display: grid; background: #fff; border-radius: 20px; overflow: hidden; border: 1px solid #efdfc6; box-shadow: 0 16px 34px rgba(42, 26, 18, 0.1); border-top: 6px solid var(--c); }
 .fr-recipe img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
 .fr-recipe div { padding: 1.1rem 1.2rem 1.3rem; }
 .fr-recipe small { font-size: 0.75rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--c); }
@@ -86,7 +86,7 @@
 /* ══ THANK-YOU PAGE ══ */
 .fr-thanks .se-thanks__cover { width: 120px; }
 .fr-thanks__spam { font-size: 0.85rem; margin: 1rem 0 0; }
-.fr-block { max-width: 620px; margin: 1.6rem auto 0; padding: 1.4rem 1.2rem; background: #fff; border-radius: 22px; border: 1px solid #efdfc6; box-shadow: 0 18px 40px rgba(60, 42, 33, 0.1); }
+.fr-block { max-width: 620px; margin: 1.6rem auto 0; padding: 1.4rem 1.2rem; background: #fff; border-radius: 22px; border: 1px solid #efdfc6; box-shadow: 0 18px 40px rgba(42, 26, 18, 0.1); }
 .fr-block h2 { font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.35rem, 4.8vw, 1.8rem); line-height: 1.2; margin: 0 0 0.7rem; }
 .fr-block p { line-height: 1.7; color: #5b463a; margin: 0 0 1rem; }
 .fr-block .se-btn { width: 100%; }

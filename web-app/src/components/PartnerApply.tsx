@@ -121,7 +121,7 @@ const input: React.CSSProperties = {
 const label: React.CSSProperties = {
   // 0.8rem = 12.8px: the smallest a form label should ever be on a phone.
   display: 'block', fontSize: '0.8rem', letterSpacing: '0.12em', textTransform: 'uppercase',
-  color: '#a6832b', fontWeight: 700, marginBottom: '0.4rem',
+  color: '#a8843f', fontWeight: 700, marginBottom: '0.4rem',
 };
 
 /**
@@ -239,14 +239,14 @@ export default function PartnerApply({ defaultKind, whatsappHref, locale = 'pt' 
           .pa-rail-inner { position: sticky; top: 7rem; }
         }
         .pa-card { background: rgba(255,255,255,0.7); border: 1px solid #efe4c8; border-radius: 16px; padding: 1rem 1.1rem; }
-        .pa-card h3 { margin: 0 0 0.6rem; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a6832b; font-weight: 700; }
+        .pa-card h3 { margin: 0 0 0.6rem; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a8843f; font-weight: 700; }
         .pa-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
         .pa-steps li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.86rem; line-height: 1.4; color: #594a42; }
-        .pa-steps b { flex-shrink: 0; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: #d4af37; color: #3c2a21; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; }
+        .pa-steps b { flex-shrink: 0; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: #c9a257; color: #2a1a12; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; }
         .pa-links { display: flex; flex-wrap: wrap; gap: 0.4rem; }
         .pa-links a { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.7rem; border-radius: 999px; background: #fff; border: 1px solid #efe4c8; font-size: 0.82rem; color: #6b5a4e; text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-        .pa-links a:hover { border-color: #d4af37; color: #3c2a21; }
-        .pa-photo { position: absolute; margin: 0; background: #fff; padding: 7px 7px 0; border-radius: 12px; box-shadow: 0 12px 28px rgba(60,42,33,0.16); }
+        .pa-links a:hover { border-color: #c9a257; color: #2a1a12; }
+        .pa-photo { position: absolute; margin: 0; background: #fff; padding: 7px 7px 0; border-radius: 12px; box-shadow: 0 12px 28px rgba(42,26,18,0.16); }
         .pa-photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
         .pa-photo figcaption { padding: 0.35rem 0.2rem 0.5rem; font-size: 0.75rem; line-height: 1.25; text-align: center; color: #6b5a4e; }
       `}</style>
@@ -359,7 +359,7 @@ export default function PartnerApply({ defaultKind, whatsappHref, locale = 'pt' 
                       type="button"
                       aria-pressed={on}
                       onClick={() => togglePick(t.id)}
-                      style={{ position: 'relative', textAlign: 'center', padding: 0, borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', background: '#fff', border: `2px solid ${on ? '#d4af37' : '#e8e1d7'}`, boxShadow: on ? '0 6px 18px rgba(212,175,55,0.35)' : 'none', opacity: m && m.status === 'unsafe' && !on ? 0.55 : 1 }}
+                      style={{ position: 'relative', textAlign: 'center', padding: 0, borderRadius: '12px', overflow: 'hidden', cursor: 'pointer', background: '#fff', border: `2px solid ${on ? '#c9a257' : '#e8e1d7'}`, boxShadow: on ? '0 6px 18px rgba(212,175,55,0.35)' : 'none', opacity: m && m.status === 'unsafe' && !on ? 0.55 : 1 }}
                     >
                       <span style={{ display: 'block', aspectRatio: '1', background: '#f5efe2' }}>
                         {t.image_url && (
@@ -367,9 +367,9 @@ export default function PartnerApply({ defaultKind, whatsappHref, locale = 'pt' 
                           <img src={optimizedSrc(t.image_url, 256)} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                         )}
                       </span>
-                      <span style={{ display: 'block', padding: '0.35rem 0.4rem 0.45rem', fontSize: '0.8rem', lineHeight: 1.25, fontWeight: on ? 700 : 500, color: '#3c2a21' }}>{t.name}</span>
+                      <span style={{ display: 'block', padding: '0.35rem 0.4rem 0.45rem', fontSize: '0.8rem', lineHeight: 1.25, fontWeight: on ? 700 : 500, color: '#2a1a12' }}>{t.name}</span>
                       {flag && <span style={{ display: 'block', padding: '0 0.4rem 0.45rem', fontSize: '0.75rem', lineHeight: 1.25, color: m?.status === 'unsafe' ? '#b03a2e' : '#8a5a00', fontWeight: 700 }}>{flag}</span>}
-                      {on && <span aria-hidden style={{ position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>✓</span>}
+                      {on && <span aria-hidden style={{ position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '50%', background: '#c9a257', color: '#2a1a12', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>✓</span>}
                     </button>
                   );
                 })}

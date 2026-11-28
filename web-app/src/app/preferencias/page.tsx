@@ -22,7 +22,7 @@ interface Prefs {
 const card: React.CSSProperties = {
   background: '#fff', border: '1px solid #e8e1d7', borderRadius: '20px',
   padding: 'clamp(1.5rem, 4vw, 2.5rem)', maxWidth: '640px', margin: '0 auto',
-  boxShadow: '0 10px 30px rgba(60,42,33,0.06)',
+  boxShadow: '0 10px 30px rgba(42,26,18,0.06)',
 };
 
 /** A plain on/off switch in the site's colours. */
@@ -181,10 +181,10 @@ function EmailPreferences() {
         {prefs && (
           <>
             <div style={{ borderBottom: '1px solid #f0e9dd', paddingBottom: '1.25rem', marginBottom: '1.5rem' }}>
-              <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700, marginBottom: '0.3rem' }}>
+              <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a8843f', fontWeight: 700, marginBottom: '0.3rem' }}>
                 Estas preferências são de
               </p>
-              <p style={{ color: '#3c2a21', fontWeight: 700, wordBreak: 'break-all' }}>{prefs.email}</p>
+              <p style={{ color: '#2a1a12', fontWeight: 700, wordBreak: 'break-all' }}>{prefs.email}</p>
               {(prefs.tags || []).length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.6rem' }}>
                   {(prefs.tags || []).map(t => (
@@ -208,7 +208,7 @@ function EmailPreferences() {
               </div>
             )}
 
-            <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700, marginBottom: '1rem' }}>
+            <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a8843f', fontWeight: 700, marginBottom: '1rem' }}>
               O que você quer receber
             </p>
 
@@ -224,7 +224,7 @@ function EmailPreferences() {
                   }}>
                     <span aria-hidden style={{ fontSize: '1.5rem' }}>{t.emoji}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ color: '#3c2a21', fontWeight: 700, marginBottom: '0.2rem' }}>{t.label}</p>
+                      <p style={{ color: '#2a1a12', fontWeight: 700, marginBottom: '0.2rem' }}>{t.label}</p>
                       <p style={{ color: '#7a6a61', fontSize: '0.86rem', lineHeight: 1.6 }}>{t.description}</p>
                     </div>
                     <Switch on={on} label={t.label} onChange={v => toggleTopic(t.id, v)} />

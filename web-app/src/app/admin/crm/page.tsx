@@ -441,7 +441,7 @@ export default function CRMAdmin() {
           style={{
             padding: '0.9rem 1.4rem',
             borderRadius: '8px',
-            border: onlyItamambuca ? '1px solid #d4af37' : '1px solid #dfe4ea',
+            border: onlyItamambuca ? '1px solid #c9a257' : '1px solid #dfe4ea',
             background: onlyItamambuca ? '#fdf7ee' : 'white',
             color: onlyItamambuca ? '#8a6d1f' : '#7f8c8d',
             fontWeight: 700,
@@ -472,7 +472,7 @@ export default function CRMAdmin() {
         <select
           value={dietFilter}
           onChange={e => setDietFilter(e.target.value)}
-          style={{ padding: '0.9rem 1rem', borderRadius: '8px', border: dietFilter ? '1px solid #d4af37' : '1px solid #dfe4ea', background: dietFilter ? '#fdf7ee' : 'white', fontSize: '0.9rem', fontWeight: 700, color: dietFilter ? '#8a6d1f' : '#7f8c8d', cursor: 'pointer' }}
+          style={{ padding: '0.9rem 1rem', borderRadius: '8px', border: dietFilter ? '1px solid #c9a257' : '1px solid #dfe4ea', background: dietFilter ? '#fdf7ee' : 'white', fontSize: '0.9rem', fontWeight: 700, color: dietFilter ? '#8a6d1f' : '#7f8c8d', cursor: 'pointer' }}
         >
           <option value="">🍽️ Todo jeito de comer</option>
           {dietOptions.map(o => <option key={o.id} value={o.id}>{o.emoji} {o.label} ({o.n})</option>)}

@@ -344,9 +344,9 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && step === 1) {
     return (
-      <main className="min-h-screen pt-32 pb-16 px-4 flex justify-center bg-[#fdfaf3]">
+      <main className="min-h-screen pt-32 pb-16 px-4 flex justify-center bg-[#faf5ec]">
         <div className="text-center">
-          <h1 className="text-3xl text-[#3c2a21] font-bold mb-4">Seu Carrinho está vazio</h1>
+          <h1 className="text-3xl text-[#2a1a12] font-bold mb-4">Seu Carrinho está vazio</h1>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/caixas" className="btn btn-primary">Pedir a Caixa de Degustação</Link>
             <Link href="/menu" className="btn btn-secondary">Menu de Eventos</Link>
@@ -533,7 +533,7 @@ export default function CheckoutPage() {
                           title={isPickup ? 'Dia da retirada' : 'Dia da entrega'} />
                         <p style={{ fontSize: '0.82rem', color: '#7a6a61', marginTop: '0.6rem', lineHeight: 1.6 }}>
                           🧊 Vai guardar para depois? No freezer os doces ficam ótimos por até {FREEZER_WEEKS} semanas.{' '}
-                          <Link href={CARE_PATH} target="_blank" style={{ color: '#a6832b', fontWeight: 600 }}>Como guardar</Link>
+                          <Link href={CARE_PATH} target="_blank" style={{ color: '#a8843f', fontWeight: 600 }}>Como guardar</Link>
                         </p>
                       </>
                     ) : (
@@ -573,7 +573,7 @@ export default function CheckoutPage() {
                               type="button"
                               aria-pressed={on}
                               onClick={() => setPayMethod(value)}
-                              style={{ flex: '1 1 170px', textAlign: 'left', padding: '0.9rem 1rem', borderRadius: '12px', cursor: 'pointer', border: `2px solid ${on ? '#d4af37' : '#e8e1d7'}`, background: on ? 'rgba(212,175,55,0.14)' : 'rgba(255,255,255,0.7)', color: '#3c2a21' }}
+                              style={{ flex: '1 1 170px', textAlign: 'left', padding: '0.9rem 1rem', borderRadius: '12px', cursor: 'pointer', border: `2px solid ${on ? '#c9a257' : '#e8e1d7'}`, background: on ? 'rgba(212,175,55,0.14)' : 'rgba(255,255,255,0.7)', color: '#2a1a12' }}
                             >
                               <span style={{ fontSize: '1.4rem' }} aria-hidden>{emoji}</span>{' '}
                               <strong>{title}</strong>
@@ -606,7 +606,7 @@ export default function CheckoutPage() {
                 </p>
 
                 {placed?.isBox && placed.date && (
-                  <div style={{ margin: '0 auto 2rem', maxWidth: '440px', padding: '1rem 1.25rem', borderRadius: '16px', background: 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)', color: '#fdfaf3', textAlign: 'left', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <div style={{ margin: '0 auto 2rem', maxWidth: '440px', padding: '1rem 1.25rem', borderRadius: '16px', background: 'linear-gradient(135deg, #2a1a12 0%, #5a3d2e 100%)', color: '#faf5ec', textAlign: 'left', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <span style={{ fontSize: '2rem' }} aria-hidden>🎉</span>
                     <div>
                       <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#ffd166', fontWeight: 700 }}>{placed.isPickup ? 'Sua caixa fica pronta para retirada' : 'Sua caixa chega'}</p>
@@ -619,7 +619,7 @@ export default function CheckoutPage() {
 
                 {placed?.isPickup && (
                   <p style={{ margin: '-0.75rem auto 2rem', maxWidth: '440px', fontSize: '0.9rem', lineHeight: 1.7, color: '#594a42' }}>
-                    🔒 O endereço para retirada aparece em <Link href="/minha-conta" style={{ color: '#a6832b', fontWeight: 700, textDecoration: 'underline' }}>Minha Conta</Link> assim que confirmarmos o seu Pix.
+                    🔒 O endereço para retirada aparece em <Link href="/minha-conta" style={{ color: '#a8843f', fontWeight: 700, textDecoration: 'underline' }}>Minha Conta</Link> assim que confirmarmos o seu Pix.
                   </p>
                 )}
 
@@ -640,7 +640,7 @@ export default function CheckoutPage() {
                     <button
                       onClick={copyPix}
                       className="btn"
-                      style={{ padding: '0.75rem 1rem', minWidth: '130px', fontSize: '0.8rem', borderRadius: '6px', backgroundColor: copied ? '#2e4432' : 'var(--color-primary)', color: 'white' }}
+                      style={{ padding: '0.75rem 1rem', minWidth: '130px', fontSize: '0.8rem', borderRadius: '6px', backgroundColor: copied ? '#1e5d54' : 'var(--color-primary)', color: 'white' }}
                     >
                       {copied ? '✅ Copiado!' : 'Copiar Código'}
                     </button>

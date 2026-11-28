@@ -107,7 +107,7 @@ export default function GlobalMenuTeaser({ inPage = false }: { inPage?: boolean 
 
       <style dangerouslySetInnerHTML={{__html: `
         .events-teaser { padding: 4rem 0; background: var(--color-background); border-top: 1px solid rgba(212,175,55,0.2); text-align: center; overflow: hidden; }
-        .events-teaser__eyebrow { color: #d4af37; letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 1rem; }
+        .events-teaser__eyebrow { color: #c9a257; letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 1rem; }
         .events-teaser__title { font-size: clamp(2rem, 4vw, 3rem); font-family: var(--font-heading); color: var(--color-primary); margin-bottom: 1rem; padding: 0 1rem; }
         .events-teaser__text { font-size: 1.1rem; color: #594a42; margin-bottom: 3rem; padding: 0 1rem; }
         .events-teaser__track { display: flex; width: max-content; animation: scrollGallery 40s linear infinite; }

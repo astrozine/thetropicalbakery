@@ -162,7 +162,7 @@ export function PathsFold({ ids }: { ids: PathId[] }) {
           return (
             <li key={id}>
               <strong>{p.emoji} {p.title}.</strong> {p.text}
-              {p.link && <> <Link href={p.link.href} style={{ color: '#a6832b', fontWeight: 700 }}>{p.link.label} →</Link></>}
+              {p.link && <> <Link href={p.link.href} style={{ color: '#a8843f', fontWeight: 700 }}>{p.link.label} →</Link></>}
             </li>
           );
         })}

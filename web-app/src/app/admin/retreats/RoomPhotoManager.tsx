@@ -164,7 +164,7 @@ export default function RoomPhotoManager({ room, onSaved, notify }: Props) {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.9rem' }}>
-        <strong style={{ color: '#3c2a21', fontSize: '1rem' }}>Fotos do quarto</strong>
+        <strong style={{ color: '#2a1a12', fontSize: '1rem' }}>Fotos do quarto</strong>
         <span style={{ fontSize: '0.82rem', color: '#7a6a61' }}>
           {visible.length} visíveis · {photos.length - visible.length} escondidas
         </span>
@@ -182,14 +182,14 @@ export default function RoomPhotoManager({ room, onSaved, notify }: Props) {
           return (
             <div key={p.url} style={{
               position: 'relative', borderRadius: '12px', overflow: 'hidden', background: '#fff',
-              border: isHero ? '3px solid #d4af37' : '1px solid #e8e1d7',
+              border: isHero ? '3px solid #c9a257' : '1px solid #e8e1d7',
               boxShadow: isHero ? '0 6px 18px rgba(212,175,55,0.35)' : '0 2px 6px rgba(0,0,0,0.05)',
             }}>
               <div style={{ position: 'relative', height: '130px', background: '#2a1d16' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.url} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: p.visible ? 1 : 0.35, filter: p.visible ? 'none' : 'grayscale(1)' }} />
                 {isHero && (
-                  <span style={{ position: 'absolute', top: '8px', left: '8px', background: '#d4af37', color: '#3c2a21', fontWeight: 800, fontSize: '0.72rem', padding: '0.25rem 0.65rem', borderRadius: '999px', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                  <span style={{ position: 'absolute', top: '8px', left: '8px', background: '#c9a257', color: '#2a1a12', fontWeight: 800, fontSize: '0.72rem', padding: '0.25rem 0.65rem', borderRadius: '999px', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
                     ⭐ Foto principal
                   </span>
                 )}
@@ -198,7 +198,7 @@ export default function RoomPhotoManager({ room, onSaved, notify }: Props) {
                     🚫 ESCONDIDA
                   </span>
                 )}
-                <span style={{ position: 'absolute', bottom: '6px', right: '8px', background: 'rgba(60,42,33,0.75)', color: '#fff', fontSize: '0.7rem', padding: '0.1rem 0.5rem', borderRadius: '999px' }}>
+                <span style={{ position: 'absolute', bottom: '6px', right: '8px', background: 'rgba(42,26,18,0.75)', color: '#fff', fontSize: '0.7rem', padding: '0.1rem 0.5rem', borderRadius: '999px' }}>
                   {i + 1}
                 </span>
               </div>
@@ -228,7 +228,7 @@ export default function RoomPhotoManager({ room, onSaved, notify }: Props) {
         {/* The add tile */}
         <label style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', textAlign: 'center',
-          minHeight: '215px', borderRadius: '12px', border: '2px dashed #d4af37', background: 'rgba(212,175,55,0.07)',
+          minHeight: '215px', borderRadius: '12px', border: '2px dashed #c9a257', background: 'rgba(212,175,55,0.07)',
           cursor: uploading ? 'wait' : 'pointer', padding: '1rem',
         }}>
           <span aria-hidden style={{ fontSize: '2rem' }}>📷</span>

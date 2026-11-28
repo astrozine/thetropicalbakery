@@ -92,7 +92,7 @@ export default function SubscriberPicks({ subscriptionId, boxSize }: Props) {
     <div style={{ marginBottom: '1.5rem' }}>
       <div style={{
         display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 1rem', marginBottom: '0.75rem', borderRadius: '12px',
-        background: chosen ? 'rgba(46,125,79,0.08)' : '#d4af37', color: chosen ? '#2e7d4f' : '#3c2a21',
+        background: chosen ? 'rgba(46,125,79,0.08)' : '#c9a257', color: chosen ? '#2e7d4f' : '#2a1a12',
         border: chosen ? '1px solid rgba(46,125,79,0.3)' : 'none',
       }}>
         <span style={{ fontSize: '1.5rem' }} aria-hidden>{chosen ? '✅' : '🍫'}</span>

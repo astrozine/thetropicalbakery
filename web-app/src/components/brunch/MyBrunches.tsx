@@ -20,7 +20,7 @@ function Credit({ t, onDone }: { t: MyTicket; onDone: () => void }) {
     return (
       <p className="bn-help">
         💌 Crédito pedido. Assine o plano <strong>Anual</strong> até {dayMonth(until)} e a Dolly desconta {formatBRL(t.price)} da primeira mensalidade.{' '}
-        <Link href="/assinatura" style={{ color: '#a6832b', fontWeight: 700 }}>Ver a assinatura</Link>
+        <Link href="/assinatura" style={{ color: '#a8843f', fontWeight: 700 }}>Ver a assinatura</Link>
       </p>
     );
   }
@@ -50,8 +50,8 @@ function Popup({ t, onDone }: { t: MyTicket; onDone: () => void }) {
   if (t.status !== 'pago' || new Date(t.starts_at).getTime() < Date.now()) return null;
   if (!open) {
     return t.popup_request
-      ? <p className="bn-help">🛍️ Pedido de pop-up enviado: “{t.popup_request}”. A Dolly te responde no grupo. <button type="button" className="bn-bubble__del" style={{ color: '#a6832b' }} onClick={() => setOpen(true)}>mudar</button></p>
-      : <button type="button" className="bn-bubble__del" style={{ color: '#a6832b', padding: 0, textAlign: 'left', fontSize: '0.85rem' }} onClick={() => setOpen(true)}>🛍️ Tenho uma marca: quero levar meu pop-up</button>;
+      ? <p className="bn-help">🛍️ Pedido de pop-up enviado: “{t.popup_request}”. A Dolly te responde no grupo. <button type="button" className="bn-bubble__del" style={{ color: '#a8843f' }} onClick={() => setOpen(true)}>mudar</button></p>
+      : <button type="button" className="bn-bubble__del" style={{ color: '#a8843f', padding: 0, textAlign: 'left', fontSize: '0.85rem' }} onClick={() => setOpen(true)}>🛍️ Tenho uma marca: quero levar meu pop-up</button>;
   }
   const save = async () => {
     setBusy(true);

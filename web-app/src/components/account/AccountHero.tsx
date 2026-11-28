@@ -64,7 +64,7 @@ export default function AccountHero({ firstName, avatarUrl, level, next, toNext,
             <defs>
               <linearGradient id="acctGold" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#ffd166" />
-                <stop offset="100%" stopColor="#d4af37" />
+                <stop offset="100%" stopColor="#c9a257" />
               </linearGradient>
             </defs>
           </svg>

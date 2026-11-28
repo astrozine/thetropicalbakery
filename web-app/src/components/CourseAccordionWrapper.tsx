@@ -51,10 +51,10 @@ export default function CourseAccordionWrapper({
           cursor: 'pointer' 
         }}
       >
-        <span style={{ fontSize: '0.9rem', color: '#d4af37', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '1px' }}>{tag}</span>
+        <span style={{ fontSize: '0.9rem', color: '#c9a257', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '1px' }}>{tag}</span>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: '#3c2a21', margin: 0, paddingRight: '1rem', lineHeight: 1.2 }}>{title}</h3>
-          <span style={{ fontSize: '2rem', color: '#d4af37', fontWeight: 300, lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
+          <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', color: '#2a1a12', margin: 0, paddingRight: '1rem', lineHeight: 1.2 }}>{title}</h3>
+          <span style={{ fontSize: '2rem', color: '#c9a257', fontWeight: 300, lineHeight: 1 }}>{isOpen ? '−' : '+'}</span>
         </div>
       </button>
       
