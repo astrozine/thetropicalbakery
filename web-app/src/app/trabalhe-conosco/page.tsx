@@ -148,7 +148,7 @@ export default function CareersPage() {
         <div style={{ maxWidth: '760px', margin: '0 auto', padding: '0 1.5rem', textAlign: 'center' }}>
           <img src="/logo-gold.webp" alt="" style={{ height: 'clamp(64px, 10vw, 88px)', margin: '0 auto 1.75rem', display: 'block' }} />
           <span style={{
-            display: 'inline-block', border: '1px solid rgba(212,175,55,0.6)', color: '#d4af37',
+            display: 'inline-block', border: '1px solid rgba(212,175,55,0.6)', color: '#c9a257',
             padding: '0.4rem 1.1rem', borderRadius: '30px', fontSize: '0.8rem',
             textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: '1.5rem',
           }}>
@@ -156,7 +156,7 @@ export default function CareersPage() {
           </span>
           <h1 style={{
             fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.2rem, 6.5vw, 4rem)',
-            lineHeight: 1.1, color: '#fdfaf3', marginBottom: '1.25rem',
+            lineHeight: 1.1, color: '#faf5ec', marginBottom: '1.25rem',
           }}>
             Trabalhe com a gente<br />aqui do seu lado da praia
           </h1>
@@ -184,7 +184,7 @@ export default function CareersPage() {
                 <div style={{
                   background: '#fff', border: '1px solid #e8e1d7', borderRadius: '20px',
                   padding: '2rem 1.75rem', height: '100%', display: 'flex', flexDirection: 'column',
-                  boxShadow: '0 8px 24px rgba(60,42,33,0.06)',
+                  boxShadow: '0 8px 24px rgba(42,26,18,0.06)',
                 }}>
                   <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>{role.icon}</div>
                   <h3 style={{
@@ -204,7 +204,7 @@ export default function CareersPage() {
                         display: 'flex', gap: '0.6rem', alignItems: 'flex-start',
                         color: '#594a42', lineHeight: 1.7, marginBottom: '0.65rem', fontSize: '0.9rem',
                       }}>
-                        <span style={{ color: '#d4af37', flexShrink: 0 }}>✦</span>
+                        <span style={{ color: '#c9a257', flexShrink: 0 }}>✦</span>
                         <span>{item}</span>
                       </li>
                     ))}
@@ -218,7 +218,7 @@ export default function CareersPage() {
                     onClick={() => pickRole(role.id)}
                     style={{
                       width: '100%', padding: '0.9rem', borderRadius: '10px', cursor: 'pointer',
-                      border: 'none', background: 'var(--color-primary)', color: '#fdfaf3',
+                      border: 'none', background: 'var(--color-primary)', color: '#faf5ec',
                       fontWeight: 700, fontSize: '0.95rem',
                     }}
                   >
@@ -242,7 +242,7 @@ export default function CareersPage() {
           <style>{`
             .tc-pay > summary { display: flex; justify-content: center; align-items: center; gap: 0.4rem; min-height: 52px; padding: 0.6rem 1.2rem; cursor: pointer; list-style: none; font-weight: 700; color: var(--color-primary); background: #fff; border: 1px solid #e8e1d7; border-radius: 16px; }
             .tc-pay > summary::-webkit-details-marker { display: none; }
-            .tc-pay > summary::after { content: '+'; color: #d4af37; font-size: 1.3rem; margin-left: 0.3rem; }
+            .tc-pay > summary::after { content: '+'; color: #c9a257; font-size: 1.3rem; margin-left: 0.3rem; }
             .tc-pay[open] > summary { display: none; }
           `}</style>
         </div>
@@ -294,9 +294,9 @@ export default function CareersPage() {
                           onClick={() => setForm({ ...form, role: r.id })}
                           style={{
                             padding: '0.55rem 1.1rem', borderRadius: '20px', border: '1px solid',
-                            borderColor: on ? '#d4af37' : '#e8e1d7',
+                            borderColor: on ? '#c9a257' : '#e8e1d7',
                             background: on ? 'rgba(212,175,55,0.15)' : 'transparent',
-                            color: on ? '#3c2a21' : '#7a6a61', fontWeight: on ? 700 : 500,
+                            color: on ? '#2a1a12' : '#7a6a61', fontWeight: on ? 700 : 500,
                             fontSize: '0.88rem', cursor: 'pointer',
                           }}
                         >
@@ -359,7 +359,7 @@ export default function CareersPage() {
                     type="checkbox"
                     checked={form.has_transport}
                     onChange={e => setForm({ ...form, has_transport: e.target.checked })}
-                    style={{ width: '22px', height: '22px', accentColor: '#d4af37', flexShrink: 0 }}
+                    style={{ width: '22px', height: '22px', accentColor: '#c9a257', flexShrink: 0 }}
                   />
                   Tenho transporte próprio (moto ou carro)
                 </label>

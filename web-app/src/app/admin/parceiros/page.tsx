@@ -195,7 +195,7 @@ export default function AdminPartnersPage() {
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', flexWrap: 'wrap' }}>
-          <button type="submit" disabled={saving} style={{ ...dark, background: '#d4af37' }}>{saving ? 'Salvando…' : editingId ? 'Salvar alterações' : 'Adicionar parceiro'}</button>
+          <button type="submit" disabled={saving} style={{ ...dark, background: '#c9a257' }}>{saving ? 'Salvando…' : editingId ? 'Salvar alterações' : 'Adicionar parceiro'}</button>
           {editingId && <button type="button" onClick={() => { setEditingId(null); setForm({ ...EMPTY }); }} style={{ ...dark, background: '#95a5a6' }}>Cancelar</button>}
         </div>
 
@@ -211,7 +211,7 @@ export default function AdminPartnersPage() {
         {(['todos', 'pendente', 'ativo', 'pausado'] as const).map(f => (
           <button key={f} type="button" onClick={() => setFilter(f)}
             style={{ padding: '0.45rem 1rem', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem',
-              border: filter === f ? '2px solid #d4af37' : '1px solid #dfe4ea', background: filter === f ? '#fdf6dd' : '#fff', color: '#2c3e50' }}>
+              border: filter === f ? '2px solid #c9a257' : '1px solid #dfe4ea', background: filter === f ? '#fdf6dd' : '#fff', color: '#2c3e50' }}>
             {f === 'todos' ? `Todos (${partners.length})` : `${PARTNER_STATUS[f].label} (${partners.filter(p => p.status === f).length})`}
           </button>
         ))}

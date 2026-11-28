@@ -3,8 +3,8 @@
  * (412px is the truth), desktop from 900px. Everything is prefixed bn-.
  */
 export const BRUNCH_CSS = `
-.bn { --bn-cocoa: #3c2a21; --bn-gold: #d4af37; --bn-gold-deep: #a6832b; --bn-cream: #fdfaf3; --bn-sand: #f3ead8;
-  --bn-line: #eadfca; --bn-text: #594a42; --bn-muted: #7a6a61; --bn-green: #2e4432; --bn-rose: #c8577a;
+.bn { --bn-cocoa: #2a1a12; --bn-gold: #c9a257; --bn-gold-deep: #a8843f; --bn-cream: #faf5ec; --bn-sand: #f3ead8;
+  --bn-line: #eadfca; --bn-text: #594a42; --bn-muted: #7a6a61; --bn-green: #1e5d54; --bn-rose: #c8577a;
   background: var(--bn-cream); color: var(--bn-text); overflow-x: clip; }
 .bn *, .bn *::before, .bn *::after { box-sizing: border-box; }
 .bn img { max-width: 100%; }
@@ -37,7 +37,7 @@ export const BRUNCH_CSS = `
 .bn-chip--green { background: #e6f4ec; border-color: #c3e6cf; color: #0b6b3a; }
 .bn-chip--rose { background: #fdecf1; border-color: #f4c6d4; color: #9b2c4e; }
 
-.bn-card { background: #fff; border: 1px solid var(--bn-line); border-radius: 22px; padding: 1.25rem; box-shadow: 0 10px 30px rgba(60,42,33,0.06); }
+.bn-card { background: #fff; border: 1px solid var(--bn-line); border-radius: 22px; padding: 1.25rem; box-shadow: 0 10px 30px rgba(42,26,18,0.06); }
 
 /* ------------------------------------------------------------------ hero */
 .bn-hero { position: relative; isolation: isolate; overflow: hidden; background: #1d1511; color: #fff; padding: 1rem 0 3rem; }
@@ -76,8 +76,8 @@ export const BRUNCH_CSS = `
 .bn-agenda { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 760px) { .bn-agenda { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .bn-event { display: grid; grid-template-columns: minmax(0, 1fr); background: #fff; border: 1px solid var(--bn-line); border-radius: 24px; overflow: hidden;
-  box-shadow: 0 12px 32px rgba(60,42,33,0.08); text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s; }
-.bn-event:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(60,42,33,0.14); }
+  box-shadow: 0 12px 32px rgba(42,26,18,0.08); text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s; }
+.bn-event:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(42,26,18,0.14); }
 .bn-event__photo { position: relative; aspect-ratio: 16 / 10; background: var(--bn-sand); }
 .bn-event__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .bn-date { position: absolute; top: 12px; left: 12px; background: var(--bn-cream); border-radius: 14px; padding: 0.35rem 0.7rem 0.45rem; text-align: center;
@@ -186,7 +186,7 @@ textarea.bn-input { min-height: 96px; resize: vertical; line-height: 1.55; }
 .bn-sponsor small { font-size: 0.78rem; color: var(--bn-muted); }
 
 /* ------------------------------------------------------------ buy panel */
-.bn-buy { background: #fff; border: 1px solid #eedcae; border-radius: 24px; padding: 1.25rem; box-shadow: 0 16px 40px rgba(60,42,33,0.12); }
+.bn-buy { background: #fff; border: 1px solid #eedcae; border-radius: 24px; padding: 1.25rem; box-shadow: 0 16px 40px rgba(42,26,18,0.12); }
 .bn-buy__price { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.75rem; }
 .bn-buy__price b { font-family: var(--font-heading); font-size: 1.8rem; color: var(--bn-cocoa); }
 .bn-methods { display: grid; gap: 0.5rem; margin: 0.4rem 0 1rem; }
@@ -257,7 +257,7 @@ textarea.bn-input { min-height: 96px; resize: vertical; line-height: 1.55; }
 
 /* --------------------------------------------------- Minha Conta card */
 .bn-mine { display: grid; gap: 0.9rem; margin-bottom: 1rem; }
-.bn-ticket { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 0; background: #fff; border: 1px solid #eedcae; border-radius: 22px; overflow: hidden; box-shadow: 0 10px 28px rgba(60,42,33,0.08); }
+.bn-ticket { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 0; background: #fff; border: 1px solid #eedcae; border-radius: 22px; overflow: hidden; box-shadow: 0 10px 28px rgba(42,26,18,0.08); }
 .bn-ticket__photo { position: relative; background: var(--bn-sand); }
 .bn-ticket__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .bn-ticket__body { padding: 0.9rem 1rem 1rem; display: grid; gap: 0.45rem; border-left: 2px dashed #eedcae; }

@@ -87,14 +87,14 @@ export default function NewPeople({ limit = 6 }: { limit?: number }) {
       )}
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .np { background: #fff; border-radius: 18px; border: 1px solid #f0dfb8; box-shadow: 0 2px 10px rgba(60,42,33,0.06); padding: 1.1rem 1.1rem 0.9rem; margin-top: 1.25rem; }
+        .np { background: #fff; border-radius: 18px; border: 1px solid #f0dfb8; box-shadow: 0 2px 10px rgba(42,26,18,0.06); padding: 1.1rem 1.1rem 0.9rem; margin-top: 1.25rem; }
         .np-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
         .np-title { font-size: 1.3rem; color: #2c3e50; margin: 0; }
         .np-all { color: #8a6d1f; font-weight: 800; text-decoration: none; font-size: 0.9rem; }
         .np-sub { color: #7f8c8d; font-size: 0.9rem; margin: 0.3rem 0 0.9rem; line-height: 1.5; }
         .np-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; grid-template-columns: minmax(0, 1fr); }
         @media (min-width: 700px) { .np-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-        .np-card { background: #fdfaf3; border: 1px solid #efe5cc; border-left: 6px solid #d4a72c; border-radius: 12px; padding: 0.75rem 0.85rem; min-width: 0; }
+        .np-card { background: #faf5ec; border: 1px solid #efe5cc; border-left: 6px solid #d4a72c; border-radius: 12px; padding: 0.75rem 0.85rem; min-width: 0; }
         .np-top { display: flex; align-items: center; gap: 0.45rem; }
         .np-name { font-size: 1.08rem; color: #2c3e50; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .np-num { background: #8a6d1f; color: #fff; font-weight: 900; font-size: 0.78rem; border-radius: 999px; padding: 0.1rem 0.5rem; flex-shrink: 0; }

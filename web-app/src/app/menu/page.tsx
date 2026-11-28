@@ -91,7 +91,7 @@ export default function MenuPage() {
       {/* Header Section */}
       <section style={{ 
         padding: 'clamp(2rem, 5vw, 6rem) 1rem', 
-        background: '#fdfaf3',
+        background: '#faf5ec',
         maxWidth: '1400px',
         margin: '0 auto'
       }}>
@@ -108,10 +108,10 @@ export default function MenuPage() {
 
           {/* Content Column */}
           <div style={{ flex: '1 1 400px' }}>
-            <span style={{ color: '#d4af37', letterSpacing: '4px', textTransform: 'uppercase', fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '1.5rem' }}>
+            <span style={{ color: '#c9a257', letterSpacing: '4px', textTransform: 'uppercase', fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '1.5rem' }}>
               Atacado &amp; Casamentos
             </span>
-            <h1 style={{ fontSize: 'clamp(1.95rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem', color: '#3c2a21' }}>
+            <h1 style={{ fontSize: 'clamp(1.95rem, 6vw, 4.5rem)', fontFamily: 'var(--font-heading)', lineHeight: '1.1', marginBottom: '1.5rem', color: '#2a1a12' }}>
               Menu para Eventos
             </h1>
             <OriginSeal text="Confeitaria de luxo · Técnica belga" style={{ marginBottom: '1.5rem' }} />
@@ -196,7 +196,7 @@ export default function MenuPage() {
               <p style={{ marginBottom: '1rem' }}>Nenhum doce combina com essa busca. Tente tirar algum filtro, ou fale com a gente no WhatsApp: podemos adaptar um doce para você.</p>
               {refineCount(refine) > 0 && (
                 <button type="button" onClick={() => setRefine({ ...emptyRefine, mode: refine.mode })}
-                  style={{ padding: '0.7rem 1.5rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}>
+                  style={{ padding: '0.7rem 1.5rem', background: '#c9a257', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}>
                   Limpar filtros
                 </button>
               )}
@@ -277,7 +277,7 @@ export default function MenuPage() {
             .menu-type-cell { display: flex; flex-direction: column; min-width: 0; }
             /* The group's colour, drawn across the full width of every card it owns, with the
                name tab sitting on that line — the card below is squared off so the two meet. */
-            .menu-type-head { height: 1.7rem; display: flex; align-items: flex-end; border-bottom: 4px solid var(--cell-accent, #d4af37); }
+            .menu-type-head { height: 1.7rem; display: flex; align-items: flex-end; border-bottom: 4px solid var(--cell-accent, #c9a257); }
             .menu-type-head span { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.76rem; font-weight: 800; line-height: 1; letter-spacing: 0.01em; padding: 0.38rem 0.7rem; border-radius: 8px 8px 0 0; visibility: hidden; }
 
             /* The name shows on the group's first card, and again on whichever card starts a row,
@@ -322,16 +322,16 @@ export default function MenuPage() {
         </p>
         <p style={{ maxWidth: '760px', margin: '1rem auto 0', textAlign: 'center', color: '#7a6a61', fontSize: '0.85rem', lineHeight: 1.75 }}>
           🧊 Os doces chegam gelados e ficam no freezer até a festa. Os crus e cremosos saem uns 10 minutos antes de servir, e o que já foi servido é para comer
-          em poucas horas. Bandejas que nem saíram do freezer continuam ótimas por até 4 semanas. <a href="/cuidados" style={{ color: '#a6832b', fontWeight: 600 }}>Como guardar e servir</a>
+          em poucas horas. Bandejas que nem saíram do freezer continuam ótimas por até 4 semanas. <a href="/cuidados" style={{ color: '#a8843f', fontWeight: 600 }}>Como guardar e servir</a>
         </p>
       </section>
 
       {/* Last stop for anyone who browsed the catalogue instead of tapping photos: the same "build it together" path. */}
-      <section id="orcamento" style={{ padding: 'clamp(4rem, 8vw, 5rem) 1rem clamp(2.25rem, 6vw, 5rem)', background: '#fdfaf3' }}>
+      <section id="orcamento" style={{ padding: 'clamp(4rem, 8vw, 5rem) 1rem clamp(2.25rem, 6vw, 5rem)', background: '#faf5ec' }}>
         <div style={{ position: 'relative', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
           <SquiggleArrows />
           <EventQuoteDecor />
-          <div style={{ position: 'relative', zIndex: 11, background: 'rgba(253,250,243,0.96)', border: '1px solid rgba(212,175,55,0.45)', borderRadius: '22px', padding: 'clamp(1.25rem, 4vw, 2rem)', boxShadow: '0 12px 34px rgba(60,42,33,0.12)', color: '#3c2a21' }}>
+          <div style={{ position: 'relative', zIndex: 11, background: 'rgba(253,250,243,0.96)', border: '1px solid rgba(212,175,55,0.45)', borderRadius: '22px', padding: 'clamp(1.25rem, 4vw, 2rem)', boxShadow: '0 12px 34px rgba(42,26,18,0.12)', color: '#2a1a12' }}>
             <h2 data-sign-top="💬" style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.4rem, 4.5vw, 1.9rem)', lineHeight: 1.15, marginBottom: '0.5rem', textAlign: 'center' }}>
               Quer ajuda para montar o seu evento?
             </h2>

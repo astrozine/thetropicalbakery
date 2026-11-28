@@ -1,7 +1,7 @@
 /* /admin/caixas: Dolly's box studio. Calm white cards, big photos, one question per screen when creating
    a box (the way Airbnb walks a host through a new listing). Everything is prefixed bx-. */
 
-.bx { --bx-ink: #222; --bx-muted: #6a6a6a; --bx-line: #e6e2dc; --bx-gold: #d4af37; --bx-cocoa: #3c2a21; --bx-soft: #f7f4ef;
+.bx { --bx-ink: #222; --bx-muted: #6a6a6a; --bx-line: #e6e2dc; --bx-gold: #c9a257; --bx-cocoa: #2a1a12; --bx-soft: #f7f4ef;
   color: var(--bx-ink); max-width: 1180px; }
 .bx *, .bx *::before, .bx *::after { box-sizing: border-box; }
 .bx img { max-width: 100%; }

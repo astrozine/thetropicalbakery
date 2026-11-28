@@ -110,11 +110,11 @@ export default function TreatInfo({ ingredients, contains, may_contain, sugars, 
     <div>
       {ing.length > 0 && (
         <div style={{ marginBottom: '1.1rem' }}>
-          <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700, marginBottom: '0.6rem' }}>🌿 Ingredientes</p>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a8843f', fontWeight: 700, marginBottom: '0.6rem' }}>🌿 Ingredientes</p>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexWrap: 'wrap', gap: '0.4rem 0.5rem' }}>
             {ing.map(i => (
               <li key={i} style={{ background: '#f5efe2', color: '#594a42', fontSize: '0.85rem', padding: '0.3rem 0.8rem', borderRadius: '20px' }}>
-                <span style={{ color: '#d4af37', marginRight: '0.3rem' }}>✦</span>{i}
+                <span style={{ color: '#c9a257', marginRight: '0.3rem' }}>✦</span>{i}
               </li>
             ))}
           </ul>

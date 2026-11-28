@@ -110,7 +110,7 @@ export default function BrunchEventView({ slug }: { slug: string }) {
                 <div>
                   <h3 className="bn-h3">{v.emoji} {event.venue_name || v.label}</h3>
                   <p className="bn-muted" style={{ marginBottom: '0.5rem' }}>{event.venue_blurb || v.blurb}</p>
-                  {event.venue_url && <p><a href={event.venue_url} target="_blank" rel="noopener noreferrer" style={{ color: '#a6832b', fontWeight: 700 }}>Conhecer o lugar ↗</a></p>}
+                  {event.venue_url && <p><a href={event.venue_url} target="_blank" rel="noopener noreferrer" style={{ color: '#a8843f', fontWeight: 700 }}>Conhecer o lugar ↗</a></p>}
                   <p className="bn-help">🔒 O endereço exato e como chegar aparecem na sua sala assim que o pagamento é confirmado.</p>
                 </div>
               </div>

@@ -120,7 +120,7 @@ const write = (key: string, value: string) => { try { localStorage.setItem(key, 
 
 const OAUTH: Record<OAuthProvider, { style: React.CSSProperties; icon: React.ReactNode }> = {
   google: {
-    style: { background: '#fff', color: '#3c2a21', border: '1px solid #d9d2c7' },
+    style: { background: '#fff', color: '#2a1a12', border: '1px solid #d9d2c7' },
     icon: (
       <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
@@ -147,7 +147,7 @@ const WhatsAppIcon = () => (
 );
 
 const fieldLabel: React.CSSProperties = { display: 'block', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a6d1f', marginBottom: '0.3rem' };
-const fieldInput: React.CSSProperties = { width: '100%', padding: '0.8rem 0.9rem', fontSize: '1rem', fontFamily: 'var(--font-body)', border: '1px solid rgba(60,42,33,0.25)', borderRadius: '8px', background: '#fff', color: '#3c2a21' };
+const fieldInput: React.CSSProperties = { width: '100%', padding: '0.8rem 0.9rem', fontSize: '1rem', fontFamily: 'var(--font-body)', border: '1px solid rgba(42,26,18,0.25)', borderRadius: '8px', background: '#fff', color: '#2a1a12' };
 const greenButton: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: '#25D366', color: '#0b3d1e', fontWeight: 800, fontSize: '1rem', fontFamily: 'var(--font-body)', padding: '0.95rem 1.6rem', minHeight: '50px', borderRadius: '999px', border: 'none', cursor: 'pointer', textDecoration: 'none' };
 
 /**
@@ -288,7 +288,7 @@ export default function WhatsAppGate({ href, topic, tags = [], locale = 'pt', ch
         >
           <div
             onClick={e => e.stopPropagation()}
-            style={{ position: 'relative', margin: 'auto', width: '100%', maxWidth: '460px', background: '#fdfaf3', border: '1px solid rgba(212,175,55,0.45)', borderRadius: '20px', padding: 'clamp(1.5rem, 5vw, 2.25rem)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', color: '#3c2a21', textAlign: 'left', fontFamily: 'var(--font-body)', textTransform: 'none', letterSpacing: 'normal', fontWeight: 400 }}
+            style={{ position: 'relative', margin: 'auto', width: '100%', maxWidth: '460px', background: '#faf5ec', border: '1px solid rgba(212,175,55,0.45)', borderRadius: '20px', padding: 'clamp(1.5rem, 5vw, 2.25rem)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', color: '#2a1a12', textAlign: 'left', fontFamily: 'var(--font-body)', textTransform: 'none', letterSpacing: 'normal', fontWeight: 400 }}
           >
             <button type="button" onClick={() => setOpen(false)} aria-label={t.close} style={{ position: 'absolute', top: '0.6rem', right: '0.6rem', width: '44px', height: '44px', background: 'none', border: 'none', fontSize: '1.4rem', lineHeight: 1, cursor: 'pointer', color: '#7a6a61' }}>✕</button>
 
@@ -315,7 +315,7 @@ export default function WhatsAppGate({ href, topic, tags = [], locale = 'pt', ch
               </div>
             ) : (
               <>
-                <span style={{ display: 'block', color: '#a6832b', letterSpacing: '0.18em', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                <span style={{ display: 'block', color: '#a8843f', letterSpacing: '0.18em', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>
                   {t.kicker}
                 </span>
                 <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.25rem, 4.5vw, 1.55rem)', lineHeight: 1.25, marginBottom: '0.75rem', paddingRight: '1.5rem' }}>

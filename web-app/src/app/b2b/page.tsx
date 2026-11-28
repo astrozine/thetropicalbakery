@@ -117,7 +117,7 @@ export default function TodasAsParcerias() {
 
       {/* ── Yellow intro banner (same spirit as the yellow boxes on other pages) ── */}
       <section style={{
-        background: 'linear-gradient(135deg, #f4d675 0%, #e8c23a 100%)',
+        background: 'linear-gradient(135deg, #e8c77e 0%, #e8c23a 100%)',
         padding: 'clamp(3.5rem, 8vw, 6rem) 1.5rem clamp(3rem, 7vw, 5rem)',
         textAlign: 'center',
       }}>
@@ -135,7 +135,7 @@ export default function TodasAsParcerias() {
         <h1 style={{
           fontFamily: 'var(--font-heading)',
           fontSize: 'clamp(2.4rem, 6vw, 4rem)',
-          color: '#3c2a21',
+          color: '#2a1a12',
           lineHeight: 1.1,
           marginBottom: '1.25rem',
           fontWeight: 900,
@@ -156,9 +156,9 @@ export default function TodasAsParcerias() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', justifyContent: 'center' }}>
           {['🏨 Hotéis', '🌿 Pousadas', '🏡 Airbnbs', '🍽️ Restaurantes', '🥐 Padarias', '⛵ Barcos', '🧘 Yoga e Spas', '✈️ Travel Managers', '🔗 Afiliados'].map(t => (
             <span key={t} style={{
-              background: 'rgba(60,42,33,0.1)',
-              color: '#3c2a21',
-              border: '1px solid rgba(60,42,33,0.18)',
+              background: 'rgba(42,26,18,0.1)',
+              color: '#2a1a12',
+              border: '1px solid rgba(42,26,18,0.18)',
               borderRadius: '999px',
               padding: '0.4rem 0.9rem',
               fontSize: '0.85rem',
@@ -191,7 +191,7 @@ export default function TodasAsParcerias() {
                   background: '#fff',
                   border: '1px solid #efe4c8',
                   borderRadius: '28px',
-                  boxShadow: '0 10px 30px rgba(60,42,33,0.09)',
+                  boxShadow: '0 10px 30px rgba(42,26,18,0.09)',
                   padding: 'clamp(1.25rem, 3.5vw, 2.5rem)',
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))',
@@ -206,7 +206,7 @@ export default function TodasAsParcerias() {
                     aspectRatio: '4/3',
                     borderRadius: '24px',
                     overflow: 'hidden',
-                    boxShadow: '0 8px 24px rgba(60,42,33,0.14)',
+                    boxShadow: '0 8px 24px rgba(42,26,18,0.14)',
                   }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -225,7 +225,7 @@ export default function TodasAsParcerias() {
                     borderRadius: '20px',
                     overflow: 'hidden',
                     border: '4px solid #fff',
-                    boxShadow: '0 10px 30px rgba(60,42,33,0.22)',
+                    boxShadow: '0 10px 30px rgba(42,26,18,0.22)',
                     transform: reversed ? 'rotate(-4deg)' : 'rotate(4deg)',
                   }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -241,7 +241,7 @@ export default function TodasAsParcerias() {
                     letterSpacing: '0.16em',
                     textTransform: 'uppercase',
                     fontWeight: 800,
-                    color: '#a6832b',
+                    color: '#a8843f',
                     marginBottom: '0.6rem',
                   }}>
                     {p.eyebrow}
@@ -249,7 +249,7 @@ export default function TodasAsParcerias() {
                   <h2 style={{
                     fontFamily: 'var(--font-heading)',
                     fontSize: 'clamp(2rem, 4vw, 2.8rem)',
-                    color: '#3c2a21',
+                    color: '#2a1a12',
                     lineHeight: 1.1,
                     marginBottom: '1rem',
                     fontWeight: 900,
@@ -284,8 +284,8 @@ export default function TodasAsParcerias() {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.5rem',
-                      background: '#3c2a21',
-                      color: '#f4d675',
+                      background: '#2a1a12',
+                      color: '#e8c77e',
                       fontFamily: 'var(--font-heading)',
                       fontWeight: 800,
                       fontSize: '0.95rem',
@@ -308,7 +308,7 @@ export default function TodasAsParcerias() {
 
       {/* ── Yellow bottom CTA box ── */}
       <section style={{
-        background: 'linear-gradient(135deg, #f4d675 0%, #e8c23a 100%)',
+        background: 'linear-gradient(135deg, #e8c77e 0%, #e8c23a 100%)',
         margin: 'clamp(2rem, 5vw, 4rem) 1.5rem',
         borderRadius: '32px',
         padding: 'clamp(3rem, 7vw, 5rem) clamp(1.5rem, 5vw, 4rem)',
@@ -332,7 +332,7 @@ export default function TodasAsParcerias() {
         <h2 style={{
           fontFamily: 'var(--font-heading)',
           fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
-          color: '#3c2a21',
+          color: '#2a1a12',
           marginBottom: '1rem',
           fontWeight: 900,
         }}>
@@ -355,8 +355,8 @@ export default function TodasAsParcerias() {
           tags={['parceiro']}
           style={{
             display: 'inline-block',
-            background: '#3c2a21',
-            color: '#f4d675',
+            background: '#2a1a12',
+            color: '#e8c77e',
             fontFamily: 'var(--font-heading)',
             fontWeight: 800,
             fontSize: '1rem',

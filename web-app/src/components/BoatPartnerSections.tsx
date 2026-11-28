@@ -22,7 +22,7 @@ export interface BoatCopy {
 }
 
 const h2: React.CSSProperties = {
-  textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.6rem, 4vw, 2rem)', color: '#3c2a21', marginBottom: '2rem',
+  textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.6rem, 4vw, 2rem)', color: '#2a1a12', marginBottom: '2rem',
 };
 
 // "Para quem é" and "Por que vale a pena" sit in the hero beside the tall photo on wide screens
@@ -30,7 +30,7 @@ const h2: React.CSSProperties = {
 const HIDE_WIDE = `@media ${HERO_EXTRA_MEDIA} { .boat-hide-wide { display: none; } }`;
 
 const kicker: React.CSSProperties = {
-  display: 'block', color: '#d4af37', letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.9rem',
+  display: 'block', color: '#c9a257', letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.9rem',
 };
 
 export function BoatHeroExtra({ c }: { c: BoatCopy }) {
@@ -42,7 +42,7 @@ export function BoatHeroExtra({ c }: { c: BoatCopy }) {
           {c.forWho.map(w => (
             <div key={w.text} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', border: '1px solid rgba(212,175,55,0.35)', background: 'rgba(253,250,243,0.05)', borderRadius: '12px', padding: '0.8rem 1rem' }}>
               <span aria-hidden style={{ fontSize: '1.5rem', lineHeight: 1 }}>{w.icon}</span>
-              <span style={{ color: '#fdfaf3', lineHeight: 1.45 }}>{w.text}</span>
+              <span style={{ color: '#faf5ec', lineHeight: 1.45 }}>{w.text}</span>
             </div>
           ))}
         </div>
@@ -50,7 +50,7 @@ export function BoatHeroExtra({ c }: { c: BoatCopy }) {
       <div>
         <span style={kicker}>{c.whyTitle}</span>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '0.55rem', color: 'rgba(253,250,243,0.85)', lineHeight: 1.55 }}>
-          {c.why.map(line => <li key={line}><span style={{ color: '#d4af37' }}>✦</span> {line}</li>)}
+          {c.why.map(line => <li key={line}><span style={{ color: '#c9a257' }}>✦</span> {line}</li>)}
         </ul>
       </div>
     </div>
@@ -66,7 +66,7 @@ export function BoatForWho({ c }: { c: BoatCopy }) {
         {c.forWho.map(w => (
           <div key={w.text} style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', background: '#fff', border: '1px solid #efe4c8', borderRadius: '16px', padding: '1.1rem 1.25rem' }}>
             <span aria-hidden style={{ fontSize: '1.9rem', lineHeight: 1 }}>{w.icon}</span>
-            <span style={{ color: '#3c2a21', lineHeight: 1.5, fontWeight: 600 }}>{w.text}</span>
+            <span style={{ color: '#2a1a12', lineHeight: 1.5, fontWeight: 600 }}>{w.text}</span>
           </div>
         ))}
       </div>
@@ -81,13 +81,13 @@ export function BoatDetails({ c }: { c: BoatCopy }) {
       <figure className="container px-4 max-w-5xl mx-auto" style={{ margin: '0 auto', paddingBottom: 'clamp(3rem, 7vw, 4.5rem)' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/assets/boat_guests_box.jpg" alt={c.photoAlt} loading="lazy" decoding="async" width={1024} height={572}
-          style={{ display: 'block', width: '100%', height: 'auto', borderRadius: '18px', border: '3px solid #fdfaf3', boxShadow: '0 0 0 1px rgba(212,175,55,0.6), 0 24px 50px rgba(60,42,33,0.22)' }} />
+          style={{ display: 'block', width: '100%', height: 'auto', borderRadius: '18px', border: '3px solid #faf5ec', boxShadow: '0 0 0 1px rgba(212,175,55,0.6), 0 24px 50px rgba(42,26,18,0.22)' }} />
       </figure>
 
       {/* Why it pays */}
       <style>{HIDE_WIDE}</style>
       <section className="container px-4 max-w-4xl mx-auto text-center boat-hide-wide" style={{ paddingBottom: 'clamp(3rem, 7vw, 4.5rem)' }}>
-        <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#d4af37', fontFamily: 'var(--font-heading)' }}>{c.whyTitle}</h3>
+        <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#c9a257', fontFamily: 'var(--font-heading)' }}>{c.whyTitle}</h3>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#594a42', lineHeight: 2, fontSize: '1.05rem' }}>
           {c.why.map(line => <li key={line}>✦ {line}</li>)}
         </ul>
@@ -117,8 +117,8 @@ export function BoatDetails({ c }: { c: BoatCopy }) {
         <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
           {c.steps.map((s, i) => (
             <li key={s} style={{ display: 'flex', gap: '0.9rem', alignItems: 'flex-start', background: '#fff', border: '1px solid #efe4c8', borderRadius: '16px', padding: '1.25rem' }}>
-              <b style={{ flexShrink: 0, width: '2.2rem', height: '2.2rem', borderRadius: '50%', background: '#d4af37', color: '#3c2a21', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.05rem' }}>{i + 1}</b>
-              <span style={{ color: '#3c2a21', lineHeight: 1.55 }}>{s}</span>
+              <b style={{ flexShrink: 0, width: '2.2rem', height: '2.2rem', borderRadius: '50%', background: '#c9a257', color: '#2a1a12', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.05rem' }}>{i + 1}</b>
+              <span style={{ color: '#2a1a12', lineHeight: 1.55 }}>{s}</span>
             </li>
           ))}
         </ol>

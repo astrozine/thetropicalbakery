@@ -24,7 +24,7 @@ const label: React.CSSProperties = { display: 'block', fontWeight: 700, color: '
 const card: React.CSSProperties = { background: 'white', borderRadius: '12px', padding: 'clamp(1.1rem, 3vw, 1.6rem)', boxShadow: '0 2px 6px rgba(0,0,0,0.06)' };
 const chip = (on: boolean): React.CSSProperties => ({
   padding: '0.5rem 0.95rem', borderRadius: '999px', cursor: 'pointer', fontWeight: 700, fontSize: '0.9rem',
-  border: `2px solid ${on ? '#d4af37' : '#e5e5e5'}`, background: on ? '#fffdf3' : 'white', color: '#2c3e50',
+  border: `2px solid ${on ? '#c9a257' : '#e5e5e5'}`, background: on ? '#fffdf3' : 'white', color: '#2c3e50',
 });
 
 const plusDays = (n: number) => {
@@ -312,7 +312,7 @@ function Propostas() {
                 Suíte {brl(quote.roomSubtotal)} + imersão {brl(quote.immersionSubtotal)} = <strong>{brl(quote.total)}</strong>
                 {room.airbnb_nightly_rate === 0 && <><br /><span style={{ color: '#a04000' }}>Esta suíte ainda não tem diária cadastrada em Retiros: fotos e preços.</span></>}
               </p>
-              <button type="button" onClick={applyQuote} style={{ justifySelf: 'start', background: '#d4af37', color: 'white', border: 'none', padding: '0.6rem 1.1rem', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>
+              <button type="button" onClick={applyQuote} style={{ justifySelf: 'start', background: '#c9a257', color: 'white', border: 'none', padding: '0.6rem 1.1rem', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>
                 Usar este valor na proposta
               </button>
             </div>
@@ -369,7 +369,7 @@ function Propostas() {
             </div>
           </div>
 
-          <button type="submit" disabled={saving || tableMissing} style={{ background: '#d4af37', color: 'white', border: 'none', padding: '1rem', borderRadius: '10px', fontWeight: 800, fontSize: '1.05rem', cursor: saving ? 'wait' : 'pointer', opacity: saving || tableMissing ? 0.7 : 1 }}>
+          <button type="submit" disabled={saving || tableMissing} style={{ background: '#c9a257', color: 'white', border: 'none', padding: '1rem', borderRadius: '10px', fontWeight: 800, fontSize: '1.05rem', cursor: saving ? 'wait' : 'pointer', opacity: saving || tableMissing ? 0.7 : 1 }}>
             {saving ? 'Criando…' : '✨ Criar proposta e pegar o link'}
           </button>
         </div>

@@ -140,18 +140,18 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.9rem' }}>
         <div>
-          <p style={{ fontSize: '0.75rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700 }}>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a8843f', fontWeight: 700 }}>
             {title} <span style={{ display: 'inline-block', animation: 'dc-wiggle 2.4s ease-in-out infinite' }}>📦</span>
           </p>
-          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.15rem, 3vw, 1.5rem)', color: '#3c2a21', lineHeight: 1.2 }}>
+          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.15rem, 3vw, 1.5rem)', color: '#2a1a12', lineHeight: 1.2 }}>
             {MONTH_NAME[month]} {year}
           </h3>
         </div>
         <div style={{ display: 'flex', gap: '0.4rem' }}>
           <button type="button" aria-label="Mês anterior" disabled={monthOffset === 0} onClick={() => setMonthOffset(m => m - 1)}
-            style={{ width: '44px', height: '44px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', color: '#3c2a21', cursor: monthOffset === 0 ? 'default' : 'pointer', opacity: monthOffset === 0 ? 0.35 : 1 }}>‹</button>
+            style={{ width: '44px', height: '44px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', color: '#2a1a12', cursor: monthOffset === 0 ? 'default' : 'pointer', opacity: monthOffset === 0 ? 0.35 : 1 }}>‹</button>
           <button type="button" aria-label="Próximo mês" disabled={monthOffset >= 3} onClick={() => setMonthOffset(m => m + 1)}
-            style={{ width: '44px', height: '44px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', color: '#3c2a21', cursor: monthOffset >= 3 ? 'default' : 'pointer', opacity: monthOffset >= 3 ? 0.35 : 1 }}>›</button>
+            style={{ width: '44px', height: '44px', borderRadius: '50%', border: '1px solid rgba(212,175,55,0.6)', background: '#fff', color: '#2a1a12', cursor: monthOffset >= 3 ? 'default' : 'pointer', opacity: monthOffset >= 3 ? 0.35 : 1 }}>›</button>
         </div>
       </div>
 
@@ -179,10 +179,10 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
             anim = 'dc-glow 2.4s ease-in-out infinite';
           }
           if (isMine) { background = 'linear-gradient(135deg, #2a9d8f 0%, #1b7a6e 100%)'; color = '#fff'; }
-          if (isSelected) { background = 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)'; color = '#ffd166'; border = '2px solid #ffd166'; anim = undefined; }
-          if (isFridge) { background = 'rgba(255,209,102,0.45)'; color = '#3c2a21'; border = '2px dashed #d4af37'; anim = undefined; }
+          if (isSelected) { background = 'linear-gradient(135deg, #2a1a12 0%, #5a3d2e 100%)'; color = '#ffd166'; border = '2px solid #ffd166'; anim = undefined; }
+          if (isFridge) { background = 'rgba(255,209,102,0.45)'; color = '#2a1a12'; border = '2px dashed #c9a257'; anim = undefined; }
           if (isOpenButTooSoon) { border = '1px dashed #d8c7a8'; color = '#b3a08a'; }
-          if (iso === today && !isSelectable) border = '1px solid #3c2a21';
+          if (iso === today && !isSelectable) border = '1px solid #2a1a12';
 
           return (
             <button
@@ -212,7 +212,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
 
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.9rem', fontSize: '0.75rem', color: '#7a6a61' }}>
         <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#fb8500', marginRight: 6 }} />{pickup ? 'dia em que a caixa fica pronta' : `dia de ${dayWord}`}</span>
-        {fridgeDays.size > 0 && <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: 'rgba(255,209,102,0.6)', border: '1px dashed #d4af37', marginRight: 6 }} />ainda dá para retirar</span>}
+        {fridgeDays.size > 0 && <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: 'rgba(255,209,102,0.6)', border: '1px dashed #c9a257', marginRight: 6 }} />ainda dá para retirar</span>}
         {highlight.length > 0 && <span><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: '#2a9d8f', marginRight: 6 }} />sua caixa</span>}
       </div>
 
@@ -221,7 +221,7 @@ export default function DeliveryCalendar({ value, onChange, highlight = [], titl
           key={focus}
           style={{
             marginTop: '1.1rem', padding: '1rem 1.25rem', borderRadius: '16px',
-            background: 'linear-gradient(135deg, #3c2a21 0%, #5a3d2e 100%)', color: '#fdfaf3',
+            background: 'linear-gradient(135deg, #2a1a12 0%, #5a3d2e 100%)', color: '#faf5ec',
             display: 'flex', alignItems: 'center', gap: '1rem', animation: 'dc-pop 0.45s ease-out',
           }}
         >

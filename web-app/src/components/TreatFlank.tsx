@@ -102,7 +102,7 @@ export default function TreatFlank({ contentWidth, sides = 'both', photos: given
           .tf-left-${id} { right: calc(100% + ${GAP}px); }
           .tf-right-${id} { left: calc(100% + ${GAP}px); }
         }
-        .tf-photo { position: absolute; margin: 0; background: #fff; padding: 7px 7px 0; border-radius: 12px; box-shadow: 0 12px 28px rgba(60,42,33,0.16); }
+        .tf-photo { position: absolute; margin: 0; background: #fff; padding: 7px 7px 0; border-radius: 12px; box-shadow: 0 12px 28px rgba(42,26,18,0.16); }
         .tf-photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
         .tf-photo figcaption { padding: 0.35rem 0.2rem 0.5rem; font-size: 0.74rem; line-height: 1.25; text-align: center; color: #6b5a4e; }
         @media print { .tf-col { display: none !important; } }

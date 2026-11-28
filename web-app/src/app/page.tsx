@@ -167,6 +167,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* The Copacabana promenade wave (Burle Marx) closes the dark hero */}
+      <div className="bm-calcadao" aria-hidden="true" />
+
       {/* Everything on the site at a glance: a short swipe row */}
       <section className="hm-offers" aria-label={c.offers}>
         <div className="hm-wrap">
@@ -230,36 +233,55 @@ export default function Home() {
 }
 
 const CSS = `
-.hm { background: #fdfaf3; color: #3c2a21; }
+.hm { background: #faf5ec; color: #2a1a12; }
 .hm-wrap { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; }
-.hm-kicker { margin: 0 0 0.5rem; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #a6832b; }
-.hm-kicker--light { color: #f4d675; }
-.hm-h2 { margin: 0 0 0.6rem; font-family: var(--font-heading); font-size: clamp(1.8rem, 5vw, 3rem); line-height: 1.08; color: #3c2a21; text-wrap: balance; }
-.hm-h2--light { color: #fdfaf3; }
+.hm-kicker { margin: 0 0 0.5rem; font-size: 0.76rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #a8843f; }
+.hm-kicker--light { color: #e8c77e; }
+.hm-h2 { margin: 0 0 0.6rem; font-family: var(--font-heading); font-weight: 500; font-size: clamp(2.1rem, 5.6vw, 3.4rem); line-height: 1.08; color: #2a1a12; text-wrap: balance; }
+.hm-h2--light { color: #faf5ec; }
+.hm-h2 em { font-style: italic; color: #1e5d54; }
+.hm-h2--light em { color: #ee8c9c; }
 .hm-lead { margin: 0 0 1.75rem; max-width: 560px; color: #594a42; font-size: 1.05rem; line-height: 1.65; }
 .hm-lead--left { margin-bottom: 1.1rem; }
 .hm-sec { padding: clamp(3rem, 8vw, 6rem) 0; }
-.hm-sec--dark { background: #3c2a21; }
+.hm-sec--dark { background: #2a1a12; }
 .hm-sec--soft { background: #f6eedf; }
 
 /* hero */
-.hm-hero { background: #fdfaf3; padding: clamp(1.5rem, 5vw, 4rem) 0 clamp(2.5rem, 6vw, 4.5rem); }
+.hm-hero { background: #2a1a12; color: #faf5ec; padding: clamp(1.5rem, 5vw, 4rem) 0 clamp(2.75rem, 6vw, 5rem); overflow: hidden; }
 .hm-hero__inner { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; display: grid; gap: 1.75rem; align-items: center; }
 @media (min-width: 900px) { .hm-hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3.5rem; } }
-.hm-hero__logo { display: block; width: clamp(110px, 14vw, 170px); height: auto; margin: 0 auto 1.25rem; filter: drop-shadow(0 10px 18px rgba(60,42,33,0.18)); }
+.hm-hero__logo { display: block; width: clamp(110px, 13vw, 160px); height: auto; margin: 0 0 1.5rem; transform: rotate(-4deg); filter: drop-shadow(0 14px 22px rgba(0,0,0,0.45)); }
+.hm-hero .hm-kicker { color: #c9a257; }
 @media (max-width: 899px) { .hm-hero__logo { display: none; } }
 .hm-hero__copy { min-width: 0; container-type: inline-size; }
-.hm-hero__title { margin: 0 0 0.7rem; font-family: var(--font-heading); font-size: clamp(2rem, 9.5cqi, 4.4rem); line-height: 1.04; color: #3c2a21; text-wrap: balance; overflow-wrap: break-word; }
-.hm-hero__title em { font-style: normal; color: #c9852b; }
-.hm-hero__text { margin: 0 0 1.1rem; max-width: 34ch; color: #594a42; font-size: clamp(1.05rem, 2.4vw, 1.25rem); line-height: 1.5; }
-.hm-pills { list-style: none; display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0 0 1.5rem; padding: 0; }
-.hm-pills li { padding: 0.35rem 0.85rem; border-radius: 999px; background: #f6eedf; border: 1px solid #eadfcb; color: #3c2a21; font-size: 0.85rem; font-weight: 700; }
+.hm-hero__title { margin: 0 0 0.9rem; font-family: var(--font-heading); font-weight: 500; font-size: clamp(2.5rem, 12cqi, 5rem); line-height: 1.02; letter-spacing: -0.015em; color: #fbf4e8; text-wrap: balance; overflow-wrap: break-word; }
+.hm-hero__title em { font-style: italic; color: #ee8c9c; }
+.hm-hero__text { margin: 0 0 1.3rem; max-width: 36ch; color: #dccdb8; font-size: clamp(1.05rem, 2.4vw, 1.25rem); line-height: 1.5; }
+.hm-pills { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin: 0 0 1.75rem; padding: 0; }
+.hm-pills li { color: #c9a257; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; }
+.hm-pills li + li::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #ee8c9c; margin-right: 1.1rem; vertical-align: middle; }
 .hm-hero__ctas { display: flex; flex-wrap: wrap; gap: 0.7rem; }
-.hm-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 1.6rem; border-radius: 999px; font-weight: 800; font-size: 1rem; text-decoration: none; }
-.hm-btn--dark { background: #3c2a21; color: #f4d675; }
-.hm-btn--ghost { border: 1.5px solid #3c2a21; color: #3c2a21; }
-.hm-hero__photos { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; max-width: 560px; width: 100%; justify-self: center; }
-.hm-hero__photos > img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 18px; box-shadow: 0 12px 28px rgba(60,42,33,0.14); }
+.hm-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 1.7rem; border-radius: 0; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; transition: background .2s, color .2s; }
+.hm-btn--dark { background: #c9a257; color: #2a1a12; }
+.hm-btn--dark:hover { background: #e2c27a; }
+.hm-btn--ghost { border: 1px solid rgba(250,245,236,0.55); color: #faf5ec; }
+.hm-btn--ghost:hover { border-color: #c9a257; color: #e2c27a; }
+/* Burle Marx garden plan: the four photos sit in hard-edged beds with a second gold contour, over flat colour beds
+   (teal with the Copacabana wave, guava stripes, mango) like his gouache plans. */
+.hm-hero__photos { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem; max-width: 560px; width: 100%; justify-self: center; padding: 0.6rem; }
+.hm-hero__photos::before, .hm-hero__photos::after { content: ''; position: absolute; z-index: -1; box-shadow: 0 0 0 4px #2a1a12, 0 0 0 6px #faf5ec; }
+.hm-hero__photos::before { width: 58%; height: 46%; left: -9%; top: -5%; background-color: #1e5d54;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='14'%3E%3Cpath d='M0 7Q10 0 20 7T40 7' fill='none' stroke='%23faf5ec' stroke-width='2.2'/%3E%3C/svg%3E");
+  border-radius: 62% 38% 55% 45% / 48% 60% 40% 52%; }
+.hm-hero__photos::after { width: 46%; height: 40%; right: -8%; bottom: -9%;
+  background: repeating-linear-gradient(62deg, #ee8c9c 0 7px, #2a1a12 7px 11px);
+  border-radius: 45% 55% 38% 62% / 60% 40% 60% 40%; }
+.hm-hero__photos > img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; box-shadow: 0 0 0 4px #2a1a12, 0 0 0 6px #c9a257; }
+.hm-hero__photos > img:nth-child(1) { border-radius: 9999px 9999px 14px 14px; }
+.hm-hero__photos > img:nth-child(2) { border-radius: 58% 42% 46% 54% / 44% 52% 48% 56%; }
+.hm-hero__photos > img:nth-child(3) { border-radius: 38% 62% 55% 45% / 55% 40% 60% 45%; }
+.hm-hero__photos > img:nth-child(4) { border-radius: 14px 14px 9999px 9999px; }
 .hm-hero__photos > img:nth-child(even) { transform: translateY(1.5rem); }
 @media (max-width: 899px) { .hm-hero__photos { order: -1; } .hm-hero__photos > img { aspect-ratio: 1; } .hm-hero__photos > img:nth-child(even) { transform: none; } }
 
@@ -273,7 +295,7 @@ const CSS = `
     opacity: 0; animation: hm-veil 4.2s ease 0.7s both; }
   .hm-seal__pop { position: relative; display: grid; place-items: center; width: 34%; max-width: 190px; animation: hm-seal-pop 4.2s linear 0.7s both; }
   .hm-seal img { display: block; width: 100%; height: auto; transform-origin: 50% 3%;
-    filter: drop-shadow(0 14px 22px rgba(60,42,33,0.35)) drop-shadow(0 2px 4px rgba(60,42,33,0.25));
+    filter: drop-shadow(0 14px 22px rgba(42,26,18,0.35)) drop-shadow(0 2px 4px rgba(42,26,18,0.25));
     animation: hm-seal-swing 4.2s linear 0.7s both; }}
 @keyframes hm-veil { 0% { opacity: 0; } 22% { opacity: 1; } 60% { opacity: 1; } 100% { opacity: 0.35; } }
 /* Generated from a spring (the size) and a damped pendulum (the swing, hung from the top of the sign), so it moves like a real object. */
@@ -530,7 +552,8 @@ const CSS = `
 
 /* boxes showcase */
 .hm-boxes { display: grid; gap: 0.6rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.hm-box { margin: 0; border-radius: 18px; overflow: hidden; background: #efe4cf; }
+.hm-box { margin: 0; border-radius: 6px; overflow: hidden; background: #efe4cf; }
+.hm-box--0 { border-radius: 9999px 9999px 6px 6px; }
 .hm-box img { display: block; width: 100%; height: 100%; aspect-ratio: 1; object-fit: cover; transition: transform .5s ease; }
 .hm-box--0 { grid-column: 1 / -1; }
 .hm-box--0 img { aspect-ratio: 4 / 3; }
@@ -544,24 +567,28 @@ const CSS = `
 /* treats row */
 .hm-treats { display: flex; gap: 0.7rem; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0.4rem 1.25rem 0.2rem; scrollbar-width: none; max-width: 1120px; margin: 1rem auto 0; }
 .hm-treats::-webkit-scrollbar { display: none; }
-.hm-treats img { flex: 0 0 62%; width: 62%; min-width: 0; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 18px; scroll-snap-align: start; }
+.hm-treats { padding-top: 0.8rem; padding-bottom: 0.8rem; }
+.hm-treats img { flex: 0 0 62%; width: 62%; min-width: 0; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 9999px 9999px 14px 14px; scroll-snap-align: start; box-shadow: 0 0 0 4px #2a1a12, 0 0 0 6px #c9a257; }
+.hm-treats img:nth-child(3n+2) { border-radius: 58% 42% 46% 54% / 44% 52% 48% 56%; }
+.hm-treats img:nth-child(3n+3) { border-radius: 38% 62% 55% 45% / 55% 40% 60% 45%; }
 @media (min-width: 760px) { .hm-treats img { flex-basis: 23%; width: 23%; } }
 
 /* Dolly */
 .hm-dolly { display: grid; gap: 1.5rem; align-items: center; }
-.hm-dolly img { width: min(260px, 70%); aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 5px solid #f4d675; }
+.hm-dolly img { width: min(260px, 70%); aspect-ratio: 4 / 5; object-fit: cover; border-radius: 9999px 9999px 18px 18px; box-shadow: 0 0 0 6px #faf5ec, 0 0 0 8px #c9a257, 22px 22px 0 8px #e2b04a; margin: 0 0 1rem; }
 @media (min-width: 760px) { .hm-dolly { grid-template-columns: 300px minmax(0, 1fr); gap: 3rem; } .hm-dolly img { width: 100%; } }
-.hm-link { font-weight: 800; color: #3c2a21; text-decoration: underline; text-underline-offset: 4px; }
+.hm-link { font-weight: 600; font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; color: #2a1a12; text-decoration: none; border-bottom: 1px solid #c9a257; padding-bottom: 3px; }
 
 /* offers swipe row */
-.hm-offers { background: #fff; padding: 1.25rem 0 1.4rem; border-bottom: 1px solid rgba(60,42,33,0.08); }
+.hm-offers { background: #faf5ec; padding: 1.5rem 0 1.6rem; }
 .hm-offers .hm-kicker { margin: 0 0 0.7rem; }
 .hm-offers__row { display: flex; gap: 0.75rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 0.4rem; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
-.hm-offer { flex: 0 0 132px; scroll-snap-align: start; display: grid; align-content: start; gap: 0.15rem; text-decoration: none; color: #3c2a21; }
-.hm-offer img { width: 132px; height: 132px; object-fit: cover; object-position: center top; border-radius: 16px; margin-bottom: 0.35rem; background: #f3ece0; }
-.hm-offer b { font-family: var(--font-heading); font-size: 0.95rem; line-height: 1.2; }
+.hm-offer { flex: 0 0 132px; scroll-snap-align: start; display: grid; align-content: start; gap: 0.15rem; text-decoration: none; color: #2a1a12; }
+.hm-offer img { width: 132px; height: 132px; object-fit: cover; object-position: center top; border-radius: 58% 42% 46% 54% / 44% 52% 48% 56%; margin: 4px 4px 0.5rem; background: #f3ece0; box-shadow: 0 0 0 3px #faf5ec, 0 0 0 4.5px #c9a257; }
+.hm-offer:nth-child(even) img { border-radius: 9999px 9999px 12px 12px; }
+.hm-offer b { font-family: var(--font-heading); font-weight: 600; font-size: 1.05rem; line-height: 1.15; }
 .hm-offer small { color: #7a6a61; font-size: 0.78rem; line-height: 1.3; }
-.hm-offer:hover img { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(60,42,33,0.15); }
+.hm-offer:hover img { transform: translateY(-2px); }
 .hm-offer img { transition: transform .2s, box-shadow .2s; }
 @media (min-width: 900px) { .hm-offer { flex-basis: 150px; } .hm-offer img { width: 150px; height: 150px; } }
 `;

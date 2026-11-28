@@ -63,7 +63,7 @@ export default function ZoomableImage({ src, alt, style, className, thumbWidth =
             top: '-20px',
             right: '-20px',
             background: '#fff',
-            color: '#3c2a21',
+            color: '#2a1a12',
             border: 'none',
             borderRadius: '50%',
             width: '40px',

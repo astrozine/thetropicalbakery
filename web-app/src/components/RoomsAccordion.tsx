@@ -67,12 +67,12 @@ function Gallery({ photos, alt, t }: { photos: string[]; alt: string; t: Copy })
                 type="button"
                 aria-label={dir === 'prev' ? t.prev : t.next}
                 onClick={() => go(dir === 'prev' ? -1 : 1)}
-                style={{ position: 'absolute', top: '50%', [dir === 'prev' ? 'left' : 'right']: '12px', transform: 'translateY(-50%)', width: '42px', height: '42px', borderRadius: '50%', border: 'none', background: 'rgba(253,250,243,0.92)', color: '#3c2a21', fontSize: '1.2rem', cursor: 'pointer', boxShadow: '0 4px 14px rgba(0,0,0,0.3)' }}
+                style={{ position: 'absolute', top: '50%', [dir === 'prev' ? 'left' : 'right']: '12px', transform: 'translateY(-50%)', width: '42px', height: '42px', borderRadius: '50%', border: 'none', background: 'rgba(253,250,243,0.92)', color: '#2a1a12', fontSize: '1.2rem', cursor: 'pointer', boxShadow: '0 4px 14px rgba(0,0,0,0.3)' }}
               >
                 {dir === 'prev' ? '‹' : '›'}
               </button>
             ))}
-            <span style={{ position: 'absolute', bottom: '12px', right: '14px', background: 'rgba(60,42,33,0.75)', color: '#fdfaf3', fontSize: '0.75rem', padding: '0.25rem 0.7rem', borderRadius: '20px' }}>
+            <span style={{ position: 'absolute', bottom: '12px', right: '14px', background: 'rgba(42,26,18,0.75)', color: '#faf5ec', fontSize: '0.75rem', padding: '0.25rem 0.7rem', borderRadius: '20px' }}>
               {i + 1} / {photos.length}
             </span>
           </>
@@ -87,7 +87,7 @@ function Gallery({ photos, alt, t }: { photos: string[]; alt: string; t: Copy })
               type="button"
               onClick={() => setI(n)}
               aria-label={t.show(n + 1)}
-              style={{ flex: '0 0 auto', width: '84px', height: '64px', borderRadius: '8px', overflow: 'hidden', padding: 0, cursor: 'pointer', border: n === i ? '2px solid #d4af37' : '2px solid transparent', opacity: n === i ? 1 : 0.65 }}
+              style={{ flex: '0 0 auto', width: '84px', height: '64px', borderRadius: '8px', overflow: 'hidden', padding: 0, cursor: 'pointer', border: n === i ? '2px solid #c9a257' : '2px solid transparent', opacity: n === i ? 1 : 0.65 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={optimizedSrc(src, 384)} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -109,7 +109,7 @@ const ROOM_CSS = `
 .room-cap,.room-count{display:none}
 .room-text{flex:1;min-width:0;display:block}
 .room-cap-inline{display:inline-block;background:rgba(212,175,55,0.16);color:#8a6d1f;font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.65rem;border-radius:20px;margin-bottom:0.4rem}
-.room-title{display:block;font-family:var(--font-heading,inherit);font-weight:700;font-size:clamp(1.05rem,2.4vw,1.4rem);color:#3c2a21;line-height:1.2}
+.room-title{display:block;font-family:var(--font-heading,inherit);font-weight:700;font-size:clamp(1.05rem,2.4vw,1.4rem);color:#2a1a12;line-height:1.2}
 .room-tag{display:block;color:#7a6a61;font-size:0.9rem;margin-top:0.3rem;line-height:1.5}
 .room-plus{flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;transition:transform .25s}
 @media (max-width:640px){
@@ -118,7 +118,7 @@ const ROOM_CSS = `
   .room-open .room-thumb{display:none}
   .room-open .room-head{padding-top:1rem}
   .room-cap{display:block;position:absolute;left:12px;bottom:12px;background:rgba(253,250,243,0.95);color:#6f5614;font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.3rem 0.75rem;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
-  .room-count{display:block;position:absolute;right:12px;bottom:12px;background:rgba(60,42,33,0.75);color:#fdfaf3;font-size:0.75rem;padding:0.25rem 0.65rem;border-radius:20px}
+  .room-count{display:block;position:absolute;right:12px;bottom:12px;background:rgba(42,26,18,0.75);color:#faf5ec;font-size:0.75rem;padding:0.25rem 0.65rem;border-radius:20px}
   .room-cap-inline{display:none}
   .room-open .room-cap-inline{display:inline-block}
   .room-text{padding-left:1.1rem}
@@ -167,7 +167,7 @@ export default function RoomsAccordion({ onInquire, locale = 'pt' }: Props) {
       {rooms.map(room => {
         const open = openId === room.id;
         return (
-          <div key={room.id} className={open ? 'room-card room-open' : 'room-card'} style={{ background: '#fff', border: open ? '1px solid #d4af37' : '1px solid #e8e1d7', borderRadius: '20px', overflow: 'hidden', boxShadow: open ? '0 16px 40px rgba(60,42,33,0.12)' : '0 4px 14px rgba(60,42,33,0.05)', transition: 'box-shadow 0.3s, border-color 0.3s' }}>
+          <div key={room.id} className={open ? 'room-card room-open' : 'room-card'} style={{ background: '#fff', border: open ? '1px solid #c9a257' : '1px solid #e8e1d7', borderRadius: '20px', overflow: 'hidden', boxShadow: open ? '0 16px 40px rgba(42,26,18,0.12)' : '0 4px 14px rgba(42,26,18,0.05)', transition: 'box-shadow 0.3s, border-color 0.3s' }}>
             <button
               type="button"
               onClick={() => setOpenId(open ? null : room.id)}
@@ -185,7 +185,7 @@ export default function RoomsAccordion({ onInquire, locale = 'pt' }: Props) {
                 <span className="room-title">{room.name}</span>
                 <span className="room-tag">{room.tagline}</span>
               </span>
-              <span aria-hidden className="room-plus" style={{ background: open ? '#d4af37' : '#f5efe2', color: open ? '#fff' : '#3c2a21', transform: open ? 'rotate(45deg)' : 'none' }}>+</span>
+              <span aria-hidden className="room-plus" style={{ background: open ? '#c9a257' : '#f5efe2', color: open ? '#fff' : '#2a1a12', transform: open ? 'rotate(45deg)' : 'none' }}>+</span>
             </button>
 
             {open && (
@@ -195,8 +195,8 @@ export default function RoomsAccordion({ onInquire, locale = 'pt' }: Props) {
                   <p style={{ color: '#594a42', lineHeight: 1.85, marginBottom: '1.25rem' }}>{room.description}</p>
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.25rem' }}>
                     {room.highlights.map(h => (
-                      <li key={h} style={{ display: 'flex', gap: '0.6rem', color: '#3c2a21', marginBottom: '0.5rem', fontSize: '0.95rem' }}>
-                        <span style={{ color: '#d4af37' }}>✦</span>{h}
+                      <li key={h} style={{ display: 'flex', gap: '0.6rem', color: '#2a1a12', marginBottom: '0.5rem', fontSize: '0.95rem' }}>
+                        <span style={{ color: '#c9a257' }}>✦</span>{h}
                       </li>
                     ))}
                   </ul>

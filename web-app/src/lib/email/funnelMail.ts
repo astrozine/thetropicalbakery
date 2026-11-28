@@ -109,7 +109,7 @@ const COPY: Record<EbookLang, MailCopy> = {
 
 // The book's own colours (sweetEscape.css), so the e-mail looks like the page they signed up on.
 const ORANGE = '#ff4f0a';
-const COCOA = '#3c2a21';
+const COCOA = '#2a1a12';
 const PAPER = '#fdf7ec';
 const FONT = `'Outfit',Helvetica,Arial,sans-serif`;
 const HEAD = `'Unbounded','Outfit',Helvetica,Arial,sans-serif`;
@@ -147,7 +147,7 @@ function bookBlock(c: MailCopy, lang: EbookLang, base: string, href: string, pri
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
           <td width="34%" valign="middle" style="padding:0 14px 0 0;">
             <a href="${href}" style="text-decoration:none;"><img src="${base}/email/se-cover-${lang}.jpg" width="160" alt="Sweet Escape"
-              style="display:block;width:100%;max-width:160px;height:auto;border:0;border-radius:4px 8px 8px 4px;box-shadow:0 10px 22px rgba(60,42,33,0.25);"></a>
+              style="display:block;width:100%;max-width:160px;height:auto;border:0;border-radius:4px 8px 8px 4px;box-shadow:0 10px 22px rgba(42,26,18,0.25);"></a>
           </td>
           <td valign="middle">
             <p style="font-family:${HEAD};font-weight:700;font-size:18px;line-height:1.2;color:${COCOA};margin:0 0 8px;">${esc(c.moreTitle)}</p>

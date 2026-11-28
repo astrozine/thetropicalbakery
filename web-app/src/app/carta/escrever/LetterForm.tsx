@@ -148,7 +148,7 @@ export default function LetterForm({ token, sunday }: { token: string; sunday: s
 }
 
 const CSS = `
-.lt { max-width: 560px; margin: 0 auto; padding: 24px 16px 56px; color: #3c2a21; font-family: 'Outfit', Helvetica, Arial, sans-serif; }
+.lt { max-width: 560px; margin: 0 auto; padding: 24px 16px 56px; color: #2a1a12; font-family: 'Outfit', Helvetica, Arial, sans-serif; }
 .lt h1 { font-family: 'Yellowtail', cursive; font-weight: 400; font-size: 38px; margin: 8px 0 6px; text-align: center; }
 .lt-sub { text-align: center; color: #594a42; line-height: 1.55; margin: 0 0 22px; font-size: 16px; }
 .lt-big { text-align: center; font-size: 48px; margin: 40px 0 0; }
@@ -157,16 +157,16 @@ const CSS = `
 .lt-label span { font-weight: 400; color: #8a7a70; font-size: 14px; }
 .lt-label--small { font-size: 15px; margin-top: 14px; }
 .lt-hint { margin: -2px 0 10px; color: #6b5a50; font-size: 14px; line-height: 1.45; }
-.lt textarea, .lt input:not([type=file]) { width: 100%; box-sizing: border-box; border: 1px solid #d9ccb8; border-radius: 12px; padding: 12px; font: inherit; font-size: 16px; color: #3c2a21; background: #fdfaf3; }
+.lt textarea, .lt input:not([type=file]) { width: 100%; box-sizing: border-box; border: 1px solid #d9ccb8; border-radius: 12px; padding: 12px; font: inherit; font-size: 16px; color: #2a1a12; background: #faf5ec; }
 .lt-photos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .lt-photo { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #f4ecdf; }
 .lt-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.lt-photo button { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: rgba(60,42,33,.75); color: #fff; font-size: 18px; line-height: 1; cursor: pointer; }
-.lt-add { aspect-ratio: 1; border: 2px dashed #d4af37; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #8a6d1d; font-weight: 600; background: #fffaf0; }
+.lt-photo button { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: rgba(42,26,18,.75); color: #fff; font-size: 18px; line-height: 1; cursor: pointer; }
+.lt-add { aspect-ratio: 1; border: 2px dashed #c9a257; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #8a6d1d; font-weight: 600; background: #fffaf0; }
 .lt-add input { display: none; }
 .lt-langs { display: flex; gap: 8px; }
-.lt-langs button { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #d9ccb8; background: #fdfaf3; font: inherit; font-size: 16px; color: #3c2a21; cursor: pointer; }
-.lt-langs button.on { background: #3c2a21; color: #fff; border-color: #3c2a21; }
+.lt-langs button { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #d9ccb8; background: #faf5ec; font: inherit; font-size: 16px; color: #2a1a12; cursor: pointer; }
+.lt-langs button.on { background: #2a1a12; color: #fff; border-color: #2a1a12; }
 .lt-send { width: 100%; padding: 16px; border-radius: 999px; border: 0; background: #ff4f0a; color: #fff; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 6px; }
 .lt-send:disabled { opacity: .6; }
 .lt-error { color: #b3261e; text-align: center; margin: 4px 0 8px; }

@@ -209,7 +209,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
 
     return (
       <div style={{
-        background: '#fdfaf3', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '20px',
+        background: '#faf5ec', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '20px',
         padding: 'clamp(2rem, 5vw, 3rem)', textAlign: 'center', maxWidth: '620px', margin: '0 auto',
       }}>
         <img src="/logo-gold.webp" alt="" style={{ height: '72px', margin: '0 auto 1.5rem', display: 'block' }} />
@@ -276,7 +276,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
     <form
       onSubmit={handleSubmit}
       style={{
-        background: '#fdfaf3', border: '1px solid rgba(212,175,55,0.35)', borderRadius: '20px',
+        background: '#faf5ec', border: '1px solid rgba(212,175,55,0.35)', borderRadius: '20px',
         padding: 'clamp(1.5rem, 4vw, 2.5rem)', maxWidth: '760px', margin: '0 auto',
       }}
     >
@@ -327,7 +327,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
                 onClick={() => onSelectPlan(p.id)}
                 style={{
                   flex: '1 1 150px', padding: '0.85rem 1rem', borderRadius: '12px',
-                  border: '1px solid', borderColor: on ? '#d4af37' : '#e8e1d7',
+                  border: '1px solid', borderColor: on ? '#c9a257' : '#e8e1d7',
                   background: on ? 'rgba(212,175,55,0.14)' : 'transparent',
                   cursor: 'pointer', textAlign: 'left',
                 }}
@@ -410,7 +410,7 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
             <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: '0.9rem' }}>
               🌿 Personalizar minha caixa
             </span>
-            <span style={{ color: '#d4af37', fontSize: '1.1rem', flexShrink: 0 }}>
+            <span style={{ color: '#c9a257', fontSize: '1.1rem', flexShrink: 0 }}>
               {showOptional ? '−' : '+'}
             </span>
           </button>
@@ -429,9 +429,9 @@ export default function SubscriptionSignup({ plans, selectedPlanId, onSelectPlan
                         onClick={() => setDietary({ ...dietary, [key]: !on })}
                         style={{
                           padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid',
-                          borderColor: on ? '#d4af37' : '#e8e1d7',
+                          borderColor: on ? '#c9a257' : '#e8e1d7',
                           background: on ? 'rgba(212,175,55,0.15)' : 'transparent',
-                          color: on ? '#3c2a21' : '#7a6a61', fontWeight: on ? 700 : 500,
+                          color: on ? '#2a1a12' : '#7a6a61', fontWeight: on ? 700 : 500,
                           fontSize: '0.85rem', cursor: 'pointer',
                         }}
                       >

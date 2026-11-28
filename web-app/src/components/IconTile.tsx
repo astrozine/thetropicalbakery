@@ -10,7 +10,7 @@ export default function IconTile({ size = 30, children, style }: { size?: number
     <span aria-hidden style={{
       width: size, height: size, flexShrink: 0, borderRadius: size * 0.3,
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.52, lineHeight: 1,
-      background: 'var(--sign-bg)', boxShadow: 'var(--sign-shadow)', color: '#3c2a21',
+      background: 'var(--sign-bg)', boxShadow: 'var(--sign-shadow)', color: '#2a1a12',
       fontStyle: 'normal', fontWeight: 'normal', letterSpacing: 0, textTransform: 'none',
       ...style,
     }}>{children}</span>

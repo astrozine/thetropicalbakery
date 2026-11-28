@@ -115,12 +115,12 @@ export default async function BoxSaleHome() {
             {announcementLink ? (
               <Link
                 href={announcementLink}
-                style={{ display: 'block', background: '#3c2a21', color: '#fdfaf3', padding: '0.65rem 1.1rem', borderRadius: '30px', fontSize: '0.82rem', fontWeight: 600, border: '1px solid rgba(212,175,55,0.6)', boxShadow: '0 8px 20px rgba(60,42,33,0.25)', lineHeight: 1.5 }}
+                style={{ display: 'block', background: '#2a1a12', color: '#faf5ec', padding: '0.65rem 1.1rem', borderRadius: '30px', fontSize: '0.82rem', fontWeight: 600, border: '1px solid rgba(212,175,55,0.6)', boxShadow: '0 8px 20px rgba(42,26,18,0.25)', lineHeight: 1.5 }}
               >
                 {announcement}
               </Link>
             ) : (
-              <div style={{ background: '#3c2a21', color: '#fdfaf3', padding: '0.65rem 1.1rem', borderRadius: '30px', fontSize: '0.82rem', fontWeight: 600, border: '1px solid rgba(212,175,55,0.6)', boxShadow: '0 8px 20px rgba(60,42,33,0.25)', lineHeight: 1.5 }}>
+              <div style={{ background: '#2a1a12', color: '#faf5ec', padding: '0.65rem 1.1rem', borderRadius: '30px', fontSize: '0.82rem', fontWeight: 600, border: '1px solid rgba(212,175,55,0.6)', boxShadow: '0 8px 20px rgba(42,26,18,0.25)', lineHeight: 1.5 }}>
                 {announcement}
               </div>
             )}
@@ -157,7 +157,7 @@ export default async function BoxSaleHome() {
       />
 
       {/* Active Box Banner */}
-      <section id="order" style={{ padding: 'clamp(3rem, 7vw, 5rem) 1.25rem', background: '#fdfaf3' }}>
+      <section id="order" style={{ padding: 'clamp(3rem, 7vw, 5rem) 1.25rem', background: '#faf5ec' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '1100px' }}>
           <ScrollReveal className="text-center">
             {featured.length ? (
@@ -186,7 +186,7 @@ export default async function BoxSaleHome() {
       {/* (A second parallax photo band sat here; taken out 2026-11-13 so the page scrolls less.) */}
 
       {/* Menu/Inspiration Section */}
-      <section id="menu" className="menu-section" style={{ padding: 'clamp(3rem, 7vw, 6rem) 1.25rem', background: '#fdfaf3' }}>
+      <section id="menu" className="menu-section" style={{ padding: 'clamp(3rem, 7vw, 6rem) 1.25rem', background: '#faf5ec' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <ScrollReveal>
             <h2 className="section-title" data-sign-top="⭐">Destaques Anteriores</h2>

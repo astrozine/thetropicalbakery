@@ -50,7 +50,7 @@ export default function SplitHero({
   const kicker = m ? m[1] : null;
   const category = m ? m[2] : eyebrow;
   return (
-    <section style={{ display: 'flex', flexWrap: 'wrap-reverse', background: '#3c2a21', overflow: 'hidden' }}>
+    <section style={{ display: 'flex', flexWrap: 'wrap-reverse', background: '#2a1a12', overflow: 'hidden' }}>
       {/* Text panel */}
       <div style={{
         flex: '1 1 460px', display: 'flex', flexDirection: 'column', justifyContent: extra ? 'flex-start' : 'center',
@@ -62,18 +62,18 @@ export default function SplitHero({
             {kicker}
           </span>
         )}
-        <span style={{ fontFamily: 'var(--font-heading)', color: '#d4af37', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.02em', lineHeight: 1.05, fontSize: 'clamp(2.4rem, 6.2vw, 5rem)', marginBottom: '1.25rem', overflowWrap: 'anywhere' }}>
+        <span style={{ fontFamily: 'var(--font-heading)', color: '#c9a257', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.02em', lineHeight: 1.05, fontSize: 'clamp(2.4rem, 6.2vw, 5rem)', marginBottom: '1.25rem', overflowWrap: 'anywhere' }}>
           {category}
         </span>
-        <div style={{ width: '56px', height: '3px', background: '#d4af37', marginBottom: '1.75rem' }} />
-        <h1 style={{ color: '#fdfaf3', fontSize: 'clamp(1.5rem, 2.6vw, 2.2rem)', lineHeight: 1.25, marginBottom: '1.5rem' }}>
+        <div style={{ width: '56px', height: '3px', background: '#c9a257', marginBottom: '1.75rem' }} />
+        <h1 style={{ color: '#faf5ec', fontSize: 'clamp(1.5rem, 2.6vw, 2.2rem)', lineHeight: 1.25, marginBottom: '1.5rem' }}>
           {title}
         </h1>
         <p style={{ color: 'rgba(253,250,243,0.82)', fontSize: '1.08rem', lineHeight: 1.85, maxWidth: '540px', marginBottom: '1.75rem' }}>
           {intro}
         </p>
         {regionNote && (
-          <p style={{ alignSelf: 'flex-start', background: 'rgba(212,175,55,0.14)', border: '1px solid rgba(212,175,55,0.5)', color: '#fdfaf3', padding: '0.5rem 1.15rem', borderRadius: '30px', fontSize: '0.83rem', lineHeight: 1.5, marginBottom: '1.75rem' }}>
+          <p style={{ alignSelf: 'flex-start', background: 'rgba(212,175,55,0.14)', border: '1px solid rgba(212,175,55,0.5)', color: '#faf5ec', padding: '0.5rem 1.15rem', borderRadius: '30px', fontSize: '0.83rem', lineHeight: 1.5, marginBottom: '1.75rem' }}>
             📍 {regionNote}
           </p>
         )}
@@ -125,7 +125,7 @@ export default function SplitHero({
           <HeroPhoto src={accentImage} alt="" preload fadeFrame sizes="(min-width: 900px) 16vw, 30vw" style={{
             position: 'absolute', left: 'clamp(24px, 4vw, 56px)', bottom: 'clamp(24px, 4vw, 56px)',
             width: 'clamp(110px, 16vw, 200px)', aspectRatio: '1', borderRadius: '14px',
-            border: '3px solid #fdfaf3', boxShadow: '0 18px 40px rgba(0,0,0,0.4)', transform: 'rotate(-5deg)',
+            border: '3px solid #faf5ec', boxShadow: '0 18px 40px rgba(0,0,0,0.4)', transform: 'rotate(-5deg)',
           }} />
         )}
         {treats && treats.length > 0 && (
@@ -140,7 +140,7 @@ export default function SplitHero({
                 sizes="(min-width: 900px) 13vw, 30vw"
                 style={{
                   width: fitPortrait ? 'clamp(96px, 7.5vw, 150px)' : 'clamp(96px, 13vw, 210px)', aspectRatio: '3 / 4', borderRadius: '12px',
-                  border: '3px solid #fdfaf3', boxShadow: '0 18px 40px rgba(0,0,0,0.45)',
+                  border: '3px solid #faf5ec', boxShadow: '0 18px 40px rgba(0,0,0,0.45)',
                   transform: `rotate(${i % 2 === 0 ? -5 : 4}deg) translateY(${i % 2 === 0 ? 0 : -18}px)`,
                   marginLeft: i === 0 ? 0 : 'clamp(-34px, -2.5vw, -18px)',
                 }}

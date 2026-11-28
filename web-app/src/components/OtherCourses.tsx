@@ -34,7 +34,7 @@ export default function OtherCourses({ currentSlug }: { currentSlug: string }) {
   if (otherCourses.length === 0) return null;
 
   return (
-    <section style={{ padding: '4rem 1.5rem', background: '#fdfaf3' }}>
+    <section style={{ padding: '4rem 1.5rem', background: '#faf5ec' }}>
       <div className="container" style={{ maxWidth: '900px', margin: '0 auto' }}>
         <h3 style={{ 
           fontSize: '2rem', 
@@ -80,7 +80,7 @@ export default function OtherCourses({ currentSlug }: { currentSlug: string }) {
                   <p style={{ color: '#594a42', fontSize: '0.95rem', marginBottom: '1.5rem', flex: 1 }}>
                     {course.description}
                   </p>
-                  <span style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' }}>
+                  <span style={{ color: '#c9a257', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' }}>
                     Ver Curso →
                   </span>
                 </div>

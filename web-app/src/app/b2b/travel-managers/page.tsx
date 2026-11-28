@@ -75,7 +75,7 @@ export default function TravelManagersPage() {
 
       {/* Everything we offer */}
       <section className="container px-4 max-w-6xl mx-auto" style={{ position: 'relative', paddingTop: 'clamp(3.5rem, 7vw, 5.5rem)', paddingBottom: '1rem' }}>
-        <h2 style={{ position: 'relative', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#3c2a21', marginBottom: '1rem' }}>
+        <h2 style={{ position: 'relative', textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '2rem', color: '#2a1a12', marginBottom: '1rem' }}>
           Tudo o Que Você Pode Incluir no Pacote
         </h2>
         <p style={{ textAlign: 'center', color: '#7a6a61', maxWidth: '640px', margin: '0 auto 3rem', lineHeight: 1.8 }}>
@@ -85,7 +85,7 @@ export default function TravelManagersPage() {
           {OFFERINGS.map((o, i) => (
             <div key={i} className="liquid-glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column' }}>
               <div style={{ fontSize: '2.4rem', marginBottom: '1rem' }}>{o.icon}</div>
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: '#3c2a21', marginBottom: '0.75rem' }}>{o.title}</h3>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', color: '#2a1a12', marginBottom: '0.75rem' }}>{o.title}</h3>
               <p style={{ color: '#594a42', lineHeight: 1.7, fontSize: '0.96rem', marginBottom: '1.25rem', flex: 1 }}>{o.description}</p>
               <Link href={o.href} style={{ color: 'var(--color-secondary)', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none' }}>
                 {o.cta} →
@@ -100,7 +100,7 @@ export default function TravelManagersPage() {
         <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '4rem', alignItems: 'center' }}>
           <div style={{ flex: '1 1 400px' }} className="fade-in">
             <div className="liquid-glass-card tm-how" style={{ padding: '3rem' }}>
-              <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', color: '#3c2a21', fontFamily: 'var(--font-heading)', fontWeight: 800 }}>Como Funciona a Parceria?</h2>
+              <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', color: '#2a1a12', fontFamily: 'var(--font-heading)', fontWeight: 800 }}>Como Funciona a Parceria?</h2>
               <p style={{ fontSize: '1.05rem', marginBottom: '1.5rem', color: '#594a42', lineHeight: '1.8' }}>
                 Se você é instrutora de yoga, guia turística, ou simplesmente a pessoa que organiza as viagens do seu grupo
                 (especialmente da Argentina!), montamos o pacote junto com você e cuidamos de toda a parte gastronômica.
@@ -123,8 +123,8 @@ export default function TravelManagersPage() {
           </div>
 
           <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '2rem' }} className="fade-in tm-photos">
-            <ZoomableImage src="/retreats/Room with open ripada door.jpg" alt="Acomodações" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 10px 30px rgba(60,42,33,0.15)' }} />
-            <ZoomableImage src="/retreats/Beach shot Itamambuca.webp" alt="Itamambuca Beach" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 10px 30px rgba(60,42,33,0.15)' }} />
+            <ZoomableImage src="/retreats/Room with open ripada door.jpg" alt="Acomodações" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 10px 30px rgba(42,26,18,0.15)' }} />
+            <ZoomableImage src="/retreats/Beach shot Itamambuca.webp" alt="Itamambuca Beach" style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px', boxShadow: '0 10px 30px rgba(42,26,18,0.15)' }} />
           </div>
         </div>
       </section>

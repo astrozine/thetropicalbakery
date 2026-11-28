@@ -142,22 +142,22 @@ export default function BrandDialogHost() {
   return (
     <>
       <style>{`
-        .bd-flag { outline: 3px solid #d4af37 !important; outline-offset: 2px; border-color: #d4af37 !important; }
+        .bd-flag { outline: 3px solid #c9a257 !important; outline-offset: 2px; border-color: #c9a257 !important; }
         .bd-overlay { position: fixed; inset: 0; z-index: 2000000; display: flex; align-items: center; justify-content: center; padding: 1.25rem;
-          background: rgba(60, 42, 33, 0.55); backdrop-filter: blur(4px); animation: bd-fade 0.18s ease-out; }
-        .bd-card { width: 100%; max-width: 420px; background: linear-gradient(160deg, #fffaf0 0%, #fdf1d6 100%); color: #3c2a21; border-radius: 22px;
+          background: rgba(42, 26, 18, 0.55); backdrop-filter: blur(4px); animation: bd-fade 0.18s ease-out; }
+        .bd-card { width: 100%; max-width: 420px; background: linear-gradient(160deg, #fffaf0 0%, #fdf1d6 100%); color: #2a1a12; border-radius: 22px;
           border: 1px solid rgba(212, 175, 55, 0.55); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); padding: 1.75rem 1.5rem 1.4rem; text-align: center;
           animation: bd-pop 0.24s cubic-bezier(0.2, 1.2, 0.4, 1); }
         .bd-star { width: 3.2rem; height: 3.2rem; margin: 0 auto 0.85rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;
           font-size: 1.6rem; background: #fdf1d6; color: #d4a017; text-shadow: 0 0 14px rgba(212, 175, 55, 0.7); box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.14); }
-        .bd-card h2 { font-family: var(--font-heading); font-size: 1.35rem; line-height: 1.2; margin: 0 0 0.6rem; color: #3c2a21; }
+        .bd-card h2 { font-family: var(--font-heading); font-size: 1.35rem; line-height: 1.2; margin: 0 0 0.6rem; color: #2a1a12; }
         .bd-card p { margin: 0 0 1.35rem; font-size: 1rem; line-height: 1.6; color: #594a42; white-space: pre-line; }
         .bd-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
         .bd-btn { flex: 1 1 130px; min-height: 46px; padding: 0.7rem 1.2rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; cursor: pointer; border: 2px solid transparent; }
-        .bd-btn:focus-visible { outline: 3px solid #d4af37; outline-offset: 2px; }
-        .bd-primary { background: #3c2a21; color: #fdfaf3; }
+        .bd-btn:focus-visible { outline: 3px solid #c9a257; outline-offset: 2px; }
+        .bd-primary { background: #2a1a12; color: #faf5ec; }
         .bd-primary.bd-danger { background: #a63d2f; }
-        .bd-ghost { background: transparent; color: #3c2a21; border-color: rgba(60, 42, 33, 0.3); }
+        .bd-ghost { background: transparent; color: #2a1a12; border-color: rgba(42, 26, 18, 0.3); }
         @keyframes bd-fade { from { opacity: 0; } to { opacity: 1; } }
         @keyframes bd-pop { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
         @media (prefers-reduced-motion: reduce) { .bd-overlay, .bd-card { animation: none; } }

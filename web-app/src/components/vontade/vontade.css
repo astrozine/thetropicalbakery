@@ -12,7 +12,7 @@ html:has(.va-shell), html:has(.va-shell) body { overflow: hidden; }
 body:has(.va-shell) .announce-bar, body:has(.va-shell) .mobile-header-nav { display: none !important; }
 
 .va-shell {
-  --va-bg: #fffaf0; --va-surface: #ffffff; --va-ink: #3c2a21; --va-muted: #7a6a5d;
+  --va-bg: #fffaf0; --va-surface: #ffffff; --va-ink: #2a1a12; --va-muted: #7a6a5d;
   --va-line: #ede4d3; --va-line-d: #dccfb8; --va-soft: #f6efe2;
   --va-green: #27b35a; --va-green-d: #1a8a43; --va-green-l: #e3f6ea;
   --va-gold: #d4a017; --va-red: #e8364f;
@@ -121,12 +121,12 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 }
 .va-ring__beam {
   position: absolute; top: 0; left: 50%; width: 110px; height: 14px; margin-left: -55px; border-radius: 7px;
-  background: linear-gradient(#8a5a3c, #5a3421); box-shadow: 0 4px 8px rgba(60,42,33,0.25);
+  background: linear-gradient(#8a5a3c, #5a3421); box-shadow: 0 4px 8px rgba(42,26,18,0.25);
 }
 /* Contact shadow on the floor, moving with the bag. */
 .va-ring::after {
   content: ''; position: absolute; left: 50%; bottom: 18px; width: 120px; height: 16px; margin-left: -60px; border-radius: 50%;
-  background: radial-gradient(rgba(60,42,33,0.28), transparent 70%); animation: va-floor 3.4s ease-in-out infinite;
+  background: radial-gradient(rgba(42,26,18,0.28), transparent 70%); animation: va-floor 3.4s ease-in-out infinite;
 }
 .va-bag {
   position: absolute; left: 50%; top: 10px; width: 124px; margin-left: -62px; padding: 0; border: 0; background: none; cursor: pointer;
@@ -145,7 +145,7 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 }
 .va-bag__band {
   position: absolute; left: 0; right: 0; height: 14px;
-  background: linear-gradient(#6a4430, #3c2a21); box-shadow: 0 2px 3px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+  background: linear-gradient(#6a4430, #2a1a12); box-shadow: 0 2px 3px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
 }
 .va-bag__band--top { top: 26px; }
 .va-bag__band--bot { bottom: 34px; }
@@ -438,7 +438,7 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 .va-path__body small { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; color: var(--va-gold); }
 .va-path__body strong { display: block; font-size: 1.05rem; font-weight: 900; margin: 0.1rem 0 0.3rem; }
 .va-path__body p { margin: 0; font-size: 0.94rem; line-height: 1.5; font-weight: 600; }
-.va-blur { color: transparent; text-shadow: 0 0 8px rgba(60,42,33,0.45); user-select: none; }
+.va-blur { color: transparent; text-shadow: 0 0 8px rgba(42,26,18,0.45); user-select: none; }
 .va-traps { margin-top: 0.2rem; }
 .va-traps ul { list-style: none; padding: 0; margin: 0.3rem 0 0; display: grid; gap: 0.7rem; }
 .va-traps li { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.95rem; line-height: 1.45; font-weight: 600; }
@@ -465,7 +465,7 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 .va-gift__icon { display: block; font-size: 2.8rem; line-height: 1; margin-bottom: 0.4rem; animation: va-wiggle 3.5s ease-in-out infinite; }
 .va-gift strong { display: block; font-size: 1.15rem; font-weight: 900; margin-bottom: 0.35rem; }
 .va-gift p { margin: 0 0 0.9rem; font-size: 0.95rem; line-height: 1.5; font-weight: 600; }
-.va-gift__login { border-radius: 18px; padding: 0.4rem; background: #fffaf0; color: #3c2a21; text-align: left; }
+.va-gift__login { border-radius: 18px; padding: 0.4rem; background: #fffaf0; color: #2a1a12; text-align: left; }
 
 .va-offer {
   position: relative; margin-top: 1.2rem; padding: 1.1rem; border-radius: 22px; text-align: left;
@@ -570,7 +570,7 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
   .va-tip { background: #3a2f12; color: #ffe9a8; }
   .va-chip[aria-pressed='true'], .va-chip[aria-selected='true'] { background: #0f3347; border-color: #1cb0f6; color: #8fdcff; }
   .va-blur { text-shadow: 0 0 8px rgba(245, 236, 224, 0.45); }
-  .va-card--light { background: #fffaf0; color: #3c2a21; border-color: #ede4d3; }
+  .va-card--light { background: #fffaf0; color: #2a1a12; border-color: #ede4d3; }
   .va-same { color: var(--va-ink); }
 
   /* The game menu. */
@@ -730,7 +730,7 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
   .va-tip { background: #3a2f12; color: #ffe9a8; }
   .va-chip[aria-pressed='true'], .va-chip[aria-selected='true'], .va-tabs button[aria-current] { background: #0f3347; border-color: #1cb0f6; color: #8fdcff; }
   .va-blur { text-shadow: 0 0 8px rgba(245,236,224,0.45); }
-  .va-card--light { background: #fffaf0; color: #3c2a21; border-color: #ede4d3; }
+  .va-card--light { background: #fffaf0; color: #2a1a12; border-color: #ede4d3; }
 }
 
 /* ---------------------------------------------------------------- loading */
@@ -756,4 +756,4 @@ button.va-card:active, a.va-card:active { transform: translateY(4px); box-shadow
 
 /* Dolly's name above her chat follows the screen (dark arena, dark mode); her bubbles stay light with dark text. */
 .va-shell .dc__name { color: var(--va-ink); }
-.va-shell .dc__msg { color: #3c2a21; }
+.va-shell .dc__msg { color: #2a1a12; }

@@ -24,7 +24,7 @@ export default function Icon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#d4af37', // Gold Foil
+          color: '#c9a257', // Gold Foil
         }}
       >
         <svg

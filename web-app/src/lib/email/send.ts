@@ -88,7 +88,7 @@ const CONTACT_COLUMNS_LEGACY = 'email, full_name, token, tags, opted_out, unsubs
 
 /** The personal diet line, wrapped so it stands out in the message. */
 const dietBlock = (line: string, warning: boolean) => line
-  ? `<div style="margin:0 0 18px;padding:12px 14px;border-radius:10px;background:${warning ? '#fdf0e8' : '#eef6ef'};border:1px solid ${warning ? '#f0c9ae' : '#cde3d1'};color:#3c2a21;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;">${line}</div>`
+  ? `<div style="margin:0 0 18px;padding:12px 14px;border-radius:10px;background:${warning ? '#fdf0e8' : '#eef6ef'};border:1px solid ${warning ? '#f0c9ae' : '#cde3d1'};color:#2a1a12;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;">${line}</div>`
   : '';
 
 /** Checks the campaign exists and every required field is filled. Throws SendError otherwise. */

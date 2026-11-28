@@ -157,7 +157,7 @@ export default function AdminTeamPage() {
           <div><label style={lbl}>Anotações internas (ela não vê)</label>
             <textarea rows={2} value={worker.notes} onChange={e => setWorker({ ...worker, notes: e.target.value })} style={{ ...field, resize: 'vertical' }} /></div>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button type="submit" disabled={saving} style={{ ...dark, background: '#d4af37' }}>{saving ? 'Salvando…' : editingId ? 'Salvar' : 'Adicionar'}</button>
+            <button type="submit" disabled={saving} style={{ ...dark, background: '#c9a257' }}>{saving ? 'Salvando…' : editingId ? 'Salvar' : 'Adicionar'}</button>
             {editingId && <button type="button" onClick={() => { setEditingId(null); setWorker({ ...EMPTY_WORKER }); }} style={{ ...dark, background: '#95a5a6' }}>Cancelar</button>}
           </div>
         </form>

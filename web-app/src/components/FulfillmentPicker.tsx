@@ -35,7 +35,7 @@ export default function FulfillmentPicker({ value, onChange }: { value: Fulfillm
             type="button"
             aria-pressed={on}
             onClick={() => { saveFulfillment(v); onChange(v); }}
-            style={{ flex: '1 1 200px', textAlign: 'left', padding: '0.9rem 1rem', borderRadius: '12px', cursor: 'pointer', border: `2px solid ${on ? '#d4af37' : '#e8e1d7'}`, background: on ? 'rgba(212,175,55,0.14)' : 'rgba(255,255,255,0.7)', color: '#3c2a21' }}
+            style={{ flex: '1 1 200px', textAlign: 'left', padding: '0.9rem 1rem', borderRadius: '12px', cursor: 'pointer', border: `2px solid ${on ? '#c9a257' : '#e8e1d7'}`, background: on ? 'rgba(212,175,55,0.14)' : 'rgba(255,255,255,0.7)', color: '#2a1a12' }}
           >
             <span style={{ fontSize: '1.4rem' }} aria-hidden>{emoji}</span>{' '}
             <strong>{title}</strong>

@@ -152,8 +152,8 @@ export default function RecipeEditor({ initial, categories, onCancel, onDone }: 
   const themes = categories.filter(c => c.kind === 'tema');
   const diets = categories.filter(c => c.kind === 'dieta');
   const chip = (on: boolean): React.CSSProperties => ({
-    padding: '0.4rem 0.75rem', borderRadius: 999, border: `1px solid ${on ? '#2e4432' : '#ddd'}`, background: on ? '#2e4432' : '#fff',
-    color: on ? '#fff' : '#3c2a21', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer',
+    padding: '0.4rem 0.75rem', borderRadius: 999, border: `1px solid ${on ? '#1e5d54' : '#ddd'}`, background: on ? '#1e5d54' : '#fff',
+    color: on ? '#fff' : '#2a1a12', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer',
   });
   const row: React.CSSProperties = { display: 'grid', gap: '0.8rem', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' };
   const sec = sections[lang];
@@ -276,7 +276,7 @@ export default function RecipeEditor({ initial, categories, onCancel, onDone }: 
 
         <h3 className="bx-h" style={{ marginBottom: 0 }}>🔒 A receita (só quem tem acesso vê)</h3>
         {sec.map((s, i) => (
-          <div key={i} style={{ border: '1px dashed #d4af37', borderRadius: 14, padding: '1rem', display: 'grid', gap: '0.7rem' }}>
+          <div key={i} style={{ border: '1px dashed #c9a257', borderRadius: 14, padding: '1rem', display: 'grid', gap: '0.7rem' }}>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'end' }}>
               <label className="bx-field" style={{ flex: 1 }}><span>Parte {i + 1} (ex.: Base, Creme, Cobertura; vazio se for uma parte só)</span>
                 <input className="bx-input" value={s.name} onChange={e => setSections(x => ({ ...x, [lang]: x[lang].map((y, j) => (j === i ? { ...y, name: e.target.value } : y)) }))} /></label>

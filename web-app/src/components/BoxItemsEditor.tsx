@@ -116,7 +116,7 @@ function MenuPicker({ inBox, onPick, onClose }: { inBox: Set<string>; onPick: (t
   const shown = (treats || []).filter(t => t.name.toLowerCase().includes(query.trim().toLowerCase()));
 
   return (
-    <div style={{ border: '1px solid #d4af37', borderRadius: '12px', background: '#fffdf6', padding: '1rem', marginTop: '0.9rem' }}>
+    <div style={{ border: '1px solid #c9a257', borderRadius: '12px', background: '#fffdf6', padding: '1rem', marginTop: '0.9rem' }}>
       <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap' }}>
         <strong style={{ color: '#2c3e50' }}>Menu de Eventos — escolha para repetir nesta caixa</strong>
         <button type="button" onClick={onClose} style={{ marginLeft: 'auto', border: 'none', background: '#ecf0f1', borderRadius: '6px', padding: '0.35rem 0.9rem', cursor: 'pointer' }}>Fechar</button>
@@ -146,7 +146,7 @@ function MenuPicker({ inBox, onPick, onClose }: { inBox: Set<string>; onPick: (t
                   {t.is_available ? 'No menu agora' : 'Fora do menu (anterior)'} · {(t.ingredients || []).length} ingredientes · {(t.contains || []).length} alérgenos
                 </span>
               </span>
-              <span style={{ color: added ? '#27ae60' : '#d4af37', fontWeight: 'bold', fontSize: '0.85rem' }}>{added ? 'Na caixa ✓' : '+ Adicionar'}</span>
+              <span style={{ color: added ? '#27ae60' : '#c9a257', fontWeight: 'bold', fontSize: '0.85rem' }}>{added ? 'Na caixa ✓' : '+ Adicionar'}</span>
             </button>
           );
         })}
@@ -197,7 +197,7 @@ export default function BoxItemsEditor({ items, onChange }: Props) {
         {items.map((item, idx) => {
           const isOpen = open === item.id;
           return (
-            <div key={item.id} style={{ border: isOpen ? '1px solid #d4af37' : '1px solid #dfe4ea', borderRadius: '12px', background: '#fff', overflow: 'hidden' }}>
+            <div key={item.id} style={{ border: isOpen ? '1px solid #c9a257' : '1px solid #dfe4ea', borderRadius: '12px', background: '#fff', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.7rem 1rem' }}>
                 <button type="button" onClick={() => setOpen(isOpen ? null : item.id)} aria-expanded={isOpen}
                   style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
@@ -211,7 +211,7 @@ export default function BoxItemsEditor({ items, onChange }: Props) {
                       {item.ingredients.length} ingredientes · {item.contains.length} alérgenos{item.treat_id ? ' · no Menu de Eventos' : ''}
                     </span>
                   </span>
-                  <span aria-hidden style={{ marginLeft: 'auto', color: '#d4af37', fontSize: '1.4rem', transform: isOpen ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s' }}>+</span>
+                  <span aria-hidden style={{ marginLeft: 'auto', color: '#c9a257', fontSize: '1.4rem', transform: isOpen ? 'rotate(45deg)' : 'none', transition: 'transform 0.2s' }}>+</span>
                 </button>
                 <div style={{ display: 'flex', gap: '0.25rem' }}>
                   <button type="button" onClick={() => move(idx, -1)} disabled={idx === 0} aria-label="Subir" style={{ width: '30px', height: '30px', borderRadius: '6px', border: '1px solid #dfe4ea', background: '#fff', cursor: 'pointer', opacity: idx === 0 ? 0.3 : 1 }}>↑</button>
@@ -227,7 +227,7 @@ export default function BoxItemsEditor({ items, onChange }: Props) {
 
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.9rem' }}>
         <button type="button" onClick={add}
-          style={{ flex: '1 1 220px', padding: '0.9rem', border: '2px dashed #d4af37', background: 'rgba(212,175,55,0.08)', color: '#8a6d1f', borderRadius: '12px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
+          style={{ flex: '1 1 220px', padding: '0.9rem', border: '2px dashed #c9a257', background: 'rgba(212,175,55,0.08)', color: '#8a6d1f', borderRadius: '12px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
           + Novo doce
         </button>
         <button type="button" onClick={() => setPickerOpen(o => !o)}

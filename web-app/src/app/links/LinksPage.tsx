@@ -40,8 +40,8 @@ const COPY: Record<Lang, { hi: string; sub: string; lead: Item; items: Item[] }>
 
 const tag = (href: string) => `${href}${href.includes('?') ? '&' : '?'}utm_source=instagram&utm_medium=bio&utm_campaign=links`;
 
-const COCOA = '#3c2a21';
-const GOLD = '#d4af37';
+const COCOA = '#2a1a12';
+const GOLD = '#c9a257';
 
 function Card({ item, big }: { item: Item; big?: boolean }) {
   return (
@@ -97,11 +97,11 @@ const CSS = `
 .lk { max-width: 520px; margin: 0 auto; padding: 24px 16px 48px; text-align: center; color: ${COCOA}; font-family: 'Outfit', Helvetica, Arial, sans-serif; }
 .lk-langs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: #f4ecdf; margin-bottom: 18px; }
 .lk-langs button { border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; font: inherit; font-size: 14px; color: ${COCOA}; cursor: pointer; }
-.lk-langs button.on { background: #fff; font-weight: 600; box-shadow: 0 1px 3px rgba(60,42,33,.15); }
+.lk-langs button.on { background: #fff; font-weight: 600; box-shadow: 0 1px 3px rgba(42,26,18,.15); }
 .lk-face { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid ${GOLD}; display: block; margin: 0 auto 12px; }
 .lk h1 { font-family: 'Yellowtail', cursive; font-weight: 400; font-size: 36px; margin: 0 0 6px; color: ${COCOA}; }
 .lk-sub { margin: 0 auto 22px; max-width: 380px; font-size: 16px; line-height: 1.5; color: #594a42; }
-.lk-card { display: flex; align-items: center; gap: 14px; text-align: left; text-decoration: none; color: ${COCOA}; background: #fff; border: 1px solid #eadfcd; border-radius: 16px; padding: 10px 14px 10px 10px; box-shadow: 0 2px 8px rgba(60,42,33,.06); }
+.lk-card { display: flex; align-items: center; gap: 14px; text-align: left; text-decoration: none; color: ${COCOA}; background: #fff; border: 1px solid #eadfcd; border-radius: 16px; padding: 10px 14px 10px 10px; box-shadow: 0 2px 8px rgba(42,26,18,.06); }
 .lk-card:active { transform: scale(.99); }
 .lk-img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex: 0 0 auto; background: #f4ecdf; }
 .lk-words { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }

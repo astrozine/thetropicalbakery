@@ -29,21 +29,21 @@ export default function BoxSizePicker({ value, onChange, priceOf, priceNote, ton
     <div className={`bsp bsp-${tone}`}>
       <style>{`
         .bsp-title { font-size: 1.05rem; font-weight: 700; margin: 0 0 0.7rem; }
-        .bsp-light .bsp-title { color: #3c2a21; }
-        .bsp-dark .bsp-title { color: #fdfaf3; }
+        .bsp-light .bsp-title { color: #2a1a12; }
+        .bsp-dark .bsp-title { color: #faf5ec; }
         .bsp-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
         .bsp-opt { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; min-height: 44px;
           padding: 0.9rem 0.4rem 0.8rem; border-radius: 16px; cursor: pointer; font: inherit; text-align: center;
           transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s, background 0.15s; }
-        .bsp-light .bsp-opt { background: #fdf7ee; border: 2px solid #e8e1d7; color: #3c2a21; }
-        .bsp-dark .bsp-opt { background: rgba(255,255,255,0.06); border: 2px solid rgba(212,175,55,0.35); color: #fdfaf3; }
+        .bsp-light .bsp-opt { background: #fdf7ee; border: 2px solid #e8e1d7; color: #2a1a12; }
+        .bsp-dark .bsp-opt { background: rgba(255,255,255,0.06); border: 2px solid rgba(212,175,55,0.35); color: #faf5ec; }
         .bsp-opt:hover { transform: translateY(-2px); }
-        .bsp-opt[aria-checked="true"] { border-color: #d4af37; box-shadow: 0 10px 24px rgba(212,175,55,0.28); }
+        .bsp-opt[aria-checked="true"] { border-color: #c9a257; box-shadow: 0 10px 24px rgba(212,175,55,0.28); }
         .bsp-light .bsp-opt[aria-checked="true"] { background: #fff8e6; }
         .bsp-dark .bsp-opt[aria-checked="true"] { background: rgba(212,175,55,0.16); }
-        .bsp-opt:focus-visible { outline: 3px solid #d4af37; outline-offset: 2px; }
+        .bsp-opt:focus-visible { outline: 3px solid #c9a257; outline-offset: 2px; }
         .bsp-dots { display: grid; grid-template-columns: repeat(var(--cols), 10px); gap: 4px; justify-content: center; min-height: 24px; align-content: center; }
-        .bsp-dot { width: 10px; height: 10px; border-radius: 50%; background: #d4af37; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15); }
+        .bsp-dot { width: 10px; height: 10px; border-radius: 50%; background: #c9a257; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15); }
         .bsp-dot-pick { background: transparent; border: 2px dashed #c9a43a; box-shadow: none; box-sizing: border-box; }
         .bsp-cap { font-size: 0.75rem; font-weight: 700; color: #a8862a; line-height: 1.2; }
         .bsp-dark .bsp-cap { color: #e8c766; }
@@ -51,7 +51,7 @@ export default function BoxSizePicker({ value, onChange, priceOf, priceNote, ton
         .bsp-word { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; opacity: 0.8; }
         .bsp-price { font-weight: 800; font-size: 1rem; }
         .bsp-note { font-size: 0.75rem; opacity: 0.75; margin-top: -0.25rem; }
-        .bsp-tick { position: absolute; top: -8px; right: -6px; width: 22px; height: 22px; border-radius: 50%; background: #d4af37; color: #fff;
+        .bsp-tick { position: absolute; top: -8px; right: -6px; width: 22px; height: 22px; border-radius: 50%; background: #c9a257; color: #fff;
           font-size: 0.75rem; font-weight: 900; display: flex; align-items: center; justify-content: center; }
         @media (prefers-reduced-motion: reduce) { .bsp-opt { transition: none; } .bsp-opt:hover { transform: none; } }
       `}</style>

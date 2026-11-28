@@ -42,7 +42,7 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
     ? <img src={avatarUrl} alt="" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
     : (
       <span style={{
-        width: '28px', height: '28px', borderRadius: '50%', background: '#d4af37', color: '#fff',
+        width: '28px', height: '28px', borderRadius: '50%', background: '#c9a257', color: '#fff',
         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700,
       }}>
         {(displayName[0] || '?').toUpperCase()}
@@ -54,7 +54,7 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
       <div style={{ padding: '0.75rem 0 0.5rem 0', borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
           {avatar}
-          <span className="notranslate" translate="no" style={{ color: '#3c2a21', fontWeight: 600 }}>{displayName}</span>
+          <span className="notranslate" translate="no" style={{ color: '#2a1a12', fontWeight: 600 }}>{displayName}</span>
         </div>
         <Link
           href="/minha-conta"
@@ -102,7 +102,7 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         {avatar}
         <span className="notranslate" translate="no" style={{
-          color: '#3c2a21', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px',
+          color: '#2a1a12', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px',
         }}>
           {displayName}
         </span>
@@ -111,7 +111,7 @@ export default function AccountMenu({ variant = 'desktop' }: { variant?: 'deskto
         <div style={{
           position: 'absolute', top: '100%', right: 0, background: 'rgba(253,250,243,0.95)',
           backdropFilter: 'blur(10px)', minWidth: '160px', padding: '0.5rem 0', borderRadius: '8px',
-          boxShadow: '0 10px 30px rgba(60,42,33,0.1)',
+          boxShadow: '0 10px 30px rgba(42,26,18,0.1)',
         }}>
           <Link
             href="/minha-conta"

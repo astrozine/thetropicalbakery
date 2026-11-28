@@ -70,8 +70,8 @@ export default function AdministradoresPage() {
   const input: React.CSSProperties = { width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid rgba(212,175,55,0.4)', background: 'white', fontSize: '1rem', color: '#594a42' };
 
   return (
-    <div className="fade-in" style={{ maxWidth: '800px', margin: '0 auto', color: '#3c2a21' }}>
-      <h1 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: '#d4af37' }}>Administradores</h1>
+    <div className="fade-in" style={{ maxWidth: '800px', margin: '0 auto', color: '#2a1a12' }}>
+      <h1 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: '#c9a257' }}>Administradores</h1>
       <p style={{ fontSize: '1.05rem', color: '#594a42', marginBottom: '2rem', lineHeight: 1.7 }}>
         Quem está nesta lista vê o item <strong>Administração</strong> no menu do site depois de entrar, e acessa todo o painel.
         A pessoa precisa entrar no site com exatamente o e-mail cadastrado aqui (Google, link por e-mail, etc.).

@@ -17,10 +17,10 @@ import type { PickableTreat } from '@/components/TreatPicker';
  */
 
 const inputStyle: React.CSSProperties = {
-  width: '100%', padding: '0.8rem 0.9rem', borderRadius: '12px', border: '1px solid rgba(60,42,33,0.18)',
-  background: '#fff', fontSize: '1rem', color: '#3c2a21', fontFamily: 'inherit',
+  width: '100%', padding: '0.8rem 0.9rem', borderRadius: '12px', border: '1px solid rgba(42,26,18,0.18)',
+  background: '#fff', fontSize: '1rem', color: '#2a1a12', fontFamily: 'inherit',
 };
-const labelStyle: React.CSSProperties = { display: 'block', marginBottom: '0.3rem', fontSize: '0.85rem', fontWeight: 700, color: '#3c2a21' };
+const labelStyle: React.CSSProperties = { display: 'block', marginBottom: '0.3rem', fontSize: '0.85rem', fontWeight: 700, color: '#2a1a12' };
 
 const btnStyle: React.CSSProperties = {
   display: 'block', width: '100%', textAlign: 'center', minHeight: '48px', padding: '0.8rem 1.2rem', borderRadius: '999px', border: 'none',
@@ -98,13 +98,13 @@ export function EventQuoteForm({ picks, withNote = false, submitLabel = 'Enviar 
     return (
       <div style={{ textAlign: 'center', padding: '0.5rem 0.25rem' }}>
         <p style={{ fontSize: '1.6rem', marginBottom: '0.25rem' }} aria-hidden>🧡</p>
-        <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: '#3c2a21', marginBottom: '0.4rem' }}>
+        <p style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: '#2a1a12', marginBottom: '0.4rem' }}>
           {done.saved ? 'Recebemos o seu pedido de orçamento!' : 'Quase lá!'}
         </p>
         <p style={{ color: '#594a42', lineHeight: 1.6, marginBottom: '1rem', fontSize: '0.95rem' }}>
           {done.saved ? 'A Dolly te responde pelo WhatsApp para montarmos tudo junto.' : 'Não conseguimos guardar aqui, mas o WhatsApp leva tudo o que você escolheu.'}
         </p>
-        <a href={done.url} target="_blank" rel="noopener noreferrer" style={{ ...btnStyle, background: '#d4af37', color: '#3c2a21' }}>Abrir o WhatsApp</a>
+        <a href={done.url} target="_blank" rel="noopener noreferrer" style={{ ...btnStyle, background: '#c9a257', color: '#2a1a12' }}>Abrir o WhatsApp</a>
       </div>
     );
   }
@@ -135,7 +135,7 @@ export function EventQuoteForm({ picks, withNote = false, submitLabel = 'Enviar 
           <textarea id={`${uid}-note`} rows={2} value={note} onChange={e => setNote(e.target.value)} placeholder="Tipo de evento, alergias dos convidados…" style={{ ...inputStyle, resize: 'vertical' }} />
         </div>
       )}
-      <button type="submit" disabled={sending} style={{ ...btnStyle, background: '#3c2a21', color: '#fdfaf3', opacity: sending ? 0.7 : 1, cursor: sending ? 'wait' : 'pointer' }}>{sending ? 'Enviando…' : submitLabel}</button>
+      <button type="submit" disabled={sending} style={{ ...btnStyle, background: '#2a1a12', color: '#faf5ec', opacity: sending ? 0.7 : 1, cursor: sending ? 'wait' : 'pointer' }}>{sending ? 'Enviando…' : submitLabel}</button>
     </form>
   );
 }
@@ -172,27 +172,27 @@ export default function EventOrderSheet({ picks, onClose }: { picks: PickableTre
   return (
     <div className="eo-overlay" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
       <style>{`
-        .eo-overlay { position: fixed; inset: 0; z-index: 100000; background: rgba(60,42,33,0.55); backdrop-filter: blur(3px);
+        .eo-overlay { position: fixed; inset: 0; z-index: 100000; background: rgba(42,26,18,0.55); backdrop-filter: blur(3px);
           display: flex; align-items: flex-end; justify-content: center; animation: eo-fade .2s ease-out; }
         .eo-sheet { width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; background: linear-gradient(170deg, #fffdf6 0%, #fdf1d6 100%);
-          border-radius: 26px 26px 0 0; padding: 1.1rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); color: #3c2a21;
+          border-radius: 26px 26px 0 0; padding: 1.1rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); color: #2a1a12;
           box-shadow: 0 -20px 50px rgba(0,0,0,0.3); animation: eo-up .28s cubic-bezier(.16,1,.3,1); }
         @media (min-width: 640px) { .eo-overlay { align-items: center; } .eo-sheet { border-radius: 26px; } }
-        .eo-grab { width: 44px; height: 5px; border-radius: 3px; background: rgba(60,42,33,0.2); margin: 0 auto 0.9rem; }
+        .eo-grab { width: 44px; height: 5px; border-radius: 3px; background: rgba(42,26,18,0.2); margin: 0 auto 0.9rem; }
         .eo-chips { display: flex; gap: 0.4rem; overflow-x: auto; padding: 0.15rem 0 0.6rem; margin: 0 -0.25rem 0.5rem; scrollbar-width: none; }
         .eo-chips::-webkit-scrollbar { display: none; }
         .eo-chip { flex: 0 0 auto; background: #fff; border: 1px solid rgba(212,175,55,0.5); border-radius: 999px; padding: 0.3rem 0.75rem; font-size: 0.82rem; font-weight: 600; white-space: nowrap; }
-        .eo-path { width: 100%; text-align: left; border: 2px solid #e8e1d7; background: #fff; border-radius: 18px; padding: 0.95rem 1.05rem; cursor: pointer; font-family: inherit; color: #3c2a21;
+        .eo-path { width: 100%; text-align: left; border: 2px solid #e8e1d7; background: #fff; border-radius: 18px; padding: 0.95rem 1.05rem; cursor: pointer; font-family: inherit; color: #2a1a12;
           display: flex; gap: 0.85rem; align-items: center; transition: border-color .18s, box-shadow .18s, transform .12s; }
-        .eo-path:hover { border-color: #d4af37; box-shadow: 0 8px 22px rgba(212,175,55,0.25); }
+        .eo-path:hover { border-color: #c9a257; box-shadow: 0 8px 22px rgba(212,175,55,0.25); }
         .eo-path:active { transform: scale(0.985); }
-        .eo-path[aria-expanded="true"] { border-color: #d4af37; box-shadow: 0 8px 22px rgba(212,175,55,0.3); }
+        .eo-path[aria-expanded="true"] { border-color: #c9a257; box-shadow: 0 8px 22px rgba(212,175,55,0.3); }
         .eo-ico { flex: 0 0 auto; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: #fdf1d6; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
         .eo-path b { display: block; font-size: 1.05rem; font-family: var(--font-heading); margin-bottom: 0.15rem; }
         .eo-path span.eo-sub { display: block; font-size: 0.85rem; line-height: 1.45; color: #594a42; }
-        .eo-go { margin-left: auto; font-size: 1.3rem; color: #a6832b; }
+        .eo-go { margin-left: auto; font-size: 1.3rem; color: #a8843f; }
         .eo-form { background: #fff; border: 1px solid #e8e1d7; border-radius: 18px; padding: 1rem; margin-top: 0.6rem; animation: eo-fade .2s ease-out; }
-        .eo-or { text-align: center; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: #a6832b; font-weight: 700; margin: 0.55rem 0; }
+        .eo-or { text-align: center; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: #a8843f; font-weight: 700; margin: 0.55rem 0; }
         @keyframes eo-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
         @keyframes eo-fade { from { opacity: 0; } to { opacity: 1; } }
         @media (prefers-reduced-motion: reduce) { .eo-overlay, .eo-sheet, .eo-form { animation: none; } }
@@ -201,7 +201,7 @@ export default function EventOrderSheet({ picks, onClose }: { picks: PickableTre
         <div className="eo-grab" aria-hidden />
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem' }}>
           <h2 id="eo-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', lineHeight: 1.15, margin: 0 }}>
-            Ótima escolha! <span style={{ color: '#a6832b' }}>{picks.length} {picks.length === 1 ? 'doce' : 'doces'}</span>
+            Ótima escolha! <span style={{ color: '#a8843f' }}>{picks.length} {picks.length === 1 ? 'doce' : 'doces'}</span>
           </h2>
           <button type="button" onClick={onClose} aria-label="Fechar" style={{ background: 'none', border: 'none', fontSize: '1.6rem', lineHeight: 1, cursor: 'pointer', color: '#7a6a61', padding: '0 0.25rem' }}>×</button>
         </div>

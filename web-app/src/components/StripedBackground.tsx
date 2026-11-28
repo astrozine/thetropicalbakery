@@ -34,16 +34,16 @@ interface StripedBackgroundProps {
 
 const TONES: Record<Tone, { a: string; b: string; foil: string; text: string }> = {
   dark: {
-    a: '#3c2a21', // deep cocoa
+    a: '#2a1a12', // deep cocoa
     b: '#33231b', // one shade down, so the banding is felt more than seen
     foil: 'rgba(212,175,55,0.38)',
-    text: '#fdfaf3',
+    text: '#faf5ec',
   },
   light: {
-    a: '#fdfaf3', // vintage cream
+    a: '#faf5ec', // vintage cream
     b: '#f5efe2', // warm sand
     foil: 'rgba(212,175,55,0.30)',
-    text: '#3c2a21',
+    text: '#2a1a12',
   },
 };
 
@@ -94,7 +94,7 @@ export default function StripedBackground({
               filter: 'grayscale(1) sepia(0.45) contrast(1.1)',
             }}
           />
-          <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'rgba(60,42,33,0.66)' }} />
+          <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'rgba(42,26,18,0.66)' }} />
         </>
       )}
       {/* A soft vignette so the stripes recede behind the text instead of
@@ -106,7 +106,7 @@ export default function StripedBackground({
           inset: 0,
           pointerEvents: 'none',
           background: tone === 'dark'
-            ? 'radial-gradient(ellipse at 50% 40%, rgba(60,42,33,0.35) 0%, rgba(60,42,33,0.78) 100%)'
+            ? 'radial-gradient(ellipse at 50% 40%, rgba(42,26,18,0.35) 0%, rgba(42,26,18,0.78) 100%)'
             : 'radial-gradient(ellipse at 50% 40%, rgba(253,250,243,0.55) 0%, rgba(253,250,243,0.88) 100%)',
         }}
       />

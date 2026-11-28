@@ -87,13 +87,13 @@ export default function MySubscription() {
           fill
           style={{ objectFit: 'cover' }}
         />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(60,42,33,0.1) 0%, rgba(60,42,33,0.85) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(42,26,18,0.1) 0%, rgba(42,26,18,0.85) 100%)' }} />
         <div style={{ position: 'absolute', bottom: '1rem', left: '1.5rem', right: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
             <p style={{ color: 'rgba(253,250,243,0.75)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.2rem' }}>
               Sua assinatura
             </p>
-            <h2 data-sign="🗓️" data-sign-dark style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: '#fdfaf3' }}>
+            <h2 data-sign="🗓️" data-sign-dark style={{ fontFamily: 'var(--font-heading)', fontSize: '1.6rem', color: '#faf5ec' }}>
               {sub.plan?.name || 'Caixa de Degustação'}
             </h2>
           </div>
@@ -109,7 +109,7 @@ export default function MySubscription() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.35)', borderRadius: '12px', padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
             <div style={{ fontSize: '1.8rem' }}>📦</div>
             <div>
-              <p style={{ fontWeight: 700, color: '#3c2a21', fontSize: '1rem' }}>
+              <p style={{ fontWeight: 700, color: '#2a1a12', fontSize: '1rem' }}>
                 {daysUntil(nextDelivery.delivery_date) === 0 ? 'Sua caixa chega hoje!' :
                  daysUntil(nextDelivery.delivery_date) === 1 ? 'Sua caixa chega amanhã!' :
                  `Sua próxima caixa chega em ${daysUntil(nextDelivery.delivery_date)} dias`}
@@ -144,14 +144,14 @@ export default function MySubscription() {
                     onClick={() => setSelected(isSelected ? null : d.delivery_date)}
                     style={{
                       flexShrink: 0, width: '68px', padding: '0.75rem 0.4rem', borderRadius: '12px',
-                      border: isNext ? '2px solid #d4af37' : '1px solid #e8e1d7',
+                      border: isNext ? '2px solid #c9a257' : '1px solid #e8e1d7',
                       background: isNext ? 'rgba(212,175,55,0.15)' : isPast ? '#f7f4ec' : '#fff',
                       opacity: isPast && d.status !== 'delivered' ? 0.6 : 1,
                       cursor: 'pointer', textAlign: 'center',
                     }}
                   >
                     <div style={{ fontSize: '0.75rem', color: '#a89a90', textTransform: 'uppercase' }}>{WEEKDAY[date.getDay()]}</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#3c2a21' }}>{date.getDate()}</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#2a1a12' }}>{date.getDate()}</div>
                     <div style={{ fontSize: '1rem' }}>{meta.icon}</div>
                   </button>
                 );
@@ -176,9 +176,9 @@ export default function MySubscription() {
 
         {/* Plan facts */}
         <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '1.5rem', fontSize: '0.9rem', color: '#594a42' }}>
-          <div><strong style={{ color: '#3c2a21' }}>{sub.boxes_per_week}x</strong> por semana</div>
-          <div>caixa de <strong style={{ color: '#3c2a21' }}>{sub.box_size || 4} doces</strong></div>
-          <div><strong style={{ color: '#3c2a21' }}>{formatBRL(sub.monthly_price || 0)}</strong>/mês</div>
+          <div><strong style={{ color: '#2a1a12' }}>{sub.boxes_per_week}x</strong> por semana</div>
+          <div>caixa de <strong style={{ color: '#2a1a12' }}>{sub.box_size || 4} doces</strong></div>
+          <div><strong style={{ color: '#2a1a12' }}>{formatBRL(sub.monthly_price || 0)}</strong>/mês</div>
           {activeDietary.length > 0 && (
             <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
               {activeDietary.map(f => (

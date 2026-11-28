@@ -323,7 +323,7 @@ export default function Agenda({ campaignId, values, diet }: Props) {
             const row = autos.find(a => a.id === def.id);
             if (!row) return null;
             return (
-              <div key={def.id} style={{ border: `1px solid ${row.enabled ? '#d4af37' : '#eef1f4'}`, background: row.enabled ? '#fffdf5' : '#fff', borderRadius: '10px', padding: '0.9rem 1.1rem' }}>
+              <div key={def.id} style={{ border: `1px solid ${row.enabled ? '#c9a257' : '#eef1f4'}`, background: row.enabled ? '#fffdf5' : '#fff', borderRadius: '10px', padding: '0.9rem 1.1rem' }}>
                 <div style={{ display: 'flex', gap: '0.9rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '1.3rem' }}>{def.emoji}</span>
                   <div style={{ flex: 1, minWidth: '240px' }}>

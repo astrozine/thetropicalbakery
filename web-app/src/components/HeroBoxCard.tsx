@@ -54,7 +54,7 @@ export default function HeroBoxCard({ photos, side, delayMs = 0, tag = 'Edição
         .hero-box-card {
           display: none; margin: 0; position: absolute; top: 50%; z-index: 1;
           width: clamp(210px, 19vw, 340px);
-          background: #fdfaf3; padding: clamp(8px, 0.8vw, 14px) clamp(8px, 0.8vw, 14px) 0; border-radius: 18px;
+          background: #faf5ec; padding: clamp(8px, 0.8vw, 14px) clamp(8px, 0.8vw, 14px) 0; border-radius: 18px;
           box-shadow: 0 30px 60px rgba(0,0,0,0.55), 0 8px 18px rgba(0,0,0,0.35);
           transition: transform .4s ease;
         }
@@ -62,10 +62,10 @@ export default function HeroBoxCard({ photos, side, delayMs = 0, tag = 'Edição
         .hero-box-card--right { right: max(1.5%, calc(50% - 860px)); transform: translateY(-46%) rotate(4deg); }
         .hero-box-card--left:hover  { transform: translateY(-50%) rotate(-2deg) scale(1.02); }
         .hero-box-card--right:hover { transform: translateY(-46%) rotate(2deg) scale(1.02); }
-        .hero-box-card__frame { position: relative; aspect-ratio: 3 / 4; border-radius: 10px; overflow: hidden; background: #3c2a21; }
+        .hero-box-card__frame { position: relative; aspect-ratio: 3 / 4; border-radius: 10px; overflow: hidden; background: #2a1a12; }
         .hero-box-card__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.2s ease; }
-        .hero-box-card figcaption { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0.7rem 0.5rem 0.9rem; color: #3c2a21; text-align: center; }
-        .hero-box-card__tag { font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: #a6832b; font-weight: 700; }
+        .hero-box-card figcaption { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0.7rem 0.5rem 0.9rem; color: #2a1a12; text-align: center; }
+        .hero-box-card__tag { font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: #a8843f; font-weight: 700; }
         .hero-box-card__name { font-family: var(--font-heading); font-size: 0.9rem; line-height: 1.25; }
         @media (min-width: 1360px) { .hero-box-card { display: block; } }
         @media (prefers-reduced-motion: reduce) { .hero-box-card, .hero-box-card__frame img { transition: none; } }
@@ -87,7 +87,7 @@ export function HeroBoxStrip({ photos, tag = 'Edição anterior' }: { photos: He
       ))}
       <style dangerouslySetInnerHTML={{ __html: `
         .hero-box-strip { display: flex; justify-content: center; gap: 0.9rem; margin: 0 auto 2rem; max-width: 460px; }
-        .hero-box-strip__item { flex: 1 1 0; background: #fdfaf3; padding: 6px; border-radius: 14px; box-shadow: 0 16px 32px rgba(0,0,0,0.5); }
+        .hero-box-strip__item { flex: 1 1 0; background: #faf5ec; padding: 6px; border-radius: 14px; box-shadow: 0 16px 32px rgba(0,0,0,0.5); }
         .hero-box-strip__item img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 9px; }
         @media (min-width: 1360px) { .hero-box-strip { display: none; } }
       ` }} />

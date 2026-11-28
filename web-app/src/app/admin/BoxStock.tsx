@@ -42,7 +42,7 @@ const UNDO_MS = 12000;
 const round = (size: number, bg: string, color: string): React.CSSProperties => ({
   width: size, height: size, flexShrink: 0, borderRadius: '50%', border: 'none', background: bg, color,
   fontSize: size > 50 ? '2rem' : '1.2rem', fontWeight: 700, lineHeight: 1, cursor: 'pointer',
-  display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 8px rgba(60,42,33,0.25)',
+  display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 8px rgba(42,26,18,0.25)',
   touchAction: 'manipulation',
 });
 
@@ -166,10 +166,10 @@ export default function BoxStock({ box, onChanged, compact }: Props) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(0.75rem, 4vw, 1.5rem)' }}>
         <button type="button" onClick={() => bump({ total: -1 })} disabled={left === 0}
           aria-label="Uma caixa a menos à venda"
-          style={{ ...round(64, left === 0 ? '#d8cfc0' : '#3c2a21', '#f4c542'), cursor: left === 0 ? 'not-allowed' : 'pointer' }}>−</button>
+          style={{ ...round(64, left === 0 ? '#d8cfc0' : '#2a1a12', '#f4c542'), cursor: left === 0 ? 'not-allowed' : 'pointer' }}>−</button>
 
         <div style={{ textAlign: 'center', minWidth: 0 }}>
-          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.8rem, 12vw, 3.6rem)', lineHeight: 1, color: soldOut ? '#c0392b' : '#3c2a21' }}>
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(2.8rem, 12vw, 3.6rem)', lineHeight: 1, color: soldOut ? '#c0392b' : '#2a1a12' }}>
             {left}
           </div>
           <div style={{ fontSize: '0.9rem', fontWeight: 700, color: soldOut ? '#c0392b' : '#8a6d1f', marginTop: '0.2rem' }}>
@@ -179,7 +179,7 @@ export default function BoxStock({ box, onChanged, compact }: Props) {
 
         <button type="button" onClick={() => bump({ total: 1 })}
           aria-label="Uma caixa a mais à venda"
-          style={round(64, '#3c2a21', '#f4c542')}>+</button>
+          style={round(64, '#2a1a12', '#f4c542')}>+</button>
       </div>
 
       {!compact && (

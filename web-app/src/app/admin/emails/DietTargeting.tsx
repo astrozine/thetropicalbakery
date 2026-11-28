@@ -33,7 +33,7 @@ interface Props {
   audience: DietContact[];
 }
 
-const chip = (on: boolean, n: number, color = '#d4af37'): React.CSSProperties => ({
+const chip = (on: boolean, n: number, color = '#c9a257'): React.CSSProperties => ({
   padding: '0.35rem 0.75rem', borderRadius: '999px', cursor: 'pointer', fontSize: '0.8rem',
   border: `1px solid ${on ? color : '#dfe4ea'}`,
   background: on ? color : '#fff',
@@ -227,7 +227,7 @@ export default function DietTargeting({ value, onChange, audience }: Props) {
       </div>
 
       {described && (
-        <div style={{ background: clash.conflicts ? '#fdf0e8' : '#f0faf4', border: `1px solid ${clash.conflicts ? '#f0c9ae' : '#b7e1c6'}`, borderRadius: '10px', padding: '0.85rem 1rem', lineHeight: 1.75, fontSize: '0.87rem', color: '#3c2a21' }}>
+        <div style={{ background: clash.conflicts ? '#fdf0e8' : '#f0faf4', border: `1px solid ${clash.conflicts ? '#f0c9ae' : '#b7e1c6'}`, borderRadius: '10px', padding: '0.85rem 1rem', lineHeight: 1.75, fontSize: '0.87rem', color: '#2a1a12' }}>
           Cada pessoa vai ler uma linha feita para ela:{' '}
           {clash.reassured > 0 && <><strong>{clash.reassured}</strong> recebem um “✅ conferimos, pode comer”. </>}
           {clash.traces > 0 && <><strong>{clash.traces}</strong> recebem um aviso de traços. </>}

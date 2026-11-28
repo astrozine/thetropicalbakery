@@ -27,7 +27,7 @@ export function CourseHero({ eyebrow, title, tagline, image, floating, price, ct
         <h1 className="crs-hero-title">{title}</h1>
         <p className="crs-hero-tagline">{tagline}</p>
         {/* The hours, where nobody can miss them (Andrew, 2026-11-15). */}
-        <p style={{ display: 'inline-block', margin: '0 auto 1.25rem', padding: '0.55rem 1rem', borderRadius: 999, background: 'rgba(253,250,243,0.95)', color: '#3c2a21', fontWeight: 800, fontSize: '0.95rem', lineHeight: 1.3 }}>
+        <p style={{ display: 'inline-block', margin: '0 auto 1.25rem', padding: '0.55rem 1rem', borderRadius: 999, background: 'rgba(253,250,243,0.95)', color: '#2a1a12', fontWeight: 800, fontSize: '0.95rem', lineHeight: 1.3 }}>
           🕑 Todos os dias · {WORKSHOP_START} às {parseInt(WORKSHOP_START, 10) + WORKSHOP_HOURS}h · {WORKSHOP_HOURS} horas
         </p>
         <div className="crs-hero-actions">

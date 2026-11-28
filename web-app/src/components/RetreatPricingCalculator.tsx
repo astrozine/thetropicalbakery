@@ -196,15 +196,15 @@ const chipStyle = (on: boolean, disabled = false): React.CSSProperties => ({
   padding: '0.55rem 1.1rem',
   borderRadius: '20px',
   border: '1px solid',
-  borderColor: on ? '#d4af37' : 'rgba(255,255,255,0.25)',
+  borderColor: on ? '#c9a257' : 'rgba(255,255,255,0.25)',
   background: on ? 'rgba(212,175,55,0.2)' : 'transparent',
-  color: on ? '#fdfaf3' : 'rgba(253,250,243,0.75)',
+  color: on ? '#faf5ec' : 'rgba(253,250,243,0.75)',
   fontWeight: on ? 700 : 500,
   fontSize: '0.9rem',
   cursor: disabled ? 'not-allowed' : 'pointer',
   opacity: disabled ? 0.35 : 1,
 });
-const stepLabel: React.CSSProperties = { fontSize: '0.75rem', fontWeight: 700, color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.6rem' };
+const stepLabel: React.CSSProperties = { fontSize: '0.75rem', fontWeight: 700, color: '#c9a257', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.6rem' };
 const soft: React.CSSProperties = { color: 'rgba(253,250,243,0.55)', fontWeight: 500, textTransform: 'none', letterSpacing: 0 };
 const line: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', gap: '1rem', color: 'rgba(253,250,243,0.85)', fontSize: '0.92rem', marginBottom: '0.6rem' };
 
@@ -329,7 +329,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
 
   return (
     <div style={{ maxWidth: '680px', margin: '0 auto', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(212,175,55,0.35)', borderRadius: '20px', padding: 'clamp(1.25rem, 4vw, 2.5rem)', backdropFilter: 'blur(6px)' }}>
-      <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', color: '#fdfaf3', marginBottom: '0.5rem', textAlign: 'center' }}>
+      <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', color: '#faf5ec', marginBottom: '0.5rem', textAlign: 'center' }}>
         {t.title}
       </h3>
       <p style={{ color: 'rgba(253,250,243,0.7)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '2rem', lineHeight: 1.7 }}>
@@ -348,7 +348,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
                 </button>
               ))}
             </div>
-            <a href="/cursos" style={{ display: 'inline-block', marginTop: '0.6rem', fontSize: '0.82rem', color: '#d4af37', textDecoration: 'underline' }}>
+            <a href="/cursos" style={{ display: 'inline-block', marginTop: '0.6rem', fontSize: '0.82rem', color: '#c9a257', textDecoration: 'underline' }}>
               {t.seeCourses}
             </a>
           </div>
@@ -389,7 +389,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
         <div>
           <p style={stepLabel}>{t.arrival} <span style={soft}>{checkIn ? `${prettyDate(checkIn)} → ${prettyDate(checkOut as string)}` : t.arrivalSoft}</span></p>
           <div style={{ background: 'rgba(0,0,0,0.18)', borderRadius: '14px', padding: '0.9rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem', color: '#fdfaf3' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem', color: '#faf5ec' }}>
               <button type="button" aria-label={t.prevMonth} disabled={monthOffset === 0} onClick={() => setMonthOffset(m => m - 1)} style={{ ...chipStyle(false, monthOffset === 0), padding: '0.3rem 0.8rem' }}>‹</button>
               <strong style={{ textTransform: 'capitalize' }}>{t.months[month]} {year}</strong>
               <button type="button" aria-label={t.nextMonth} disabled={monthOffset >= 14} onClick={() => setMonthOffset(m => m + 1)} style={{ ...chipStyle(false, monthOffset >= 14), padding: '0.3rem 0.8rem' }}>›</button>
@@ -407,9 +407,9 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
                     title={taken ? t.taken : ok ? t.arriveHere : t.noFit(nights)}
                     style={{
                       aspectRatio: '1', minHeight: '34px', borderRadius: '8px', fontSize: '0.85rem', border: '1px solid',
-                      borderColor: picked ? '#d4af37' : 'transparent',
-                      background: picked ? '#d4af37' : stay ? 'rgba(212,175,55,0.35)' : ok ? 'rgba(46,68,50,0.85)' : 'transparent',
-                      color: picked ? '#3c2a21' : ok || stay ? '#fdfaf3' : 'rgba(253,250,243,0.28)',
+                      borderColor: picked ? '#c9a257' : 'transparent',
+                      background: picked ? '#c9a257' : stay ? 'rgba(212,175,55,0.35)' : ok ? 'rgba(46,68,50,0.85)' : 'transparent',
+                      color: picked ? '#2a1a12' : ok || stay ? '#faf5ec' : 'rgba(253,250,243,0.28)',
                       textDecoration: taken ? 'line-through' : 'none',
                       fontWeight: picked || stay ? 800 : 500, cursor: ok ? 'pointer' : 'default',
                     }}>
@@ -438,7 +438,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
               <div key={d.day} style={{ display: 'grid', gridTemplateColumns: '2.2rem 1fr', gap: '0.6rem', alignItems: 'start', padding: '0.6rem 0.75rem', borderRadius: '10px', background: d.kind === 'class' ? 'rgba(212,175,55,0.14)' : 'rgba(0,0,0,0.15)' }}>
                 <span style={{ fontSize: '1.3rem', lineHeight: 1 }}>{d.emoji}</span>
                 <div>
-                  <div style={{ color: '#fdfaf3', fontWeight: 700, fontSize: '0.9rem' }}>
+                  <div style={{ color: '#faf5ec', fontWeight: 700, fontSize: '0.9rem' }}>
                     {t.day(d.day)}{d.date ? ` · ${prettyDate(d.date)}` : ''} · {d.title}
                   </div>
                   <div style={{ color: 'rgba(253,250,243,0.7)', fontSize: '0.82rem', lineHeight: 1.5 }}>{d.text}</div>
@@ -446,7 +446,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
               </div>
             ))}
             <div style={{ padding: '0.75rem', borderRadius: '10px', border: '1px dashed rgba(212,175,55,0.5)', color: 'rgba(253,250,243,0.8)', fontSize: '0.82rem', lineHeight: 1.6 }}>
-              <strong style={{ color: '#fdfaf3' }}>{t.rainTitle}</strong> {t.rainText} {rainPlanFor(locale).join(' · ')}.
+              <strong style={{ color: '#faf5ec' }}>{t.rainTitle}</strong> {t.rainText} {rainPlanFor(locale).join(' · ')}.
             </div>
           </div>
         )}
@@ -467,7 +467,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
             <span>{formatBRL((coursePrice[c.slug] ?? 0) * cappedGuests)}</span>
           </div>
         ))}
-        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '0.9rem', marginTop: '0.3rem', color: '#fdfaf3', fontWeight: 800, fontSize: '1.3rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '0.9rem', marginTop: '0.3rem', color: '#faf5ec', fontWeight: 800, fontSize: '1.3rem' }}>
           <span>Total</span>
           <span>{formatBRL(total)}</span>
         </div>
@@ -476,7 +476,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
             {foreignLine} <span style={{ opacity: 0.7 }}>{t.approx}</span>
           </div>
         )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d4af37', fontSize: '0.92rem', marginTop: '0.75rem', fontWeight: 700 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#c9a257', fontSize: '0.92rem', marginTop: '0.75rem', fontWeight: 700 }}>
           <span>{t.deposit(depositPct)}</span>
           <span>{formatBRL(deposit)}</span>
         </div>

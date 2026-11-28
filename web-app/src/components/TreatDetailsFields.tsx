@@ -22,7 +22,7 @@ export function Fold({ title, summary, chips, defaultOpen = false, children }: {
         onClick={() => setOpen(o => !o)}
         style={{ width: '100%', display: 'flex', alignItems: 'flex-start', gap: '0.6rem', padding: '0.55rem 0.8rem', background: open ? '#fdf7ee' : '#fff', border: 'none', cursor: 'pointer', textAlign: 'left' }}
       >
-        <span aria-hidden style={{ display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none', color: '#a6832b', flexShrink: 0, lineHeight: 1.5 }}>▸</span>
+        <span aria-hidden style={{ display: 'inline-block', transition: 'transform .15s', transform: open ? 'rotate(90deg)' : 'none', color: '#a8843f', flexShrink: 0, lineHeight: 1.5 }}>▸</span>
         <span style={{ flex: 1, minWidth: 0 }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#2c3e50', lineHeight: 1.5 }}>{title}</span>
@@ -131,7 +131,7 @@ export function SugarCaffeineFields({ sugars, caffeine, ingredients, onChange }:
 
   const pill = (on: boolean, refined = false): React.CSSProperties => ({
     textAlign: 'left', padding: '0.55rem 0.7rem', borderRadius: '10px', cursor: 'pointer', fontFamily: 'inherit', minHeight: '44px',
-    border: `1px solid ${on ? (refined ? '#d9894a' : '#d4af37') : '#dfe4ea'}`, background: on ? (refined ? '#fbeee2' : '#fdf6dd') : '#fff',
+    border: `1px solid ${on ? (refined ? '#d9894a' : '#c9a257') : '#dfe4ea'}`, background: on ? (refined ? '#fbeee2' : '#fdf6dd') : '#fff',
     color: on ? (refined ? '#8a4a17' : '#6b5214') : '#566573', fontWeight: on ? 700 : 500, fontSize: '0.85rem', lineHeight: 1.3,
   });
   const linkBtn: React.CSSProperties = { border: 'none', background: 'none', padding: 0, color: '#8a6d1f', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' };
@@ -229,7 +229,7 @@ export function IngredientsField({ ingredients, onChange }: { ingredients: strin
           placeholder="Digite um ingrediente e clique no +" style={fieldStyle}
         />
         <button type="button" onClick={add} aria-label="Adicionar ingrediente"
-          style={{ width: '48px', flexShrink: 0, borderRadius: '6px', border: 'none', background: '#d4af37', color: '#fff', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1 }}>+</button>
+          style={{ width: '48px', flexShrink: 0, borderRadius: '6px', border: 'none', background: '#c9a257', color: '#fff', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1 }}>+</button>
       </div>
       {ingredients.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.6rem' }}>
@@ -262,7 +262,7 @@ export function TreatTypeField({ value, onChange }: { value: string | null | und
               onClick={() => onChange(active ? null : t.id)}
               style={{
                 padding: '0.35rem 0.75rem', borderRadius: '20px', fontSize: '0.82rem', cursor: 'pointer',
-                border: `1px solid ${active ? '#d4af37' : '#dfe4ea'}`, background: active ? '#fdf6dd' : '#fff',
+                border: `1px solid ${active ? '#c9a257' : '#dfe4ea'}`, background: active ? '#fdf6dd' : '#fff',
                 color: active ? '#8a6d1f' : '#7f8c8d', fontWeight: active ? 700 : 500,
               }}
             >
@@ -307,7 +307,7 @@ export function EmojiField({ emoji, onChange }: { emoji: string; onChange: (e: s
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
         {TREAT_EMOJIS.map(e => (
           <button key={e} type="button" onClick={() => onChange(e)}
-            style={{ width: '34px', height: '34px', borderRadius: '8px', fontSize: '1.15rem', cursor: 'pointer', border: emoji === e ? '2px solid #d4af37' : '1px solid #dfe4ea', background: emoji === e ? '#fdf6dd' : '#fff' }}>
+            style={{ width: '34px', height: '34px', borderRadius: '8px', fontSize: '1.15rem', cursor: 'pointer', border: emoji === e ? '2px solid #c9a257' : '1px solid #dfe4ea', background: emoji === e ? '#fdf6dd' : '#fff' }}>
             {e}
           </button>
         ))}

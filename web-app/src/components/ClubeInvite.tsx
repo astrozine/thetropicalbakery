@@ -47,7 +47,7 @@ export function ClubeModal({ open, onClose }: { open: boolean; onClose: () => vo
     <div
       onClick={onClose}
       style={{
-        position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(60,42,33,0.45)',
+        position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(42,26,18,0.45)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
       }}
     >
@@ -58,7 +58,7 @@ export function ClubeModal({ open, onClose }: { open: boolean; onClose: () => vo
         onClick={e => e.stopPropagation()}
         style={{
           position: 'relative', width: '100%', maxWidth: '460px', maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto',
-          background: 'var(--color-background)', borderRadius: '20px', boxShadow: '0 20px 60px rgba(60,42,33,0.3)',
+          background: 'var(--color-background)', borderRadius: '20px', boxShadow: '0 20px 60px rgba(42,26,18,0.3)',
           padding: '1.6rem 1.4rem 1.2rem', color: '#594a42',
         }}
       >
@@ -83,7 +83,7 @@ export function ClubeModal({ open, onClose }: { open: boolean; onClose: () => vo
           {PERKS.map(p => (
             <li key={p.title} style={{ display: 'flex', gap: '0.7rem', alignItems: 'flex-start', lineHeight: 1.45, fontSize: '0.92rem' }}>
               <span aria-hidden style={{ fontSize: '1.3rem', lineHeight: 1.1 }}>{p.icon}</span>
-              <span><strong style={{ color: '#3c2a21' }}>{p.title}.</strong> {p.text}</span>
+              <span><strong style={{ color: '#2a1a12' }}>{p.title}.</strong> {p.text}</span>
             </li>
           ))}
         </ul>
@@ -117,8 +117,8 @@ export default function ClubeInvite({ variant = 'desktop' }: { variant?: 'deskto
           type="button"
           onClick={() => setOpen(true)}
           style={{
-            width: '100%', minHeight: '48px', border: '2px solid #3c2a21', borderRadius: '999px', background: '#fff',
-            color: '#3c2a21', fontWeight: 700, fontSize: '1rem', cursor: 'pointer',
+            width: '100%', minHeight: '48px', border: '2px solid #2a1a12', borderRadius: '999px', background: '#fff',
+            color: '#2a1a12', fontWeight: 700, fontSize: '1rem', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
           }}
         >
@@ -132,8 +132,8 @@ export default function ClubeInvite({ variant = 'desktop' }: { variant?: 'deskto
         onClick={() => setOpen(true)}
         title={shellText('Entrar ou criar conta', lang)}
         style={{
-          marginLeft: 'clamp(0.7rem, 1.1vw, 1.5rem)', padding: '0.5rem 1.1rem', border: 'none', borderRadius: '999px', background: '#d4af37',
-          color: '#3c2a21', fontWeight: 700, fontSize: 'clamp(0.74rem, 0.78vw, 0.9rem)', letterSpacing: '0.5px', textTransform: 'uppercase',
+          marginLeft: 'clamp(0.7rem, 1.1vw, 1.5rem)', padding: '0.5rem 1.1rem', border: 'none', borderRadius: '999px', background: '#c9a257',
+          color: '#2a1a12', fontWeight: 700, fontSize: 'clamp(0.74rem, 0.78vw, 0.9rem)', letterSpacing: '0.5px', textTransform: 'uppercase',
           cursor: 'pointer', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
           boxShadow: '0 4px 12px rgba(212,175,55,0.35)',
         }}

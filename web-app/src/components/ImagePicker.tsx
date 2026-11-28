@@ -20,7 +20,7 @@ export default function ImagePicker({ label, imageUrl, uploading, onChange }: Im
       <label
         style={{
           display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.85rem 1.1rem', maxWidth: '460px',
-          border: '2px dashed #d4af37', borderRadius: '14px', background: 'rgba(212,175,55,0.07)',
+          border: '2px dashed #c9a257', borderRadius: '14px', background: 'rgba(212,175,55,0.07)',
           cursor: uploading ? 'wait' : 'pointer',
         }}
       >

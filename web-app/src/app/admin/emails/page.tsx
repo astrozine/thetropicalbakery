@@ -55,7 +55,7 @@ function ScaledPreview({ html }: { html: string }) {
   // Shrunk, more of the e-mail fits in the same space, so let the frame be taller.
   const realHeight = scale < 1 ? 1300 : 640;
   return (
-    <div ref={box} style={{ width: '100%', height: realHeight * scale, overflow: 'hidden', borderRadius: '10px', border: '1px solid #e8e1d7', background: '#fdfaf3' }}>
+    <div ref={box} style={{ width: '100%', height: realHeight * scale, overflow: 'hidden', borderRadius: '10px', border: '1px solid #e8e1d7', background: '#faf5ec' }}>
       <iframe title="Prévia do e-mail" srcDoc={html} scrolling={scale < 1 ? 'no' : 'auto'}
         style={{ width: scale < 1 ? EMAIL_WIDTH : '100%', height: realHeight, border: 0, display: 'block', transform: `scale(${scale})`, transformOrigin: 'top left' }} />
     </div>
@@ -263,7 +263,7 @@ export default function AdminEmailsPage() {
         Escolha o tipo de e-mail, preencha, veja como vai chegar e envie. Cada pessoa só recebe a <strong>mesma</strong> mensagem
         uma vez — se você clicar em enviar de novo, só recebe quem ficou faltando.
       </p>
-      <a href="/admin/emails/todos" style={{ display: 'inline-block', marginBottom: '1.5rem', padding: '0.7rem 1.2rem', borderRadius: '10px', background: '#fdf6dd', border: '2px solid #d4af37', color: '#2c3e50', fontWeight: 'bold', textDecoration: 'none' }}>
+      <a href="/admin/emails/todos" style={{ display: 'inline-block', marginBottom: '1.5rem', padding: '0.7rem 1.2rem', borderRadius: '10px', background: '#fdf6dd', border: '2px solid #c9a257', color: '#2c3e50', fontWeight: 'bold', textDecoration: 'none' }}>
         👀 Ver todos os e-mails que o site manda (recibos, livro, receitas grátis…)
       </a>
 
@@ -303,7 +303,7 @@ export default function AdminEmailsPage() {
             return (
               <button key={c.id} type="button" onClick={() => setCampaignId(c.id)}
                 style={{ textAlign: 'left', padding: '0.85rem 1rem', borderRadius: '10px', cursor: 'pointer',
-                  border: on ? '2px solid #d4af37' : '1px solid #dfe4ea', background: on ? '#fdf6dd' : '#fff' }}>
+                  border: on ? '2px solid #c9a257' : '1px solid #dfe4ea', background: on ? '#fdf6dd' : '#fff' }}>
                 <span style={{ fontSize: '1.2rem' }}>{c.emoji}</span>
                 <strong style={{ display: 'block', color: '#2c3e50', margin: '0.3rem 0 0.2rem' }}>{c.name}</strong>
                 <span style={{ display: 'block', fontSize: '0.8rem', color: '#7f8c8d', lineHeight: 1.5 }}>{c.description}</span>
@@ -353,7 +353,7 @@ export default function AdminEmailsPage() {
             <button type="button" onClick={check} disabled={!!busy} style={{ ...dark, background: '#7f8c8d' }}>
               {busy === 'check' ? 'Conferindo…' : '👀 Ver quem vai receber'}
             </button>
-            <button type="button" onClick={sendReal} disabled={!!busy} style={{ ...dark, background: '#d4af37' }}>
+            <button type="button" onClick={sendReal} disabled={!!busy} style={{ ...dark, background: '#c9a257' }}>
               {busy === 'send' ? 'Enviando…' : '✉️ Enviar'}
             </button>
           </div>

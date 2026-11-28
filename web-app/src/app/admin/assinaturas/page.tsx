@@ -351,7 +351,7 @@ export default function SubscriptionsAdmin() {
                     {(restrictions.length > 0 || s.allergies) && (
                       <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                         {restrictions.map(t => (
-                          <span key={t} style={{ background: '#fdf7ee', color: '#d4af37', border: '1px solid #e8e1d7', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 'bold' }}>{t}</span>
+                          <span key={t} style={{ background: '#fdf7ee', color: '#c9a257', border: '1px solid #e8e1d7', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 'bold' }}>{t}</span>
                         ))}
                       </div>
                     )}
@@ -430,7 +430,7 @@ export default function SubscriptionsAdmin() {
           ) : (
             <>
               {/* The shopping brief */}
-              <div style={{ ...card, marginBottom: '1.5rem', borderLeft: '5px solid #d4af37' }}>
+              <div style={{ ...card, marginBottom: '1.5rem', borderLeft: '5px solid #c9a257' }}>
                 <h3 style={{ fontSize: '1.1rem', color: '#2c3e50', marginBottom: '1rem' }}>
                   Resumo da produção — {formatDate(rosterDate)}
                 </h3>

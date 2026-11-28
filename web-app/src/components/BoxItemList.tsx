@@ -104,18 +104,18 @@ export default function BoxItemList({ description, items, tone = 'dark' }: { des
         .bil-name { display: inline-block; font-family: var(--font-heading); font-size: 1.02rem; line-height: 1.2; letter-spacing: 0.02em;
           padding: 0.28rem 0.7rem 0.3rem; border-radius: 9px; transform: rotate(-1.2deg); max-width: 100%; overflow-wrap: anywhere; }
         .bil li:nth-child(even) .bil-name { transform: rotate(1deg); }
-        .bil-dark .bil-name { background: linear-gradient(135deg, #f4d675, #d4af37); color: #3c2a21; box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35); }
-        .bil-light .bil-name { background: #3c2a21; color: #f4d675; box-shadow: 0 4px 12px rgba(60, 42, 33, 0.18); }
+        .bil-dark .bil-name { background: linear-gradient(135deg, #e8c77e, #c9a257); color: #2a1a12; box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35); }
+        .bil-light .bil-name { background: #2a1a12; color: #e8c77e; box-shadow: 0 4px 12px rgba(42, 26, 18, 0.18); }
         .bil-desc { font-size: 0.95rem; }
         .bil-dark .bil-desc { color: rgba(253, 250, 243, 0.82); }
         .bil-flavors { display: flex; gap: 0.4rem; margin-top: 0.3rem; font-size: 1.2rem; line-height: 1.2; }
         .bil-dark .bil-intro { color: rgba(253, 250, 243, 0.9); }
         .bil-dark li { color: rgba(253, 250, 243, 0.96); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(244, 214, 117, 0.3); backdrop-filter: blur(6px); }
         .bil-dark li:hover { border-color: rgba(244, 214, 117, 0.7); }
-        .bil-dark .bil-star { background: rgba(244, 214, 117, 0.16); color: #f4d675; text-shadow: 0 0 12px rgba(244, 214, 117, 0.9); }
+        .bil-dark .bil-star { background: rgba(244, 214, 117, 0.16); color: #e8c77e; text-shadow: 0 0 12px rgba(244, 214, 117, 0.9); }
         .bil-light .bil-intro { color: #594a42; }
         .bil-light li { color: #594a42; background: #fffaf0; border: 1px solid #f0e2bf; }
-        .bil-light li:hover { border-color: #d4af37; }
+        .bil-light li:hover { border-color: #c9a257; }
         .bil-light .bil-star { background: #fdf1d6; color: #d4a017; text-shadow: 0 0 10px rgba(212, 175, 55, 0.55); }
         @keyframes bil-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
         @keyframes bil-twinkle { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.18) rotate(18deg); } }

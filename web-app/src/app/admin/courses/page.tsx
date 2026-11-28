@@ -142,7 +142,7 @@ export default function CoursesAdmin() {
 
       {/* Editor Form */}
       <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', maxWidth: '820px' }}>
-        <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#3c2a21' }}>
+        <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#2a1a12' }}>
           {editingId ? 'Editar Curso' : 'Adicionar Novo Curso'}
         </h2>
         
@@ -208,7 +208,7 @@ export default function CoursesAdmin() {
           </div>
 
           <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <button type="submit" style={{ padding: '0.8rem 2rem', background: '#d4af37', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+            <button type="submit" style={{ padding: '0.8rem 2rem', background: '#c9a257', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
               {editingId ? 'Salvar Alterações' : 'Adicionar Curso'}
             </button>
             {editingId && (
@@ -223,12 +223,12 @@ export default function CoursesAdmin() {
 
       {/* Courses: a slim column beside the form, one compact row per course */}
       <aside className="courses-column" aria-label="Cursos cadastrados">
-        <h2 style={{ fontSize: '1.05rem', color: '#3c2a21', margin: '0 0 1rem' }}>
+        <h2 style={{ fontSize: '1.05rem', color: '#2a1a12', margin: '0 0 1rem' }}>
           Cursos cadastrados <span style={{ color: '#95a5a6', fontWeight: 500 }}>({courses.length})</span>
         </h2>
         <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}>
           {courses.map(course => (
-            <div key={course.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.06)', padding: '0.75rem', outline: editingId === course.id ? '2px solid #d4af37' : 'none' }}>
+            <div key={course.id} style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.06)', padding: '0.75rem', outline: editingId === course.id ? '2px solid #c9a257' : 'none' }}>
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                 <div style={{ position: 'relative', width: '76px', height: '76px', flexShrink: 0, borderRadius: '8px', overflow: 'hidden', background: '#f5f6fa', opacity: course.is_active ? 1 : 0.55, filter: course.is_active ? undefined : 'grayscale(0.6)' }}>
                   {course.image_url ? (
@@ -239,7 +239,7 @@ export default function CoursesAdmin() {
                 </div>
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <h3 style={{ fontSize: '0.98rem', margin: '0 0 0.2rem', color: '#2c3e50', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{course.title}</h3>
-                  <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '1rem', margin: 0 }}>
+                  <p style={{ color: '#c9a257', fontWeight: 'bold', fontSize: '1rem', margin: 0 }}>
                     R$ {course.price.toFixed(2).replace('.', ',')}
                     {!course.is_active && (
                       <span style={{ marginLeft: '0.5rem', background: '#9a5b00', color: 'white', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold', verticalAlign: 'middle' }}>🙈 Escondido</span>

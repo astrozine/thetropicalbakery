@@ -9,9 +9,9 @@ const chipStyle = (on: boolean): React.CSSProperties => ({
   padding: '0.55rem 1.1rem',
   borderRadius: '20px',
   border: '1px solid',
-  borderColor: on ? '#d4af37' : '#e8e1d7',
+  borderColor: on ? '#c9a257' : '#e8e1d7',
   background: on ? 'rgba(212,175,55,0.15)' : 'transparent',
-  color: on ? '#3c2a21' : '#7a6a61',
+  color: on ? '#2a1a12' : '#7a6a61',
   fontWeight: on ? 700 : 500,
   fontSize: '0.9rem',
   cursor: 'pointer',
@@ -66,7 +66,7 @@ export default function PayEstimator() {
         <p style={{ fontSize: '0.78rem', color: '#7a6a61', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.35rem' }}>
           Estimativa por mês
         </p>
-        <p style={{ fontSize: 'clamp(1.8rem, 5vw, 2.4rem)', fontWeight: 800, color: '#3c2a21', fontFamily: 'var(--font-heading)' }}>
+        <p style={{ fontSize: 'clamp(1.8rem, 5vw, 2.4rem)', fontWeight: 800, color: '#2a1a12', fontFamily: 'var(--font-heading)' }}>
           {formatBRL(est.monthlyPay)}
         </p>
         <p style={{ fontSize: '0.82rem', color: '#7a6a61', marginTop: '0.35rem' }}>
@@ -75,17 +75,17 @@ export default function PayEstimator() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
-        <div style={{ padding: '1rem', background: '#fdfaf3', borderRadius: '10px' }}>
+        <div style={{ padding: '1rem', background: '#faf5ec', borderRadius: '10px' }}>
           <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginBottom: '0.3rem' }}>13º salário (proporcional/mês)</p>
-          <p style={{ fontWeight: 700, color: '#3c2a21' }}>{formatBRL(est.thirteenthPerMonth)}</p>
+          <p style={{ fontWeight: 700, color: '#2a1a12' }}>{formatBRL(est.thirteenthPerMonth)}</p>
         </div>
-        <div style={{ padding: '1rem', background: '#fdfaf3', borderRadius: '10px' }}>
+        <div style={{ padding: '1rem', background: '#faf5ec', borderRadius: '10px' }}>
           <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginBottom: '0.3rem' }}>Férias + 1/3 (proporcional/mês)</p>
-          <p style={{ fontWeight: 700, color: '#3c2a21' }}>{formatBRL(est.vacationPerMonth)}</p>
+          <p style={{ fontWeight: 700, color: '#2a1a12' }}>{formatBRL(est.vacationPerMonth)}</p>
         </div>
-        <div style={{ padding: '1rem', background: '#fdfaf3', borderRadius: '10px' }}>
+        <div style={{ padding: '1rem', background: '#faf5ec', borderRadius: '10px' }}>
           <p style={{ fontSize: '0.75rem', color: '#7a6a61', marginBottom: '0.3rem' }}>FGTS depositado/mês</p>
-          <p style={{ fontWeight: 700, color: '#3c2a21' }}>{formatBRL(est.fgtsPerMonth)}</p>
+          <p style={{ fontWeight: 700, color: '#2a1a12' }}>{formatBRL(est.fgtsPerMonth)}</p>
         </div>
       </div>
 

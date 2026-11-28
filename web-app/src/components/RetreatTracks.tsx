@@ -152,10 +152,10 @@ export default function RetreatTracks({ onInquire, locale = 'pt' }: Props) {
     <section style={{ background: '#f5efe2', padding: 'clamp(2.25rem, 8vw, 7rem) clamp(1rem, 4vw, 2rem)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <span style={{ color: '#a6832b', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '1rem' }}>
+          <span style={{ color: '#a8843f', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '1rem' }}>
             {c.eyebrow}
           </span>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: '#3c2a21', lineHeight: 1.15, marginBottom: '1.25rem' }}>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: '#2a1a12', lineHeight: 1.15, marginBottom: '1.25rem' }}>
             {c.title}
           </h2>
           <p style={{ color: '#594a42', fontSize: '1.08rem', lineHeight: 1.85, maxWidth: '700px', margin: '0 auto' }}>
@@ -165,16 +165,16 @@ export default function RetreatTracks({ onInquire, locale = 'pt' }: Props) {
 
         <div className="tb-rail" style={{ display: 'grid', gap: '1.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}>
           {c.tracks.map(t => (
-            <div key={t.title} style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(60,42,33,0.08)', display: 'flex', flexDirection: 'column' }}>
+            <div key={t.title} style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(42,26,18,0.08)', display: 'flex', flexDirection: 'column' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={optimizedSrc(t.photo, 750)} alt="" loading="lazy" decoding="async" style={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block' }} />
               <div style={{ padding: '1.6rem 1.5rem 1.75rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <h3 style={{ fontSize: '1.4rem', color: '#3c2a21', marginBottom: '0.5rem' }}>{t.title}</h3>
+                <h3 style={{ fontSize: '1.4rem', color: '#2a1a12', marginBottom: '0.5rem' }}>{t.title}</h3>
                 <p style={{ color: '#7a6a61', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: '1.1rem' }}>{t.intro}</p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.5rem', flex: 1 }}>
                   {t.items.map(item => (
                     <li key={item} style={{ display: 'flex', gap: '0.6rem', color: '#594a42', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: '0.55rem' }}>
-                      <span style={{ color: '#d4af37', flexShrink: 0 }}>✦</span>{item}
+                      <span style={{ color: '#c9a257', flexShrink: 0 }}>✦</span>{item}
                     </li>
                   ))}
                 </ul>

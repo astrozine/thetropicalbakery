@@ -134,7 +134,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         />
         {/* On phones the badge sits INSIDE the photo: hanging 10px past its edge made the whole page 2px wider than the screen. */}
         <style dangerouslySetInnerHTML={{ __html: '.box-price-badge{top:-10px;right:-10px}@media (max-width:767px){.box-price-badge{top:8px;right:8px}}' }} />
-        <div className="box-price-badge" style={{ position: 'absolute', background: '#d4af37', color: '#fff', borderRadius: '50%', fontWeight: 'bold', fontSize: '1.1rem', width: '68px', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(212,175,55,0.4)', transform: 'rotate(15deg)' }}>
+        <div className="box-price-badge" style={{ position: 'absolute', background: '#c9a257', color: '#fff', borderRadius: '50%', fontWeight: 'bold', fontSize: '1.1rem', width: '68px', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(212,175,55,0.4)', transform: 'rotate(15deg)' }}>
           R${Math.round(unit)}
         </div>
       </div>
@@ -142,7 +142,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
       {/* Order details */}
       <div style={{ flex: '1 1 380px', minWidth: '260px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         <div>
-          <h2 data-sign="🛒" style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#3c2a21', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '0.75rem' }}>{presale ? 'Encomende Sua Caixa' : 'Peça Sua Caixa'}</h2>
+          <h2 data-sign="🛒" style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)', color: '#2a1a12', fontFamily: 'var(--font-heading)', lineHeight: 1.1, marginBottom: '0.75rem' }}>{presale ? 'Encomende Sua Caixa' : 'Peça Sua Caixa'}</h2>
           {presale ? (
             <p style={{ fontSize: '1rem', color: '#594a42', lineHeight: 1.6 }}>
               Feita sob encomenda: a Dolly assa só as caixas que foram pedidas, então a sua sai do forno
@@ -158,7 +158,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         </div>
 
         {sale && sale.state !== 'open' ? (
-          <div style={{ padding: '1.5rem', background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '16px', color: '#3c2a21', lineHeight: 1.7 }}>
+          <div style={{ padding: '1.5rem', background: '#fdf7ee', border: '1px solid #e8e1d7', borderRadius: '16px', color: '#2a1a12', lineHeight: 1.7 }}>
             <p style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.4rem' }}>
               {sale.state === 'soldout' ? (presale ? 'As vagas desta fornada acabaram 🧡' : 'Esta edição esgotou 🧡')
                 : sale.state === 'closed' && presale ? 'As encomendas desta fornada fecharam'
@@ -180,7 +180,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         ) : (
           <>
         <div>
-          <p style={{ fontSize: '0.75rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a6832b', fontWeight: 700, marginBottom: '0.6rem' }}>1 · Como você quer pegar sua caixa?</p>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a8843f', fontWeight: 700, marginBottom: '0.6rem' }}>1 · Como você quer pegar sua caixa?</p>
           <FulfillmentPicker value={fulfillment} onChange={setFulfillment} />
         </div>
 
@@ -191,7 +191,7 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
         </TreatFlank>
 
         {own && (
-          <div style={{ display: 'flex', gap: '0.9rem', alignItems: 'center', background: '#fff', border: '2px solid #d4af37', borderRadius: '16px', padding: '1rem 1.1rem', color: '#3c2a21' }}>
+          <div style={{ display: 'flex', gap: '0.9rem', alignItems: 'center', background: '#fff', border: '2px solid #c9a257', borderRadius: '16px', padding: '1rem 1.1rem', color: '#2a1a12' }}>
             <span style={{ fontSize: '1.8rem' }} aria-hidden>🎁</span>
             <span style={{ flex: 1, minWidth: 0, lineHeight: 1.45 }}>
               <strong style={{ display: 'block' }}>Caixa completa{treats.length ? `: os ${treats.length} doces desta edição` : ''}</strong>
@@ -218,16 +218,16 @@ export default function BoxOrder({ box, maxQuantity, sale, prices }: BoxOrderPro
           </div>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#3c2a21', background: '#fdf7ee', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#2a1a12', background: '#fdf7ee', padding: '1rem', borderRadius: '16px', border: '1px solid #e8e1d7', flexWrap: 'wrap' }}>
           <label style={{ fontSize: '1.1rem', fontWeight: 600, flex: 1, minWidth: '120px' }}>Quantas caixas:</label>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button type="button" onClick={() => changeQuantity(-1)} aria-label="Menos" style={{ width: '40px', height: '40px', borderRadius: '20px', border: 'none', background: '#fff', color: '#3c2a21', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 4px 10px rgba(0,0,0,0.08)' }}>-</button>
+            <button type="button" onClick={() => changeQuantity(-1)} aria-label="Menos" style={{ width: '40px', height: '40px', borderRadius: '20px', border: 'none', background: '#fff', color: '#2a1a12', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 4px 10px rgba(0,0,0,0.08)' }}>-</button>
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold', width: '25px', textAlign: 'center' }}>{quantity}</span>
-            <button type="button" onClick={() => changeQuantity(1)} aria-label="Mais" style={{ width: '40px', height: '40px', borderRadius: '20px', border: 'none', background: '#d4af37', color: '#fff', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 4px 10px rgba(212,175,55,0.3)' }}>+</button>
+            <button type="button" onClick={() => changeQuantity(1)} aria-label="Mais" style={{ width: '40px', height: '40px', borderRadius: '20px', border: 'none', background: '#c9a257', color: '#fff', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 4px 10px rgba(212,175,55,0.3)' }}>+</button>
           </div>
         </div>
 
-        <div style={{ fontSize: 'clamp(1.1rem, 3vw, 1.3rem)', color: '#3c2a21', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.5rem' }}>
+        <div style={{ fontSize: 'clamp(1.1rem, 3vw, 1.3rem)', color: '#2a1a12', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.5rem' }}>
           <span>{quantity}x {own ? wholeText : sizeText(size)} · {formatBRL(unit)}</span>
           <strong>{formatBRL(quantity * unit)}</strong>
         </div>

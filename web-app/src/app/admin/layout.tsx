@@ -264,7 +264,7 @@ export default function AdminLayout({
           )}
           <button type="button" onClick={() => setAccountOpen(o => !o)} aria-haspopup="menu" aria-expanded={accountOpen}
             style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.5rem 0.6rem', background: accountOpen ? 'rgba(255,255,255,0.1)' : 'transparent', border: 'none', borderRadius: '10px', cursor: 'pointer', color: '#fff', textAlign: 'left', fontFamily: 'inherit' }}>
-            <span aria-hidden style={{ width: '2rem', height: '2rem', borderRadius: '50%', background: '#f4c542', color: '#3c2a21', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0 }}>
+            <span aria-hidden style={{ width: '2rem', height: '2rem', borderRadius: '50%', background: '#f4c542', color: '#2a1a12', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0 }}>
               {(user?.email || '?')[0].toUpperCase()}
             </span>
             <span style={{ flex: 1, minWidth: 0, fontSize: '0.8rem', opacity: 0.85, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</span>
@@ -314,7 +314,7 @@ export default function AdminLayout({
 
           <Link href={NEW_BOX_PATH} aria-label="Nova caixa da semana" style={{
             justifySelf: 'center', marginTop: '-1.6rem', width: '60px', height: '60px', borderRadius: '50%', textDecoration: 'none',
-            background: 'linear-gradient(135deg, #f4c542, #e2a52a)', color: '#3c2a21', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'linear-gradient(135deg, #f4c542, #e2a52a)', color: '#2a1a12', display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '2.4rem', fontWeight: 300, lineHeight: 1, paddingBottom: '0.3rem', border: '4px solid #22323f', boxShadow: '0 6px 14px rgba(0,0,0,0.4)',
           }}>+</Link>
 

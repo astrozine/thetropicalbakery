@@ -256,7 +256,7 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
       : tone === 'status'
         ? { bg: '#eaf2fb', border: '#3b82c4', color: '#245d94' }
         : tone === 'type'
-          ? { bg: '#fdf6e3', border: '#d4af37', color: '#8a6d1f' }
+          ? { bg: '#fdf6e3', border: '#c9a257', color: '#8a6d1f' }
           : value.mode === 'free'
             ? { bg: '#eaf7ee', border: '#27ae60', color: '#1e6b3c' }
             : value.mode === 'may'
@@ -401,19 +401,19 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
   return (
     <>
       <style>{`
-        .trm-panel { background: #fff; border: 1px solid rgba(212,175,55,0.3); border-radius: 16px; box-shadow: 0 10px 28px rgba(60,42,33,0.09); margin-bottom: 1.5rem; overflow: hidden; }
+        .trm-panel { background: #fff; border: 1px solid rgba(212,175,55,0.3); border-radius: 16px; box-shadow: 0 10px 28px rgba(42,26,18,0.09); margin-bottom: 1.5rem; overflow: hidden; }
 
         /* ── Header: icon · title over the count · badge · caret. One tidy line each, no wrapping. ── */
         .trm-head { width: 100%; display: flex; align-items: center; gap: 0.75rem; padding: 0.9rem 1.05rem; border: none; cursor: pointer; text-align: left;
           background: linear-gradient(135deg, #6f4c39 0%, #8b6249 100%); font-family: inherit; transition: filter .15s; }
         .trm-head:hover { filter: brightness(1.08); }
-        .trm-head:focus-visible { outline: 2px solid #f4d675; outline-offset: -3px; }
+        .trm-head:focus-visible { outline: 2px solid #e8c77e; outline-offset: -3px; }
         .trm-head__icon { flex: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: rgba(255,255,255,0.16); font-size: 1rem; }
         .trm-head__text { flex: 1; min-width: 0; display: block; }
         .trm-head__text b { display: block; font-size: 0.98rem; font-weight: 800; color: #fff; line-height: 1.25; }
         .trm-head__text i { display: block; font-style: normal; font-size: 0.76rem; color: rgba(255,255,255,0.75); margin-top: 0.15rem; }
-        .trm-head__badge { flex: none; background: #f4d675; color: #3c2a21; border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.76rem; font-weight: 800; }
-        .trm-head__caret { flex: none; color: #f4d675; font-size: 0.9rem; transition: transform .18s; }
+        .trm-head__badge { flex: none; background: #e8c77e; color: #2a1a12; border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.76rem; font-weight: 800; }
+        .trm-head__caret { flex: none; color: #e8c77e; font-size: 0.9rem; transition: transform .18s; }
         .trm-head[data-open="true"] .trm-head__caret { transform: rotate(180deg); }
 
         .trm-body { padding: 1rem; display: grid; gap: 0.9rem; border-top: 1px solid #f2ece1; }
@@ -421,8 +421,8 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
         /* ── Search ── */
         .trm-search { position: relative; display: flex; align-items: center; }
         .trm-search__icon { position: absolute; left: 0.75rem; font-size: 0.85rem; opacity: 0.55; pointer-events: none; }
-        .trm-search input { width: 100%; min-height: 42px; padding: 0.6rem 2.2rem 0.6rem 2.25rem; border: 1px solid #e6ddcd; border-radius: 10px; font-size: 0.92rem; font-family: inherit; color: #3c2a21; background: #fffdf8; }
-        .trm-search input:focus { outline: none; border-color: #d4af37; box-shadow: 0 0 0 3px rgba(212,175,55,0.18); }
+        .trm-search input { width: 100%; min-height: 42px; padding: 0.6rem 2.2rem 0.6rem 2.25rem; border: 1px solid #e6ddcd; border-radius: 10px; font-size: 0.92rem; font-family: inherit; color: #2a1a12; background: #fffdf8; }
+        .trm-search input:focus { outline: none; border-color: #c9a257; box-shadow: 0 0 0 3px rgba(212,175,55,0.18); }
         .trm-search input::-webkit-search-cancel-button { display: none; }
         .trm-search__clear { position: absolute; right: 0.45rem; width: 28px; height: 28px; border: none; border-radius: 50%; background: #f1ece2; color: #6d5c50; cursor: pointer; font-size: 0.75rem; line-height: 1; }
 
@@ -430,8 +430,8 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
         .trm-modes { display: flex; padding: 3px; gap: 3px; background: #f5efe4; border-radius: 12px; }
         .trm-modes button { flex: 1; min-width: 0; min-height: 38px; padding: 0.45rem 0.35rem; border: none; border-radius: 9px; cursor: pointer;
           font-family: inherit; font-size: 0.82rem; font-weight: 700; line-height: 1.15; color: #7a6a5d; background: transparent; transition: background .15s, color .15s; }
-        .trm-modes button[data-on="true"] { background: #3c2a21; color: #fff; box-shadow: 0 2px 6px rgba(60,42,33,0.25); }
-        .trm-modes button:focus-visible { outline: 2px solid #d4af37; outline-offset: 1px; }
+        .trm-modes button[data-on="true"] { background: #2a1a12; color: #fff; box-shadow: 0 2px 6px rgba(42,26,18,0.25); }
+        .trm-modes button:focus-visible { outline: 2px solid #c9a257; outline-offset: 1px; }
         .trm-help { font-size: 0.78rem; color: #8a7a6b; line-height: 1.5; margin: 0.55rem 0 0; }
 
         /* ── What's on right now ── */
@@ -452,12 +452,12 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
         .trm-folder { border: 1px solid #f0e9dd; border-radius: 12px; background: #fff; overflow: hidden; }
         .trm-folder[data-open="true"] { border-color: rgba(212,175,55,0.45); }
         .trm-folder__btn { width: 100%; display: flex; align-items: center; gap: 0.6rem; min-height: 46px; padding: 0.6rem 0.8rem; border: none; cursor: pointer;
-          text-align: left; background: #fff; font-family: inherit; font-size: 0.9rem; font-weight: 700; color: #3c2a21; }
+          text-align: left; background: #fff; font-family: inherit; font-size: 0.9rem; font-weight: 700; color: #2a1a12; }
         .trm-folder[data-open="true"] .trm-folder__btn { background: #fdf8ef; }
-        .trm-folder__btn:focus-visible { outline: 2px solid #d4af37; outline-offset: -2px; }
+        .trm-folder__btn:focus-visible { outline: 2px solid #c9a257; outline-offset: -2px; }
         .trm-folder__icon { flex: none; font-size: 0.95rem; }
         .trm-folder__title { flex: 1; min-width: 0; }
-        .trm-folder__badge { flex: none; background: #d4af37; color: #fff; border-radius: 999px; padding: 0.05rem 0.5rem; font-size: 0.73rem; font-weight: 800; }
+        .trm-folder__badge { flex: none; background: #c9a257; color: #fff; border-radius: 999px; padding: 0.05rem 0.5rem; font-size: 0.73rem; font-weight: 800; }
         .trm-folder__caret { flex: none; color: #b99a3e; font-size: 0.75rem; transition: transform .18s; }
         .trm-folder[data-open="true"] .trm-folder__caret { transform: rotate(180deg); }
         .trm-folder__body { padding: 0.15rem 0.8rem 0.85rem; }
@@ -465,7 +465,7 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
         /* ── Phone sheet ── */
         .trm-fab { position: fixed; left: 50%; transform: translateX(-50%); z-index: 950; display: inline-flex; align-items: center; gap: .5rem;
           padding: .8rem 1.3rem; border: none; border-radius: 999px; background: linear-gradient(135deg, #7a5540, #93694f); color: #fff;
-          font-family: inherit; font-weight: 800; font-size: .95rem; box-shadow: 0 10px 28px rgba(60,42,33,.4); cursor: pointer; white-space: nowrap; }
+          font-family: inherit; font-weight: 800; font-size: .95rem; box-shadow: 0 10px 28px rgba(42,26,18,.4); cursor: pointer; white-space: nowrap; }
         .trm-fab-count { background: rgba(255,255,255,.22); border-radius: 999px; padding: .05rem .55rem; font-size: .78rem; font-weight: 700; }
         .trm-backdrop { position: fixed; inset: 0; z-index: 9990; background: rgba(0,0,0,.5); display: flex; align-items: flex-end; }
         .trm-sheet { width: 100%; max-height: 88vh; max-height: 88dvh; background: #fff; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; box-shadow: 0 -10px 40px rgba(0,0,0,.3); }
@@ -503,17 +503,17 @@ export default function TreatRefineMenu({ treats, value, onChange, shown, varian
               <div className="trm-sheet" role="dialog" aria-modal="true" aria-label={title} onClick={e => e.stopPropagation()}>
                 <div className="trm-sheet-head">
                   <div>
-                    <strong style={{ display: 'block', fontSize: '1.05rem', color: '#3c2a21' }}>🔎 {title}</strong>
+                    <strong style={{ display: 'block', fontSize: '1.05rem', color: '#2a1a12' }}>🔎 {title}</strong>
                     <span style={{ fontSize: '0.82rem', color: '#8a7a6b' }}>Mostrando {shown} de {treats.length} doces</span>
                   </div>
-                  <button type="button" aria-label="Fechar" onClick={() => setSheetOpen(false)} style={{ width: '40px', height: '40px', flexShrink: 0, borderRadius: '50%', border: 'none', background: '#f1ece2', fontSize: '1.2rem', cursor: 'pointer', color: '#3c2a21' }}>✕</button>
+                  <button type="button" aria-label="Fechar" onClick={() => setSheetOpen(false)} style={{ width: '40px', height: '40px', flexShrink: 0, borderRadius: '50%', border: 'none', background: '#f1ece2', fontSize: '1.2rem', cursor: 'pointer', color: '#2a1a12' }}>✕</button>
                 </div>
                 <div className="trm-sheet-body">{bodyContent}</div>
                 <div className="trm-sheet-foot">
                   {active > 0 && (
-                    <button type="button" onClick={clearAll} style={{ padding: '0.85rem 1.1rem', background: '#f1ece2', color: '#3c2a21', border: 'none', borderRadius: '10px', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer' }}>Limpar</button>
+                    <button type="button" onClick={clearAll} style={{ padding: '0.85rem 1.1rem', background: '#f1ece2', color: '#2a1a12', border: 'none', borderRadius: '10px', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer' }}>Limpar</button>
                   )}
-                  <button type="button" onClick={() => setSheetOpen(false)} style={{ flex: 1, padding: '0.85rem 1.1rem', background: '#3c2a21', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 800, fontFamily: 'inherit', fontSize: '1rem', cursor: 'pointer' }}>
+                  <button type="button" onClick={() => setSheetOpen(false)} style={{ flex: 1, padding: '0.85rem 1.1rem', background: '#2a1a12', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 800, fontFamily: 'inherit', fontSize: '1rem', cursor: 'pointer' }}>
                     Ver {shown} {shown === 1 ? 'doce' : 'doces'}
                   </button>
                 </div>

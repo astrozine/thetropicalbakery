@@ -66,11 +66,11 @@ export default function FormSideRails({ formWidth, rail, photos, children }: Pro
           .fsr-rail-inner { position: sticky; top: 7rem; display: grid; gap: 0.9rem; }
         }
         .fsr-card { background: rgba(255,255,255,0.75); border: 1px solid #efe4c8; border-radius: 16px; padding: 1rem 1.1rem; text-align: left; }
-        .fsr-card h3 { margin: 0 0 0.6rem; font-family: var(--font-body); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a6832b; font-weight: 700; }
+        .fsr-card h3 { margin: 0 0 0.6rem; font-family: var(--font-body); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a8843f; font-weight: 700; }
         .fsr-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
         .fsr-steps li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.86rem; line-height: 1.4; color: #594a42; }
-        .fsr-steps b { flex-shrink: 0; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: #d4af37; color: #3c2a21; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; }
-        .fsr-photo { position: absolute; margin: 0; background: #fff; padding: 7px 7px 0; border-radius: 12px; box-shadow: 0 12px 28px rgba(60,42,33,0.16); }
+        .fsr-steps b { flex-shrink: 0; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: #c9a257; color: #2a1a12; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; }
+        .fsr-photo { position: absolute; margin: 0; background: #fff; padding: 7px 7px 0; border-radius: 12px; box-shadow: 0 12px 28px rgba(42,26,18,0.16); }
         .fsr-photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
         .fsr-photo figcaption { padding: 0.35rem 0.2rem 0.5rem; font-size: 0.74rem; line-height: 1.25; text-align: center; color: #6b5a4e; }
         @media print { .fsr-rail, .fsr-photos { display: none !important; } }
