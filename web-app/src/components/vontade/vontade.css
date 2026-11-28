@@ -937,27 +937,27 @@ img.va-tabs__icon { width: 30px; height: 30px; object-fit: contain; filter: satu
 .va-hud__foe img { filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
 .is-ko .va-pow img { animation: va-flower 0.7s linear 0.2s; }
 @keyframes va-flower { to { transform: rotate(60deg); } }
-.va-pow b { color: #fff3dc; text-shadow: 0 3px 0 #2a1a12, 2px 0 0 #2a1a12, -2px 0 0 #2a1a12, 0 -2px 0 #2a1a12; font-family: 'Fraunces', Georgia, serif; }
+.va-pow b { color: #fff3dc; text-shadow: 0 3px 0 #2c2942, 2px 0 0 #2c2942, -2px 0 0 #2c2942, 0 -2px 0 #2c2942; font-family: 'Fraunces', Georgia, serif; }
 
 /* The bag: a soft guava character with the same ink line, little eyes and blush. */
 .va-bag__body {
-  border: 5px solid #2a1a12;
+  border: 5px solid #2c2942;
   background:
     radial-gradient(55% 35% at 32% 20%, rgba(255, 255, 255, 0.55), transparent 60%),
-    linear-gradient(100deg, #ffb3c4 0%, #ff8fab 45%, #f2708f 100%);
+    linear-gradient(100deg, #f9b5ca 0%, #f993b1 45%, #ec7597 100%);
   box-shadow: inset 0 -12px 0 rgba(194, 56, 79, 0.18), 0 10px 0 rgba(0, 0, 0, 0.25);
 }
-.va-bag__band { height: 12px; background: #e2c27a; border-block: 4px solid #2a1a12; box-shadow: none; }
+.va-bag__band { height: 12px; background: #e2c27a; border-block: 4px solid #2c2942; box-shadow: none; }
 .va-bag__band--top { top: 22px; }
-.va-bag strong { color: #fff3dc; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 2rem; text-shadow: 0 3px 0 #2a1a12, 2px 0 0 #2a1a12, -2px 0 0 #2a1a12; }
-.va-bag small { color: #2a1a12; }
-.va-bag__chain { background: repeating-linear-gradient(#2a1a12 0 4px, #e2c27a 4px 9px); }
+.va-bag strong { color: #fff3dc; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 2rem; text-shadow: 0 3px 0 #2c2942, 2px 0 0 #2c2942, -2px 0 0 #2c2942; }
+.va-bag small { color: #2c2942; }
+.va-bag__chain { background: repeating-linear-gradient(#2c2942 0 4px, #e2c27a 4px 9px); }
 .va-bag__face { position: relative; display: block; width: 64px; height: 26px; margin-bottom: 0.1rem; }
-.va-bag__face i { position: absolute; top: 2px; width: 10px; height: 13px; border-radius: 50%; background: #2a1a12; box-shadow: inset 3px 2px 0 -1px #fff; }
+.va-bag__face i { position: absolute; top: 2px; width: 10px; height: 13px; border-radius: 50%; background: #2c2942; box-shadow: inset 3px 2px 0 -1px #fff; }
 .va-bag__face i:first-child { left: 12px; }
 .va-bag__face i:nth-child(2) { right: 12px; }
-.va-bag__face b { position: absolute; left: 50%; top: 12px; width: 14px; height: 8px; margin-left: -7px; border: 3px solid #2a1a12; border-top: 0; border-radius: 0 0 10px 10px; }
-.va-bag__face::before, .va-bag__face::after { content: ''; position: absolute; top: 16px; width: 14px; height: 8px; border-radius: 50%; background: #ff5f86; opacity: 0.7; }
+.va-bag__face b { position: absolute; left: 50%; top: 12px; width: 14px; height: 8px; margin-left: -7px; border: 3px solid #2c2942; border-top: 0; border-radius: 0 0 10px 10px; }
+.va-bag__face::before, .va-bag__face::after { content: ''; position: absolute; top: 16px; width: 14px; height: 8px; border-radius: 50%; background: #f8659a; opacity: 0.7; }
 .va-bag__face::before { left: 0; }
 .va-bag__face::after { right: 0; }
 
@@ -983,3 +983,13 @@ img.va-tabs__icon { width: 30px; height: 30px; object-fit: contain; filter: satu
 .va-fighter--l { left: -4px; }
 .va-fighter--r { right: -4px; }
 .va-fighter__food { width: 88px; height: 88px; }
+/* v3 (Nijntje): eyes bigger, wider and low; a little x for the mouth. */
+.va-bag__face { width: 92px; height: 30px; margin-top: 0.2rem; }
+.va-bag__face i { top: 2px; width: 13px; height: 17px; box-shadow: inset 4px 3px 0 -2px #fff; background: #2c2942; }
+.va-bag__face i:first-child { left: 14px; }
+.va-bag__face i:nth-child(2) { right: 14px; }
+.va-bag__face b {
+  top: 12px; width: 12px; height: 12px; margin-left: -6px; border: 0; border-radius: 0;
+  background: linear-gradient(45deg, transparent 40%, #2c2942 40% 60%, transparent 60%), linear-gradient(-45deg, transparent 40%, #2c2942 40% 60%, transparent 60%);
+}
+.va-bag__face::before, .va-bag__face::after { top: 18px; width: 16px; }
