@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { SITE_URL, button, esc, paragraphs, type BuiltEmail, type LayoutOptions } from './layout';
 import { deliver } from './send';
 import { BOOK_OFFERS } from '@/lib/ebook';
-import { LANG_PATH, fill, type EbookLang } from '@/lib/ebookCopy';
+import { LANG_PATH, fill, isEbookLang, type EbookLang } from '@/lib/ebookCopy';
 import { FUNNEL, freePdf } from '@/lib/funnel';
 
 /**
@@ -186,15 +186,55 @@ export function freeRecipesEmail(o: { firstName: string; lang: EbookLang }, base
   return { messageKey: `${FUNNEL.source}:pdf`, subject: COPY[o.lang].subject, layout: freeRecipesLayout(o, base) };
 }
 
-export async function sendFreeRecipes(db: SupabaseClient, o: { email: string; firstName: string; lang: EbookLang }) {
+export const FREE_RECIPES_KEY = `${FUNNEL.source}:pdf`;
+
+/**
+ * The 2-recipes PDF e-mail, once per address. A refused send (Resend down for a moment) is tried once more
+ * right away; anything still missing is picked up by `resendMissingFreeRecipes` from the scheduler and the
+ * team alert, so a sign-up never silently goes without their recipes (Judy, 2026-11-28).
+ */
+export async function sendFreeRecipes(db: SupabaseClient, o: { email: string; firstName: string; lang: EbookLang }): Promise<'sent' | 'failed' | 'claimed' | 'skipped'> {
   const email = o.email.trim().toLowerCase();
-  if (!email.includes('@')) return;
+  if (!email.includes('@')) return 'skipped';
+  const once = () => deliver(db, {
+    email, token: '', messageKey: FREE_RECIPES_KEY, subject: COPY[o.lang].subject, topic: 'pedido', template: 'receitas-d0', transactional: true,
+    layout: freeRecipesLayout(o),
+  });
   try {
-    await deliver(db, {
-      email, token: '', messageKey: `${FUNNEL.source}:pdf`, subject: COPY[o.lang].subject, topic: 'pedido', template: 'receitas-d0', transactional: true,
-      layout: freeRecipesLayout(o),
-    });
+    let outcome = await once();
+    if (outcome === 'failed') {
+      await new Promise(r => setTimeout(r, 1500));
+      outcome = await once();
+    }
+    if (outcome === 'failed') console.error('free recipes e-mail failed twice for', email);
+    return outcome;
   } catch (err) {
     console.error('free recipes e-mail failed for', email, err);
+    return 'failed';
   }
+}
+
+/**
+ * Safety net: every free-recipes sign-up of the last `days` days whose address has no recipes e-mail on record
+ * gets it now. Safe to run any number of times (the send claims the address first). Returns who was sent.
+ */
+export async function resendMissingFreeRecipes(db: SupabaseClient, days = 7, max = 25): Promise<{ sent: string[]; failed: string[] }> {
+  const out = { sent: [] as string[], failed: [] as string[] };
+  const since = new Date(Date.now() - days * 86_400_000).toISOString();
+  const { data: leads, error } = await db.from('funnel_leads').select('email, first_name, lang, created_at')
+    .gte('created_at', since).order('created_at', { ascending: true }).limit(500);
+  if (error || !leads?.length) return out;
+  const { data: sends } = await db.from('email_sends').select('email').eq('message_key', FREE_RECIPES_KEY).limit(10000);
+  const have = new Set((sends || []).map(r => String(r.email || '').trim().toLowerCase()));
+  const seen = new Set<string>();
+  for (const l of leads as { email: string | null; first_name: string | null; lang: string | null }[]) {
+    const email = String(l.email || '').trim().toLowerCase();
+    if (!email.includes('@') || have.has(email) || seen.has(email)) continue;
+    seen.add(email);
+    if (out.sent.length + out.failed.length >= max) break;
+    const lang: EbookLang = isEbookLang(l.lang) ? l.lang : 'en';
+    const r = await sendFreeRecipes(db, { email, firstName: (l.first_name || '').trim().split(' ')[0], lang });
+    if (r === 'sent') out.sent.push(email); else if (r === 'failed') out.failed.push(email);
+  }
+  return out;
 }
