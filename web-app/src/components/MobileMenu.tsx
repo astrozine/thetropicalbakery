@@ -84,8 +84,8 @@ const COPY: Record<ShellLang, Copy> = {
 };
 
 const LANGS = [
-  { code: 'pt', name: 'Português' }, { code: 'en', name: 'English' }, { code: 'es', name: 'Español' },
-  { code: 'nl', name: 'Nederlands' }, { code: 'de', name: 'Deutsch' }, { code: 'fr', name: 'Français' }, { code: 'it', name: 'Italiano' },
+  { code: 'pt', flag: '🇧🇷', name: 'Português' }, { code: 'en', flag: '🇬🇧', name: 'English' }, { code: 'es', flag: '🇪🇸', name: 'Español' },
+  { code: 'nl', flag: '🇳🇱', name: 'Nederlands' }, { code: 'de', flag: '🇩🇪', name: 'Deutsch' }, { code: 'fr', flag: '🇫🇷', name: 'Français' }, { code: 'it', flag: '🇮🇹', name: 'Italiano' },
 ];
 
 const IMG = {
@@ -255,7 +255,7 @@ export default function MobileMenu({ open, onClose, lang, pageLang, currentLang,
             {LANGS.map(l => (
               <button key={l.code} type="button" className={currentLang === l.code ? 'is-on' : undefined}
                 aria-pressed={currentLang === l.code} onClick={() => { onClose(); onLanguage(l.code); }}>
-                {l.name}
+                <span className="mm-flag" aria-hidden>{l.flag}</span>{l.name}
               </button>
             ))}
           </div>
@@ -341,6 +341,7 @@ const MM_CSS = `
 .mm-list__go{margin-left:auto;color:#b5a596;font-size:1.25rem}
 .mm-langs{display:flex;flex-wrap:wrap;gap:0.45rem}
 .mm-langs button{border:1px solid rgba(42,26,18,0.14);background:#fff;color:#2a1a12;border-radius:999px;padding:0.55rem 0.9rem;font-size:0.9rem;cursor:pointer;min-height:40px}
+.mm-flag{margin-right:0.4rem;font-size:1.05em}
 .mm-langs button.is-on{background:#2a1a12;color:#e2c27a;border-color:#2a1a12;font-weight:700}
 .mm-account{margin-top:1.6rem;padding-top:1.1rem;border-top:1px solid rgba(201,162,87,0.3)}
 .mm-account__me{display:flex;align-items:center;gap:0.75rem;text-decoration:none;color:#2a1a12}

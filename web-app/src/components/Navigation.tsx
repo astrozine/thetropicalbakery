@@ -95,6 +95,8 @@ const BAG_BADGE: React.CSSProperties = {
 function BagIcon({ size = 22 }: { size?: number }) {
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>);
 }
+const LANG_FLAG: Record<string, string> = { pt: '🇧🇷', en: '🇬🇧', es: '🇪🇸', nl: '🇳🇱', de: '🇩🇪', fr: '🇫🇷', it: '🇮🇹' };
+
 function GlobeIcon({ size = 16 }: { size?: number }) {
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg>);
 }
@@ -484,19 +486,19 @@ export default function Navigation() {
             {isRetreatsDropdownOpen && (
               <div style={{ position: 'absolute', top: '100%', left: 0, background: 'rgba(253,250,243,0.95)', backdropFilter: 'blur(10px)', minWidth: '200px', padding: '1rem 0', borderRadius: '8px', boxShadow: '0 10px 30px rgba(42,26,18,0.1)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {[
-                  { code: 'pt', name: 'Português' },
-                  { code: 'en', name: 'English' },
-                  { code: 'es', name: 'Español' },
-                  { code: 'it', name: 'Italiano' },
-                  { code: 'fr', name: 'Français' },
-                  { code: 'de', name: 'Deutsch' },
-                  { code: 'nl', name: 'Nederlands' }
+                  { code: 'pt', flag: '🇧🇷', name: 'Português' },
+                  { code: 'en', flag: '🇬🇧', name: 'English' },
+                  { code: 'es', flag: '🇪🇸', name: 'Español' },
+                  { code: 'it', flag: '🇮🇹', name: 'Italiano' },
+                  { code: 'fr', flag: '🇫🇷', name: 'Français' },
+                  { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
+                  { code: 'nl', flag: '🇳🇱', name: 'Nederlands' }
                 ].map((lang) => (
                   <button 
                     key={lang.code} 
                     onClick={() => { changeLanguage(lang.code); setIsRetreatsDropdownOpen(false); }}
                     style={{ padding: '0.5rem 1.5rem', color: '#594a42', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', fontSize: '0.9rem', textTransform: 'uppercase' }}>
-                    {lang.name}
+                    <span aria-hidden style={{ marginRight: '0.5rem' }}>{lang.flag}</span>{lang.name}
                   </button>
                 ))}
               </div>
@@ -548,21 +550,21 @@ export default function Navigation() {
             <button type="button" onClick={() => setPhoneLangOpen(o => !o)} aria-label={langLabel} aria-expanded={phoneLangOpen}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2a1a12', minWidth: '44px', minHeight: '44px', padding: 0, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1px' }}>
               <GlobeIcon size={20} />
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.5px' }}>{(pageL !== 'pt' ? pageL : trL).toUpperCase()}</span>
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>{LANG_FLAG[pageL !== 'pt' ? pageL : trL] ?? ''} {(pageL !== 'pt' ? pageL : trL).toUpperCase()}</span>
             </button>
             {phoneLangOpen && (
               <>
                 <div onClick={() => setPhoneLangOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 1 }} />
                 <div role="menu" style={{ position: 'absolute', top: 'calc(100% + 10px)', right: '-60px', zIndex: 2, background: '#fdfaf3', borderRadius: '16px', boxShadow: '0 14px 40px rgba(42,26,18,0.22)', border: '1px solid rgba(201,162,87,0.35)', padding: '0.4rem', minWidth: '176px', display: 'grid' }}>
                   {[
-                    { code: 'pt', name: 'Português' }, { code: 'en', name: 'English' }, { code: 'es', name: 'Español' },
-                    { code: 'nl', name: 'Nederlands' }, { code: 'de', name: 'Deutsch' }, { code: 'fr', name: 'Français' }, { code: 'it', name: 'Italiano' },
+                    { code: 'pt', flag: '🇧🇷', name: 'Português' }, { code: 'en', flag: '🇬🇧', name: 'English' }, { code: 'es', flag: '🇪🇸', name: 'Español' },
+                    { code: 'nl', flag: '🇳🇱', name: 'Nederlands' }, { code: 'de', flag: '🇩🇪', name: 'Deutsch' }, { code: 'fr', flag: '🇫🇷', name: 'Français' }, { code: 'it', flag: '🇮🇹', name: 'Italiano' },
                   ].map(l => {
                     const on = (pageL !== 'pt' ? pageL : trL) === l.code;
                     return (
                       <button key={l.code} role="menuitem" type="button" onClick={() => { setPhoneLangOpen(false); changeLanguage(l.code); }}
                         style={{ textAlign: 'left', background: on ? 'rgba(201,162,87,0.16)' : 'none', border: 'none', borderRadius: '10px', cursor: 'pointer', padding: '0.7rem 0.9rem', fontSize: '1rem', color: '#2a1a12', fontWeight: on ? 700 : 400 }}>
-                        {l.name}
+                        <span aria-hidden style={{ marginRight: '0.5rem' }}>{l.flag}</span>{l.name}
                       </button>
                     );
                   })}
