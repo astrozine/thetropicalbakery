@@ -112,7 +112,7 @@ const ORANGE = '#ff4f0a';
 const COCOA = '#2a1a12';
 const PAPER = '#fdf7ec';
 const FONT = `'Outfit',Helvetica,Arial,sans-serif`;
-const HEAD = `'Bodoni Moda','Didot','Bodoni 72',Georgia,'Times New Roman',serif`;
+const HEAD = `'Fraunces',Georgia,'Times New Roman',serif`;
 const RECIPE_LOOK = [{ img: 'se-red.jpg', hex: '#e8364f' }, { img: 'se-caramel.jpg', hex: '#c9853c' }];
 
 /** The two free recipes side by side, like the cards on the landing page: photo, colour bar, FREE tag, name. */
