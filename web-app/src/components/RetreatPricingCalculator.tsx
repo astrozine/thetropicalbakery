@@ -436,7 +436,7 @@ export default function RetreatPricingCalculator({ whatsappNumber, locale = 'pt'
           <div style={{ marginTop: '0.75rem', display: 'grid', gap: '0.5rem' }}>
             {plan.map(d => (
               <div key={d.day} style={{ display: 'grid', gridTemplateColumns: '2.2rem 1fr', gap: '0.6rem', alignItems: 'start', padding: '0.6rem 0.75rem', borderRadius: '10px', background: d.kind === 'class' ? 'rgba(212,175,55,0.14)' : 'rgba(0,0,0,0.15)' }}>
-                <span style={{ fontSize: '1.3rem', lineHeight: 1 }}>{d.emoji}</span>
+                <span aria-hidden style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#c9a257', marginTop: '0.45rem', justifySelf: 'center' }} />
                 <div>
                   <div style={{ color: '#faf5ec', fontWeight: 700, fontSize: '0.9rem' }}>
                     {t.day(d.day)}{d.date ? ` · ${prettyDate(d.date)}` : ''} · {d.title}

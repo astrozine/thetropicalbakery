@@ -143,3 +143,42 @@
   .cx-others { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cx-acc-photo { height: 180px; }
 }
+
+/* ---- Brazilian luxury redesign (2026-11-28): Bodoni titles, square buttons, no emoji, Burle Marx photo beds
+   with a second gold contour. Layout and order unchanged. */
+.cx-eyebrow { font-weight: 600; letter-spacing: .22em; }
+.cx-h2 { font-weight: 500; font-size: clamp(1.6rem, 6vw, 2.4rem); }
+.cx-hero h1 { font-weight: 500; letter-spacing: -.01em; text-shadow: none; }
+.cx-hero .cx-eyebrow, .cx-magic .cx-eyebrow { color: #c9a257; }
+.cx-btn { border-radius: 0; font-weight: 600; font-size: .8rem; letter-spacing: .18em; text-transform: uppercase; min-height: 50px; padding: .7rem 1.5rem; }
+.cx-btn-gold { box-shadow: none; }
+.cx-btn-gold:hover { background: #e2c27a; }
+.cx-btn-sm { font-size: .72rem; padding: .5rem 1rem; }
+.cx-hero { background: #2a1a12; }
+.cx-hero-main { border: 0; border-radius: 9999px 9999px 14px 14px; aspect-ratio: 4 / 3.4; box-shadow: 0 0 0 4px #2a1a12, 0 0 0 6px #c9a257, 0 24px 50px rgba(0,0,0,.45); }
+.cx-hero-float { border: 0; box-shadow: 0 0 0 3px #2a1a12, 0 0 0 5px #faf5ec; }
+.cx-hero-float-0 { border-radius: 58% 42% 46% 54% / 44% 52% 48% 56%; }
+.cx-hero-float-1 { border-radius: 38% 62% 55% 45% / 55% 40% 60% 45%; }
+.cx-facts { gap: .35rem 1rem; }
+.cx-facts li, .cx-facts li.cx-fact-main { padding: 0; border: 0; border-radius: 0; background: none; color: #c9a257; font-size: .74rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
+.cx-facts li + li::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #ee8c9c; margin-right: 1rem; vertical-align: middle; }
+.cx-strip { background: #faf5ec; border-bottom: 0; }
+.cx-strip span { font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+.cx-strip span + span::before { content: ''; display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #c9a257; margin: 0 .7rem 0 .2rem; vertical-align: middle; }
+.cx-course { border-radius: 4px; }
+.cx-course-img { border-radius: 9999px 9999px 8px 8px; }
+.cx-course h3 { font-weight: 600; font-size: 1.2rem; }
+.cx-price { border-radius: 4px; }
+.cx-trick { border-radius: 4px; }
+.cx-trick-emoji, .cx-acc-emoji { display: none; }
+.cx-acc details { border-radius: 4px; }
+.cx-acc summary { font-family: var(--font-heading); font-weight: 600; font-size: 1.05rem; }
+.cx-leave { border-radius: 4px; }
+.cx-leave li::before { content: ''; top: .55em; width: 9px; height: 9px; border-radius: 50%; background: #c9a257; }
+.cx-photos img { border-radius: 9999px 9999px 8px 8px; }
+.cx-photos img:nth-child(even) { border-radius: 58% 42% 46% 54% / 44% 52% 48% 56%; }
+.cx-other { border-radius: 4px; }
+.cx-other-img { border-radius: 50%; }
+@media (min-width: 760px) {
+  .cx-course-img { border-radius: 0 0 9999px 9999px / 0 0 60px 60px; }
+}

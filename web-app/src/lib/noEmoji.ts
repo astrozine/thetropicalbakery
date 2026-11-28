@@ -3,7 +3,7 @@
  * (keys in shellCopy, older data) is passed through this on the way to the screen, so the stored text and
  * translation keys stay exactly as they are.
  */
-const EMOJI = /(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{23F3}\u{231B}\u{2190}-\u{21FF}](?:️|‍[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]️?)*)/gu;
+const EMOJI = /(?:[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{23F3}\u{231B}\u{2190}-\u{21FF}](?:️|‍[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]️?)*)/gu;
 
 export function noEmoji(s: string): string {
   return s.replace(EMOJI, '').replace(/\s{2,}/g, ' ').replace(/^\s+|\s+$/g, '');

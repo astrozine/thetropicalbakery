@@ -1,5 +1,6 @@
 'use client';
 
+import { noEmoji } from '@/lib/noEmoji';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ZoomableImage from '@/components/ZoomableImage';
@@ -51,10 +52,10 @@ export function CompactHero({ eyebrow, title, tagline, image, floating = [], cta
         <h1>{title}</h1>
         <p className="cx-hero-tag">{tagline}</p>
         <ul className="cx-facts">
-          <li className="cx-fact-main">🕑 Todos os dias · {WORKSHOP_START} às {endHour}</li>
-          <li>⏳ {WORKSHOP_HOURS} horas</li>
-          <li>📍 Itamambuca</li>
-          <li>💛 {WORKSHOP_PRICE_SHORT}</li>
+          <li className="cx-fact-main">Todos os dias · {WORKSHOP_START} às {endHour}</li>
+          <li>{WORKSHOP_HOURS} horas</li>
+          <li>Itamambuca</li>
+          <li>{WORKSHOP_PRICE_SHORT}</li>
         </ul>
         <div className="cx-hero-actions">
           <button type="button" onClick={onCta} className="cx-btn cx-btn-gold">{cta}</button>
@@ -79,7 +80,7 @@ export function PriceCard() {
 
 /* ------------------------------------------------------------------ one row of promises */
 export function PromiseStrip({ items }: { items: string[] }) {
-  return <div className="cx-strip">{items.map(t => <span key={t}>{t}</span>)}</div>;
+  return <div className="cx-strip">{items.map(t => <span key={t}>{noEmoji(t)}</span>)}</div>;
 }
 
 /* ------------------------------------------------------------------ Dolly's flavour tricks, small */
