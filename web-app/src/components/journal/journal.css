@@ -312,3 +312,29 @@
 .rj-more__foot { display: flex; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; align-items: baseline; margin-top: 0.35rem;
   font-size: 0.88rem; color: rgba(253, 250, 243, 0.7); align-self: end; }
 .rj-more__cta { color: #e7c75a; font-weight: 700; }
+
+/* ── Brazilian luxury pass (2026-11-28): Bodoni italic instead of the script, square buttons and tags,
+   emoji out of the chrome, Burle Marx beds on the photos. Only looks: no markup or data changed. ── */
+.rj-top { background: #2a1a12; }
+.rj-top__name em { font-family: var(--font-heading); font-style: italic; font-weight: 500; color: #ee8c9c; }
+.rj-top__kicker { color: #c9a257; }
+.rj-jump a > span[aria-hidden], .rj-how__sign { display: none; }
+.rj-jump a, .rj-pill, .rj-feat__cta, .rj-btn, .rj-chip, .rj-seg, .rj-select, .rj-code input, .rj-code button {
+  border-radius: 2px;
+}
+.rj-jump a, .rj-feat__cta, .rj-btn { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.74rem; font-weight: 600; }
+.rj-jump a { backdrop-filter: none; background: transparent; border-color: rgba(201, 162, 87, 0.5); }
+.rj-how { background: #2a1a12; }
+.rj-how__list b { color: #c9a257; text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.72rem; }
+.rj-tags span, .rj-badge, .rj-allergen { border-radius: 2px; }
+.rj-badge { letter-spacing: 0.14em; font-weight: 600; }
+.rj-feat { border-radius: 4px; }
+.rj-band--green { background: #1e5d54; }
+.rj-card__photo { border-radius: 6px; box-shadow: 0 0 0 3px var(--rj-paper), 0 0 0 4px rgba(201, 162, 87, 0.7); }
+.rj-grid > :nth-child(4n + 1) .rj-card__photo { border-radius: 999px 999px 6px 6px / 46% 46% 6px 6px; }
+.rj-grid > :nth-child(4n + 3) .rj-card__photo { border-radius: 6px 80px 6px 6px; }
+.rj-hero { border-radius: 999px 999px 6px 6px / 38% 38% 6px 6px; }
+.rj-book, .rj-recipe, .rj-lock, .rj-aside__box, .rj-empty { border-radius: 4px; }
+.rj-book__covers span, .rj-gallery span { border-radius: 4px; }
+.rj-book__covers span:first-child { border-radius: 999px 999px 4px 4px; }
+.rj-special li, .rj-note, .rj-search { border-radius: 4px; }

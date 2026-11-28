@@ -8,8 +8,8 @@ import { BRUNCH_CSS } from './brunchStyles';
 import { CIRCLE_PERKS, DEFAULT_INCLUDES, HOST, VENUE_KINDS, isUpcoming, type Availability, type BrunchEvent } from '@/lib/brunch';
 
 const WHO = [
-  '🥗 Nutricionistas', '🧘‍♀️ Professoras de yoga e pilates', '💆‍♀️ Terapeutas', '👩‍🍳 Chefs e confeiteiras',
-  '🌿 Naturopatas', '💪 Personal trainers', '🛍️ Empreendedoras do bem-estar', '✨ Quem quer entrar nesse mundo',
+  'Nutricionistas', 'Professoras de yoga e pilates', 'Terapeutas', 'Chefs e confeiteiras',
+  'Naturopatas', 'Personal trainers', 'Empreendedoras do bem-estar', 'Quem quer entrar nesse mundo',
 ];
 
 const MOMENTS = [
@@ -80,7 +80,7 @@ export default function BrunchLanding() {
             <a href="#como" className="bn-btn bn-btn--light">Como funciona</a>
           </div>
           <div className="bn-hero__proof">
-            <span>🎟️ Lugares limitados</span><span>⚡ Quem paga primeiro garante</span><span>💬 Grupo com a Dolly</span>
+            <span>Lugares limitados</span><span>Quem paga primeiro garante</span><span>Grupo com a Dolly</span>
           </div>
         </div>
       </section>
@@ -166,7 +166,7 @@ export default function BrunchLanding() {
         <div className="bn-wrap bn-host">
           <div className="bn-host__photo">
             <img src="/dolly/dolly-portrait.jpg" alt="Dolly, a confeiteira da The Tropical Bakery" />
-            <span className="bn-host__sig">Sua anfitriã ✨</span>
+            <span className="bn-host__sig">Sua anfitriã</span>
           </div>
           <div>
             <p className="bn-kicker" data-sign="👩‍🍳">Quem recebe</p>

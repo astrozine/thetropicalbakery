@@ -112,7 +112,8 @@ export default function B2BPageLayout({
         <div className="tb-rail" style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.75rem', marginBottom: 'clamp(2rem, 5vw, 4rem)' }}>
           {options.map((opt, i) => (
             <div key={i} className="liquid-glass-card" style={{ padding: 'clamp(1.4rem, 4vw, 2rem)', textAlign: 'center' }}>
-              <div style={{ fontSize: '2.4rem', marginBottom: '1rem' }}>{opt.icon}</div>
+              {/* A Bodoni numeral instead of the old emoji icon (2026-11-28). `icon` stays in the data, unused. */}
+              <div aria-hidden style={{ fontFamily: 'var(--font-heading)', fontStyle: 'italic', fontSize: '1.6rem', color: '#c9a257', marginBottom: '0.8rem', lineHeight: 1 }}>{String(i + 1).padStart(2, '0')}</div>
               <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', color: '#2a1a12', marginBottom: '0.75rem' }}>{opt.title}</h3>
               <p style={{ color: '#594a42', lineHeight: 1.7, fontSize: '0.98rem' }}>{opt.description}</p>
               {opt.note && <p style={{ marginTop: '1rem', color: '#8a6d1f', fontWeight: 700, fontSize: '0.95rem' }}>{opt.note}</p>}
