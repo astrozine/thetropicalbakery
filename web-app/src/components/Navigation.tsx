@@ -333,19 +333,25 @@ export default function Navigation() {
   useEffect(() => {
     let last = window.scrollY;
     let frame = 0;
+    let settle: ReturnType<typeof setTimeout> | undefined;
     const onScroll = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const y = window.scrollY;
-        const down = y > last;
-        // Never hide near the top, and ignore tiny jitters.
-        if (Math.abs(y - last) > 6) setTucked(down && y > 160);
-        setScrolled(y > 40);
-        last = y;
+        // Slim bar on/off with a wide gap: switching changes the header's height, which moves the page, which used
+        // to flip it straight back (the flicker Andrew saw on 2026-11-28).
+        setScrolled(prev => (prev ? y > 20 : y > 140));
+        if (Math.abs(y - last) > 6) {
+          // Hide while scrolling down; float back in as soon as the scrolling stops (Andrew, 2026-11-28).
+          setTucked(y > last && y > 160);
+          clearTimeout(settle);
+          settle = setTimeout(() => setTucked(false), 350);
+          last = y;
+        }
       });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', onScroll); };
+    return () => { cancelAnimationFrame(frame); clearTimeout(settle); window.removeEventListener('scroll', onScroll); };
   }, []);
   const [mobileLangOpen, setMobileLangOpen] = useState(false);
 
