@@ -920,3 +920,62 @@ body:has(.va-shell) .nav-actions > a { padding: 0.4rem 0.9rem !important; }
 }
 @keyframes va-star { 0% { opacity: 0; transform: translateY(0); } 25% { opacity: 1; } 100% { opacity: 0.85; transform: translateY(-38vh); } }
 @media (prefers-reduced-motion: reduce) { .va-night { display: none; } }
+
+/* ---------------------------------------------------------------- the kawaii set (Andrew, 2026-11-28)
+ * "Hello Kitty meets Rio glam Burle Marx, Murakami x Burle Marx": our own characters in public/vontade/kawaii/
+ * (round faces, blush, a dark ink outline, flat Burle Marx colours, smiling Murakami flowers) instead of emoji. */
+img.va-kw { display: block; object-fit: contain; filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.18)); }
+img.va-choice__emoji { width: 4.4rem; height: 4.4rem; margin: -0.3rem 0 auto -0.2rem; transition: transform 0.25s var(--va-bounce); }
+.va-choice:hover img.va-choice__emoji, .va-gcard:hover img.va-gcard__emoji { transform: rotate(-6deg) scale(1.08); }
+img.va-gcard__emoji { width: 3.8rem; height: 3.8rem; margin: -0.2rem 0 auto -0.2rem; transition: transform 0.25s var(--va-bounce); }
+img.va-hero__emoji { width: 6.5rem; height: 6.5rem; }
+img.va-kw-tile { width: 56px; height: 56px; flex-shrink: 0; }
+img.va-tabs__icon { width: 30px; height: 30px; object-fit: contain; filter: saturate(0.55) opacity(0.75); }
+.va-tabs button[aria-current] img.va-tabs__icon { filter: none; }
+.va-fighter__food, .va-fighter__glove { filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.22)); }
+.va-fighter__food { width: 92px; height: 92px; top: -6px; }
+.va-hud__foe img { filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3)); }
+.is-ko .va-pow img { animation: va-flower 0.7s linear 0.2s; }
+@keyframes va-flower { to { transform: rotate(60deg); } }
+.va-pow b { color: #fff3dc; text-shadow: 0 3px 0 #2a1a12, 2px 0 0 #2a1a12, -2px 0 0 #2a1a12, 0 -2px 0 #2a1a12; font-family: 'Fraunces', Georgia, serif; }
+
+/* The bag: a soft guava character with the same ink line, little eyes and blush. */
+.va-bag__body {
+  border: 5px solid #2a1a12;
+  background:
+    radial-gradient(55% 35% at 32% 20%, rgba(255, 255, 255, 0.55), transparent 60%),
+    linear-gradient(100deg, #ffb3c4 0%, #ff8fab 45%, #f2708f 100%);
+  box-shadow: inset 0 -12px 0 rgba(194, 56, 79, 0.18), 0 10px 0 rgba(0, 0, 0, 0.25);
+}
+.va-bag__band { height: 12px; background: #e2c27a; border-block: 4px solid #2a1a12; box-shadow: none; }
+.va-bag__band--top { top: 22px; }
+.va-bag strong { color: #fff3dc; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 2rem; text-shadow: 0 3px 0 #2a1a12, 2px 0 0 #2a1a12, -2px 0 0 #2a1a12; }
+.va-bag small { color: #2a1a12; }
+.va-bag__chain { background: repeating-linear-gradient(#2a1a12 0 4px, #e2c27a 4px 9px); }
+.va-bag__face { position: relative; display: block; width: 64px; height: 26px; margin-bottom: 0.1rem; }
+.va-bag__face i { position: absolute; top: 2px; width: 10px; height: 13px; border-radius: 50%; background: #2a1a12; box-shadow: inset 3px 2px 0 -1px #fff; }
+.va-bag__face i:first-child { left: 12px; }
+.va-bag__face i:nth-child(2) { right: 12px; }
+.va-bag__face b { position: absolute; left: 50%; top: 12px; width: 14px; height: 8px; margin-left: -7px; border: 3px solid #2a1a12; border-top: 0; border-radius: 0 0 10px 10px; }
+.va-bag__face::before, .va-bag__face::after { content: ''; position: absolute; top: 16px; width: 14px; height: 8px; border-radius: 50%; background: #ff5f86; opacity: 0.7; }
+.va-bag__face::before { left: 0; }
+.va-bag__face::after { right: 0; }
+
+/* Murakami flowers: one each side of the title on phones; three in the garden on the big screen. */
+.va-arena__title { position: relative; }
+.va-arena__title::before, .va-arena__title::after {
+  content: ''; position: absolute; top: 0.4rem; width: 54px; height: 54px; background: url(/vontade/kawaii/flower.svg) center / contain no-repeat;
+  animation: va-spin 14s linear infinite;
+}
+.va-arena__title::before { left: 2px; }
+.va-arena__title::after { right: 2px; width: 40px; height: 40px; top: 2.4rem; animation-direction: reverse; }
+@keyframes va-spin { to { transform: rotate(360deg); } }
+@media (min-width: 900px) {
+  .va-arena__title::before { left: 9%; top: 3.2rem; width: 86px; height: 86px; }
+  .va-arena__title::after { right: 9%; top: 1.2rem; width: 64px; height: 64px; }
+  .va-fighter__food { width: 96px; height: 96px; }
+  img.va-tabs__icon { width: 38px; height: 38px; }
+  img.va-choice__emoji { width: 5rem; height: 5rem; }
+}
+.va-ring--faded .va-bag, .va-ring--faded .va-fighter { opacity: 1; filter: none; }
+.va-bag small { font-size: 0.62rem; white-space: nowrap; }
