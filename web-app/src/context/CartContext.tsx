@@ -34,6 +34,8 @@ interface CartContextType {
   setIsCartOpen: (isOpen: boolean) => void;
 }
 
+const CART_TTL_MS = 3 * 24 * 60 * 60 * 1000;
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
@@ -42,10 +44,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Load from localStorage on mount
   useEffect(() => {
+    // A cart is kept for 3 days. Old carts (saved before the date was stored) are dropped: one phone showed
+    // "20" on the bag for weeks while food sales were on hold (Andrew, 2026-11-28).
     const saved = localStorage.getItem('tropical_cart');
     if (saved) {
       try {
-        setItems(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.items) && Date.now() - Number(parsed.savedAt) < CART_TTL_MS) {
+          setItems(parsed.items);
+        } else {
+          localStorage.removeItem('tropical_cart');
+        }
       } catch (e) {
         console.error('Failed to parse cart');
       }
@@ -54,7 +63,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Save to localStorage when items change
   useEffect(() => {
-    localStorage.setItem('tropical_cart', JSON.stringify(items));
+    if (items.length) localStorage.setItem('tropical_cart', JSON.stringify({ savedAt: Date.now(), items }));
+    else localStorage.removeItem('tropical_cart');
   }, [items]);
 
   const addToCart = (newItem: Omit<CartItem, 'quantity'>, options?: { open?: boolean; quantity?: number }) => {

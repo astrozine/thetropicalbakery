@@ -14,7 +14,8 @@ import { courseIsShown, useShownCourses } from '@/lib/useShownCourses';
 import { isEbookLang, LANG_PATH } from '@/lib/ebookCopy';
 import { clearGoogleTranslate } from '@/lib/googleTranslate';
 import { usePageLang } from '@/lib/usePageLang';
-import { shellHref, shellText } from '@/lib/shellCopy';
+import { useTranslateLang } from '@/lib/useTranslateLang';
+import { shellHref, shellText, type ShellLang } from '@/lib/shellCopy';
 import { FUNNEL } from '@/lib/funnel';
 import { COACHING_PATH, COACHING_PRICES, isCoachingLang } from '@/lib/coachingCopy';
 import IconTile from '@/components/IconTile';
@@ -116,6 +117,12 @@ export default function Navigation() {
   // Pages written by hand in another language get the menu in that language too (lib/shellCopy.ts).
   const pageL = usePageLang();
   const tl = (pt: string) => shellText(pt, pageL);
+  // Labels Google Translate gets wrong ("Entrar" became "To enter"): when it is translating into a language we wrote the
+  // shell in, show our own words and keep Google off them (Andrew, 2026-11-28).
+  const trL = useTranslateLang();
+  const ownL: ShellLang = pageL !== 'pt' ? pageL : ((['en', 'es', 'nl', 'de'] as string[]).includes(trL) ? trL as ShellLang : 'pt');
+  const ownProps = ownL !== 'pt' || trL === 'pt' ? { className: 'notranslate', translate: 'no' as const } : {};
+  const [phoneLangOpen, setPhoneLangOpen] = useState(false);
   const { totalItems, setIsCartOpen } = useCart();
   const { user } = useAuth();
   const [loginOpen, setLoginOpen] = useState(false);
@@ -321,6 +328,8 @@ export default function Navigation() {
   // text underneath. Every app solves this the same way: tuck the bar away when
   // the reader scrolls down, bring it straight back when they scroll up.
   const [tucked, setTucked] = useState(false);
+  // Past the top, the phone header turns into one slim solid bar instead of two big pills floating over the text.
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     let last = window.scrollY;
     let frame = 0;
@@ -331,6 +340,7 @@ export default function Navigation() {
         const down = y > last;
         // Never hide near the top, and ignore tiny jitters.
         if (Math.abs(y - last) > 6) setTucked(down && y > 160);
+        setScrolled(y > 40);
         last = y;
       });
     };
@@ -362,7 +372,7 @@ export default function Navigation() {
         <span>{tl('🌴 Entregas exclusivas: Itamambuca, Ubatuba e Região. Paraty: pedidos a partir de R$ 600! 🌴')}</span>
       </div>
 
-      <nav className="mobile-header-nav" data-tucked={tucked && !isOpen ? 'true' : 'false'} style={{
+      <nav className="mobile-header-nav" data-tucked={tucked && !isOpen && !phoneLangOpen ? 'true' : 'false'} data-scrolled={scrolled ? 'true' : 'false'} style={{
         position: 'sticky',
         top: 0,
         width: '100%',
@@ -521,10 +531,37 @@ export default function Navigation() {
               display: 'inline-flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1px',
             }}>
               <PersonIcon size={22} />
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{tl('Entrar')}</span>
+              <span className="nav-login-label" {...ownProps} style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>{shellText('Entrar', ownL)}</span>
             </button>
           )}
           <ClubeModal open={loginOpen} onClose={closeLogin} />
+          {/* The language switch, in sight on phones instead of at the bottom of the menu (Andrew, 2026-11-28). */}
+          <div className="notranslate" translate="no" style={{ position: 'relative' }}>
+            <button type="button" onClick={() => setPhoneLangOpen(o => !o)} aria-label={langLabel} aria-expanded={phoneLangOpen}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2a1a12', minWidth: '44px', minHeight: '44px', padding: 0, display: 'inline-flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1px' }}>
+              <GlobeIcon size={20} />
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.5px' }}>{(pageL !== 'pt' ? pageL : trL).toUpperCase()}</span>
+            </button>
+            {phoneLangOpen && (
+              <>
+                <div onClick={() => setPhoneLangOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 1 }} />
+                <div role="menu" style={{ position: 'absolute', top: 'calc(100% + 10px)', right: '-60px', zIndex: 2, background: '#fdfaf3', borderRadius: '16px', boxShadow: '0 14px 40px rgba(42,26,18,0.22)', border: '1px solid rgba(201,162,87,0.35)', padding: '0.4rem', minWidth: '176px', display: 'grid' }}>
+                  {[
+                    { code: 'pt', name: 'Português' }, { code: 'en', name: 'English' }, { code: 'es', name: 'Español' },
+                    { code: 'nl', name: 'Nederlands' }, { code: 'de', name: 'Deutsch' }, { code: 'fr', name: 'Français' }, { code: 'it', name: 'Italiano' },
+                  ].map(l => {
+                    const on = (pageL !== 'pt' ? pageL : trL) === l.code;
+                    return (
+                      <button key={l.code} role="menuitem" type="button" onClick={() => { setPhoneLangOpen(false); changeLanguage(l.code); }}
+                        style={{ textAlign: 'left', background: on ? 'rgba(201,162,87,0.16)' : 'none', border: 'none', borderRadius: '10px', cursor: 'pointer', padding: '0.7rem 0.9rem', fontSize: '1rem', color: '#2a1a12', fontWeight: on ? 700 : 400 }}>
+                        {l.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
           {/* 44x44 is the smallest a thumb hits reliably (Apple HIG); the glyph stays 1.5rem. */}
           <button
             onClick={() => setIsCartOpen(true)}

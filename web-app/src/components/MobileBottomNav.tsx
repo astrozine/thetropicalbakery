@@ -7,12 +7,18 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { ClubeModal, PersonIcon } from '@/components/ClubeInvite';
 import { usePageLang } from '@/lib/usePageLang';
-import { shellHref, shellText } from '@/lib/shellCopy';
+import { useTranslateLang } from '@/lib/useTranslateLang';
+import { shellHref, shellText, type ShellLang } from '@/lib/shellCopy';
 
 export default function MobileBottomNav() {
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
   const lang = usePageLang();
+  // Google turned "Receitas" into "Revenues" and "Entrar" into "To enter": when it translates into a language we wrote
+  // the bar in, the bar shows our words and Google leaves them alone (Andrew, 2026-11-28).
+  const trL = useTranslateLang();
+  const ownL: ShellLang = lang !== 'pt' ? lang : ((['en', 'es', 'nl', 'de'] as string[]).includes(trL) ? trL as ShellLang : 'pt');
+  const own = ownL !== 'pt' || trL === 'pt' ? { className: 'notranslate', translate: 'no' as const } : {};
   const { totalItems, setIsCartOpen } = useCart();
   const { user } = useAuth();
   const [clubeOpen, setClubeOpen] = useState(false);
@@ -55,7 +61,7 @@ export default function MobileBottomNav() {
     { name: 'Cursos', path: '/cursos', icon: '🎓' },
     { name: 'Coaching', path: '/coaching', icon: '🌱' },
     { name: 'Retiro', path: '/retreats', icon: '🌴' },
-  ]).map(i => ({ ...i, name: shellText(i.name, lang), path: shellHref(i.path, lang) }));
+  ]).map(i => ({ ...i, name: shellText(i.name, ownL), path: shellHref(i.path, lang) }));
 
   return (
     <div style={{
@@ -71,7 +77,8 @@ export default function MobileBottomNav() {
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'center',
-      padding: '0.75rem 0.5rem',
+      padding: '0.75rem 0.25rem',
+      gap: '2px',
       paddingBottom: 'env(safe-area-inset-bottom, 1rem)',
       zIndex: 1000,
       borderTopLeftRadius: '24px',
@@ -91,7 +98,8 @@ export default function MobileBottomNav() {
             color: isActive ? '#c9a257' : '#887d77',
             gap: '4px',
             position: 'relative',
-            width: '20%'
+            flex: '1 1 0',
+            minWidth: 0
           }}>
             <span style={{ 
               fontSize: '1.5rem',
@@ -101,11 +109,9 @@ export default function MobileBottomNav() {
             }}>
               {item.icon}
             </span>
-            <span style={{
-              fontSize: '0.75rem',
+            <span {...own} style={{
+              ...tabLabel,
               fontWeight: isActive ? 600 : 400,
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
             }}>
               {item.name}
             </span>
@@ -117,12 +123,12 @@ export default function MobileBottomNav() {
       {user ? (
         <Link href="/minha-conta" style={{ ...tabStyle, color: pathname === '/minha-conta' ? '#c9a257' : '#887d77' }}>
           <span style={{ height: '1.5rem', display: 'flex', alignItems: 'center' }}><PersonIcon size={24} /></span>
-          <span style={tabLabel}>{shellText('Conta', lang)}</span>
+          <span {...own} style={tabLabel}>{shellText('Conta', ownL)}</span>
         </Link>
       ) : (
         <button type="button" onClick={() => setClubeOpen(true)} style={{ ...tabStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#2a1a12' }}>
           <span style={{ height: '1.5rem', display: 'flex', alignItems: 'center' }}><PersonIcon size={24} /></span>
-          <span style={{ ...tabLabel, fontWeight: 700 }}>{shellText('Entrar', lang)}</span>
+          <span {...own} style={{ ...tabLabel, fontWeight: 700 }}>{shellText('Entrar', ownL)}</span>
         </button>
       )}
       <ClubeModal open={clubeOpen} onClose={closeClube} />
@@ -131,6 +137,10 @@ export default function MobileBottomNav() {
 }
 
 const tabStyle: React.CSSProperties = {
-  display: 'flex', flexDirection: 'column', alignItems: 'center', textDecoration: 'none', gap: '4px', position: 'relative', width: '20%',
+  display: 'flex', flexDirection: 'column', alignItems: 'center', textDecoration: 'none', gap: '4px', position: 'relative', flex: '1 1 0', minWidth: 0,
 };
-const tabLabel: React.CSSProperties = { fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' };
+// One line per label, shrinking with the phone and never touching the next one (big system fonts ran them together).
+const tabLabel: React.CSSProperties = {
+  fontSize: 'min(0.68rem, 2.9vw)', textTransform: 'uppercase', letterSpacing: '0.3px', whiteSpace: 'nowrap',
+  maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', padding: '0 2px',
+};

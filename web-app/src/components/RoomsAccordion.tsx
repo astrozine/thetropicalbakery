@@ -104,7 +104,7 @@ function Gallery({ photos, alt, t }: { photos: string[]; alt: string; t: Copy })
 // into a narrow text column. Once a card is open the gallery shows the photo, so it hides.
 const ROOM_CSS = `
 .room-head{width:100%;display:flex;align-items:center;gap:1.25rem;padding:1rem 1.25rem;background:none;border:none;cursor:pointer;text-align:left;font:inherit}
-.room-thumb{position:relative;flex:0 0 auto;width:104px;height:78px;border-radius:12px;overflow:hidden;display:block}
+.room-thumb{position:relative;flex:0 0 auto;width:220px;height:150px;border-radius:14px;overflow:hidden;display:block}
 .room-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .room-cap,.room-count{display:none}
 .room-text{flex:1;min-width:0;display:block}
@@ -128,18 +128,27 @@ const ROOM_CSS = `
   .room-body{padding:0.25rem 1rem 1.25rem !important}
   .room-actions .btn{flex:1 1 100%;text-align:center;justify-content:center}
 }
-/* Calmer, shorter (2026-11-13): phones keep the compact row (small photo | name | plus) instead of a full-width
-   photo per room, so four closed rooms take about one screen. */
+/* Big and inviting (Andrew, 2026-11-28): on phones each room leads with a large photo, its name over it,
+   instead of a stamp-sized thumbnail next to a squeezed column of text. */
 @media (max-width:640px){
-  .room-head{display:flex;gap:0.85rem;padding:0.75rem 0.9rem;align-items:center}
-  .room-thumb{width:84px;height:64px;aspect-ratio:auto;border-radius:10px}
-  .room-cap,.room-count{display:none}
-  .room-cap-inline{display:inline-block;font-size:0.75rem;margin-bottom:0.25rem}
-  .room-text{padding-left:0}
-  .room-tag{font-size:0.88rem;margin-top:0.2rem}
-  .room-plus{margin:0}
-  .room-open .room-head{padding-top:0.75rem}
+  .room-thumb{aspect-ratio:4/5;max-height:72vh}
+  .room-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,12,8,0) 45%,rgba(20,12,8,0.72) 100%);pointer-events:none}
+  .room-cap{top:14px;left:14px;bottom:auto;z-index:1}
+  .room-count{top:14px;right:14px;bottom:auto;z-index:1}
+  .room-head{position:relative}
+  .room-text{grid-column:1 / -1;position:absolute;left:0;right:64px;bottom:1.1rem;padding-left:1.1rem;z-index:1}
+  .room-title{color:#fff;font-size:1.55rem;line-height:1.1;text-shadow:0 2px 12px rgba(0,0,0,0.35)}
+  .room-tag{color:rgba(255,255,255,0.9);font-size:0.95rem;margin-top:0.35rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .room-plus{position:absolute;right:1rem;bottom:1.1rem;z-index:1;background:rgba(253,250,243,0.95) !important;margin:0}
+  .room-head{padding:0}
+  .room-open .room-head{padding:1rem 1.1rem 0}
+  .room-open .room-text{position:static;padding:0}
+  .room-open .room-title{color:#2a1a12;text-shadow:none}
+  .room-open .room-tag{color:#7a6a61}
+  .room-open .room-plus{position:static;background:#c9a257 !important}
+  .room-open .room-head{display:flex;align-items:center}
 }
+.room-cap,.room-cap-inline{white-space:nowrap}
 `;
 
 export default function RoomsAccordion({ onInquire, locale = 'pt' }: Props) {
