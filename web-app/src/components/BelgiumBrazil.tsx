@@ -47,12 +47,12 @@ export function OriginSeal({ tone = 'light', text = 'Maestria belga · Natureza 
       title="Receitas de Elisabeth “Dolly” Van Dam, da Bélgica, com ingredientes da natureza brasileira"
       style={{
         display: 'inline-flex', alignItems: 'center', gap: '0.6rem', maxWidth: '100%',
-        padding: '0.4rem 0.95rem 0.4rem 0.7rem', borderRadius: 999,
-        background: dark ? 'rgba(212,175,55,0.12)' : '#fff',
+        padding: '0.4rem 0.95rem 0.4rem 0.7rem', borderRadius: 2,
+        background: dark ? 'rgba(212,175,55,0.08)' : 'transparent',
         border: `1px solid ${dark ? 'rgba(212,175,55,0.55)' : 'rgba(212,175,55,0.6)'}`,
         color: dark ? '#e8c77e' : '#7a5a14',
-        fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.35,
-        boxShadow: dark ? 'none' : '0 4px 14px rgba(42,26,18,0.08)',
+        fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1.35,
+        boxShadow: 'none',
         ...style,
       }}
     >

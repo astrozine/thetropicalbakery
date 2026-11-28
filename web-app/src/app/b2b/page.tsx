@@ -115,9 +115,9 @@ export default function TodasAsParcerias() {
   return (
     <main style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
 
-      {/* ── Yellow intro banner (same spirit as the yellow boxes on other pages) ── */}
+      {/* ── Intro banner: espresso with gold, the house style since 2026-11-28 (was a yellow gradient) ── */}
       <section style={{
-        background: 'linear-gradient(135deg, #e8c77e 0%, #e8c23a 100%)',
+        background: '#2a1a12',
         padding: 'clamp(3.5rem, 8vw, 6rem) 1.5rem clamp(3rem, 7vw, 5rem)',
         textAlign: 'center',
       }}>
@@ -127,7 +127,7 @@ export default function TodasAsParcerias() {
           letterSpacing: '0.18em',
           textTransform: 'uppercase',
           fontWeight: 800,
-          color: '#7a5a14',
+          color: '#c9a257',
           marginBottom: '0.75rem',
         }}>
           Programa de Parceria B2B
@@ -135,10 +135,10 @@ export default function TodasAsParcerias() {
         <h1 style={{
           fontFamily: 'var(--font-heading)',
           fontSize: 'clamp(2.4rem, 6vw, 4rem)',
-          color: '#2a1a12',
+          color: '#faf5ec',
           lineHeight: 1.1,
           marginBottom: '1.25rem',
-          fontWeight: 900,
+          fontWeight: 500,
         }}>
           Todas as Parcerias
         </h1>
@@ -146,23 +146,25 @@ export default function TodasAsParcerias() {
           maxWidth: '640px',
           margin: '0 auto 2rem',
           fontSize: 'clamp(1rem, 2.2vw, 1.2rem)',
-          color: '#5a3d10',
+          color: 'rgba(250,245,236,0.82)',
           lineHeight: 1.75,
-          fontWeight: 500,
+          fontWeight: 400,
         }}>
           Do hotel de beira-mar ao afiliado digital — crescer junto com a The Tropical Bakery
           cabe em muitos formatos. Conheça cada um e descubra qual é o seu.
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', justifyContent: 'center' }}>
-          {['🏨 Hotéis', '🌿 Pousadas', '🏡 Airbnbs', '🍽️ Restaurantes', '🥐 Padarias', '⛵ Barcos', '🧘 Yoga e Spas', '✈️ Travel Managers', '🔗 Afiliados'].map(t => (
+          {['Hotéis', 'Pousadas', 'Airbnbs', 'Restaurantes', 'Padarias', 'Barcos', 'Yoga e Spas', 'Travel Managers', 'Afiliados'].map(t => (
             <span key={t} style={{
-              background: 'rgba(42,26,18,0.1)',
-              color: '#2a1a12',
-              border: '1px solid rgba(42,26,18,0.18)',
-              borderRadius: '999px',
-              padding: '0.4rem 0.9rem',
-              fontSize: '0.85rem',
-              fontWeight: 700,
+              background: 'transparent',
+              color: '#e8c77e',
+              border: '1px solid rgba(201,162,87,0.55)',
+              borderRadius: '2px',
+              padding: '0.4rem 0.8rem',
+              fontSize: '0.7rem',
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              fontWeight: 600,
             }}>{t}</span>
           ))}
         </div>
@@ -171,8 +173,8 @@ export default function TodasAsParcerias() {
       {/* ── Alternating partnership cards ── (compact on phones, 2026-11-13: shorter site) */}
       <style>{`
         @media (max-width: 699px) {
-          .b2b-card { gap: 0.9rem !important; padding: 0.9rem !important; border-radius: 22px !important; }
-          .b2b-card__photo { aspect-ratio: 16 / 9 !important; border-radius: 16px !important; }
+          .b2b-card { gap: 0.9rem !important; padding: 0.9rem !important; border-radius: 4px !important; }
+          .b2b-card__photo { aspect-ratio: 16 / 9 !important; }
           .b2b-card__inset, .b2b-card__tags { display: none !important; }
           .b2b-card h2 { font-size: 1.45rem !important; margin-bottom: 0.5rem !important; }
           .b2b-card p { line-height: 1.6 !important; margin-bottom: 0.9rem !important; font-size: 0.95rem !important; }
@@ -190,8 +192,8 @@ export default function TodasAsParcerias() {
                 style={{
                   background: '#fff',
                   border: '1px solid #efe4c8',
-                  borderRadius: '28px',
-                  boxShadow: '0 10px 30px rgba(42,26,18,0.09)',
+                  borderRadius: '4px',
+                  boxShadow: '0 10px 30px rgba(42,26,18,0.07)',
                   padding: 'clamp(1.25rem, 3.5vw, 2.5rem)',
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))',
@@ -204,9 +206,10 @@ export default function TodasAsParcerias() {
                 <div style={{ position: 'relative', direction: 'ltr' }}>
                   <div className="b2b-card__photo" style={{
                     aspectRatio: '4/3',
-                    borderRadius: '24px',
+                    // Burle Marx beds: hard-edged curves that alternate side to side, with the gold double contour.
+                    borderRadius: reversed ? '6px 999px 6px 6px / 6px 70% 6px 6px' : '999px 6px 6px 6px / 70% 6px 6px 6px',
                     overflow: 'hidden',
-                    boxShadow: '0 8px 24px rgba(42,26,18,0.14)',
+                    boxShadow: '0 0 0 4px #fff, 0 0 0 6px #c9a257',
                   }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -222,7 +225,7 @@ export default function TodasAsParcerias() {
                     [reversed ? 'left' : 'right']: '-12px',
                     width: '130px',
                     aspectRatio: '1',
-                    borderRadius: '20px',
+                    borderRadius: '999px 999px 6px 6px',
                     overflow: 'hidden',
                     border: '4px solid #fff',
                     boxShadow: '0 10px 30px rgba(42,26,18,0.22)',
@@ -252,9 +255,9 @@ export default function TodasAsParcerias() {
                     color: '#2a1a12',
                     lineHeight: 1.1,
                     marginBottom: '1rem',
-                    fontWeight: 900,
+                    fontWeight: 500,
                   }}>
-                    {p.emoji} {p.title}
+                    {p.title}
                   </h2>
                   <p style={{
                     color: '#594a42',
@@ -268,9 +271,10 @@ export default function TodasAsParcerias() {
                   <div className="b2b-card__tags" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1.75rem' }}>
                     {p.tags.map(t => (
                       <span key={t} style={{
-                        background: '#fdf1d6',
+                        background: 'transparent',
+                        border: '1px solid rgba(168,132,63,0.45)',
                         color: '#7a5a14',
-                        borderRadius: '999px',
+                        borderRadius: '2px',
                         padding: '0.25rem 0.75rem',
                         fontSize: '0.78rem',
                         fontWeight: 700,
@@ -286,18 +290,18 @@ export default function TodasAsParcerias() {
                       gap: '0.5rem',
                       background: '#2a1a12',
                       color: '#e8c77e',
-                      fontFamily: 'var(--font-heading)',
-                      fontWeight: 800,
-                      fontSize: '0.95rem',
-                      letterSpacing: '0.05em',
-                      padding: '0.9rem 2rem',
-                      borderRadius: '999px',
+                      fontWeight: 600,
+                      fontSize: '0.78rem',
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      padding: '0.95rem 1.8rem',
+                      borderRadius: '2px',
                       textDecoration: 'none',
                       transition: 'background 0.2s, transform 0.2s',
                     }}
                     className="b2b-index-cta"
                   >
-                    Conhecer a parceria →
+                    Conhecer a parceria
                   </Link>
                 </div>
               </article>
@@ -306,11 +310,12 @@ export default function TodasAsParcerias() {
         </div>
       </section>
 
-      {/* ── Yellow bottom CTA box ── */}
+      {/* ── Bottom CTA: a teal bed with a rounded Burle Marx corner ── */}
       <section style={{
-        background: 'linear-gradient(135deg, #e8c77e 0%, #e8c23a 100%)',
+        background: '#1e5d54',
         margin: 'clamp(2rem, 5vw, 4rem) 1.5rem',
-        borderRadius: '32px',
+        borderRadius: '6px 120px 6px 6px',
+        boxShadow: '0 0 0 4px var(--color-background), 0 0 0 6px #c9a257',
         padding: 'clamp(3rem, 7vw, 5rem) clamp(1.5rem, 5vw, 4rem)',
         textAlign: 'center',
         maxWidth: '1100px',
@@ -323,7 +328,7 @@ export default function TodasAsParcerias() {
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           fontWeight: 800,
-          color: '#7a5a14',
+          color: '#e8c77e',
           display: 'block',
           marginBottom: '0.75rem',
         }}>
@@ -332,14 +337,14 @@ export default function TodasAsParcerias() {
         <h2 style={{
           fontFamily: 'var(--font-heading)',
           fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
-          color: '#2a1a12',
+          color: '#faf5ec',
           marginBottom: '1rem',
-          fontWeight: 900,
+          fontWeight: 500,
         }}>
           Fale com a Gente
         </h2>
         <p style={{
-          color: '#5a3d10',
+          color: 'rgba(250,245,236,0.85)',
           lineHeight: 1.75,
           maxWidth: '540px',
           margin: '0 auto 2rem',
@@ -355,14 +360,14 @@ export default function TodasAsParcerias() {
           tags={['parceiro']}
           style={{
             display: 'inline-block',
-            background: '#2a1a12',
-            color: '#e8c77e',
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 800,
-            fontSize: '1rem',
-            letterSpacing: '0.06em',
-            padding: '1rem 2.5rem',
-            borderRadius: '999px',
+            background: '#c9a257',
+            color: '#2a1a12',
+            fontWeight: 600,
+            fontSize: '0.8rem',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            padding: '1rem 2rem',
+            borderRadius: '2px',
             textDecoration: 'none',
           }}
         >

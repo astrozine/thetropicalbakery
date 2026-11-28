@@ -102,7 +102,7 @@ export default function MenuPage() {
             <img 
               src="/event_hero.jpg" 
               alt="Menu de Eventos The Tropical Bakery" 
-              style={{ width: '100%', height: 'auto', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.15)', objectFit: 'cover' }} 
+              style={{ width: '100%', height: 'auto', borderRadius: '999px 6px 6px 6px / 60% 6px 6px 6px', boxShadow: '0 0 0 4px #faf5ec, 0 0 0 6px #c9a257', objectFit: 'cover' }} 
             />
           </div>
 
@@ -134,7 +134,7 @@ export default function MenuPage() {
             </div>
 
             <p style={{ margin: '0 0 1rem', fontSize: '0.95rem', color: '#594a42', lineHeight: 1.5 }}>
-              🌴 Entregamos em Itamambuca, Ubatuba e região. Paraty: pedidos a partir de R$ 600.
+              Entregamos em Itamambuca, Ubatuba e região. Paraty: pedidos a partir de R$ 600.
             </p>
             <details style={{ marginBottom: '2.5rem', cursor: 'pointer' }}>
               <summary style={{ fontSize: '1.15rem', color: '#594a42', fontWeight: 600, padding: '0.5rem 0', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
@@ -321,7 +321,7 @@ export default function MenuPage() {
           fale com a gente no WhatsApp antes de fechar o pedido.
         </p>
         <p style={{ maxWidth: '760px', margin: '1rem auto 0', textAlign: 'center', color: '#7a6a61', fontSize: '0.85rem', lineHeight: 1.75 }}>
-          🧊 Os doces chegam gelados e ficam no freezer até a festa. Os crus e cremosos saem uns 10 minutos antes de servir, e o que já foi servido é para comer
+          Os doces chegam gelados e ficam no freezer até a festa. Os crus e cremosos saem uns 10 minutos antes de servir, e o que já foi servido é para comer
           em poucas horas. Bandejas que nem saíram do freezer continuam ótimas por até 4 semanas. <a href="/cuidados" style={{ color: '#a8843f', fontWeight: 600 }}>Como guardar e servir</a>
         </p>
       </section>

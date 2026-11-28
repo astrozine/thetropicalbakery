@@ -315,4 +315,33 @@ textarea.bn-input { min-height: 96px; resize: vertical; line-height: 1.55; }
 .bn-faq-more > summary::-webkit-details-marker { display: none; }
 .bn-faq-more[open] > summary { display: none; }
 .bn-faq-more > .bn-faq { margin-top: 0.6rem; }
+
+/* ------------------------------------------------------------------ Brazilian luxury pass (2026-11-28)
+   Square caps buttons, flat gold, Burle Marx beds with the gold double contour instead of tilted polaroids,
+   and the decorative emoji tiles hidden (the words stay). Looks only. */
+.bn-btn { border-radius: 2px; text-transform: uppercase; letter-spacing: 0.13em; font-size: 0.78rem; font-weight: 600; }
+.bn-btn--gold { background: var(--bn-gold); color: #2a1a12; box-shadow: none; }
+.bn-btn--ghost { background: transparent; }
+.bn-btn--light { background: transparent; border-color: rgba(201,162,87,0.6); }
+.bn-chip { border-radius: 2px; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; font-weight: 600; }
+.bn-card, .bn-event, .bn-moment, .bn-perk, .bn-venue, .bn-buy, .bn-ticket, .bn-option, .bn-person, .bn-empty { border-radius: 4px; }
+.bn-stack li, .bn-faq details, .bn-sponsor, .bn-method, .bn-input, .bn-room-tab { border-radius: 4px; }
+.bn-seats__bar span { background: var(--bn-gold); }
+.bn-polaroid { padding: 0; border: 0; background: none; border-radius: 0; box-shadow: none; }
+.bn-polaroid img { border-radius: 999px 999px 6px 6px / 60% 60% 6px 6px; box-shadow: 0 0 0 4px #2a1a12, 0 0 0 6px var(--bn-gold); }
+.bn-polaroid--b img { border-radius: 6px 120px 6px 6px; }
+.bn-polaroid figcaption { color: #e8c77e; font-family: var(--font-heading); font-style: italic; text-transform: none; letter-spacing: 0; font-size: 0.8rem; font-weight: 500; line-height: 1.25; text-align: left; padding: 0.5rem 0 0; }
+.bn-polaroid--b figcaption { text-align: right; }
+.bn-polaroid--a, .bn-polaroid--b { transform: none; }
+.bn-float { box-shadow: 0 0 0 4px var(--bn-gold); border-color: #2a1a12; transform: none; }
+.bn-float--treat { border-radius: 999px 999px 6px 6px; }
+.bn-host__photo img { transform: none; border-radius: 999px 999px 6px 6px / 50% 50% 6px 6px; border: 0; box-shadow: 0 0 0 4px #2a1a12, 0 0 0 6px var(--bn-gold), 14px 14px 0 6px #ee8c9c; }
+.bn-host__sig { transform: none; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.7rem; font-weight: 600; }
+.bn-ev-cover { transform: none; border: 0; border-radius: 999px 999px 6px 6px / 40% 40% 6px 6px; box-shadow: 0 0 0 4px #2a1a12, 0 0 0 6px var(--bn-gold); }
+@media (min-width: 960px) { .bn-ev-cover { transform: none; } }
+.bn-moment img, .bn-gallery img { border-radius: 4px; }
+.bn-perk { background: #fff; }
+.bn-perk__icon, .bn-venue > span[aria-hidden], .bn-empty__icon { display: none; }
+.bn-perk { grid-template-columns: minmax(0, 1fr); border-left: 3px solid var(--bn-gold); }
+.bn-date { border-radius: 2px; }
 `;
