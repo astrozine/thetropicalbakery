@@ -327,7 +327,7 @@ export default function VontadeApp() {
                     <div className="va-grid">
                       {CRAVINGS.filter(c => c.group === grp.id).map(c => (
                         <button key={c.id} className="va-choice" style={cssVars({ '--c': c.hex, color: c.ink })} onClick={() => chooseCraving(c.id)}>
-                          <span className="va-choice__emoji" aria-hidden>{c.emoji}</span>
+                          <Kw id={c.id} className="va-choice__emoji" fallback={c.emoji} />
                           <strong>{c.label}</strong><small>{c.hint}</small>
                         </button>
                       ))}
@@ -388,7 +388,7 @@ export default function VontadeApp() {
                   <SwapList c={craving} />
                 )}
                 <button className="va-card va-next" onClick={() => { buzz(); setGuide(craving); scrollTop(); }}>
-                  <IconTile size={46}>{cv.emoji}</IconTile>
+                  <Kw id={cv.id} className="va-kw-tile" fallback={cv.emoji} />
                   {repeats >= 3
                     ? <span><strong>{repeats}ª vez nesta semana: {cv.label.toLowerCase()}</strong><small>Quando ela volta assim, tem motivo. Veja o que ela procura e como fazer ela parar de voltar.</small></span>
                     : <span><strong>Vencer essa vontade de vez</strong><small>O que ela procura, quanto tempo leva e o plano semana a semana</small></span>}
@@ -430,7 +430,7 @@ export default function VontadeApp() {
                 <div className="va-guides">
                   {CRAVINGS.filter(c => c.group === grp.id).map(c => (
                     <button key={c.id} className="va-gcard" style={cssVars({ '--c': c.hex, color: c.ink })} onClick={() => { buzz(); setGuide(c.id); scrollTop(); }}>
-                      <span className="va-gcard__emoji" aria-hidden>{c.emoji}</span>
+                      <Kw id={c.id} className="va-gcard__emoji" fallback={c.emoji} />
                       <strong>{c.label}</strong>
                       <Effort n={GUIDES[c.id].effort} small />
                       <small>{EFFORT_LABEL[GUIDES[c.id].effort]} · {GUIDES[c.id].reset}</small>
@@ -466,13 +466,13 @@ export default function VontadeApp() {
       <nav className="va-tabs" aria-label="App">
         <SideBrand />
         {([
-          ['hoje', '🏠', 'Hoje'],
-          ['vontades', '🧭', 'Vontades'],
-          ['receitas', '📖', 'Receitas'],
-          ['plus', '🌴', 'Tropical+'],
-        ] as const).map(([id, emoji, label]) => (
+          ['hoje', 'Hoje'],
+          ['vontades', 'Vontades'],
+          ['receitas', 'Receitas'],
+          ['plus', 'Tropical+'],
+        ] as const).map(([id, label]) => (
           <button key={id} aria-current={(tab === id && !open && !guide) || undefined} onClick={() => { go(id); if (id === 'hoje') setStep('home'); }}>
-            <span className="va-tabs__icon" aria-hidden>{emoji}</span>{label}
+            <img className="va-tabs__icon" src={`/vontade/kawaii/tab-${id}.svg`} alt="" aria-hidden />{label}
           </button>
         ))}
       </nav>
@@ -522,9 +522,9 @@ function GuestApp() {
       </div>
       <nav className="va-tabs" aria-label="App">
         <SideBrand />
-        {([['🏠', 'Hoje'], ['🧭', 'Vontades'], ['📖', 'Receitas'], ['🌴', 'Tropical+']] as const).map(([emoji, label], i) => (
+        {([['hoje', 'Hoje'], ['vontades', 'Vontades'], ['receitas', 'Receitas'], ['plus', 'Tropical+']] as const).map(([id, label], i) => (
           <button key={label} aria-current={i === 0 || undefined} onClick={() => (i === 0 ? null : open('tab'))}>
-            <span className="va-tabs__icon" aria-hidden>{emoji}</span>{label}
+            <img className="va-tabs__icon" src={`/vontade/kawaii/tab-${id}.svg`} alt="" aria-hidden />{label}
           </button>
         ))}
       </nav>
@@ -624,7 +624,7 @@ function Arena({ name, energy, foe, streak, round, lines, faded, onHit }: {
             <span className="va-hud__bar va-hud__bar--foe"><i style={{ width: `${foe}%` }} /></span>
             <small>Vida {foe}%</small>
           </div>
-          <span className="va-hud__foe"><img src="/vontade/fx/burger.webp" alt="" /><img src="/vontade/fx/shake.webp" alt="" /></span>
+          <span className="va-hud__foe"><img src="/vontade/kawaii/burger.svg" alt="" /><img src="/vontade/kawaii/shake.svg" alt="" /></span>
         </div>
       </div>
       <button className="va-hud__sound" onClick={toggle} aria-label={sound ? 'Tirar o som' : 'Ligar o som'} aria-pressed={sound}>{sound ? '🔊' : '🔇'}</button>
@@ -726,7 +726,7 @@ function Insight({ store, onGuide }: { store: VontadeStore; onGuide: (c: Craving
   const c = cravingOf(top)!;
   return (
     <button className="va-card va-next" onClick={() => onGuide(top)}>
-      <IconTile size={46}>{c.emoji}</IconTile>
+      <Kw id={c.id} className="va-kw-tile" fallback={c.emoji} />
       <span><strong>Sua vontade mais frequente: {c.label}</strong><small>Veja o que ela procura de verdade e como vencer de vez</small></span>
       <span aria-hidden className="va-row__go">›</span>
     </button>
@@ -790,7 +790,7 @@ function GuideView({ c, list, unlocked, userId, access, onBack, onRecipe, onNow,
     <article className="va-screen va-guide">
       <button className="va-back" onClick={onBack}>‹ Voltar</button>
       <header className="va-hero" style={cssVars({ '--c': cv.hex, color: cv.ink })}>
-        <span className="va-hero__emoji" aria-hidden>{cv.emoji}</span>
+        <Kw id={cv.id} className="va-hero__emoji" fallback={cv.emoji} />
         <small>Vontade de</small>
         <h1>{cv.label}</h1>
         <p>{g.behind}</p>
@@ -974,7 +974,7 @@ function DollyPhoto({ src, small, children }: { src: string; small?: boolean; ch
  * The SOS button is a punching bag: "bateu vontade" literally means the craving hit you. A burger and a soda, each
  * throwing a boxing glove, take turns jabbing it from the edges of the screen; tapping it hits back (both slam in,
  * the bag squashes, POW) and opens the questions. The frustration is the point: you're allowed to be mad at it.
- * Art: Microsoft Fluent Emoji 3D (MIT, public/vontade/fx/LICENSE-fluent-emoji.txt); the bag is drawn in CSS to match.
+ * Art: our own kawaii set (public/vontade/kawaii/*.svg: Hello Kitty cute, Murakami flowers, Burle Marx colours); the bag is CSS.
  */
 function PunchBag({ onHit, faded, sound, hotkey }: { onHit: () => void; faded?: boolean; sound?: boolean; hotkey?: boolean }) {
   const [ko, setKo] = useState(false);
@@ -1003,25 +1003,33 @@ function PunchBag({ onHit, faded, sound, hotkey }: { onHit: () => void; faded?: 
     <div className={`va-ring${ko ? ' is-ko' : ''}${faded && !ko ? ' va-ring--faded' : ''}`}>
       <span className="va-ring__beam" aria-hidden />
       <span className="va-fighter va-fighter--l" aria-hidden>
-        <img className="va-fighter__food" src="/vontade/fx/burger.webp" alt="" />
-        <img className="va-fighter__glove" src="/vontade/fx/glove.webp" alt="" />
+        <img className="va-fighter__food" src="/vontade/kawaii/burger.svg" alt="" />
+        <img className="va-fighter__glove" src="/vontade/kawaii/glove.svg" alt="" />
       </span>
       <button className="va-bag" onClick={hit} aria-label="Bateu vontade! Pedir socorro">
         <span className="va-bag__chain" aria-hidden />
         <span className="va-bag__body">
           <span className="va-bag__band va-bag__band--top" aria-hidden />
+          <span className="va-bag__face" aria-hidden><i /><i /><b /></span>
           <strong>SOS</strong>
           <small>Bateu vontade!</small>
           <span className="va-bag__band va-bag__band--bot" aria-hidden />
         </span>
       </button>
       <span className="va-fighter va-fighter--r" aria-hidden>
-        <img className="va-fighter__food" src="/vontade/fx/shake.webp" alt="" />
-        <img className="va-fighter__glove" src="/vontade/fx/glove.webp" alt="" />
+        <img className="va-fighter__food" src="/vontade/kawaii/shake.svg" alt="" />
+        <img className="va-fighter__glove" src="/vontade/kawaii/glove.svg" alt="" />
       </span>
-      <span className="va-pow" aria-hidden><img src="/vontade/fx/pow.webp" alt="" /><b>POW!</b></span>
+      <span className="va-pow" aria-hidden><img src="/vontade/kawaii/flower.svg" alt="" /><b>POW!</b></span>
     </div>
   );
+}
+
+/** A craving's kawaii character (public/vontade/kawaii/<id>.svg); the emoji only if a drawing is missing. */
+const KAWAII = new Set(['chocolate', 'cremoso', 'fresquinho', 'crocante', 'salgadinho', 'umami', 'queijo', 'frito', 'refri', 'paoemassa']);
+function Kw({ id, className, fallback }: { id: string; className?: string; fallback: string }) {
+  if (!KAWAII.has(id)) return <span className={className} aria-hidden>{fallback}</span>;
+  return <img className={`va-kw ${className ?? ''}`} src={`/vontade/kawaii/${id}.svg`} alt="" aria-hidden />;
 }
 
 /** What Dolly says on the home screen: the streak first, then a dense day, then the welcome. */
