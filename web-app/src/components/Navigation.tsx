@@ -389,7 +389,9 @@ export default function Navigation() {
       }}>
         {/* flexShrink 0: next to the long one-line desktop menu the logo used to be squeezed to nothing. */}
         <Link href="/" aria-label="Início" title="Início" className="glass-pill logo-pill" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', maxWidth: '70vw', flexShrink: 0 }}>
-          <img src="/logo-pineapple-sm.webp" alt="The Tropical Bakery Logo" width={121} height={180} style={{ height: '68px', width: 'auto', maxWidth: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(42,26,18,0.18))' }} />
+          <img className="logo-full" src="/logo-pineapple-sm.webp" alt="The Tropical Bakery Logo" width={121} height={180} style={{ height: '68px', width: 'auto', maxWidth: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(42,26,18,0.18))' }} />
+          {/* Phones, once scrolled: the smaller text-only badge instead of the pineapple (Andrew, 2026-11-28). */}
+          <img className="logo-text-sm" src="/logo-gold-sm.webp" alt="" aria-hidden width={240} height={215} />
         </Link>
 
         {/* Desktop: logo | the menu, centred on the page | account and cart. */}

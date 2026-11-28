@@ -1450,7 +1450,7 @@ body {
    big pills floating over the text (Andrew, 2026-11-28). */
 @media (max-width: 767px) {
   .mobile-header-nav[data-scrolled="true"] {
-    background: rgba(253,250,243,0.97) !important;
+    background: #fdfaf3 !important;
     box-shadow: 0 2px 14px rgba(42,26,18,0.1) !important;
     pointer-events: auto;
     transition: transform .3s cubic-bezier(.16,1,.3,1);
@@ -1458,7 +1458,10 @@ body {
   .mobile-header-nav[data-scrolled="true"] .mobile-header-inner { padding: 0.3rem 0.75rem !important; }
   .mobile-header-nav[data-scrolled="true"] .glass-pill { background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
   .mobile-header-nav[data-scrolled="true"] .logo-pill { padding: 0 0.25rem; }
-  .mobile-header-nav[data-scrolled="true"] .logo-pill img { height: 44px !important; filter: none !important; }
+  .mobile-header-nav[data-scrolled="true"] .logo-pill .logo-full { display: none; }
+  .mobile-header-nav[data-scrolled="true"] .logo-pill .logo-text-sm { display: block; height: 40px; width: auto; }
   .mobile-header-nav[data-scrolled="true"][data-tucked="true"] { transform: translateY(-100%); }
   .mobile-header-nav[data-scrolled="true"][data-tucked="true"] .glass-pill { transform: none; opacity: 1; }
 }
+
+.logo-text-sm { display: none; }
