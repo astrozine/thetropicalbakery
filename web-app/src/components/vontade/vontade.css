@@ -979,3 +979,7 @@ img.va-tabs__icon { width: 30px; height: 30px; object-fit: contain; filter: satu
 }
 .va-ring--faded .va-bag, .va-ring--faded .va-fighter { opacity: 1; filter: none; }
 .va-bag small { font-size: 0.62rem; white-space: nowrap; }
+/* v2 (Turma da Mônica clean line, vinyl-toy gloss): the whole burger stays on screen. */
+.va-fighter--l { left: -4px; }
+.va-fighter--r { right: -4px; }
+.va-fighter__food { width: 88px; height: 88px; }
