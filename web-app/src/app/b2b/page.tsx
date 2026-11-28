@@ -154,8 +154,11 @@ export default function TodasAsParcerias() {
           cabe em muitos formatos. Conheça cada um e descubra qual é o seu.
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', justifyContent: 'center' }}>
-          {['Hotéis', 'Pousadas', 'Airbnbs', 'Restaurantes', 'Padarias', 'Barcos', 'Yoga e Spas', 'Travel Managers', 'Afiliados'].map(t => (
-            <span key={t} style={{
+          {/* Each chip jumps to its card further down (Andrew, 2026-11-28). The ids are the cards' own slugs. */}
+          {([['Hotéis', 'hotels'], ['Pousadas', 'pousadas'], ['Airbnbs', 'airbnbs'], ['Restaurantes', 'restaurants'], ['Padarias', 'bakeries'],
+            ['Barcos', 'barcos'], ['Yoga e Spas', 'bem-estar'], ['Travel Managers', 'travel-managers'], ['Afiliados', 'affiliates']] as const).map(([t, id]) => (
+            <a key={t} href={`#${id}`} className="b2b-chip" style={{
+              textDecoration: 'none',
               background: 'transparent',
               color: '#e8c77e',
               border: '1px solid rgba(201,162,87,0.55)',
@@ -165,7 +168,7 @@ export default function TodasAsParcerias() {
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               fontWeight: 600,
-            }}>{t}</span>
+            }}>{t}</a>
           ))}
         </div>
       </section>
@@ -180,6 +183,11 @@ export default function TodasAsParcerias() {
           .b2b-card p { line-height: 1.6 !important; margin-bottom: 0.9rem !important; font-size: 0.95rem !important; }
           .b2b-card .b2b-index-cta { padding: 0.75rem 1.4rem !important; }
         }
+        html:has(.b2b-card) { scroll-behavior: smooth; }
+        @media (prefers-reduced-motion: reduce) { html:has(.b2b-card) { scroll-behavior: auto; } }
+        .b2b-card { scroll-margin-top: 120px; }
+        .b2b-chip { transition: background 0.2s, color 0.2s; }
+        .b2b-chip:hover, .b2b-chip:focus-visible { background: #c9a257 !important; color: #2a1a12 !important; }
       `}</style>
       <section style={{ padding: 'clamp(3rem, 7vw, 5rem) 1.5rem' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'clamp(1.75rem, 4vw, 2.75rem)' }}>
@@ -188,6 +196,7 @@ export default function TodasAsParcerias() {
             return (
               <article
                 key={p.slug}
+                id={p.slug.split('/').pop()}
                 className="b2b-card"
                 style={{
                   background: '#fff',

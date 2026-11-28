@@ -95,6 +95,13 @@ function LangSwitch({ lang, label, dark }: { lang: CoachingLang; label: string; 
   );
 }
 
+/** Photos for "A day in the Reset" (2026-11-28). The two real ones are Dolly's own treats; the rest are the
+ *  Paradise Pantry illustrations until Dolly sends photos of her own plates. */
+const DAY_PHOTOS = [
+  '/coaching/day-breakfast.webp', '/coaching/day-snack-am.webp', '/coaching/day-lunch.webp',
+  '/coaching/day-snack-pm.webp', '/coaching/day-dinner.webp', '/coaching/day-sweet.webp',
+];
+
 export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }) {
   const t = COACHING_COPY[lang];
   // The WhatsApp sign-up speaks Portuguese, English and Spanish; Dutch readers get English.
@@ -201,8 +208,10 @@ export default function CoachingLanding({ lang = 'pt' }: { lang?: CoachingLang }
         <h2 className="fc-h2">{t.day.title}</h2>
         <p className="fc-intro">{t.day.intro}</p>
         <div className="fc-swipe fc-swipe--cards">
-          {t.day.items.map(d => (
+          {t.day.items.map((d, i) => (
             <div key={d.title} className="fc-day__card">
+              {/* Same order in every language: breakfast, morning snack, lunch, afternoon snack, dinner, the sweet. */}
+              {DAY_PHOTOS[i] && <img className="fc-day__photo" src={DAY_PHOTOS[i]} alt="" loading="lazy" width={720} height={480} />}
               <h3>{d.title}</h3>
               <p>{d.text}</p>
             </div>
@@ -511,7 +520,17 @@ const CSS = `
 
 /* Final */
 .fc-final { position: relative; padding: clamp(4rem, 9vw, 7rem) 1.25rem; overflow: hidden; background: #2a1d16; text-align: center; }
-.fc-final__bg { position: absolute; inset: 0; background: url("/dolly/hero-mata.webp") center / cover; filter: brightness(0.3) blur(2px); transform: scale(1.08); }
+.fc-final { background: #1e5d54; box-shadow: inset 0 0 0 0 transparent; }
+/* A Burle Marx bed instead of the stretched forest photo (too small for wide screens, looked pixelated): teal ground,
+   the Copacabana wave along the top, a guava stripe bed and a deep-green leaf bed in two corners. */
+.fc-final__bg { position: absolute; inset: 0; background:
+  radial-gradient(120% 90% at 105% 105%, #14453e 0 38%, transparent 38.2%),
+  repeating-linear-gradient(135deg, rgba(238,140,156,0.9) 0 10px, transparent 10px 22px) left -70px bottom -70px / 240px 240px no-repeat; }
+.fc-final__bg::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 28px;
+  background: url("/email/calcadao.png") left top / auto 28px repeat-x; opacity: 0.9; }
+.fc-final__bg::after { content: ''; position: absolute; left: -70px; bottom: -70px; width: 240px; height: 240px; border-radius: 0 999px 0 0;
+  box-shadow: 0 0 0 4px #1e5d54, 0 0 0 6px #c9a257; }
+@media (max-width: 699px) { .fc-final__bg { background: radial-gradient(120% 60% at 110% 108%, #14453e 0 30%, transparent 30.2%); } .fc-final__bg::after { display: none; } }
 .fc-final__inner { position: relative; max-width: 760px; margin: 0 auto; }
 .fc-final__kicker { color: #c9a257; letter-spacing: 4px; text-transform: uppercase; font-size: 0.82rem; font-weight: 700; margin: 0 0 0.8rem; }
 .fc-final__title { font-family: var(--font-heading); color: #fff; font-size: clamp(1.6rem, 4.4vw, 2.8rem); margin: 0 0 2rem; }
@@ -646,7 +665,11 @@ const CSS = `
 .fc-dots li { display: inline-flex; align-items: center; gap: 0.4rem; }
 .fc-dots span { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,0.3); }
 
-.fc-swipe--cards .fc-day__card { flex: 0 0 74%; max-width: 280px; background: #fff; border: 1px solid rgba(42,26,18,0.1); border-radius: 16px; padding: 1.1rem 1.2rem; }
+.fc-swipe--cards .fc-day__card { flex: 0 0 74%; max-width: 280px; background: #fff; border: 1px solid rgba(42,26,18,0.1); border-radius: 4px; padding: 0 0 1.1rem; overflow: hidden; }
+.fc-day__card h3, .fc-day__card p { padding: 0 1.2rem; }
+.fc-day__photo { display: block; width: 100%; max-width: 100%; margin: 0 0 0.9rem; aspect-ratio: 3 / 2; object-fit: cover; }
+.fc-day__card:nth-child(3n + 1) .fc-day__photo { border-radius: 0 0 999px 0 / 0 0 40% 0; }
+.fc-day__card:nth-child(3n + 2) .fc-day__photo { border-radius: 0 0 0 999px / 0 0 0 40%; }
 .fc-day__card h3 { font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; margin: 0 0 0.4rem; color: #2a1a12; }
 .fc-day__card p { margin: 0; font-size: 0.92rem; line-height: 1.6; color: #594a42; }
 
