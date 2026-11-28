@@ -30,7 +30,7 @@ const MUTED = '#a89a90';
  */
 const KICKER_MARK = '#a6832c';
 
-const HEADING_FONT = `'Unbounded','Outfit',Helvetica,Arial,sans-serif`;
+const HEADING_FONT = `'Bodoni Moda','Didot','Bodoni 72',Georgia,'Times New Roman',serif`;
 const BODY_FONT = `'Outfit',Helvetica,Arial,sans-serif`;
 
 /**
@@ -264,7 +264,7 @@ export const bulletList = (items: string[]) =>
     ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 20px;">${items
         .map(
           i =>
-            `<tr><td valign="top" style="color:${GOLD};font-size:14px;line-height:1.7;padding:0 10px 8px 0;">&#10022;</td>` +
+            `<tr><td valign="top" style="color:${GOLD};font-size:14px;line-height:1.7;padding:0 10px 8px 0;">&bull;</td>` +
             `<td style="color:${TEXT};font-family:${BODY_FONT};font-size:15px;line-height:1.7;padding:0 0 8px;">${esc(i)}</td></tr>`,
         )
         .join('')}</table>`
@@ -397,7 +397,7 @@ function factsRow(facts: EmailFact[]): string {
   const cells = list.map(f => `
     <td class="tb-fact" width="${w}%" valign="top" style="padding:0 4px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr><td class="tb-fact-in" height="96" valign="middle" bgcolor="${SAND}" style="height:96px;background:${SAND};border:1px solid ${LINE};border-radius:14px;padding:12px 10px;text-align:center;">
+        <tr><td class="tb-fact-in" height="96" valign="middle" bgcolor="${SAND}" style="height:96px;background:${SAND};border:1px solid ${LINE};border-radius:4px;padding:12px 10px;text-align:center;">
           <div class="tb-fact-num${f.num.length > 7 ? " tb-fact-num--long" : ""}" style="font-family:${HEADING_FONT};font-weight:700;font-size:${f.num.length > 7 ? 16 : 22}px;line-height:1.15;color:${GOLD_DEEP};">${esc(f.num)}</div>
           <div class="tb-fact-lbl" style="font-family:${BODY_FONT};font-size:12px;line-height:1.4;color:${TEXT};margin-top:6px;">${esc(f.label)}</div>
         </td></tr>
@@ -409,8 +409,8 @@ function factsRow(facts: EmailFact[]): string {
 export function button(label: string, href: string, bg = GOLD, ink = COCOA): string {
   return `
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:6px auto 4px;">
-      <tr><td bgcolor="${bg}" style="background:${bg};border-radius:999px;box-shadow:0 6px 16px rgba(42,26,18,0.25);">
-        <a href="${href}" style="display:inline-block;padding:16px 32px;font-family:${BODY_FONT};font-size:14px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:${ink};text-decoration:none;border-radius:999px;">${esc(label)}&nbsp;&rarr;</a>
+      <tr><td bgcolor="${bg}" style="background:${bg};">
+        <a href="${href}" style="display:inline-block;padding:17px 34px;font-family:${BODY_FONT};font-size:13px;font-weight:bold;letter-spacing:2.5px;text-transform:uppercase;color:${ink};text-decoration:none;">${esc(label)}</a>
       </td></tr>
     </table>`;
 }
@@ -420,22 +420,25 @@ function photoStrip(t: ThemeDef, base: string): string {
     <td class="tb-tile" width="33%" valign="top" style="padding:0 4px;">
       <a href="${SITE_URL}${s.path}" style="text-decoration:none;">
         <img src="${img(base, s.img)}" width="176" height="176" alt="${esc(s.alt)}"
-          style="display:block;width:100%;max-width:176px;height:auto;border:0;border-radius:14px;background:${SAND};">
-        <div style="font-family:${BODY_FONT};font-size:12px;line-height:1.35;color:${COCOA};font-weight:bold;margin-top:8px;">${esc(s.caption)}</div>
+          style="display:block;width:100%;max-width:176px;height:auto;border:0;border-radius:88px 88px 6px 6px;background:${SAND};">
+        <div style="font-family:${HEADING_FONT};font-style:italic;font-size:14px;line-height:1.3;color:${COCOA};margin-top:8px;">${esc(s.caption)}</div>
       </a>
     </td>`).join('');
   return `
     <tr><td style="padding:34px 0 0;">
-      <p style="text-align:center;color:${GOLD_DEEP};font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;margin:0 0 14px;">&#10022;&nbsp; ${esc(t.stripTitle)} &nbsp;&#10022;</p>
+      <p style="text-align:center;color:${GOLD_DEEP};font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;margin:0 0 14px;">${esc(t.stripTitle)}</p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr>${cells}</tr></table>
     </td></tr>`;
 }
 
 function originBand(base: string, t: (typeof UI)[EmailLang]): string {
   return `
-    <tr><td style="padding:30px 0 0;">
+    <tr><td style="padding:30px 0 0;line-height:0;font-size:0;">
+      <img src="${img(base, 'calcadao', 'png')}" width="580" height="20" alt="" style="display:block;width:100%;max-width:580px;height:auto;border:0;">
+    </td></tr>
+    <tr><td style="padding:0;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr><td bgcolor="${COCOA}" style="background:${COCOA};border-radius:18px;padding:26px 24px;text-align:center;">
+        <tr><td bgcolor="${COCOA}" style="background:${COCOA};padding:26px 24px;text-align:center;">
           <img src="${img(base, 'flags', 'png')}" width="66" height="36" alt="${t.flagsAlt}" style="display:block;margin:0 auto 12px;border:0;">
           <p style="font-family:${BODY_FONT};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:bold;color:${GOLD};margin:0 0 10px;">${t.originKicker}</p>
           <p style="font-family:${BODY_FONT};font-size:14px;line-height:1.7;color:#d9cfc4;margin:0;">
@@ -481,7 +484,7 @@ export function renderEmail(o: LayoutOptions): string {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light">
 <title>${esc(o.heading)}</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Unbounded:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Bodoni+Moda:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <style>
   :root { color-scheme: light; }
   a { color: ${GOLD_DEEP}; }
@@ -512,15 +515,15 @@ export function renderEmail(o: LayoutOptions): string {
 
         <tr><td>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff"
-            style="background:#ffffff;border:1px solid ${LINE};border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 18px 40px rgba(42,26,18,0.10);">
-            <tr><td bgcolor="${SAND}" style="background:${SAND};line-height:0;font-size:0;border-radius:22px 22px 0 0;overflow:hidden;">
+            style="background:#ffffff;border:1px solid ${LINE};border-radius:4px;border-collapse:separate;overflow:hidden;">
+            <tr><td bgcolor="${SAND}" style="background:${SAND};line-height:0;font-size:0;border-radius:4px 4px 0 0;overflow:hidden;">
               <img src="${esc(heroSrc)}" width="580" ${heroSize} alt="${esc(heroAlt)}"
-                style="display:block;width:100%;max-width:580px;height:auto;border:0;border-radius:22px 22px 0 0;">
+                style="display:block;width:100%;max-width:580px;height:auto;border:0;border-radius:4px 4px 0 0;">
             </td></tr>
             <tr><td height="${look ? 6 : 4}" bgcolor="${accent}" style="background:${accent};line-height:${look ? 6 : 4}px;font-size:0;">&nbsp;</td></tr>
             <tr><td class="tb-card" style="padding:32px 36px 34px;">
-              <p style="text-align:center;font-family:${BODY_FONT};font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;color:${look ? accent : GOLD_DEEP};margin:0 0 12px;">&#10022;&nbsp; ${esc(look ? look.kicker : theme.kicker)} &nbsp;&#10022;</p>
-              <h1 class="tb-h1" style="font-family:${HEADING_FONT};font-weight:700;color:${COCOA};font-size:27px;line-height:1.22;margin:0 0 22px;text-align:center;letter-spacing:-0.3px;">${esc(o.heading)}</h1>
+              <p style="text-align:center;font-family:${BODY_FONT};font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;color:${look ? accent : GOLD_DEEP};margin:0 0 12px;">${esc(look ? look.kicker : theme.kicker)}</p>
+              <h1 class="tb-h1" style="font-family:${HEADING_FONT};font-weight:600;color:${COCOA};font-size:31px;line-height:1.15;margin:0 0 22px;text-align:center;letter-spacing:-0.2px;">${esc(o.heading)}</h1>
               ${o.body.split(KICKER_MARK).join(look ? accent : GOLD_DEEP)}
               ${o.facts?.length ? factsRow(o.facts) : ''}
               ${o.cta ? button(o.cta.label, o.cta.href, accent, look ? look.accentInk || '#ffffff' : COCOA) : ''}
@@ -541,7 +544,7 @@ export function renderEmail(o: LayoutOptions): string {
           <p style="margin:0 0 12px;font-family:${BODY_FONT};line-height:2;">
             ${footerLinks.map(
               l => `<a href="${SITE_URL}${l.path}" style="color:${TEXT};font-size:12px;text-decoration:none;margin:0 4px;white-space:nowrap;">${l.label}</a>`,
-            ).join(`<span style="color:${GOLD};">&nbsp;&#10022;</span> `)}
+            ).join(`<span style="color:${GOLD};">&nbsp;&middot;</span> `)}
           </p>
           <p style="color:${MUTED};font-family:${BODY_FONT};font-size:12px;line-height:1.7;margin:0;">
             The Tropical Bakery · Itamambuca, Ubatuba — SP<br>

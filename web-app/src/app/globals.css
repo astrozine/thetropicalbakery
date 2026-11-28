@@ -1431,3 +1431,15 @@ body {
   [data-sign-top]::before { width: 3.1rem; height: 3.1rem; font-size: 1.6rem; margin-bottom: 0.7rem; }
 }
 
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Brazilian luxury redesign (2026-11-28): the emoji signposts become Dolly's gold pineapple above a heading,
+   and the small inline tiles go away. The data-sign attributes stay in the markup, so nothing else changes.
+   ════════════════════════════════════════════════════════════════════════════ */
+[data-sign]::before { display: none !important; }
+[data-sign-top]::before {
+  content: '' !important; width: 1.35rem !important; height: 2.6rem !important; border-radius: 0 !important;
+  background: url('/pineapple-gold.png') center / contain no-repeat !important; box-shadow: none !important;
+}
+/* Decorative emoji spans on customer pages (the apps and admin keep theirs). */
+.rs__emoji, .crs-trick-emoji, .crs-path-emoji, .ag-offer-emoji, .acct-spot-emoji, .acct-empty-emoji, .btp-emoji { display: none !important; }
